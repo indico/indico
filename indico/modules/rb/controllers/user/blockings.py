@@ -113,9 +113,11 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
     def _save(self):
         blocking = self._blocking
         blocking.reason = self._form.reason.data
-        # Just overwrite the whole list
-        blocking.allowed = self._form.principals.data
-        # Blocked rooms need some more work as we can't just overwrite them
+        # Update the ACL. We don't use `=` here to prevent SQLAlchemy
+        # from deleting and re-adding unchanged entries.
+        blocking.allowed |= self._form.principals.data
+        blocking.allowed &= self._form.principals.data
+        # Add/remove blocked rooms if necessary
         old_blocked = {br.room_id for br in blocking.blocked_rooms}
         new_blocked = set(self._form.blocked_rooms.data)
         added_blocks = new_blocked - old_blocked

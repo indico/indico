@@ -16,16 +16,15 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
-
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalMixin
 from indico.util.string import return_ascii
-from indico.util.user import retrieve_principal
 
 
-class BlockingPrincipal(db.Model):
+class BlockingPrincipal(PrincipalMixin, db.Model):
     __tablename__ = 'blocking_principals'
     __table_args__ = {'schema': 'roombooking'}
+    principal_backref_name = 'in_blocking_acls'
 
     id = db.Column(
         db.Integer,
@@ -36,19 +35,6 @@ class BlockingPrincipal(db.Model):
         db.ForeignKey('roombooking.blockings.id'),
         nullable=False
     )
-    _principal = db.Column(
-        'principal',
-        JSON,
-        nullable=False
-    )
-
-    @property
-    def principal(self):
-        return retrieve_principal(self._principal, legacy=False)
-
-    @principal.setter
-    def principal(self, value):
-        self._principal = value.as_principal
 
     @return_ascii
     def __repr__(self):
