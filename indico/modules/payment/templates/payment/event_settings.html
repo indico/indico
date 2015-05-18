@@ -4,7 +4,7 @@
 
 {% block content %}
     {% if settings.enabled and not enabled_plugins %}
-        <div class="warning-message-box fixed-width">
+        <div class="warning-message-box">
             <div class="message-text">
                 {% trans -%}
                     The payment module is enabled but you did not enable any payment methods. You must enable at least
@@ -47,7 +47,7 @@
     </dl>
 
     {%- if settings.enabled %}
-        <p class="fixed-width">
+        <p>
             {%- trans -%}
                 The following payment methods are available. You can enable, disable and configure them by clicking on them.
             {%- endtrans -%}

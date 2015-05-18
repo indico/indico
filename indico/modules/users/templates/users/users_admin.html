@@ -4,7 +4,7 @@
 {% block title %}{% trans %}Users{% endtrans %}{% endblock %}
 
 {%- block content %}
-    <div class="i-box-group vert fixed-width">
+    <div class="i-box-group vert">
         <div class="i-box titled">
             <div class="i-box-header">
                 <div class="i-box-title">
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="i-box-content">
-                <div class="info-message-box fixed-width">
+                <div class="info-message-box">
                     <div class="message-text">{% trans num_of_users=num_of_users %}There are {{ num_of_users }} users, {{ num_deleted_users }} of which are deleted{% endtrans %}</div>
                 </div>
                 <h2>{% trans %}Search users{% endtrans %}</h2>

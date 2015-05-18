@@ -21,6 +21,33 @@
     max-width: 800px !important;
 }
 
+.page-content-header {
+    border-bottom: 1px solid $separator-color;
+    margin-bottom: 1.2em;
+
+    h1, h2 {
+        display: inline-block;
+        vertical-align: baseline;
+    }
+
+    h2 {
+        color: $light-black;
+        margin-left: 1em;
+        font-size: 1.2em;
+    }
+}
+
+.page-content {
+    max-width: 800px;
+
+    .page-content-description {
+        @extend %font-family-title;
+        color: $dark-gray;
+        font-size: 1.2em;
+        margin-bottom: 2em;
+    }
+}
+
 .titled-rule {
     color: $dark-gray;
     font-size: 0.9em;
@@ -55,6 +82,10 @@
     margin-left: auto;
     margin-right: auto;
     width: 1000px;
+
+    .page-content {
+        max-width: 1000px;
+    }
 }
 
 .layout-wrapper {

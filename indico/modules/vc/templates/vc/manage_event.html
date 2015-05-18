@@ -3,10 +3,10 @@
 
 {% block title %}{% trans %}Current videoconference rooms{% endtrans %}{% endblock %}
 {% block content %}
-    <div class="module-vc vc-management fixed-width" id="vc-info-container">
+    <div class="module-vc vc-management" id="vc-info-container">
         {% if plugins %}
             {% if event_vc_rooms %}
-                <table class="i-table-widget fixed-width">
+                <table class="i-table-widget">
                     <thead>
                          <tr>
                             <th class="small-column"></th>
@@ -59,7 +59,7 @@
                     </tbody>
                 </table>
             {% else %}
-                <div class="info-message-box fixed-width">
+                <div class="info-message-box">
                     <div class="message-text">{% trans %}No videoconference rooms have been added yet.{% endtrans %}</div>
                 </div>
             {% endif %}

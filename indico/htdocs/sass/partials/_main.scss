@@ -222,29 +222,3 @@ div.impersonation-header {
         content: "\3b";
     }
 }
-
-
-/* Header for new pages */
-.content-page-header {
-    border-bottom: 1px solid $separator-color;
-    margin-bottom: 1.2em;
-
-    h1, h2 {
-        display: inline-block;
-        vertical-align: baseline;
-    }
-
-    h2 {
-        color: $light-black;
-        margin-left: 1em;
-        font-size: 1.2em;
-    }
-}
-
-.content-page-description {
-    @extend %font-family-title;
-    max-width: 800px;
-    color: $dark-gray;
-    font-size: 1.2em;
-    margin-bottom: 2em;
-}

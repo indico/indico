@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="fixed-width">
+    <div>
         {% for definition in definitions %}
             {% set active = definition.is_active(event) %}
             <div class="action-box">
