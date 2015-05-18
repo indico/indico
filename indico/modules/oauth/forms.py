@@ -16,19 +16,18 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.users.views import WPUser
-from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin
+from wtforms.fields import StringField, TextAreaField
+from wtforms.validators import DataRequired, ValidationError
+
+from indico.modules.oauth.models.clients import OAuthClient
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
 
 
-class WPOAuthJinjaMixin(WPJinjaMixin):
-    template_prefix = 'oauth/'
+class OAuthAdminAddApplicationForm(IndicoForm):
+    name = StringField(_("Name"), [DataRequired()])
+    description = TextAreaField(_("Description"))
 
-
-class WPOAuthAdmin(WPOAuthJinjaMixin, WPAdminsBase):
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['oauth'].setActive()
-
-
-class WPOAuthUserProfile(WPOAuthJinjaMixin, WPUser):
-    pass
+    def validate_name(self, field):
+        if OAuthClient.find(name=field.data).count():
+            raise ValidationError(_("There is already an application with this name"))

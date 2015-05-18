@@ -1,0 +1,51 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {%- trans %}OAuth settings{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <div id="inPlaceAddConsumer" style="margin-bottom: 1em;"></div>
+
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {%- trans %}Applications{% endtrans -%}
+            </div>
+            <div class="i-box-buttons toolbar right">
+                <a href="{{ url_for('.admin_register') }}" class="i-button icon-plus">
+                    {%- trans %}Register new application{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="i-box-content">
+            <ul class="group-list with-buttons">
+                {% for client in clients %}
+                    <li>
+                        <div class="list-item-title">
+                            {{ client.name }}
+                            <div data-consumer-key="{{ client.client_id }}" aria-hidden="true" style="margin:0" class="i-button i-button-mini icon-remove icon-only right" title="{% trans %}Delete this client.{% endtrans %}"></div>
+                            <div data-consumer-key="{{ client.client_id }}" aria-hidden="true" style="margin:0" class="i-button i-button-mini icon-trust ${'trusted' if client.is_trusted else ''} icon-only right"></div>
+                        </div>
+                        <div class="list-item-content">
+                            <span class="list-item-content-title">
+                                {% trans %}client id{% endtrans %}
+                            </span>
+                            <span class="list-item-content-data">
+                                {{ client.client_id }}
+                            </span>
+                        </div>
+                        <div class="list-item-content">
+                            <span class="list-item-content-title">
+                                {% trans %}client secret{% endtrans %}
+                            </span>
+                            <span class="list-item-content-data">
+                                {{ client.client_secret }}
+                            </span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

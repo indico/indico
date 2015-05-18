@@ -16,9 +16,35 @@
 
 from __future__ import unicode_literals
 
+from flask import redirect
+
 from indico.core.index import Catalog
+
 from indico.modules.users.controllers import RHUserBase
-from indico.modules.oauth.views import WPOAuthUserProfile
+from indico.modules.oauth.forms import OAuthAdminAddApplicationForm
+from indico.modules.oauth.models.clients import OAuthClient
+from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
+from indico.web.flask.util import url_for
+from MaKaC.webinterface.rh.admins import RHAdminBase
+
+
+class RHOAuthAdmin(RHAdminBase):
+    """OAuth server administration settings"""
+
+    def _process(self):
+        clients = OAuthClient.find_all()
+        return WPOAuthAdmin.render_template('admin.html', clients=clients)
+
+
+class RHOAuthAdminAddApplication(RHAdminBase):
+    """Handles OAuth application registration"""
+
+    def _process(self):
+        form = OAuthAdminAddApplicationForm()
+        if form.validate_on_submit():
+            # TODO: insert new OAuth client
+            return redirect(url_for('.admin'))
+        return WPOAuthAdmin.render_template('admin_register.html', form=form, back_url=url_for('.admin'))
 
 
 class RHOAuthUserProfile(RHUserBase):

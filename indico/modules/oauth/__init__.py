@@ -18,7 +18,14 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.menu import MenuItem
+
+
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'oauth', SideMenuItem('OAuth', url_for('oauth.admin'))
 
 
 @signals.users.profile_sidemenu.connect

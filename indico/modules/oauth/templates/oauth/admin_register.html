@@ -1,0 +1,19 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% block title %}
+    {%- trans %}OAuth settings{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {%- trans %}Register new application{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(orientation='vertical') }}
+    {{ form_rows(form) }}
+    {% call form_footer() %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Register{% endtrans %}">
+        <a href="{{ back_url }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}
