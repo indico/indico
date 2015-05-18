@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from uuid import uuid4
+
 from indico.core.db import db
 
 
@@ -96,3 +98,9 @@ class OAuthClient(db.Model):
 
     def __repr__(self):
         return '<OAuthClient({}, {}, {})>'.format(self.id, self.name, self.client_id)
+
+    @classmethod
+    def create(cls, name, description=None):
+        client_id = str(uuid4())
+        client_secret = str(uuid4())
+        return OAuthClient(name=name, description=description, client_id=client_id, client_secret=client_secret)

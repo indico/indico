@@ -16,14 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect
+from flask import redirect, flash
 
 from indico.core.index import Catalog
 
+from indico.core.db import db
 from indico.modules.users.controllers import RHUserBase
-from indico.modules.oauth.forms import OAuthAdminAddApplicationForm
+from indico.modules.oauth.forms import ApplicationForm
 from indico.modules.oauth.models.clients import OAuthClient
 from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
@@ -36,13 +38,15 @@ class RHOAuthAdmin(RHAdminBase):
         return WPOAuthAdmin.render_template('admin.html', clients=clients)
 
 
-class RHOAuthAdminAddApplication(RHAdminBase):
+class RHOAuthAdminRegisterApplication(RHAdminBase):
     """Handles OAuth application registration"""
 
     def _process(self):
-        form = OAuthAdminAddApplicationForm()
+        form = ApplicationForm()
         if form.validate_on_submit():
-            # TODO: insert new OAuth client
+            client = OAuthClient.create(name=form.name.data, description=form.description.data)
+            db.session.add(client)
+            flash(_("Application {} registered successfully").format(client.name), 'success')
             return redirect(url_for('.admin'))
         return WPOAuthAdmin.render_template('admin_register.html', form=form, back_url=url_for('.admin'))
 

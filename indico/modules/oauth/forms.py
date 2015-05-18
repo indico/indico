@@ -24,7 +24,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 
 
-class OAuthAdminAddApplicationForm(IndicoForm):
+class ApplicationForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
 
