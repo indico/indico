@@ -298,10 +298,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         repeat_interval = form.repeat_interval.data
         day_start_dt = datetime.combine(start_dt.date(), time())
         day_end_dt = datetime.combine(end_dt.date(), time(23, 59))
-        today_start_dt = datetime.combine(date.today(), time())
         flexible_start_dt = day_start_dt - timedelta(days=flexible_days)
-        if not session.user.is_admin:
-            flexible_start_dt = max(today_start_dt, flexible_start_dt)
         flexible_end_dt = day_end_dt + timedelta(days=flexible_days)
 
         occurrences = ReservationOccurrence.find_all(
