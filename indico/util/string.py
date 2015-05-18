@@ -190,7 +190,7 @@ def remove_tags(text):
     return remove_extra_spaces(pattern.sub(' ', text))
 
 
-def render_markdown(text, escape_latex_math=True, **kwargs):
+def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
     """ Mako markdown to html filter """
     if escape_latex_math:
         math_segments = []
@@ -202,6 +202,8 @@ def render_markdown(text, escape_latex_math=True, **kwargs):
 
         text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
 
+    if md is not None:
+        return re.sub(placeholder, lambda _: math_segments.pop(0), md(text))
     res = markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs)
 
     if escape_latex_math:

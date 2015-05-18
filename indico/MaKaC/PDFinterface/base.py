@@ -48,6 +48,7 @@ from mako.template import Template
 
 from indico.core.config import Config
 from indico.util import mdx_latex
+from indico.util.string import render_markdown
 import markdown
 from PIL import Image as PILImage
 from indico.util.string import sanitize_for_platypus, to_unicode
@@ -710,17 +711,8 @@ class PDFLaTeXBase(object):
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
-        # Escape LaTeX before markdown
         def _convert_markdown(text):
-            math_segments = []
-            placeholder = u"\uE000"
-
-            def _math_replace(m):
-                math_segments.append(m.group(0))
-                return placeholder
-
-            text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
-            return re.sub(placeholder, lambda _: math_segments.pop(0), md.convert(text))
+            return render_markdown(text, md=md.convert)
 
         self._args = {
             'md_convert': _convert_markdown
