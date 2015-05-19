@@ -41,7 +41,7 @@ from indico.util.i18n import gettext_context, ngettext_context, babel, _
 from indico.core.logger import Logger
 
 from indico.core.auth import multipass
-from indico.core.celery import configure_celery
+from indico.core.celery import celery
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
@@ -335,7 +335,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
     app.config['TESTING'] = testing
     fix_root_path(app)
     configure_app(app, set_path)
-    configure_celery(app)
+    celery.init_app(app)
 
     babel.init_app(app)
     multipass.init_app(app)
