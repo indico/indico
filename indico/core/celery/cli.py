@@ -28,6 +28,7 @@ class IndicoCeleryCommand(Command):
     """Runs the celery commands within the indico environment"""
 
     capture_all_args = True
+    help_args = ()
 
     def __call__(self, app=None, *args, **kwargs):
         # We don't need no request context here.
