@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import os
+
 from celery import Celery
 
 from indico.core.config import Config
@@ -40,15 +42,32 @@ celery.Task = IndicoTask
 
 
 def configure_celery(app):
-    broker_url = Config.getInstance().getCeleryBroker()
-    if not broker_url:
+    cfg = Config.getInstance()
+    broker_url = cfg.getCeleryBroker()
+    if not broker_url and not app.config['TESTING']:
         raise ValueError('Celery broker URL is not set')
     celery.conf['BROKER_URL'] = broker_url
-    celery.conf['CELERY_RESULT_BACKEND'] = Config.getInstance().getCeleryResultBackend() or broker_url
-    celery.conf['CELERY_RESULT_SERIALIZER'] = 'yaml'
-    celery.conf['CELERY_TASK_SERIALIZER'] = 'yaml'
-    celery.conf['CELERY_ACCEPT_CONTENT'] = ['yaml']
-    celery.conf['CELERYD_HIJACK_ROOT_LOGGER'] = app.debug  # in debug mode logging on stdout is nicer!
+    celery.conf['CELERY_RESULT_BACKEND'] = cfg.getCeleryResultBackend() or broker_url
+    celery.conf['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(cfg.getTempDir(), 'celerybeat-schedule')
+    celery.conf['CELERYD_HIJACK_ROOT_LOGGER'] = False
+    celery.conf['CELERY_TIMEZONE'] = cfg.getDefaultTimezone()
+    celery.conf['CELERY_STORE_ERRORS_EVEN_IF_IGNORED'] = True
+    celery.conf['CELERY_REDIRECT_STDOUTS'] = not app.debug
+    # Pickle isn't pretty but that way we can pass along all types (tz-aware datetimes, sets, etc.)
+    celery.conf['CELERY_RESULT_SERIALIZER'] = 'pickle'
+    celery.conf['CELERY_TASK_SERIALIZER'] = 'pickle'
+    celery.conf['CELERY_ACCEPT_CONTENT'] = ['pickle']
+    # Send emails about failed tasks
+    celery.conf['CELERY_SEND_TASK_ERROR_EMAILS'] = True
+    celery.conf['ADMINS'] = [('Admin', cfg.getSupportEmail())]
+    celery.conf['SERVER_EMAIL'] = 'Celery <{}>'.format(cfg.getNoReplyEmail())
+    celery.conf['EMAIL_HOST'] = cfg.getSmtpServer()[0]
+    celery.conf['EMAIL_PORT'] = cfg.getSmtpServer()[1]
+    celery.conf['EMAIL_USE_TLS'] = cfg.getSmtpUseTLS()
+    celery.conf['EMAIL_HOST_USER'] = cfg.getSmtpLogin() or None
+    celery.conf['EMAIL_HOST_PASWORD'] = cfg.getSmtpPassword() or None
+    # Allow indico.conf to override settings
+    celery.conf.update(cfg.getCeleryConfig())
     assert celery.flask_app is None
     celery.flask_app = app
 

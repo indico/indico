@@ -534,6 +534,7 @@ class Config:
         'DefaultTimezone'           : 'UTC',
         'CeleryBroker'              : None,
         'CeleryResultBackend'       : None,
+        'CeleryConfig'              : {},
     }
 
     if sys.platform == 'win32':

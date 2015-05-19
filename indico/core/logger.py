@@ -230,6 +230,7 @@ class Logger:
                 'indico': ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
                 'other': ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
                 'celery': ("FileHandler", "('%s', 'a')" % cls._log_path('celery.log'), 'DEBUG'),
+                'stderr': ('StreamHandler', '()', 'DEBUG'),
                 'smtp': (
                     "handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
                     % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")

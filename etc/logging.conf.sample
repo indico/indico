@@ -2,10 +2,10 @@
 keys=root,celery
 
 [handlers]
-keys=indico,other,celery,smtp
+keys=indico,other,celery,stderr,smtp
 
 [formatters]
-keys=defaultFormatter,mailFormatter
+keys=defaultFormatter,simpleFormatter,mailFormatter
 
 # For deactivating a handler, remove its entry from
 # the list below.
@@ -15,7 +15,7 @@ handlers=indico,other,smtp
 
 [logger_celery]
 level=INFO
-handlers=celery,smtp
+handlers=celery,stderr
 qualname=celery
 
 # By default, the args are taken from the indico.conf file.
@@ -50,10 +50,19 @@ level=ERROR
 formatter=mailFormatter
 #args=('','',[],'')
 
+[handler_stderr]
+class=StreamHandler
+level=NOTSET
+formatter=simpleFormatter
+
 [formatter_mailFormatter]
 format=%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s
 datefmt=
 
 [formatter_defaultFormatter]
 format=%(asctime)s  %(levelname)-7s  %(request_id)s  %(name)-25s %(message)s
+datefmt=
+
+[formatter_simpleFormatter]
+format=%(asctime)s  %(levelname)-7s  %(name)-25s %(message)s
 datefmt=
