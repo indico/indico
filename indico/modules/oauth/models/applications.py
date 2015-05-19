@@ -93,6 +93,10 @@ class OAuthApplication(db.Model):
         return []        
 
     @property
+    def locator(self):
+        return {'id': self.id}
+
+    @property
     def redirect_uris(self):
         if self._redirect_uris:
             return self._default_redirect_uris.split()
