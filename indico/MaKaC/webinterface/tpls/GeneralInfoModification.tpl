@@ -33,12 +33,6 @@
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Timezone")}</span></td>
-      <td bgcolor="white" width="50%">&nbsp;
-           <select name="timezone">${ timezone }</select>
-      </td>
-    </tr>
-    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Address")}</span></td>
       <td bgcolor="white" width="100%">
         <table width="100%">

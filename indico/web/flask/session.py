@@ -26,12 +26,11 @@ from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
-from indico.core.db import DBMgr
+from indico.core.config import Config
 from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _
 from MaKaC.common.cache import GenericCache
-from MaKaC.common.info import HelperMaKaCInfo
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -118,8 +117,7 @@ class IndicoSession(BaseSession):
             return self['_timezone']
         if '_avatarId' not in self:
             return 'LOCAL'
-        with DBMgr.getInstance().global_connection():
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        return Config.getInstance().getDefaultTimezone()
 
     @timezone.setter
     def timezone(self, tz):

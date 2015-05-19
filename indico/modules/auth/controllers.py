@@ -288,7 +288,7 @@ class RHRegister(RH):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         timezone = session.timezone
         if timezone == 'LOCAL':
-            timezone = minfo.getTimezone()
+            timezone = Config.getInstance().getDefaultTimezone()
         user.settings.set('timezone', timezone)
         user.settings.set('lang', session.lang or minfo.getLang())
         handler.update_user(user, form)

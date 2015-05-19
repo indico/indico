@@ -2338,7 +2338,7 @@ class WConferenceLog(wcomponents.WTemplated):
     def __init__(self, conference):
         wcomponents.WTemplated.__init__(self)
         self.__conf = conference
-        self._tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        self._tz = Config.getInstance().getDefaultTimezone()
         if not self._tz:
             self._tz = 'UTC'
 

@@ -22,7 +22,6 @@ from datetime import datetime
 from pytz import timezone
 from xml.sax.saxutils import quoteattr, escape
 from indico.core.config import Config
-from MaKaC.i18n import _
 
 
 def convertTime(d,tz):

@@ -385,3 +385,11 @@ OAuthAccessTokenTTL = 10000
 #AuthProviders = {}
 #IdentityProviders = {}
 #ProviderMap = {}
+
+#------------------------------------------------------------------------------
+# GLOBAL DEFAULTS
+#------------------------------------------------------------------------------
+
+# The timezone that is used by default. This also affects the timezone used by
+# periodic tasks.
+#DefaultTimezone = 'UTC'

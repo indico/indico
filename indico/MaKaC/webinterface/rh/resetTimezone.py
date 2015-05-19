@@ -16,16 +16,16 @@
 
 from flask import session, request, redirect
 
+from indico.core.config import Config
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 import MaKaC.webinterface.rh.base as base
-from MaKaC.common.info import HelperMaKaCInfo
 
 
 class RHResetTZ(base.RH):
     def _process(self):
         if 'activeTimezone' not in request.values or request.values['activeTimezone'] == 'My':
-            tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+            tz = Config.getInstance().getDefaultTimezone()
             if session.user:
                 tz = session.user.settings.get('timezone', tz)
         else:

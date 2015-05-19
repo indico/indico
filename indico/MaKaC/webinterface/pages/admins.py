@@ -22,10 +22,8 @@ from operator import methodcaller
 from pytz import timezone
 
 # MaKaC
-import MaKaC.common.indexes as indexes
 import MaKaC.common.info as info
 import MaKaC.conference as conference
-import MaKaC.user as user
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -35,7 +33,6 @@ from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
 from MaKaC.i18n import _
-from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
@@ -170,10 +167,7 @@ class WAdmins(wcomponents.WTemplated):
                 vars["address"] = "%s (%s)"%(vars["address"], minfo.getCountry())
             else:
                 vars["address"] = "%s"%minfo.getCountry()
-        try:
-            vars["timezone"] = minfo.getTimezone()
-        except:
-            vars["timezone"] = 'UTC'
+        vars["timezone"] = Config.getInstance().getDefaultTimezone()
         vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
         iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
         iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
@@ -226,11 +220,6 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         vars["organisation"] = genInfo.getOrganisation()
         vars["city"] = genInfo.getCity()
         vars["country"] = genInfo.getCountry()
-        try:
-            selected_tz = genInfo.getTimezone()
-        except:
-            selected_tz = 'UTC'
-        vars["timezone"] = TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
         vars["language"] = genInfo.getLang()
         vars["language_list"] = get_all_locales()
         return vars

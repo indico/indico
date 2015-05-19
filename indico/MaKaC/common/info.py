@@ -44,7 +44,6 @@ class MaKaCInfo(Persistent):
         self._city = ""
         self._country = ""
         self._lang = "en_GB"
-        self._tz = ""
 
         # Account-related features
         self._authorisedAccountCreation = True
@@ -209,17 +208,10 @@ class MaKaCInfo(Persistent):
     def setCountry( self, newCountry ):
         self._country = newCountry
 
-    def getTimezone( self ):
-        try:
-            return self._timezone
-        except:
-            self.setTimezone('UTC')
-            return 'UTC'
-
-    def setTimezone( self, tz=None):
-        if not tz:
-            tz = 'UTC'
-        self._timezone = tz
+    def getTimezone(self):
+        msg = 'MaKaCinfo.getTimezone() is deprecated; use Config.getInstance().getDefaultTimezone() instead'
+        warnings.warn(msg, DeprecationWarning, 2)
+        return Config.getInstance().getDefaultTimezone()
 
     def getDefaultConference( self ):
         try:

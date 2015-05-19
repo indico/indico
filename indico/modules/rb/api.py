@@ -37,7 +37,6 @@ from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from MaKaC.common.info import HelperMaKaCInfo
 
 
 class RoomBookingHookBase(HTTPAPIHook):
@@ -356,7 +355,7 @@ def _ical_serialize_reservation(cal, data, now):
 
 def _add_server_tz(dt):
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()))
+        return dt.replace(tzinfo=get_timezone(Config.getInstance().getDefaultTimezone()))
     return dt
 
 

@@ -1074,8 +1074,7 @@ class WConferenceCreation( wcomponents.WTemplated ):
             vars["sMinute_"][i] = vars.get("sMinute_%s"%i,"00")
             vars["dur_"][i] = vars.get("dur_%s"%i,"60")
         vars["nbDates"] = vars.get("nbDates",1)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        seltitle = minfo.getTimezone()
+        seltitle = Config.getInstance().getDefaultTimezone()
         if self._categ:
             seltitle= self._categ.getTimezone()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(seltitle)
@@ -1518,13 +1517,8 @@ class WCategoryCreation(wcomponents.WTemplated):
 
                 styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId, selected, styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        try:
-           default_tz = minfo.getTimezone()
-        except:
-           default_tz = 'UTC'
-
+        default_tz = Config.getInstance().getDefaultTimezone()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(default_tz)
         vars["categTitle"] = self.__target.getTitle()
         if self.__target.isProtected():

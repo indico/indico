@@ -30,8 +30,8 @@ from babel.numbers import format_number as _format_number
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from dateutil.relativedelta import relativedelta
 
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
+from indico.core.config import Config
 from indico.util.i18n import get_current_locale, _
 
 
@@ -55,13 +55,13 @@ def server_to_utc(dt):
 
     The given datetime **MUST** be naive but already contain the correct time in the server's TZ.
     """
-    server_tz = get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+    server_tz = get_timezone(Config.getInstance().getDefaultTimezone())
     return server_tz.localize(dt).astimezone(pytz.utc)
 
 
 def utc_to_server(dt):
     """Converts the given UTC datetime to the server's TZ."""
-    server_tz = get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+    server_tz = get_timezone(Config.getInstance().getDefaultTimezone())
     return dt.astimezone(server_tz)
 
 
@@ -77,7 +77,7 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     elif not timezone and dt.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
     elif server_tz:
-        timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        timezone = Config.getInstance().getDefaultTimezone()
 
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
@@ -101,7 +101,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     if not timezone and t.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
     elif server_tz:
-        timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        timezone = Config.getInstance().getDefaultTimezone()
     if timezone:
         timezone = get_timezone(timezone)
 

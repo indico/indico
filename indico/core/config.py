@@ -25,6 +25,7 @@ import socket
 import sys
 import urlparse
 
+import pytz
 from flask import request, current_app
 from werkzeug.urls import url_parse
 
@@ -530,6 +531,7 @@ class Config:
         'LocalIdentities'           : True,
         'ExternalRegistrationURL'   : '',
         'SecretKey'                 : None,
+        'DefaultTimezone'           : 'UTC',
         'CeleryBroker'              : None,
         'CeleryResultBackend'       : None,
     }
@@ -676,6 +678,9 @@ class Config:
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
+
+        if self.getDefaultTimezone() not in pytz.all_timezones_set:
+            raise ValueError('Invalid default timezone: {}'.format(self.getDefaultTimezone()))
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf

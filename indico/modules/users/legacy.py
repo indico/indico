@@ -16,9 +16,7 @@
 
 from persistent import Persistent
 
-from indico.core.auth import multipass
-from indico.modules.groups import GroupProxy
-from indico.modules.rb.util import rb_is_admin
+from indico.core.config import Config
 from indico.modules.users import User, logger
 from indico.modules.auth import Identity
 from indico.util.caching import memoize_request
@@ -186,7 +184,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @encode_utf8
     def getTimezone(self):
-        default = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        default = Config.getInstance().getDefaultTimezone()
         return self.user.settings.get('timezone', default) if self.user else default
 
     def getDisplayTZMode(self):

@@ -249,7 +249,7 @@ class WHeader(WTemplated):
             if self._locTZ:
                 return self._locTZ
             else:
-                return info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+                return Config.getInstance().getDefaultTimezone()
         else:
             return timezone
 
