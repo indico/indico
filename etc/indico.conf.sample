@@ -393,3 +393,37 @@ OAuthAccessTokenTTL = 10000
 # The timezone that is used by default. This also affects the timezone used by
 # periodic tasks.
 #DefaultTimezone = 'UTC'
+
+
+#------------------------------------------------------------------------------
+# CELERY
+#------------------------------------------------------------------------------
+
+# Indico uses Celery to run time-consuming background tasks and periodic jobs.
+# You must configure a Celery "broker" which is used to  communicate between
+# Indico and the worker(s).
+# We recommend Redis as it is very easy to set up. For details, see the Celery
+# documentation:
+# http://celery.readthedocs.org/en/latest/getting-started/brokers/redis.html
+#CeleryBroker = 'redis://unused:password@localhost:6379/0'
+#
+# By default, task results are stored in the broker backend, but you can
+# override it.
+#CeleryResultBackend = None
+#
+# By default, all periodic tasks are enabled and use a schedule that is
+# considered appropriate by the Indico developers.  You can override this
+# for specific tasks using the `ScheduledTaskOverride` dict.  The key is the
+# name of the task and the value can be one of the following:
+# - `None` or `False`: Disables the task completely
+# - A dictionary, as described in the Celery documentation
+#   http://celery.readthedocs.org/en/latest/userguide/periodic-tasks.html#available-fields
+#   The `task` key is not necessary in this case, as it is set automatically.
+# - A `timedelta` or `crontab` object which will just override the schedule
+#   and not touch any other options of the task.
+#ScheduledTaskOverride = {}
+#
+# You can use the `CeleryConfig` settings to specify/override any config option
+# supported by Celery. For the full list of options, see the Celery docs at
+# http://celery.readthedocs.org/en/latest/configuration.html
+#CeleryConfig = {}
