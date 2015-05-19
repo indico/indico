@@ -52,7 +52,7 @@ import tempfile
 import copy
 import stat
 from datetime import datetime, timedelta
-from flask import session, request
+from flask import session, request, has_request_context
 
 from MaKaC.contributionReviewing import ReviewManager
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -3706,7 +3706,7 @@ class Conference(CommonObjectBase, Locatable):
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(request.remote_addr):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
 
         # Managers have always access
@@ -6172,7 +6172,7 @@ class Session(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(request.remote_addr):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -8899,7 +8899,7 @@ class Contribution(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(request.remote_addr):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -10906,7 +10906,7 @@ class Material(CommonObjectBase):
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(request.remote_addr):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -11355,7 +11355,7 @@ class Resource(CommonObjectBase):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(request.remote_addr):
+        if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
