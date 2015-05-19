@@ -25,7 +25,7 @@ from indico.web.menu import MenuItem
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'oauth', SideMenuItem('OAuth', url_for('oauth.admin'))
+    return 'applications', SideMenuItem('Applications', url_for('oauth.apps'))
 
 
 @signals.users.profile_sidemenu.connect

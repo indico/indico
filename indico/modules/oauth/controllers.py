@@ -23,7 +23,7 @@ from indico.core.index import Catalog
 from indico.core.db import db
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.oauth.forms import ApplicationForm
-from indico.modules.oauth.models.clients import OAuthClient
+from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -35,39 +35,39 @@ class RHOAuthAdmin(RHAdminBase):
     """OAuth server administration settings"""
 
     def _process(self):
-        clients = OAuthClient.find_all()
-        return WPOAuthAdmin.render_template('admin.html', clients=clients)
+        applications = OAuthApplication.find().order_by(db.func.lower(OAuthApplication.name)).all()
+        return WPOAuthAdmin.render_template('apps.html', applications=applications)
 
 
-class RHOAuthAdminApplicationDetails(RHAdminBase):
+class RHOAuthAdminApplication(RHAdminBase):
     """Handles application details page"""
 
     def _checkParams(self):
-        self.client = OAuthClient.get(request.view_args['id'])
+        self.application = OAuthApplication.get(request.view_args['id'])
 
     def _process(self):
-        defaults = FormDefaults(name=self.client.name, description=self.client.description)
-        form = ApplicationForm(obj=defaults, client=self.client)
+        defaults = FormDefaults(name=self.application.name, description=self.application.description)
+        form = ApplicationForm(obj=defaults, application=self.application)
         if form.validate_on_submit():
-            self.client.name = form.name.data
-            self.client.description = form.description.data
-            flash(_("Application {} was modified").format(self.client.name), 'success')
-            return redirect(url_for('.admin'))
-        return WPOAuthAdmin.render_template('app_details.html', client=self.client, form=form,
-                                            back_url=url_for('.admin'))
+            self.application.name = form.name.data
+            self.application.description = form.description.data
+            flash(_("Application {} was modified").format(self.application.name), 'success')
+            return redirect(url_for('.apps'))
+        return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form,
+                                            back_url=url_for('.apps'))
 
 
-class RHOAuthAdminRegisterApplication(RHAdminBase):
+class RHOAuthAdminApplicationNew(RHAdminBase):
     """Handles OAuth application registration"""
 
     def _process(self):
         form = ApplicationForm()
         if form.validate_on_submit():
-            client = OAuthClient.create(name=form.name.data, description=form.description.data)
-            db.session.add(client)
-            flash(_("Application {} registered successfully").format(client.name), 'success')
-            return redirect(url_for('.admin'))
-        return WPOAuthAdmin.render_template('admin_register.html', form=form, back_url=url_for('.admin'))
+            application = OAuthApplication.create(name=form.name.data, description=form.description.data)
+            db.session.add(application)
+            flash(_("Application {} registered successfully").format(application.name), 'success')
+            return redirect(url_for('.apps'))
+        return WPOAuthAdmin.render_template('app_new.html', form=form, back_url=url_for('.apps'))
 
 
 class RHOAuthUserProfile(RHUserBase):

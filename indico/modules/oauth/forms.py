@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.modules.oauth.models.clients import OAuthClient
+from indico.core.db import db
+from indico.modules.oauth.models.applications import OAuthApplication
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 
@@ -29,12 +30,12 @@ class ApplicationForm(IndicoForm):
     description = TextAreaField(_("Description"))
 
     def __init__(self, *args, **kwargs):
-        self.client = kwargs.pop('client', None)
+        self.application = kwargs.pop('application', None)
         super(ApplicationForm, self).__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = OAuthClient.find(name=field.data)
-        if self.client:
-            query = query.filter(OAuthClient.name != self.client.name)
+        query = OAuthApplication.find(name=field.data)
+        if self.application:
+            query = query.filter(db.func.lower(OAuthApplication.name) != self.application.name.lower())
         if query.count():
             raise ValidationError(_("There is already an application with this name"))

@@ -1,9 +1,10 @@
-{% extends 'oauth/admin_register.html' %}
+{% extends 'oauth/app_new.html' %}
 
 {% block subtitle %}
-    {%- trans %}Modify application{% endtrans -%}
+    {{ application.name }}
+{% endblock %}
 {% endblock %}
 
 {% block action_button %}
-    {%- trans %}Save{% endtrans -%}
+    {%- trans %}Update{% endtrans -%}
 {% endblock %}

@@ -16,16 +16,23 @@
 
 from uuid import uuid4
 
+from sqlalchemy.ext.declarative import declared_attr
+
 from indico.core.db import db
+from indico.util.string import return_ascii
 
 
-class OAuthClient(db.Model):
-    """OAuth clients registered in Indico"""
+class OAuthApplication(db.Model):
+    """OAuth applications registered in Indico"""
 
-    __tablename__ = 'clients'
-    __table_args__ = ({'schema': 'oauth'})
+    __tablename__ = 'applications'
 
-    #: the unique id of the client
+    @declared_attr
+    def __table_args__(cls):
+        return (db.Index('ix_uq_applications_name_lower', db.func.lower(cls.name), unique=True),
+                {'schema': 'oauth'})
+
+    #: the unique id of the application
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -37,46 +44,41 @@ class OAuthClient(db.Model):
     )
     #: human readable description
     description = db.Column(
-        db.Text
+        db.Text,
+        nullable=False,
+        default=''
     )
-    #: identifier issued to the client during the registration process
+    #: the OAuth client_id
     client_id = db.Column(
         db.String,
         unique=True,
         nullable=False,
     )
-    #: the client secret
+    #: the OAuth client_secret
     client_secret = db.Column(
         db.String,
-        unique=True,
         nullable=False
     )
-    #: whether the client is confidential or public
-    is_confidential = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    #: whether the client is enabled or disabled
+    #: whether the application is enabled or disabled
     is_enabled = db.Column(
         db.Boolean,
         nullable=False,
         default=True
     )
-    #: whether the client can access user data without asking for permission
+    #: whether the application can access user data without asking for permission
     is_trusted = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
-    #: default scopes the client may request access to
-    _default_scopes = db.Column(db.Text)
-    #: absolute URIs that a client may use to redirect to after authorization
-    _redirect_uris = db.Column(db.Text)
+    #: default scopes the application may request access to
+    _default_scopes = db.Column('default_scopes', db.Text)
+    #: absolute URIs that a application may use to redirect to after authorization
+    _redirect_uris = db.Column('redirect_uris', db.Text)
 
     @property
     def client_type(self):
-        return 'confidential' if self.is_confidential else 'public'
+        return 'public'
 
     @property
     def default_redirect_uri(self):
@@ -96,11 +98,12 @@ class OAuthClient(db.Model):
             return self._default_redirect_uris.split()
         return []
 
+    @return_ascii
     def __repr__(self):
-        return '<OAuthClient({}, {}, {})>'.format(self.id, self.name, self.client_id)
+        return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
 
     @classmethod
     def create(cls, name, description=None):
         client_id = str(uuid4())
         client_secret = str(uuid4())
-        return OAuthClient(name=name, description=description, client_id=client_id, client_secret=client_secret)
+        return OAuthApplication(name=name, description=description, client_id=client_id, client_secret=client_secret)

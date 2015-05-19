@@ -18,17 +18,16 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.oauth.controllers import (RHOAuthUserProfile, RHOAuthAdmin, RHOAuthAdminRegisterApplication,
-                                              RHOAuthAdminApplicationDetails)
+from indico.modules.oauth.controllers import (RHOAuthUserProfile, RHOAuthAdmin, RHOAuthAdminApplicationNew,
+                                              RHOAuthAdminApplication)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='templates')
 
 # Server administration
-_bp.add_url_rule('/admin/oauth/', 'admin', RHOAuthAdmin)
-_bp.add_url_rule('/admin/oauth/register/', 'admin_register', RHOAuthAdminRegisterApplication, methods=('GET', 'POST'))
-_bp.add_url_rule('/admin/oauth/<int:id>', 'app_details',
-                 RHOAuthAdminApplicationDetails, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/apps', 'apps', RHOAuthAdmin)
+_bp.add_url_rule('/admin/apps/new/', 'app_new', RHOAuthAdminApplicationNew, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/apps/<int:id>', 'app_details', RHOAuthAdminApplication, methods=('GET', 'POST'))
 
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
