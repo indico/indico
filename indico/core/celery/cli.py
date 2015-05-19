@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
+import os
+
 from celery.bin.celery import CeleryCommand
 from flask_script import Command
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.celery import celery
@@ -36,4 +39,10 @@ class IndicoCeleryCommand(Command):
 
     def run(self, args):
         update_session_options(db)  # disable the zodb commit hook
-        CeleryCommand(celery).execute_from_commandline(['indico celery'] + args)
+        if args[0] == 'flower':
+            # Somehow flower hangs when executing it using CeleryCommand() so we simply exec it directly.
+            # It doesn't really need the celery config anyway (besides the broker url)
+            os.execlp('celery', 'celery', '-b', Config.getInstance().getCeleryBroker(),
+                      *args)
+        else:
+            CeleryCommand(celery).execute_from_commandline(['indico celery'] + args)
