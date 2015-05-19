@@ -7,6 +7,7 @@ Create Date: 2015-05-19 11:25:26.268379
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -22,10 +23,10 @@ def upgrade():
                     sa.Column('description', sa.Text(), nullable=False),
                     sa.Column('client_id', sa.String(), nullable=False),
                     sa.Column('client_secret', sa.String(), nullable=False),
+                    sa.Column('default_scopes', postgresql.ARRAY(sa.String()), nullable=False),
+                    sa.Column('redirect_uris', postgresql.ARRAY(sa.String()), nullable=False),
                     sa.Column('is_enabled', sa.Boolean(), nullable=False),
                     sa.Column('is_trusted', sa.Boolean(), nullable=False),
-                    sa.Column('default_scopes', sa.Text(), nullable=True),
-                    sa.Column('redirect_uris', sa.Text(), nullable=True),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_applications')),
                     sa.UniqueConstraint('client_id', name=op.f('uq_applications_client_id')),
                     schema='oauth')

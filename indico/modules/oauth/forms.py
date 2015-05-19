@@ -23,11 +23,14 @@ from indico.core.db import db
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import TextListField
 
 
 class ApplicationForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
+    redirect_uris = TextListField(_("Authorization callback URLs"),
+                                  description=_("More than one URL can be specified adding new lines"))
 
     def __init__(self, *args, **kwargs):
         self.application = kwargs.pop('application', None)

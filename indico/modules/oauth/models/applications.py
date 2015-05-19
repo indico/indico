@@ -16,6 +16,7 @@
 
 from uuid import uuid4
 
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -59,6 +60,18 @@ class OAuthApplication(db.Model):
         db.String,
         nullable=False
     )
+    #: the OAuth default scopes the application may request access to
+    default_scopes = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
+    #: the OAuth absolute URIs that a application may use to redirect to after authorization
+    redirect_uris = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
     #: whether the application is enabled or disabled
     is_enabled = db.Column(
         db.Boolean,
@@ -71,10 +84,6 @@ class OAuthApplication(db.Model):
         nullable=False,
         default=False
     )
-    #: default scopes the application may request access to
-    _default_scopes = db.Column('default_scopes', db.Text)
-    #: absolute URIs that a application may use to redirect to after authorization
-    _redirect_uris = db.Column('redirect_uris', db.Text)
 
     @property
     def client_type(self):
@@ -83,31 +92,20 @@ class OAuthApplication(db.Model):
     @property
     def default_redirect_uri(self):
         if self.redirect_uris:
-            return self._default_redirect_uri[0]
+            return self.redirect_uris[0]
         return None
-
-    @property
-    def default_scopes(self):
-        if self._default_scopes:
-            return self._default_scopes.split()
-        return []        
 
     @property
     def locator(self):
         return {'id': self.id}
-
-    @property
-    def redirect_uris(self):
-        if self._redirect_uris:
-            return self._default_redirect_uris.split()
-        return []
 
     @return_ascii
     def __repr__(self):
         return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
 
     @classmethod
-    def create(cls, name, description=None):
+    def create(cls, name, description=None, redirect_uris=None):
         client_id = str(uuid4())
         client_secret = str(uuid4())
-        return OAuthApplication(name=name, description=description, client_id=client_id, client_secret=client_secret)
+        return OAuthApplication(name=name, description=description, client_id=client_id, client_secret=client_secret,
+                                redirect_uris=redirect_uris)

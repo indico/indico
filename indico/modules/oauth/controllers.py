@@ -46,7 +46,8 @@ class RHOAuthAdminApplication(RHAdminBase):
         self.application = OAuthApplication.get(request.view_args['id'])
 
     def _process(self):
-        defaults = FormDefaults(name=self.application.name, description=self.application.description)
+        defaults = FormDefaults(name=self.application.name, description=self.application.description,
+                                redirect_uris=self.application.redirect_uris)
         form = ApplicationForm(obj=defaults, application=self.application)
         if form.validate_on_submit():
             self.application.name = form.name.data
@@ -63,7 +64,8 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
     def _process(self):
         form = ApplicationForm()
         if form.validate_on_submit():
-            application = OAuthApplication.create(name=form.name.data, description=form.description.data)
+            application = OAuthApplication.create(name=form.name.data, description=form.description.data,
+                                                  redirect_uris=form.redirect_uris.data)
             db.session.add(application)
             flash(_("Application {} registered successfully").format(application.name), 'success')
             return redirect(url_for('.apps'))
