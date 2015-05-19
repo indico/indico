@@ -28,6 +28,13 @@ class ApplicationForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
 
+    def __init__(self, *args, **kwargs):
+        self.client = kwargs.pop('client', None)
+        super(ApplicationForm, self).__init__(*args, **kwargs)
+
     def validate_name(self, field):
-        if OAuthClient.find(name=field.data).count():
+        query = OAuthClient.find(name=field.data)
+        if self.client:
+            query = query.filter(OAuthClient.name != self.client.name)
+        if query.count():
             raise ValidationError(_("There is already an application with this name"))
