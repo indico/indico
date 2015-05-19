@@ -15,12 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
-from collections import defaultdict, Counter
+from collections import defaultdict
 from datetime import date, timedelta
 from itertools import islice
-from operator import methodcaller, itemgetter
+from operator import methodcaller
 
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
@@ -134,8 +133,8 @@ def _get_category_score(avatar, categ, attended_events, debug=False):
 
 
 def get_category_scores(avatar, debug=False):
-    attendance_roles = set(['conference_participant', 'contribution_submission', 'abstract_submitter',
-                            'registration_registrant', 'evaluation_submitter'])
+    attendance_roles = {'conference_participant', 'contribution_submission', 'abstract_submitter',
+                        'registration_registrant', 'evaluation_submitter'}
     links = avatar_links.get_links(avatar)
     ch = ConferenceHolder()
     attended = filter(None, (ch.getById(eid, True) for eid, roles in links.iteritems() if attendance_roles & roles))
@@ -144,41 +143,3 @@ def get_category_scores(avatar, debug=False):
         categ_events[event.getOwner()].append(event)
     return dict((categ, _get_category_score(avatar, categ, events, debug))
                 for categ, events in categ_events.iteritems())
-
-
-def update_event_data(avatar, categ, data):
-    attendance_roles = set(['conference_participant', 'contribution_submission', 'abstract_submitter',
-                            'registration_registrant', 'evaluation_submitter'])
-    links = avatar_links.get_links(avatar)
-    ch = ConferenceHolder()
-    attended = filter(None, (ch.getById(eid, True) for eid, roles in links.iteritems() if attendance_roles & roles))
-    attended = [e for e in attended if e.getOwner() == categ]
-    # Count common chairpersons and attendants
-    chair_count = data.setdefault('chair_count', Counter())
-    participant_count = data.setdefault('participant_count', Counter())
-    for event in attended:
-        for ch in event.getChairList():
-            chair_count[ch.getEmail()] += 1
-        for part in event.getParticipation().getParticipantList():
-            participant_count[part.getEmail()] += 1
-
-
-def _is_event_interesting(avatar, event, data):
-    interesting_chairs = set(map(itemgetter(0), data['chair_count'].most_common(3)))
-    interesting_participants = set(map(itemgetter(0), data['participant_count'].most_common(10)))
-    event_chairs = set(ch.getEmail() for ch in event.getChairList())
-    event_participants = set(part.getEmail() for part in event.getParticipation().getParticipantList())
-    if interesting_chairs & event_chairs:
-        return True
-    common_participants = interesting_participants & event_participants
-    return common_participants and len(common_participants) >= len(event_participants) * 0.25
-
-
-def iter_interesting_events(avatar, data):
-    idx = IndexesHolder().getById('categoryDateAll')
-    now_local = utc2server(nowutc(), False)
-    aw = AccessWrapper()
-    aw.setUser(avatar)
-    for event in _unique_events(idx.iterateObjectsIn('0', now_local, now_local + timedelta(weeks=24))):
-        if _is_event_interesting(avatar, event, data) and event.canAccess(aw):
-            yield event
