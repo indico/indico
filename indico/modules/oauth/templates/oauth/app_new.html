@@ -1,9 +1,5 @@
-{% extends 'layout/base.html' %}
+{% extends 'oauth/apps_base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-
-{% block title %}
-    {%- trans %}Applications settings{% endtrans -%}
-{% endblock %}
 
 {% block subtitle %}
     {%- trans %}Register new application{% endtrans -%}
