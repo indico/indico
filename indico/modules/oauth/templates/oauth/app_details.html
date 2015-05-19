@@ -34,21 +34,19 @@
             </div>
         </div>
         <div class="i-box-content">
-            <div>
-                {%- trans %}Client ID{% endtrans -%}
-            </div>
-            <div>{{ application.client_id }}</div>
-            <div>
-                {%- trans %}Client Secret{% endtrans -%}
-            </div>
-            <div>{{ application.client_secret }}</div>
+            <dl class="i-data-list">
+                <dt>{%- trans %}Client ID{% endtrans -%}</dt>
+                <dd><code>{{ application.client_id }}</code></dd>
+                <dt>{%- trans %}Client Secret{% endtrans -%}</dt>
+                <dd><code>{{ application.client_secret }}</code></dd>
+            </dl>
+            <hr>
+            {{ form_header() }}
+            {{ form_rows(form) }}
+            {% call form_footer() %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Update application{% endtrans %}">
+                <a href="{{ back_url }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+            {% endcall %}
         </div>
-
-        {{ form_header(orientation='vertical') }}
-        {{ form_rows(form) }}
-        {% call form_footer() %}
-            <input class="i-button big highlight" type="submit" value="{% trans %}Update application{% endtrans %}">
-            <a href="{{ back_url }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
-        {% endcall %}
     </div>
 {% endblock %}
