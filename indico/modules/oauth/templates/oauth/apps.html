@@ -19,28 +19,15 @@
             </div>
         </div>
         <div class="i-box-content">
+            <p>{% trans %}This is the list of applications authorized to access Indico. Click on the name of an application to see more information.{% endtrans %}</p>
             <ul class="group-list with-buttons">
                 {% for application in applications %}
                     <li>
-                        <div class="list-item-title">
-                            {{ application.name }}
-                        </div>
-                        <div class="list-item-content">
-                            <span class="list-item-content-title">
-                                {% trans %}client id{% endtrans %}
-                            </span>
-                            <span class="list-item-content-data">
-                                {{ application.client_id }}
-                            </span>
-                        </div>
-                        <div class="list-item-content">
-                            <span class="list-item-content-title">
-                                {% trans %}client secret{% endtrans %}
-                            </span>
-                            <span class="list-item-content-data">
-                                {{ application.client_secret }}
-                            </span>
-                        </div>
+                        <span class="list-item-title">
+                            <a href="{{ url_for('.app_details', application) }}">
+                                {{ application.name }}
+                            </a>
+                        </span>
                     </li>
                 {% endfor %}
             </ul>
