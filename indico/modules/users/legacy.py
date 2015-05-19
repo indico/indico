@@ -92,7 +92,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         if link and redis_write_client:
             event = avatar_links.event_from_obj(obj)
             if event:
-                avatar_links.add_link(self, event, '{}_{}'.format(link.type, link.role))
+                avatar_links.add_link(self.user, event, '{}_{}'.format(link.type, link.role))
 
     def unlinkTo(self, obj, role):
         if not self.user or self.user.is_deleted:
@@ -102,7 +102,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
             for link in links:
                 event = avatar_links.event_from_obj(obj)
                 if event:
-                    avatar_links.del_link(self, event, '{}_{}'.format(link.type, link.role))
+                    avatar_links.del_link(self.user, event, '{}_{}'.format(link.type, link.role))
 
     def getStatus(self):
         return 'deleted' if not self.user or self.user.is_deleted else 'activated'

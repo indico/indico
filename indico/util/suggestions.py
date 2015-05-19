@@ -67,9 +67,8 @@ def _get_blocks(events, attended):
     return blocks
 
 
-def _get_category_score(avatar, categ, attended_events, debug=False):
+def _get_category_score(user, categ, attended_events, debug=False):
     # avoid stale SQLAlchemy object
-    user = avatar.user
     if debug:
         print repr(categ)
     idx = IndexesHolder().getById('categoryDateAll')
@@ -132,14 +131,14 @@ def _get_category_score(avatar, categ, attended_events, debug=False):
     return score
 
 
-def get_category_scores(avatar, debug=False):
+def get_category_scores(user, debug=False):
     attendance_roles = {'conference_participant', 'contribution_submission', 'abstract_submitter',
                         'registration_registrant', 'evaluation_submitter'}
-    links = avatar_links.get_links(avatar)
+    links = avatar_links.get_links(user)
     ch = ConferenceHolder()
     attended = filter(None, (ch.getById(eid, True) for eid, roles in links.iteritems() if attendance_roles & roles))
     categ_events = defaultdict(list)
     for event in attended:
         categ_events[event.getOwner()].append(event)
-    return dict((categ, _get_category_score(avatar, categ, events, debug))
+    return dict((categ, _get_category_score(user, categ, events, debug))
                 for categ, events in categ_events.iteritems())

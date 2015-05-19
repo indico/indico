@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
+from indico.modules.users import User
 from indico.util.i18n import _
 from indico.util.redis import avatar_links
 from MaKaC.services.interface.rpc.common import ServiceError
@@ -88,16 +91,12 @@ class UserRefreshRedisLinks(AdminService):
     def _checkParams(self):
         AdminService._checkParams(self)
         self._pm = ParameterManager(self._params)
-        userId = self._pm.extract("userId", pType=str, allowEmpty=True)
-        if userId is not None:
-            ah = AvatarHolder()
-            self._avatar = ah.getById(userId)
-        else:
-            self._avatar = self._aw.getUser()
+        user_id = self._pm.extract("userId", pType=int, allowEmpty=True)
+        self._user = User.get(user_id) if user_id is not None else session.user
 
     def _getAnswer(self):
-        avatar_links.delete_avatar(self._avatar)  # clean start
-        avatar_links.init_links(self._avatar)
+        avatar_links.delete_avatar(self._user)  # clean start
+        avatar_links.init_links(self._user)
 
 
 methodMap = {
