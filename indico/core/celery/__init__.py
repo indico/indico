@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import os
 
 from celery import Celery
+from celery.beat import PersistentScheduler
 
 from indico.core.config import Config
 from indico.core.db import DBMgr
@@ -48,6 +49,7 @@ def configure_celery(app):
         raise ValueError('Celery broker URL is not set')
     celery.conf['BROKER_URL'] = broker_url
     celery.conf['CELERY_RESULT_BACKEND'] = cfg.getCeleryResultBackend() or broker_url
+    celery.conf['CELERYBEAT_SCHEDULER'] = IndicoPersistentScheduler
     celery.conf['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(cfg.getTempDir(), 'celerybeat-schedule')
     celery.conf['CELERYD_HIJACK_ROOT_LOGGER'] = False
     celery.conf['CELERY_TIMEZONE'] = cfg.getDefaultTimezone()
@@ -71,3 +73,20 @@ def configure_celery(app):
     assert celery.flask_app is None
     celery.flask_app = app
 
+
+class IndicoPersistentScheduler(PersistentScheduler):
+    """Celery scheduler that allows indico.conf to override specific entries"""
+
+    def setup_schedule(self):
+        for task_name, entry in Config.getInstance().getScheduledTaskOverride().iteritems():
+            if task_name not in self.app.conf['CELERYBEAT_SCHEDULE']:
+                self.logger.error('Invalid entry in ScheduledTaskOverride: ' + task_name)
+                continue
+            if not entry:
+                del self.app.conf['CELERYBEAT_SCHEDULE'][task_name]
+            elif isinstance(entry, dict):
+                assert entry.get('task') in {None, task_name}  # make sure the task name is not changed
+                self.app.conf['CELERYBEAT_SCHEDULE'][task_name].update(entry)
+            else:
+                self.app.conf['CELERYBEAT_SCHEDULE'][task_name]['schedule'] = entry
+        super(IndicoPersistentScheduler, self).setup_schedule()

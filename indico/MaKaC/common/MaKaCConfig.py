@@ -28,4 +28,14 @@ if indico_conf == '': # we may be in development mode or in installation mode
     if not os.path.exists(indico_conf):
         indico_conf = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'etc', 'indico.conf.sample')
 
+
+# Provide useful globals that can be used inside indico.conf when
+# overriding the celery schedule.
+try:
+    from datetime import timedelta
+    from celery.schedules import crontab
+except ImportError:
+    pass
+
+
 execfile(indico_conf)

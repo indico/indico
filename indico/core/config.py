@@ -535,6 +535,7 @@ class Config:
         'CeleryBroker'              : None,
         'CeleryResultBackend'       : None,
         'CeleryConfig'              : {},
+        'ScheduledTaskOverride'     : {},
     }
 
     if sys.platform == 'win32':
