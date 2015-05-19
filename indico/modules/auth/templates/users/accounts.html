@@ -55,12 +55,12 @@
                             </li>
                             {% for identity in user.secondary_local_identities %}
                                 <li style="display: none">
-                                    <span class="account-identity">
+                                    <span class="list-item-title">
                                         <i class="icon-user"></i>
                                         <span>{{ identity.identifier }}</span>
                                     </span>
                                     <span class="right">
-                                        <span class="account-identity-info">
+                                        <span class="list-item-info">
                                             <span>
                                                 <span class="label">
                                                     {% trans %}Last login:{% endtrans %}
@@ -104,14 +104,14 @@
                     {% if user.external_identities %}
                         {% for identity in user.external_identities | sort(attribute='safe_last_login_dt', reverse=True) %}
                             <li>
-                                <span class="account-identity">
+                                <span class="list-item-title">
                                     {{ provider_titles[identity.provider] }}
                                 </span>
                                 <small>
                                     ({{ identity.identifier }})
                                 </small>
                                 <span class="right">
-                                    <span class="account-identity-info">
+                                    <span class="list-item-info">
                                         <span>
                                             <span class="label">
                                                 {% trans %}Last login:{% endtrans %}

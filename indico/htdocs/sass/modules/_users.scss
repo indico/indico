@@ -209,30 +209,10 @@
     }
 }
 
-.account-identity {
-    font-weight: bold;
-}
-
 .account-no-identities {
     @extend .account-identity-provider;
     color: $dark-gray;
     font-style: italic;
-}
-
-.account-identity-info {
-    margin: 0 1em;
-
-    > span:not(:last-child) {
-        margin-right: 0.7em;
-    }
-
-    .label {
-        font-weight: bold;
-    }
-
-    .content {
-        font-style: italic;
-    }
 }
 
 .category-box {

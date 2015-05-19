@@ -201,4 +201,24 @@
             margin-top: 0;
         }
     }
+
+    .list-item-title {
+        font-weight: bold;
+    }
+
+    .list-item-info {
+        margin: 0 1em;
+
+        > span:not(:last-child) {
+            margin-right: 0.7em;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .content {
+            font-style: italic;
+        }
+    }
 }
