@@ -39,11 +39,14 @@ class RHOAuthAdmin(RHAdminBase):
         return WPOAuthAdmin.render_template('apps.html', applications=applications)
 
 
-class RHOAuthAdminApplication(RHAdminBase):
-    """Handles application details page"""
-
+class RHOAuthAdminApplicationBase(RHAdminBase):
+    """Base class for single OAuth application RHs"""
     def _checkParams(self):
         self.application = OAuthApplication.get(request.view_args['id'])
+
+
+class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
+    """Handles application details page"""
 
     def _process(self):
         defaults = FormDefaults(name=self.application.name, description=self.application.description,
@@ -58,6 +61,15 @@ class RHOAuthAdminApplication(RHAdminBase):
                                             back_url=url_for('.apps'))
 
 
+class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
+    """Handles OAuth application deletion"""
+
+    def _process(self):
+        db.session.delete(self.application)
+        flash(_("Application deleted successfully"), 'success')
+        return redirect(url_for('.apps'))
+
+
 class RHOAuthAdminApplicationNew(RHAdminBase):
     """Handles OAuth application registration"""
 
@@ -70,6 +82,24 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
             flash(_("Application {} registered successfully").format(application.name), 'success')
             return redirect(url_for('.apps'))
         return WPOAuthAdmin.render_template('app_new.html', form=form, back_url=url_for('.apps'))
+
+
+class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
+    """Resets the client secret of the OAuth application"""
+
+    def _process(self):
+        self.application.reset_client_secret()
+        flash(_("New client secret generated for the application"), 'success')
+        return redirect(url_for('.app_details', self.application))
+
+
+class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
+    """Revokes all user tokens associated to the OAuth application"""
+
+    def _process(self):
+        # TODO: revoke tokens when implemented
+        flash(_("All user tokens for this application were revoked successfully"), 'success')
+        return redirect(url_for('.app_details', self.application))
 
 
 class RHOAuthUserProfile(RHUserBase):

@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.oauth.controllers import (RHOAuthUserProfile, RHOAuthAdmin, RHOAuthAdminApplicationNew,
-                                              RHOAuthAdminApplication)
+from indico.modules.oauth.controllers import (RHOAuthUserProfile, RHOAuthAdmin, RHOAuthAdminApplication,
+                                              RHOAuthAdminApplicationNew, RHOAuthAdminApplicationDelete,
+                                              RHOAuthAdminApplicationReset, RHOAuthAdminApplicationRevoke)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='templates')
@@ -27,7 +28,10 @@ oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='temp
 # Server administration
 _bp.add_url_rule('/admin/apps', 'apps', RHOAuthAdmin)
 _bp.add_url_rule('/admin/apps/new/', 'app_new', RHOAuthAdminApplicationNew, methods=('GET', 'POST'))
-_bp.add_url_rule('/admin/apps/<int:id>', 'app_details', RHOAuthAdminApplication, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/apps/<int:id>/', 'app_details', RHOAuthAdminApplication, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/apps/<int:id>/delete', 'app_delete', RHOAuthAdminApplicationDelete, methods=('POST',))
+_bp.add_url_rule('/admin/apps/<int:id>/reset', 'app_reset', RHOAuthAdminApplicationReset, methods=('POST',))
+_bp.add_url_rule('/admin/apps/<int:id>/revoke', 'app_revoke', RHOAuthAdminApplicationRevoke, methods=('POST',))
 
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
