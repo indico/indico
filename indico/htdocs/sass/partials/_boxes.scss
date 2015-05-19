@@ -47,6 +47,16 @@
     background: white;
     color: $black;
     padding: 10px;
+
+    hr {
+        height: 0;
+        overflow: hidden;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid lighten($gray, $color-variation);
+        margin-left: -10px;
+        margin-right: -10px;
+    }
 }
 
 .i-box.titled {
