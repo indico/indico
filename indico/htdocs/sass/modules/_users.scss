@@ -41,6 +41,8 @@
 
 .suggested-users {
     max-width: 250px;
+    max-height: 450px;
+    overflow-y: scroll;
 }
 
 .suggested-users,
