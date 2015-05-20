@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.users.ext import ExtraUserPreferences
+from indico.modules.users.models.favorites import FavoriteCategory
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.util.i18n import _
@@ -42,3 +43,8 @@ user_settings = UserSettingsProxy('users', {
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'users', SideMenuItem(_("Users"), url_for('users.users_admin'))
+
+
+@signals.category.deleted.connect
+def _category_deleted(category, **kwargs):
+    FavoriteCategory.find(target_id=category.id).delete()
