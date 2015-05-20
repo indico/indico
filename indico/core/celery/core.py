@@ -21,11 +21,13 @@ import os
 from celery import Celery
 from celery.beat import PersistentScheduler
 from celery.signals import before_task_publish
+from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
 
 from indico.core.celery import CELERY_IMPORTS
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
+from indico.core.plugins import plugin_engine
 from indico.util.string import return_ascii
 
 
@@ -104,7 +106,10 @@ class IndicoCelery(Celery):
                     with DBMgr.getInstance().global_connection():
                         args = _CelerySAWrapper.unwrap_args(args)
                         kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
-                        return super(IndicoTask, s).__call__(*args, **kwargs)
+                        plugin_name = kwargs.pop('__current_plugin__', None)
+                        plugin = plugin_engine.get_plugin(plugin_name) if plugin_name else None
+                        with plugin_context(plugin):
+                            return super(IndicoTask, s).__call__(*args, **kwargs)
 
         self.Task = IndicoTask
 
@@ -173,3 +178,5 @@ def before_task_publish_signal(*args, **kwargs):
     body = kwargs['body']
     body['args'] = _CelerySAWrapper.wrap_args(body['args'])
     body['kwargs'] = _CelerySAWrapper.wrap_kwargs(body['kwargs'])
+    if current_plugin:
+        body['kwargs']['__current_plugin__'] = current_plugin.name
