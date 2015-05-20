@@ -88,7 +88,7 @@ type("ListOfUsersManager", [], {
             data.name = user.name;
         } else {
             if (user.pending) {
-                data.name = $T('Non-registered user');
+                data.name = user.email;
             } else {
                 data.name = user.firstName + ' ' + user.familyName;
             }
