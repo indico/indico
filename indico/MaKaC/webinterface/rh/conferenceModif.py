@@ -519,7 +519,7 @@ class RHConfDeletion(RHConferenceModifBase):
             parent=None
             if self._conf.getOwnerList()!=[]:
                 parent=self._conf.getOwnerList()[0]
-            self._conf.delete()
+            self._conf.delete(session.user)
             if parent is not None:
                 self._redirect( urlHandlers.UHCategoryModification.getURL(parent) )
             else:
