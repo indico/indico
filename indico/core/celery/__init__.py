@@ -21,6 +21,7 @@ __all__ = ('celery',)
 #: Modules to import when starting Celery.
 #: This is only needed if the modules aren't already imported by default.
 CELERY_IMPORTS = (
+    'indico.modules.categories.cleanup',
     'indico.modules.categories.suggestions',
 )
 
