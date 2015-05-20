@@ -23,6 +23,7 @@ __all__ = ('celery',)
 CELERY_IMPORTS = (
     'indico.modules.categories.cleanup',
     'indico.modules.categories.suggestions',
+    'indico.modules.rb.tasks',
 )
 
 # Must be imported after CELERY_IMPORTS has been defined
