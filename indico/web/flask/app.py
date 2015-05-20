@@ -50,6 +50,7 @@ from indico.core.plugins import plugin_engine, include_plugin_css_assets, includ
 from indico.modules.auth.providers import IndicoAuthProvider
 from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
+from indico.modules.oauth import oauth as oauth2
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
@@ -346,6 +347,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
 
     babel.init_app(app)
     multipass.init_app(app)
+    oauth2.init_app(app)
     setup_jinja(app)
 
     with app.app_context():

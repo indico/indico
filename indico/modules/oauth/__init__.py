@@ -16,10 +16,17 @@
 
 from __future__ import unicode_literals
 
+import os
+
+from flask_oauthlib.provider import OAuth2Provider
+
 from indico.core import signals
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import MenuItem
+
+
+oauth = OAuth2Provider()
 
 
 @signals.admin_sidemenu.connect
@@ -31,3 +38,9 @@ def _extend_admin_menu(sender, **kwargs):
 @signals.users.profile_sidemenu.connect
 def _extend_profile_menu(user, **kwargs):
     return MenuItem(_('Applications'), 'oauth.user_profile')
+
+
+@signals.app_created.connect
+def _no_ssl_required_on_debug(app, **kwargs):
+    if app.debug:
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
