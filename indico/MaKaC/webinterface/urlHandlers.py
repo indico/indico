@@ -2903,10 +2903,6 @@ class UHPaperReviewingDisplay(URLHandler):
 
 
 #### End of reviewing
-class UHChangeLang(URLHandler):
-    _endpoint = 'misc.changeLang'
-
-
 class UHAbout(URLHandler):
     _endpoint = 'misc.about'
 

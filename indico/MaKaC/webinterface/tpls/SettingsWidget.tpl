@@ -6,7 +6,8 @@
     </div>
     <div class="settingsSeparator"></div>
     <div class="settingsWidgetSection">
-        <form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }">
+        <form id="languageForm" method="post" action="${ url_for('misc.changeLang') }">
+            <input type="hidden" name="next" value="${ _request.relative_url }">
             <span>${_("Language:")}</span>
             <select name="lang" onchange="$E('languageForm').dom.submit();">
             % for k, v in sorted(Languages.iteritems(), key=lambda x: x[1]):
