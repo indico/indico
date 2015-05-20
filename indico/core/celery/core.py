@@ -17,12 +17,14 @@
 from __future__ import unicode_literals
 
 import os
+from operator import itemgetter
 
 from celery import Celery
 from celery.beat import PersistentScheduler
 from celery.signals import before_task_publish
 from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
+from terminaltables import AsciiTable
 
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
@@ -117,11 +119,13 @@ class IndicoPersistentScheduler(PersistentScheduler):
     """Celery scheduler that allows indico.conf to override specific entries"""
 
     def setup_schedule(self):
+        deleted = set()
         for task_name, entry in Config.getInstance().getScheduledTaskOverride().iteritems():
             if task_name not in self.app.conf['CELERYBEAT_SCHEDULE']:
                 self.logger.error('Invalid entry in ScheduledTaskOverride: ' + task_name)
                 continue
             if not entry:
+                deleted.add(task_name)
                 del self.app.conf['CELERYBEAT_SCHEDULE'][task_name]
             elif isinstance(entry, dict):
                 assert entry.get('task') in {None, task_name}  # make sure the task name is not changed
@@ -129,11 +133,17 @@ class IndicoPersistentScheduler(PersistentScheduler):
             else:
                 self.app.conf['CELERYBEAT_SCHEDULE'][task_name]['schedule'] = entry
         super(IndicoPersistentScheduler, self).setup_schedule()
-        print
-        print cformat('%{white!}The following periodic tasks are scheduled:')
-        for entry in self.app.conf['CELERYBEAT_SCHEDULE'].itervalues():
-            print cformat('%{yellow!}{}%{reset}: %{green}{!r}').format(entry['task'], entry['schedule'])
-        print
+        self._print_schedule(deleted)
+
+    def _print_schedule(self, deleted):
+        table_data = [['Name', 'Schedule']]
+        for entry in sorted(self.app.conf['CELERYBEAT_SCHEDULE'].itervalues(), key=itemgetter('task')):
+            table_data.append([cformat('%{yellow!}{}%{reset}').format(entry['task']),
+                               cformat('%{green}{!r}%{reset}').format(entry['schedule'])])
+        for task_name in sorted(deleted):
+            table_data.append([cformat('%{yellow}{}%{reset}').format(task_name),
+                               cformat('%{red!}Disabled%{reset}')])
+        print AsciiTable(table_data, cformat('%{white!}Periodic Tasks%{reset}')).table
 
 
 class _CelerySAWrapper(object):
