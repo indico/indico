@@ -107,3 +107,12 @@ class RHOAuthUserProfile(RHUserBase):
     def _process(self):
         tokens = OAuthToken.find_all()
         return WPOAuthUserProfile.render_template('user_profile.html', user=self.user, tokens=tokens)
+
+
+class RHOAuthUserTokenRevoke(RHUserBase):
+    """Revokes user token"""
+
+    def _process(self):
+        # TODO: revoke token when implemented
+        flash(_("Your token was revoked successfully"), 'success')
+        return redirect(url_for('.user_profile'))
