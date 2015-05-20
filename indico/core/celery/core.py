@@ -26,6 +26,7 @@ from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
+from indico.core.celery.util import locked_task
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.core.plugins import plugin_engine
@@ -80,8 +81,13 @@ class IndicoCelery(Celery):
         schedules the task to execute periodically, using extra kwargs
         as described in the Celery documentation:
         http://celery.readthedocs.org/en/latest/userguide/periodic-tasks.html#available-fields
+
+        :param locked: Set this to ``False`` if you want to allow the
+                       task to run more than once at the same time.
         """
         def decorator(f):
+            if kwargs.pop('locked', True):
+                f = locked_task(f)
             entry = {
                 'schedule': kwargs.pop('run_every'),
                 'args': kwargs.pop('args', ()),
