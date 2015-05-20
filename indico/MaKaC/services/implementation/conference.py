@@ -1219,16 +1219,6 @@ class ConferenceProtectionUserList(ConferenceModifBase):
 
 class ConferenceProtectionAddUsers(ConferenceModifBase):
 
-    def _getAccessList(self):
-        result = fossilize(self._conf.getAccessList())
-        # get pending users
-        for email in self._conf.getAccessController().getEmail():
-            pendingUser = {}
-            pendingUser["email"] = email
-            pendingUser["pending"] = True
-            result.append(pendingUser)
-        return result
-
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
@@ -1237,7 +1227,8 @@ class ConferenceProtectionAddUsers(ConferenceModifBase):
     def _getAnswer(self):
         for principal in self._principals:
             self._conf.grantAccess(principal)
-        return self._getAccessList()
+        return fossilize(self._conf.getAccessController().getAccessList())
+
 
 class ConferenceProtectionRemoveUser(ConferenceModifBase):
 
