@@ -23,6 +23,13 @@ app_created = _signals.signal('app-created', """
 Called when the app has been created. The *sender* is the flask app.
 """)
 
+import_tasks = _signals.signal('import-tasks', """
+Called when Celery needs to import all tasks. Use this signal if you
+have modules containing task registered using one of the Celery
+decorators but don't import them anywhere.  The signal handler should
+only ``import`` these modules and do nothing else.
+""")
+
 after_process = _signals.signal('after-process', """
 Called after an Indico request has been processed.
 """)

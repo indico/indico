@@ -16,18 +16,18 @@
 
 from __future__ import unicode_literals
 
+from celery.signals import import_modules
+
+from indico.core import signals
+from indico.core.celery.core import IndicoCelery
+
 __all__ = ('celery',)
 
-#: Modules to import when starting Celery.
-#: This is only needed if the modules aren't already imported by default.
-CELERY_IMPORTS = (
-    'indico.modules.categories.cleanup',
-    'indico.modules.categories.suggestions',
-    'indico.modules.rb.tasks',
-)
-
-# Must be imported after CELERY_IMPORTS has been defined
-from indico.core.celery.core import IndicoCelery
 
 #: The Celery instance for all Indico tasks
 celery = IndicoCelery('indico')
+
+
+@import_modules.connect
+def _import_modules(*args, **kwargs):
+    signals.import_tasks.send()

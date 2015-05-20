@@ -24,7 +24,6 @@ from celery.signals import before_task_publish
 from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
 
-from indico.core.celery import CELERY_IMPORTS
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.core.plugins import plugin_engine
@@ -54,7 +53,6 @@ class IndicoCelery(Celery):
         self.conf['CELERY_IGNORE_RESULT'] = True
         self.conf['CELERY_STORE_ERRORS_EVEN_IF_IGNORED'] = True
         self.conf['CELERY_REDIRECT_STDOUTS'] = not app.debug
-        self.conf['CELERY_IMPORTS'] = CELERY_IMPORTS
         # Pickle isn't pretty but that way we can pass along all types (tz-aware datetimes, sets, etc.)
         self.conf['CELERY_RESULT_SERIALIZER'] = 'pickle'
         self.conf['CELERY_TASK_SERIALIZER'] = 'pickle'

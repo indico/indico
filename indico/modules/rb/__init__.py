@@ -41,6 +41,11 @@ settings = SettingsProxy('roombooking', {
 }, acls={'admin_principals', 'authorized_principals'})
 
 
+@signals.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.rb.tasks
+
+
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     source_principals = set(source.in_blocking_acls.options(joinedload(BlockingPrincipal.blocking)))
