@@ -30,4 +30,4 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.users.profile_sidemenu.connect
 def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('Authorized Apps'), 'oauth.user_profile')
+    return MenuItem(_('Applications'), 'oauth.user_profile')

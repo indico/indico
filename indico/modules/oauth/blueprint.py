@@ -35,7 +35,7 @@ _bp.add_url_rule('/admin/apps/<int:id>/revoke', 'app_revoke', RHOAuthAdminApplic
 
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
-    _bp.add_url_rule('/apps/', 'user_profile', RHOAuthUserProfile)
+    _bp.add_url_rule('/applications/', 'user_profile', RHOAuthUserProfile)
 
 
 @_bp.url_defaults
