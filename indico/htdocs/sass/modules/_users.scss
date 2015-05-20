@@ -43,6 +43,10 @@
     max-width: 250px;
     max-height: 450px;
     overflow-y: scroll;
+
+    .user-list li .info {
+        max-width: 200px;
+    }
 }
 
 .suggested-users,
