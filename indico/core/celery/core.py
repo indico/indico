@@ -45,6 +45,7 @@ class IndicoCelery(Celery):
         self.conf['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(cfg.getTempDir(), 'celerybeat-schedule')
         self.conf['CELERYD_HIJACK_ROOT_LOGGER'] = False
         self.conf['CELERY_TIMEZONE'] = cfg.getDefaultTimezone()
+        self.conf['CELERY_IGNORE_RESULT'] = True
         self.conf['CELERY_STORE_ERRORS_EVEN_IF_IGNORED'] = True
         self.conf['CELERY_REDIRECT_STDOUTS'] = not app.debug
         self.conf['CELERY_IMPORTS'] = CELERY_IMPORTS
