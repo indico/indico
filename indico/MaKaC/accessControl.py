@@ -168,16 +168,6 @@ class AccessController(Persistent):
             self.allowedEmail = []
         return self.allowedEmail
 
-    def grantAccessEmail(self, email):
-        if not email in self.getAccessEmail():
-            self.getAccessEmail().append(email)
-        signals.acl.access_granted.send(self, principal=email)
-
-    def revokeAccessEmail(self, email):
-        if email in self.getAccessEmail.keys():
-            self.getAccessEmail().remove(email)
-        signals.acl.access_revoked.send(self, principal=email)
-
     def revokeAccess( self, principal ):
         """revokes read access for the related resource to the specified
             principal"""
@@ -240,7 +230,6 @@ class AccessController(Persistent):
             for email in av.getEmails():
                 if email in self.getAccessEmail():
                     self.grantAccess(av)
-                    self.revokeAccessEmail(email)
                     av.linkTo(self.getOwner(), "manager")
         return False
 
