@@ -28,6 +28,7 @@ from indico.core.celery import CELERY_IMPORTS
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.core.plugins import plugin_engine
+from indico.util.console import cformat
 from indico.util.string import return_ascii
 
 
@@ -130,6 +131,11 @@ class IndicoPersistentScheduler(PersistentScheduler):
             else:
                 self.app.conf['CELERYBEAT_SCHEDULE'][task_name]['schedule'] = entry
         super(IndicoPersistentScheduler, self).setup_schedule()
+        print
+        print cformat('%{white!}The following periodic tasks are scheduled:')
+        for entry in self.app.conf['CELERYBEAT_SCHEDULE'].itervalues():
+            print cformat('%{yellow!}{}%{reset}: %{green}{!r}').format(entry['task'], entry['schedule'])
+        print
 
 
 class _CelerySAWrapper(object):
