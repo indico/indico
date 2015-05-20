@@ -30,7 +30,7 @@ from indico.util.redis.suggestions import next_scheduled_check, suggest, unsched
 SUGGESTION_MIN_SCORE = 0.25
 
 
-@celery.periodic_task(name='update_category_suggestions', run_every=crontab(hour='7'))
+@celery.periodic_task(name='update_category_suggestions', run_every=crontab(minute='0', hour='7'))
 def update_category_suggestions():
     if not redis_write_client:
         return
