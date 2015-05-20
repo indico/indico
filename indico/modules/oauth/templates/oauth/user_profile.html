@@ -3,36 +3,40 @@
 {% from 'message_box.html' import message_box %}
 
 {% block subtitle -%}
-    {% trans %}Authorized Apps{% endtrans %}
+    {% trans %}Authorized applications{% endtrans %}
 {%- endblock %}
 
 {% block user_content %}
     {% if tokens %}
-        <ol id="oauth-token-list" class="ordered-list" style="border-top: 1px solid #ddd;">
-            {% for token in tokens %}
-                <li>
-                    <div class="list-item-title">
-                        {{ token.getConsumer().getName() }}
-                        <div data-third-party-app="{{ token.getConsumer().getName() }}" aria-hidden="true"
-                        style="margin: 0;" class="i-button i-button-mini icon-remove icon-only right"></div>
-                    </div>
-                    {% if session.user.is_admin %}
-                        <div class="list-item-content">
-                            <span class="list-item-content-title">{% trans %}Access Token{% endtrans %}</span>
-                            <span class="list-item-content-data">{{ token.getId() }}</span>
-                        </div>
-                        <div class="list-item-content">
-                            <span class="list-item-content-title">{% trans %}Token secret{% endtrans %}</span>
-                            <span class="list-item-content-data">{{ token.getToken().secret }}</span>
-                        </div>
-                    {% endif %}
-                    <div class="list-item-content">
-                        <span class="list-item-content-title">{% trans %}Last update{% endtrans %}</span>
-                        <span class="list-item-content-data">{{ token.getTimestamp() | format_datetime }}</span>
-                    </div>
-                </li>
-            {% endfor %}
-        </ol>
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Authorized applications{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <p>{% trans %}This is the list of applications your authorized to access your Indico data.{% endtrans %}</p>
+                <ul class="group-list with-buttons">
+                    {% for token in tokens %}
+                        <li>
+                            <span class="list-item-title">{{ token.application.name }}</span>
+                            <span class="right">
+                                <span class="list-item-info">
+                                    <span class="label">{% trans %}Last used:{% endtrans %}</span>
+                                    <span class="content">
+                                        {% if token.last_used_dt %}
+                                            {{ token.last_used_dt | format_datetime('short') }}
+                                        {% else %}
+                                            {% trans %}Never{% endtrans %}
+                                        {% endif %}
+                                    </span>
+                                </span>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     {% endif %}
 
     {% call message_box('warning', id='no-third-apps', style=('display:none;' if tokens else '')) %}

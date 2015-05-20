@@ -18,12 +18,11 @@ from __future__ import unicode_literals
 
 from flask import flash, redirect, request
 
-from indico.core.index import Catalog
-
 from indico.core.db import db
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.oauth.forms import ApplicationForm
 from indico.modules.oauth.models.applications import OAuthApplication
+from indico.modules.oauth.models.tokens import OAuthToken
 from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -106,5 +105,5 @@ class RHOAuthUserProfile(RHUserBase):
     """OAuth overview (user)"""
 
     def _process(self):
-        tokens = Catalog.getIdx('user_oauth_access_token').get(str(self.user.id), [])
+        tokens = OAuthToken.find_all()
         return WPOAuthUserProfile.render_template('user_profile.html', user=self.user, tokens=tokens)
