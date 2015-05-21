@@ -25,10 +25,10 @@ from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.modules.events.static.tasks import build_static_site
+from indico.modules.events.static.views import WPStaticSites
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 
-from MaKaC.webinterface.pages.conferences import WPConfOffline
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -43,7 +43,9 @@ class RHStaticSiteList(RHStaticSiteBase):
         self.check_legacy_events()
         if not Config.getInstance().getOfflineStore():
             raise NotFound()
-        return WPConfOffline(self, self._conf).display()
+        static_sites = StaticSite.find(event_id=self._conf.id).order_by(StaticSite.requested_dt.desc()).all()
+        return WPStaticSites.render_template('static_sites.html', self._conf,
+                                             event=self._conf, static_sites=static_sites)
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):

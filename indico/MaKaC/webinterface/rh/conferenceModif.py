@@ -4499,14 +4499,3 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
                 key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
                 filePath = os.path.join(tempPath, session[key][int(self.__backgroundId)][0])
                 return self.__fileBin(filePath)
-
-
-class RHConfOffline(RHConferenceModifBase):
-
-    def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
-
-    def _process(self):
-        if not Config.getInstance().getOfflineStore():
-            raise MaKaCError(_("This feature is not enabled"))
-        return conferences.WPConfOffline(self, self._conf).display()

@@ -211,6 +211,7 @@ def setup_jinja(app):
     app.add_template_filter(markdown)
     app.add_template_filter(dedent)
     app.add_template_filter(natsort)
+    app.add_template_filter(any)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
     app.add_template_test(equalto)

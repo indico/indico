@@ -1969,7 +1969,7 @@ class WPConfModifToolsBase(WPConferenceModifBase):
         self._tabMatPackage = self._tabCtrl.newTab("matPackage", _("Material Package"), \
                 urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf))
         if Config.getInstance().getOfflineStore():
-            self._tabOffline = self._tabCtrl.newTab("offline", _("Offline version"),
+            self._tabOffline = self._tabCtrl.newTab("offline", _("Offline copy"),
                                                     url_for('static_site.list', self._conf))
 
         self._setActiveTab()
@@ -2479,33 +2479,6 @@ class WPConfClone(WPConfModifToolsBase):
                                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>""") }
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)
-
-#---------------------------------------------------------------------------------------
-
-class WPConfOffline(WPConfModifToolsBase):
-
-    def _setActiveTab(self):
-        self._tabOffline.setActive()
-
-    def _getTabContent(self, params):
-        p = WConfOffline(self._conf)
-        return p.getHTML(params)
-
-
-class WConfOffline(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["confId"] = self._conf.getId()
-        vars['event'] = self._conf
-        vars["avatarId"] = self._rh._aw.getUser().getId()
-        vars["offlineTasks"] = ModuleHolder().getById("offlineEvents").getOfflineEventByConfId(self._conf.getId())
-        return vars
-
-#---------------------------------------------------------------------------------------
 
 
 class WConferenceAllSessionsConveners(wcomponents.WTemplated):
