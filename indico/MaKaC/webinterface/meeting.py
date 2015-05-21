@@ -1151,6 +1151,8 @@ class WMTimeTableCustomizePDF(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars['showDays'] = vars.get('showDays', 'all')
+        vars['showSessions'] = vars.get('showSessions', 'all')
         url=urlHandlers.UHConfTimeTablePDF.getURL(self._conf)
         # Add the view as a parameter so we can keep track of it
         # when the pdf export is cancelled.
