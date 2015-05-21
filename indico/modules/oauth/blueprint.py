@@ -18,13 +18,17 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.oauth.controllers import (RHOAuthUserProfile, RHOAuthAdmin, RHOAuthAdminApplication,
-                                              RHOAuthAdminApplicationNew, RHOAuthAdminApplicationDelete,
-                                              RHOAuthAdminApplicationReset, RHOAuthAdminApplicationRevoke,
-                                              RHOAuthUserTokenRevoke)
+from indico.modules.oauth.controllers import (RHOAuthAuthorize, RHOAuthUserProfile, RHOAuthAdmin,
+                                              RHOAuthAdminApplication, RHOAuthAdminApplicationNew,
+                                              RHOAuthAdminApplicationDelete, RHOAuthAdminApplicationReset,
+                                              RHOAuthAdminApplicationRevoke, RHOAuthUserTokenRevoke)
 from indico.web.flask.wrappers import IndicoBlueprint
 
+
 oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='templates')
+
+# Application endpoints
+_bp.add_url_rule('/oauth/authorize', 'oauth_authorize', RHOAuthAuthorize)
 
 # Server administration
 _bp.add_url_rule('/admin/apps', 'apps', RHOAuthAdmin)

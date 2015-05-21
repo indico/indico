@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request
+from flask import flash, redirect, request, render_template
 
 from indico.core.db import db
 from indico.modules.users.controllers import RHUserBase
+from indico.modules.oauth.provider import oauth
 from indico.modules.oauth.forms import ApplicationForm
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthToken
@@ -28,6 +29,20 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
+from MaKaC.webinterface.rh.base import RHProtected
+
+
+class RHOAuthAuthorize(RHProtected):
+    def _checkParams(self):
+        self.application = OAuthApplication.find_one(client_id=request.args['client_id'])
+
+    @oauth.authorize_handler
+    def _process(self, **kwargs):
+        if request.method == 'POST':
+            return 'confirm' in request.form
+        if self.application.is_trusted:
+            return True
+        return render_template('oauth/authorize.html', application=self.application)
 
 
 class RHOAuthAdmin(RHAdminBase):
