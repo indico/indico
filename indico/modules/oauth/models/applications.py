@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -54,11 +56,13 @@ class OAuthApplication(db.Model):
         db.String,
         unique=True,
         nullable=False,
+        default=lambda: unicode(uuid4())
     )
     #: the OAuth client_secret
     client_secret = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default=lambda: unicode(uuid4())
     )
     #: the OAuth default scopes the application may request access to
     default_scopes = db.Column(
@@ -103,12 +107,5 @@ class OAuthApplication(db.Model):
     def __repr__(self):
         return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
 
-    @classmethod
-    def create(cls, name, description=None, redirect_uris=None):
-        client_id = str(uuid4())
-        client_secret = str(uuid4())
-        return OAuthApplication(name=name, description=description, client_id=client_id, client_secret=client_secret,
-                                redirect_uris=redirect_uris)
-
     def reset_client_secret(self):
-        self.client_secret = str(uuid4())
+        self.client_secret = unicode(uuid4())

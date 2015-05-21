@@ -93,8 +93,8 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
     def _process(self):
         form = ApplicationForm()
         if form.validate_on_submit():
-            application = OAuthApplication.create(name=form.name.data, description=form.description.data,
-                                                  redirect_uris=form.redirect_uris.data)
+            application = OAuthApplication()
+            form.populate_obj(application)
             db.session.add(application)
             flash(_("Application {} registered successfully").format(application.name), 'success')
             return redirect(url_for('.apps'))
