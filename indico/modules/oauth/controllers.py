@@ -54,6 +54,7 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
         if form.validate_on_submit():
             self.application.name = form.name.data
             self.application.description = form.description.data
+            self.application.redirect_uris = form.redirect_uris.data
             flash(_("Application {} was modified").format(self.application.name), 'success')
             return redirect(url_for('.apps'))
         return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form,
