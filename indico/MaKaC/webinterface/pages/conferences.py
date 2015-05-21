@@ -1970,7 +1970,7 @@ class WPConfModifToolsBase(WPConferenceModifBase):
                 urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf))
         if Config.getInstance().getOfflineStore():
             self._tabOffline = self._tabCtrl.newTab("offline", _("Offline version"),
-                                                    urlHandlers.UHConfOffline.getURL(self._conf))
+                                                    url_for('static_site.list', self._conf))
 
         self._setActiveTab()
 
@@ -2500,6 +2500,7 @@ class WConfOffline(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confId"] = self._conf.getId()
+        vars['event'] = self._conf
         vars["avatarId"] = self._rh._aw.getUser().getId()
         vars["offlineTasks"] = ModuleHolder().getById("offlineEvents").getOfflineEventByConfId(self._conf.getId())
         return vars

@@ -83,24 +83,3 @@ class OfflineEventsModule(Module):
     @classmethod
     def getOfflineEventTypes(self):
         return OfflineEventsModule._offlineEventTypes
-
-class OfflineEventItem(Persistent):
-
-    def __init__(self, conference, avatar, status):
-        self.id = None
-        self.conference = conference
-        self.avatar = avatar
-        self.requestTime = nowutc()
-        self.creationTime = None
-        self.status = status
-        self.file = None
-
-    def getOfflineEventStatusLabel(self):
-        return OfflineEventsModule.getOfflineEventTypes()[self.status]
-
-    def getDownloadLink(self):
-        if self.file:
-            link = UHOfflineEventAccess.getURL()
-            link.addParam('fileId', self.id)
-            link.addParam('confId', self.conference.getId())
-            return link

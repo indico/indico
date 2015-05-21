@@ -248,6 +248,7 @@ class User(db.Model):
     # - agreements (Agreement.user)
     # - requests_created (Request.created_by_user)
     # - requests_processed (Request.processed_by_user)
+    # - static_site (StaticSite.user)
 
     @property
     def as_principal(self):

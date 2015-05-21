@@ -59,10 +59,7 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 
 
 # indico imports
-from indico.modules import ModuleHolder
-from indico.modules.offlineEvents import OfflineEventItem
-from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
-from indico.modules.scheduler import tasks, Client
+from indico.modules.scheduler import tasks
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil
@@ -1652,21 +1649,6 @@ class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
         result["authRequestDetailedURL"] = urls["authRequestURL"]
         return result
 
-class ConferenceOfflineAddTask(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._avatar = AvatarHolder().getById(pm.extract("avatarId", pType=str, allowEmpty=False))
-
-    def _getAnswer(self):
-        offlineEventsModule = ModuleHolder().getById("offlineEvents")
-        offlineEvent = OfflineEventItem(self._conf, self._avatar, "Queued")
-        offlineEventsModule.addOfflineEvent(offlineEvent)
-        client = Client()
-        client.enqueue(OfflineEventGeneratorTask(offlineEvent))
-        return True
-
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupport": ConferenceSupportModification,
@@ -1734,5 +1716,4 @@ methodMap = {
     "protection.getProtectedChildren": ConferenceGetChildrenProtected,
     "protection.getPublicChildren": ConferenceGetChildrenPublic,
     "api.getExportURLs": ConferenceExportURLs,
-    "offline.addTask": ConferenceOfflineAddTask
-    }
+}

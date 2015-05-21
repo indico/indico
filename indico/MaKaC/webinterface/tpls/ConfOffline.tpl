@@ -45,36 +45,10 @@
     % endif
     ${_("If you wish to generate your own offline copy of the conference click the 'Generate' button below.")}
   </div>
-  <input style="margin-top: 20px; font-weight: bold" class="i-button"  id="generateButton" name="generateButton" value="${ _('Generate')}" type="button"/>
-<div>
+  <button style="margin-top: 20px; font-weight: bold" class="i-button" type="button"
+          data-method="post" data-href="${ url_for('static_site.build', event) }"
+          data-title="${ _('Offline version generation') }"
+          data-confirm="${ _('Are you sure you want to generate offline version of this event?<br>Remember that this is a heavy operation especially for big events so make sure that this is necessary before you continue!') }">
+    ${ _('Generate')}
+  </button>
 </div>
-
-<script type="text/javascript">
-var taskAddedPopup = new AlertPopup($T("Task successfully added to generation queue"),$T("You will get email notification when offline version of the event will be generated and ready to download"),
-  function () {
-    window.location.reload();
-  });
-
-$("#generateButton").click(function(){
-    new ConfirmPopup($T("Offline version generation"),$T("Are you sure you want to generate offline version of this event?<br>Remember that this is a heavy operation especially for big events so make sure that this is necessary before you continue!"), function(confirmed) {
-        if(confirmed) {
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Adding generation request task..."));
-            indicoRequest('event.offline.addTask',
-                    { confId: "${confId}",
-                      avatarId: "${avatarId}" },
-                      function(result, error) {
-                          if (!error) {
-                            killProgress();
-                            if (result) {
-                              taskAddedPopup.open();
-                            }
-                          } else {
-                            killProgress();
-                            IndicoUtil.errorReport(error);
-                          }
-                    });
-        }
-    }).open();
-    return false;
-    });
-</script>
