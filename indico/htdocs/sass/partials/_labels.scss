@@ -53,4 +53,8 @@
         color: #EFEFEF !important;
         background: $yellow;
     }
+    &.disabled {
+        color: $light-black;
+        background: $pastel-gray;
+    }
 }
