@@ -59,7 +59,7 @@ class IndicoCelery(Celery):
         # Pickle isn't pretty but that way we can pass along all types (tz-aware datetimes, sets, etc.)
         self.conf['CELERY_RESULT_SERIALIZER'] = 'pickle'
         self.conf['CELERY_TASK_SERIALIZER'] = 'pickle'
-        self.conf['CELERY_ACCEPT_CONTENT'] = ['pickle']
+        self.conf['CELERY_ACCEPT_CONTENT'] = ['json', 'yaml', 'pickle']
         # Send emails about failed tasks
         self.conf['CELERY_SEND_TASK_ERROR_EMAILS'] = True
         self.conf['ADMINS'] = [('Admin', cfg.getSupportEmail())]
