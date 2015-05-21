@@ -26,5 +26,4 @@ logger = Logger.get('categories')
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico.modules.categories.cleanup
-    import indico.modules.categories.suggestions
+    import indico.modules.categories.tasks
