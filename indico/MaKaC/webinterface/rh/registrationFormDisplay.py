@@ -21,7 +21,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
 from MaKaC.errors import FormValuesError, MaKaCError, AccessError, NotFoundError
-from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
 from MaKaC.common.utils import validMail
@@ -30,6 +29,7 @@ from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.notifications import (notify_registration_confirmation,
                                                               notify_registration_modification)
 from indico.modules.payment import event_settings as payment_event_settings
+from indico.modules.users.util import get_user_by_email
 from indico.web.flask.util import send_file, url_for
 
 from indico.util import json
@@ -112,11 +112,20 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
             raise FormValuesError(_("An email address has to be set in order to make the registration in the event."))
         elif not validMail(email, False):
             raise FormValuesError(_("The given email address is not valid."))
-        matchedUsers = AvatarHolder().match({"email": email}, exact=1)
-        if matchedUsers:
-            user = matchedUsers[0]
-        else:
-            user = None
+
+        # Check if the email matches an existing user
+        user = get_user_by_email(email)
+        avatar = user.as_avatar if user else None
+        if user:
+            if not session.user:
+                return redirect_to_login(
+                    reason=_("The provided email ({email}) is linked to an Indico account. Please log in with that "
+                             "account first to register to the event with that email.").format(email=email))
+            elif session.user != user:
+                flash(_("The provided email ({email}) is linked to another Indico account. Please log in using that "
+                        "account to register to the event with that email.").format(email=email), 'error')
+                return redirect(url_for('event.confRegistrationFormDisplay-creation', self._conf))
+
         # Check if the user can register
         if not canManageRegistration:  # normal user registering. Managers can.
             if self._conf.getRegistrationForm().isFull():
@@ -129,22 +138,22 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
             if self._conf.hasRegistrantByEmail(email):
                 raise FormValuesError("There is already a user with the email \"%s\". Please choose another one" % email)
         else:
-            if user.isRegisteredInConf(self._conf) or self._conf.hasRegistrantByEmail(email):
+            if avatar.isRegisteredInConf(self._conf) or self._conf.hasRegistrantByEmail(email):
                 if canManageRegistration:
                     raise FormValuesError("There is already a user with the email \"%s\". Please choose another one" % email)
                 else:
                     raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference." % email)
 
         rp = registration.Registrant()
-        self._conf.addRegistrant(rp, user)
-        rp.setValues(self._getRequestParams(), user)
+        self._conf.addRegistrant(rp, avatar)
+        rp.setValues(self._getRequestParams(), avatar)
 
-        if user is not None:
-            rp.setAvatar(user)
+        if avatar is not None:
+            rp.setAvatar(avatar)
 
         notify_registration_confirmation(self._conf, rp)
 
-        if canManageRegistration and user != self._getUser():
+        if canManageRegistration and user != session.user:
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
         else:
             params = {}
@@ -230,9 +239,27 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                 return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
             else:
                 rp = self._getUser().getRegistrantById(self._conf.getId())
+
+                # Check if the email matches an existing user
+                params = self._getRequestParams()
+                email = self._regForm.getPersonalData().getValueFromParams(params, 'email') or ''
+                user = get_user_by_email(email)
+                if user:
+                    if not session.user:
+                        return redirect_to_login(
+                            reason=_(
+                                "The provided email ({email}) is linked to an Indico account. Please log in with that "
+                                "account first to register to the event with that email.").format(email=email))
+                    elif session.user != user:
+                        flash(_(
+                            "The provided email ({email}) is linked to another Indico account. Please log in using that"
+                            " account to register to the event with that email.").format(email=email), 'error')
+                        return redirect(url_for('event.confRegistrationFormDisplay-modify', self._conf))
+
                 # check if the email is being changed by another one that already exists
-                if self._getRequestParams().get("email", "") != rp.getEmail() and self._conf.hasRegistrantByEmail(self._getRequestParams().get("email", "")):
-                    raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one") % self._getRequestParams().get("email", "--no email--"))
+                if email != rp.getEmail() and self._conf.hasRegistrantByEmail(email):
+                    raise FormValuesError(_("There is already a user with the email \"{email}\". "
+                                            "Please choose another one.").format(email or "--no email--"))
                 rp.setValues(self._getRequestParams(), self._getUser())
 
                 notify_registration_modification(self._conf, rp)
