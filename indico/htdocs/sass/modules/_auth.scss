@@ -49,6 +49,10 @@ body {
             .centered-column {
                 width: 300px;
                 margin: 100px auto;
+
+                &.wide {
+                    width: 500px;
+                }
             }
 
             .header-logo {
@@ -85,7 +89,7 @@ body {
         @include login-form-button();
     }
 
-    form input {
+    form input:not([type="submit"]) {
         height: 2.5em;
         padding: 0.5em 1em;
         line-height: 1.5;
@@ -198,4 +202,13 @@ body {
     font-weight: bold;
     margin: 1em 0;
     padding: 1em;
+}
+
+
+/* OAuth application authentication page */
+
+.app-auth-box {
+    > .app-auth-box-content {
+        padding: 30px 0;
+    }
 }

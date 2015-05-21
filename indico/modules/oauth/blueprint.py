@@ -28,7 +28,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='templates')
 
 # Application endpoints
-_bp.add_url_rule('/oauth/authorize', 'oauth_authorize', RHOAuthAuthorize)
+_bp.add_url_rule('/oauth/authorize', 'oauth_authorize', RHOAuthAuthorize, methods=('GET', 'POST'))
 
 # Server administration
 _bp.add_url_rule('/admin/apps', 'apps', RHOAuthAdmin)
