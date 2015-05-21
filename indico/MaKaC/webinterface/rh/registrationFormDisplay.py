@@ -118,9 +118,9 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
         avatar = user.as_avatar if user else None
         if user:
             if not session.user:
-                return redirect_to_login(
-                    reason=_('The provided email ({email}) is linked to an Indico account. Please sign in with it '
-                             'first.').format(email=email))
+                flash(_('The provided email ({email}) is linked to an Indico account. Please sign in with it '
+                        'first.').format(email=email), 'error')
+                return redirect(url_for('event.confRegistrationFormDisplay-creation', self._conf))
             elif session.user != user:
                 flash(_('The provided email ({email}) is linked to another Indico account. Please sign in with it '
                         'first.').format(email=email), 'error')
@@ -246,9 +246,9 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                 user = get_user_by_email(email)
                 if user:
                     if not session.user:
-                        return redirect_to_login(
-                            reason=_('The provided email ({email}) is linked to an Indico account. Please sign in with '
-                                     'it first.').format(email=email))
+                        flash(_('The provided email ({email}) is linked to an Indico account. Please sign in with it '
+                                'first.').format(email=email), 'error')
+                        return redirect(url_for('event.confRegistrationFormDisplay-modify', self._conf))
                     elif session.user != user:
                         flash(_('The provided email ({email}) is linked to another Indico account. Please sign in with '
                                 'it first.').format(email=email), 'error')
