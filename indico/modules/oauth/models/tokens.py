@@ -31,7 +31,8 @@ class OAuthToken(db.Model):
     """OAuth tokens"""
 
     __tablename__ = 'tokens'
-    __table_args__ = ({'schema': 'oauth'})
+    __table_args__ = (db.UniqueConstraint('application_id', 'user_id'),
+                      {'schema': 'oauth'})
 
     #: the unique identifier of the token
     id = db.Column(
