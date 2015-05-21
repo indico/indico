@@ -250,6 +250,7 @@ class User(db.Model):
     # - requests_processed (Request.processed_by_user)
     # - static_sites (StaticSite.user)
     # - event_reminders (EventReminder.creator)
+    # - oauth_tokens (OAuthToken.user)
 
     @property
     def as_principal(self):

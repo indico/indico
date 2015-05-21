@@ -68,10 +68,27 @@ class OAuthToken(db.Model):
         nullable=True,
         default=now_utc
     )
+
     #: application authorized by this token
-    application = db.relationship('OAuthApplication')
+    application = db.relationship(
+        'OAuthApplication',
+        lazy=True,
+        backref=db.backref(
+            'tokens',
+            lazy='dynamic',
+            cascade='all, delete-orphan'
+        )
+    )
     #: the user who owns this token
-    user = db.relationship('User')
+    user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'oauth_tokens',
+            lazy='dynamic',
+            cascade='all, delete-orphan'
+        )
+    )
 
     @property
     def locator(self):
