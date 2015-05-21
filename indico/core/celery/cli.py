@@ -17,14 +17,16 @@
 from __future__ import unicode_literals
 
 import os
+import sys
 
-from celery.bin.celery import CeleryCommand
+from celery.bin.celery import CeleryCommand, command_classes
 from flask_script import Command
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.celery import celery
+from indico.util.console import cformat
 
 
 class IndicoCeleryCommand(Command):
@@ -38,11 +40,19 @@ class IndicoCeleryCommand(Command):
         return self.run(*args, **kwargs)
 
     def run(self, args):
-        update_session_options(db)  # disable the zodb commit hook
-        if args[0] == 'flower':
+        # disable the zodb commit hook
+        update_session_options(db)
+        # remove the celery shell command
+        next(funcs for group, funcs, _ in command_classes if group == 'Main').remove('shell')
+        del CeleryCommand.commands['shell']
+
+        if args and args[0] == 'flower':
             # Somehow flower hangs when executing it using CeleryCommand() so we simply exec it directly.
             # It doesn't really need the celery config anyway (besides the broker url)
             os.execlp('celery', 'celery', '-b', Config.getInstance().getCeleryBroker(),
                       *args)
+        elif args and args[0] == 'shell':
+            print cformat('%{red!}Please use `indico shell`.')
+            sys.exit(1)
         else:
             CeleryCommand(celery).execute_from_commandline(['indico celery'] + args)
