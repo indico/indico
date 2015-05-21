@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request, render_template
+from flask import flash, redirect, request, render_template, session
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.users.controllers import RHUserBase
@@ -37,12 +38,11 @@ class RHOAuthAuthorize(RHProtected):
 
     @oauth.authorize_handler
     def _process(self, **kwargs):
-        if request.method == 'GET':
-            if self.application.is_trusted:
-                return True
-            return render_template('oauth/authorize.html', application=self.application)
-        confirm = request.form.get('confirm', 'no')
-        return confirm == 'yes'
+        if request.method == 'POST':
+            return 'confirm' in request.form
+        if self.application.is_trusted:
+            return True
+        return render_template('oauth/authorize.html', application=self.application)
 
 
 class RHOAuthToken(RH):
@@ -114,7 +114,8 @@ class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
     """Revokes all user tokens associated to the OAuth application"""
 
     def _process(self):
-        # TODO: revoke tokens when implemented
+        OAuthToken.find(application_id=request.view_args['id']).delete()
+        logger.info("All user tokens for the application with id {} were revoked.".format(request.view_args['id']))
         flash(_("All user tokens for this application were revoked successfully"), 'success')
         return redirect(url_for('.app_details', self.application))
 
@@ -123,14 +124,20 @@ class RHOAuthUserProfile(RHUserBase):
     """OAuth overview (user)"""
 
     def _process(self):
-        tokens = OAuthToken.find_all()
+        tokens = OAuthToken.find_all(user=session.user)
         return WPOAuthUserProfile.render_template('user_profile.html', user=self.user, tokens=tokens)
 
 
 class RHOAuthUserTokenRevoke(RHUserBase):
     """Revokes user token"""
 
+    def _checkParams(self):
+        RHUserBase._checkParams(self)
+        self.token = OAuthToken.get(request.view_args['id'])
+        if session.user != self.token.user:
+            raise Forbidden("You can only revoke tokens associated with your user")
+
     def _process(self):
-        # TODO: revoke token when implemented
+        db.session.delete(self.token)
         flash(_("Your token was revoked successfully"), 'success')
         return redirect(url_for('.user_profile'))
