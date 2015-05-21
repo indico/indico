@@ -119,11 +119,11 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
         if user:
             if not session.user:
                 return redirect_to_login(
-                    reason=_("The provided email ({email}) is linked to an Indico account. Please log in with that "
-                             "account first to register to the event with that email.").format(email=email))
+                    reason=_('The provided email ({email}) is linked to an Indico account. Please sign in with it '
+                             'first.').format(email=email))
             elif session.user != user:
-                flash(_("The provided email ({email}) is linked to another Indico account. Please log in using that "
-                        "account to register to the event with that email.").format(email=email), 'error')
+                flash(_('The provided email ({email}) is linked to another Indico account. Please sign in with it '
+                        'first.').format(email=email), 'error')
                 return redirect(url_for('event.confRegistrationFormDisplay-creation', self._conf))
 
         # Check if the user can register
@@ -247,13 +247,11 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                 if user:
                     if not session.user:
                         return redirect_to_login(
-                            reason=_(
-                                "The provided email ({email}) is linked to an Indico account. Please log in with that "
-                                "account first to register to the event with that email.").format(email=email))
+                            reason=_('The provided email ({email}) is linked to an Indico account. Please sign in with '
+                                     'it first.').format(email=email))
                     elif session.user != user:
-                        flash(_(
-                            "The provided email ({email}) is linked to another Indico account. Please log in using that"
-                            " account to register to the event with that email.").format(email=email), 'error')
+                        flash(_('The provided email ({email}) is linked to another Indico account. Please sign in with '
+                                'it first.').format(email=email), 'error')
                         return redirect(url_for('event.confRegistrationFormDisplay-modify', self._conf))
 
                 # check if the email is being changed by another one that already exists
