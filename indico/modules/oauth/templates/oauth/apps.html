@@ -17,6 +17,11 @@
         <div class="i-box-content">
             <p>{% trans %}This is the list of applications authorized to access Indico. Click on the name of an application to see more information.{% endtrans %}</p>
             <ul class="group-list with-buttons">
+                {% if not applications %}
+                    <li class="italic">
+                        {%- trans %}There aren't any authorized applications.{% endtrans -%}
+                    </li>
+                {% endif %}
                 {% for application in applications %}
                     <li>
                         <span class="list-item-title">
