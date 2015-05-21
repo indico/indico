@@ -158,24 +158,6 @@ class TaskOccurrence(TimedEvent):
         return self._task
 
 
-class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
-    '''Updates statistics associated with categories
-    '''
-
-    # seconds to consider a task AWOL
-    _AWOLThresold = 15000
-
-    def __init__(self, cat, frequency, **kwargs):
-        super(CategoryStatisticsUpdaterTask, self).__init__(frequency,
-                                                            **kwargs)
-        self._cat = cat
-
-    def run(self):
-        from MaKaC.statistics import CategoryStatistics
-        CategoryStatistics.updateStatistics(self._cat,
-                                            self.getLogger())
-
-
 class SamplePeriodicTask(PeriodicTask):
     def run(self):
         base.TimeSource.get().sleep(1)
