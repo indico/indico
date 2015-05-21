@@ -16,14 +16,20 @@
 
 from __future__ import unicode_literals
 
+import errno
+import os
+from datetime import timedelta
+
+from celery.schedules import crontab
 from flask import session
 
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.notifications import make_email, email_sender
 from indico.modules.events.static import logger
-from indico.modules.events.static.models.static import StaticSiteState
+from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.contextManager import ContextManager
+from indico.util.date_time import now_utc
 from indico.util.fossilize import clearCache
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -83,3 +89,26 @@ def notify_static_site_success(static_site):
                                                  event_title=static_site.event.getTitle(),
                                                  link=url_for('static_site.download', static_site, _external=True))
     return make_email(to_list, subject=subject, body=body, html=False)
+
+
+@celery.periodic_task(name='static_sites_cleanup', run_every=crontab(minute='30', hour='3', day_of_week='monday'))
+def static_sites_cleanup(days=30):
+    """Clean up old static sites
+
+    :param days: number of days after which to remove static sites
+    """
+    expired_sites = StaticSite.find_all(StaticSite.requested_dt < (now_utc() - timedelta(days=days)),
+                                        StaticSite.state == StaticSiteState.success)
+    logger.info('Removing {0} expired static sites from the past {1} days'.format(len(expired_sites), days))
+    try:
+        for site in expired_sites:
+            try:
+                os.remove(site.path)
+            except OSError as err:
+                if err.errno != errno.ENOENT:
+                    raise
+            site.path = None
+            site.state = StaticSiteState.expired
+            logger.info('Removed static site {}'.format(site))
+    finally:
+        db.session.commit()
