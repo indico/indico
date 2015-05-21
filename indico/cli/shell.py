@@ -31,6 +31,7 @@ from indico.core.config import Config
 from indico.util.console import colored, strip_ansi, cformat
 from indico.core.db import DBMgr, db
 from indico.core.index import Catalog
+from indico.core.plugins import plugin_engine
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import Conference, ConferenceHolder, CategoryManager
@@ -133,6 +134,11 @@ class IndicoShell(Shell):
             celery.loader.import_default_modules()  # load all tasks
             tasks = [task for task in sorted(celery.tasks.values()) if not task.name.startswith('celery.')]
             add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
+            # Plugins
+            self._info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
+            plugins = [type(plugin) for plugin in sorted(plugin_engine.get_active_plugins().values(),
+                                                         key=attrgetter('name'))]
+            add_to_context_multi(plugins, color='yellow!')
             # Utils
             self._info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
             add_to_context(celery, 'celery', doc='celery app', color='blue!')
