@@ -69,11 +69,7 @@ class IndicoMailFormatter(logging.Formatter):
                 info.append('Params: %s' % rh._getTruncatedParams())
 
             if session:
-                try:
-                    info.append('User: {0}'.format(session.avatar))
-                except POSError:
-                    # If the DB connection is closed getting the avatar may fail
-                    info.append('User id: {0}'.format(session.get('_avatarId')))
+                info.append('User: {0}'.format(session.user))
             info.append('IP: %s' % request.remote_addr)
             info.append('User Agent: %s' % request.user_agent)
             info.append('Referer: %s' % (request.referrer or 'n/a'))
