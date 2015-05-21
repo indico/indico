@@ -23,6 +23,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.string import return_ascii
+from indico.util.date_time import now_utc
 from MaKaC.common.cache import GenericCache
 
 
@@ -63,7 +64,8 @@ class OAuthToken(db.Model):
     #: the last time the token was used by the application
     last_used_dt = db.Column(
         UTCDateTime,
-        nullable=True
+        nullable=True,
+        default=now_utc
     )
     #: application authorized by this token
     application = db.relationship('OAuthApplication')
@@ -89,12 +91,12 @@ class OAuthGrant(object):
     #: cache entry to store grant tokens
     _cache = GenericCache('oauth-grant-tokens')
 
-    def __init__(self, client_id, code, redirect_uri, user, expires):
+    def __init__(self, client_id, code, redirect_uri, user, scopes, expires):
         self.client_id = client_id
         self.code = code
         self.redirect_uri = redirect_uri
         self.user = user
-        self.scopes = ''
+        self.scopes = scopes
         self.expires = expires
 
     @property
@@ -103,7 +105,7 @@ class OAuthGrant(object):
 
     @property
     def ttl(self):
-        return self.expires - datetime.nowutc()
+        return self.expires - datetime.utcnow()
 
     @classmethod
     def get(cls, client_id, code):
@@ -115,7 +117,7 @@ class OAuthGrant(object):
         return '{}:{}'.format(client_id, code)
 
     def save(self):
-        self._cache.set(key=self.key, value=self, time=self.ttl)
+        self._cache.set(key=self.key, val=self, time=self.ttl)
 
     def delete(self):
         self._cache.delete(self.key)

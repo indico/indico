@@ -64,7 +64,7 @@ class OAuthApplication(db.Model):
     default_scopes = db.Column(
         ARRAY(db.String),
         nullable=False,
-        default=[]
+        default=['api']
     )
     #: the OAuth absolute URIs that a application may use to redirect to after authorization
     redirect_uris = db.Column(

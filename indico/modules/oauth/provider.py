@@ -25,6 +25,7 @@ from indico.core.config import Config
 from indico.modules.oauth import oauth
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
+from indico.util.date_time import now_utc
 
 
 @oauth.clientgetter
@@ -39,32 +40,33 @@ def load_grant(client_id, code):
 
 @oauth.grantsetter
 def save_grant(client_id, code, request, *args, **kwargs):
-    ttl = Config.getInstance().getSupportEmail()
+    ttl = Config.getInstance().getOAuthGrantTokenTTL()
     expires = datetime.utcnow() + timedelta(seconds=ttl)
     grant = OAuthGrant(client_id=client_id, code=code['code'], redirect_uri=request.redirect_uri,
-                       user=session.user, expires=expires)
+                       user=session.user, scopes=request.scopes, expires=expires)
     grant.save()
     return grant
 
 
 @oauth.tokengetter
-def load_token(access_token=None, refresh_token=None):
-    if not access_token and not refresh_token:
-        raise ValueError
-    if access_token:
-        return OAuthToken.find_first(access_token=access_token)
-    elif refresh_token:
-        return OAuthToken.find_first(refresh_token=refresh_token)
+def load_token(access_token, refresh_token=None):
+    token = OAuthToken.find_first(access_token=access_token)
+    if token:
+        token.last_used_dt = now_utc()
+    return token
 
 
 @oauth.tokensetter
 def save_token(token, request, *args, **kwargs):
-    tokens = OAuthToken.find(client_id=request.client.client_id, user_id=session.user.id)
+    tokens = OAuthToken.find(OAuthApplication.client_id == request.client.client_id,
+                             OAuthToken.user_id == request.user.id,
+                             _join=OAuthApplication)
     # make sure that every client has only one token connected to a user
     for t in tokens:
         db.session.delete(t)
     application = OAuthApplication.find_one(client_id=request.client.client_id)
-    token = OAuthToken(application_id=application.id, user_id=session.user.id, access_token=token['access_token'])
+    scopes = token['scope'].split()
+    token = OAuthToken(application_id=application.id, user_id=request.user.id,
+                       access_token=token['access_token'], scopes=scopes)
     db.session.add(token)
-    db.session.commit()
     return token
