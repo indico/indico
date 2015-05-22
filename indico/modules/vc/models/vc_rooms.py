@@ -92,7 +92,7 @@ class VCRoom(db.Model):
     #: The user who created the videoconference room
     created_by_user = db.relationship(
         'User',
-        lazy=False,
+        lazy=True,
         backref=db.backref(
             'vc_rooms',
             lazy='dynamic'

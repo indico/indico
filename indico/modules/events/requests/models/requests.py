@@ -103,7 +103,7 @@ class Request(db.Model):
     #: The user who created the request
     created_by_user = db.relationship(
         'User',
-        lazy=False,
+        lazy=True,
         foreign_keys=[created_by_id],
         backref=db.backref(
             'requests_created',
@@ -113,7 +113,7 @@ class Request(db.Model):
     #: The user who processed the request
     processed_by_user = db.relationship(
         'User',
-        lazy=False,
+        lazy=True,
         foreign_keys=[processed_by_id],
         backref=db.backref(
             'requests_processed',
