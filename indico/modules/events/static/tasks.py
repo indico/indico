@@ -31,7 +31,7 @@ from indico.modules.events.static.models.static import StaticSite, StaticSiteSta
 from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
 from indico.util.fossilize import clearCache
-from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
 from MaKaC.accessControl import AccessWrapper
@@ -80,15 +80,11 @@ def build_static_site(static_site):
 
 @email_sender
 def notify_static_site_success(static_site):
-    to_list = [static_site.user.email]
-    subject = _("Static version of an event ready for download")
-    body = _("Dear {user.full_name},\n\n"
-             "The static version for the event {event_title} is ready to be downloaded.\n\n"
-             "Download link: {link}\n\n"
-             'Best Regards,\n--\nIndico').format(user=static_site.user,
-                                                 event_title=static_site.event.getTitle(),
-                                                 link=url_for('static_site.download', static_site, _external=True))
-    return make_email(to_list, subject=subject, body=body, html=False)
+    template = get_template_module('events/static/emails/download_notification_email.txt',
+                                   user=static_site.user,
+                                   event_title=static_site.event.getTitle(),
+                                   link=url_for('static_site.download', static_site, _external=True))
+    return make_email({static_site.user.email}, template=template, html=False)
 
 
 @celery.periodic_task(name='static_sites_cleanup', run_every=crontab(minute='30', hour='3', day_of_week='monday'))

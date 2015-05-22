@@ -1,0 +1,14 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject %}Offline copy of an event ready for download{% endblock %}
+
+{% block header_recipient -%}
+    {{ user.full_name }}
+{%- endblock %}
+
+{% block body -%}
+The offline copy of the event "{{ event_title }}" is ready for download.
+
+Download link: {{ link }}
+
+{%- endblock %}
