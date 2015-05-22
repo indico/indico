@@ -20,8 +20,9 @@ from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
 import transaction
-from flask import request, session, redirect, flash, json, Response, jsonify
-from sqlalchemy import func
+from flask import request, session, redirect, flash, json, Response
+from sqlalchemy import func, inspect
+from sqlalchemy.orm import lazyload
 from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.db import db
@@ -331,6 +332,9 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .filter(func.lower(VCRoom.name).contains(self.query.lower()), VCRoom.status != VCRoomStatus.deleted,
                          VCRoom.type == self.plugin.service_name)
                  .join(VCRoomEventAssociation)
+                 # Plugins might add eager-loaded extensions to the table - since we cannot group by them
+                 # we need to make sure everything is lazy-loaded here.
+                 .options(lazyload(r) for r in inspect(VCRoom).relationships.keys())
                  .group_by(VCRoom.id)
                  .order_by(db.desc('event_count'))
                  .limit(10))
