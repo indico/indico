@@ -149,18 +149,22 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
             if not event_vc_room:
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
-            self.plugin.update_data_vc_room(vc_room, form.data)
+            with db.session.no_autoflush:
+                self.plugin.update_data_vc_room(vc_room, form.data)
 
             try:
-                self.plugin.create_room(vc_room, self.event)
+                # avoid flushing the incomplete vc room to the database
+                with db.session.no_autoflush:
+                    self.plugin.create_room(vc_room, self.event)
                 notify_created(self.plugin, vc_room, event_vc_room, self.event, session.user)
             except VCRoomError as err:
                 if err.field is None:
                     raise
                 field = getattr(form, err.field)
                 field.errors.append(err.message)
+                transaction.abort()  # otherwise the incomplete vc room would be added to the db!
             else:
-                db.session.add_all((vc_room, event_vc_room))
+                db.session.add(vc_room)
                 # TODO: notify_created(vc_room, self.event, session.user)
 
                 flash(_("{plugin_name} room '{room.name}' created").format(
