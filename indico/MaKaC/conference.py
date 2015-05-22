@@ -16,6 +16,7 @@
 
 from itertools import ifilter
 from flask_pluginengine import plugin_context
+from sqlalchemy.orm import lazyload
 
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
@@ -157,9 +158,12 @@ class Locatable:
         if not location or not room:
             return None
 
-        return Room.find_first(Room.name == fix_broken_string(room, True),
-                               Location.name == fix_broken_string(location, True),
-                               _join=Room.location)
+        return (Room.query
+                .join(Room.location)
+                .options(lazyload(Room.owner))
+                .filter(Room.name == fix_broken_string(room, True),
+                        Location.name == fix_broken_string(location, True))
+                .first())
 
     def getLocationParent(self):
         """
