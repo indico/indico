@@ -37,8 +37,7 @@ from indico.core.logger import Logger
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
-from indico.modules.oauth.errors import OAuthError
-from indico.modules.oauth.components import OAuthUtils
+from indico.modules.oauth.provider import load_token
 from indico.util.contextManager import ContextManager
 from indico.util.string import to_unicode
 from indico.web.http_api import HTTPAPIHook
@@ -154,10 +153,11 @@ def handler(prefix, path):
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
-    oauthToken = 'oauth_token' in queryParams
-    # Check if OAuth data is supplied in the Authorization header
-    if not oauthToken and request.headers.get('Authorization') is not None:
-        oauthToken = 'oauth_token' in request.headers.get('Authorization')
+    oauthToken = request.args.get('oauth_token')
+    if oauthToken is None:
+        token_param = request.headers.get('Authorization', '').split()
+        if token_param:
+            oauthToken = token_param[-1]
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -188,7 +188,7 @@ def handler(prefix, path):
                 # Create an access wrapper for the API key's user
                 aw = buildAW(ak, onlyPublic)
             else:  # Access Token (OAuth)
-                at = OAuthUtils.OAuthCheckAccessResource()
+                at = load_token(oauthToken)
                 aw = buildAW(at, onlyPublic)
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:
@@ -244,10 +244,6 @@ def handler(prefix, path):
             responseUtil.status = e.getCode()
             if responseUtil.status == 405:
                 responseUtil.headers['Allow'] = 'GET' if request.method == 'POST' else 'POST'
-    except OAuthError, e:
-        error = e
-        if e.getCode():
-            responseUtil.status = e.getCode()
 
     if result is None and error is None:
         # TODO: usage page
