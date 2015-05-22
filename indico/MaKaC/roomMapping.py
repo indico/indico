@@ -15,12 +15,15 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
+
+from persistent import Persistent
+from sqlalchemy.orm import load_only, noload
+
 from indico.core.config import Config
 from indico.util.caching import memoize_request
 from MaKaC.common import filters
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
-from persistent import Persistent
 
 
 class RoomMapperHolder(ObjectHolder):
@@ -126,7 +129,10 @@ class RoomMapper(Persistent):
             return ''
         if Config.getInstance().getIsRoomBookingActive():
             from indico.modules.rb.models.rooms import Room
-            room = Room.find_first(name=roomName)
+            room = (Room.query
+                    .options(load_only('building', 'floor', 'number'), noload('owner'))
+                    .filter_by(name=roomName)
+                    .first())
             if room:
                 if all(field in self.getBaseMapURL() for field in ['{building}','{floor}','{roomNr}']):
                     return self.getBaseMapURL().format(**{'building': str(room.building),
