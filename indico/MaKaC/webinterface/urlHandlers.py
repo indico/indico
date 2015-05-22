@@ -1909,14 +1909,6 @@ class UHConfModFullMaterialPackagePerform(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-performMatPkg'
 
 
-class UHConfOffline(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-offline'
-
-
-class UHOfflineEventAccess(URLHandler):
-    _endpoint = 'event_mgmt.getFile-offlineEvent'
-
-
 class UHTaskManager(URLHandler):
     _endpoint = 'admin.taskManager'
 

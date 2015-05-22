@@ -6484,36 +6484,6 @@ ul.conveners ul.names .affiliation {
     font-weight: bold;
 }
 
-.offlineTasksGenerated {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #9AC33A;
-}
-
-.offlineTasksQueued {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #A4CCC9;
-}
-
-.offlineTasksFailed {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #B93725;
-}
-
-.offlineTasksExpired {
-    text-align: center;
-    width: 80px;
-    background: none repeat scroll 0 0 #E0A565;
-}
-
-.offlineTask {
-    width: 1px;
-    white-space: nowrap;
-    padding: 1px 20px 3px 0px;
-}
-
 .contributionReviewingStatusRejected, .abstractStatusRejected, .abstractStatusDuplicated, .abstractStatusWithdrawn {
     background: none repeat scroll 0 0 #B93725;
 }

@@ -120,22 +120,3 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _process( self ):
         p = files.WPVideoFlash(self, self._link )
         return p.display()
-
-
-class RHOfflineEventAccess(RHConferenceModifBase):
-    _uh = urlHandlers.UHOfflineEventAccess
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        if 'fileId' not in params:
-            raise NotFoundError(_("Missing 'fileId' argument."))
-        self._offlineEvent = ModuleHolder().getById("offlineEvents").getOfflineEventByFileId(params["confId"],
-                                                                                             params["fileId"])
-        if not self._offlineEvent or not self._offlineEvent.file or \
-           not os.path.isfile(self._offlineEvent.file.getFilePath()):
-            raise NotFoundError(_("The file you tried to access does not exist anymore."))
-
-    def _process(self):
-        f = self._offlineEvent.file
-        return send_file('event-%s.zip' % self._conf.getId(), f.getFilePath(), f.getFileType(),
-                         last_modified=self._offlineEvent.creationTime, inline=False)

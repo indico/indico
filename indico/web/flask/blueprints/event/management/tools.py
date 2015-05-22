@@ -80,7 +80,3 @@ event_mgmt.add_url_rule('/tools/badges/save-background', 'confModifTools-badgeSa
 event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-matPkg', conferenceModif.RHFullMaterialPackage)
 event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-performMatPkg',
                         conferenceModif.RHFullMaterialPackagePerform, methods=('POST',))
-
-# Tools: Offline version
-event_mgmt.add_url_rule('/tools/offline/', 'confModifTools-offline', conferenceModif.RHConfOffline)
-event_mgmt.add_url_rule('/tools/offline/<fileId>.zip', 'getFile-offlineEvent', fileAccess.RHOfflineEventAccess)

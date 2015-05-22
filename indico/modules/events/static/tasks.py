@@ -39,7 +39,7 @@ from MaKaC.common.offlineWebsiteCreator import OfflineEvent
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 
 
-@celery.task
+@celery.task(request_context=True)
 def build_static_site(static_site):
     static_site.state = StaticSiteState.running
     db.session.commit()
