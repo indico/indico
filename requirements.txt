@@ -75,3 +75,4 @@ itsdangerous==0.24
 celery==3.1.18
 PyYAML==3.11
 terminaltables==1.1.1
+contextlib2==0.4.0

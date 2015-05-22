@@ -22,6 +22,7 @@ from operator import itemgetter
 from celery import Celery
 from celery.beat import PersistentScheduler
 from celery.signals import before_task_publish
+from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
@@ -35,7 +36,17 @@ from indico.util.string import return_ascii
 
 
 class IndicoCelery(Celery):
-    """Celery sweetened with some Indico/Flask-related sugar"""
+    """Celery sweetened with some Indico/Flask-related sugar
+
+    The following extra params are available on the `task` decorator:
+
+    - `request_context` -- if True, the task will run inside a Flask
+                           `test_request_context`
+    - `plugin` -- if set to a plugin name or class, the task will run
+                  inside a plugin context for that plugin.  This will
+                  override whatever plugin context is active when
+                  sending the task.
+    """
 
     def __init__(self, *args, **kwargs):
         super(IndicoCelery, self).__init__(*args, **kwargs)
@@ -109,14 +120,23 @@ class IndicoCelery(Celery):
             abstract = True
 
             def __call__(s, *args, **kwargs):
-                with self.flask_app.app_context():
-                    with DBMgr.getInstance().global_connection():
-                        args = _CelerySAWrapper.unwrap_args(args)
-                        kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
-                        plugin_name = kwargs.pop('__current_plugin__', None)
-                        plugin = plugin_engine.get_plugin(plugin_name) if plugin_name else None
-                        with plugin_context(plugin):
-                            return super(IndicoTask, s).__call__(*args, **kwargs)
+                stack = ExitStack()
+                stack.enter_context(self.flask_app.app_context())
+                stack.enter_context(DBMgr.getInstance().global_connection())
+                if getattr(s, 'request_context', False):
+                    stack.enter_context(self.flask_app.test_request_context())
+                args = _CelerySAWrapper.unwrap_args(args)
+                kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
+                plugin = getattr(s, 'plugin', kwargs.pop('__current_plugin__', None))
+                if isinstance(plugin, basestring):
+                    plugin_name = plugin
+                    plugin = plugin_engine.get_plugin(plugin)
+                    if plugin is None:
+                        stack.close()
+                        raise ValueError('Plugin not active: ' + plugin_name)
+                stack.enter_context(plugin_context(plugin))
+                with stack:
+                    return super(IndicoTask, s).__call__(*args, **kwargs)
 
         self.Task = IndicoTask
 
