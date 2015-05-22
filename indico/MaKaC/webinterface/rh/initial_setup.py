@@ -17,22 +17,25 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from operator import itemgetter
+
 from flask import render_template, request, session
-from wtforms import Form, validators, TextField, PasswordField, BooleanField
+from pytz import common_timezones
 from tzlocal import get_localzone
+from wtforms import validators, TextField, SelectField, BooleanField
+from wtforms.fields.html5 import EmailField
 
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh import services
 from MaKaC.webinterface.pages import signIn
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.user import AvatarHolder, Avatar, LoginInfo
 from MaKaC.errors import AccessError, FormValuesError
-from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.accessControl import AdminList
-from MaKaC.i18n import _
-from MaKaC.webinterface.common.timezones import TimezoneRegistry
+
+from indico.modules.auth.forms import LocalRegistrationForm
+from indico.modules.users import User
+from indico.util.i18n import _, get_all_locales, parse_locale
 from indico.web.forms.validators import UsedIfChecked
-from indico.util.i18n import parseLocale, getLocaleDisplayNames
+from indico.web.forms.widgets import SwitchWidget
 
 
 class RHInitialSetup(RH):
@@ -46,31 +49,17 @@ class RHInitialSetup(RH):
         av.setLang(setup_form.language.data)
 
     def _checkProtection(self):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
+        if User.query.count() > 0:
             raise AccessError
 
     def _checkParams_POST(self):
         self._enable = 'enable' in request.form
 
     def _process_GET(self):
-        tz = str(get_localzone())
-        timezone_options = TimezoneRegistry.getShortSelectItemsHTML(tz)
-        language_options = getLocaleDisplayNames()
-        for code in language_options:
-            language_options.remove(code)
-            language_options.append((code[0], code[1][0].upper() + code[1][1:]))
-        sel_lang = session.lang
-        locale = parseLocale(sel_lang)
-        lang_name = locale.languages[locale.language].encode('utf-8')
-        selected_language_name = lang_name[0].upper() + lang_name[1:]
-
-        wvars = {'language_options': language_options,
-                 'timezone_options': timezone_options,
-                 'selected_language': sel_lang,
-                 'selected_language_name': selected_language_name}
-
-        return render_template('initial_setup.html', **wvars)
+        return render_template('initial_setup.html',
+                               selected_lang_name=parse_locale(session.lang).language_name,
+                               language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
+                               form=InitialSetupForm(timezone=str(get_localzone()), language=session.lang))
 
     def _process_POST(self):
         setup_form = InitialSetupForm(request.form)
@@ -78,8 +67,7 @@ class RHInitialSetup(RH):
             print setup_form.errors
             raise FormValuesError(_("Some fields are invalid. Please, correct them and submit the form again."))
         # Creating new user
-        ah = AvatarHolder()
-        av = Avatar()
+
         authManager = AuthenticatorMgr()
         self._setUserData(av, setup_form)
         ah.add(av)
@@ -104,19 +92,19 @@ class RHInitialSetup(RH):
         return p.display()
 
 
-class InitialSetupForm(Form):
-    name = TextField('Name', [validators.Required()])
-    surname = TextField('Surname', [validators.Required()])
-    user_email = TextField('User Email Address', [validators.Required(), validators.Email()])
-    login = TextField('Login', [validators.Required()])
-    password = PasswordField('New Password', [validators.Required()])
-    password_confirm = PasswordField('Repeat Password',
-                                     [validators.EqualTo('password', message='Passwords must match')])
-    timezone = TextField('Timezone', [validators.Required()])
-    language = TextField('Language', [validators.Required()])
-    organisation = TextField('Organisation', [validators.Required()])
-    enable = BooleanField('Enable Instance Tracking')
-    it_email = TextField('Instance Tracking Email Address',
-                         [UsedIfChecked('enable'), validators.Required(), validators.Email()])
-    it_contact = TextField('Instance Tracking Email Address',
-                           [UsedIfChecked('enable'), validators.Required()])
+class InitialSetupForm(LocalRegistrationForm):
+    first_name = TextField('First Name', [validators.Required()])
+    last_name = TextField('Last Name', [validators.Required()])
+    email = EmailField(_('Email address'), [validators.Required()])
+    timezone = SelectField('Timezone', [validators.Required()], choices=[(k, k) for k in common_timezones])
+    language = SelectField('Language', [validators.Required()])
+    affiliation = TextField('Organization', [validators.Required()])
+    enable_tracking = BooleanField('Enable Instance Tracking', widget=SwitchWidget())
+    contact_name = TextField('Contact Name',
+                             [UsedIfChecked('enable'), validators.Required()])
+    contact_email = EmailField('Contact Email Address',
+                               [UsedIfChecked('enable'), validators.Required(), validators.Email()])
+
+    def __init__(self, *args, **kwargs):
+        super(InitialSetupForm, self).__init__(*args, **kwargs)
+        self.language.choices = sorted(get_all_locales().items(), key=itemgetter(1))

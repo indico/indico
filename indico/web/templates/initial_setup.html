@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% from 'forms/_form.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
+
 {% block title %}{% trans %}Initial Setup{% endtrans %}{% endblock %}
 
 {% block head %}
@@ -21,7 +23,7 @@
             <form id="language-form" method="POST" action="{{ url_for('misc.changeLang') }}">
                 <input id="language-hidden" type="hidden" name="lang">
             </form>
-            <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selected_language_name }}</a>
+            <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selected_lang_name }}</a>
             <ul class="dropdown">
                 {% for code, lang in language_options -%}
                     <li id="{{ code }}"><a>{{ lang }}</a></li>
@@ -31,9 +33,7 @@
     </div>
 
     <div class="init-setup-body">
-
-        <form id="initial-setup-form" class="init-setup-form" action="" method="POST">
-
+        <form method="POST" action="" class="i-form init-setup-form" id="initial-setup-form">
             <div class="step-wrapper" id="step1">
 
                 <div class="step-icon">
@@ -50,35 +50,11 @@
                     </div>
 
                     <div class="fields-container">
-
-                        <div>
-                            <input id="name" type="text" name="name" data-error-tooltip="{% trans %}You must enter a name{% endtrans %}" value="{{ name_value }}" placeholder="{% trans %}First name{% endtrans %}" required>
-                        </div>
-
-                        <div>
-                            <input id="surname" type="text" name="surname" data-error-tooltip="{% trans %}You must enter a surname{% endtrans %}" value="{{ surname_value }}" placeholder="{% trans %}Family name{% endtrans %}" required>
-                        </div>
-
-                        <div>
-                            <input id="user-email" type="email" name="user_email" data-error-tooltip="{% trans %}You must enter your user e-mail address{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail address{% endtrans %}" value="{{ user_email_value }}" placeholder="{% trans %}Email{% endtrans %}" required>
-                        </div>
-
-                        <div>
-                            <input id="login" type="text" name="login" data-error-tooltip="{% trans %}You must enter a login{% endtrans %}" value="{{ login_value }}" placeholder="{% trans %}Login{% endtrans %}" required>
-                        </div>
-
-                        <div>
-                            <input id="password" type="password" name="password" data-error-tooltip="{% trans %}You must define a password{% endtrans %}" value="" placeholder="{% trans %}Password{% endtrans %}" required>
-                        </div>
-
-                        <div>
-                            <input id="password-confirm" type="password" name="password_confirm" data-error-tooltip="{% trans %}You must enter the same password twice{% endtrans %}" value="" placeholder="{% trans %}Confirm password{% endtrans %}" required>
-                        </div>
-
+                        {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'username', 'password', 'confirm_password'),
+                                     placeholder=True) }}
                     </div>
 
                 </div>
-
             </div>
 
             <div class="step-wrapper" id="step2">
@@ -97,33 +73,9 @@
                     </div>
 
                     <div class="fields-container">
-
-                        <div>
-                            <label for="lang">{% trans %}Language{% endtrans %}</label>
-                            <select id="lang" name="language" class="input-lang">
-                                {% for code, lang in language_options -%}
-                                    {% if selected_language == code %}
-                                        <option value="{{ code }}" selected>{{ lang }}</option>
-                                    {% else %}
-                                        <option value="{{ code }}">{{ lang }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="timezone">{% trans %}Timezone{% endtrans %}</label>
-                            <select id="timezone" name="timezone" class="input-timezone">{{ timezone_options | safe }}</select>
-                        </div>
-
-                        <div>
-                            <input id="organisation" type="text" name="organisation" data-error-tooltip="{% trans %}You must enter the name of your organization{% endtrans %}" value="{{ organisation_value }}" placeholder="{% trans %}Organization{% endtrans %}" required>
-                        </div>
-
+                        {{ form_rows(form, fields=('language', 'timezone', 'affiliation'), placeholder=True) }}
                     </div>
-
                 </div>
-
             </div>
 
             <div class="step-wrapper" id="step3">
@@ -150,34 +102,16 @@
                     </div>
 
                     <div class="fields-container">
-
-                        <div class="enable-line">
-                            <label>{% trans %}Count me in!{% endtrans %}</label>
-                            <input id="enable" type="checkbox" name="enable" value="1" {{ checked }}>
-                            <div class="toggle-button">
-                                <div class="toggle"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <input id="it-contact" class="input-it" type="text" name="it_contact" data-error-tooltip="{% trans %}You must enter a contact name{% endtrans %}" value="{{ it_contact_value }}" placeholder="{% trans %}Contact name{% endtrans %}" disabled>
-                        </div>
-
-                        <div>
-                            <input id="it-email" class="input-it" type="email" name="it_email" data-error-tooltip="{% trans %}You must enter an e-mail for Instance Tracking{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail for Instance Tracking{% endtrans %}" value="{{ it_email_value }}" placeholder="{% trans %}Contact email{% endtrans %}" disabled>
-                        </div>
-
+                        {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=True) }}
                     </div>
-
-                </div>
-                <div class="center">
-                    <a id="submit-initial-setup" class="i-button blue-button big-button">
-                        {% trans %}Finish{% endtrans %}
-                    </a>
                 </div>
             </div>
-
-        </form>
+        {% call form_footer() %}
+            <a id="submit-initial-setup" class="i-button blue-button big-button">
+                {% trans %}Finish{% endtrans %}
+            </a>
+        {% endcall %}
     </div>
+
 
 {% endblock %}

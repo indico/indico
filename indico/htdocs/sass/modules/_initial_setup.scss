@@ -110,6 +110,7 @@
     .init-setup-form {
         width: 100%;
         height: 100%;
+        max-width: none;
 
         .step-wrapper {
             height: 100%;
@@ -186,7 +187,7 @@
                     }
 
                     input, select {
-                        font-size: 30px;
+                        font-size: 1.8em;
                     }
 
                     label {
@@ -203,6 +204,7 @@
                             color: #BEBEBE;
                         }
 
+                        @include border-radius(2px);
                         width: 80%;
                         box-shadow: none;
                     }
@@ -283,6 +285,11 @@
                 @extend %font-family-logo;
             }
         }
+    }
+
+    .form-group-footer {
+        float: right;
+        margin-bottom: 2em;
     }
 }
 
