@@ -155,6 +155,8 @@ def setup_jinja(app):
     # Unicode hack
     app.jinja_env.add_extension(EnsureUnicodeExtension)
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
+    # Useful (Python) builtins
+    app.add_template_global(dict)
     # Global functions
     app.add_template_global(url_for)
     app.add_template_global(url_for_plugin)
