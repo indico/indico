@@ -16,10 +16,12 @@
 
 import re
 from indico.core.config import Config
-from MaKaC.common import filters, info
+from indico.util.caching import memoize_request
+from MaKaC.common import filters
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from persistent import Persistent
+
 
 class RoomMapperHolder(ObjectHolder):
     """
@@ -35,6 +37,7 @@ class RoomMapperHolder(ObjectHolder):
             crit["name"] = crit["roommappername"]
         f=RoomMapperFilter(_RoomMapperFilterCriteria(crit),None)
         return f.apply(self.getList(), exact)
+
 
 class RoomMapper(Persistent):
 
@@ -114,6 +117,7 @@ class RoomMapper(Persistent):
                 return m.groupdict()
         return None
 
+    @memoize_request
     def getMapURL(self, roomName):
         groupdict = self.applyRegularExpressions(roomName)
         if groupdict:
