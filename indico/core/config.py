@@ -536,6 +536,7 @@ class Config:
         'CeleryResultBackend'       : None,
         'CeleryConfig'              : {},
         'ScheduledTaskOverride'     : {},
+        'CheckinAppClientId'        : None
     }
 
     if sys.platform == 'win32':

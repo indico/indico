@@ -24,7 +24,8 @@ from cStringIO import StringIO
 
 from indico.util.date_time import format_datetime, format_date
 from indico.util import json
-from indico.modules.oauth.db import ConsumerHolder
+from indico.modules.oauth.models.applications import OAuthApplication
+
 
 from MaKaC.common.Configuration import Config
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
@@ -77,11 +78,14 @@ class ConferenceEticketSetAfterRegistration(TextModificationBase, RegistrationMo
 class ConferenceEticketQRCode(RegistrationModifBase):
 
     def _getAnswer(self):
-
-        consumers = dict((consumer.getName(), consumer) for consumer in ConsumerHolder().getList())
-
-        if "indico-checkin" not in consumers:
-            raise NoReportError(_("There is no indico-checkin consumer key for OAuth"))
+        config = Config.getInstance()
+        checkin_app_client_id = config.getCheckinAppClientId()
+        if checkin_app_client_id is None:
+            raise NoReportError(_("indico-checkin client_id is not defined in the Indico configuration"))
+        checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
+        if checkin_app is None:
+            raise NoReportError(_("indico-checkin is not registered as an OAuth application with client_id {}")
+                                .format(checkin_app_client_id))
 
         # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         qr = QRCode(
@@ -91,15 +95,13 @@ class ConferenceEticketQRCode(RegistrationModifBase):
             border=1
         )
 
-        oauth_checkin = consumers["indico-checkin"]
-        config = Config.getInstance()
         baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
         qr_data = {"event_id": self._conf.getId(),
                    "title": self._conf.getTitle(),
                    "date": format_date(self._conf.getAdjustedStartDate()),
                    "server": {"baseUrl": baseURL,
-                              "consumerKey": oauth_checkin.getId(),
-                              "consumerSecret": oauth_checkin.getSecret(),
+                              "consumerKey": checkin_app.client_id,
+                              "consumerSecret": checkin_app.client_secret,
                               }
                    }
         json_qr_data = json.dumps(qr_data)

@@ -418,3 +418,13 @@ MaxUploadFileSize = 0
 # supported by Celery. For the full list of options, see the Celery docs at
 # http://celery.readthedocs.org/en/latest/configuration.html
 #CeleryConfig = {}
+
+
+# ------------------------------------------------------------------------------
+# Indico Checkin
+# ------------------------------------------------------------------------------
+
+# In order to use Indico check-in app, first register the application manually
+# within `Server admin > Applications` and then fill in here the client_id
+# assigned to it.
+#CheckinAppClientId = ''
