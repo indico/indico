@@ -28,7 +28,7 @@ import MaKaC
 from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import Config
-from indico.util.console import colored, strip_ansi, cformat
+from indico.util.console import strip_ansi, cformat
 from indico.core.db import DBMgr, db
 from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
@@ -79,8 +79,7 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
 
 class IndicoShell(Shell):
     def __init__(self):
-        banner = colored('\nIndico v{} is ready for your commands!\n'.format(MaKaC.__version__),
-                         'yellow', attrs=['bold'])
+        banner = cformat('%{yellow!}Indico v{} is ready for your commands!').format(MaKaC.__version__)
         super(IndicoShell, self).__init__(banner=banner, use_bpython=False)
         self._context = None
         self._info = None
@@ -89,7 +88,7 @@ class IndicoShell(Shell):
     def run(self, no_ipython, use_bpython, quiet):
         context = self.get_context()
         if not quiet:
-            self.banner = '\n'.join(self._info + [self.banner])
+            self.banner = '\n'.join(self._info + ['', self.banner])
         if use_bpython:
             # bpython does not support escape sequences :(
             # https://github.com/bpython/bpython/issues/396
