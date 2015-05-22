@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (admins, announcement, maintenance, domains, templates, conferenceModif, services,
-                                   oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.rh import admins, announcement, maintenance, domains, templates, conferenceModif, services
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -98,7 +97,3 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
                    methods=('POST',))
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
-
-# OAuth
-admin.add_url_rule('/oauth/authorized', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
-admin.add_url_rule('/oauth/consumers', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)

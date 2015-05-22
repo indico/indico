@@ -50,7 +50,7 @@ from indico.core.plugins import plugin_engine, include_plugin_css_assets, includ
 from indico.modules.auth.providers import IndicoAuthProvider
 from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.oauth import oauth as oauth2
+from indico.modules.oauth import oauth
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
@@ -63,7 +63,6 @@ from indico.web.forms.jinja_helpers import is_single_line_field, render_field
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
 from indico.web.flask.blueprints.misc import misc
-from indico.web.flask.blueprints.oauth import oauth
 from indico.web.flask.blueprints.category import category
 from indico.web.flask.blueprints.category_management import category_mgmt
 from indico.web.flask.blueprints.event import event_display, event_creation, event_mgmt
@@ -88,12 +87,12 @@ from indico.modules.users.blueprint import users_blueprint
 from indico.web.assets.blueprint import assets_blueprint
 
 
-BLUEPRINTS = (legacy, misc, oauth, rooms, category, category_mgmt, event_display,
+BLUEPRINTS = (legacy, misc, rooms, category, category_mgmt, event_display,
               event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint,
               event_registration_blueprint, requests_blueprint, agreements_blueprint, evaluation_blueprint,
               event_reminders_blueprint, static_site_blueprint, vc_blueprint, assets_blueprint, api_blueprint,
               users_blueprint, oauth_blueprint, auth_blueprint, groups_blueprint)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, oauth, rooms, category, category_mgmt, event_display,
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 COMPAT_BLUEPRINTS += (vc_compat_blueprint, auth_compat_blueprint)
 
@@ -347,7 +346,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
 
     babel.init_app(app)
     multipass.init_app(app)
-    oauth2.init_app(app)
+    oauth.init_app(app)
     setup_jinja(app)
 
     with app.app_context():

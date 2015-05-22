@@ -1,6 +1,5 @@
 {% extends 'users/base.html' %}
 {% from '_switch.html' import switch %}
-{% from 'message_box.html' import message_box %}
 
 {% block subtitle -%}
     {% trans %}Authorized applications{% endtrans %}
@@ -48,26 +47,4 @@
             </ul>
         </div>
     </div>
-
-    <script>
-        $('#oauth-token-list').on('click', '.icon-remove', function() {
-            var self = $(this);
-            var killProgress = IndicoUI.Dialogs.Util.progress($T('Deleting...'));
-            jsonRpc(Indico.Urls.JsonRpcService, 'oauth.unauthorizeConsumer', {
-                third_party_app: self.data('third-party-app'),
-                userId: '{{ user.id }}'
-            }, function(result, error){
-                killProgress();
-                if (error) {
-                    IndicoUtil.errorReport(error);
-                    return
-                }
-                self.closest('li').remove();
-                if (!$('#oauth-token-list').children().length) {
-                    $('#oauth-token-list').hide();
-                    $('#no-third-apps').show();
-                }
-            });
-        });
-    </script>
 {% endblock %}

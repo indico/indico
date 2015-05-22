@@ -27,7 +27,6 @@ from functools import wraps, partial
 from urlparse import urljoin
 from xml.sax.saxutils import escape
 
-import oauth2 as oauth
 import transaction
 from flask import request, session, g, current_app
 from itsdangerous import BadData
@@ -383,15 +382,6 @@ class RH(RequestHandlerBase):
         """Request lacks a necessary key for processing"""
         msg = _('Required argument missing: %s') % e.message
         return errors.WPFormValuesError(self, msg).display()
-
-    # TODO: check this method to integrate with jsonify error
-    def _processOAuthError(self, e):
-        res = json.dumps(e.fossilize())
-        header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-        self._responseUtil.headers.extend(header)
-        self._responseUtil.content_type = 'application/json'
-        self._responseUtil.status = e.code
-        return res
 
     @jsonify_error
     def _processConferenceClosedError(self, e):
