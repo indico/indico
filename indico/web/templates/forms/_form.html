@@ -6,7 +6,7 @@
     </ul>
 {%- endmacro %}
 
-{% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=False, i_form=true) -%}
+{% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=false, i_form=true) -%}
     <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="{% if i_form %}i-form {% endif %}{{ orientation }} {{ classes }}"{% if id %} id="{{ id }}"{% endif %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
         {% if form.csrf_enabled -%}
             {{ form.csrf_token() }}
@@ -40,7 +40,7 @@
     </div>
 {%- endmacro %}
 
-{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false) %}
+{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, placeholder=false) %}
     {% if field or not allow_missing %}
         <div id="form-group-{{ field.id }}"
              class="form-group {{ orientation }}
@@ -49,20 +49,20 @@
             {% if not skip_label %}
                 <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
                             {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
-                    {%- if field.widget.input_type != 'checkbox' -%}
+                    {%- if field.widget.input_type != 'checkbox' and (not field.widget.input_type or not placeholder) -%}
                         {{ field.label() }}
                     {%- endif -%}
                     {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
                 </div>
             {% endif %}
-            {{ form_field(field, "form-field form-block", widget_attrs) }}
+            {{ form_field(field, "form-field form-block", dict(widget_attrs, placeholder=(field.label.text if placeholder else ''))) }}
         </div>
     {% endif %}
 {%- endmacro %}
 
-{% macro form_rows(form, fields=none, skip=(), orientation='', skip_labels=false, widget_attrs={}) %}
+{% macro form_rows(form, fields=none, skip=(), orientation='', skip_labels=false, widget_attrs={}, placeholder=false) %}
     {% for field in _iter_form_fields(form, fields=fields, skip=skip) %}
-        {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation, skip_label=skip_labels) }}
+        {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation, skip_label=skip_labels, placeholder=placeholder) }}
     {% endfor %}
 {% endmacro %}
 

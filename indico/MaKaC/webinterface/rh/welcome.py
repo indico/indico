@@ -19,9 +19,8 @@ import MaKaC.conference as conference
 import MaKaC.webinterface.pages.welcome as welcome
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.user import AvatarHolder
 
+from indico.modules.users import User
 from indico.web.flask.util import url_for
 
 
@@ -32,8 +31,7 @@ class RHWelcome(base.RHDisplayBaseProtected):
         self._target = conference.CategoryManager().getRoot()
 
     def _process(self):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        if not minfo.getAdminList().getList() and not AvatarHolder()._getIdx():
+        if User.query.count() == 0:
             self._redirect(url_for('admin.initial-setup'))
         else:
             wfReg = webFactoryRegistry.WebFactoryRegistry()
