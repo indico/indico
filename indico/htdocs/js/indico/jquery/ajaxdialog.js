@@ -82,7 +82,10 @@
             popup.draw = function() {
                 this.ExclusivePopup.prototype.draw.call(this, dialogData.html);
             };
-            popup.postDraw = ajaxifyForms;
+            popup.postDraw = function() {
+                ajaxifyForms();
+                injectJS(dialogData.js);
+            };
             popup.open();
         }
 
@@ -137,10 +140,17 @@
                         } else if (data.html) {
                             popup.contentContainer.html(data.html);
                             ajaxifyForms();
+                            injectJS(data.js);
                         }
                     }
                 });
             });
+        }
+
+        function injectJS(js) {
+            if (js) {
+                $('body').append(js)
+            }
         }
     };
 })(window, jQuery);

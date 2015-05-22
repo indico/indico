@@ -22,7 +22,6 @@ from flask import request, session, render_template, g, jsonify
 import MaKaC.webinterface.wcomponents as wcomponents
 from indico.core import signals
 from indico.web import assets
-from indico.web.flask.util import url_for
 from indico.core.config import Config
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.i18n import i18nformat
@@ -63,7 +62,12 @@ class WPJinjaMixin:
         """
         template = cls._prefix_template(template_name_or_list or cls._template)
         if request.is_xhr:
-            return jsonify(html=cls.render_template_func(template, **context))
+            html = cls.render_template_func(template, **context)
+            js = None
+            if 'injected_js' in g:
+                js = g.injected_js
+                del g.injected_js
+            return jsonify(html=html, js=js)
         else:
             context['_jinja_template'] = template
             return cls(g.rh, *wp_args, **context).display()
