@@ -1,7 +1,7 @@
 """Add OAuth tables
 
 Revision ID: 3f3a9554a6da
-Revises: 45f41372799d
+Revises: 55583215f6fb
 Create Date: 2015-05-19 11:25:26.268379
 """
 
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '3f3a9554a6da'
-down_revision = '45f41372799d'
+down_revision = '55583215f6fb'
 
 
 def upgrade():
