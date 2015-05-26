@@ -124,6 +124,7 @@ def configure_app(app, set_path=False):
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
         base = url_parse(cfg.getBaseURL())
+        app.config['PREFERRED_URL_SCHEME'] = base.scheme
         app.config['SERVER_NAME'] = base.netloc
         if base.path:
             app.config['APPLICATION_ROOT'] = base.path
