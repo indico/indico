@@ -481,6 +481,7 @@ if __name__ == '__main__':
             api = indico_zodbimport.modules.api:APIImporter
             users = indico_zodbimport.modules.users:UserImporter
             groups = indico_zodbimport.modules.groups:GroupImporter
+            evaluation_alarms = indico_zodbimport.modules.evaluation_alarms:EvaluationAlarmImporter
             """,
           zip_safe=False,
           packages=foundPackages,

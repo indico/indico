@@ -14,19 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime     import datetime, timedelta
-from persistent   import Persistent
-from registration import Notification
+from datetime import date, datetime, timedelta
+
+from persistent import Persistent
+from pytz import timezone
+
+from MaKaC.registration import Notification
 from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
 from MaKaC.i18n import _
-from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.core.config import Config
-from indico.modules.scheduler import Client
-from indico.modules.scheduler.tasks import AlarmTask
+from indico.modules.events.evaluation import event_settings as evaluation_settings
 from indico.modules.users.legacy import AvatarUserWrapper
 
 
@@ -59,7 +60,6 @@ class Evaluation(Persistent):
         self.setStartDate(datetime(1,1,1)) #must be datetime(1,1,1) because conf isn't yet ready
         self.setEndDate(datetime(1,1,1))   #must be datetime(1,1,1) because conf isn't yet ready
         self.notifications = {}            #contains pairs like this (notificationKey: notification)
-        self.alarms = {}                   #contains pairs like this (notificationKey: alarm)
         self.visible = False
         self.anonymous = True
         self.announcement = ""
@@ -68,6 +68,21 @@ class Evaluation(Persistent):
         self.mandatoryParticipant = False
         self.mandatoryAccount = False
         self._submissionCounter = Counter(1)
+
+    def update_notification(self):
+        """Enables/disables the notification task for the evaluation.
+
+        If the evaluation is valid and not running/finished yet, the
+        task will be enabled, sending an email to the configured
+        recipients then the evaluation starts.
+        Otherwise the task will be disabled for the event.
+        """
+        notification = self.getNotification(Evaluation._EVALUATION_START)
+        if (self.visible and self.startDate.date() > date.today() and self.getNbOfQuestions() and
+                notification and (notification.getToList() or notification.getCCList())):
+            evaluation_settings.set(self._conf, 'send_notification', True)
+        else:
+            evaluation_settings.delete(self._conf, 'send_notification')
 
     def getTimezone(self):
         return self._conf.getTimezone()
@@ -82,7 +97,6 @@ class Evaluation(Persistent):
 
     def removeReferences(self):
         """remove all pointers to other objects."""
-        self.removeAllAlarms()
         self.removeAllNotifications()
         self.removeAllQuestions()
         self.removeAllSubmissions()
@@ -143,11 +157,13 @@ class Evaluation(Persistent):
 
     def notifyModification(self):
         """indicates to the database that current object attributes have changed."""
-        self._p_changed=1
+        self._p_changed = 1
+        self.update_notification()
 
     def setVisible(self, visible):
         """If visible, the evaluation is allowed to be shown in the Display Area."""
         self.visible = utils._bool(visible)
+
     def isVisible(self):
         """returns if the evaluation is allowed to be shown in the Display Area."""
         if not hasattr(self, "visible"):
@@ -218,12 +234,8 @@ class Evaluation(Persistent):
             self.submissionsLimit = 0
         return self.submissionsLimit
 
-    def setStartDate( self, sd ):
-        self.startDate = datetime(sd.year,sd.month,sd.day,0,0,0)
-        for nid, notif in self.getNotifications().iteritems():
-            if isinstance(notif, EvaluationAlarm):
-                if notif.getStartOn() != sd:
-                    notif.move(sd)
+    def setStartDate(self, sd):
+        self.startDate = datetime(sd.year, sd.month, sd.day, 0, 0, 0)
 
     def getStartDate( self ):
         if not hasattr(self, "startDate") or self.startDate==datetime(1,1,1,0,0,0):
@@ -385,7 +397,6 @@ class Evaluation(Persistent):
         if notificationKey in self._ALL_NOTIFICATIONS :
             self.getNotifications()[notificationKey] = notification or Notification()
             self.notifyModification()
-            self.setAlarm(notificationKey)
 
     def removeNotification(self, notificationKey):
         """remove corresponding Notification with given notification key."""
@@ -393,7 +404,6 @@ class Evaluation(Persistent):
         if notifications.has_key(notificationKey) :
             notifications.pop(notificationKey, None)
             self.notifyModification()
-            self.removeAlarm(self.getAlarm(notificationKey))
 
     def removeAllNotifications(self):
         """remove all notifications."""
@@ -409,121 +419,6 @@ class Evaluation(Persistent):
     def getNotification(self, notificationKey):
         """For given notification key gets the corresponding Notification or None if not found."""
         return self.getNotifications().get(notificationKey, None)
-
-    def setAlarm(self, notificationKey):
-        """Set the id of an Alarm with given notification key (cf _ALL_NOTIFICATIONS)."""
-        if self.getStartDate() < nowutc():
-            self.removeAlarm(self.getAlarm(notificationKey))
-        elif notificationKey == self._NEW_SUBMISSION :
-            pass #no need of an alarm for this kind of notification
-        elif notificationKey == self._EVALUATION_START :
-            notification = self.getNotification(notificationKey)
-            if notification != None:
-                from MaKaC.webinterface import urlHandlers
-                alarm = self.getAlarm(notificationKey)
-                if alarm == None :
-                    alarm = EvaluationAlarm(self, notificationKey)
-                    self.getConference().addAlarm(alarm)
-                    self.getAlarms()[notificationKey] = alarm
-
-                    self.notifyModification()
-                else:
-                    if self.getStartDate() != alarm.getStartOn():
-                        alarm.move(self.getStartDate())
-
-                alarm.setFromAddr( Config.getInstance().getSupportEmail() )
-                alarm.setToAddrList(notification.getToList())
-                alarm.setCcAddrList(notification.getCCList())
-                alarm.setSubject( self.getTitle() )
-                url = urlHandlers.UHConfEvaluationDisplay.getURL(self.getConference())
-                alarm.setText( _("Hello,\n\nPlease answer this survey :\n%s\n\nBest Regards")%url)
-
-    def removeAlarm(self, alarm):
-        """Remove given Alarm."""
-        if alarm is not None:
-            if self.getConference().getAlarmById(alarm.getConfRelativeId()) is not None:
-                self.getConference().removeAlarm(alarm)
-            self.getAlarms().pop(alarm.getNotificationKey(), None)
-            self.notifyModification()
-
-    def removeAllAlarms(self):
-        """remove all alarms."""
-        alarms = self.getAlarms()
-
-        for alarm in alarms.values() :
-            self.getConference().removeAlarm(alarm)
-        self.alarms = {}
-        self.notifyModification()
-
-    def getAlarms(self):
-        """get the dictionnary with pairs like this ([int]notificationKey: [Alarm]alarm)."""
-        if not hasattr(self, "alarms"):
-            self.alarms = {}
-        return self.alarms
-
-    def getAlarm(self, notificationKey):
-        """For given notification key gets the corresponding Alarm or None if not found."""
-        alarm = self.getAlarms().get(notificationKey, None)
-        #Integrity check
-        if alarm!=None and self.getConference().getAlarmById(alarm.getId())==None :
-            self.removeAlarm(alarm)
-            return None
-        return alarm
-
-
-class EvaluationAlarm(AlarmTask):
-    """Suited alarm for an evaluation."""
-
-    def __init__(self, evaluation, notificationKey):
-        self._evaluation = evaluation
-        self.notificationKey = notificationKey  #cf Evaluation._ALL_NOTIFICATIONS
-        super(EvaluationAlarm, self).__init__(evaluation.getConference(),
-                                              'Eval_%s' % notificationKey,
-                                              evaluation.getStartDate())
-
-    def setEvaluation(self, evaluation):
-        self._evaluation = evaluation
-
-    def getEvaluation(self):
-        if not hasattr(self, "_evaluation"):
-            self._evaluation = None
-        return self._evaluation
-
-    def setNotificationKey(self, notificationKey):
-        self.notificationKey = notificationKey
-
-    def getNotificationKey(self):
-        if not hasattr(self, "notificationKey"):
-            self.notificationKey = None
-        return self.notificationKey
-
-    def move(self, newDate):
-        c = Client()
-        c.moveTask(self, newDate)
-
-    def delete(self):
-        evaluation = self.getEvaluation()
-        if evaluation is not None:
-            evaluation.removeAlarm(self)
-        self.setEvaluation(None)
-
-    def _prepare(self, check=True):
-
-        # date checking...
-        from MaKaC.conference import ConferenceHolder
-        evaluation = self.getEvaluation()
-        notificationKey = self.getNotificationKey()
-        evalEndDate = evaluation.getEndDate().date()
-        today = nowutc().date()
-        if not ConferenceHolder().hasKey(self.conf.getId()) or \
-                evaluation.getNbOfQuestions() < 1 or \
-                not evaluation.isVisible() or \
-                (notificationKey == Evaluation._EVALUATION_START and \
-                evalEndDate < today and check):
-            self.conf.removeAlarm(self)
-            self.suicide()
-            return False  # email aborted
-        return True  # email ok
 
 
 class Question(Persistent):

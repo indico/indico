@@ -58,6 +58,7 @@ class RHEvaluationSetupChangeStatus( RHEvaluationBase ):
             evaluation.setVisible(True)
         else:
             evaluation.setVisible(False)
+        evaluation.notifyModification()
         self._redirect(urlHandlers.UHConfModifEvaluationSetup.getURL(self._conf))
 
 class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
