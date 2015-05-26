@@ -108,6 +108,11 @@ class EventSettingsProxy(SettingsProxyBase):
 
     acl_proxy_class = EventACLProxy
 
+    @property
+    def query(self):
+        """Returns a query object filtering by the proxy's module."""
+        return EventSetting.find(module=self.module)
+
     @event_or_id
     def get_all(self, event, no_defaults=False):
         """Retrieves all settings

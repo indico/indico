@@ -72,6 +72,11 @@ def user_or_id(f):
 class UserSettingsProxy(SettingsProxyBase):
     """Proxy class to access user-specific settings for a certain module"""
 
+    @property
+    def query(self):
+        """Returns a query object filtering by the proxy's module."""
+        return UserSetting.find(module=self.module)
+
     @user_or_id
     def get_all(self, user, no_defaults=False):
         """Retrieves all settings

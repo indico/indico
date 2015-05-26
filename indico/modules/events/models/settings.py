@@ -40,6 +40,11 @@ class EventSettingsMixin(object):
         nullable=False
     )
 
+    @property
+    def event(self):
+        from MaKaC.conference import ConferenceHolder
+        return ConferenceHolder().getById(self.event_id, True)
+
     @classmethod
     def delete_event(cls, event_id):
         cls.find(event_id=event_id).delete(synchronize_session='fetch')
