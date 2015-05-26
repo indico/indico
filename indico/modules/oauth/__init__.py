@@ -47,3 +47,9 @@ def _extend_profile_menu(user, **kwargs):
 def _no_ssl_required_on_debug(app, **kwargs):
     if app.debug:
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
+
+
+@signals.users.merged.connect
+def _delete_merged_user_tokens(target, source, **kwargs):
+    source.oauth_tokens.delete()
+    logger.info("All tokens for the user {} were deleted.".format(source))
