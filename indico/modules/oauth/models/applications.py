@@ -22,6 +22,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.modules.oauth import logger
 from indico.util.string import return_ascii
 
 
@@ -109,3 +110,4 @@ class OAuthApplication(db.Model):
 
     def reset_client_secret(self):
         self.client_secret = unicode(uuid4())
+        logger.info("Client secret for the application {} was reset.".format(self.name))

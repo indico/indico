@@ -22,7 +22,7 @@ from flask import session
 
 from indico.core.db import db
 from indico.core.config import Config
-from indico.modules.oauth import oauth
+from indico.modules.oauth import oauth, logger
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
 from indico.util.date_time import now_utc
@@ -64,6 +64,7 @@ def save_token(token, request, *args, **kwargs):
     # make sure that every client has only one token connected to a user
     for t in tokens:
         db.session.delete(t)
+        logger.info("Deleted token for user {} before saving a new one.".format(request.user.id))
     application = OAuthApplication.find_one(client_id=request.client.client_id)
     scopes = token['scope'].split()
     token = OAuthToken(application_id=application.id, user_id=request.user.id,

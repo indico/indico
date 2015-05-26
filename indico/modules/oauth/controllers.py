@@ -21,6 +21,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.users.controllers import RHUserBase
+from indico.modules.oauth import logger
 from indico.modules.oauth.provider import oauth
 from indico.modules.oauth.forms import ApplicationForm
 from indico.modules.oauth.models.applications import OAuthApplication
@@ -83,6 +84,7 @@ class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
 
     def _process(self):
         db.session.delete(self.application)
+        logger.info("Application {} was deleted.".format(self.application))
         flash(_("Application deleted successfully"), 'success')
         return redirect(url_for('.apps'))
 
@@ -139,5 +141,6 @@ class RHOAuthUserTokenRevoke(RHUserBase):
 
     def _process(self):
         db.session.delete(self.token)
+        logger.info("Token of application {} for user {} was revoked.".format(self.token.application, self.token.user))
         flash(_("Your token was revoked successfully"), 'success')
         return redirect(url_for('.user_profile'))

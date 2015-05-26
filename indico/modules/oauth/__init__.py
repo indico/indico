@@ -21,12 +21,15 @@ import os
 from flask_oauthlib.provider import OAuth2Provider
 
 from indico.core import signals
+from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import MenuItem
 
 
 oauth = OAuth2Provider()
+
+logger = Logger.get('oauth')
 
 
 @signals.admin_sidemenu.connect
