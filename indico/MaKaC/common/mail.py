@@ -145,6 +145,10 @@ class GenericMailer:
 
     @classmethod
     def sendAndLog(cls, notification, conference, module='', user=None, skipQueue=False):
+        if isinstance(notification, dict):
+            # Wrap a raw dictionary in a notification class
+            from MaKaC.webinterface.mail import GenericNotification
+            notification = GenericNotification(notification)
         cls.send(notification, skipQueue=skipQueue)
         logData = {
             'contentType': notification.getContentType(),

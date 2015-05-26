@@ -18,8 +18,8 @@ from functools import wraps
 from types import GeneratorType
 
 from indico.core.config import Config
+from indico.util.user import unify_user_args
 from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 
 
 def email_sender(fn):
@@ -33,12 +33,49 @@ def email_sender(fn):
         elif not isinstance(mails, list):
             mails = [mails]
         for mail in filter(None, mails):
-            GenericMailer.send(GenericNotification(mail))
+            send_email(mail)
     return wrapper
 
 
+def send_email(email, event=None, module='', user=None, skip_queue=False):
+    """Sends an email created by :func:`make_email`.
+
+    :param email: The email object returned by :func:`make_email`
+    :param event: If specified, the email will be saved in that
+                  event's log
+    :param module: The module name to show in the email log
+    :param user: The user to show in the email log
+    :param skip_queue: If true, the email will be sent immediately
+                       instead of being queued until after commit even
+                       while inside a RH context
+    """
+    if event is not None:
+        GenericMailer.sendAndLog(email, event, module=module, user=user, skipQueue=skip_queue)
+    else:
+        GenericMailer.send(email, skipQueue=skip_queue)
+
+
+@unify_user_args(legacy=True)
 def make_email(to_list, cc_list=None, from_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
+    """Creates an email.
+
+    The preferred way to specify the email content is using the
+    `template` argument. To do so, use :func:`.get_template_module` on
+    a template inheriting from ``emails/base.txt`` for test emails or
+    ``emails/base.html`` for HTML emails.
+
+    :param to_list: The recipient email or a collection of emails
+    :param cc_list: The CC email or a collection of emails
+    :param from_address: The sender address. Defaults to noreply.
+    :param attachments: A list of attachments, consisting of dicts
+                        containing ``name`` and ``binary`` keys.
+    :param subject: The subject of the email.
+    :param body: The body of the email:
+    :param template: A template module containing ``get_subject`` and
+                     ``get_body`` macros.
+    :param html: ``True`` if the email body is HTML
+    """
     if template is not None and (subject is not None or body is not None):
         raise ValueError("Only subject/body or template can be passed")
     if template:
