@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+import errno
+import os
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
@@ -96,6 +99,18 @@ class StaticSite(db.Model):
     def locator(self):
         return {'confId': self.event_id,
                 'id': self.id}
+
+    def delete_file(self):
+        try:
+            os.remove(self.path)
+        except OSError as err:
+            if err.errno != errno.ENOENT:
+                raise
+
+    def __committed__(self, change):
+        super(StaticSite, self).__committed__(change)
+        if change == 'delete':
+            self.delete_file()
 
     @return_ascii
     def __repr__(self):

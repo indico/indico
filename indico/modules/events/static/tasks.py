@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-import errno
-import os
 from datetime import timedelta
 
 from celery.schedules import crontab
@@ -98,11 +96,7 @@ def static_sites_cleanup(days=30):
     logger.info('Removing {0} expired static sites from the past {1} days'.format(len(expired_sites), days))
     try:
         for site in expired_sites:
-            try:
-                os.remove(site.path)
-            except OSError as err:
-                if err.errno != errno.ENOENT:
-                    raise
+            site.delete_file()
             site.path = None
             site.state = StaticSiteState.expired
             logger.info('Removed static site {}'.format(site))
