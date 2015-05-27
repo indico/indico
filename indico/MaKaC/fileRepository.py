@@ -287,31 +287,3 @@ class MaterialLocalRepository(Persistent):
         if not self.__files.has_key( file.getRepositoryId() ):
             return
         del self.__files[ file.getRepositoryId() ]
-
-
-class OfflineRepository(MaterialLocalRepository):
-    """File repositroy keeping the offline sites under a certain path in the local
-        filesystem.
-    """
-
-    _repo_name = "offline"
-
-    def _getRepositoryPath(self):
-        return Config.getInstance().getOfflineStore()
-
-    def storeFile(self, newFile, confId):
-        from MaKaC.common import info
-        volume = info.HelperMaKaCInfo.getMaKaCInfoInstance().getArchivingVolume()
-        new_file_id = self._getNewFileId()
-        destPath = os.path.join(self._getRepositoryPath(), volume, 'offline', confId)
-        if not os.access(destPath, os.F_OK):
-            os.makedirs(destPath)
-        destPath = os.path.join(destPath, newFile.getFileName())
-        relativePath = os.path.join(volume, 'offline', confId, newFile.getFileName())
-        try:
-            shutil.copyfile(newFile.getFilePath(), destPath)
-            self.getFiles()[new_file_id] = relativePath
-            newFile.setArchivedId(self, new_file_id)
-        except IOError:
-            raise Exception(_("Couldn't archive file %s to %s") % (newFile.getFilePath(), destPath))
-        return new_file_id

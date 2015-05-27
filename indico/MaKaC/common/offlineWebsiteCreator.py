@@ -15,9 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
+import errno
 import os
 import re
 import requests
+import shutil
 from bs4 import BeautifulSoup
 from werkzeug.utils import secure_filename
 
@@ -34,9 +36,7 @@ from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStati
 from indico.core.config import Config
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
-from MaKaC.common import timezoneUtils, info
-from MaKaC.conference import LocalFile
-from MaKaC.fileRepository import OfflineRepository
+from MaKaC.common import timezoneUtils, HelperMaKaCInfo
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
     ContribsToPDF
 from indico.util.contextManager import ContextManager
@@ -74,13 +74,13 @@ class OfflineEvent:
         self._conf = conf
         self._eventType = eventType
 
-    def create(self):
+    def create(self, static_site_id):
         websiteCreator = None
         if self._eventType in ("simple_event", "meeting"):
             websiteCreator = OfflineEventCreator(self._rh, self._conf, self._eventType)
         elif self._eventType == "conference":
             websiteCreator = ConferenceOfflineCreator(self._rh, self._conf)
-        return websiteCreator.create()
+        return websiteCreator.create(static_site_id)
 
 
 class OfflineEventCreator(object):
@@ -89,7 +89,6 @@ class OfflineEventCreator(object):
         self._rh = rh
         self._conf = conf
         self._html = ""
-        self._outputFile = ""
         self._fileHandler = None
         self._mainPath = ""
         self._staticPath = ""
@@ -98,7 +97,7 @@ class OfflineEventCreator(object):
         self._css_files = set()
         self._downloaded_files = {}
 
-    def create(self):
+    def create(self, static_site_id):
         config = Config.getInstance()
         self._fileHandler = ZIPFileHandler()
 
@@ -148,8 +147,7 @@ class OfflineEventCreator(object):
                                      '<meta http-equiv="Refresh" content="0; url=%s">' % conferenceDisplayPath)
 
         self._fileHandler.close()
-        self._outputFile = self._generateZipFile(self._fileHandler.getPath())
-        return self._outputFile
+        return self._save_file(self._fileHandler.getPath(), static_site_id)
 
     def _get_static_files(self, html):
         config = Config.getInstance()
@@ -228,7 +226,7 @@ class OfflineEventCreator(object):
 
     def _create_home(self):
         # get default/selected view
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        styleMgr = HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._rh._target).getDefaultStyle()
         # if no default view was attributed, then get the configuration default
         if view == "" or not styleMgr.existsStyle(view) or view in styleMgr.getXSLStyles():
@@ -278,14 +276,17 @@ class OfflineEventCreator(object):
                 if not self._fileHandler.hasFile(dst_filepath):
                     self._fileHandler.add(dst_filepath, src_filepath)
 
-    def _generateZipFile(self, srcPath):
-        repo = OfflineRepository.getRepositoryFromDB()
-        filename = os.path.basename(srcPath) + ".zip"
-        fd = LocalFile()
-        fd.setFilePath(srcPath)
-        fd.setFileName(filename)
-        repo.storeFile(fd, self._conf.getId())
-        return fd
+    def _save_file(self, srcPath, static_site_id):
+        volume = HelperMaKaCInfo.getMaKaCInfoInstance().getArchivingVolume()
+        path = os.path.join(Config.getInstance().getOfflineStore(), volume, 'offline', self._conf.getId())
+        file_path = os.path.join(path, '{}.zip'.format(static_site_id))
+        try:
+            os.makedirs(path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+        shutil.copyfile(srcPath, file_path)
+        return file_path
 
 
 class ConferenceOfflineCreator(OfflineEventCreator):

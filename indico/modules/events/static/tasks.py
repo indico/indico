@@ -56,9 +56,9 @@ def build_static_site(static_site):
         wf = rh.getWebFactory()
         event_type = wf.getId() if wf else 'conference'
 
-        zip_archive = OfflineEvent(rh, rh._conf, event_type).create()
+        zip_file_path = OfflineEvent(rh, rh._conf, event_type).create(static_site.id)
 
-        static_site.path = zip_archive.getFilePath()
+        static_site.path = zip_file_path
         static_site.state = StaticSiteState.success
         db.session.commit()
 
