@@ -56,7 +56,7 @@ def send_email(email, event=None, module='', user=None, skip_queue=False):
 
 
 @unify_user_args(legacy=True)
-def make_email(to_list, cc_list=None, from_address=None, attachments=None,
+def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
     """Creates an email.
 
@@ -67,7 +67,9 @@ def make_email(to_list, cc_list=None, from_address=None, attachments=None,
 
     :param to_list: The recipient email or a collection of emails
     :param cc_list: The CC email or a collection of emails
+    :param bcc_list: The BCC email or a collection of emails
     :param from_address: The sender address. Defaults to noreply.
+    :param reply_address: The reply-to address. Defaults to empty.
     :param attachments: A list of attachments, consisting of dicts
                         containing ``name`` and ``binary`` keys.
     :param subject: The subject of the email.
@@ -81,16 +83,23 @@ def make_email(to_list, cc_list=None, from_address=None, attachments=None,
     if template:
         subject = template.get_subject()
         body = template.get_body()
+    if to_list is None:
+        to_list = set()
     if cc_list is None:
-        cc_list = []
-    to_list = [to_list] if isinstance(to_list, basestring) else to_list
-    cc_list = [cc_list] if isinstance(cc_list, basestring) else cc_list
+        cc_list = set()
+    if bcc_list is None:
+        bcc_list = set()
+    to_list = {to_list} if isinstance(to_list, basestring) else to_list
+    cc_list = {cc_list} if isinstance(cc_list, basestring) else cc_list
+    bcc_list = {bcc_list} if isinstance(bcc_list, basestring) else bcc_list
     if not from_address:
         from_address = Config.getInstance().getNoReplyEmail()
     return {
-        'toList': to_list,
-        'ccList': cc_list,
+        'toList': set(to_list),
+        'ccList': set(cc_list),
+        'bccList': set(bcc_list),
         'fromAddr': from_address,
+        'replyAddr': reply_address,
         'attachments': attachments,
         'subject': subject,
         'body': body,

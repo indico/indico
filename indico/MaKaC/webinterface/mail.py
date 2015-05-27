@@ -51,6 +51,7 @@ class GenericNotification:
     def __init__(self, data=None):
         if data is None:
             self._fromAddr = ""
+            self._replyAddr = ""
             self._toList = []
             self._ccList = []
             self._bccList = []
@@ -60,6 +61,7 @@ class GenericNotification:
             self._attachments = []
         else:
             self._fromAddr = data.get("fromAddr", "")
+            self._replyAddr = data.get('replyAddr', '')
             self._toList = data.get("toList", [])
             self._ccList = data.get("ccList", [])
             self._bccList = data.get("bccList", [])
