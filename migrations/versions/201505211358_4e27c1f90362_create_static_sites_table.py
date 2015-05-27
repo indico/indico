@@ -24,8 +24,8 @@ def upgrade():
                     sa.Column('state', PyIntEnum(StaticSiteState), nullable=False),
                     sa.Column('requested_dt', UTCDateTime, nullable=False),
                     sa.Column('path', sa.String(), nullable=True),
-                    sa.Column('user_id', sa.Integer(), index=True, nullable=False),
-                    sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+                    sa.Column('creator_id', sa.Integer(), index=True, nullable=False),
+                    sa.ForeignKeyConstraint(['creator_id'], ['users.users.id']),
                     sa.PrimaryKeyConstraint('id'),
                     schema='events')
 

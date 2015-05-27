@@ -65,10 +65,7 @@ class StaticSitesImporter(Importer):
                               '%{yellow!}file missing, marking static site as expired.').format(event_id)
                 state = StaticSite.expired
 
-            static_site = StaticSite(user=user,
-                                     event_id=event_id,
-                                     state=state,
-                                     requested_dt=requested_dt)
+            static_site = StaticSite(creator=user, event_id=event_id, state=state, requested_dt=requested_dt)
             if static_site.state == StaticSiteState.success:
                 static_site.path = file_path
             db.session.add(static_site)

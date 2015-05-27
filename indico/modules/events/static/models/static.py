@@ -51,7 +51,7 @@ class StaticSite(db.Model):
         db.Integer,
         nullable=False
     )
-    #: A :class:`StaticSiteState`
+    #: The state of the static site (a :class:`StaticSiteState` member)
     state = db.Column(
         PyIntEnum(StaticSiteState),
         default=StaticSiteState.pending,
@@ -69,7 +69,7 @@ class StaticSite(db.Model):
         nullable=True
     )
     #: ID of the user who created the static site
-    user_id = db.Column(
+    creator_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
         index=True,
@@ -77,11 +77,11 @@ class StaticSite(db.Model):
     )
 
     #: The user who created the static site
-    user = db.relationship(
+    creator = db.relationship(
         'User',
         lazy=False,
         backref=db.backref(
-            'static_site',
+            'static_sites',
             lazy='dynamic'
         )
     )
@@ -101,6 +101,8 @@ class StaticSite(db.Model):
                 'id': self.id}
 
     def delete_file(self):
+        if not self.path:
+            return
         try:
             os.remove(self.path)
         except OSError as err:

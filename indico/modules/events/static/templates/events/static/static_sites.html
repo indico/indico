@@ -40,16 +40,17 @@
                     <tbody>
                         {% for site in static_sites %}
                             <tr>
-                                <td>{{ site.user.full_name }}</td>
+                                <td>{{ site.creator.full_name }}</td>
                                 <td>{{ site.requested_dt|format_datetime }}</td>
                                 <td><span class="i-label {{ label_mapping.get(site.state.name, 'disabled') }}">{{ site.state.title }}</span></td>
                                 {% if has_downloads %}
                                     <td>
-                                    {% if site.state.name == 'success' %}
-                                        <a href="{{ url_for('static_site.download', site, _external=True) }}" class="i-button icon-file-download">
-                                            {%- trans %}Download{% endtrans -%}
-                                        </a>
-                                    {% endif %}
+                                        {% if site.state.name == 'success' %}
+                                            <a href="{{ url_for('static_site.download', site, _external=True) }}"
+                                               class="i-button icon-file-download">
+                                                {%- trans %}Download{% endtrans -%}
+                                            </a>
+                                        {% endif %}
                                     </td>
                                 {% endif %}
                             </tr>

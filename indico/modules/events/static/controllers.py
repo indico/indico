@@ -51,7 +51,7 @@ class RHStaticSiteList(RHStaticSiteBase):
 class RHStaticSiteBuild(RHStaticSiteBase):
     def _process(self):
         self.check_legacy_events()
-        static_site = StaticSite(user=session.user, event=self._conf)
+        static_site = StaticSite(creator=session.user, event=self._conf)
         db.session.add(static_site)
         transaction.commit()
         build_static_site.delay(static_site)

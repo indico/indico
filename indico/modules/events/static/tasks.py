@@ -44,7 +44,7 @@ def build_static_site(static_site):
     clearCache()
     try:
         logger.info('Building static site: {}'.format(static_site))
-        session.lang = static_site.user.settings.get('lang')
+        session.lang = static_site.creator.settings.get('lang')
         rh = RHCustomizable()
         rh._aw = AccessWrapper()
         rh._conf = rh._target = static_site.event
@@ -79,10 +79,9 @@ def build_static_site(static_site):
 @email_sender
 def notify_static_site_success(static_site):
     template = get_template_module('events/static/emails/download_notification_email.txt',
-                                   user=static_site.user,
-                                   event_title=static_site.event.getTitle(),
+                                   user=static_site.creator, event=static_site.event,
                                    link=url_for('static_site.download', static_site, _external=True))
-    return make_email({static_site.user.email}, template=template, html=False)
+    return make_email({static_site.creator.email}, template=template, html=False)
 
 
 @celery.periodic_task(name='static_sites_cleanup', run_every=crontab(minute='30', hour='3', day_of_week='monday'))

@@ -3,12 +3,13 @@
 {% block subject %}Offline copy of an event ready for download{% endblock %}
 
 {% block header_recipient -%}
-    {{ user.full_name }}
+    {{ user.first_name }}
 {%- endblock %}
 
 {% block body -%}
-The offline copy of the event "{{ event_title }}" is ready for download.
+The offline copy of the event "{{ event.getTitle() }}" is ready for download.
 
 Download link: {{ link }}
-
 {%- endblock %}
+
+{% block footer_url %}{{ url_for('event.conferenceDisplay', event, _external=true) }}{% endblock %}

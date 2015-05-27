@@ -28,3 +28,8 @@ def _event_deleted(event, **kwargs):
         return
     for static_site in StaticSite.find(event_id=int(event.id)):
         db.session.delete(static_site)
+
+
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    StaticSite.find(creator_id=source.id).update({StaticSite.creator_id: target.id})
