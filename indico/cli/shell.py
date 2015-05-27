@@ -28,14 +28,15 @@ import MaKaC
 from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import Config
-from indico.util.console import strip_ansi, cformat
 from indico.core.db import DBMgr, db
 from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
+from indico.util.console import strip_ansi, cformat
+from indico.util.fossilize import clearCache
+from indico.web.flask.util import IndicoConfigWrapper
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import Conference, ConferenceHolder, CategoryManager
-from indico.web.flask.util import IndicoConfigWrapper
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):
@@ -85,6 +86,10 @@ class IndicoShell(Shell):
         self._info = None
         self._quiet = False
 
+    def __call__(self, app, *args, **kwargs):
+        with app.test_request_context(base_url=Config.getInstance().getBaseURL()):
+            return self.run(*args, **kwargs)
+
     def run(self, no_ipython, use_bpython, quiet):
         context = self.get_context()
         if not quiet:
@@ -93,6 +98,7 @@ class IndicoShell(Shell):
             # bpython does not support escape sequences :(
             # https://github.com/bpython/bpython/issues/396
             self.banner = strip_ansi(self.banner)
+        clearCache()
         with context['dbi'].global_connection():
             super(IndicoShell, self).run(no_ipython or use_bpython, not use_bpython)
 
