@@ -2041,6 +2041,13 @@ class Abstract(Persistent):
 
         return self._tracks.values()
 
+    def getAcceptedTrack(self):
+        status = self.getCurrentStatus()
+        if status.getTrack() is None:
+            return None
+        if isinstance(status, (AbstractStatusAccepted, AbstractStatusProposedToAccept)):
+            return status.getTrack()
+
     def hasTrack( self, track ):
         self._changeTracksImpl()
 

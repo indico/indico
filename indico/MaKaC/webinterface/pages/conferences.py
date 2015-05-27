@@ -3192,10 +3192,10 @@ class WAbstracts( wcomponents.WTemplated ):
         return ""
 
     def _getAccTrack(self, abstract):
-        status = abstract.getCurrentStatus()
-        if isinstance(status,(review.AbstractStatusAccepted, review.AbstractStatusProposedToAccept)) and status.getTrack() is not None:
-            return self.htmlText(status.getTrack().getCode())
-        return ""
+        acc_track = abstract.getAcceptedTrack()
+        if not acc_track:
+            return ""
+        return self.htmlText(acc_track.getCode())
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
