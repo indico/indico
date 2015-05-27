@@ -23,7 +23,12 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.modules.oauth import logger
+from indico.util.i18n import _
 from indico.util.string import return_ascii
+
+
+SCOPES = {'api': _('API'),
+          'checkin': _('Indico Checkin')}
 
 
 class OAuthApplication(db.Model):
@@ -68,8 +73,7 @@ class OAuthApplication(db.Model):
     #: the OAuth default scopes the application may request access to
     default_scopes = db.Column(
         ARRAY(db.String),
-        nullable=False,
-        default=['api']
+        nullable=False
     )
     #: the OAuth absolute URIs that a application may use to redirect to after authorization
     redirect_uris = db.Column(

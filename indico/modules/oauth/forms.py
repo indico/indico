@@ -20,10 +20,10 @@ from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
-from indico.modules.oauth.models.applications import OAuthApplication
+from indico.modules.oauth.models.applications import OAuthApplication, SCOPES
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TextListField
+from indico.web.forms.fields import TextListField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -32,6 +32,7 @@ class ApplicationForm(IndicoForm):
     description = TextAreaField(_("Description"))
     redirect_uris = TextListField(_("Authorization callback URLs"),
                                   description=_("More than one URL can be specified adding new lines."))
+    default_scopes = IndicoSelectMultipleCheckboxField('Default scopes', [DataRequired()], choices=SCOPES.items())
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
                               description=_("Trusted applications will be granted authorization automatically and "
                                             "no intermediate page will be displayed during the authorization process."))
