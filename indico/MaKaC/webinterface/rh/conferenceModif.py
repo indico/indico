@@ -2023,6 +2023,9 @@ class RHAbstractsToXML(RHConfModifCFABase):
 
             for t in abstract.getTrackList():
                 x.writeTag("Track", t.getTitle())
+            accepted_track = abstract.getAcceptedTrack()
+            if accepted_track:
+                x.writeTag('AcceptedTrack', accepted_track.getTitle())
 
             x.closeTag("abstract")
 
