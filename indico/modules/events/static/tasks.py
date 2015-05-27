@@ -28,7 +28,6 @@ from indico.modules.events.static import logger
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
-from indico.util.fossilize import clearCache
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
@@ -41,7 +40,6 @@ from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 def build_static_site(static_site):
     static_site.state = StaticSiteState.running
     db.session.commit()
-    clearCache()
     try:
         logger.info('Building static site: {}'.format(static_site))
         session.lang = static_site.creator.settings.get('lang')

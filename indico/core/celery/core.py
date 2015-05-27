@@ -32,6 +32,7 @@ from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
+from indico.util.fossilize import clearCache
 from indico.util.string import return_ascii
 
 
@@ -135,6 +136,7 @@ class IndicoCelery(Celery):
                         stack.close()
                         raise ValueError('Plugin not active: ' + plugin_name)
                 stack.enter_context(plugin_context(plugin))
+                clearCache()
                 with stack:
                     return super(IndicoTask, s).__call__(*args, **kwargs)
 
