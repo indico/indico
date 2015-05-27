@@ -1,0 +1,79 @@
+{% extends 'emails/base.txt' %}
+{% from 'events/reminders/emails/_agenda.txt' import render_agenda %}
+
+{% set address = event.getLocation().getAddress() if event.getLocation() %}
+{% set location = event.getLocation().getName() if event.getLocation() %}
+{% set room = event.getRoom().getName() if event.getRoom() %}
+
+
+{% block subject -%}
+    [Event reminder] {{ event.getTitle() }} ({{ event.getAdjustedStartDate() | format_datetime('short', keep_tz=True) }} {{ event.getTimezone() }})
+{%- endblock %}
+{% block header %}{% endblock %}
+{% block footer_url %}{{ url }}{% endblock %}
+
+
+{% block body -%}
+Please note that the event "{{ event.getTitle() }}" will start on {{ event.getAdjustedStartDate() | format_datetime(keep_tz=true) }} ({{ event.timezone }}).
+
+{%- if location or room or address %}
+It will take place at {{ render_location() }}
+{%- endif %}
+
+You can access the full event here:
+{{ url }}
+
+{#- Blank lines are intended #}
+{%- if note %}
+
+
+{% filter underline %}Note{% endfilter %}
+{{ note }}
+{%- endif -%}
+
+{# Blank lines are intended #}
+{%- if with_agenda %}
+
+
+{{ render_agenda(event, agenda) }}
+{%- endif -%}
+{%- endblock %}
+
+
+{%- macro render_location() -%}
+    {%- if location -%}
+        {%- if room -%}
+            {{ location | trim }} {{ render_room() }}.
+        {%- else -%}
+            {{ location | trim }}.
+        {%- endif -%}
+        {{- render_address() }}
+    {%- elif room -%}
+        {{ render_room() }}.
+        {{- render_address() }}
+    {%- else -%}
+        {{ render_address() }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_room() -%}
+    {%- if room -%}
+        {%- if location -%}
+            ({{ room | trim }})
+        {%- else -%}
+            room {{ room | trim }}
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_address() -%}
+    {%- if address -%}
+        {%- if location or room %}
+Address:
+        {%- else -%}
+the following address:
+        {%- endif %}
+
+    {{ address | trim | indent }}
+    {%- endif -%}
+{%- endmacro -%}

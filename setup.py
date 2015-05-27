@@ -483,6 +483,7 @@ if __name__ == '__main__':
             groups = indico_zodbimport.modules.groups:GroupImporter
             evaluation_alarms = indico_zodbimport.modules.evaluation_alarms:EvaluationAlarmImporter
             static_sites = indico_zodbimport.modules.static_sites:StaticSitesImporter
+            event_alarms = indico_zodbimport.modules.event_alarms:EventAlarmImporter
             """,
           zip_safe=False,
           packages=foundPackages,

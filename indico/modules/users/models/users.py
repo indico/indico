@@ -249,6 +249,7 @@ class User(db.Model):
     # - requests_created (Request.created_by_user)
     # - requests_processed (Request.processed_by_user)
     # - static_sites (StaticSite.user)
+    # - event_reminders (EventReminder.creator)
 
     @property
     def as_principal(self):
