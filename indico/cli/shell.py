@@ -146,6 +146,7 @@ class IndicoShell(Shell):
             add_to_context(transaction, doc='transaction module', color='cyan!')
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
             add_to_context(current_app, 'app', doc='flask app')
+            add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id')
             # Stuff from plugins
             signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
 
