@@ -75,8 +75,7 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
             form.populate_obj(self.application)
             flash(_("Application {} was modified").format(self.application.name), 'success')
             return redirect(url_for('.apps'))
-        return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form,
-                                            back_url=url_for('.apps'))
+        return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form)
 
 
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
@@ -100,7 +99,7 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
             db.session.add(application)
             flash(_("Application {} registered successfully").format(application.name), 'success')
             return redirect(url_for('.apps'))
-        return WPOAuthAdmin.render_template('app_new.html', form=form, back_url=url_for('.apps'))
+        return WPOAuthAdmin.render_template('app_new.html', form=form)
 
 
 class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):

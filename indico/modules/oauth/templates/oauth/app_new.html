@@ -10,6 +10,6 @@
     {{ form_rows(form) }}
     {% call form_footer() %}
         <input class="i-button big highlight" type="submit" value="{% block action_button %}{% trans %}Register{% endtrans %}{% endblock %}">
-        <a href="{{ back_url }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+        <a href="{{ url_for('.apps') }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
     {% endcall %}
 {% endblock %}
