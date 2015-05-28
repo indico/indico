@@ -13,4 +13,4 @@ You can submit feedback on the following page until {{ evaluation.getEndDate()|f
 
 {% block footer_title %}Evaluation{% endblock %}
 
-{% block footer_url %}{{ url_for('event.conferenceDisplay', event, _external=true) }}{% endblock %}
+{% block footer_url %}{{ event.getURL() }}{% endblock %}

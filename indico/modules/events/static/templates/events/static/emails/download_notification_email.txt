@@ -12,4 +12,4 @@ The offline copy of the event "{{ event.getTitle() }}" is ready for download.
 Download link: {{ link }}
 {%- endblock %}
 
-{% block footer_url %}{{ url_for('event.conferenceDisplay', event, _external=true) }}{% endblock %}
+{% block footer_url %}{{ event.getURL() }}{% endblock %}
