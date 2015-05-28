@@ -2,11 +2,12 @@
     <div class="i-box titled">
         <div class="i-box-header">
             <div class="i-box-title">{%- trans %}New Offline Copy{% endtrans -%}</div>
-            <button id="test" class="i-button icon-wrench right" type="button"
+            <button class="i-button icon-wrench right" type="button"
                     data-method="post"
                     data-href="{{ url_for('static_site.build', event) }}"
-                    data-title="{{ _('Build an offline copy') }}"
-                    data-confirm="{{ _('Are you sure you want to build an offline copy of this event?<br>Beware that it is a heavy operation, especially for large events, and it might take some time to finish.') }}">{{_('Build offline copy')}}
+                    data-title="{% trans %}Build an offline copy{% endtrans %} }}"
+                    data-confirm="{% trans %}Are you sure you want to build an offline copy of this event?<br>Beware that it is a heavy operation, especially for large events, and it might take some time to finish.{% endtrans %} }}">
+                {%- trans %}Build offline copy{% endtrans -%}
             </button>
         </div>
         <div class="i-box-content">
