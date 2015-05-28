@@ -32,8 +32,8 @@ _bp.add_url_rule('/oauth/authorize', 'oauth_authorize', RHOAuthAuthorize, method
 _bp.add_url_rule('/oauth/token', 'oauth_token', RHOAuthToken, methods=('POST',))
 
 # Server administration
-_bp.add_url_rule('/admin/apps', 'apps', RHOAuthAdmin)
-_bp.add_url_rule('/admin/apps/new/', 'app_new', RHOAuthAdminApplicationNew, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/apps/', 'apps', RHOAuthAdmin)
+_bp.add_url_rule('/admin/apps/new', 'app_new', RHOAuthAdminApplicationNew, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/apps/<int:id>/', 'app_details', RHOAuthAdminApplication, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/apps/<int:id>/delete', 'app_delete', RHOAuthAdminApplicationDelete, methods=('POST',))
 _bp.add_url_rule('/admin/apps/<int:id>/reset', 'app_reset', RHOAuthAdminApplicationReset, methods=('POST',))
@@ -42,7 +42,7 @@ _bp.add_url_rule('/admin/apps/<int:id>/revoke', 'app_revoke', RHOAuthAdminApplic
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/applications/', 'user_profile', RHOAuthUserProfile)
-    _bp.add_url_rule('/applications/<int:id>/revoke/', 'user_token_revoke', RHOAuthUserTokenRevoke, methods=('POST',))
+    _bp.add_url_rule('/applications/<int:id>/revoke', 'user_token_revoke', RHOAuthUserTokenRevoke, methods=('POST',))
 
 
 @_bp.url_defaults

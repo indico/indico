@@ -35,9 +35,10 @@
         </div>
         <div class="i-box-content">
             <dl class="i-data-list">
-                <dt>{%- trans %}Client ID{% endtrans -%}</dt>
+                {# Do not translate Client ID/Secret since they are the official term in OAuth2 RFC #}
+                <dt>Client ID</dt>
                 <dd><code>{{ application.client_id }}</code></dd>
-                <dt>{%- trans %}Client Secret{% endtrans -%}</dt>
+                <dt>Client Secret</dt>
                 <dd><code>{{ application.client_secret }}</code></dd>
             </dl>
             <hr>

@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -95,6 +95,11 @@ class OAuthToken(db.Model):
         return {'id': self.id}
 
     @property
+    def expires(self):
+        # work around to have a non-expiring token
+        return now_utc + timedelta(days=3600)
+
+    @property
     def type(self):
         return 'bearer'
 
@@ -134,8 +139,8 @@ class OAuthGrant(object):
     def make_key(cls, client_id, code):
         return '{}:{}'.format(client_id, code)
 
-    def save(self):
-        self._cache.set(key=self.key, val=self, time=self.ttl)
-
     def delete(self):
         self._cache.delete(self.key)
+
+    def save(self):
+        self._cache.set(key=self.key, val=self, time=self.ttl)

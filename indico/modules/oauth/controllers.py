@@ -115,8 +115,8 @@ class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
     """Revokes all user tokens associated to the OAuth application"""
 
     def _process(self):
-        OAuthToken.find(application_id=request.view_args['id']).delete()
-        logger.info("All user tokens for the application with id {} were revoked.".format(request.view_args['id']))
+        self.application.tokens.delete()
+        logger.info("All user tokens for {} have been revoked.".format(self.application))
         flash(_("All user tokens for this application were revoked successfully"), 'success')
         return redirect(url_for('.app_details', self.application))
 
@@ -141,5 +141,5 @@ class RHOAuthUserTokenRevoke(RHUserBase):
     def _process(self):
         db.session.delete(self.token)
         logger.info("Token of application {} for user {} was revoked.".format(self.token.application, self.token.user))
-        flash(_("Your token was revoked successfully"), 'success')
+        flash(_("Token for {} has been revoked successfully").format(self.token.application.name), 'success')
         return redirect(url_for('.user_profile'))

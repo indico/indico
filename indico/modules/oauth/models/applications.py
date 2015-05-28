@@ -100,9 +100,7 @@ class OAuthApplication(db.Model):
 
     @property
     def default_redirect_uri(self):
-        if self.redirect_uris:
-            return self.redirect_uris[0]
-        return None
+        return self.redirect_uris[0] if self.redirect_uris else None
 
     @property
     def locator(self):
@@ -114,4 +112,4 @@ class OAuthApplication(db.Model):
 
     def reset_client_secret(self):
         self.client_secret = unicode(uuid4())
-        logger.info("Client secret for the application {} was reset.".format(self.name))
+        logger.info("Client secret for {} has been reset.".format(self))

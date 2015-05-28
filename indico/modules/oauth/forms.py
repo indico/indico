@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import itemgetter
+
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -30,9 +32,10 @@ from indico.web.forms.widgets import SwitchWidget
 class ApplicationForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    redirect_uris = TextListField(_("Authorization callback URLs"),
+    redirect_uris = TextListField(_("Allowed authorization callback URLs"), [DataRequired()],
                                   description=_("More than one URL can be specified adding new lines."))
-    default_scopes = IndicoSelectMultipleCheckboxField('Default scopes', [DataRequired()], choices=SCOPES.items())
+    default_scopes = IndicoSelectMultipleCheckboxField('Default scopes', [DataRequired()],
+                                                       choices=sorted(SCOPES.items(), key=itemgetter(1)))
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
                               description=_("Trusted applications will be granted authorization automatically and "
                                             "no intermediate page will be displayed during the authorization process."))
