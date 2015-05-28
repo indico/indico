@@ -62,14 +62,26 @@ class IndicoForm(Form):
         If `skip` is set, fields in that list are skipped.
         If `existing_only` is True, only attributes that already exist on `obj` are populated.
         """
+        def _included(field_name):
+            if fields and field_name not in fields:
+                return False
+            if skip and field_name in skip:
+                return False
+            if existing_only and not hasattr(obj, field_name):
+                return False
+            return True
+
+        # Populate data from actual fields
         for name, field in self._fields.iteritems():
-            if fields and name not in fields:
-                continue
-            if skip and name in skip:
-                continue
-            if existing_only and not hasattr(obj, name):
+            if not _included(name):
                 continue
             field.populate_obj(obj, name)
+
+        # Populate generated data
+        for name, value in self.generated_data.iteritems():
+            if not _included(name):
+                continue
+            setattr(obj, name, value)
 
     @property
     def visible_fields(self):
@@ -91,13 +103,18 @@ class IndicoForm(Form):
         return all_errors
 
     @property
+    def generated_data(self):
+        """Returns a dict containing all generated data"""
+        cls = type(self)
+        return {field: getattr(self, field).data
+                for field in dir(cls)
+                if isinstance(getattr(cls, field), generated_data)}
+
+    @property
     def data(self):
         """Extends form.data with generated data from properties"""
         data = super(IndicoForm, self).data
-        cls = type(self)
-        for field in dir(cls):
-            if isinstance(getattr(cls, field), generated_data):
-                data[field] = getattr(self, field).data
+        data.update(self.generated_data)
         return data
 
 
