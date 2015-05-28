@@ -16,13 +16,18 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.reminders.controllers import RHListReminders, RHDeleteReminder, RHEditReminder, RHAddReminder
-from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.pages.conferences import WPConfModifToolsBase
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
-event_reminders_blueprint = _bp = IndicoBlueprint('event_reminders', __name__, template_folder='templates',
-                                                  url_prefix='/event/<confId>/manage/tools/reminders')
 
-_bp.add_url_rule('/', 'list', RHListReminders)
-_bp.add_url_rule('/add', 'add', RHAddReminder, methods=('GET', 'POST'))
-_bp.add_url_rule('/<int:id>/', 'edit', RHEditReminder, methods=('GET', 'POST'))
-_bp.add_url_rule('/<int:id>/delete', 'delete', RHDeleteReminder, methods=('POST',))
+class WPReminders(WPConfModifToolsBase, WPJinjaMixin):
+    template_prefix = 'events/reminders/'
+
+    def getCSSFiles(self):
+        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+
+    def _setActiveTab(self):
+        self._tabReminders.setActive()
+
+    def _getTabContent(self, params):
+        return WPJinjaMixin._getPageContent(self, params)

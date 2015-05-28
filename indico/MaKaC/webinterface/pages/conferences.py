@@ -1956,6 +1956,8 @@ class WPConfModifToolsBase(WPConferenceModifBase):
 
         self._tabAlarms = self._tabCtrl.newTab("alarms", _("Alarms"), \
                 urlHandlers.UHConfDisplayAlarm.getURL(self._conf))
+        self._tabReminders = self._tabCtrl.newTab('reminders', _("Reminders"),
+                                                  url_for('event_reminders.list', self._conf))
         self._tabCloneEvent = self._tabCtrl.newTab("clone", _("Clone Event"), \
                 urlHandlers.UHConfClone.getURL(self._conf))
         self._tabPosters = self._tabCtrl.newTab("posters", _("Posters"), \
