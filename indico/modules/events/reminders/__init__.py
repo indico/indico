@@ -28,6 +28,21 @@ def _import_tasks(sender, **kwargs):
     import indico.modules.events.reminders.tasks
 
 
+@signals.event.data_changed.connect
+def _event_data_changed(event, **kwargs):
+    from indico.modules.events.reminders.models.reminders import EventReminder
+    if event.has_legacy_id:
+        return
+    query = EventReminder.find(EventReminder.event_id == int(event.id),
+                               EventReminder.is_relative,
+                               ~EventReminder.is_sent)
+    for reminder in query:
+        new_dt = event.getStartDate() - reminder.event_start_delta
+        if reminder.scheduled_dt != new_dt:
+            logger.info('Changing start time of {} to {}'.format(reminder, new_dt))
+            reminder.scheduled_dt = new_dt
+
+
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder

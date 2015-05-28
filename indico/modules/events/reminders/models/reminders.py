@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -146,10 +147,14 @@ class EventReminder(db.Model):
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
-    @property
+    @hybrid_property
     def is_relative(self):
         """Returns if the reminder is relative to the event time"""
         return self.event_start_delta is not None
+
+    @is_relative.expression
+    def is_relative(self):
+        return self.event_start_delta != None  # NOQA
 
     def send(self):
         """Sends the reminder to its recipients."""
