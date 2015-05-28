@@ -19,7 +19,7 @@
 
         if log_entry.getLogType() == "emailLog" and caption == "Body" and log_entry.getLogContentType() == "text/plain":
             mime = "plain-text-email"
-            value = escape(value)
+            value = '<pre>{}</pre>'.format(escape(value))
     %>
 
     <tr class="i-table content">

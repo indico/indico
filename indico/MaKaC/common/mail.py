@@ -154,12 +154,13 @@ class GenericMailer:
             from MaKaC.webinterface.mail import GenericNotification
             notification = GenericNotification(notification)
         cls.send(notification, skipQueue=skipQueue)
-        logData = {
+        log_data = {
             'contentType': notification.getContentType(),
             'fromAddr': notification.getFromAddr(),
             'toList': notification.getToList(),
             'ccList': notification.getCCList(),
+            'bccList': notification.getBCCList(),
             'subject': notification.getSubject(),
             'body': notification.getBody()
         }
-        conference.getLogHandler().logEmail(logData, module, user)
+        conference.getLogHandler().logEmail(log_data, module, user)

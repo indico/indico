@@ -112,6 +112,7 @@ class EmailLogItem(LogItem):
     """
     self._logInfo expected keys:
     - body
+    - bccList
     - ccList
     - toList
     """
@@ -122,11 +123,14 @@ class EmailLogItem(LogItem):
     def getLogBody(self):
         return self._logInfo.get("body", "No message")
 
+    def getLogBCCList(self):
+        return self._logInfo.get("bccList", ())
+
     def getLogCCList(self):
-        return self._logInfo.get("ccList", "No CC receptors")
+        return self._logInfo.get("ccList", ())
 
     def getLogToList(self):
-        return self._logInfo.get("toList", "No receptors")
+        return self._logInfo.get("toList", ())
 
     def getLogContentType(self):
         return self._logInfo.get("contentType", "text/html" if seems_html(self._logInfo['body']) else 'text/plain')
@@ -136,11 +140,11 @@ class EmailLogItem(LogItem):
         Return a list of pairs with the caption and the pre-processed
         information to be shown.
         """
-        info_list = []
-        info_list.append(("To", ",".join(self.getLogToList())))
-        info_list.append(("CC", ",".join(self.getLogCCList())))
-        info_list.append(("Body", self.getLogBody()))
-        return info_list
+        info_list = [("To", ', '.join(self.getLogToList())) if self.getLogToList() else None,
+                     ("CC", ', '.join(self.getLogCCList())) if self.getLogCCList() else None,
+                     ("BCC", ', '.join(self.getLogBCCList())) if self.getLogBCCList() else None,
+                     ("Body", self.getLogBody())]
+        return filter(None, info_list)
 
 
 class LogHandler(Persistent):
@@ -241,7 +245,7 @@ class LogHandler(Persistent):
         return True
 
     def logEmail(self, logInfo, module, user=None):
-        if logInfo is None :
+        if logInfo is None:
             return False
         logItem = EmailLogItem(user, logInfo, module)
         self._addLogItem(logItem)
