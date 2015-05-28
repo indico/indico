@@ -16,12 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.core.config import Config
+from indico.core.notifications import make_email, send_email
 from indico.web.flask.templating import get_template_module, get_overridable_template_name
 from indico.modules.vc.util import get_linked_to_description
-
-from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 
 
 def notify_created(plugin, room, room_assoc, event, user):
@@ -35,7 +32,7 @@ def notify_created(plugin, room, room_assoc, event, user):
     name = get_overridable_template_name('emails/created.html', plugin, core_prefix='vc/')
     tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user,
                               linked_to_title=get_linked_to_description(room_assoc))
-    _send('create', user, plugin, event, room, tpl.get_subject(), tpl.get_body())
+    _send('create', user, plugin, event, room, tpl)
 
 
 def notify_deleted(plugin, room, room_assoc, event, user):
@@ -47,25 +44,13 @@ def notify_deleted(plugin, room, room_assoc, event, user):
     """
     name = get_overridable_template_name('emails/deleted.html', plugin, core_prefix='vc/')
     tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user)
-    _send('delete', user, plugin, event, room, tpl.get_subject(), tpl.get_body())
+    _send('delete', user, plugin, event, room, tpl)
 
 
-def _send(action, user, plugin, event, room, subject, body):
+def _send(action, user, plugin, event, room, template_module):
     to_list = {user.email}
     cc_list = plugin.get_notification_cc_list(action, room, event) - to_list
     bcc_list = plugin.get_notification_bcc_list(action, room, event) - cc_list - to_list
 
-    notification = {
-        'content-type': 'text/html',
-        'fromAddr': Config.getInstance().getNoReplyEmail(),
-        'toList': to_list,
-        'ccList': cc_list,
-        'bccList': bcc_list,
-        'subject': subject,
-        'body': body
-    }
-    if event is None:
-        GenericMailer.send(GenericNotification(notification))
-    else:
-        GenericMailer.sendAndLog(GenericNotification(notification),
-                                 event, plugin.name)
+    email = make_email(to_list, cc_list, bcc_list, template=template_module, html=True)
+    send_email(email, event, plugin.friendly_name)
