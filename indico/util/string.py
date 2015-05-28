@@ -310,3 +310,13 @@ def encode_utf8(f):
         return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
 
     return _wrapper
+
+
+def is_legacy_id(id_):
+    """Checks if an ID is a broken legacy ID.
+
+    These IDs are not compatible with new code since they are not
+    numeric or have a leading zero, resulting in different objects
+    with the same numeric id.
+    """
+    return not isinstance(id_, (int, long)) and (not id_.isdigit() or str(int(id_)) != id_)

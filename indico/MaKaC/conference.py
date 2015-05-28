@@ -44,7 +44,7 @@ from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import L_
-from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
+from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii, is_legacy_id
 from MaKaC.review import AbstractFieldContent
 
 
@@ -2156,6 +2156,16 @@ class Conference(CommonObjectBase, Locatable):
     @return_ascii
     def __repr__(self):
         return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
+
+    @property
+    def has_legacy_id(self):
+        """Returns True if the event has a broken legacy ID.
+
+        These IDs are not compatible with new code since they are not
+        numeric or have a leading zero, resulting in different events
+        with the same numeric event id.
+        """
+        return is_legacy_id(self.id)
 
     @property
     def all_manager_emails(self):

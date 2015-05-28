@@ -19,7 +19,6 @@ import tempfile
 import os
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import log
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError, NotFoundError
@@ -29,11 +28,13 @@ from MaKaC.export import fileConverter
 from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
 
+from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from MaKaC.common.timezoneUtils import nowutc
 
 from indico.util import json
 from indico.util.contextManager import ContextManager
+from indico.util.string import is_legacy_id
 from indico.util.user import principal_from_fossil
 
 BYTES_1MB = 1024 * 1024
@@ -52,9 +53,17 @@ class RHCustomizable(RH):
         return self._wf
 
 
-class RHConferenceSite( RHCustomizable ):
+class RHConferenceSite(RHCustomizable):
+    ALLOW_LEGACY_IDS = True
 
-    def _checkParams( self, params ):
+    def _legacy_check(self):
+        if self.ALLOW_LEGACY_IDS:
+            return
+        event_id = request.view_args.get('confId') or request.values.get('confId')
+        if event_id is not None and is_legacy_id(event_id):
+            raise IndicoError('This page is not available for legacy events.')
+
+    def _checkParams(self, params):
         l = locators.WebLocator()
         l.setConference( params )
         self._conf = self._target = l.getObject()
