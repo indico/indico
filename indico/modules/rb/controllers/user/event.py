@@ -73,6 +73,8 @@ def _assign_room(obj, room, flash_message=True):
 
 
 class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
+    ALLOW_LEGACY_IDS = False
+
     def _checkProtection(self):
         RHConferenceModifBase._checkProtection(self)
         RHRoomBookingBase._checkProtection(self)
@@ -80,10 +82,7 @@ class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf
-        try:
-            self.event_id = int(self.event.getId())
-        except ValueError:
-            raise NoReportError(_('Room booking tools are not available for legacy events.'))
+        self.event_id = int(self.event.getId())
 
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):

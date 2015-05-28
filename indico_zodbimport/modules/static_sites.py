@@ -25,6 +25,7 @@ from indico.core.db import db
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.modules.users import User
 from indico.util.console import cformat
+from indico.util.string import is_legacy_id
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer
 
@@ -44,7 +45,7 @@ class StaticSitesImporter(Importer):
                                         self.zodb_root['modules']['offlineEvents']._idxConf.itervalues())):
 
             event_id = item.conference.id
-            if not event_id.isdigit() or (event_id[0] == '0' and event_id != '0'):
+            if is_legacy_id(event_id):
                 print cformat('%{red!}!!!%{reset} '
                               '%{white!}{0:6s}%{reset} %{yellow!}Event has non-numeric/broken ID').format(event_id)
                 continue

@@ -26,7 +26,7 @@ from sqlalchemy.orm import lazyload
 from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.db import db
-from indico.core.errors import AccessError, IndicoError
+from indico.core.errors import AccessError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.forms import VCRoomListFilterForm
@@ -82,12 +82,11 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
 
 class RHVCManageEventBase(RHConferenceModifBase):
+    ALLOW_LEGACY_IDS = False
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
-        try:
-            self.event_id = int(self._conf.id)
-        except ValueError:
-            raise IndicoError(_('This page is not available for legacy events.'))
+        self.event_id = int(self._conf.id)
         self.event = self._conf
 
 
@@ -101,11 +100,8 @@ class RHVCManageEvent(RHVCManageEventBase):
     """Lists the available videoconference rooms"""
 
     def _process(self):
-        try:
-            room_event_assocs = VCRoomEventAssociation.find_for_event(self._conf, include_hidden=True,
-                                                                      include_deleted=True).all()
-        except ValueError:
-            raise IndicoError(_('This page is not available for legacy events.'))
+        room_event_assocs = VCRoomEventAssociation.find_for_event(self._conf, include_hidden=True,
+                                                                  include_deleted=True).all()
         event_vc_rooms = [event_vc_room for event_vc_room in room_event_assocs if event_vc_room.vc_room.plugin]
         return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
                                                event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())

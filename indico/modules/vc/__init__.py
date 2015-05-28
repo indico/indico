@@ -56,6 +56,8 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
+    if event.has_legacy_id:
+        return
     return 'vc', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
                               visible=bool(get_vc_plugins()) and event.canModify(session.user))
 
@@ -63,7 +65,7 @@ def _extend_event_management_menu(event, **kwargs):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     def _visible(event):
-        if not event.id.isdigit():
+        if event.has_legacy_id:
             return False
         return (bool(get_vc_plugins()) and
                 bool(VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).count()))
@@ -73,7 +75,7 @@ def _extend_event_menu(sender, **kwargs):
 @signals.event.session_slot_deleted.connect
 def _session_slot_deleted(session_slot, **kwargs):
     event = session_slot.getConference()
-    if not event.id.isdigit():
+    if event.has_legacy_id:
         return
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         if event_vc_room.link_object is None:
@@ -84,7 +86,7 @@ def _session_slot_deleted(session_slot, **kwargs):
 @signals.event.contribution_deleted.connect
 def _contrib_deleted(contrib, **kwargs):
     event = contrib.getConference()
-    if not event.id.isdigit():
+    if event.has_legacy_id:
         return
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         if event_vc_room.link_object is None:
@@ -94,7 +96,7 @@ def _contrib_deleted(contrib, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    if not event.id.isdigit():
+    if event.has_legacy_id:
         return
     user = session.user if has_request_context() and session.user else User.get(Config.getInstance().getJanitorUserId())
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):

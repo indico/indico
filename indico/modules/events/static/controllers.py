@@ -22,25 +22,20 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
 from indico.core.db import db
-from indico.core.errors import IndicoError
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.modules.events.static.tasks import build_static_site
 from indico.modules.events.static.views import WPStaticSites
-from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHStaticSiteBase(RHConferenceModifBase):
-    def check_legacy_events(self):
-        if not self._conf.id.isdigit():
-            raise IndicoError(_('This page is not available for legacy events.'))
+    ALLOW_LEGACY_IDS = False
 
 
 class RHStaticSiteList(RHStaticSiteBase):
     def _process(self):
-        self.check_legacy_events()
         if not Config.getInstance().getOfflineStore():
             raise NotFound()
         static_sites = StaticSite.find(event_id=self._conf.id).order_by(StaticSite.requested_dt.desc()).all()
@@ -50,7 +45,6 @@ class RHStaticSiteList(RHStaticSiteBase):
 
 class RHStaticSiteBuild(RHStaticSiteBase):
     def _process(self):
-        self.check_legacy_events()
         static_site = StaticSite(creator=session.user, event=self._conf)
         db.session.add(static_site)
         transaction.commit()
@@ -60,7 +54,6 @@ class RHStaticSiteBuild(RHStaticSiteBase):
 
 class RHStaticSiteDownload(RHStaticSiteBase):
     def _process(self):
-        self.check_legacy_events()
         static_site = StaticSite.get_one(request.view_args['id'])
         if static_site.state != StaticSiteState.success:
             raise NotFound()

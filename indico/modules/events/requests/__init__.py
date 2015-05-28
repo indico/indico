@@ -50,7 +50,7 @@ def _merge_users(target, source, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    if not event.id.isdigit():
+    if event.has_legacy_id:
         return
     event_id = int(event.id)
     requests = Request.find(event_id=event_id)
