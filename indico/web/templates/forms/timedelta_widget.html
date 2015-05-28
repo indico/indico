@@ -1,0 +1,35 @@
+{% extends 'forms/base_widget.html' %}
+{% set value = field._value() %}
+
+
+{% block html %}
+    <div class="timedelta-widget">
+        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
+               value="{{ value | tojson | forceescape }}">
+        <input type="number" id="{{ field.id }}-value" value="{{ value.value }}"
+               {% if field.flags.required %} required min="1"{% endif %}
+               {{ input_args|html_params }}>
+        <select id="{{ field.id }}-unit" data-tooltip-anchor
+                {% if field.flags.required %} required{% endif %}
+                {{ input_args|html_params }}>
+            {% for unit, name, selected in field.choices %}
+                <option value="{{ unit }}" {%- if selected %} selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+            $('#{{ field.id }}-value, #{{ field.id }}-unit').on('change input', function() {
+                $('#{{ field.id }}').val(JSON.stringify({
+                    unit: $('#{{ field.id }}-unit').val(),
+                    value: +$('#{{ field.id }}-value').val()
+                }));
+            });
+        })();
+    </script>
+{% endblock %}

@@ -43,12 +43,23 @@ class ConcatWidget(object):
 
 
 class JinjaWidget(object):
-    """Renders a field using a custom Jinja template"""
-    def __init__(self, template, plugin=None, single_line=False, **context):
+    """Renders a field using a custom Jinja template
+
+    :param template: The template to render
+    :param plugin: The plugin or plugin name containing the template
+    :param single_line: If the field should be rendered in single-line
+                        style.
+    :param single_kwargs: If kwargs should be passed to the template as
+                          ``input_args`` instead of being passed as
+                          separate kwargs.
+    """
+
+    def __init__(self, template, plugin=None, single_line=False, single_kwargs=False, **context):
         self.template = template
         self.plugin = plugin
         self.context = context
         self.single_line = single_line
+        self.single_kwargs = single_kwargs
 
     def __call__(self, field, **kwargs):
         if self.plugin:
@@ -58,6 +69,8 @@ class JinjaWidget(object):
             template = '{}:{}'.format(plugin, self.template)
         else:
             template = self.template
+        if self.single_kwargs:
+            kwargs = {'input_args': kwargs}
         template_module = get_template_module(template, field=field, **dict(self.context, **kwargs))
         javascript = template_module.javascript()
         if '<script' in javascript:

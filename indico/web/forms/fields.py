@@ -15,6 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import json
+from collections import OrderedDict
+from datetime import timedelta
 from operator import attrgetter
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
@@ -295,3 +297,74 @@ class OverrideMultipleItemsField(HiddenField):
     def get_row_key(self, row):
         """Utility for the widget to get the unique value for a row"""
         return row[self.unique_field]
+
+
+class TimedeltaField(HiddenField):
+    """A field that lets the user select a simple timedelta.
+
+    It does not support mixing multiple units, but it is smart enough
+    to switch to a different unit to represent a timedelta that could
+    not be represented otherwise.
+
+    :param units: The available units. Must be a tuple containing any
+                  any of 'seconds', 'minutes', 'hours' and 'days'.
+                  If not specified, ``('hours', 'days')`` is assumed.
+    """
+    widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
+    unit_names = {
+        'seconds': _(u'Seconds'),
+        'minutes': _(u'Minutes'),
+        'hours': _(u'Hours'),
+        'days': _(u'Days')
+    }
+    magnitudes = OrderedDict([
+        ('days', 86400),
+        ('hours', 3600),
+        ('minutes', 60),
+        ('seconds', 1)
+    ])
+
+    def __init__(self, *args, **kwargs):
+        self.units = kwargs.pop('units', ('hours', 'days'))
+        super(TimedeltaField, self).__init__(*args, **kwargs)
+
+    @property
+    def best_unit(self):
+        """Returns the largest unit that covers the current timedelta"""
+        if self.data is None:
+            return None
+        seconds = int(self.data.total_seconds())
+        for unit, magnitude in self.magnitudes.iteritems():
+            if not seconds % magnitude:
+                return unit
+        return 'seconds'
+
+    @property
+    def choices(self):
+        best_unit = self.best_unit
+        choices = [(unit, self.unit_names[unit], unit == best_unit) for unit in self.units]
+        # Add whatever unit is necessary to represent the currenet value if we have one
+        if best_unit and best_unit not in self.units:
+            choices.append((best_unit, u'({})'.format(self.unit_names[best_unit]), True))
+        return choices
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            data = json.loads(valuelist[0])
+            if data:
+                self.data = timedelta(seconds=self.magnitudes[data['unit']] * int(data['value']))
+
+    def pre_validate(self, form):
+        if self.best_unit in self.units:
+            return
+        if self.object_data is None:
+            raise ValueError(_(u'Please choose a valid unit.'))
+        if self.object_data != self.data:
+            raise ValueError(_(u'Please choose a different unit or keep the previous value.'))
+
+    def _value(self):
+        if self.data is None:
+            return {}
+        else:
+            return {'unit': self.best_unit,
+                    'value': int(self.data.total_seconds()) // self.magnitudes[self.best_unit]}

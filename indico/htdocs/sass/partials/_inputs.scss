@@ -677,6 +677,19 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 }
 
+.timedelta-widget {
+    input[type=number] {
+        display: inline;
+        width: 3em;
+        text-align: center;
+    }
+
+    select {
+        display: inline;
+        width: auto;
+    }
+}
+
 .has-warning {
     color: $yellow;
 }
