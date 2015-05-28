@@ -37,6 +37,7 @@ def email_sender(fn):
     return wrapper
 
 
+@unify_user_args(legacy=True)
 def send_email(email, event=None, module='', user=None, skip_queue=False):
     """Sends an email created by :func:`make_email`.
 
@@ -55,7 +56,6 @@ def send_email(email, event=None, module='', user=None, skip_queue=False):
         GenericMailer.send(email, skipQueue=skip_queue)
 
 
-@unify_user_args(legacy=True)
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
     """Creates an email.
