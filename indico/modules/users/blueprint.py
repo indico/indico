@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request
 
+from indico.modules.users.api import fetch_authenticated_user
 from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, RHUserPreferences, RHUserFavorites,
                                               RHUserEmails, RHUserEmailsVerify, RHUserEmailsDelete,
                                               RHUserEmailsSetPrimary, RHUserFavoritesUsersAdd,
@@ -52,6 +53,10 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/verify/<token>', 'user_emails_verify', RHUserEmailsVerify)
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
+
+
+# Users API
+_bp.add_url_rule('!/api/user/', 'authenticated_user', fetch_authenticated_user)
 
 
 @_bp.url_defaults

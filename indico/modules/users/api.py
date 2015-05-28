@@ -17,7 +17,10 @@
 # python stdlib imports
 import itertools
 
+from flask import jsonify, session
+
 # indico imports
+from indico.modules.oauth import oauth
 from indico.modules.users.util import get_related_categories
 from indico.util.redis import client as redis_client
 from indico.util.redis import avatar_links
@@ -30,6 +33,15 @@ from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder
 from MaKaC.user import AvatarHolder
+
+
+def fetch_authenticated_user():
+    valid, req = oauth.verify_request([])
+    user = req.user if valid else session.user
+    if not user:
+        return jsonify()
+    return jsonify(id=user.id, email=user.email, first_name=user.first_name, last_name=user.last_name,
+                   admin=user.is_admin)
 
 
 @HTTPAPIHook.register
