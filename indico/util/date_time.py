@@ -16,6 +16,7 @@
 
 import calendar
 import time
+from collections import OrderedDict
 from datetime import timedelta, datetime
 from datetime import time as dt_time
 
@@ -32,7 +33,7 @@ from dateutil.relativedelta import relativedelta
 
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from indico.core.config import Config
-from indico.util.i18n import get_current_locale, _
+from indico.util.i18n import get_current_locale, _, ngettext
 
 
 now_utc = nowutc
@@ -116,6 +117,58 @@ def format_timedelta(td, format='short', locale=None):
         locale = get_current_locale()
 
     return _format_timedelta(td, format=format, locale=locale).encode('utf-8')
+
+
+def format_human_timedelta(delta, granularity='seconds'):
+    """Formats a timedelta in a human-readable way
+
+    :param delta: the timedelta to format
+    :param granularity: the granularity, i.e. the lowest unit that is
+                        still displayed. when set e.g. to 'minutes',
+                        the output will never contain seconds unless
+                        the whole timedelta spans less than a minute.
+                        Accepted values are 'seconds', 'minutes',
+                        'hours' and 'days'.
+    """
+    field_order = ('days', 'hours', 'minutes', 'seconds')
+    long_names = {
+        'seconds': lambda n: ngettext(u'{0} second', u'{0} seconds', n).format(n),
+        'minutes': lambda n: ngettext(u'{0} minute', u'{0} minutes', n).format(n),
+        'hours': lambda n: ngettext(u'{0} hour', u'{0} hours', n).format(n),
+        'days': lambda n: ngettext(u'{0} day', u'{0} days', n).format(n),
+    }
+    short_names = {
+        'seconds': lambda n: ngettext(u'{0}s', u'{0}s', n).format(n),
+        'minutes': lambda n: ngettext(u'{0}m', u'{0}m', n).format(n),
+        'hours': lambda n: ngettext(u'{0}h', u'{0}h', n).format(n),
+        'days': lambda n: ngettext(u'{0}d', u'{0}d', n).format(n),
+    }
+
+    values = OrderedDict((key, 0) for key in field_order)
+    values['seconds'] = delta.total_seconds()
+    values['days'], values['seconds'] = divmod(values['seconds'], 86400)
+    values['hours'], values['seconds'] = divmod(values['seconds'], 3600)
+    values['minutes'], values['seconds'] = divmod(values['seconds'], 60)
+    for key, value in values.iteritems():
+        values[key] = int(value)
+    # keep all fields covered by the granularity, and if that results in
+    # no non-zero fields, include otherwise excluded ones
+    used_fields = set(field_order[:field_order.index(granularity) + 1])
+    available_fields = [x for x in field_order if x not in used_fields]
+    used_fields -= {k for k, v in values.iteritems() if not v}
+    while not sum(values[x] for x in used_fields) and available_fields:
+        used_fields.add(available_fields.pop(0))
+    for key in available_fields:
+        values[key] = 0
+    nonzero = OrderedDict((k, v) for k, v in values.iteritems() if v)
+    if not nonzero:
+        return long_names[granularity](0)
+    elif len(nonzero) == 1:
+        key, value = nonzero.items()[0]
+        return long_names[key](value)
+    else:
+        parts = [short_names[key](value) for key, value in nonzero.iteritems()]
+        return u' '.join(parts)
 
 
 def format_human_date(dt, format='medium', locale=None):
