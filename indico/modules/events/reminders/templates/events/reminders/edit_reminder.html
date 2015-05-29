@@ -57,8 +57,12 @@
                 $('#absolute_date').datepicker({minDate: 0});
                 $('#reminder-form input[name=schedule_type]').on('change', function() {
                     var type = $('#reminder-form input[name=schedule_type]:checked').val();
-                    $('#absolute_date, #absolute_time').prop('disabled', type != 'absolute');
-                    $('#relative_delta-value, #relative_delta-unit').prop('disabled', type != 'relative');
+                    $('#absolute_date, #absolute_time')
+                        .prop('disabled', type != 'absolute')
+                        .closest('.form-group').toggle(type == 'absolute');
+                    $('#relative_delta-value, #relative_delta-unit')
+                        .prop('disabled', type != 'relative')
+                        .closest('.form-group').toggle(type == 'relative');
                     $('#save-button').val(type == 'now' ? $T('Send') : $T('Save'))
                 }).trigger('change');
 
