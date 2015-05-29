@@ -32,6 +32,9 @@ $(document).ready(function() {
         });
     });
 
+    // Remove ui-widget-content style from static tabs as it messes up e.g. link colors
+    $('.static-tabs').find('.ui-widget-content').addBack().removeClass('ui-widget-content');
+
     $('.main-breadcrumb a[href="#"]').css({cursor: 'default', outline: 'none'}).on('click', function(e) {
         e.preventDefault();
     });
