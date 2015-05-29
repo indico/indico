@@ -58,16 +58,20 @@ def load_token(access_token, refresh_token=None):
 
 @oauth.tokensetter
 def save_token(token, request, *args, **kwargs):
+    # For the implicit flow
+    # Check issue: https://github.com/lepture/flask-oauthlib/issues/209
+    user_id = request.user.id if request.user else session.user.id
+
     tokens = OAuthToken.find(OAuthApplication.client_id == request.client.client_id,
-                             OAuthToken.user_id == request.user.id,
+                             OAuthToken.user_id == user_id,
                              _join=OAuthApplication)
     # make sure that every client has only one token connected to a user
     for t in tokens:
         db.session.delete(t)
-        logger.info("Deleted token for user {} before saving a new one.".format(request.user.id))
+        logger.info("Deleted token for user {} before saving a new one.".format(user_id))
     application = OAuthApplication.find_one(client_id=request.client.client_id)
     scopes = token['scope'].split()
-    token = OAuthToken(application_id=application.id, user_id=request.user.id,
+    token = OAuthToken(application_id=application.id, user_id=user_id,
                        access_token=token['access_token'], scopes=scopes)
     db.session.add(token)
     return token
