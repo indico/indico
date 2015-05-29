@@ -586,11 +586,13 @@ For information on how to configure Apache HTTPD, take a look at:
 http://indico.readthedocs.org/en/latest/installation/#configuring-the-web-server
 
 
-Please do not forget to start the scheduler in order to use alarms, creation
-of off-line websites, reminders, etc. You can manage it with the 'indico_scheduler' command.
+Please do not forget to start the Celery worker in order to use background tasks
+such as event reminders and periodic cleanups. You can run it using this command:
+$ indico celery worker -l INFO -B
 
 %s
 """ % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
+
 
 def _databaseText(cfgPrefix):
     return """If you are running ZODB on this host:

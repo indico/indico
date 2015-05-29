@@ -327,7 +327,6 @@ if __name__ == '__main__':
           license="http://www.gnu.org/licenses/gpl-3.0.txt",
           entry_points="""
             [console_scripts]
-            indico_scheduler = indico.modules.scheduler.daemon_script:main
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico = indico.cli.manage:main

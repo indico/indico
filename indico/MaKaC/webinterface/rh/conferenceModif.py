@@ -65,7 +65,6 @@ from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.fossils.conference import ISessionBasicFossil
 
-from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file, url_for

@@ -59,7 +59,6 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 
 
 # indico imports
-from indico.modules.scheduler import tasks
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil

@@ -855,12 +855,10 @@ class WPAdminsSystemBase(WPAdminsBase):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabConfiguration = self._tabCtrl.newTab("configuration", _("Configuration"), \
-                urlHandlers.UHAdminsSystem.getURL())
-        self._subTabTaskManager = self._tabCtrl.newTab("tasks", _("Task Manager"), \
-                urlHandlers.UHTaskManager.getURL())
-        self._subTabMaintenance = self._tabCtrl.newTab("maintenance", _("Maintenance"), \
-                urlHandlers.UHMaintenance.getURL())
+        self._subTabConfiguration = self._tabCtrl.newTab("configuration", _("Configuration"),
+                                                         urlHandlers.UHAdminsSystem.getURL())
+        self._subTabMaintenance = self._tabCtrl.newTab("maintenance", _("Maintenance"),
+                                                       urlHandlers.UHMaintenance.getURL())
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
@@ -985,28 +983,6 @@ class WPMaintenancePack(WPMaintenanceBase):
                     </tr>
                 </table>
                 """ % wc.getHTML(msg, url, {})
-
-
-class WPTaskManagerBase(WPAdminsSystemBase):
-
-    def __init__(self, rh):
-        WPAdminsBase.__init__(self, rh)
-
-    def _setActiveTab(self):
-        self._subTabTaskManager.setActive()
-
-
-class WPTaskManager(WPTaskManagerBase):
-
-    def _getTabContent(self, params):
-        wc = WTaskManager()
-
-        pars = {}
-        return wc.getHTML(pars)
-
-
-class WTaskManager(wcomponents.WTemplated):
-    pass
 
 
 class WPIPBasedACL( WPServicesCommon ):

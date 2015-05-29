@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, templates,
-                                   conferenceModif, services, oauth)
+from MaKaC.webinterface.rh import (admins, announcement, maintenance, domains, templates, conferenceModif, services,
+                                   oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -41,9 +41,6 @@ admin.add_url_rule('/news', 'updateNews', admins.RHUpdateNews)
 
 # Upcoming events
 admin.add_url_rule('/upcoming-events', 'adminUpcomingEvents', admins.RHConfigUpcoming)
-
-# Task manager
-admin.add_url_rule('/tasks', 'taskManager', taskManager.RHTaskManager)
 
 # Maintenance
 admin.add_url_rule('/maintenance/', 'adminMaintenance', maintenance.RHMaintenance)

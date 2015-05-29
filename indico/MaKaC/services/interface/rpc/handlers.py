@@ -77,7 +77,6 @@ endpointMap = {
     "category": importModule('MaKaC.services.implementation.category'),
     "upcomingEvents": importModule('MaKaC.services.implementation.upcoming'),
     "timezone": importModule('MaKaC.services.implementation.timezone'),
-    "scheduler": importModule('MaKaC.services.implementation.scheduler'),
     "abstractReviewing": importModule('MaKaC.services.implementation.abstractReviewing'),
     "abstract": importModule('MaKaC.services.implementation.abstract'),
     "abstracts": importModule('MaKaC.services.implementation.abstracts'),

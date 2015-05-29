@@ -98,7 +98,6 @@ from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 import zope.interface
 
-from indico.modules.scheduler import Client, tasks
 from indico.core import signals
 from indico.util.date_time import utc_timestamp, format_datetime
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog

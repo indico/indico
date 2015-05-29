@@ -142,7 +142,6 @@ indico_admin = rjs_bundle(
     *namespace('js/indico/Admin',
 
                'News.js',
-               'Scheduler.js',
                'Upcoming.js'))
 
 indico_timetable = rjs_bundle(

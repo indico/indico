@@ -1881,10 +1881,6 @@ class UHConfModFullMaterialPackagePerform(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-performMatPkg'
 
 
-class UHTaskManager(URLHandler):
-    _endpoint = 'admin.taskManager'
-
-
 class UHUpdateNews(URLHandler):
     _endpoint = 'admin.updateNews'
 

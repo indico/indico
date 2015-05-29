@@ -25,7 +25,6 @@ behind to ensure the persistence.
 
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
 from persistent import Persistent
 
 
@@ -45,13 +44,11 @@ class ModuleHolder( ObjectHolder ):
         from indico.modules import news
         from indico.modules import cssTpls
         from indico.modules import upcoming
-        from indico.modules import scheduler
 
         ModuleHolder._availableModules = {
-            news.NewsModule.id                    : news.NewsModule,
-            cssTpls.CssTplsModule.id              : cssTpls.CssTplsModule,
-            upcoming.UpcomingEventsModule.id      : upcoming.UpcomingEventsModule,
-            scheduler.SchedulerModule.id          : scheduler.SchedulerModule
+            news.NewsModule.id: news.NewsModule,
+            cssTpls.CssTplsModule.id: cssTpls.CssTplsModule,
+            upcoming.UpcomingEventsModule.id: upcoming.UpcomingEventsModule,
         }
 
     def _newId( self ):
