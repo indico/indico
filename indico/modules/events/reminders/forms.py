@@ -69,6 +69,8 @@ class ReminderForm(IndicoForm):
         super(ReminderForm, self).__init__(*args, **kwargs)
         self.absolute_time.description = _('Your active timezone is {tz}.').format(tz=self.timezone)
         self._set_email_choices()
+        if self.event.getType() == 'simple_event':
+            del self.include_summary
 
     def _set_email_choices(self):
         # User
