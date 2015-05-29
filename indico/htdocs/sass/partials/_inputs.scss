@@ -72,7 +72,7 @@ input[type=checkbox].validate {
     }
 }
 
-input[type=number] {
+input[type=number], input[type=time] {
     -moz-appearance: textfield;
     padding-right: 0;
 
@@ -463,7 +463,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 vertical-align: middle;
             }
 
-            input[type=number] {
+            input[type=number], input[type=time] {
                 padding-right: 0 !important;
 
                 &::-webkit-inner-spin-button {
@@ -680,8 +680,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 .timedelta-widget {
     input[type=number] {
         display: inline;
-        width: 3em;
-        text-align: center;
+        width: 6em;
     }
 
     select {
