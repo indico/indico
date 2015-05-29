@@ -299,7 +299,7 @@ class OverrideMultipleItemsField(HiddenField):
         return row[self.unique_field]
 
 
-class TimedeltaField(Field):
+class TimeDeltaField(Field):
     """A field that lets the user select a simple timedelta.
 
     It does not support mixing multiple units, but it is smart enough
@@ -326,7 +326,7 @@ class TimedeltaField(Field):
 
     def __init__(self, *args, **kwargs):
         self.units = kwargs.pop('units', ('hours', 'days'))
-        super(TimedeltaField, self).__init__(*args, **kwargs)
+        super(TimeDeltaField, self).__init__(*args, **kwargs)
 
     @property
     def best_unit(self):

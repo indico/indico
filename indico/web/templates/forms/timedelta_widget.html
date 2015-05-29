@@ -5,7 +5,7 @@
 {% block html %}
     <div class="timedelta-widget">
         {# The order of these two fields matters! If you change it, update
-           `process_formdata` and `_value` in TimedeltaField accordingly! #}
+           `process_formdata` and `_value` in TimeDeltaField accordingly! #}
         <input type="number" name="{{ field.name }}" id="{{ field.id }}-value" value="{{ current_value }}"
                {% if field.flags.required %} required min="1"{% endif %}
                {{ input_args|html_params }}>
