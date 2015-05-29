@@ -83,5 +83,7 @@ class EventAlarmImporter(Importer):
 
     def _iter_alarms(self):
         for event in self.flushing_iterator(self.zodb_root['conferences'].itervalues()):
+            if not hasattr(event, 'alarmList'):
+                continue
             for alarm in event.alarmList.itervalues():
                 yield event, alarm
