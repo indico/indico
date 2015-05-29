@@ -125,7 +125,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
                 var favouritizeButtonDiv = Html.div("actions", new Html(create_favorite_button(peopleData.get('id')).get(0)));
                 return [Html.div("info", userName, userEmail, affiliation), favouritizeButtonDiv];
             } else {
-                return [userName, userEmail, affiliation];
+                return Html.div("info", userName, userEmail, affiliation);
             }
         }
     }
