@@ -112,7 +112,8 @@ def extend_header_menu(sender, **kwargs):
 
 class VCCloner(EventCloner):
     def get_options(self):
-        enabled = bool(VCRoomEventAssociation.find_for_event(self.event, include_hidden=True).count())
+        enabled = (not self.event.has_legacy_id and
+                   bool(VCRoomEventAssociation.find_for_event(self.event, include_hidden=True).count()))
         return {'vc_rooms': (_('Videoconference rooms'), enabled, True)}
 
     def clone(self, new_event, options):
