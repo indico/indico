@@ -31,7 +31,7 @@
                 return;
             }
             var href = $(this).attr('href');
-            if (href == '#') {
+            if (href === undefined || href == '#') {
                 var data_href = $(this).data('href');
                 href = data_href ? data_href : href;
             }
@@ -48,7 +48,9 @@
         options = $.extend({
             trigger: null, // element that opened the dialog
             title: null, // title of the dialog
-            url: null, // url to GET the form from
+            url: null, // url to get the form/dialog from
+            method: 'GET', // http method to get the form/dialog
+            data: null, // object or callable to add data when loading the form/dialog
             backSelector: '[data-button-back]', // elements in the form which will close the form
             clearFlashes: true, // clear existing flashed messages before showing new ones
             onClose: null, // callback to invoke after closing the dialog. first argument is null if closed manually,
@@ -59,8 +61,9 @@
         var popup = null;
 
         $.ajax({
-            type: 'GET',
+            type: options.method,
             url: options.url,
+            data: $.isFunction(options.data) ? options.data() : options.data,
             cache: false, // IE caches GET AJAX requests. WTF.
             complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
