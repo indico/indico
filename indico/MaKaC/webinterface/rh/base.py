@@ -174,7 +174,7 @@ class RH(RequestHandlerBase):
     _doNotSanitizeFields = []
     _isMobile = True  # this value means that the generated web page can be mobile
 
-    HTTP_VERBS = frozenset(('GET', 'POST', 'PUT', 'DELETE'))
+    HTTP_VERBS = frozenset(('GET', 'PATCH', 'POST', 'PUT', 'DELETE'))
 
     def __init__(self):
         self._responseUtil = ResponseUtil()
