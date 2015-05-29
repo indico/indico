@@ -36,7 +36,7 @@ from MaKaC.user import AvatarHolder
 
 
 def fetch_authenticated_user():
-    valid, req = oauth.verify_request([])
+    valid, req = oauth.verify_request(['read:user'])
     user = req.user if valid else session.user
     if not user:
         return jsonify()

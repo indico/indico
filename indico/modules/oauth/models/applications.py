@@ -27,9 +27,10 @@ from indico.util.i18n import _
 from indico.util.string import return_ascii
 
 
-SCOPES = {'read:legacy_api': _('Read access to the legacy API'),
-          'write:legacy_api': _('Write access to the legacy API'),
-          'registrants': _('Read/Write access to event registrants')}
+SCOPES = {'read:user': _("User information (read only)"),
+          'read:legacy_api': _('Legacy API (read only)'),
+          'write:legacy_api': _('Legacy API (write only)'),
+          'registrants': _('Event registrants')}
 
 
 class OAuthApplication(db.Model):

@@ -34,7 +34,7 @@ class ApplicationForm(IndicoForm):
     description = TextAreaField(_("Description"))
     redirect_uris = TextListField(_("Allowed authorization callback URLs"), [DataRequired()],
                                   description=_("More than one URL can be specified adding new lines."))
-    default_scopes = IndicoSelectMultipleCheckboxField('Default scopes', [DataRequired()],
+    default_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
                                                        choices=sorted(SCOPES.items(), key=itemgetter(1)))
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
                               description=_("Trusted applications will be granted authorization automatically and "
