@@ -73,33 +73,47 @@ class RHDeleteReminder(RHSpecificReminderBase):
         return redirect(url_for('.list', self.event))
 
 
+def _send_reminder(reminder):
+    """Send reminder immediately"""
+    reminder.send()
+    logger.info('Reminder sent by {}: {}'.format(session.user, reminder))
+    flash(_('The reminder has been sent.'), 'success')
+
+
 class RHEditReminder(RHSpecificReminderBase):
     """Modifies an existing reminder"""
 
-    def _process(self):
-        if self.reminder.is_relative:
+    def _get_defaults(self):
+        reminder = self.reminder
+        if reminder.is_relative:
             defaults_kwargs = {'schedule_type': 'relative',
-                               'relative_delta': self.reminder.event_start_delta}
+                               'relative_delta': reminder.event_start_delta}
         else:
             # Use the user's preferred event timezone
             tz = get_timezone(DisplayTZ(conf=self.event).getDisplayTZ())
-            dt = self.reminder.scheduled_dt.astimezone(tz)
+            dt = reminder.scheduled_dt.astimezone(tz)
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_date': dt.date(),
                                'absolute_time': dt.time()}
-        defaults = FormDefaults(self.reminder, **defaults_kwargs)
-        form = ReminderForm(obj=defaults, event=self.event)
-        if not self.reminder.is_sent and form.validate_on_submit():
-            form.populate_obj(self.reminder, existing_only=True)
-            logger.info('Reminder modified by {}: {}'.format(session.user, self.reminder))
-            flash(_("The reminder at {} has been modified.").format(format_datetime(self.reminder.scheduled_dt)),
-                  'success')
+        return FormDefaults(reminder, **defaults_kwargs)
+
+    def _process(self):
+        reminder = self.reminder
+        form = ReminderForm(obj=self._get_defaults(), event=self.event)
+        if not reminder.is_sent and form.validate_on_submit():
+            form.populate_obj(reminder, existing_only=True)
+            if form.schedule_type.data == 'now':
+                _send_reminder(reminder)
+            else:
+                logger.info('Reminder modified by {}: {}'.format(session.user, reminder))
+                flash(_("The reminder at {} has been modified.").format(format_datetime(reminder.scheduled_dt)),
+                      'success')
             return redirect(url_for('.list', self.event))
 
         widget_attrs = ({field.short_name: {'disabled': True} for field in form}
-                        if self.reminder.is_sent
+                        if reminder.is_sent
                         else form.default_widget_attrs)
-        return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=self.reminder,
+        return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=reminder,
                                            form=form, widget_attrs=widget_attrs)
 
 
@@ -113,8 +127,11 @@ class RHAddReminder(RHRemindersBase):
             form.populate_obj(reminder, existing_only=True)
             db.session.add(reminder)
             db.session.flush()
-            logger.info('Reminder created by {}: {}'.format(session.user, reminder))
-            flash(_("A reminder at {} has been created.").format(format_datetime(reminder.scheduled_dt)), 'success')
+            if form.schedule_type.data == 'now':
+                _send_reminder(reminder)
+            else:
+                logger.info('Reminder created by {}: {}'.format(session.user, reminder))
+                flash(_("A reminder at {} has been created.").format(format_datetime(reminder.scheduled_dt)), 'success')
             return redirect(url_for('.list', self.event))
 
         return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=None, form=form,

@@ -26,6 +26,7 @@ from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 from wtforms_components import TimeField
 
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm, generated_data
@@ -43,7 +44,8 @@ class ReminderForm(IndicoForm):
     # Schedule
     schedule_type = IndicoRadioField(_('Type'), [DataRequired()],
                                      choices=[('relative', _("Relative to the event start time")),
-                                              ('absolute', _("Fixed date/time"))])
+                                              ('absolute', _("Fixed date/time")),
+                                              ('now', _('Send immediately'))])
     relative_delta = TimeDeltaField(_('Offset'), [UsedIf(lambda form, field: form.schedule_type.data == 'relative'),
                                                   DataRequired()])
     absolute_date = DateField(_('Date'), [UsedIf(lambda form, field: form.schedule_type.data == 'absolute'),
@@ -107,8 +109,10 @@ class ReminderForm(IndicoForm):
         if self.schedule_type.data == 'absolute':
             dt = datetime.combine(self.absolute_date.data, self.absolute_time.data)
             return get_timezone(self.timezone).localize(dt).astimezone(pytz.utc)
-        else:
+        elif self.schedule_type.data == 'relative':
             return self.event.getStartDate() - self.relative_delta.data
+        elif self.schedule_type.data == 'now':
+            return now_utc()
 
     @generated_data
     def event_start_delta(self):
