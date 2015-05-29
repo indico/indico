@@ -85,7 +85,10 @@ class ReminderCloner(EventCloner):
                                                                         'is_sent'}
         for old_reminder in self.find_reminders():
             scheduled_dt = new_event.getStartDate() - old_reminder.event_start_delta
-            if scheduled_dt < now_utc():
+            # Skip anything that's would have been sent on a past date.
+            # We ignore the time on purpose so cloning an event shortly before will
+            # still trigger a reminder that's just a few hours overdue.
+            if scheduled_dt.date() < now_utc().date():
                 logger.info('Not cloning reminder {} which would trigger at {}'.format(old_reminder, scheduled_dt))
                 continue
             reminder = EventReminder(event=new_event, **{attr: getattr(old_reminder, attr) for attr in attrs})

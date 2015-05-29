@@ -98,6 +98,12 @@ class ReminderForm(IndicoForm):
         if not field.data and not self.recipients.data:
             raise ValidationError(_('If no recipients are specified you need to include participants.'))
 
+    def validate_schedule_type(self, field):
+        # Be graceful and allow a reminder that's in the past but on the same day.
+        # It will be sent immediately but that way we are a little bit more user-friendly
+        if field.data != 'now' and self.scheduled_dt.data.date() < now_utc().date():
+            raise ValidationError(_('The specified date is in the past'))
+
     def validate_absolute_date(self, field):
         if self.schedule_type.data == 'absolute' and field.data < date.today():
             raise ValidationError(_('The specified date is in the past'))
