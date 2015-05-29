@@ -85,7 +85,6 @@ class WebLocator:
         self.__reviewId = None
         self.__materialId = None
         self.__resId = None
-        self.__alarmId = None
         self.__trackId = None
         self.__abstractId = None
         self.__menuLinkId = None
@@ -229,16 +228,6 @@ class WebLocator:
         else:
             self.__reviewId = params["reviewId"]
 
-    def setAlarm(self, params, mustExist=1 ):
-        self.setConference( params )
-        #self.setConference( params )
-        if not ("alarmId" in params.keys()) or \
-            params["alarmId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("alarm id not set"))
-        else:
-            self.__alarmId = params["alarmId"]
-
     def setRegistrant( self, params, mustExist=1  ):
         self.setConference( params )
         if not ("registrantId" in params.keys()) or \
@@ -302,9 +291,6 @@ class WebLocator:
         fr = materialFactories.ConfMFRegistry
         if self.__notifTplId:
             obj = obj.getAbstractMgr().getNotificationTplById(self.__notifTplId)
-            return obj
-        if self.__alarmId:
-            obj = obj.getAlarmById( self.__alarmId )
             return obj
         if self.__trackId:
             obj = obj.getTrackById( self.__trackId )

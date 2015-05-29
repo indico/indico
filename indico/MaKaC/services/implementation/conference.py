@@ -1283,30 +1283,6 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getAccessController().getContactInfo()
 
-class ConferenceAlarmSendTestNow(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._fromAddr = pm.extract("fromAddr", pType=str, allowEmpty=True, defaultValue="")
-        self._note = pm.extract("note", pType=str, allowEmpty=True)
-        self._includeConf = pm.extract("includeConf", pType=str, allowEmpty=True, defaultValue="")
-
-    def _getAnswer(self):
-        al = tasks.AlarmTask(self._conf, 0, datetime.timedelta(), relative=datetime.timedelta())
-        if self._fromAddr:
-            al.setFromAddr(self._fromAddr)
-        else:
-            raise NoReportError(_("""Please choose a "FROM" address for the test alarm"""))
-        al.setNote(self._note)
-        al.setConfSummary(self._includeConf == "1")
-        if self._getUser():
-            al.addToAddr(self._aw.getUser().getEmail())
-        else:
-            raise NoReportError(_("You must be logged in to use this feature"))
-        al.run(check = False)
-        return True
-
 
 class ConferenceSocialBookmarksToggle(ConferenceModifBase):
     def _getAnswer(self):
@@ -1679,7 +1655,6 @@ methodMap = {
     "pic.delete": ConferencePicDelete,
     "social.toggle": ConferenceSocialBookmarksToggle,
     "showConcurrentEvents": ShowConcurrentEvents,
-#    "getFields": ConferenceGetFields,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
     "participation.allowDisplay": ConferenceParticipantsDisplay,
     "participation.notifyMgrNewParticipant": ConferenceParticipantsNotifyMgrNewParticipant,
@@ -1708,7 +1683,6 @@ methodMap = {
     "protection.setAccessKey": ConferenceProtectionSetAccessKey,
     "protection.setModifKey": ConferenceProtectionSetModifKey,
     "protection.changeContactInfo": ConferenceContactInfoModification,
-    "alarm.sendTestNow": ConferenceAlarmSendTestNow,
     "protection.addExistingManager": ConferenceProtectionAddExistingManager,
     "protection.removeManager": ConferenceProtectionRemoveManager,
     "protection.addExistingRegistrar": ConferenceProtectionAddExistingRegistrar,

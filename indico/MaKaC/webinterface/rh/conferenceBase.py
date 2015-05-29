@@ -139,15 +139,6 @@ class RHFileBase(RHConferenceSite):
             self._categ = self._file.getCategory()
 
 
-class RHAlarmBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setAlarm( params )
-        self._alarm = self._target = l.getObject()
-        self._conf = self._alarm.getConference()
-
-
 class RHLinkBase( RHConferenceSite ):
 
     def _checkParams( self, params ):

@@ -37,7 +37,7 @@ import MaKaC.conference as conference
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
 from indico.core.config import Config
@@ -495,14 +495,6 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
                     ses.grantModification(convener,False)
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
 
-class RHConfModifTools( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifTools
-    _allowClosed = True
-
-    def _process( self ):
-        p = conferences.WPConfDisplayAlarm(self, self._target)
-        return p.display()
-
 
 class RHConfDeletion(RHConferenceModifBase):
     _uh = urlHandlers.UHConfDeletion
@@ -836,7 +828,6 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                     "tracks"        : "cloneTracks"       in paramNames,
                     "registration"  : "cloneRegistration" in paramNames,
                     "abstracts"     : "cloneAbstracts"    in paramNames,
-                    "alerts"        : "cloneAlerts"       in paramNames,
                     "participants"  : "cloneParticipants" in paramNames,
                     "evaluation"    : "cloneEvaluation"   in paramNames,
                     "managing"      : self._getUser()
@@ -1053,149 +1044,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         else:
             return nbClones
 
-
-
-
 ####################################################################################
-
-class RHConfDisplayAlarm( RHConferenceModifBase ):
-
-    def _process( self ):
-        p = conferences.WPConfDisplayAlarm( self, self._conf )
-        return p.display()
-
-class RHConfAddAlarm( RHConferenceModifBase ):
-
-    def _process( self ):
-        p = conferences.WPConfAddAlarm( self, self._conf )
-        return p.display()
-
-
-class RHCreateAlarm(RHConferenceModifBase):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        if not params.has_key("fromAddr") or params.get("fromAddr","")=="":
-            raise FormValuesError( _("""Please choose a "FROM" address for this alarm"""))
-        self._fromAddr=params.get("fromAddr")
-
-        if not params.has_key("toAllParticipants") and (not params.has_key("defineRecipients")
-                                                        or (params.has_key("defineRecipients") and params.get("Emails","")=="")):
-            raise FormValuesError( _("""Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."""))
-        self._toAllParticipants = params.get("toAllParticipants", False)
-        self._defineRecipients = params.get("defineRecipients", False)
-        self._emails = params.get("Emails","")
-
-        self._dateType = params.get("dateType", "")
-        self._year = int(params["year"])
-        self._month = int(params["month"])
-        self._day = int(params["day"])
-        self._hour = int(params["hour"])
-        self._minute = int(params["minute"])
-        self._timeBefore = int(params.get("timeBefore", 0))
-        if self._dateType == "2" and self._timeBefore <= 0:
-            raise FormValuesError(_("Time before the beginning of the event should be bigger than zero"))
-        self._timeTypeBefore = params["timeTypeBefore"]
-        self._note = params.get("note", "")
-        self._includeConf = params.get("includeConf", None)
-        self._alarmId = params.get("alarmId", None)
-        self._testAlarm = False
-
-    def _initializeAlarm(self, dryRun=False):
-        if dryRun:  # sending now
-            dtStart = timezoneUtils.nowutc()
-            relative = None
-        else:
-            if self._dateType == "1":  # given date
-                dtStart = timezone(self._conf.getTimezone()).localize(datetime(self._year,
-                                                                              self._month,
-                                                                              self._day,
-                                                                              self._hour,
-                                                                              self._minute)).astimezone(timezone('UTC'))
-                relative = None
-            elif self._dateType == "2":  # N days/hours before the event
-                if self._timeTypeBefore == "days":
-                    delta = timedelta(days=self._timeBefore)
-                elif self._timeTypeBefore == "hours":
-                    delta = timedelta(0, self._timeBefore * 3600)
-                dtStart = self._target.getStartDate() - delta
-                relative = delta
-            else:
-                raise MaKaCError(_("Wrong value has been choosen for 'when to send the alarm'"))
-
-        if self._alarmId:
-            al = self._conf.getAlarmById(self._alarmId)
-            c = Client()
-            if dryRun:
-                c.dequeue(al)
-            else:
-                c.moveTask(al, dtStart)
-            al.setRelative(relative)
-        else:
-            al = self._conf.newAlarm(relative or dtStart, enqueue=not dryRun)
-
-        al.setToAddrList([])
-        if(self._defineRecipients or self._testAlarm):
-            for addr in self._emails.split(","):
-                addr = addr.strip()
-                if addr:
-                    al.addToAddr(addr)
-
-        al.setFromAddr(self._fromAddr)
-
-        if self._includeConf and self._includeConf == "1":
-            al.setConfSummary(True)
-        else:
-            al.setConfSummary(False)
-
-        al.setSubject("Event reminder: %s"%self._conf.getTitle())
-
-        al.setNote(self._note)
-
-        al.setToAllParticipants(self._toAllParticipants)
-        self._al = al
-
-class RHConfSendAlarmNow( RHCreateAlarm ):
-
-    def _checkParams( self, params ):
-        RHCreateAlarm._checkParams( self, params )
-
-        self._initializeAlarm(dryRun = True)
-
-    def _process( self ):
-        RHCreateAlarm._process(self)
-        if self._al:
-            self._al.run(check = False)
-            self._al.setStartedOn(timezoneUtils.nowutc())
-            self._al.setEndedOn(timezoneUtils.nowutc())
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
-
-class RHConfSaveAlarm( RHCreateAlarm ):
-
-    def _checkParams( self, params ):
-        RHCreateAlarm._checkParams( self, params )
-
-        if not params.has_key("dateType") or params.get("dateType","")=="":
-            raise FormValuesError(_("Please choose when to send this alarm"))
-
-        self._initializeAlarm()
-
-    def _process(self):
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
-
-class RHConfDeleteAlarm( RHAlarmBase ):
-
-    def _process(self):
-        if self._alarm.getEndedOn():
-            raise MaKaCError(_("The alarm can not be deleted"))
-        self._alarm.delete()
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._conf ) )
-
-
-class RHConfModifyAlarm( RHAlarmBase ):
-
-    def _process(self):
-        return conferences.WPConfModifyAlarm( self, self._conf, self._alarm ).display()
 
 
 class RHConfModifProgram( RHConferenceModifBase ):

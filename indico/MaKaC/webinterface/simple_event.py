@@ -68,9 +68,8 @@ class WebFactory(WebFactory):
         webPageWithSideMenu._listingsMenuItem.setVisible(False)
 
     @staticmethod
-    def customiseToolsTabCtrl( tabCtrl ):
+    def customiseToolsTabCtrl(tabCtrl):
         tabCtrl.getTabById("clone").enable()
-        tabCtrl.getTabById("alarms").enable()
         tabCtrl.getTabById("posters").enable()
         tabCtrl.getTabById("close").enable()
         tabCtrl.getTabById("delete").enable()
@@ -131,13 +130,6 @@ class WebFactory(WebFactory):
     def getEvaluationInactive(rh, conf):
         return WPSEEvaluationInactive(rh, conf)
     getEvaluationInactive = staticmethod(getEvaluationInactive)
-
-#################### Alarms #####################################
-    def getConfAddAlarm(rh, conf):
-        return WPSEConfAddAlarm(rh, conf)
-    getConfAddAlarm = staticmethod(getConfAddAlarm)
-
-
 
 
 SimpleEventWebFactory = WebFactory
@@ -288,10 +280,8 @@ class WPSEConfClone(WPSEConfModifToolsBase, object):
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
             "cloneOptions": i18nformat("""
-    <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" >
-        _("Participants")</li>
-    <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" >
-        _("Evaluation")</li>
+    <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1">_("Participants")</li>
+    <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1">_("Evaluation")</li>
            """)
         }
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)

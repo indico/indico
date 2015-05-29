@@ -84,7 +84,6 @@ class WebFactory(WebFactory):
         tabCtrl.getTabById("matPackage").enable()
         tabCtrl.getTabById("delete").enable()
         tabCtrl.getTabById("badges").disable()
-        tabCtrl.getTabById("alarms").enable()
         tabCtrl.getTabById("posters").enable()
         tabCtrl.getTabById("badges").disable()
 
@@ -227,11 +226,6 @@ class WebFactory(WebFactory):
         return WPMEvaluationInactive(rh, conf)
     getEvaluationInactive = staticmethod(getEvaluationInactive)
 
-#################### Alarms #####################################
-
-    def getConfAddAlarm(rh, conf):
-        return WPMConfAddAlarm(rh, conf)
-    getConfAddAlarm = staticmethod(getConfAddAlarm)
 
 MeetingWebFactory = WebFactory
 
@@ -598,7 +592,6 @@ class WPMConfModifTools (conferences.WPConfModifToolsBase):
         p = {
             "deleteConferenceURL": urlHandlers.UHConfDeletion.getURL( self._conf ), \
             "cloneConferenceURL": urlHandlers.UHConfClone.getURL( self._conf ), \
-            "addAlarmURL": urlHandlers.UHConfAddAlarm.getURL( self._conf ), \
             }
         return wc.getHTML( p )
 

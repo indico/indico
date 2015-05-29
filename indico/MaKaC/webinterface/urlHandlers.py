@@ -978,34 +978,6 @@ class UHConfAllSpeakersAction(URLHandler):
     _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
 
 
-class UHConfDisplayAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-displayAlarm'
-
-
-class UHConfAddAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-addAlarm'
-
-
-class UHSaveAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-saveAlarm'
-
-
-class UHModifySaveAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-modifySaveAlarm'
-
-
-class UHSendAlarmNow(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-sendAlarmNow'
-
-
-class UHConfDeleteAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-deleteAlarm'
-
-
-class UHConfModifyAlarm(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-modifyAlarm'
-
-
 class UHSaveLogo(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-saveLogo'
 

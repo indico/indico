@@ -2108,9 +2108,6 @@ class Conference(CommonObjectBase, Locatable):
         else:
             self._modificationDS = nowutc() #modification timestamp
 
-        self.alarmList = {}
-        self.__alarmCounter = Counter()
-
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
         self._trackCoordinators = TCIndex() #index for the track coordinators
@@ -2695,10 +2692,6 @@ class Conference(CommonObjectBase, Locatable):
 
         self.removeAllEvaluations()
 
-        for alarm in self.getAlarmList():
-            if not alarm.getEndedOn():
-                self.removeAlarm(alarm)
-
         # For each conference we have a list of managers. If we delete the conference but we don't delete
         # the link in every manager to the conference then, when the manager goes to his "My profile" he
         # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
@@ -2833,9 +2826,6 @@ class Conference(CommonObjectBase, Locatable):
         if index:
             self.indexConf()
 
-        # update the time for the alarms to be sent
-        self._updateAlarms()
-
         # Update redis link timestamp
         if redis_write_client:
             avatar_links.update_event_time(self)
@@ -2844,15 +2834,6 @@ class Conference(CommonObjectBase, Locatable):
         if notifyObservers:
             if oldSdate != sDate:
                 signals.event.data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
-
-    def _updateAlarms(self):
-        c = Client()
-        # are there any alarms? if so, update the relative ones
-        for alarm in self.getAlarmList():
-            tbef = alarm.getTimeBefore()
-            if tbef:
-                # only relative alarms
-                c.moveTask(alarm, self.getStartDate() - tbef)
 
     def verifyStartDate(self, sdate, check=1):
         if sdate>self.getEndDate():
@@ -4278,13 +4259,6 @@ class Conference(CommonObjectBase, Locatable):
         #conference's abstracts
         if options.get("abstracts",False) :
             conf.abstractMgr = self.abstractMgr.clone(conf)
-        # conference's alerts
-        if options.get("alerts",False) :
-            for alarm in self.getAlarmList() :
-                # Indico does not clone absoulte alarms
-                if alarm._relative is not None:
-                    # .clone takes care of enqueuing it
-                    alarm.clone(conf)
         # Meetings' and conferences' contributions cloning
         if options.get("contributions",False) :
             sch = conf.getSchedule()
@@ -4310,58 +4284,6 @@ class Conference(CommonObjectBase, Locatable):
         #we inform the plugins in case they want to add anything to the new conference
         EventCloner.clone_event(self, conf)
         return conf
-
-    def newAlarm(self, when, enqueue=True):
-
-        if type(when) == timedelta:
-            relative = when
-            dtStart = None
-        else:
-            relative = None
-            dtStart = when
-
-        confRelId = self._getNextAlarmId()
-        al = tasks.AlarmTask(self, confRelId,
-                             startDateTime=dtStart,
-                             relative=relative)
-
-        self.addAlarm(al, enqueue)
-        return al
-
-    def removeAlarm(self, alarm):
-        confRelId = alarm.getConfRelativeId()
-
-        if confRelId in self.alarmList:
-            del self.alarmList[confRelId]
-            self._p_changed = 1
-
-            tl = Client()
-            tl.dequeue(alarm)
-        else:
-            raise Exception("alarm not in list!")
-
-    def _getNextAlarmId(self):
-        return self.__alarmCounter.newCount()
-
-    def addAlarm(self, alarm, enqueue = True):
-        if enqueue:
-            tl = Client()
-            tl.enqueue(alarm)
-
-        self.alarmList[alarm.getConfRelativeId()] = alarm
-        self._p_changed = 1
-
-    def recoverAlarm(self, alarm):
-        self.addAlarm(alarm)
-        alarm.conf = self
-        alarm.recover()
-
-    def getAlarmList(self):
-        return self.alarmList.values()
-
-    def getAlarmById(self, id):
-        """For given id returns corresponding Alarm or None if not found."""
-        return self.alarmList.get(id, None)
 
     def getCoordinatedTracks( self, av ):
         """Returns a list with the tracks for which a user is coordinator.

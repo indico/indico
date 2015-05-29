@@ -14,28 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif, fileAccess
 from indico.web.flask.blueprints.event.management import event_mgmt
+from indico.web.flask.util import redirect_view
+from MaKaC.webinterface.rh import conferenceModif
 
 
 # Tools
-event_mgmt.add_url_rule('/tools/', 'confModifTools', conferenceModif.RHConfModifTools)
-
-# Tools: Alarms
-event_mgmt.add_url_rule('/tools/alarms/', 'confModifTools-displayAlarm', conferenceModif.RHConfDisplayAlarm)
-event_mgmt.add_url_rule('/tools/alarms/add', 'confModifTools-addAlarm', conferenceModif.RHConfAddAlarm,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/alarms/add/save', 'confModifTools-saveAlarm', conferenceModif.RHConfSaveAlarm,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/tools/alarms/add/trigger', 'confModifTools-sendAlarmNow', conferenceModif.RHConfSendAlarmNow,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/tools/alarms/<alarmId>/', 'confModifTools-modifyAlarm', conferenceModif.RHConfModifyAlarm)
-event_mgmt.add_url_rule('/tools/alarms/<alarmId>/', 'confModifTools-modifySaveAlarm', conferenceModif.RHConfSaveAlarm,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/tools/alarms/<alarmId>/delete', 'confModifTools-deleteAlarm',
-                        conferenceModif.RHConfDeleteAlarm)
-event_mgmt.add_url_rule('/tools/alarms/<alarmId>/trigger', 'confModifTools-sendAlarmNow',
-                        conferenceModif.RHConfSendAlarmNow, methods=('POST',))
+event_mgmt.add_url_rule('/tools/', 'confModifTools', redirect_view('event_reminders.list'))
 
 # Tools: Clone
 event_mgmt.add_url_rule('/tools/clone', 'confModifTools-clone', conferenceModif.RHConfClone)
