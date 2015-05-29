@@ -20,9 +20,6 @@ API
    :numbered:
 
    fossilize.rst
-   test.rst
-   scheduler.rst
-   livesync.rst
    http_api/index.rst
    plugins/index.rst
 
