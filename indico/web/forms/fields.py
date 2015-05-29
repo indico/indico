@@ -22,7 +22,7 @@ from operator import attrgetter
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select
-from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase
+from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
 
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
@@ -299,7 +299,7 @@ class OverrideMultipleItemsField(HiddenField):
         return row[self.unique_field]
 
 
-class TimedeltaField(HiddenField):
+class TimedeltaField(Field):
     """A field that lets the user select a simple timedelta.
 
     It does not support mixing multiple units, but it is smart enough
@@ -342,17 +342,19 @@ class TimedeltaField(HiddenField):
     @property
     def choices(self):
         best_unit = self.best_unit
-        choices = [(unit, self.unit_names[unit], unit == best_unit) for unit in self.units]
+        choices = [(unit, self.unit_names[unit]) for unit in self.units]
         # Add whatever unit is necessary to represent the currenet value if we have one
         if best_unit and best_unit not in self.units:
-            choices.append((best_unit, u'({})'.format(self.unit_names[best_unit]), True))
+            choices.append((best_unit, u'({})'.format(self.unit_names[best_unit])))
         return choices
 
     def process_formdata(self, valuelist):
-        if valuelist:
-            data = json.loads(valuelist[0])
-            if data:
-                self.data = timedelta(seconds=self.magnitudes[data['unit']] * int(data['value']))
+        if valuelist and len(valuelist) == 2:
+            value = int(valuelist[0])
+            unit = valuelist[1]
+            if unit not in self.magnitudes:
+                raise ValueError(u'Invalid unit')
+            self.data = timedelta(seconds=self.magnitudes[unit] * value)
 
     def pre_validate(self, form):
         if self.best_unit in self.units:
@@ -364,7 +366,6 @@ class TimedeltaField(HiddenField):
 
     def _value(self):
         if self.data is None:
-            return {}
+            return u'', u''
         else:
-            return {'unit': self.best_unit,
-                    'value': int(self.data.total_seconds()) // self.magnitudes[self.best_unit]}
+            return int(self.data.total_seconds()) // self.magnitudes[self.best_unit], self.best_unit
