@@ -1,72 +1,81 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_rows %}
+{% from 'message_box.html' import message_box %}
 {% set editable = not reminder or not reminder.is_sent %}
 
-<div class="i-box-group vert fixed-width reminders">
-    <div class="i-box titled no-padding">
-        <div class="i-box-header">
-            <div class="i-box-title">
-                {% if not reminder %}
-                    {%- trans %}Add Reminder{% endtrans -%}
-                {% elif reminder.is_sent %}
-                    {%- trans %}Reminder Details{% endtrans -%}
-                {% else %}
-                    {%- trans %}Edit Reminder{% endtrans -%}
+<div class="reminders">
+    {% if reminder and reminder.is_overdue %}
+        {% call message_box('warning', fixed_width=true) %}
+            {% trans %}This reminder is overdue and will be sent within a few minutes.{% endtrans %}
+        {% endcall %}
+    {% endif %}
+
+    <div class="i-box-group vert">
+        <div class="i-box titled no-padding">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {% if not reminder %}
+                        {%- trans %}Add Reminder{% endtrans -%}
+                    {% elif reminder.is_sent %}
+                        {%- trans %}Reminder Details{% endtrans -%}
+                    {% else %}
+                        {%- trans %}Edit Reminder{% endtrans -%}
+                    {% endif %}
+                </div>
+                {% if not reminder or not reminder.is_sent %}
+                    <button id="preview-reminder" type="button" class="i-button icon-eye right"
+                            data-href="{{ url_for('.preview', event) }}">
+                        {%- trans %}Preview email{% endtrans -%}
+                    </button>
                 {% endif %}
             </div>
-            {% if not reminder or not reminder.is_sent %}
-                <button id="preview-reminder" type="button" class="i-button icon-eye right"
-                        data-href="{{ url_for('.preview', event) }}">
-                    {%- trans %}Preview email{% endtrans -%}
-                </button>
-            {% endif %}
-        </div>
-        <div class="i-box-content">
-            {{ form_header(id='reminder-form') }}
-            {% call form_fieldset(_('Schedule')) %}
-                {{ form_rows(form, fields=form.schedule_fields, widget_attrs=widget_attrs) }}
-            {% endcall %}
-            {% call form_fieldset(_('Recipients')) %}
-                {{ form_rows(form, fields=form.recipient_fields, widget_attrs=widget_attrs) }}
-            {% endcall %}
-            {% call form_fieldset(_('Misc')) %}
-                {{ form_rows(form, skip=form.schedule_recipient_fields, widget_attrs=widget_attrs) }}
-            {% endcall %}
-            {% call form_footer() %}
-                {% if editable %}
-                    <input id="save-button" class="i-button big highlight" type="submit"
-                           value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
-                {% endif %}
-                <a href="{{ url_for('.list', event) }}" class="i-button big" data-button-back>
-                    {%- trans %}Back{% endtrans -%}
-                </a>
-            {% endcall %}
+            <div class="i-box-content">
+                {{ form_header(id='reminder-form') }}
+                {% call form_fieldset(_('Schedule')) %}
+                    {{ form_rows(form, fields=form.schedule_fields, widget_attrs=widget_attrs) }}
+                {% endcall %}
+                {% call form_fieldset(_('Recipients')) %}
+                    {{ form_rows(form, fields=form.recipient_fields, widget_attrs=widget_attrs) }}
+                {% endcall %}
+                {% call form_fieldset(_('Misc')) %}
+                    {{ form_rows(form, skip=form.schedule_recipient_fields, widget_attrs=widget_attrs) }}
+                {% endcall %}
+                {% call form_footer() %}
+                    {% if editable %}
+                        <input id="save-button" class="i-button big highlight" type="submit"
+                               value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
+                    {% endif %}
+                    <a href="{{ url_for('.list', event) }}" class="i-button big" data-button-back>
+                        {%- trans %}Back{% endtrans -%}
+                    </a>
+                {% endcall %}
+            </div>
         </div>
     </div>
+
+    {% if editable %}
+        <script>
+            (function() {
+                'use strict';
+
+                $('#absolute_date').datepicker({minDate: 0});
+                $('#reminder-form input[name=schedule_type]').on('change', function() {
+                    var type = $('#reminder-form input[name=schedule_type]:checked').val();
+                    $('#absolute_date, #absolute_time').prop('disabled', type != 'absolute');
+                    $('#relative_delta-value, #relative_delta-unit').prop('disabled', type != 'relative');
+                    $('#save-button').val(type == 'now' ? $T('Send') : $T('Save'))
+                }).trigger('change');
+
+                $('#preview-reminder').ajaxDialog({
+                    title: $T('Reminder Preview'),
+                    method: 'POST',
+                    data: function() {
+                        return {
+                            include_summary: $('#include_summary').prop('checked') ? '1' : '0',
+                            message: $('#message').val()
+                        };
+                    }
+                });
+            })();
+        </script>
+    {% endif %}
 </div>
-
-{% if editable %}
-    <script>
-        (function() {
-            'use strict';
-
-            $('#absolute_date').datepicker({minDate: 0});
-            $('#reminder-form input[name=schedule_type]').on('change', function() {
-                var type = $('#reminder-form input[name=schedule_type]:checked').val();
-                $('#absolute_date, #absolute_time').prop('disabled', type != 'absolute');
-                $('#relative_delta-value, #relative_delta-unit').prop('disabled', type != 'relative');
-                $('#save-button').val(type == 'now' ? $T('Send') : $T('Save'))
-            }).trigger('change');
-
-            $('#preview-reminder').ajaxDialog({
-                title: $T('Reminder Preview'),
-                method: 'POST',
-                data: function() {
-                    return {
-                        include_summary: $('#include_summary').prop('checked') ? '1' : '0',
-                        message: $('#message').val()
-                    };
-                }
-            });
-        })();
-    </script>
-{% endif %}

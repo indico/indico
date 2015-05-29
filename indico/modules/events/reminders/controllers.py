@@ -100,7 +100,10 @@ class RHEditReminder(RHSpecificReminderBase):
     def _process(self):
         reminder = self.reminder
         form = ReminderForm(obj=self._get_defaults(), event=self.event)
-        if not reminder.is_sent and form.validate_on_submit():
+        if form.validate_on_submit():
+            if reminder.is_sent:
+                flash(_("This reminder has already been sent and cannot be modified anymore."), 'error')
+                return redirect(url_for('.edit', reminder))
             form.populate_obj(reminder, existing_only=True)
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)

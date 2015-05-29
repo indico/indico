@@ -156,6 +156,10 @@ class EventReminder(db.Model):
     def is_relative(self):
         return self.event_start_delta != None  # NOQA
 
+    @property
+    def is_overdue(self):
+        return not self.is_sent and self.scheduled_dt <= now_utc()
+
     def send(self):
         """Sends the reminder to its recipients."""
         event = self.event
