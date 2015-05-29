@@ -20,6 +20,7 @@ from celery.signals import import_modules
 
 from indico.core import signals
 from indico.core.celery.core import IndicoCelery
+from indico.core.config import Config
 
 __all__ = ('celery',)
 
@@ -31,3 +32,12 @@ celery = IndicoCelery('indico')
 @import_modules.connect
 def _import_modules(*args, **kwargs):
     signals.import_tasks.send()
+
+
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    flower_url = Config.getInstance().getFlowerURL()
+    if not flower_url:
+        return None
+    return 'flower', SideMenuItem('Flower', flower_url)

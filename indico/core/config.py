@@ -536,7 +536,9 @@ class Config:
         'CeleryResultBackend'       : None,
         'CeleryConfig'              : {},
         'ScheduledTaskOverride'     : {},
-        'CheckinAppClientId'        : None
+        'CheckinAppClientId'        : None,
+        'FlowerClientId'            : None,
+        'FlowerURL'                 : None,
     }
 
     if sys.platform == 'win32':
