@@ -124,7 +124,7 @@ class RHAddReminder(RHRemindersBase):
     """Adds a new reminder"""
 
     def _process(self):
-        form = ReminderForm(event=self.event)
+        form = ReminderForm(event=self.event, schedule_type='relative')
         if form.validate_on_submit():
             reminder = EventReminder(creator=session.user, event=self.event)
             form.populate_obj(reminder, existing_only=True)

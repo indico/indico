@@ -58,11 +58,11 @@ class ReminderForm(IndicoForm):
                                         description=_('Send the reminder to all participants/registrants '
                                                       'of the event.'))
     # Misc
-    reply_to_address = SelectField(_('Reply-to address'), [DataRequired()],
+    reply_to_address = SelectField(_('Reply-to'), [DataRequired()],
                                    description=_('The email address users may send replies to.'))
+    message = TextAreaField(_('Note'), description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
                                    description=_("Includes a simple text version of the event's agenda in the email."))
-    message = TextAreaField(_('Note'), description=_('A custom message to include in the email.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
