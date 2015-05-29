@@ -16,8 +16,14 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import inspect
+
 from indico.core import signals
+from indico.core.db import db
 from indico.core.logger import Logger
+from indico.util.date_time import now_utc
+from indico.util.i18n import _
+from MaKaC.conference import EventCloner
 
 
 logger = Logger.get('events.reminders')
@@ -51,7 +57,39 @@ def _event_deleted(event, **kwargs):
     EventReminder.find(event_id=int(event.id)).delete()
 
 
+@signals.event_management.clone.connect
+def _get_reminder_cloner(event, **kwargs):
+    return ReminderCloner(event)
+
+
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
     EventReminder.find(creator_id=source.id).update({EventReminder.creator_id: target.id})
+
+
+class ReminderCloner(EventCloner):
+    def find_reminders(self):
+        from indico.modules.events.reminders.models.reminders import EventReminder
+        return EventReminder.find(EventReminder.is_relative, EventReminder.event_id == int(self.event.id))
+
+    def get_options(self):
+        enabled = not self.event.has_legacy_id and bool(self.find_reminders().count())
+        return {'reminders': (_('Reminders'), enabled, True)}
+
+    def clone(self, new_event, options):
+        from indico.modules.events.reminders.models.reminders import EventReminder
+        if 'reminders' not in options:
+            return
+        attrs = {x.key for x in inspect(EventReminder).column_attrs} - {'id', 'event_id', 'created_dt', 'scheduled_dt',
+                                                                        'is_sent'}
+        for old_reminder in self.find_reminders():
+            scheduled_dt = new_event.getStartDate() - old_reminder.event_start_delta
+            if scheduled_dt < now_utc():
+                logger.info('Not cloning reminder {} which would trigger at {}'.format(old_reminder, scheduled_dt))
+                continue
+            reminder = EventReminder(event=new_event, **{attr: getattr(old_reminder, attr) for attr in attrs})
+            reminder.scheduled_dt = scheduled_dt
+            db.session.add(reminder)
+            db.session.flush()
+            logger.info('Added reminder during event cloning: {}'.format(reminder))
