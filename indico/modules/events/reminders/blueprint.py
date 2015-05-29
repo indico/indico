@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.reminders.controllers import RHListReminders, RHDeleteReminder, RHEditReminder, RHAddReminder
+from indico.modules.events.reminders.controllers import (RHListReminders, RHDeleteReminder, RHEditReminder,
+                                                         RHAddReminder, RHPreviewReminder)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 event_reminders_blueprint = _bp = IndicoBlueprint('event_reminders', __name__, template_folder='templates',
@@ -24,5 +25,6 @@ event_reminders_blueprint = _bp = IndicoBlueprint('event_reminders', __name__, t
 
 _bp.add_url_rule('/', 'list', RHListReminders)
 _bp.add_url_rule('/add', 'add', RHAddReminder, methods=('GET', 'POST'))
+_bp.add_url_rule('/preview', 'preview', RHPreviewReminder, methods=('POST',))
 _bp.add_url_rule('/<int:id>/', 'edit', RHEditReminder, methods=('GET', 'POST'))
 _bp.add_url_rule('/<int:id>/delete', 'delete', RHDeleteReminder, methods=('POST',))

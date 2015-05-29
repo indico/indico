@@ -17,12 +17,13 @@
 from __future__ import unicode_literals
 
 from babel.dates import get_timezone
-from flask import request, session, redirect, flash
+from flask import request, session, redirect, flash, jsonify, render_template
 
 from indico.core.db import db
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.forms import ReminderForm
 from indico.modules.events.reminders.models.reminders import EventReminder
+from indico.modules.events.reminders.util import make_reminder_email
 from indico.modules.events.reminders.views import WPReminders
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
@@ -118,3 +119,12 @@ class RHAddReminder(RHRemindersBase):
 
         return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=None, form=form,
                                            widget_attrs=form.default_widget_attrs)
+
+
+class RHPreviewReminder(RHRemindersBase):
+    """Previews the email for a reminder"""
+
+    def _process(self):
+        tpl = make_reminder_email(self.event, request.form.get('include_summary') == '1', request.form.get('message'))
+        html = render_template('events/reminders/preview.html', subject=tpl.get_subject(), body=tpl.get_body())
+        return jsonify(html=html)

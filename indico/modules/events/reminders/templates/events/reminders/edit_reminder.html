@@ -13,6 +13,12 @@
                     {%- trans %}Edit Reminder{% endtrans -%}
                 {% endif %}
             </div>
+            {% if not reminder or not reminder.is_sent %}
+                <button id="preview-reminder" type="button" class="i-button icon-eye right"
+                        data-href="{{ url_for('.preview', event) }}">
+                    {%- trans %}Preview email{% endtrans -%}
+                </button>
+            {% endif %}
         </div>
         <div class="i-box-content">
             {{ form_header(id='reminder-form') }}
@@ -42,12 +48,24 @@
     <script>
         (function() {
             'use strict';
+
             $('#absolute_date').datepicker({minDate: 0});
             $('#reminder-form input[name=schedule_type]').on('change', function() {
                 var type = $('#reminder-form input[name=schedule_type]:checked').val();
                 $('#absolute_date, #absolute_time').prop('disabled', type != 'absolute');
                 $('#relative_delta-value, #relative_delta-unit').prop('disabled', type != 'relative');
             }).trigger('change');
+
+            $('#preview-reminder').ajaxDialog({
+                title: $T('Reminder Preview'),
+                method: 'POST',
+                data: function() {
+                    return {
+                        include_summary: $('#include_summary').prop('checked') ? '1' : '0',
+                        message: $('#message').val()
+                    };
+                }
+            });
         })();
     </script>
 {% endif %}
