@@ -53,7 +53,9 @@ class RHListReminders(RHRemindersBase):
 
     def _process(self):
         reminders = EventReminder.find(event_id=self.event.id).order_by(EventReminder.scheduled_dt.desc()).all()
-        return WPReminders.render_template('reminders.html', self.event, event=self.event, reminders=reminders)
+        tz = get_timezone(DisplayTZ(conf=self.event).getDisplayTZ())
+        return WPReminders.render_template('reminders.html', self.event, event=self.event, reminders=reminders,
+                                           timezone=tz)
 
 
 class RHDeleteReminder(RHSpecificReminderBase):

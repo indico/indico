@@ -7,11 +7,11 @@
                         {%- if reminder.is_relative -%}
                             {{ reminder.event_start_delta|format_human_timedelta('hours') }} before the event
                         {%- else -%}
-                            {{ reminder.scheduled_dt|format_datetime }}
+                            {{ reminder.scheduled_dt|format_datetime(timezone=timezone) }} <small>({{ timezone }})</small>
                         {%- endif -%}
                     </a>
                     {% if reminder.is_relative %}
-                        <i class="icon-alarm" title="{{ reminder.scheduled_dt|format_datetime }}"></i>
+                        <i class="icon-alarm" title="{{ reminder.scheduled_dt|format_datetime(timezone=timezone) }} ({{ timezone }})"></i>
                     {% endif %}
                 </strong>
                 {% if not reminder.is_sent %}
