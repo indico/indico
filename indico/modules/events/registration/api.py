@@ -14,20 +14,66 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.conference import ConferenceHolder
+from __future__ import unicode_literals
+
+from flask import request, jsonify
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
+from indico.modules.oauth import oauth
 from indico.modules.payment import event_settings as payment_event_settings
-
 from indico.modules.events.api import EventBaseHook
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
+from indico.util.date_time import format_datetime
+from indico.util.fossilize import fossilize
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 
-from indico.util.date_time import format_datetime
-from indico.util.fossilize import fossilize
+from MaKaC.conference import ConferenceHolder
+from MaKaC.webinterface.rh.base import RH
+
+
+class RHAPIRegistrant(RH):
+    """RESTful registrant API"""
+
+    @oauth.require_oauth('registrants')
+    def _checkParams(self):
+        event = ConferenceHolder().getById(request.view_args['event_id'], True)
+        if event is None:
+            raise NotFound("No such event")
+        if not event.canManageRegistration(request.oauth.user):
+            raise Forbidden()
+        registrant = event.getRegistrantById(request.view_args['registrant_id'])
+        if registrant is None:
+            raise NotFound("No such registrant")
+        self.event = event
+        self.registrant = registrant
+
+    def _get_result(self):
+        checkin_date = None
+        if self.registrant.isCheckedIn():
+            checkin_date = format_datetime(self.registrant.getAdjustedCheckInDate(), format='short')
+        return jsonify(event_id=self.event.getId(),
+                       registrant_id=self.registrant.getId(),
+                       registrant_name=self.registrant.getFullName(title=True, firstNameFirst=True),
+                       checked_in=self.registrant.isCheckedIn(),
+                       checkin_secret=self.registrant.getCheckInUUID(),
+                       checkin_date=checkin_date)
+
+    def _process_GET(self):
+        return self._get_result()
+
+    def _process_PATCH(self):
+        invalid_fields = request.json.viewkeys() - {'checked_in'}
+        if invalid_fields:
+            raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
+        if self.registrant is None:
+            raise NotFound("No such registrant")
+        if 'checked_in' in request.json:
+            self.registrant.setCheckedIn(bool(request.json['checked_in']))
+        return self._get_result()
 
 
 @HTTPAPIHook.register
@@ -61,37 +107,6 @@ class SetPaidHook(EventBaseHook):
         return {
             "paid": self._registrant.getPayed(),
             "amount_paid": self._registrant.getTotal()
-        }
-
-
-@HTTPAPIHook.register
-class CheckInHook(EventBaseHook):
-    PREFIX = "api"
-    RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/checkin'
-    METHOD_NAME = 'api_checkin'
-    NO_CACHE = True
-    COMMIT = True
-    HTTP_POST = True
-
-    def _getParams(self):
-        super(CheckInHook, self)._getParams()
-        self._check_in = get_query_parameter(self._queryParams, ["checked_in"]) == "yes"
-        self._secret = get_query_parameter(self._queryParams, ["secret"])
-        registrant_id = self._pathParams["registrant_id"]
-        self._conf = ConferenceHolder().getById(self._pathParams['event'])
-        self._registrant = self._conf.getRegistrantById(registrant_id)
-
-    def _hasAccess(self, aw):
-        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
-            and self._secret == self._registrant.getCheckInUUID()
-
-    def api_checkin(self, aw):
-        self._registrant.setCheckedIn(self._check_in)
-        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate(), format="short")
-
-        return {
-            "checked_in": self._check_in,
-            "checkin_date": checkin_date if self._check_in else None
         }
 
 
