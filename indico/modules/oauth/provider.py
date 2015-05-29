@@ -22,7 +22,7 @@ from flask import session
 
 from indico.core.db import db
 from indico.core.config import Config
-from indico.modules.oauth import oauth, logger
+from indico.modules.oauth import oauth
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
 from indico.util.date_time import now_utc
@@ -57,21 +57,17 @@ def load_token(access_token, refresh_token=None):
 
 
 @oauth.tokensetter
-def save_token(token, request, *args, **kwargs):
+def save_token(token_data, request, *args, **kwargs):
     # For the implicit flow
     # Check issue: https://github.com/lepture/flask-oauthlib/issues/209
-    user_id = request.user.id if request.user else session.user.id
-
-    tokens = OAuthToken.find(OAuthApplication.client_id == request.client.client_id,
-                             OAuthToken.user_id == user_id,
-                             _join=OAuthApplication)
-    # make sure that every client has only one token connected to a user
-    for t in tokens:
-        db.session.delete(t)
-        logger.info("Deleted token for user {} before saving a new one.".format(user_id))
-    application = OAuthApplication.find_one(client_id=request.client.client_id)
-    scopes = token['scope'].split()
-    token = OAuthToken(application_id=application.id, user_id=user_id,
-                       access_token=token['access_token'], scopes=scopes)
-    db.session.add(token)
+    user = request.user or session.user
+    token = OAuthToken.find_first(OAuthApplication.client_id == request.client.client_id,
+                                  OAuthToken.user == user,
+                                  _join=OAuthApplication)
+    if token is None:
+        application = OAuthApplication.find_one(client_id=request.client.client_id)
+        token = OAuthToken(application=application, user=user)
+        db.session.add(token)
+    token.access_token = token_data['access_token']
+    token.scopes = token_data['scope'].split()
     return token
