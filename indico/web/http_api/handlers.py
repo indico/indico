@@ -37,6 +37,7 @@ from indico.core.logger import Logger
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
+from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
 from indico.util.contextManager import ContextManager
 from indico.util.string import to_unicode
@@ -153,11 +154,8 @@ def handler(prefix, path):
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
-    oauthToken = request.args.get('oauth_token')
-    if oauthToken is None:
-        token_param = request.headers.get('Authorization', '').split()
-        if token_param:
-            oauthToken = token_param[-1]
+    scope = 'read:legacy_api' if request.method == 'GET' else 'write:legacy_api'
+    oauth_valid, oauth_request = oauth.verify_request([scope])
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
@@ -179,8 +177,8 @@ def handler(prefix, path):
             if not used_session.user:  # ignore guest sessions
                 used_session = None
 
-        if apiKey or oauthToken or not used_session:
-            if not oauthToken:
+        if apiKey or oauth_valid or not used_session:
+            if not oauth_valid:
                 # Validate the API key (and its signature)
                 ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
                 if enforceOnlyPublic:
@@ -188,7 +186,7 @@ def handler(prefix, path):
                 # Create an access wrapper for the API key's user
                 aw = buildAW(ak, onlyPublic)
             else:  # Access Token (OAuth)
-                at = load_token(oauthToken)
+                at = load_token(oauth_request.access_token.access_token)
                 aw = buildAW(at, onlyPublic)
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:
