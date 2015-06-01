@@ -136,7 +136,7 @@ class RHOAuthUserTokenRevoke(RHUserBase):
     def _checkParams(self):
         RHUserBase._checkParams(self)
         self.token = OAuthToken.get(request.view_args['id'])
-        if session.user != self.token.user:
+        if self.user != self.token.user:
             raise Forbidden("You can only revoke tokens associated with your user")
 
     def _process(self):
