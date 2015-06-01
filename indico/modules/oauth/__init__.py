@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import os
+from datetime import timedelta
 
 from flask_oauthlib.provider import OAuth2Provider
 
@@ -27,8 +28,13 @@ from indico.web.flask.util import url_for
 from indico.web.menu import MenuItem
 
 
-oauth = OAuth2Provider()
+class IndicoOAuth2Provider(OAuth2Provider):
+    def init_app(self, app):
+        app.config.setdefault('OAUTH2_PROVIDER_TOKEN_EXPIRES_IN', int(timedelta(days=3650).total_seconds()))
+        super(IndicoOAuth2Provider, self).init_app(app)
 
+
+oauth = IndicoOAuth2Provider()
 logger = Logger.get('oauth')
 
 

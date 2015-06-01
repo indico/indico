@@ -45,7 +45,7 @@ class OAuthToken(db.Model):
         db.ForeignKey('oauth.applications.id'),
         nullable=False
     )
-    #: the identifier of the linke user
+    #: the identifier of the linked user
     user_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
@@ -97,7 +97,7 @@ class OAuthToken(db.Model):
     @property
     def expires(self):
         # work around to have a non-expiring token
-        return datetime.utcnow() + timedelta(days=3600)
+        return datetime.utcnow() + timedelta(days=3650)
 
     @property
     def type(self):
