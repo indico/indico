@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -61,14 +61,14 @@ class OAuthApplication(db.Model):
     )
     #: the OAuth client_id
     client_id = db.Column(
-        db.String,
+        UUID,
         unique=True,
         nullable=False,
         default=lambda: unicode(uuid4())
     )
     #: the OAuth client_secret
     client_secret = db.Column(
-        db.String,
+        UUID,
         nullable=False,
         default=lambda: unicode(uuid4())
     )

@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -54,7 +54,7 @@ class OAuthToken(db.Model):
     )
     #: an unguessable unique string of characters
     access_token = db.Column(
-        db.String,
+        UUID,
         unique=True,
         nullable=False
     )
