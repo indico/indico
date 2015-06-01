@@ -1,5 +1,6 @@
 {% extends 'oauth/apps_base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% set num_tokens = application.tokens.count() %}
 
 {% block subtitle %}
     {{ application.name }}
@@ -15,7 +16,8 @@
                 <div class="group">
                     <button class="i-button"
                         data-href="{{ url_for('.app_revoke', application) }}" data-method="POST"
-                        data-confirm="{% trans %}Are you sure you want to revoke all user tokens?{% endtrans %}">
+                        data-confirm="{% trans %}Are you sure you want to revoke all {{ num_tokens }} user tokens?{% endtrans %}"
+                        {% if not num_tokens %}disabled{% endif %}>
                         {%- trans %}Revoke user tokens{% endtrans -%}
                     </button>
                     <button class="i-button"
@@ -35,11 +37,13 @@
         </div>
         <div class="i-box-content">
             <dl class="i-data-list">
-                {# Do not translate Client ID/Secret since they are the official term in OAuth2 RFC #}
+                {# Do not translate Client ID/Secret since they are the official terms in OAuth2 RFC #}
                 <dt>Client ID</dt>
                 <dd><code>{{ application.client_id }}</code></dd>
                 <dt>Client Secret</dt>
                 <dd><code>{{ application.client_secret }}</code></dd>
+                <dt>{% trans %}Authorized users{% endtrans %}</dt>
+                <dd>{{ num_tokens }}</dd>
             </dl>
             <hr>
             {{ form_header() }}
