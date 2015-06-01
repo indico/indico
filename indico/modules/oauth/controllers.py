@@ -105,8 +105,9 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
             application = OAuthApplication()
             form.populate_obj(application)
             db.session.add(application)
+            db.session.flush()
             flash(_("Application {} registered successfully").format(application.name), 'success')
-            return redirect(url_for('.apps'))
+            return redirect(url_for('.app_details', application))
         return WPOAuthAdmin.render_template('app_new.html', form=form)
 
 
