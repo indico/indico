@@ -53,9 +53,14 @@
         overflow: hidden;
         background: transparent;
         border: 0;
-        border-bottom: 1px solid lighten($gray, $color-variation);
+        border-bottom: 1px solid $gray;
         margin-left: -10px;
         margin-right: -10px;
+
+        &.inline {
+            margin-left: 0;
+            margin-right: 0;
+        }
     }
 }
 
@@ -102,8 +107,6 @@
             color: $dark-gray;
         }
     }
-
-
 }
 
 .i-box .i-box-footer {
