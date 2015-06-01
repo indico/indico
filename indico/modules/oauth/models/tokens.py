@@ -66,8 +66,7 @@ class OAuthToken(db.Model):
     #: the last time the token was used by the application
     last_used_dt = db.Column(
         UTCDateTime,
-        nullable=True,
-        default=now_utc
+        nullable=True
     )
 
     #: application authorized by this token
