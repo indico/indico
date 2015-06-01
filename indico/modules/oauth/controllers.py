@@ -54,6 +54,11 @@ class RHOAuthAuthorize(RHProtected):
                                new_scopes=filter(None, [SCOPES.get(s) for s in new_scopes]))
 
 
+class RHOAuthErrors(RHProtected):
+    def _process(self, **kwargs):
+        return render_template('oauth/authorize_errors.html', error=request.args['error'])
+
+
 class RHOAuthToken(RH):
     @oauth.token_handler
     def _process(self, **kwargs):
