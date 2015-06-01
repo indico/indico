@@ -24,7 +24,7 @@ from indico.modules.users.controllers import RHUserBase
 from indico.modules.oauth import logger
 from indico.modules.oauth.provider import oauth
 from indico.modules.oauth.forms import ApplicationForm
-from indico.modules.oauth.models.applications import OAuthApplication
+from indico.modules.oauth.models.applications import OAuthApplication, SCOPES
 from indico.modules.oauth.models.tokens import OAuthToken
 from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
 from indico.util.i18n import _
@@ -43,7 +43,8 @@ class RHOAuthAuthorize(RHProtected):
             return 'confirm' in request.form
         if self.application.is_trusted:
             return True
-        return render_template('oauth/authorize.html', application=self.application)
+        scopes = [SCOPES[scope] for scope in kwargs['scopes']]
+        return render_template('oauth/authorize.html', application=self.application, scopes=scopes)
 
 
 class RHOAuthToken(RH):

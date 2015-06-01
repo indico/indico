@@ -16,7 +16,7 @@
  */
 
 @import 'base';
-@import "compass";
+@import 'compass';
 
 body {
     background-color: #f9f9f9;
@@ -208,7 +208,32 @@ body {
 /* OAuth application authentication page */
 
 .app-auth-box {
-    > .app-auth-box-content {
-        padding: 30px 0;
+    .row {
+        padding: 20px;
+
+        & + .row {
+            padding-top: 0;
+        }
+    }
+}
+
+.auth-stakeholder-info {
+    width: 120px;
+
+    i {
+        font-size: 5em;
+    }
+
+    div {
+        font-weight: bold;
+    }
+}
+
+.auth-scopes {
+    display: inline-block;
+
+    ul {
+        text-align: left;
+        margin-bottom: 0;
     }
 }
