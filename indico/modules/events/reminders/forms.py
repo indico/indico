@@ -53,7 +53,7 @@ class ReminderForm(IndicoForm):
     absolute_time = TimeField(_('Time'), [UsedIf(lambda form, field: form.schedule_type.data == 'absolute'),
                                           InputRequired()])
     # Recipients
-    recipients = EmailListField(_('Email addresses'))
+    recipients = EmailListField(_('Email addresses'), description=_('One email address per line.'))
     send_to_participants = BooleanField(_('Participants'),
                                         description=_('Send the reminder to all participants/registrants '
                                                       'of the event.'))
