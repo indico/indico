@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
-from flask import session
+from flask import session, after_this_request
 
 from indico.core.db import db
 from indico.core.config import Config
@@ -51,8 +51,17 @@ def save_grant(client_id, code, request, *args, **kwargs):
 @oauth.tokengetter
 def load_token(access_token, refresh_token=None):
     token = OAuthToken.find_first(access_token=access_token)
-    if token:
-        token.last_used_dt = now_utc()
+    if not token:
+        return None
+
+    @after_this_request
+    def _update_last_use(response):
+        with db.tmp_session() as sess:
+            # do not modify `token` directly, it's attached to a different session!
+            sess.query(OAuthToken).filter_by(id=token.id).update({OAuthToken.last_used_dt: now_utc()})
+            sess.commit()
+        return response
+
     return token
 
 

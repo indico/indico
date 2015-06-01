@@ -16,6 +16,8 @@
 
 from __future__ import absolute_import
 
+from contextlib import contextmanager
+
 import logging
 from functools import partial
 from flask import has_app_context, g, has_request_context
@@ -43,6 +45,23 @@ class IndicoSQLAlchemy(SQLAlchemy):
         logger = Logger.get('db')
         logger.setLevel(logging.DEBUG)
         return logger
+
+    @contextmanager
+    def tmp_session(self):
+        """Provides a contextmanager with a temporary SQLAlchemy session.
+
+        This allows you to use SQLAlchemy e.g. in a `after_this_request`
+        callback without having to worry about things like the ZODB extension,
+        implicit commits, etc.
+        """
+        session = db.create_session({})
+        try:
+            yield session
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
 
 def on_models_committed(sender, changes):
