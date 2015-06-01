@@ -70,7 +70,7 @@ from indico.web.flask.blueprints.files import files
 from indico.web.flask.blueprints.admin import admin
 from indico.web.flask.blueprints.rooms_admin import rooms_admin
 
-from indico.core.plugins.blueprints import plugins_blueprint
+from indico.core.plugins.blueprint import plugins_blueprint
 from indico.modules.api.blueprint import api_blueprint
 from indico.modules.auth.blueprint import auth_blueprint, auth_compat_blueprint
 from indico.modules.events.agreements.blueprint import agreements_blueprint
