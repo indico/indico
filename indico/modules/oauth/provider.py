@@ -66,6 +66,7 @@ def save_token(token_data, request, *args, **kwargs):
         user = session.user
     else:
         raise ValueError('Invalid grant_type')
+    requested_scopes = set(token_data['scope'].split())
     token = OAuthToken.find_first(OAuthApplication.client_id == request.client.client_id,
                                   OAuthToken.user == user,
                                   _join=OAuthApplication)
@@ -74,9 +75,10 @@ def save_token(token_data, request, *args, **kwargs):
         token = OAuthToken(application=application, user=user)
         db.session.add(token)
         token.access_token = token_data['access_token']
-        token.scopes = sorted(token_data['scope'].split())
+        token.scopes = requested_scopes
     else:
-        assert set(token.scopes) == set(token_data['scope'].split())
+        if requested_scopes - token.scopes:
+            token.scopes = token.scopes | requested_scopes
         token_data['expires_in'] = int((token.expires - datetime.utcnow()).total_seconds())
         token_data['access_token'] = token.access_token
     token_data.pop('refresh_token', None)  # we don't support refresh tokens so far

@@ -58,8 +58,9 @@ class OAuthToken(db.Model):
         unique=True,
         nullable=False
     )
-    #: the list of scopes the linked application may request access to
-    scopes = db.Column(
+    #: the list of scopes the linked application has access to
+    _scopes = db.Column(
+        'scopes',
         ARRAY(db.String)
     )
     #: the last time the token was used by the application
@@ -98,6 +99,15 @@ class OAuthToken(db.Model):
     def expires(self):
         # work around to have a non-expiring token
         return datetime.utcnow() + timedelta(days=3650)
+
+    @property
+    def scopes(self):
+        """The set of scopes the linked application has access to."""
+        return set(self._scopes)
+
+    @scopes.setter
+    def scopes(self, value):
+        self._scopes = sorted(value)
 
     @property
     def type(self):

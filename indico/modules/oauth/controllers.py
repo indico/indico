@@ -43,8 +43,15 @@ class RHOAuthAuthorize(RHProtected):
             return 'confirm' in request.form
         if self.application.is_trusted:
             return True
-        scopes = [SCOPES[scope] for scope in kwargs['scopes']]
-        return render_template('oauth/authorize.html', application=self.application, scopes=scopes)
+        requested_scopes = set(kwargs['scopes'])
+        token = self.application.tokens.filter_by(user=session.user).first()
+        authorized_scopes = token.scopes if token else set()
+        if requested_scopes <= authorized_scopes:
+            return True
+        new_scopes = requested_scopes - authorized_scopes
+        return render_template('oauth/authorize.html', application=self.application,
+                               authorized_scopes=filter(None, [SCOPES.get(s) for s in authorized_scopes]),
+                               new_scopes=filter(None, [SCOPES.get(s) for s in new_scopes]))
 
 
 class RHOAuthToken(RH):

@@ -31,13 +31,16 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <hr class="inline"></hr>
+                                    <hr class="inline">
                                     <div class="row">
                                         <div class="auth-scopes">
                                             <span class="bold">{{ application.name }}</span> {% trans %}is requesting the following permissions:{% endtrans %}
                                             <ul>
-                                                {% for scope in scopes %}
-                                                    <li>{{ scope }}</li>
+                                                {% for scope in authorized_scopes|sort %}
+                                                    <li class="icon-checkbox-checked">{{ scope }}</li>
+                                                {% endfor %}
+                                                {% for scope in new_scopes|sort %}
+                                                    <li class="icon-checkbox-unchecked">{{ scope }}</li>
                                                 {% endfor %}
                                             </ul>
                                         </div>
