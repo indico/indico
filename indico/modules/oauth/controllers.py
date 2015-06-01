@@ -126,7 +126,7 @@ class RHOAuthUserProfile(RHUserBase):
     """OAuth overview (user)"""
 
     def _process(self):
-        tokens = OAuthToken.find_all(user=session.user)
+        tokens = self.user.oauth_tokens.all()
         return WPOAuthUserProfile.render_template('user_profile.html', user=self.user, tokens=tokens)
 
 

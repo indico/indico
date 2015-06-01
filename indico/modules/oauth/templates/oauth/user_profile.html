@@ -20,7 +20,7 @@
                         {%- trans %}No third party applications have been authorized.{% endtrans -%}
                     </li>
                 {% endif %}
-                {% for token in tokens %}
+                {% for token in tokens|sort(attribute='application.name') %}
                     <li>
                         <span class="list-item-title">{{ token.application.name }}</span>
                         <span class="right">
