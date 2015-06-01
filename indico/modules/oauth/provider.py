@@ -60,7 +60,12 @@ def load_token(access_token, refresh_token=None):
 def save_token(token_data, request, *args, **kwargs):
     # For the implicit flow
     # Check issue: https://github.com/lepture/flask-oauthlib/issues/209
-    user = request.user or session.user
+    if request.grant_type == 'authorization_code':
+        user = request.user
+    elif request.grant_type is None:  # implicit flow
+        user = session.user
+    else:
+        raise ValueError('Invalid grant_type')
     token = OAuthToken.find_first(OAuthApplication.client_id == request.client.client_id,
                                   OAuthToken.user == user,
                                   _join=OAuthApplication)
