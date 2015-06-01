@@ -16,10 +16,12 @@
 
 from __future__ import unicode_literals
 
+import logging
 import os
 from operator import itemgetter
 
 from celery import Celery
+from celery.app.log import Logging
 from celery.beat import PersistentScheduler
 from celery.signals import before_task_publish
 from contextlib2 import ExitStack
@@ -50,6 +52,7 @@ class IndicoCelery(Celery):
     """
 
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault('log', IndicoCeleryLogging)
         super(IndicoCelery, self).__init__(*args, **kwargs)
         self.flask_app = None  # set from configure_celery
         self._patch_task()
@@ -141,6 +144,14 @@ class IndicoCelery(Celery):
                     return super(IndicoTask, s).__call__(*args, **kwargs)
 
         self.Task = IndicoTask
+
+
+class IndicoCeleryLogging(Logging):
+    def _configure_logger(self, logger, *args, **kwargs):
+        # don't let celery mess with the root logger
+        if logger is logging.getLogger():
+            return
+        super(IndicoCeleryLogging, self)._configure_logger(logger, *args, **kwargs)
 
 
 class IndicoPersistentScheduler(PersistentScheduler):

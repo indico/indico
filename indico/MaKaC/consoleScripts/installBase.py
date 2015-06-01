@@ -588,7 +588,7 @@ http://indico.readthedocs.org/en/latest/installation/#configuring-the-web-server
 
 Please do not forget to start the Celery worker in order to use background tasks
 such as event reminders and periodic cleanups. You can run it using this command:
-$ indico celery worker -l INFO -B
+$ indico celery worker -B
 
 %s
 """ % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))

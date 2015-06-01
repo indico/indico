@@ -317,7 +317,7 @@ For background tasks you need to run the Celery scheduler daemon:
 
 .. code-block:: console
 
-    # indico celery worker -l INFO -B
+    # indico celery worker -B
 
 If you have changed your server host name for some reason  you may need to delete ``/opt/indico/tmp/vars.js.tpl.tmp``.
 
