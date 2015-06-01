@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+import re
 from operator import itemgetter
 
+from markupsafe import escape
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -29,11 +31,23 @@ from indico.web.forms.fields import TextListField, IndicoSelectMultipleCheckboxF
 from indico.web.forms.widgets import SwitchWidget
 
 
+class RedirectURIField(TextListField):
+    _re = re.compile(r'^https?://(?P<host>[^/:]+)(?P<port>:[0-9]+)?(?P<path>/[^?]*)?$')
+
+    def _validate_item(self, line):
+        msg = _('Invalid URI: {}.<br>It must use http or https and may not contain a query string.')
+        if not self._re.match(line):
+            raise ValueError(msg.format(escape(line)))
+
+
 class ApplicationForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    redirect_uris = TextListField(_("Allowed authorization callback URLs"), [DataRequired()],
-                                  description=_("More than one URL can be specified adding new lines."))
+    redirect_uris = RedirectURIField(_("Allowed authorization callback URLs"), [DataRequired()],
+                                     description=_("More than one URL can be specified adding new lines. The "
+                                                   "redirect_uri sent by the OAuth client must use the same protocol "
+                                                   "and host/port. If an entry contains a path, the redirect_uri's "
+                                                   "path must start with this path."))
     default_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
                                                        choices=sorted(SCOPES.items(), key=itemgetter(1)))
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),

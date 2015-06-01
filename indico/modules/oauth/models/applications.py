@@ -20,6 +20,7 @@ from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
+from werkzeug.urls import url_parse
 
 from indico.core.db import db
 from indico.modules.oauth import logger
@@ -115,3 +116,18 @@ class OAuthApplication(db.Model):
     def reset_client_secret(self):
         self.client_secret = unicode(uuid4())
         logger.info("Client secret for {} has been reset.".format(self))
+
+    def validate_redirect_uri(self, redirect_uri):
+        """Called by flask-oauthlib to validate the redirect_uri.
+
+        Uses a logic similar to the one at GitHub, i.e. protocol and
+        host/port must match exactly and if there is a path in the
+        whitelisted URL, the path of the redirect_uri must start with
+        that path.
+        """
+        uri_data = url_parse(redirect_uri)
+        for valid_uri_data in map(url_parse, self.redirect_uris):
+            if (uri_data.scheme == valid_uri_data.scheme and uri_data.netloc == valid_uri_data.netloc and
+                    uri_data.path.startswith(valid_uri_data.path)):
+                return True
+        return False
