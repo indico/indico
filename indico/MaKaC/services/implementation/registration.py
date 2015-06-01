@@ -25,6 +25,7 @@ from cStringIO import StringIO
 from indico.util.date_time import format_datetime, format_date
 from indico.util import json
 from indico.modules.oauth.models.applications import OAuthApplication
+from indico.web.flask.util import url_for
 
 
 from MaKaC.common.Configuration import Config
@@ -101,9 +102,8 @@ class ConferenceEticketQRCode(RegistrationModifBase):
                    "date": format_date(self._conf.getAdjustedStartDate()),
                    "server": {"baseUrl": baseURL,
                               "consumerKey": checkin_app.client_id,
-                              "consumerSecret": checkin_app.client_secret,
-                              }
-                   }
+                              "auth_url": url_for('oauth.oauth_authorize', _external=True),
+                              "token_url": url_for('oauth.oauth_token', _external=True)}}
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)
         qr.make(fit=True)
