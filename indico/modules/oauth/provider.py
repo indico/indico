@@ -73,8 +73,12 @@ def save_token(token_data, request, *args, **kwargs):
         application = OAuthApplication.find_one(client_id=request.client.client_id)
         token = OAuthToken(application=application, user=user)
         db.session.add(token)
-    token.access_token = token_data['access_token']
-    token.scopes = token_data['scope'].split()
+        token.access_token = token_data['access_token']
+        token.scopes = sorted(token_data['scope'].split())
+    else:
+        assert set(token.scopes) == set(token_data['scope'].split())
+        token_data['expires_in'] = int((token.expires - datetime.utcnow()).total_seconds())
+        token_data['access_token'] = token.access_token
     token_data.pop('refresh_token', None)  # we don't support refresh tokens so far
     token_data.pop('expires_in', None)  # our tokens currently do not expire
     return token
