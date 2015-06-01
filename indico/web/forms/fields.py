@@ -19,6 +19,7 @@ from collections import OrderedDict
 from datetime import timedelta
 from operator import attrgetter
 
+from markupsafe import escape
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select
@@ -83,7 +84,7 @@ class TextListField(TextAreaField):
         else:
             self.data = []
 
-    def _validate_item(self, lie):
+    def _validate_item(self, line):
         pass
 
     def pre_validate(self, form):
@@ -97,7 +98,7 @@ class TextListField(TextAreaField):
 class EmailListField(TextListField):
     def _validate_item(self, line):
         if not is_valid_mail(line, False):
-            raise ValueError(_(u'Invalid email address: {}').format(line))
+            raise ValueError(_(u'Invalid email address: {}').format(escape(line)))
 
 
 class IndicoEnumSelectField(SelectFieldBase):
@@ -236,7 +237,7 @@ class MultipleItemsField(HiddenField):
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
             elif item.viewkeys() != {x[0] for x in self.fields}:
-                raise ValueError(u'Invalid item (bad keys): {}'.format(', '.join(item.viewkeys())))
+                raise ValueError(u'Invalid item (bad keys): {}'.format(escape(u', '.join(item.viewkeys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
                     raise ValueError(u'{} must be unique'.format(self.field_names[self.unique_field]))
