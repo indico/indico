@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'partials/toolbars';
+
+
 // ============================================================================
 // Base classes and mixins
 // ============================================================================
@@ -88,6 +91,25 @@
             float: right;
             margin: 0;
             padding: 0;
+        }
+
+        .i-box-metadata {
+            line-height: $toolbar-thin-height;
+            margin: 0 1em;
+
+            > span:not(:last-child) {
+                margin-right: 0.7em;
+            }
+
+            .label {
+                color: $black;
+                font-weight: bold;
+            }
+
+            .content {
+                color: $light-black;
+                font-style: italic;
+            }
         }
     }
 
