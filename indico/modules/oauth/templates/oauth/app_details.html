@@ -12,7 +12,7 @@
             <div class="i-box-title">
                 {%- trans %}Details{% endtrans -%}
             </div>
-            <div class="i-box-buttons toolbar right">
+            <div class="i-box-buttons toolbar thin right">
                 <div class="group">
                     <button class="i-button"
                         data-href="{{ url_for('.app_revoke', application) }}" data-method="POST"
@@ -34,16 +34,29 @@
                     </button>
                 </div>
             </div>
+            <div class="i-box-metadata right">
+                <span>
+                    <span class="label">
+                        <i class="icon-user"></i>
+                        {% trans %}Users:{% endtrans %}
+                    </span>
+                    <span class="content">
+                        {{ num_tokens }}
+                    </span>
+                </span>
+            </div>
         </div>
         <div class="i-box-content">
-            <dl class="i-data-list">
-                {# Do not translate Client ID/Secret since they are the official terms in OAuth2 RFC #}
-                <dt>Client ID</dt>
+            <dl class="i-data-list dt-select-disabled">
+                {# Do not translate <dt> since they are the official terms in OAuth2 RFC #}
+                <dt>Client ID</dt>{#--#}
                 <dd><code>{{ application.client_id }}</code></dd>
-                <dt>Client Secret</dt>
+                <dt>Client Secret</dt>{#--#}
                 <dd><code>{{ application.client_secret }}</code></dd>
-                <dt>{% trans %}Authorized users{% endtrans %}</dt>
-                <dd>{{ num_tokens }}</dd>
+                <dt>Authorize URL</dt>{#--#}
+                <dd><code>{{ url_for('.oauth_authorize', _external=true) }}</code></dd>
+                <dt>Access token URL</dt>{#--#}
+                <dd><code>{{ url_for('.oauth_token', _external=true) }}</code></dd>
             </dl>
             <hr>
             {{ form_header() }}
