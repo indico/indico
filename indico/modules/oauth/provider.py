@@ -17,9 +17,10 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+from uuid import UUID
 
 from flask import session, after_this_request
-from oauthlib.oauth2 import FatalClientError
+from oauthlib.oauth2 import FatalClientError, InvalidClientIdError
 
 from indico.core.db import db
 from indico.core.config import Config
@@ -35,6 +36,10 @@ class DisabledClientIdError(FatalClientError):
 
 @oauth.clientgetter
 def load_client(client_id):
+    try:
+        UUID(hex=client_id)
+    except ValueError:
+        raise InvalidClientIdError
     app = OAuthApplication.find_first(client_id=client_id)
     if not app.is_enabled:
         raise DisabledClientIdError
@@ -58,6 +63,11 @@ def save_grant(client_id, code, request, *args, **kwargs):
 
 @oauth.tokengetter
 def load_token(access_token, refresh_token=None):
+    try:
+        UUID(hex=access_token)
+    except ValueError:
+        # malformed oauth token
+        return None
     token = OAuthToken.find(access_token=access_token).options(db.joinedload(OAuthToken.application)).first()
     if not token or not token.application.is_enabled:
         return None

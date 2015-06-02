@@ -16,7 +16,10 @@
 
 from __future__ import unicode_literals
 
+from uuid import UUID
+
 from flask import flash, redirect, request, render_template, session
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -35,6 +38,10 @@ from MaKaC.webinterface.rh.base import RH, RHProtected
 
 class RHOAuthAuthorize(RHProtected):
     def _checkParams(self):
+        try:
+            UUID(hex=request.args['client_id'])
+        except ValueError:
+            raise NoResultFound
         self.application = OAuthApplication.find_one(client_id=request.args['client_id'])
 
     @oauth.authorize_handler
