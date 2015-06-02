@@ -244,15 +244,12 @@ body {
     }
 
     li {
-        @include icon-before('icon-checkbox-unchecked');
-
+        @include icon-before('icon-checkbox-checked');
         &:before {
             padding-right: 0.5em;
         }
-    }
-
-    li.authorized {
-        @include icon-before('icon-checkbox-checked');
-        @extend .text-superfluous;
+        &.authorized {
+            @extend .text-superfluous;
+        }
     }
 }
