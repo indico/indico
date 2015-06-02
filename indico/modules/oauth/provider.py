@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 
 from flask import session, after_this_request
+from oauthlib.oauth2 import FatalClientError
 
 from indico.core.db import db
 from indico.core.config import Config
@@ -28,9 +29,16 @@ from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
 from indico.util.date_time import now_utc
 
 
+class DisabledClientIdError(FatalClientError):
+    error = 'application_disabled_by_admin'
+
+
 @oauth.clientgetter
 def load_client(client_id):
-    return OAuthApplication.find_first(client_id=client_id)
+    app = OAuthApplication.find_first(client_id=client_id)
+    if not app.is_enabled:
+        raise DisabledClientIdError
+    return app
 
 
 @oauth.grantgetter
@@ -50,8 +58,8 @@ def save_grant(client_id, code, request, *args, **kwargs):
 
 @oauth.tokengetter
 def load_token(access_token, refresh_token=None):
-    token = OAuthToken.find_first(access_token=access_token)
-    if not token:
+    token = OAuthToken.find(access_token=access_token).options(db.joinedload(OAuthToken.application)).first()
+    if not token or not token.application.is_enabled:
         return None
 
     @after_this_request

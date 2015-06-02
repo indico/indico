@@ -50,6 +50,9 @@ class ApplicationForm(IndicoForm):
                                                    "path must start with this path."))
     default_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
                                                        choices=sorted(SCOPES.items(), key=itemgetter(1)))
+    is_enabled = BooleanField(_("Enabled"), widget=SwitchWidget(),
+                              description=_("If an application is not enabled, its OAuth tokens cannot be used and "
+                                            "user cannot be prompted to authorize the application."))
     is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
                               description=_("Trusted applications will be granted authorization automatically and "
                                             "no intermediate page will be displayed during the authorization process."))
