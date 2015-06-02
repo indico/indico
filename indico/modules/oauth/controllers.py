@@ -47,8 +47,12 @@ class RHOAuthAuthorize(RHProtected):
     @oauth.authorize_handler
     def _process(self, **kwargs):
         if request.method == 'POST':
-            return 'confirm' in request.form
+            if 'confirm' not in request.form:
+                return False
+            logger.info('User {} authorized {}'.format(session.user, self.application))
+            return True
         if self.application.is_trusted:
+            logger.info('User {} automatically authorized {}'.format(session.user, self.application))
             return True
         requested_scopes = set(kwargs['scopes'])
         token = self.application.tokens.filter_by(user=session.user).first()

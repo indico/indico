@@ -24,7 +24,7 @@ from oauthlib.oauth2 import FatalClientError, InvalidClientIdError
 
 from indico.core.db import db
 from indico.core.config import Config
-from indico.modules.oauth import oauth
+from indico.modules.oauth import oauth, logger
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
 from indico.util.date_time import now_utc
@@ -104,9 +104,10 @@ def save_token(token_data, request, *args, **kwargs):
         token.access_token = token_data['access_token']
         token.scopes = requested_scopes
     elif requested_scopes - token.scopes:
+        logger.info('Added scopes to {}: {}'.format(token, requested_scopes - token.scopes))
         # use the new access_token when extending scopes
         token.access_token = token_data['access_token']
-        token.scopes = token.scopes | requested_scopes
+        token.scopes |= requested_scopes
     else:
         token_data['access_token'] = token.access_token
     token_data.pop('refresh_token', None)  # we don't support refresh tokens so far
