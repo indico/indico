@@ -86,7 +86,7 @@ class IndicoCelery(Celery):
         self.conf['EMAIL_HOST_PASWORD'] = cfg.getSmtpPassword() or None
         # Allow indico.conf to override settings
         self.conf.update(cfg.getCeleryConfig())
-        assert self.flask_app is None
+        assert self.flask_app is None or self.flask_app is app
         self.flask_app = app
         self.loader.import_default_modules()  # load all tasks
 
