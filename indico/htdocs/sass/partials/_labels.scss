@@ -35,26 +35,31 @@
 
     // same as in _buttons.scss
     &.accept {
+        @include border-all(darken($green, $light-color-variation));
         background: $green;
         color: #FDFDFD !important;
     }
 
     &.danger {
+        @include border-all(darken($red, $light-color-variation));
         background: $red;
         color: #FDFDFD !important;
     }
 
     &.highlight {
+        @include border-all(darken($blue, $light-color-variation));
         background: $blue;
         color: #FDFDFD !important;
     }
 
     &.warning {
-        color: #EFEFEF !important;
+        @include border-all(darken($yellow, $light-color-variation));
         background: $yellow;
+        color: #EFEFEF !important;
     }
     &.disabled {
-        color: $light-black;
+        @include border-all(darken($pastel-gray, $light-color-variation));
         background: $pastel-gray;
+        color: $light-black;
     }
 }
