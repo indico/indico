@@ -31,6 +31,7 @@ from indico.web.menu import MenuItem
 
 class IndicoOAuth2Provider(OAuth2Provider):
     def init_app(self, app):
+        app.config.setdefault('OAUTH2_PROVIDER_ERROR_ENDPOINT', 'oauth.oauth_errors')
         app.config.setdefault('OAUTH2_PROVIDER_TOKEN_EXPIRES_IN', int(timedelta(days=3650).total_seconds()))
         app.config.setdefault('OAUTH2_PROVIDER_TOKEN_GENERATOR', lambda req: unicode(uuid4()))
         super(IndicoOAuth2Provider, self).init_app(app)
