@@ -1,5 +1,5 @@
-{% from 'message_box.html' import message_box %}
 {% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}
     {% trans %}Tasks{% endtrans %}
@@ -9,7 +9,9 @@
     <div class="tasks">
         {%- call message_box('info', fixed_width=True) -%}
             {%- if flower_url -%}
-                {%- trans -%}Monitor Indico related tasks with flower <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.{%- endtrans %}
+                {%- trans -%}
+                    Monitor Indico's Celery tasks with Flower <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
+                {%- endtrans -%}
             {%- else -%}
                 {%- trans -%}
                     Indico uses Celery to manage tasks, which can be monitored using Flower.<br>
