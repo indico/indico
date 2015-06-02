@@ -22,7 +22,7 @@ qualname=celery
 # For setting your custom arguments, uncomment the args entry below.
 [handler_indico]
 class=FileHandler
-level=NOTSET
+level=INFO
 formatter=defaultFormatter
 #args=('',)
 
@@ -52,7 +52,7 @@ formatter=mailFormatter
 
 [handler_stderr]
 class=StreamHandler
-level=NOTSET
+level=INFO
 formatter=simpleFormatter
 
 [formatter_mailFormatter]
