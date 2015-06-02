@@ -85,10 +85,11 @@ def save_token(token_data, request, *args, **kwargs):
         db.session.add(token)
         token.access_token = token_data['access_token']
         token.scopes = requested_scopes
+    elif requested_scopes - token.scopes:
+        # use the new access_token when extending scopes
+        token.access_token = token_data['access_token']
+        token.scopes = token.scopes | requested_scopes
     else:
-        if requested_scopes - token.scopes:
-            token.scopes = token.scopes | requested_scopes
-        token_data['expires_in'] = int((token.expires - datetime.utcnow()).total_seconds())
         token_data['access_token'] = token.access_token
     token_data.pop('refresh_token', None)  # we don't support refresh tokens so far
     token_data.pop('expires_in', None)  # our tokens currently do not expire
