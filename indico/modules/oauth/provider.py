@@ -63,6 +63,8 @@ def save_grant(client_id, code, request, *args, **kwargs):
 
 @oauth.tokengetter
 def load_token(access_token, refresh_token=None):
+    if not access_token:
+        return None
     try:
         UUID(hex=access_token)
     except ValueError:
