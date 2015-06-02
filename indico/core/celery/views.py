@@ -16,26 +16,12 @@
 
 from __future__ import unicode_literals
 
-from celery.signals import import_modules
-
-from indico.core import signals
-from indico.core.celery.core import IndicoCelery
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
-
-__all__ = ('celery',)
+from MaKaC.webinterface.pages.admins import WPAdminsBase
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
-#: The Celery instance for all Indico tasks
-celery = IndicoCelery('indico')
+class WPCelery(WPJinjaMixin, WPAdminsBase):
+    template_prefix = 'celery/'
 
-
-@import_modules.connect
-def _import_modules(*args, **kwargs):
-    signals.import_tasks.send()
-
-
-@signals.admin_sidemenu.connect
-def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'))
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['celery'].setActive()

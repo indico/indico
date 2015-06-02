@@ -16,26 +16,9 @@
 
 from __future__ import unicode_literals
 
-from celery.signals import import_modules
+from indico.core.celery.controllers import RHCeleryTasks
+from indico.web.flask.wrappers import IndicoBlueprint
 
-from indico.core import signals
-from indico.core.celery.core import IndicoCelery
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
+celery_blueprint = _bp = IndicoBlueprint('celery', __name__, url_prefix='/admin/tasks', template_folder='templates')
 
-__all__ = ('celery',)
-
-
-#: The Celery instance for all Indico tasks
-celery = IndicoCelery('indico')
-
-
-@import_modules.connect
-def _import_modules(*args, **kwargs):
-    signals.import_tasks.send()
-
-
-@signals.admin_sidemenu.connect
-def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'))
+_bp.add_url_rule('/', 'index', RHCeleryTasks)

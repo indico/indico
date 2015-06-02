@@ -136,7 +136,6 @@ class IndicoShell(Shell):
             add_to_context_smart(models)
             # Tasks
             self._info.append(cformat('*** %{magenta!}Tasks%{reset} ***'))
-            celery.loader.import_default_modules()  # load all tasks
             tasks = [task for task in sorted(celery.tasks.values()) if not task.name.startswith('celery.')]
             add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
             # Plugins
