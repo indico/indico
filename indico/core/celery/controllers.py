@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import timedelta
+from operator import itemgetter
 
 from indico.core.celery.views import WPCelery
 from MaKaC.webinterface.rh.admins import RHAdminBase
@@ -49,5 +50,6 @@ class RHCeleryTasks(RHAdminBase):
                           'schedule': entry['schedule'],
                           'custom_schedule': custom_schedule,
                           'disabled': disabled})
+        tasks.sort(key=itemgetter('disabled', 'name'))
 
         return WPCelery.render_template('celery_tasks.html', flower_url=flower_url, tasks=tasks, timedelta=timedelta)
