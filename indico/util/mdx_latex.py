@@ -82,6 +82,12 @@ import markdown
 import xml.dom.minidom
 from PIL import Image
 
+from urlparse import urlparse
+import httplib
+import os
+import tempfile
+import urllib
+import bleach
 
 start_single_quote_re = re.compile("(^|\s|\")'")
 start_double_quote_re = re.compile("(^|\s|'|`)\"")
@@ -133,6 +139,21 @@ safe_mathmode_commands = {
 
 class ImageURLException(Exception):
     pass
+
+
+def contains_supported_latex_symbols(text):
+    supported_symbols = [
+        r'\section',
+        r'\subsection',
+        r'\paragraph',
+        r'\footnote',
+        r'\emph',
+        r'\begin',
+        r'\noindent',
+        r'\textbf'
+    ]
+
+    return any(latex_symbol in text for latex_symbol in supported_symbols)
 
 
 def unescape_html_entities(text):
@@ -210,7 +231,7 @@ def escape_latex_entities(text):
 def unescape_latex_entities(text):
     """Limit ourselves as this is only used for maths stuff."""
     out = text
-    out = out.replace('\\&', '&')
+    out = out.replace(r'\&', '&')
     return out
 
 
@@ -355,20 +376,20 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         subcontent = ""
 
         if ournode.text:
-            subcontent += escape_latex_entities(ournode.text)
+            subcontent += ournode.text
 
         if ournode.getchildren():
             for child in ournode.getchildren():
                 subcontent += self.tolatex(child)
 
         if ournode.tag == 'h1':
-            buffer += '\n\n\\section{%s}\n' % subcontent
+            buffer += '\n\n\\section{%s}\n' % escape_latex_entities(subcontent)
         elif ournode.tag == 'h2':
-            buffer += '\n\n\\subsection{%s}\n' % subcontent
+            buffer += '\n\n\\subsection{%s}\n' % escape_latex_entities(subcontent)
         elif ournode.tag == 'h3':
-            buffer += '\n\\subsubsection{%s}\n' % subcontent
+            buffer += '\n\\subsubsection{%s}\n' % escape_latex_entities(subcontent)
         elif ournode.tag == 'h4':
-            buffer += '\n\\paragraph{%s}\n' % subcontent
+            buffer += '\n\\paragraph{%s}\n' % escape_latex_entities(subcontent)
         elif ournode.tag == 'hr':
             buffer += '\\noindent\makebox[\linewidth]{\\rule{\paperwidth}{0.4pt}}'
         elif ournode.tag == 'ul':
@@ -385,7 +406,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
 """ % subcontent
         elif ournode.tag == 'li':
             buffer += """
-  \\item %s""" % subcontent.strip()
+  \\item %s""" % escape_latex_entities(subcontent.strip())
         elif ournode.tag == 'blockquote':
             # use quotation rather than quote as quotation can support multiple
             # paragraphs
@@ -405,28 +426,35 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'q':
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
-            buffer += '\n%s\n' % subcontent.strip()
+            # do not escape if it is latex already
+            if contains_supported_latex_symbols(subcontent):
+                buffer += '\n%s\n' % subcontent.strip()
+            else:
+                buffer += '\n%s\n' % latex_escape(subcontent.strip())
+        # Footnote processor inserts all of the footnote in a sup tag
+        elif ournode.tag == 'sup':
+            buffer += '\\footnote{%s}' % escape_latex_entities(subcontent.strip())
         elif ournode.tag == 'strong':
-            buffer += '\\textbf{%s}' % subcontent.strip()
+            buffer += '\\textbf{%s}' % escape_latex_entities(subcontent.strip())
         elif ournode.tag == 'em':
-            buffer += '\\emph{%s}' % subcontent.strip()
+            buffer += '\\emph{%s}' % escape_latex_entities(subcontent.strip())
         # Keep table strcuture. TableTextPostProcessor will take care.
         elif ournode.tag == 'table':
-            buffer += '\n\n<table>%s</table>\n\n' % subcontent
+            buffer += '\n\n<table>%s</table>\n\n' % bleach.clean(subcontent)
         elif ournode.tag == 'thead':
-            buffer += '<thead>%s</thead>' % subcontent
+            buffer += '<thead>%s</thead>' % bleach.clean(subcontent)
         elif ournode.tag == 'tbody':
-            buffer += '<tbody>%s</tbody>' % subcontent
+            buffer += '<tbody>%s</tbody>' % bleach.clean(subcontent)
         elif ournode.tag == 'tr':
-            buffer += '<tr>%s</tr>' % subcontent
+            buffer += '<tr>%s</tr>' % bleach.clean(subcontent)
         elif ournode.tag == 'th':
-            buffer += '<th>%s</th>' % subcontent
+            buffer += '<th>%s</th>' % bleach.clean(subcontent)
         elif ournode.tag == 'td':
-            buffer += '<td>%s</td>' % subcontent
+            buffer += '<td>%s</td>' % bleach.clean(subcontent)
         elif ournode.tag == 'img':
-            buffer += latex_render_image(ournode.get('src'), ournode.get('alt'))[0]
+            buffer += latex_render_image(bleach.clean(ournode.get('src')), bleach.clean(ournode.get('alt')))[0]
         elif ournode.tag == 'a':
-            buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
+            buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), bleach.clean(subcontent))
         else:
             buffer = subcontent
 
@@ -640,6 +668,7 @@ class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
 class Link2Latex(object):
     def convert(self, instr):
         dom = xml.dom.minidom.parseString(instr.encode('utf-8'))
+        instr = unescape_html_entities(instr)
         link = dom.documentElement
         href = link.getAttribute('href')
 
