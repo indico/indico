@@ -2,335 +2,255 @@
 
 .init-setup-header {
     @extend %font-family-initial-setup;
-    color: #005272;
+
+    font-weight: bolder;
+
+    z-index: 1;
+
+    display: block;
+
     width: 100%;
+    height: 350px;
+    padding-top: 20px;
+
+    text-align: center;
+
+    border-bottom: 5px solid white;
     background-color: $dark-blue-logo;
     background-repeat: no-repeat;
-    display: block;
-    text-align: center;
     background-position: 20px 20px;
-    font-weight: bolder;
-    padding-top: 20px;
-    z-index: 1;
-    height: 350px;
-    border-bottom: 5px solid white;
-
     .header-logo {
         height: 50%;
+
         color: white;
-
     }
-
     .header-title {
         @extend %font-family-logo;
-        font-size: 54px;
-        color: $light-blue-logo;
-    }
 
+        font-size: 54px;
+
+        color: $pastel-blue;
+    }
     .header-subtitle {
         @extend %font-family-logo;
-        color: white;
+
         font-size: 26px;
+
+        color: white;
     }
-
     &.mini {
-        position:fixed;
+        position: fixed;
         top: 0;
-        height: 120px;
-        text-align: left;
 
+        height: 120px;
+
+        text-align: left;
         .header-logo {
             float: left;
+
             height: 75%;
             margin-left: 50px;
             padding-right: 30px;
         }
     }
-
     .language-selector {
         position: fixed;
+        z-index: 1;
         top: 0;
         right: 10px;
-        z-index: 1;
+
         padding: 0;
-
         .i-button.arrow {
-            border: 0;
             width: 102px;
-            color: darken(white, 10%) !important;
 
+            color: darken(white, 10%) !important;
+            border: 0;
             &:hover:not(.disabled):not(:disabled) {
                 color: white !important;
             }
         }
-
         .dropdown {
-            text-align: left;
             width: 100px;
+
+            text-align: left;
         }
     }
 }
 
-.init-setup-body:before, .init-setup-body:after {
-    content: "";
-    display: table;
+.init-setup-body:before,
+.init-setup-body:after {
     line-height: 0;
+
+    display: table;
+
+    content: '';
 }
 
 .init-setup-body {
     @extend %font-family-initial-setup;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 30px;
-    padding-bottom: 50px;
+
+    width: 100%;
     min-width: 800px;
     max-width: 1140px;
-    width: 100%;
-    background: white;
-    border-left: 3px #005272 solid;
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: 30px;
+    padding-bottom: 50px;
 
+    border-left: 3px $dark-blue-logo solid;
+    background: white;
     @media only screen and (min-width: 481px) and (max-width: 768px) {
         min-width: 480px;
         max-width: 492px;
     }
-
     @media only screen and (min-width: 769px) and (max-width: 1024px) {
         min-width: 600px;
         max-width: 680px;
     }
-
     @media only screen and (min-width: 1025px) and (max-width: 1230px) {
         max-width: 937px;
     }
-
     &.mini {
         margin-top: 120px;
     }
-
     .init-setup-form {
         width: 100%;
-        height: 100%;
         max-width: none;
-
+        height: 100%;
         .step-wrapper {
-            height: 100%;
             width: 100%;
-            color: $black;
+            height: 100%;
             padding-top: 75px;
 
+            color: $black;
             div {
                 @include clearfix;
             }
-
             .step-icon {
                 @include box-sizing(border-box);
+
                 float: left;
-                margin-top: 1em;
-                margin-left: -50px;
-                border: 5px solid white;
-                border-radius: 50%;
-                background-color: #005272;
+
                 width: 100px;
                 height: 100px;
-                padding: 0px;
+                margin-top: 1em;
+                margin-left: -50px;
+                padding: 0;
 
+                border: 5px solid white;
+                border-radius: 50%;
+                background-color: $dark-blue-logo;
                 i {
-                    color: white;
+                    font-size: 50px;
+
+                    position: relative;
+                    z-index: 0;
                     top: 20px;
                     left: 20px;
-                    position: relative;
-                    font-size: 50px;
-                    z-index: 0;
+
+                    color: white;
                 }
             }
-
             .step-container {
                 width: 85%;
-                text-align: left;
 
+                text-align: left;
                 .step-title {
                     @extend %font-family-logo;
-                    color: #005272;
-                    font-weight: bold;
-                    padding-left: 2%;
-                    font-size: 4em;
-                    padding-bottom: 30px;
-                }
 
+                    font-size: 4em;
+                    font-weight: bold;
+
+                    padding-bottom: 0.6em;
+                    padding-left: 2%;
+
+                    color: $dark-blue-logo;
+                }
                 .step-description {
+                    font-size: 1.4em;
+
                     float: left;
+
                     width: 40%;
                     padding-left: 2%;
-                    font-size: 18px;
-                    color: #555555;
+
                     text-align: justify;
 
+                    color: #555555;
                     div {
                         padding-bottom: 1em;
                     }
-
                     .additional-information {
-                        color: #D3D3D3;
+                        color: #d3d3d3;
                     }
                 }
-
                 .fields-container {
                     float: right;
+
                     width: 50%;
-
-                    div {
-                        width: 100%;
-                    }
-
-                    label, input, select {
-                        margin-bottom: 20px;
-                    }
-
-                    input, select {
-                        font-size: 1.8em;
-                    }
-
-                    label {
-                        text-align: left;
-                        width: 15%;
-                        padding-right: 3%;
-                        margin-top: 6px;
-                        font-weight: normal;
-                        font-size: 1.8em;
-                    }
-
-                    input {
-                        @include placeholder {
-                            color: #BEBEBE;
-                        }
-
-                        @include border-radius(2px);
-                        width: 80%;
-                        box-shadow: none;
-                    }
-
-                    .input-timezone, .input-lang {
-                        width: 272px;
-                        font-size: 25px;
-                    }
-
-                    .input-it:disabled {
-                        @include placeholder {
-                            color: lighten(#BEBEBE, $color-variation);
-                        }
-                    }
-
-                    .enable-line {
-                        margin-bottom: 1.5em;
-
-                        input {
+                    > .form-group {
+                        > .form-label > .required {
                             display: none;
-                        }
-
-                        label {
-                            vertical-align: super;
-                        }
-
-                        .toggle-button {
-                            @include box-sizing(border-box);
-                            border: 1px solid #999;
-                            box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
-                            width: 7em;
-                            display: inline-block;
-                            background: #ddd;
-                            height: 3em;
-                            cursor: pointer;
-                            position: relative;
-
-                            .toggle {
-                                @include box-sizing(border-box);
-                                @include transition-property(left, background-color, border-color);
-                                @include transition-duration(.25s);
-                                position: absolute;
-                                left: 0px;
-                                width: 50%;
-                                height: 100%;
-                                background: #aaa;
-                                text-align: center;
-                                border: 1px solid #888
-                            }
-
-                            .toggle::before {
-                                color: #666;
-                                display: inline-block;
-                                font-size: 1.6em;
-                                content: "NO";
-                                line-height: 1.6em;
-                            }
-
-                            &.toggled {
-                                .toggle {
-                                    box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
-                                    background-color: $light-blue-logo;
-                                    border-color: lighten($dark-blue-logo, $color-variation);
-                                    left: 3.5em;
-                                }
-
-                                .toggle::before {
-                                    content: "YES";
-                                    color: #eee !important;
-                                }
-                            }
                         }
                     }
                 }
+                > div {
+                    width: 100%;
+                }
+                input,
+                select,
+                label {
+                    font-size: 1.2em;
+                }
             }
-
             .i-button {
                 @extend %font-family-logo;
             }
         }
     }
-
     .form-group-footer {
         float: right;
+
         margin-bottom: 2em;
     }
 }
 
-
-.blue-button {
-    background-color: $light-blue-logo !important;
-    color: darken(white, 10%) !important;
-    border-color: lighten($dark-blue-logo, $color-variation);
-
-    &:hover:not(.disabled):not(:disabled) {
-        @include gradient(lighten($light-blue-logo, $color-variation), $light-blue-logo);
-        color: white !important;
-        border-color: $dark-blue-logo;
-    }
-
-    &:active:not(.disabled):not(:disabled) {
-        @include gradient($light-blue-logo, lighten($light-blue-logo, $color-variation));
-        border-color: lighten($dark-blue-logo, $color-variation);
-    }
-}
-
 .transparent-button {
-    background-color: transparent !important;
     border-color: transparent;
-
+    background-color: transparent !important;
     &:hover:not(.disabled):not(:disabled) {
         @include gradient(transparent, transparent);
+
         border-color: transparent;
         box-shadow: none;
     }
-
     &:active:not(.disabled):not(:disabled) {
         @include gradient(transparent, transparent);
+
         border-color: transparent;
     }
 }
 
-.big-button {
-    padding-top: 0.3em;
-    margin-top: 50px;
-    font-size: 2.5em;
-    width: 3.8em;
-    height: 1.6em;
+#step1 .form-group .form-field,
+#step2 .form-group:nth-last-child(2) .form-field,
+#step3 .form-group:nth-child(n+2) .form-field {
+    margin-bottom: 1.6em;
+}
+
+#step1 .form-group .form-label,
+#step2 .form-group:last-child .form-label,
+#step3 .form-group:nth-child(n+2) .form-label {
+    display: none;
+}
+
+#step4 .step-description {
+    width: 100%;
+
+    text-align: center;
+    .i-button.big {
+        font-size: 2em;
+
+        width: 40%;
+        padding: 0.5em;
+    }
 }

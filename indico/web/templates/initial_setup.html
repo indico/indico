@@ -14,7 +14,6 @@
 {% endblock %}
 
 {% block body %}
-
     <div class="init-setup-header">
         <img class="header-logo" src="{{ system_icon('logoIndicoWhite') }}">
         <div class="header-title">{% trans %}Hello there!{% endtrans %}</div>
@@ -35,43 +34,32 @@
     <div class="init-setup-body">
         <form method="POST" action="" class="i-form init-setup-form" id="initial-setup-form">
             <div class="step-wrapper" id="step1">
-
                 <div class="step-icon">
                     <i class="icon-user"></i>
                 </div>
-
                 <div class="center step-container">
-
                     <h1 class="step-title">{% trans %}Administrator Account{% endtrans %}</h1>
-
                     <div class="step-description">
                         <div>{% trans %}Insert here all basic information needed to create your account.{% endtrans %}</div>
                         <div class="additional-information">{% trans %}You can change any extra parameters (like your address or phone number) afterwards by accessing "Account Details" (from "My Profile").{% endtrans %}</div>
                     </div>
-
                     <div class="fields-container">
                         {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'username', 'password', 'confirm_password'),
                                      placeholder=True) }}
                     </div>
-
                 </div>
             </div>
 
             <div class="step-wrapper" id="step2">
-
                 <div class="step-icon">
                     <i class="icon-earth"></i>
                 </div>
-
                 <div class="center step-container">
-
                     <h1 class="step-title">{% trans %}Site configuration{% endtrans %}</h1>
-
                     <div class="step-description">
                         <div>{% trans %}These are the default parameters for your Indico site.{% endtrans %}</div>
                         <div class="additional-information">{% trans %}Please note that this information will also be used for your own user profile. You can change it later.{% endtrans %}</div>
                     </div>
-
                     <div class="fields-container">
                         {{ form_rows(form, fields=('language', 'timezone', 'affiliation'), placeholder=True) }}
                     </div>
@@ -79,15 +67,11 @@
             </div>
 
             <div class="step-wrapper" id="step3">
-
                 <div class="step-icon">
                     <i class="icon-mail"></i>
                 </div>
-
                 <div class="center step-container">
-
                     <h1 class="step-title">{% trans %}Let us know you exist!{% endtrans %}</h1>
-
                     <div class="step-description">
                             <div>{% trans %}Be part of the ever growing Indico community! Choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.{% endtrans %}</div>
                             <div>
@@ -100,18 +84,23 @@
                             </div>
                             <div>{% trans %}Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime (from "Server Admin", "Services", "Instance Tracking").{% endtrans %}</div>
                     </div>
-
                     <div class="fields-container">
                         {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=True) }}
                     </div>
                 </div>
             </div>
-        {% call form_footer() %}
-            <a id="submit-initial-setup" class="i-button blue-button big-button">
-                {% trans %}Finish{% endtrans %}
-            </a>
-        {% endcall %}
+
+            <div class="step-wrapper" id="step4">
+                <div class="center step-container">
+                    <div class="step-description">
+                        {% call form_footer() %}
+                            <a id="submit-initial-setup" class="i-button highlight big">
+                                {% trans %}Finish{% endtrans %}
+                            </a>
+                        {% endcall %}
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-
-
 {% endblock %}
