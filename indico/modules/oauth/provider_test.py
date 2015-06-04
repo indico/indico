@@ -40,12 +40,12 @@ def token_data():
 
 
 @pytest.fixture
-def create_request(dummy_application, create_user):
+def create_request(dummy_application, dummy_user):
     def _create_request(implicit=False):
         request = MagicMock()
         request.grant_type = 'authorization_code' if not implicit else None
         request.client.client_id = dummy_application.client_id
-        request.user = create_user(1, legacy=False)
+        request.user = dummy_user
         return request
     return _create_request
 
@@ -122,7 +122,7 @@ def test_load_token_disabled_app(dummy_application, dummy_token, token_data, app
 @pytest.mark.parametrize('implicit', (True, False))
 def test_save_token(create_request, create_user, token_data, implicit):
     request = create_request(implicit=implicit)
-    session.user = create_user(1337, legacy=False)
+    session.user = create_user(1)
     token = save_token(token_data, request)
     assert request.user != session.user
     assert token.user == session.user if implicit else request.user

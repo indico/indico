@@ -89,18 +89,17 @@ def test_get_all_acls():
 
 @pytest.mark.usefixtures('db')
 def test_acls(dummy_user, create_user):
-    user = dummy_user.user
-    other_user = create_user(123, legacy=False)
+    other_user = create_user(123)
     proxy = SettingsProxy('foo', acls={'acl'})
     assert proxy.acls.get('acl') == set()
-    proxy.acls.set('acl', {user})
-    assert proxy.acls.get('acl') == {user}
-    assert proxy.acls.contains_user('acl', user)
+    proxy.acls.set('acl', {dummy_user})
+    assert proxy.acls.get('acl') == {dummy_user}
+    assert proxy.acls.contains_user('acl', dummy_user)
     assert not proxy.acls.contains_user('acl', other_user)
     proxy.acls.add_principal('acl', other_user)
     assert proxy.acls.contains_user('acl', other_user)
-    assert proxy.acls.get('acl') == {user, other_user}
-    proxy.acls.remove_principal('acl', user)
+    assert proxy.acls.get('acl') == {dummy_user, other_user}
+    proxy.acls.remove_principal('acl', dummy_user)
     assert proxy.acls.get('acl') == {other_user}
 
 

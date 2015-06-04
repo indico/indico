@@ -51,7 +51,7 @@ def dummy_location(db, create_location):
 
 
 @pytest.yield_fixture
-def create_reservation(db, dummy_room, dummy_user):
+def create_reservation(db, dummy_room, dummy_avatar):
     """Returns a callable which lets you create reservations"""
     _reservations = set()
 
@@ -60,12 +60,12 @@ def create_reservation(db, dummy_room, dummy_user):
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
         params.setdefault('repeat_frequency', RepeatFrequency.NEVER)
         params.setdefault('repeat_interval', int(params['repeat_frequency'] != RepeatFrequency.NEVER))
-        params.setdefault('contact_email', dummy_user.email)
+        params.setdefault('contact_email', dummy_avatar.email)
         params.setdefault('is_accepted', True)
         params.setdefault('booking_reason', u'Testing')
         params.setdefault('room', dummy_room)
-        params.setdefault('booked_for_user', dummy_user.user)
-        params.setdefault('created_by_user', dummy_user.user)
+        params.setdefault('booked_for_user', dummy_avatar.user)
+        params.setdefault('created_by_user', dummy_avatar.user)
         reservation = Reservation(**params)
         reservation.create_occurrences(skip_conflicts=False)
         db.session.add(reservation)
@@ -110,7 +110,7 @@ def dummy_occurrence(create_occurrence):
 
 
 @pytest.yield_fixture
-def create_room(db, dummy_location, dummy_user):
+def create_room(db, dummy_location, dummy_avatar):
     """Returns a callable which lets you create rooms"""
     _rooms = set()
 
@@ -119,7 +119,7 @@ def create_room(db, dummy_location, dummy_user):
         params.setdefault('floor', u'2')
         params.setdefault('number', u'3')
         params.setdefault('name', '')
-        params.setdefault('owner', dummy_user.user)
+        params.setdefault('owner', dummy_avatar.user)
         params.setdefault('location', dummy_location)
         room = Room(**params)
         room.update_name()
@@ -172,7 +172,7 @@ def create_equipment_type(db, dummy_location):
 
 
 @pytest.yield_fixture
-def create_blocking(db, dummy_room, dummy_user):
+def create_blocking(db, dummy_room, dummy_avatar):
     """Returns a callable which lets you create blockings"""
     _blockings = set()
 
@@ -182,7 +182,7 @@ def create_blocking(db, dummy_room, dummy_user):
         params.setdefault('start_date', date.today())
         params.setdefault('end_date', date.today())
         params.setdefault('reason', u'Blocked')
-        params.setdefault('created_by_user', dummy_user.user)
+        params.setdefault('created_by_user', dummy_avatar.user)
         blocking = Blocking(**params)
         if room is not None:
             br = BlockedRoom(room=room, state=state, blocking=blocking)

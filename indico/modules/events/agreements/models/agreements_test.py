@@ -108,7 +108,7 @@ def test_locator():
 @pytest.mark.parametrize('person_with_user', (True, False))
 def test_create_from_data(dummy_event, dummy_person, dummy_user, person_with_user):
     type_ = 'dummy'
-    dummy_person.user = dummy_user.user if person_with_user else None
+    dummy_person.user = dummy_user if person_with_user else None
     agreement = Agreement.create_from_data(event=dummy_event, type_=type_, person=dummy_person)
     assert agreement.event == dummy_event
     assert agreement.type == type_

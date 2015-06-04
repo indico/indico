@@ -40,12 +40,12 @@ def create_application(db, dummy_event, dummy_registrant):
 
 
 @pytest.fixture
-def create_token(db, dummy_application, create_user):
+def create_token(db, dummy_application, dummy_user):
     """Returns a callable which lets you create tokens"""
 
     def _create_tokens(**params):
         params.setdefault('access_token', unicode(uuid4()))
-        params.setdefault('user', create_user(1, legacy=False))
+        params.setdefault('user', dummy_user)
         params.setdefault('application', dummy_application)
         params.setdefault('scopes', ['read:api', 'write:api'])
         token = OAuthToken(**params)

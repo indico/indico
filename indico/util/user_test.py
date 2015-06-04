@@ -27,9 +27,9 @@ def test_iter_acl():
     assert list(iter_acl(iter(acl))) == [user, local_group, remote_group]
 
 
-def test_unify_user_args_new(dummy_user):
-    avatar = dummy_user
-    user = dummy_user.user
+def test_unify_user_args_new(dummy_avatar):
+    avatar = dummy_avatar
+    user = dummy_avatar.user
 
     @unify_user_args
     def fn(a, b, c, d, e, f):
@@ -45,9 +45,9 @@ def test_unify_user_args_new(dummy_user):
     fn('foo', user, avatar, d='bar', e=user, f=avatar)
 
 
-def test_unify_user_args_legacy(dummy_user):
-    avatar = dummy_user
-    user = dummy_user.user
+def test_unify_user_args_legacy(dummy_avatar):
+    avatar = dummy_avatar
+    user = dummy_avatar.user
 
     @unify_user_args(legacy=True)
     def fn(a, b, c, d, e, f):

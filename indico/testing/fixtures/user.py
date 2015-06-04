@@ -16,7 +16,6 @@
 
 import pytest
 
-from indico.modules.groups import GroupProxy
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.rb import settings as rb_settings
 from indico.modules.users import User
@@ -28,7 +27,7 @@ def create_user(db):
     _users = set()
 
     def _create_user(id_, first_name=u'Guinea', last_name=u'Pig', rb_admin=False, admin=False, email=None, groups=None,
-                     legacy=True):
+                     legacy=False):
         user = User.get(id_)
         if user:
             return user.as_avatar if legacy else user
@@ -55,8 +54,14 @@ def create_user(db):
 
 @pytest.fixture
 def dummy_user(create_user):
-    """Creates a mocked dummy avatar"""
-    return create_user(1337)
+    """Creates a mocked used"""
+    return create_user(1337, legacy=False)
+
+
+@pytest.fixture
+def dummy_avatar(dummy_user):
+    """Creates a mocked dummy legacy avatar"""
+    return dummy_user.as_avatar
 
 
 @pytest.yield_fixture
