@@ -110,7 +110,7 @@ class OAuthApplication(db.Model):
         return {'id': self.id}
 
     @return_ascii
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return '<OAuthApplication({}, {}, {})>'.format(self.id, self.name, self.client_id)
 
     def reset_client_secret(self):

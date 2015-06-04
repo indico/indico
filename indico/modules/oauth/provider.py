@@ -47,7 +47,7 @@ def load_client(client_id):
 
 
 @oauth.grantgetter
-def load_grant(client_id, code):
+def load_grant(client_id, code):  # pragma: no cover
     return OAuthGrant.get(client_id, code)
 
 
