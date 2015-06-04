@@ -88,7 +88,6 @@ class IndicoCelery(Celery):
         self.conf.update(cfg.getCeleryConfig())
         assert self.flask_app is None or self.flask_app is app
         self.flask_app = app
-        self.loader.import_default_modules()  # load all tasks
 
     def periodic_task(self, *args, **kwargs):
         """Decorator to register a periodic task.
