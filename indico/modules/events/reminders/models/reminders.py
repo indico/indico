@@ -169,7 +169,7 @@ class EventReminder(db.Model):
             logger.info('Notification {} has no recipients; not sending anything'.format(self))
             return
         email_tpl = make_reminder_email(event, self.include_summary, self.message)
-        email = make_email(bcc_list=recipients, reply_address=self.reply_to_address, template=email_tpl)
+        email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
         send_email(email, event, 'Reminder', self.creator)
 
     @return_ascii

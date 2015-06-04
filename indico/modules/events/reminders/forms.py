@@ -58,8 +58,8 @@ class ReminderForm(IndicoForm):
                                         description=_('Send the reminder to all participants/registrants '
                                                       'of the event.'))
     # Misc
-    reply_to_address = SelectField(_('Reply-to'), [DataRequired()],
-                                   description=_('The email address users may send replies to.'))
+    reply_to_address = SelectField(_('Sender'), [DataRequired()],
+                                   description=_('The email address that will show up as the sender.'))
     message = TextAreaField(_('Note'), description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
                                    description=_("Includes a simple text version of the event's agenda in the email."))
