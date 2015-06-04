@@ -20,24 +20,6 @@
 </h1>
 <div class="sessionMainContent abstractMainContent">
     <div class="sessionRightPanel abstractRightPanel">
-        <% location = session.getLocation() %>
-        <% room = session.getRoom() %>
-        % if (room and room.getName()) or location:
-            <div class="sessionRightPanelSection">
-                <h2 class="sessionSectionTitle">${_("Place")}</h2>
-                <div>
-                % if location:
-                    <div><span style="font-weight:bold">${_("Location")}: </span>${location.getName()}</div>
-                    % if location.getAddress() is not None and location.getAddress() != "":
-                        <div><span style="font-weight:bold">${_("Address")}: </span>${location.getAddress()}</div>
-                    % endif
-                % endif
-                % if room and room.getName():
-                    <div><span style="font-weight:bold">${_("Room")}: </span>${linking.RoomLinker().getHTMLLink(room, location)}</div>
-                % endif
-                </div>
-            </div>
-        % endif
         <% canEditFiles = self_._aw.getUser() and session.canModify(self_._aw) %>
         % if session.getAllMaterialList() or canEditFiles:
             <div class="sessionRightPanelSection" style="border: none;">
