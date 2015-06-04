@@ -14,93 +14,99 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import transaction
 from operator import itemgetter
 
-from flask import render_template, request, session
-from pytz import common_timezones
-from tzlocal import get_localzone
+from flask import flash, redirect, render_template, request, session
+from markupsafe import Markup
 from wtforms import validators, TextField, SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh import services
-from MaKaC.webinterface.pages import signIn
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import AccessError, FormValuesError
 
+from indico.core.config import Config
+from indico.core.db import db
+from indico.modules.auth import Identity, login_user
 from indico.modules.auth.forms import LocalRegistrationForm
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales, parse_locale
+from indico.util.string import to_unicode
+from indico.web.flask.util import url_for
 from indico.web.forms.validators import UsedIfChecked
 from indico.web.forms.widgets import SwitchWidget
 
+# TODO: set the time zone  here once communities settings are available.
+
 
 class RHInitialSetup(RH):
-
-    def _setUserData(self, av, setup_form):
-        av.setName(setup_form.name.data)
-        av.setSurName(setup_form.surname.data)
-        av.setOrganisation(setup_form.organisation.data)
-        av.setEmail(setup_form.user_email.data)
-        av.setTimezone(setup_form.timezone.data)
-        av.setLang(setup_form.language.data)
 
     def _checkProtection(self):
         if User.query.count() > 0:
             raise AccessError
 
-    def _checkParams_POST(self):
-        self._enable = 'enable' in request.form
-
     def _process_GET(self):
         return render_template('initial_setup.html',
                                selected_lang_name=parse_locale(session.lang).language_name,
                                language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
-                               form=InitialSetupForm(timezone=str(get_localzone()), language=session.lang))
+                               form=InitialSetupForm(language=session.lang),
+                               timezone=Config.getInstance().getDefaultTimezone())
 
     def _process_POST(self):
         setup_form = InitialSetupForm(request.form)
         if not setup_form.validate():
             print setup_form.errors
             raise FormValuesError(_("Some fields are invalid. Please, correct them and submit the form again."))
-        # Creating new user
 
-        authManager = AuthenticatorMgr()
-        self._setUserData(av, setup_form)
-        ah.add(av)
-        li = LoginInfo(setup_form.login.data, setup_form.password.data.encode('UTF8'))
-        identity = authManager.createIdentity(li, av, "Local")
-        authManager.add(identity)
-        # Activating new account
-        av.activateAccount()
-        # Granting admin priviledges
-        al = AdminList().getInstance()
-        al.grant(av)
+        # Creating new user
+        user = User()
+        user.first_name = to_unicode(setup_form.first_name.data)
+        user.last_name = to_unicode(setup_form.last_name.data)
+        user.affiliation = to_unicode(setup_form.affiliation.data)
+        user.email = to_unicode(setup_form.email.data)
+        user.is_admin = True
+        user.settings.set('timezone', Config.getInstance().getDefaultTimezone())
+        user.settings.set('lang', to_unicode(setup_form.language.data))
+
+        identity = Identity(provider='indico', identifier=setup_form.username.data, password=setup_form.password.data)
+        user.identities.add(identity)
+        full_name = user.full_name  # needed after the session closes
+
+        login_user(user, identity)
+        db.session.add(user)
+        transaction.commit()
+
         # Configuring server's settings
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        minfo.setOrganisation(setup_form.organisation.data)
-        minfo.setTimezone(setup_form.timezone.data)
+        minfo.setOrganisation(setup_form.affiliation.data)
         minfo.setLang(setup_form.language.data)
-        if self._enable:
+        if setup_form.enable_tracking.data:
             # Posting a request to the server with the data
             services.register_instance(setup_form.it_contact.data, setup_form.it_email.data)
 
-        p = signIn.WPAdminCreated(self, av)
-        return p.display()
+        flash(Markup(
+            _("Congrats {name}, Indico is now ready and you are logged in with your new administration account!<br>"
+              "Don't forget to tweak <a href=\"{settings_link}\">Indico's settings</a> and update your "
+              "<a href=\"{profile_link}\">profile</a>.").format(
+                name=full_name, settings_link=url_for('admin.adminList'), profile_link=url_for('users.user_dashboard'))
+        ), 'success')
+
+        return redirect(url_for('misc.index'))
 
 
 class InitialSetupForm(LocalRegistrationForm):
     first_name = TextField('First Name', [validators.Required()])
     last_name = TextField('Last Name', [validators.Required()])
     email = EmailField(_('Email address'), [validators.Required()])
-    timezone = SelectField('Timezone', [validators.Required()], choices=[(k, k) for k in common_timezones])
     language = SelectField('Language', [validators.Required()])
-    affiliation = TextField('Organization', [validators.Required()])
+    affiliation = TextField('Affiliation', [validators.Required()])
     enable_tracking = BooleanField('Enable Instance Tracking', widget=SwitchWidget())
     contact_name = TextField('Contact Name',
-                             [UsedIfChecked('enable'), validators.Required()])
+                             [UsedIfChecked('enable_tracking'), validators.Required()])
     contact_email = EmailField('Contact Email Address',
-                               [UsedIfChecked('enable'), validators.Required(), validators.Email()])
+                               [UsedIfChecked('enable_tracking'), validators.Required(), validators.Email()])
 
     def __init__(self, *args, **kwargs):
         super(InitialSetupForm, self).__init__(*args, **kwargs)

@@ -20,12 +20,13 @@
         <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
         <div id="language-selector" class="toolbar language-selector">
             <form id="language-form" method="POST" action="{{ url_for('misc.changeLang') }}">
-                <input id="language-hidden" type="hidden" name="lang">
+                <input id="language-hidden" type="hidden" name="lang" value="{{ session.lang }}">
+                <input type="hidden" name="next" value="{{ url_for('admin.initial-setup') }}">
             </form>
             <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selected_lang_name }}</a>
             <ul class="dropdown">
                 {% for code, lang in language_options -%}
-                    <li id="{{ code }}"><a>{{ lang }}</a></li>
+                    <li class="language-option" data-language-code="{{ code }}"><a>{{ lang }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -59,9 +60,10 @@
                     <div class="step-description">
                         <div>{% trans %}These are the default parameters for your Indico site.{% endtrans %}</div>
                         <div class="additional-information">{% trans %}Please note that this information will also be used for your own user profile. You can change it later.{% endtrans %}</div>
+                        <div class="additional-information">{% trans %}The time zone for the server has been set to {{ timezone }} and can be modified in <span class="mono">indico.conf</span>.{% endtrans %}</div>
                     </div>
                     <div class="fields-container">
-                        {{ form_rows(form, fields=('language', 'timezone', 'affiliation'), placeholder=True) }}
+                        {{ form_rows(form, fields=('language', 'affiliation'), placeholder=True) }}
                     </div>
                 </div>
             </div>
@@ -94,9 +96,7 @@
                 <div class="center step-container">
                     <div class="step-description">
                         {% call form_footer() %}
-                            <a id="submit-initial-setup" class="i-button highlight big">
-                                {% trans %}Finish{% endtrans %}
-                            </a>
+                            <input type="submit" id="submit-initial-setup" class="i-button highlight big" value="{% trans %}Finish{% endtrans %}"/>
                         {% endcall %}
                     </div>
                 </div>
