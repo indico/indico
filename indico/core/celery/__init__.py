@@ -30,6 +30,11 @@ __all__ = ('celery',)
 celery = IndicoCelery('indico')
 
 
+@signals.app_created.connect
+def _load_default_modules(app, **kwargs):
+    celery.loader.import_default_modules()  # load all tasks
+
+
 @import_modules.connect
 def _import_modules(*args, **kwargs):
     signals.import_tasks.send()
