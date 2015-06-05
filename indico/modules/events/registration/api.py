@@ -51,19 +51,22 @@ class RHAPIRegistrant(RH):
         self.event = event
         self.registrant = registrant
 
-    def _get_result(self):
+    def _get_result(self, **kwargs):
         checkin_date = None
         if self.registrant.isCheckedIn():
             checkin_date = format_datetime(self.registrant.getAdjustedCheckInDate(), format='short')
         return jsonify(event_id=self.event.getId(),
                        registrant_id=self.registrant.getId(),
-                       registrant_name=self.registrant.getFullName(title=True, firstNameFirst=True),
+                       full_name=self.registrant.getFullName(title=True, firstNameFirst=True),
                        checked_in=self.registrant.isCheckedIn(),
                        checkin_secret=self.registrant.getCheckInUUID(),
-                       checkin_date=checkin_date)
+                       checkin_date=checkin_date,
+                       **kwargs)
 
     def _process_GET(self):
-        return self._get_result()
+        registration_form = self.event.getRegistrationForm()
+        personal_data = registration_form.getPersonalData().getRegistrantValues(self.registrant)
+        return self._get_result(personal_data=personal_data)
 
     def _process_PATCH(self):
         if request.json is None:
