@@ -78,6 +78,33 @@ class RHAPIRegistrant(RH):
         return self._get_result()
 
 
+class RHAPIRegistrants(RH):
+    """RESTful registrants API"""
+
+    @oauth.require_oauth('registrants')
+    def _checkParams(self):
+        event = ConferenceHolder().getById(request.view_args['event_id'], True)
+        if event is None:
+            raise NotFound("No such event")
+        if not event.canManageRegistration(request.oauth.user):
+            raise Forbidden()
+        self.event = event
+
+    def _process_GET(self):
+        registrants = []
+        for registrant in self.event.getRegistrantsList():
+            regForm = self.event.getRegistrationForm()
+            registrant_entry = {
+                "registrant_id": registrant.getId(),
+                "checked_in": registrant.isCheckedIn(),
+                "full_name": registrant.getFullName(title=True, firstNameFirst=True),
+                "checkin_secret": registrant.getCheckInUUID(),
+                "personal_data": regForm.getPersonalData().getRegistrantValues(registrant)
+            }
+            registrants.append(registrant_entry)
+        return jsonify(registrants=registrants)
+
+
 @HTTPAPIHook.register
 class SetPaidHook(EventBaseHook):
     PREFIX = "api"

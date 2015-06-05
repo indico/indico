@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.registration.api import RHAPIRegistrant
+from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
 from indico.web.flask.wrappers import IndicoBlueprint
 
 event_registration_blueprint = _bp = IndicoBlueprint('event_registration', __name__, template_folder='templates')
@@ -25,3 +25,5 @@ event_registration_blueprint = _bp = IndicoBlueprint('event_registration', __nam
 # API
 _bp.add_url_rule('!/api/events/<event_id>/registrants/<registrant_id>', 'api_registrant',
                  RHAPIRegistrant, methods=('GET', 'PATCH'))
+_bp.add_url_rule('!/api/events/<event_id>/registrants', 'api_registrants',
+                 RHAPIRegistrants)
