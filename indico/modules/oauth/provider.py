@@ -74,11 +74,13 @@ def load_token(access_token, refresh_token=None):
     if not token or not token.application.is_enabled:
         return None
 
+    token_id = token.id  # avoid DetachedInstanceError in the callback
+
     @after_this_request
     def _update_last_use(response):
         with db.tmp_session() as sess:
             # do not modify `token` directly, it's attached to a different session!
-            sess.query(OAuthToken).filter_by(id=token.id).update({OAuthToken.last_used_dt: now_utc()})
+            sess.query(OAuthToken).filter_by(id=token_id).update({OAuthToken.last_used_dt: now_utc()})
             sess.commit()
         return response
 
