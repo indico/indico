@@ -28,6 +28,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
+from indico.util.string import to_unicode
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import CategoryManager
 
@@ -90,11 +91,11 @@ def serialize_user(user):
 
 
 def _build_match(column, value, exact):
-    value = value.replace('%', '')
+    value = to_unicode(value).replace('%', '').replace('_', '')
     if exact:
-        return db.func.lower(column) == value.lower()
+        return db.func.indico_unaccent(db.func.lower(column)) == db.func.indico_unaccent(value.lower())
     else:
-        return column.ilike("%{}%".format(value))
+        return db.func.indico_unaccent(column).ilike(db.func.indico_unaccent("%{}%".format(value)))
 
 
 def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
