@@ -175,7 +175,7 @@ class WAdmins(wcomponents.WTemplated):
         icon = iconEnabled if minfo.isNewsActive() else iconDisabled
         vars["features"] = i18nformat("""<a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a>""") % (url, icon)
         vars["administrators"] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
-                                                  key=methodcaller('getFullName')))
+                                                  key=methodcaller('getStraightFullName')))
         return vars
 
 
