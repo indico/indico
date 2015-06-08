@@ -85,6 +85,10 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBaseCheckProtection):
 class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
+    def __init__(self, is_manager=False):
+        RHRegistrationFormDisplayBaseCheckProtection.__init__(self)
+        self.is_manager = is_manager
+
     def _checkParams(self, params):
         RHBaseRegistrationForm._checkParams(self, params)
         self._regForm = self._conf.getRegistrationForm()
@@ -92,7 +96,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
         sessionForm = self._regForm.getSessionsForm()
         sessions = sessionForm.getSessionsFromParams(params)
         params["sessions"] = sessions
-        # ACCMMODATION
+        # ACCOMMODATION
         params["accommodationType"] = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodation_type", ""))
         # SOCIAL EVENTS
         socialEventIds = self._normaliseListParam(params.get("socialEvents", []))
@@ -116,7 +120,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
         # Check if the email matches an existing user
         user = get_user_by_email(email)
         avatar = user.as_avatar if user else None
-        if user:
+        if user and not self.is_manager:
             if not session.user:
                 flash(_('The provided email ({email}) is linked to an Indico account. Please sign in with it '
                         'first.').format(email=email), 'error')
@@ -153,7 +157,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
 
         notify_registration_confirmation(self._conf, rp)
 
-        if canManageRegistration and user != session.user:
+        if self.is_manager:
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
         else:
             params = {}

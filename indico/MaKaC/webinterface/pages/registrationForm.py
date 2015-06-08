@@ -756,7 +756,7 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
-        return wc.getHTML()
+        return wc.getHTML(params)
 
     def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
@@ -788,7 +788,10 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         wvars["body_title"] = self._getTitle()
         wvars["title_regform"] = regForm.getTitle()
         wvars["currency"] = payment_event_settings.get(self._conf, 'currency')
-        wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
+        if wvars.get('manager'):
+            wvars['postURL'] = quoteattr(url_for('event_mgmt.confModifRegistrants-newRegistrant-save', self._conf))
+        else:
+            wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
         wvars["conf"] = self._conf
         wvars['sections'] = fossilize(section for section in self.getSections() if section.isEnabled())
         return wvars

@@ -119,6 +119,8 @@ event_mgmt.add_url_rule('/registration/users/email/send', 'EMail-sendreg', regis
                         methods=('POST',))
 event_mgmt.add_url_rule('/registration/users/new', 'confModifRegistrants-newRegistrant',
                         registrantsModif.RHRegistrantNewForm, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/registration/users/new/save', 'confModifRegistrants-newRegistrant-save',
+                        registrantsModif.RHRegistrantNewFormSave, methods=('POST',))
 event_mgmt.add_url_rule('/registration/users/remove', 'confModifRegistrants-remove',
                         registrantsModif.RHRegistrantListRemove, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/registration/users/<registrantId>/', 'confModifRegistrants-modification',

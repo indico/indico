@@ -313,8 +313,15 @@ class RHRegistrantNewForm(RHRegistrantListModifBase):
         RHRegistrantListModifBase._checkParams(self, params)
 
     def _process(self):
-        p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
+        p = registrationForm.WPRegistrationFormDisplay(self, self._conf, manager=True)
         return p.display()
+
+
+class RHRegistrantNewFormSave(object):
+    def process(self, params):
+        from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormCreation
+        return RHRegistrationFormCreation(is_manager=True).process(params)
+
 
 class RHRegistrantListRemove(RHRegistrantListModifBase):
 
