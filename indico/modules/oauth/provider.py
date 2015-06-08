@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from flask import session, after_this_request
+from flask import session, after_this_request, g
 from oauthlib.oauth2 import FatalClientError, InvalidClientIdError
 
 from indico.core.db import db
@@ -65,6 +65,10 @@ def save_grant(client_id, code, request, *args, **kwargs):
 def load_token(access_token, refresh_token=None):
     if not access_token:
         return None
+    # ugly hack so we can know in other places that we received a token
+    # e.g. to show an error if there was an invalid token specified but
+    # not if there was no token at all
+    g.received_oauth_token = True
     try:
         UUID(hex=access_token)
     except ValueError:

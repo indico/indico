@@ -27,9 +27,9 @@ import urllib
 from uuid import UUID
 
 import transaction
-from flask import request, session
+from flask import request, session, g
 from urlparse import parse_qs
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.db import DBMgr
 from indico.core.config import Config
@@ -157,6 +157,10 @@ def handler(prefix, path):
     scope = 'read:legacy_api' if request.method == 'GET' else 'write:legacy_api'
     try:
         oauth_valid, oauth_request = oauth.verify_request([scope])
+        if not oauth_valid and oauth_request and oauth_request.error_message != 'Bearer token not found.':
+            raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
+        elif g.get('received_oauth_token') and oauth_request.error_message == 'Bearer token not found.':
+            raise BadRequest('OAuth error: Invalid token')
     except ValueError:
         # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
         #      not to properly urlencode request query strings
