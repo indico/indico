@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.util.string import return_ascii
 
 
@@ -47,3 +48,6 @@ class UserAffiliation(db.Model):
     @return_ascii
     def __repr__(self):
         return '<UserAffiliation({}, {}, {})>'.format(self.id, self.name, self.user)
+
+
+define_unaccented_lowercase_index(UserAffiliation.name)

@@ -28,6 +28,7 @@ from werkzeug.utils import cached_property
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
@@ -506,3 +507,9 @@ def _user_deleted(target, value, *unused):
         target._primary_email.is_user_deleted = value
     for email in target._secondary_emails:
         email.is_user_deleted = value
+
+
+define_unaccented_lowercase_index(User.first_name)
+define_unaccented_lowercase_index(User.last_name)
+define_unaccented_lowercase_index(User.phone)
+define_unaccented_lowercase_index(User.address)
