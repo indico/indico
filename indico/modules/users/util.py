@@ -91,11 +91,12 @@ def serialize_user(user):
 
 
 def _build_match(column, value, exact):
-    value = to_unicode(value).replace('%', '').replace('_', '')
-    if exact:
-        return db.func.indico_unaccent(db.func.lower(column)) == db.func.indico_unaccent(value.lower())
-    else:
-        return db.func.indico_unaccent(column).ilike(db.func.indico_unaccent("%{}%".format(value)))
+    value = to_unicode(value).replace('%', r'\%').replace('_', r'\%').lower()
+    if not exact:
+        value = '%{}%'.format(value)
+    # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is
+    # actually faster than `=`
+    return db.func.indico_unaccent(db.func.lower(column)).ilike(db.func.indico_unaccent(value))
 
 
 def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
