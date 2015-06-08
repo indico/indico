@@ -66,6 +66,8 @@ class RHAPIRegistrant(RH):
         return self._get_result()
 
     def _process_PATCH(self):
+        if request.json is None:
+            raise BadRequest('Expected JSON payload')
         invalid_fields = request.json.viewkeys() - {'checked_in'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
