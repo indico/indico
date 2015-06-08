@@ -31,9 +31,10 @@ from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
 
+from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
+
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
 from indico.core.db.sqlalchemy.util.models import IndicoModel
-
 flask_sqlalchemy.Model = IndicoModel
 
 
@@ -80,6 +81,8 @@ def _before_create(target, connection, **kw):
     schemas = {table.schema for table in kw['tables']}
     for schema in schemas:
         CreateSchema(schema).execute_if(callable_=_should_create_schema).execute(connection)
+    # Create the indico_unaccent function
+    create_unaccent_function(connection)
 
 
 def _mapper_configured(mapper, class_):

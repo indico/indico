@@ -68,3 +68,8 @@ def escape_like(value):
 def preprocess_ts_string(text, prefix=True):
     atoms = [TS_REGEX.sub(r'\\\1', atom.strip()) for atom in text.split()]
     return ' & '.join('{}:*'.format(atom) if prefix else atom for atom in atoms)
+
+
+def has_extension(conn, name):
+    """Checks if the postgres database has a certain extension installed"""
+    return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()

@@ -8,15 +8,12 @@ Create Date: 2015-06-08 12:44:42.485227
 import sqlalchemy as sa
 from alembic import op, context
 
+from indico.core.db.sqlalchemy.util.queries import has_extension
+
 
 # revision identifiers, used by Alembic.
 revision = 'a2dfbb4b85c'
 down_revision = '4074211727ba'
-
-
-def _has_extension(name):
-    conn = op.get_bind()
-    return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()
 
 
 def _create_index(has_trgm, table, column):
@@ -33,7 +30,7 @@ def upgrade():
     if context.is_offline_mode():
         raise Exception('This upgrade is only possible in online mode')
 
-    has_trgm = _has_extension('pg_trgm')
+    has_trgm = has_extension(op.get_bind(), 'pg_trgm')
     if has_trgm:
         print 'pg_trgm extension is available - creating trigram indexes'
     else:
