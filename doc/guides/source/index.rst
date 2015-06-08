@@ -15,7 +15,6 @@ Contents:
    ./QuickStartGuides/index.rst
    ./PaperReviewingGuides/index.rst
    ./Importer/Importer.rst
-   ./Statistics/index.rst
    ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
