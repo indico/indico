@@ -42,6 +42,14 @@ def upgrade():
     op.drop_column('blocking_principals', 'principal', schema='roombooking')
     op.create_index(None, 'blocking_principals', ['local_group_id'], schema='roombooking')
     op.create_index(None, 'blocking_principals', ['user_id'], schema='roombooking')
+    op.create_foreign_key(None,
+                          'blocking_principals', 'users',
+                          ['user_id'], ['id'],
+                          source_schema='roombooking', referent_schema='users')
+    op.create_foreign_key(None,
+                          'blocking_principals', 'groups',
+                          ['local_group_id'], ['id'],
+                          source_schema='roombooking', referent_schema='users')
 
 
 def downgrade():
