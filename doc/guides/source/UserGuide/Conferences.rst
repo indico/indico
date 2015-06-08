@@ -1289,19 +1289,6 @@ This is where you set up the reviewing for the conference. The tabs
 contain all the options described above put together; see :ref:`content_reviewing`
 and :ref:`layout_reviewing`
 
---------------
-
-Chat room
-~~~~~~~~~
-
-See :ref:`chat_room` in Lectures.
-
---------------
-
-Video Services
-~~~~~~~~~~~~~~
-
-See :ref:`video_services` in Lectures.
 
 --------------
 

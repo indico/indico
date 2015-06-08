@@ -126,19 +126,6 @@ by clicking on |image144| or to delete it by clicking on |image145|.
 
 |image143|
 
---------------
-
-Chat rooms
-~~~~~~~~~~
-
-Similar to lectures; see :ref:`chat_room` for lectures.
-
---------------
-
-Video Services
-~~~~~~~~~~~~~~
-
-Similar to lectures; see :ref:`video_services` for lectures
 
 --------------
 
