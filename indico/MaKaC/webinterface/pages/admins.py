@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
 import os
 import re
 from cgi import escape
 from operator import methodcaller
+from urlparse import urljoin
 
 from pytz import timezone
 
@@ -40,6 +40,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from indico.core import signals
 from indico.core.config import Config
 from indico.modules import ModuleHolder
+from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.users import User
 from indico.util.i18n import _, i18nformat, get_all_locales
 from indico.util.signals import values_from_signal
@@ -172,13 +173,13 @@ class WAdmins(wcomponents.WTemplated):
                                        'style="float:left; padding-right: 5px">_("News Pages")</a>').format(url, icon)
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
-
-        wvars["itActive"] = minfo.isInstanceTrackingActive()
-        wvars["uuid"] = minfo.getInstanceTrackingUUID()
-        wvars["url"] = Config.getInstance().getBaseURL()
-        wvars["contact"] = minfo.getInstanceTrackingContact()
-        wvars["itEmail"] = minfo.getInstanceTrackingEmail()
-        wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
+        wvars['tracker_url'] = urljoin(Config.getInstance().getTrackerURL(),
+                                       'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        wvars['cephalopod_data'] = {'enabled': cephalopod_settings.get('tracked'),
+                                    'contact': cephalopod_settings.get('contact_name'),
+                                    'email': cephalopod_settings.get('contact_email'),
+                                    'url': Config.getInstance().getBaseURL(),
+                                    'organisation': minfo.getOrganisation()}
         return wvars
 
 
@@ -204,13 +205,16 @@ class WAdminFrame(wcomponents.WTemplated):
 
 class WPAdmins(WPAdminsBase):
 
+    def getJSFiles(self):
+        # Cephalopod is needed to check if the data is synced.
+        return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
+
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive()
 
     def _getPageContent(self, params):
         wc = WAdmins()
-        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(),
-                "UpdateITURL": url_for("admin.adminServices-instanceTracking")}
+        pars = {'GeneralInfoModifURL': urlHandlers.UHGeneralInfoModification.getURL()}
         return wc.getHTML(pars)
 
 

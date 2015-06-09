@@ -376,6 +376,7 @@ base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jqu
                  indico_core, indico_legacy, indico_common)
 
 module_js = {
+    'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
     'event_display': rjs_bundle('modules_event_display', 'js/indico/modules/eventdisplay.js'),
     'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js')

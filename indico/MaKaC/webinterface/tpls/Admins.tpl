@@ -10,13 +10,6 @@
 
 <div class="groupTitle">${ _("General System Information") }</div>
 
-<div class="warning-message-box out-of-sync-popup admin-popup">
-    <div class="message-text">${ _('Instance Tracking data out of sync!') }</div>
-    <div class="group">
-        <a id="button-learn-more" class="i-button" href="#">${ _('Learn more') }</a>
-    </div>
-</div>
-
 <table class="groupTable">
 <tr>
   <td>
@@ -100,37 +93,24 @@
 </table>
 
 <script>
-    var adminListManager = new ListOfUsersManager(null,
-            {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
-            {}, $E('inPlaceAdministrators'), "administrator", "item-user", false, {}, {title: false, affiliation: false, email:true},
-            {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j}, null, null, null, false);
+    $(function() {
+        var adminListManager = new ListOfUsersManager(null, {
+                'addExisting': 'admin.general.addExistingAdmin',
+                'remove'     : 'admin.general.removeAdmin'
+            }, {}, $E('inPlaceAdministrators'), "administrator", "item-user", false, {}, {
+                title      : false,
+                affiliation: false,
+                email      :true
+            }, {
+                remove  : true,
+                edit    : false,
+                favorite: true,
+                arrows  : false,
+                menu    : false }, ${ administrators | n,j}, null, null, null, false);
 
-    % if itActive:
-        var outOfSyncMessage = $('.out-of-sync-popup');
-        $.ajax({
-            url: "${ updateURL }${ uuid }",
-            type: "GET",
-            dataType: "json",
-            success: function(response){
-                var url = ${ url | n,j };
-                var contact = ${ contact | n,j };
-                var email = ${ itEmail | n,j };
-                var organisation = ${ organisation | n,j };
-                var enabled = ${ itActive | n,j };
-
-                if (url != response.url || contact != response.contact || email != response.email || organisation != response.organisation || enabled != response.enabled) {
-                    outOfSyncMessage.show();
-                }
-            },
-            error: function(){
-                outOfSyncMessage.show();
-            }
-        });
+    % if cephalopod_data['enabled']:
+        initCephalopodOnAdminPage(${ tracker_url|n,j }, ${ cephalopod_data|n,j }, ${ url_for('cephalopod.index')|n,j });
     % endif
-
-    $('#button-learn-more').on('click', function(e){
-        e.preventDefault();
-        location.href = ${ url_for('admin.adminServices-instanceTracking') | n,j };
     });
 
 </script>
