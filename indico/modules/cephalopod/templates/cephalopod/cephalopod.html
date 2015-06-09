@@ -1,0 +1,56 @@
+{% extends 'layout/base.html' %}
+
+{% from 'forms/_form.html' import form_footer, form_header, form_row_static, form_rows %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}{% trans %}Instance Tracking{% endtrans %}{% endblock %}
+
+{% block content %}
+    <span id="cephalopod-data" class="hidden" data-tracker-url="{{ tracker_url }}"></span>
+
+    {{ form_header(id='cephalopod-form')}}
+    {{ form_rows(form, fields=('tracked', 'contact_name', 'contact_email')) }}
+    {% call form_row_static(_('URL')) %}
+        <span id="instance-url" class="mono">{{ instnace_url }}</span>
+        <p class="form-field-description"><em>{% trans %}URL of your Indico instance{% endtrans %}</em></p>
+    {% endcall %}
+    {% call form_row_static(_('Affiliation')) %}
+        <span id="affiliation">{{ affiliation }}</span>
+        <p class="form-field-description"><em>{% trans %}Affiliation of your Indico instance{% endtrans %}</em></p>
+    {% endcall %}
+    {% if enabled %}
+        {% call form_row_static(_('Status')) %}
+            <span id="tracking-status"><span class="icon-spinner"></span></span>
+        {% endcall %}
+    {% endif %}
+    {% call form_footer() %}
+            <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+            <button id="sync-button" class="i-button big" {%- if not enabled %} disabled{% endif %}>
+                <span class="icon-loop"> {% trans %}Sync{% endtrans %}</span>
+            </button>
+    {% endcall %}
+
+    {% call message_box('info', fixed_width=true) %}
+        <h3>{% trans %}Let us know that you exist!{% endtrans %}</h3>
+        {% trans %}By enabling this service you will receive updated news on latest releases as well as important security warnings.{% endtrans %}<br>
+        {% trans %}The following data will be sent back to us:{% endtrans %}
+        <ul>
+            <li>{% trans %}Contact person{% endtrans %}</li>
+            <li>{% trans %}Contact email{% endtrans %}</li>
+            <li>{% trans %}Server URL{% endtrans %}</li>
+            <li>{% trans %}Name of the organisation{% endtrans %}</li>
+        </ul>
+        {% trans %}Alongside the previous data, the following public information will be periodically collected by us:{% endtrans %}
+        <ul>
+            <li>{% trans %}Server default language{% endtrans %}</li>
+            <li>{% trans %}Indico version installed{% endtrans %}</li>
+            <li>{% trans %}Python version used{% endtrans %}</li>
+            <li>{% trans %}Statistical data (number of events, contributions, etc...){% endtrans %}</li>
+        </ul>
+    {% endcall %}
+    <script>
+        $(function initCephalopod() {
+            initCephalopdOnSettingsPage({{ tracker_url|tojson }});
+        });
+    </script>
+{% endblock %}

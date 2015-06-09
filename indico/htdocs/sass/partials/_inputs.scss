@@ -499,11 +499,13 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
             .static-text {
                 display: block;
-                height: 2.5em;
-                padding: 0.5em 1em 0.5em 0;
+                padding: 0.5em 0.5em 0 0;
                 line-height: 1.5;
                 color: $black;
                 width: 400px;
+                .form-field-description {
+                    color: $light-black;
+                }
             }
 
             :invalid {
