@@ -337,8 +337,6 @@ class WPServicesCommon(WPAdminsBase):
 
         self._subTabIPBasedACL = self._tabCtrl.newTab("ip_based_acl", _("IP Based ACL"),
                                                       urlHandlers.UHIPBasedACL.getURL())
-        self._subTabInstanceTracking = self._tabCtrl.newTab("instance_tracking", _("Instance Tracking"),
-                                                            urlHandlers.UHInstanceTracking.getURL())
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
@@ -1004,37 +1002,6 @@ class WIPBasedACL(wcomponents.WTemplated):
         vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
         vars["removeIcon"] = Config.getInstance().getSystemIconURL("remove")
         return vars
-
-
-class WPInstanceTracking(WPServicesCommon):
-
-    def __init__(self, rh):
-        WPServicesCommon.__init__(self, rh)
-
-    def _getTabContent(self, params):
-        wc = WInstanceTracking()
-        return wc.getHTML(params)
-
-    def _setActiveTab(self):
-        self._subTabInstanceTracking.setActive()
-
-
-class WInstanceTracking(wcomponents.WTemplated):
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        wvars["checked"] = 'checked' if minfo.isInstanceTrackingActive() else ''
-        wvars["postURL"] = url_for('admin.adminServices-instanceTracking')
-        wvars["contact"] = minfo.getInstanceTrackingContact()
-        wvars["email"] = minfo.getInstanceTrackingEmail()
-        wvars["organisation"] = minfo.getOrganisation()
-        wvars["uuid"] = minfo.getInstanceTrackingUUID()
-        wvars["url"] = Config.getInstance().getBaseURL()
-        wvars["itEnabled"] = minfo.isInstanceTrackingActive()
-        wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
-        return wvars
 
 
 class WPAdminProtection(WPAdminsBase):

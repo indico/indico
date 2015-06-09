@@ -61,12 +61,6 @@ class MaKaCInfo(Persistent):
         self._newsActive = False
         self._debugActive = False
 
-        # Instance Tracking
-        self._instanceTrackingActive = False
-        self._instanceTrackingEmail = ""
-        self._instanceTrackingContact = ""
-        self._instanceTrackingUUID = ""
-
         # template set
         self._defaultTemplateSet = None
 
@@ -113,46 +107,6 @@ class MaKaCInfo(Persistent):
         msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
         warnings.warn(msg, DeprecationWarning, 2)
         return app.debug
-
-    def isInstanceTrackingActive(self):
-        if hasattr(self, "_instanceTrackingActive"):
-            return self._instanceTrackingActive
-        else:
-            self._instanceTrackingActive = False
-            return False
-
-    def setInstanceTrackingActive(self, active=True):
-        self._instanceTrackingActive = active
-
-    def getInstanceTrackingEmail(self):
-        if hasattr(self, "_instanceTrackingEmail"):
-            return self._instanceTrackingEmail
-        else:
-            self._instanceTrackingEmail = ""
-            return ""
-
-    def setInstanceTrackingEmail(self, email=""):
-        self._instanceTrackingEmail = email
-
-    def getInstanceTrackingContact(self):
-        if hasattr(self, "_instanceTrackingContact"):
-            return self._instanceTrackingContact
-        else:
-            self._instanceTrackingContact = ""
-            return ""
-
-    def setInstanceTrackingContact(self, contact=""):
-        self._instanceTrackingContact = contact
-
-    def getInstanceTrackingUUID(self):
-        if hasattr(self, "_instanceTrackingUUID"):
-            return self._instanceTrackingUUID
-        else:
-            self._instanceTrackingUUID = ""
-            return ""
-
-    def setInstanceTrackingUUID(self, uuid=""):
-        self._instanceTrackingUUID = uuid
 
     def getNews( self ):
         try:

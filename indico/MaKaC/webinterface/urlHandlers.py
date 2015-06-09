@@ -1690,14 +1690,6 @@ class UHIPBasedACLFullAccessRevoke(URLHandler):
     _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
 
 
-class UHInstanceTracking(URLHandler):
-    _endpoint = 'admin.adminServices-instanceTracking'
-
-
-class UHITInfoModification(URLHandler):
-    _endpoint = 'admin.adminServices-itInfoModification'
-
-
 class UHBadgeTemplates(URLHandler):
     _endpoint = 'admin.badgeTemplates'
 
