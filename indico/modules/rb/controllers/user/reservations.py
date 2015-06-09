@@ -68,6 +68,8 @@ class _SuccessUrlDetailsMixin:
 
 
 class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         if not self._reservation.can_be_accepted(session.user):
@@ -83,6 +85,8 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         if not self._reservation.can_be_cancelled(session.user):
@@ -96,6 +100,8 @@ class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         self._reason = request.form.get('reason', u'')
@@ -113,6 +119,8 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
@@ -131,6 +139,8 @@ class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
 
 class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()

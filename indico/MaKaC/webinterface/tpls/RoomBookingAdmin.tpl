@@ -31,6 +31,7 @@
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         % if locations:
         <form action="${ urlHandlers.UHRoomBookingDeleteLocation.getURL() }" method="POST">
+          <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
           <p>
             % for loc in locations:
               <input type="radio" name="location_id" value="${ loc.id }">
@@ -43,6 +44,7 @@
         </form>
         % endif
         <form action="${urlHandlers.UHRoomBookingSaveLocation.getURL() }" method="POST">
+          <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
           <p>
             <input type="text" id="newLocationName" name="newLocationName" value="" size="28" />
             <input type="submit" class="i-button" value="${ _('Add') }" />
@@ -57,6 +59,7 @@
       </td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         <form action="${urlHandlers.UHRoomBookingSetDefaultLocation.getURL() }" method="POST">
+          <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
           <select name="location_id" id="defaultLocation">
             % for loc in locations:
               <option value="${ loc.id }" ${' selected' if loc.is_default else ''} >${ loc.name }</option>

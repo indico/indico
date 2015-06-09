@@ -17,7 +17,7 @@
 from collections import defaultdict
 from datetime import date
 
-from flask import flash, request, session
+from flask import flash, request, session, redirect
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
@@ -48,10 +48,9 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
     def _process(self):
         if self._form.validate_on_submit():
             self._save()
-            self._redirect(url_for('rooms.blocking_details', blocking_id=str(self._blocking.id)))
-        else:
-            return WPRoomBookingBlockingForm(self, form=self._form, errors=self._form.error_list,
-                                             blocking=self._blocking).display()
+            return redirect(url_for('rooms.blocking_details', blocking_id=str(self._blocking.id)))
+        return WPRoomBookingBlockingForm(self, form=self._form, errors=self._form.error_list,
+                                         blocking=self._blocking).display()
 
     def _process_blocked_rooms(self, blocked_rooms):
         rooms_by_owner = defaultdict(list)
@@ -136,6 +135,8 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
 
 
 class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         self._block = Blocking.get(request.view_args['blocking_id'])
         if not self._block:
@@ -149,7 +150,7 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
     def _process(self):
         db.session.delete(self._block)
         flash(_(u'Blocking deleted'), 'success')
-        self._redirect(url_for('rooms.blocking_list', only_mine=True, timeframe='recent'))
+        return redirect(url_for('rooms.blocking_list', only_mine=True, timeframe='recent'))
 
 
 class RHRoomBookingBlockingList(RHRoomBookingBase):

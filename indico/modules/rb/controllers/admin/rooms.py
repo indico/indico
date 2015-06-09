@@ -34,7 +34,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.common.cache import GenericCache
-from MaKaC.user import AvatarHolder
 from MaKaC.webinterface import urlHandlers as UH
 
 
@@ -42,6 +41,8 @@ _cache = GenericCache('Rooms')
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         self._room = Room.get(request.view_args['roomID'])
         self._target = self._room

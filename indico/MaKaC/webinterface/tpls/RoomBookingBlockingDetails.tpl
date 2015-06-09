@@ -47,14 +47,14 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td>
                                     % if canModify:
-                                        <form style="display:inline;" action="${ url_for('rooms.modify_blocking', blocking_id=blocking.id) }" method="get">
-                                            <input type="submit" class="btn" value="${ _("Modify")}" />
-                                        </form>
+                                        <a class="i-button" href="${ url_for('rooms.modify_blocking', blocking_id=blocking.id) }">${ _("Modify")}</a>
                                     % endif
                                     % if canDelete:
-                                        <form id="deleteBlockingForm" style="display:inline;" action="${ url_for('rooms.delete_blocking', blocking_id=blocking.id) }" method="post">
-                                            <input type="submit" id="deleteBlocking" class="btn" value="${ _("Delete")}" />
-                                        </form>
+                                        <input type="button" class="i-button" value="${ _("Delete")}"
+                                               data-href="${ url_for('rooms.delete_blocking', blocking_id=blocking.id) }"
+                                               data-method="POST"
+                                               data-title="${ _('Delete blocking?') }"
+                                               data-confirm="${ _('Do you really want to delete this blocking?') }">
                                     % endif
                                 </td>
                             </tr>
@@ -113,15 +113,4 @@
             </td>
         </tr>
     </table>
-    <br />
-
-    <script>
-        $('#deleteBlocking').on('click', function(e) {
-            e.preventDefault();
-            new ConfirmPopup($T('Delete blocking'), $T('Do you really want to DELETE this blocking?'), function(confirmed) {
-                if (confirmed) {
-                    $('#deleteBlockingForm').submit();
-                }
-            }).open();
-        });
-    </script>
+    <br>
