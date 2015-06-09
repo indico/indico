@@ -106,82 +106,18 @@ Users
 The *Users and Groups* option allows you to control and modify any of
 the users accounds and groups.
 
---------------
-
-Manually Creating a User
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-To manually create a new account use the *New User* button in the
-*Users and Groups* menu, *Manage Users* tab. You will be presented
-with the same form as a user creating his own account;
-fill it in and submit it in order to create the account. You will still
-need to activate the account.
 
 --------------
 
 Searching for Users
 ~~~~~~~~~~~~~~~~~~~
 
-You can search for a user by surname, first name, email
-address or organisation. If you are not sure of the full details you
-can enter only one of the options or the first few letters and you will
-be shown all the users that match your search. The Search filter is
-found by clicking on *Users and Groups* > *Manage Users*.
+You can search for a user by surname, first name, email address or organisation.
+If you are not sure of the full details you can enter only one of the options or
+the first few letters and you will be shown all the users that match your
+search. The Search filter is found by clicking on *Users*. User profiles can be
+accessed and modified by clicking on the results.
 
---------------
-
-Manually Activating an Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To activate an account from within the administration area, go to
-the *Users and Groups* option, *Manage Users* tab and search for the user's
-account using the filter. Then select the account you wish to
-activate, this will take you to the user's details:
-
-|image5|
-
-If an account has not been activated its status will be *not
-confirmed*. Click the button *activate the account* next to the status
-in order to activate the account. The account status will then be
-changed to *activated* and the user for that account will now be able
-to log in.
-
---------------
-
-Modifying a User's Account
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-From the Account Details screen above you have the option to modify
-the user's details. From here you are able to modify the user
-affiliation, email address, postal address, telephone number,
-fax number, default timezone, default language, etc.
-
---------------
-
-Creating Additional Logins for a User
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A user may have more than one login (username and password) on
-their account, this can be useful if the user has certain access
-rights with one login but not with another, they can then choose
-which login to use when using Indico.
-
-|image6|
-
-To create a new login account for a user, click on the *create a new
-account* button. This will take you to a screen where you can enter
-a new username and password. Once the new account is added it will
-show in the User Details screen as above.
-
---------------
-
-Deleting Additional Logins
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To delete any additional account login select those accounts for
-that user that you wish to delete and use the *delete selected
-accounts* option from the User Details screen above. However, a user
-must have at least one login account.
 
 --------------
 
@@ -195,15 +131,8 @@ manage an event, you could make a group of Managers for each event
 and then assign each set to an event, as apposed to adding each
 individual user.
 
-To create a new group use the *New Group* feature in the *Users
-and Groups* menu, *Manage Groups* tab. You will be asked for a
-group name and a description.
-
-|image7|
-
-You can then start to add or remove users from the group.
-
-|image8|
+To create a new group use the *Create new Group* feature in the *Groups* menu.
+You will be asked for a group name and users to add.
 
 You can assign a group of users to Access Control in the same way
 as you can add individual users. Once your group(s) is/are created
@@ -354,10 +283,6 @@ For more information type in console ::
 .. |image2| image:: AdminGuidePics/start2.png
 .. |image3| image:: AdminGuidePics/admin1.png
 .. |image4| image:: AdminGuidePics/admin2.png
-.. |image5| image:: AdminGuidePics/admin3.png
-.. |image6| image:: AdminGuidePics/admin4.png
-.. |image7| image:: AdminGuidePics/admin5.png
-.. |image8| image:: AdminGuidePics/admin6.png
 .. |image9| image:: AdminGuidePics/admin7.png
 .. |image10| image:: AdminGuidePics/admin8.png
 .. |image11| image:: AdminGuidePics/admin9.png
