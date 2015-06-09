@@ -12,6 +12,7 @@
 
 <form id="periodForm" method="POST" action="">
     <input type="hidden" name="step" value="2">
+    ${ form.csrf_token() }
     ${ period_form.repeat_frequency(style='display: none;') }
     ${ period_form.repeat_interval(type='hidden') }
     ${ period_form.start_dt(type='hidden') }

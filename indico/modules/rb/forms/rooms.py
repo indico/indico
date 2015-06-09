@@ -16,6 +16,7 @@
 
 import itertools
 from operator import itemgetter
+from wtforms import Form
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.dateutil.fields import DateTimeField
@@ -74,7 +75,7 @@ class SearchRoomsForm(IndicoForm):
     include_pre_bookings = BooleanField(_(u'Check conflicts against pre-bookings'), default=True)
 
 
-class _TimePair(IndicoForm):
+class _TimePair(Form):
     start = TimeField(_(u'from'), [UsedIf(lambda form, field: form.end.data)])
     end = TimeField(_(u'to'), [UsedIf(lambda form, field: form.start.data)])
 
@@ -85,7 +86,7 @@ class _TimePair(IndicoForm):
     validate_end = validate_start
 
 
-class _DateTimePair(IndicoForm):
+class _DateTimePair(Form):
     start = DateTimeField(_(u'from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M',
                           parse_kwargs={'dayfirst': True})
     end = DateTimeField(_(u'to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M',

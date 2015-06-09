@@ -9,6 +9,7 @@
 <%include file="ErrorList.tpl" args='errors=form.error_list, msg=_("There are some errors:")'/>
 
 <form method="post" action="">
+    ${ form.csrf_token() }
     <table>
         % for field in form.visible_fields:
             <tr>

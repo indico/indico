@@ -11,6 +11,7 @@
 <%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria")'/>
 
 <form id="searchForm" method="POST" action="">
+    ${ form.csrf_token() }
     <input type="hidden" name="step" value="1">
 
     <h2 class="group-title">

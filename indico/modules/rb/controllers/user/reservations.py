@@ -162,7 +162,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
     def _checkParams(self):
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.full_name))
         self._form_data = self._get_form_data()
-        self._form = BookingSearchForm(self._form_data)
+        self._form = BookingSearchForm(self._form_data, csrf_enabled=False)
         self._form.room_ids.choices = [(r.id, None) for r in self._rooms]
 
     def _is_submitted(self):
@@ -184,7 +184,8 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
                                                       menu_item=self.menu_item).display()
 
         my_rooms = [r.id for r in Room.get_owned_by(session.user)]
-        return WPRoomBookingSearchBookings(self, errors=form.error_list, rooms=self._rooms, my_rooms=my_rooms).display()
+        return WPRoomBookingSearchBookings(self, errors=form.error_list, rooms=self._rooms, my_rooms=my_rooms,
+                                           form=form).display()
 
 
 class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):

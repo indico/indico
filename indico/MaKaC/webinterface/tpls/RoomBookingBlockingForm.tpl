@@ -19,6 +19,7 @@
 </div>
 
 <form id="blockingForm" method="post">
+    ${ form.csrf_token() }
     ${ form.blocked_rooms() }
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
         <tr>

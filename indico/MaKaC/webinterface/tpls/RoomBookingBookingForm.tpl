@@ -10,6 +10,7 @@
 <%include file="ErrorList.tpl" args='errors=form.error_list, msg=_("There are some errors in the data you submitted")'/>
 
 <form id="bookingForm" method="POST" data-only-conflicts="${ int(only_conflicts) }">
+    ${ form.csrf_token() }
     <h2 class="group-title">
     <i class="icon-location"></i>
         ${ _('Room details') }

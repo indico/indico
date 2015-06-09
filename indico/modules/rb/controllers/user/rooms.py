@@ -85,7 +85,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
 
     def _checkParams(self):
         defaults = FormDefaults(location=Location.default_location)
-        self._form = SearchRoomsForm(self._get_form_data(), obj=defaults)
+        self._form = SearchRoomsForm(self._get_form_data(), obj=defaults, csrf_enabled=False)
         if (not session.user or not Room.user_owns_rooms(session.user)) and not hasattr(self, 'search_criteria'):
             # Remove the form element if the user has no rooms and we are not using a shortcut
             del self._form.is_only_my_rooms

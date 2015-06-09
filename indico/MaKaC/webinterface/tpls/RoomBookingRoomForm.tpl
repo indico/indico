@@ -85,6 +85,7 @@
 <!-- END OF CONTEXT HELP DIVS -->
 
 <form action="" method="post" enctype="multipart/form-data">
+    ${ form.csrf_token() }
     <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
         <tr>
             <td class="formTitle">
