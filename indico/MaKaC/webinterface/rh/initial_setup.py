@@ -19,11 +19,11 @@ from operator import itemgetter
 
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
+from requests.exceptions import HTTPError, Timeout
 from wtforms import validators, TextField, SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh import services
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import AccessError, FormValuesError
 
@@ -31,6 +31,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.auth import Identity, login_user
 from indico.modules.auth.forms import LocalRegistrationForm
+from indico.modules.cephalopod.util import register_instance
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales, parse_locale
 from indico.util.string import to_unicode
@@ -82,9 +83,6 @@ class RHInitialSetup(RH):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         minfo.setOrganisation(setup_form.affiliation.data)
         minfo.setLang(setup_form.language.data)
-        if setup_form.enable_tracking.data:
-            # Posting a request to the server with the data
-            services.register_instance(setup_form.it_contact.data, setup_form.it_email.data)
 
         flash(Markup(
             _("Congrats {name}, Indico is now ready and you are logged in with your new administration account!<br>"
@@ -92,6 +90,21 @@ class RHInitialSetup(RH):
               "<a href=\"{profile_link}\">profile</a>.").format(
                 name=full_name, settings_link=url_for('admin.adminList'), profile_link=url_for('users.user_dashboard'))
         ), 'success')
+
+        # Activate instance tracking
+        if setup_form.enable_tracking.data:
+            contact = setup_form.it_contact.data
+            email = setup_form.it_email.data
+
+            try:
+                register_instance(contact, email)
+            except (HTTPError, ValueError) as err:
+                flash(Markup(_("Instance tracking registration failed with: {err.message}.<br>"
+                               "See the logs for details and try again <a href=\"{link}\">here</a>.").format(
+                                   link=url_for('cephalopod.index'), err=err)), 'error')
+            except Timeout:
+                flash(Markup(_("Instance tracking registration timed-out. Please try again in a while "
+                               "<a href=\"{link}\">here</a>.").format(link=url_for('cephalopod.index'))), 'error')
 
         return redirect(url_for('misc.index'))
 
