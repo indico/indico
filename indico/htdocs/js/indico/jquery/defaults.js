@@ -55,3 +55,13 @@ $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
 $.extend($.colorbox.settings, {
     opacity: 0.6
 });
+
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^https?:.*/.test(settings.url)) {
+            // Add CSRF token to local requests
+            xhr.setRequestHeader('X-CSRF-Token', $('#csrf-token').attr('content'));
+        }
+    }
+});

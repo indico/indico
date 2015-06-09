@@ -138,6 +138,7 @@ $(document).ready(function() {
                     action: url,
                     method: method
                 });
+                form.append($('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')}));
                 $.each(params, function(key, value) {
                     form.append($('<input>', {type: 'hidden', name: key, value: value}));
                 });

@@ -67,6 +67,9 @@ from indico.util.redis import RedisError
 from indico.web.flask.util import ResponseUtil
 
 
+HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
+
+
 class RequestHandlerBase():
 
     _uh = None
@@ -173,8 +176,7 @@ class RH(RequestHandlerBase):
     _tohttps = False  # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
     _doNotSanitizeFields = []
     _isMobile = True  # this value means that the generated web page can be mobile
-
-    HTTP_VERBS = frozenset(('GET', 'PATCH', 'POST', 'PUT', 'DELETE'))
+    CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
 
     def __init__(self):
         self._responseUtil = ResponseUtil()
@@ -288,11 +290,17 @@ class RH(RequestHandlerBase):
         """
         method = getattr(self, '_process_' + request.method, None)
         if method is None:
-            valid_methods = [m for m in self.HTTP_VERBS if hasattr(self, '_process_' + m)]
+            valid_methods = [m for m in HTTP_VERBS if hasattr(self, '_process_' + m)]
             raise MethodNotAllowed(valid_methods)
         return method()
 
     def _checkCSRF(self):
+        token = request.headers.get('X-CSRF-Token', request.form.get('csrf_token'))
+        if self.CSRF_ENABLED and request.method != 'GET' and token != session.csrf_token:
+            msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
+                    u"button, reload the page and try again.")
+            raise BadRequest(msg)
+        # legacy csrf check (referer-based):
         # Check referer for POST requests. We do it here so we can properly use indico's error handling
         if Config.getInstance().getCSRFLevel() < 3 or request.method != 'POST':
             return
@@ -549,7 +557,7 @@ class RH(RequestHandlerBase):
                 Logger.get('redis').exception('Could not execute pipeline')
 
     def process(self, params):
-        if request.method not in self.HTTP_VERBS:
+        if request.method not in HTTP_VERBS:
             # Just to be sure that we don't get some crappy http verb we don't expect
             raise BadRequest
 
