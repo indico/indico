@@ -733,14 +733,20 @@ type("AbstractFilesManager", [],
 
     _buildExistingElement: function(pos) {
         var file = this.initialMaterial[pos];
-        var div = Html.div({id:'divExFile_' + pos, className:'existingAttachment'});
+        var div = Html.div({id: 'divExFile_' + pos, className: 'existingAttachment'});
         var a = Html.a({href: file['url']}, file['file']['fileName']);
+        var fileId = this._extractFileIdFromUrl(file['url']);
         div.append(a);
         var imageRemove = this._getImageRemove(pos);
         div.append(imageRemove);
-        var inputHidden = Html.input('hidden', {name: 'existingFile'}, file['id']);
+        var inputHidden = Html.input('hidden', {name: 'existingFile'}, fileId);
         div.append(inputHidden);
         return div;
+    },
+
+    _extractFileIdFromUrl: function(file) {
+        var filename = file.split('/').reverse()[0];
+        return parseInt(filename.substring(0, filename.indexOf('.')), 10);
     },
 
     _getImageRemove: function(pos) {
