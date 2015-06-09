@@ -4,9 +4,9 @@
 {% block title %}{% trans %}Merge users{% endtrans %}{% endblock %}
 
 {%- block content %}
-    {{ form_header(id='merge-form') }}
+    {{ form_header(form, id='merge-form') }}
     {{ form_rows(form) }}
-    {% call form_footer() %}
+    {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" disabled value="{% trans %}Merge{% endtrans %}">
     {% endcall %}
 

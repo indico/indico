@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="i-box-content">
-                {{ form_header(id='reminder-form') }}
+                {{ form_header(form, id='reminder-form') }}
                 {% call form_fieldset(_('Schedule')) %}
                     {{ form_rows(form, fields=form.schedule_fields, widget_attrs=widget_attrs) }}
                 {% endcall %}
@@ -33,7 +33,7 @@
                 {% call form_fieldset(_('Misc')) %}
                     {{ form_rows(form, skip=form.schedule_recipient_fields, widget_attrs=widget_attrs) }}
                 {% endcall %}
-                {% call form_footer() %}
+                {% call form_footer(form) %}
                     {% if editable %}
                         <input id="save-button" class="i-button big highlight" type="submit"
                                value="{% trans %}Save{% endtrans %}" data-disabled-until-change>

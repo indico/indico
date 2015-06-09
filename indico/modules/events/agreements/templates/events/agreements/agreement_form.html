@@ -1,4 +1,5 @@
 {% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import form_header, form_footer %}
 
 <h2 class="page-title">
     {{ agreement.definition.title }}
@@ -18,7 +19,7 @@
     {% endcall %}
 {% endif %}
 
-<form method="post">
+{{ form_header(form, i_form=false) }}
     <div class="agreement-form-sections">
         <div class="i-box info-body">
             <div class="info-section info-person">
@@ -98,7 +99,7 @@
             </div>
         </div>
     {% endif %}
-</form>
+{{ form_footer(form, i_form=false) }}
 
 <script>
     $('.agreement-form-sections input:radio').on('change', function(e) {

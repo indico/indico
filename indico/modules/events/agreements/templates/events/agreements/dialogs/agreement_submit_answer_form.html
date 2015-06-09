@@ -10,10 +10,10 @@
 {% endblock %}
 
 {% block content %}
-    {{ form_header(id='agreement-upload-form', multipart=True) }}
+    {{ form_header(form, id='agreement-upload-form', multipart=True) }}
     {{ form_rows(form) }}
 
-    {% call form_footer() %}
+    {% call form_footer(form) %}
         <input type="submit" class="i-button big highlight" value="{% trans %}Submit{% endtrans %}" disabled>
         <a href="#" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
     {% endcall %}
@@ -23,11 +23,7 @@
             'use strict';
 
             function accepts_agreement(form) {
-                var accepted = form.find(':input[name=answer]:checked').val();
-                if (accepted == '1') {
-                    return true;
-                }
-                return false;
+                return form.find(':input[name=answer]:checked').val() == '1';
             }
 
             function validate(form) {

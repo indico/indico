@@ -205,7 +205,7 @@ class RH(RequestHandlerBase):
 
     @property
     def csrf_token(self):
-        return session.csrf_token
+        return session.csrf_token if session.csrf_protected else ''
 
     def _getRequestParams(self):
         return self._reqParams

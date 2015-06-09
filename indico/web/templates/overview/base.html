@@ -17,9 +17,9 @@
 
     <div class="i-box-group vert">
         <div class="i-box">
-            {{ form_header(method='get', action=action) }}
+            {{ form_header(form, method='get', action=action) }}
             {{ form_rows(form) }}
-            {% call form_footer() %}
+            {% call form_footer(form) %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
             {% endcall %}
         </div>

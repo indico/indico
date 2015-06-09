@@ -21,9 +21,9 @@
                             <a href="#" class="js-show-form">{% trans %}Create one{% endtrans %}</a>
                         </span>
                         <div id="credentials-form" {%- if not form.is_submitted() %} style="display: none;"{% endif %}>
-                            {{ form_header(orientation='vertical', classes='no-block-padding') }}
+                            {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                             {{ form_rows(form) }}
-                            {% call form_footer() %}
+                            {% call form_footer(form) %}
                                 <input class="i-button big highlight" type="submit"
                                        value="{% trans %}Create account{% endtrans %}" data-disabled-until-change>
                                 <a href="#" class="i-button big js-hide-form">
@@ -32,9 +32,9 @@
                             {% endcall %}
                         </div>
                     {% else %}
-                        {{ form_header(orientation='vertical', classes='no-block-padding') }}
+                        {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                         {{ form_rows(form) }}
-                        {% call form_footer() %}
+                        {% call form_footer(form) %}
                             <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}" data-disabled-until-change>
                         {% endcall %}
                     {% endif %}

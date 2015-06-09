@@ -21,9 +21,9 @@
                     <div class="message-text">{% trans num_of_users=num_of_users %}There are {{ num_of_users }} users, {{ num_deleted_users }} of which are deleted{% endtrans %}</div>
                 </div>
                 <h2>{% trans %}Search users{% endtrans %}</h2>
-                {{ form_header() }}
+                {{ form_header(form) }}
                 {{ form_rows(form) }}
-                {% call form_footer() %}
+                {% call form_footer(form) %}
                     <input class="i-button big highlight" type="submit" value="{% trans %}Search{% endtrans %}">
                 {% endcall %}
                 {% if search_results is not none %}

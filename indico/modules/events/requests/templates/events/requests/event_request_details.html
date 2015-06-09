@@ -8,7 +8,7 @@
 {% block subtitle %}{{ definition.title }}{% endblock %}
 
 {% block content %}
-    {{ form_header(id='request-form') }}
+    {{ form_header(form, id='request-form') }}
 
     {% block warnings %}
         {%- if not req -%}
@@ -74,7 +74,7 @@
         {{ self.form() }}
     {% endif %}
 
-    {% call form_footer() %}
+    {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="
             {%- if not req -%}
                 {%- trans -%}Send request{%- endtrans -%}
@@ -94,7 +94,7 @@
     {% endcall %}
 
     {% if show_management %}
-        {{ form_header(id='request-manage-form', classes='management-area', action=url_for('.event_requests_process', req)) }}
+        {{ form_header(manager_form, id='request-manage-form', classes='management-area', action=url_for('.event_requests_process', req)) }}
         {% call form_fieldset(legend=_('Manage service request')) %}
             {% if req.processed_by_user %}
                 {{ form_row_static(_('Processed by'), req.processed_by_user.full_name) }}
@@ -106,7 +106,7 @@
                 {{ form_rows(manager_form, skip=manager_form.action_buttons) }}
             {% endblock %}
         {% endcall %}
-        {% call form_footer() %}
+        {% call form_footer(manager_form) %}
             {% if req.state.name in ('accepted', 'rejected') %}
                 {{ manager_form.action_save(class_='i-button big') }}
             {% endif %}

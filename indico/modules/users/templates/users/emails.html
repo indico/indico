@@ -34,9 +34,9 @@
                         </li>
                     {% endfor %}
                 </ul>
-                {{ form_header(orientation='vertical', classes='no-block-padding') }}
+                {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                 {{ form_rows(form) }}
-                {% call form_footer() %}
+                {% call form_footer(form) %}
                     <input class="i-button big highlight" type="submit" value="{% trans %}Add{% endtrans %}" data-disabled-until-change>
                 {% endcall %}
             </div>

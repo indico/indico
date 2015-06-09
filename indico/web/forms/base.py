@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from flask import request, session, flash, g
 from flask_wtf import Form
+from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import FieldList
 from wtforms.widgets.core import HiddenInput
 
 from indico.core.auth import multipass
+from indico.util.i18n import _
 from indico.util.string import strip_whitespace
 
 
@@ -54,6 +56,21 @@ class IndicoForm(Form):
             filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
             return unbound_field.bind(form=form, filters=filters, **options)
+
+    def generate_csrf_token(self, csrf_context=None):
+        if not self.csrf_enabled:
+            return None
+        return session.csrf_token
+
+    def validate_csrf_token(self, field):
+        if self.csrf_enabled and field.data != session.csrf_token:
+            if not g.get('flashed_csrf_message'):
+                # Only flash the message once per request. We may end up in here
+                # multiple times if `validate()` is called more than once
+                flash(_(u'It looks like there was a problem with your current session. Please submit the form again.'),
+                      'error')
+                g.flashed_csrf_message = True
+            raise ValidationError(_(u'CSRF token missing'))
 
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.

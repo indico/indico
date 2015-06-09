@@ -133,7 +133,6 @@ def configure_app(app, set_path=False):
         app.config['SERVER_NAME'] = base.netloc
         if base.path:
             app.config['APPLICATION_ROOT'] = base.path
-    app.config['WTF_CSRF_ENABLED'] = False  # for forms of room booking
     static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
