@@ -99,9 +99,5 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
 
-# Instance Tracking
-admin.add_url_rule('/instance-tracking', 'adminServices-instanceTracking', services.RHInstanceTracking,
-                   methods=('GET', 'POST'))
-
 # Initial Setup
 admin.add_url_rule('/initial-setup', 'initial-setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))
