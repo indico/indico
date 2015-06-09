@@ -44,6 +44,8 @@ class RHStaticSiteList(RHStaticSiteBase):
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         static_site = StaticSite(creator=session.user, event=self._conf)
         db.session.add(static_site)

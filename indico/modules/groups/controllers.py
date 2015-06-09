@@ -128,6 +128,8 @@ class RHLocalGroupBase(RHAdminBase):
 class RHGroupDelete(RHLocalGroupBase):
     """Admin group deletion"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         db.session.delete(self.group)
         flash(_("The group '{name}' has been deleted.").format(name=self.group.name), 'success')
@@ -136,6 +138,8 @@ class RHGroupDelete(RHLocalGroupBase):
 
 class RHGroupDeleteMember(RHLocalGroupBase):
     """Admin group member deletion (ajax)"""
+
+    CSRF_ENABLED = True
 
     def _process(self):
         self.group.members.discard(User.get(request.view_args['user_id']))

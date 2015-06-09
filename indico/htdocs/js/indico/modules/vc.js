@@ -30,20 +30,22 @@
                     return;
                 }
 
+                var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
                 $('<form>', {
                     action: $this.data('href'),
                     method: 'post'
-                }).appendTo('body').submit();
+                }).append(csrf).appendTo('body').submit();
             }).open();
         });
 
         $('.js-vcroom-refresh').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
+            var csrf = $('<input>', {type: 'hidden', name: 'csrf_token', value: $('#csrf-token').attr('content')});
             $('<form>', {
                 action: $this.data('href'),
                 method: 'post'
-            }).appendTo('body').submit();
+            }).append(csrf).appendTo('body').submit();
         });
 
         $('.vc-room-entry.deleted').qtip({

@@ -145,6 +145,8 @@ class RHUserFavorites(RHUserBase):
 
 
 class RHUserFavoritesUsersAdd(RHUserBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
         self.user.favorite_users |= set(filter(None, users))
@@ -154,6 +156,8 @@ class RHUserFavoritesUsersAdd(RHUserBase):
 
 
 class RHUserFavoritesUserRemove(RHUserBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         user = User.get(int(request.view_args['fav_user_id']))
         if user in self.user.favorite_users:
@@ -162,6 +166,8 @@ class RHUserFavoritesUserRemove(RHUserBase):
 
 
 class RHUserFavoritesCategoryAPI(RHUserBase):
+    CSRF_ENABLED = True
+
     def _process_PUT(self):
         category = CategoryManager().getById(request.view_args['category_id'])
         if category not in self.user.favorite_categories:
@@ -183,6 +189,8 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
 
 
 class RHUserSuggestionsRemove(RHUserBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         suggestions.unsuggest(self.user, 'category', request.view_args['category_id'], True)
         return jsonify(success=True)
@@ -247,6 +255,8 @@ class RHUserEmailsVerify(RHUserBase):
 
 
 class RHUserEmailsDelete(RHUserBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         email = request.view_args['email']
         if email in self.user.secondary_emails:
@@ -255,6 +265,8 @@ class RHUserEmailsDelete(RHUserBase):
 
 
 class RHUserEmailsSetPrimary(RHUserBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         email = request.form['email']
         if email in self.user.secondary_emails:

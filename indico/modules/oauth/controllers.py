@@ -105,6 +105,8 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
     """Handles OAuth application deletion"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         db.session.delete(self.application)
         logger.info("Application {} was deleted.".format(self.application))
@@ -130,6 +132,8 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
 class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
     """Resets the client secret of the OAuth application"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         self.application.reset_client_secret()
         flash(_("New client secret generated for the application"), 'success')
@@ -138,6 +142,8 @@ class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
 
 class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
     """Revokes all user tokens associated to the OAuth application"""
+
+    CSRF_ENABLED = True
 
     def _process(self):
         self.application.tokens.delete()
@@ -156,6 +162,8 @@ class RHOAuthUserProfile(RHUserBase):
 
 class RHOAuthUserTokenRevoke(RHUserBase):
     """Revokes user token"""
+
+    CSRF_ENABLED = True
 
     def _checkParams(self):
         RHUserBase._checkParams(self)

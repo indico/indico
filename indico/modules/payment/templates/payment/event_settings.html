@@ -18,6 +18,7 @@
         <dt>{% trans %}Status{% endtrans %}</dt>
         <dd>
             <form action="{{ url_for('.event_toggle', event) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                 <label class="switch">
                     <input type="checkbox" class="switch-input" id="toggle-payment"{% if settings.enabled %} checked{% endif %}>
                     <span class="switch-label" data-on="On" data-off="Off"></span>

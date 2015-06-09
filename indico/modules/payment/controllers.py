@@ -85,6 +85,8 @@ class RHPaymentEventSettingsEdit(RHConferenceModifBase):
 class RHPaymentEventToggle(RHConferenceModifBase):
     """Enable/disable payment for an event"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         event = self._conf
         enabled = request.form['enabled'] == '1'

@@ -342,6 +342,8 @@ class RHAccounts(RHUserBase):
 class RHRemoveAccount(RHUserBase):
     """Removes an identity linked to a user"""
 
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         RHUserBase._checkParams(self)
         self.identity = Identity.get_one(request.view_args['identity'])

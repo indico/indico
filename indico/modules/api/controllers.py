@@ -71,6 +71,8 @@ class RHAPIUserProfile(RHUserBase):
 class RHAPICreateKey(RHUserBase):
     """API key creation"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         quiet = request.form.get('quiet') == '1'
         force = request.form.get('force') == '1'
@@ -104,6 +106,8 @@ class RHAPICreateKey(RHUserBase):
 class RHAPIDeleteKey(RHUserBase):
     """API key deletion"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         key = self.user.api_key
         key.is_active = False
@@ -113,6 +117,8 @@ class RHAPIDeleteKey(RHUserBase):
 
 class RHAPITogglePersistent(RHUserBase):
     """API key - persistent signatures on/off"""
+
+    CSRF_ENABLED = True
 
     def _process(self):
         quiet = request.form.get('quiet') == '1'
@@ -128,6 +134,8 @@ class RHAPITogglePersistent(RHUserBase):
 
 class RHAPIBlockKey(RHUserBase):
     """API key blocking/unblocking"""
+
+    CSRF_ENABLED = True
 
     def _checkProtection(self):
         RHUserBase._checkProtection(self)

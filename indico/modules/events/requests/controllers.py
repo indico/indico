@@ -174,9 +174,11 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
     """Withdraw a request"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         if self.request.state not in {RequestState.pending, RequestState.accepted}:
             raise BadRequest
         self.definition.withdraw(self.request)
         flash(_('You have withdrawn your request ({0})').format(self.definition.title))
-        return jsonify(success=True, url=url_for('.event_requests', self.event))
+        return redirect(url_for('.event_requests', self.event))

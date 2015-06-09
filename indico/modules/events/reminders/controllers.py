@@ -62,6 +62,8 @@ class RHListReminders(RHRemindersBase):
 class RHDeleteReminder(RHSpecificReminderBase):
     """Deletes a reminder"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         if self.reminder.is_sent:
             flash(_('Sent reminders cannot be deleted.'), 'error')

@@ -238,6 +238,8 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 class RHVCManageEventRefresh(RHVCSystemEventBase):
     """Refreshes an existing VC room, fetching information from the VC system"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to refresh {plugin_name} rooms for this event.').format(
@@ -262,6 +264,8 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
 class RHVCManageEventRemove(RHVCSystemEventBase):
     """Removes an existing VC room"""
+
+    CSRF_ENABLED = True
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):

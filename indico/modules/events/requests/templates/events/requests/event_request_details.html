@@ -85,10 +85,12 @@
             {%- endif -%}
         ">
         {% if req and req.state.name in ('pending', 'accepted') %}
-            <a href="#" class="i-button big warning" id="withdraw-request"
-               data-href="{{ url_for('.event_requests_withdraw', req) }}">
-                {%- trans %}Withdraw request{% endtrans -%}
-            </a>
+            <input type="button" class="i-button big warning" id="withdraw-request"
+               data-href="{{ url_for('.event_requests_withdraw', req) }}"
+               data-method="POST"
+               data-title="{% trans %}Withdraw request{% endtrans %}"
+               data-confirm="{% trans %}Do you really want to withdraw this request?{% endtrans %}"
+               value="{%- trans %}Withdraw request{% endtrans -%}">
         {% endif %}
         <a href="{{ url_for('.event_requests', event) }}" class="i-button big">{% trans %}Back{% endtrans %}</a>
     {% endcall %}
@@ -118,29 +120,6 @@
             {% endif %}
         {% endcall %}
     {% endif %}
-
-    <script>
-        $('#withdraw-request').on('click', function(e) {
-            e.preventDefault();
-
-            if (!confirm($T('Do you really want to withdraw this request?'))) {
-                return;
-            }
-
-            $.ajax({
-                url: $(this).data('href'),
-                type: 'POST',
-                dataType: 'json',
-                complete: IndicoUI.Dialogs.Util.progress(),
-                success: function(data) {
-                    if (handleAjaxError(data)) {
-                        return;
-                    }
-                    location.href = data.url;
-                }
-            });
-        });
-    </script>
 
     {% block scripts %}{% endblock %}
 {% endblock %}
