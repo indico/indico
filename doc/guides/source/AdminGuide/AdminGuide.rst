@@ -200,18 +200,6 @@ Plugins
 -----------
 
 The plugins area is accessible from the *Plugins* menu.
-From here you are able to:
-
--
-   Load the plugin types that are installed within Indico. This can be done
-   manually by clicking in *Reload the plugins manually* button or
-   automatically when you enter in the page by activating the checkbox
-   *Reload all plugins every time you open*.
-
--
-   Enable and disable the plugin types by clicking in the red/green square.
-
-|image12|
 
 
 Search plugin
@@ -255,10 +243,6 @@ The Synchronization is run at a specific interval by the indico-scheduler.
 |image14|
 
 
-Livesync plugin
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 Administration scripts
 ========================
 
@@ -286,6 +270,5 @@ For more information type in console ::
 .. |image9| image:: AdminGuidePics/admin7.png
 .. |image10| image:: AdminGuidePics/admin8.png
 .. |image11| image:: AdminGuidePics/admin9.png
-.. |image12| image:: AdminGuidePics/admin10.png
 .. |image13| image:: AdminGuidePics/admin11.png
 .. |image14| image:: AdminGuidePics/admin12.png
