@@ -19,7 +19,6 @@
 """
 import os
 import threading
-import pkg_resources
 from contextlib import contextmanager
 
 from ZEO.ClientStorage import ClientStorage
@@ -125,9 +124,6 @@ class DBMgr:
         else:
             transaction.commit()
 
-    def commitZODBOld(self, sub=False):
-        transaction.commit(sub)
-
     def abort(self):
         transaction.abort()
 
@@ -187,19 +183,3 @@ class DBMgr:
                 yield
             finally:
                 self.endRequest(commit)
-
-    # ZODB version check
-    try:
-        zodbPkg = pkg_resources.require('ZODB3')[0]
-        zodbVersion = zodbPkg.parsed_version
-        zodbVersion = (int(zodbVersion[0]), int(zodbVersion[1]))
-    except pkg_resources.DistributionNotFound:
-        # Very old versions, in which ZODB didn't register
-        # with pkg_resources
-        import ZODB
-        zodbVersion = ZODB.__version__.split('.')
-
-    if int(zodbVersion[0]) < 3:
-        raise Exception("ZODB 3 required! %s found" % zodbPkg.version)
-    elif int(zodbVersion[1]) < 7:
-        commit = commitZODBOld
