@@ -79,3 +79,33 @@ class RHCephalopod(RHAdminBase):
             flash(_('The operation timed-out. Please try again in a while.'), 'error')
 
         return redirect(url_for('.index'))
+
+
+class RHCephalopodSync(RHAdminBase):
+
+    def _process_GET(self):
+        if not settings.get('tracked'):
+            flash(_('Synchronization is not possible if instance tracking is disabled. Please enable it before.'),
+                  'error')
+        else:
+            contact_name = settings.get('contact_name')
+            contact_email = settings.get('contact_email')
+            try:
+                sync_instance(contact_name, contact_email)
+            except HTTPError as err:
+                flash(_('Synchronization failed, the instance tracker returned: {err.message}').format(err=err),
+                      'error')
+            except Timeout:
+                flash(_('Synchronization timed-out. Please try again in a while.'), 'error')
+
+            return redirect(url_for('.index'))
+
+
+class RHSystemInfo(RH):
+
+    def _process(self):
+        language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+        stats = {'python_version': sys.version.split()[0],
+                 'indico_version': _indico_version(),
+                 'language': language}
+        return jsonify(stats)
