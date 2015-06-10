@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from indico.modules.events.logs.views import WPEventLogs
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-# Logs
-event_mgmt.add_url_rule('/logs-old', 'confModifLog', conferenceModif.RHConfModifLog)
+class RHEventLogs(RHConferenceModifBase):
+    """Shows the modification/action log for the event"""
 
-# Material
-event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow', conferenceModif.RHMaterialsShow)
-event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd', conferenceModif.RHMaterialsAdd,
-                        methods=('POST',))
+    def _process(self):
+        return WPEventLogs.render_template('logs.html', self._conf)

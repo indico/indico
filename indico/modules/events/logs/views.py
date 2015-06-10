@@ -14,14 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
-# Logs
-event_mgmt.add_url_rule('/logs-old', 'confModifLog', conferenceModif.RHConfModifLog)
+class WPEventLogs(WPConferenceModifBase, WPJinjaMixin):
+    template_prefix = 'events/logs/'
 
-# Material
-event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow', conferenceModif.RHMaterialsShow)
-event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd', conferenceModif.RHMaterialsAdd,
-                        methods=('POST',))
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items_advanced['logs'].setActive()
+
+    def _getPageContent(self, params):
+        return WPJinjaMixin._getPageContent(self, params)

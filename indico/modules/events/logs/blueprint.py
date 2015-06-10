@@ -14,14 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
 
+from indico.modules.events.logs.controllers import RHEventLogs
+from indico.web.flask.wrappers import IndicoBlueprint
 
-# Logs
-event_mgmt.add_url_rule('/logs-old', 'confModifLog', conferenceModif.RHConfModifLog)
+_bp = IndicoBlueprint('event_logs', __name__, template_folder='templates', url_prefix='/event/<confId>/manage/logs')
 
-# Material
-event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow', conferenceModif.RHMaterialsShow)
-event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd', conferenceModif.RHMaterialsAdd,
-                        methods=('POST',))
+_bp.add_url_rule('/', 'index', RHEventLogs)
