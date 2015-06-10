@@ -32,6 +32,7 @@ from indico.modules.oauth.models.tokens import OAuthToken
 from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH, RHProtected
 
@@ -118,7 +119,7 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
     """Handles OAuth application registration"""
 
     def _process(self):
-        form = ApplicationForm()
+        form = ApplicationForm(obj=FormDefaults(is_enabled=True))
         if form.validate_on_submit():
             application = OAuthApplication()
             form.populate_obj(application)
