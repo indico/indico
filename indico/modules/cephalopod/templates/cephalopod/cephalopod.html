@@ -6,30 +6,6 @@
 {% block title %}{% trans %}Instance Tracking{% endtrans %}{% endblock %}
 
 {% block content %}
-    <span id="cephalopod-data" class="hidden" data-tracker-url="{{ tracker_url }}"></span>
-
-    {{ form_header(id='cephalopod-form')}}
-    {{ form_rows(form, fields=('tracked', 'contact_name', 'contact_email')) }}
-    {% call form_row_static(_('URL')) %}
-        <span id="instance-url" class="mono">{{ instnace_url }}</span>
-        <p class="form-field-description"><em>{% trans %}URL of your Indico instance{% endtrans %}</em></p>
-    {% endcall %}
-    {% call form_row_static(_('Affiliation')) %}
-        <span id="affiliation">{{ affiliation }}</span>
-        <p class="form-field-description"><em>{% trans %}Affiliation of your Indico instance{% endtrans %}</em></p>
-    {% endcall %}
-    {% if enabled %}
-        {% call form_row_static(_('Status')) %}
-            <span id="tracking-status"><span class="icon-spinner"></span></span>
-        {% endcall %}
-    {% endif %}
-    {% call form_footer() %}
-            <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
-            <button id="sync-button" class="i-button big" {%- if not enabled %} disabled{% endif %}>
-                <span class="icon-loop"> {% trans %}Sync{% endtrans %}</span>
-            </button>
-    {% endcall %}
-
     {% call message_box('info', fixed_width=true) %}
         <strong>{% trans %}Let us know that you exist!{% endtrans %}</strong>
         <p>
@@ -43,6 +19,38 @@
             <li>{% trans %}Statistical data (number of events, contributions, etc...){% endtrans %}</li>
         </ul>
     {% endcall %}
+    <span id="cephalopod-data" class="hidden" data-tracker-url="{{ tracker_url }}"></span>
+
+    <div id="tracking-status" class="action-box">
+        <div class="section">
+            <span class="icon"></span>
+            <div class="text">
+                <div class="label">{% trans %}Loading&hellip;{% endtrans %}</div>
+                <div>{% trans %}We are checking the status of your instance.{% endtrans %}</div>
+            </div>
+            <div class="toolbar thin right">
+                <a id="sync-tracking" class="i-button warning icon-loop" href="{{ url_for('cephalopod.sync') }}" style="display: none;">
+                    {% trans %}Synchronize{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="i-box">
+            {{ form_header(form, id='cephalopod-form')}}
+            {{ form_rows(form, fields=('tracked', 'contact_name', 'contact_email')) }}
+            {% call form_row_static(_('URL')) %}
+                <span id="instance-url" class="mono">{{ instance_url }}</span>
+                <p class="form-field-description"><em>{% trans %}URL of your Indico instance{% endtrans %}</em></p>
+            {% endcall %}
+            {% call form_row_static(_('Affiliation')) %}
+                <span id="affiliation">{{ affiliation }}</span>
+                <p class="form-field-description"><em>{% trans %}Affiliation of your Indico instance{% endtrans %}</em></p>
+            {% endcall %}
+            {% call form_footer(form) %}
+                    <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+            {% endcall %}
+    </div>
+
     <script>
         $(function initCephalopod() {
             initCephalopdOnSettingsPage({{ tracker_url|tojson }});
