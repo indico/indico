@@ -182,66 +182,10 @@ From here you are able to:
    to save memory by using the *pack* option, this will keep the
    current version of the database.
 
--
-   Delete Websessions. The database stores temporary information for
-   the period in which an end user is navigating Indico, for example,
-   websessions. Websessions are stored in the database until you choose
-   to delete them.
-
 
 |image11|
 
-You will be asked to confirm the deletion of temporary files and
-websessions as well as packing of the database.
-
 --------------
-
-Plugins
------------
-
-The plugins area is accessible from the *Plugins* menu.
-
-
-Search plugin
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This plugin allows to choose which search engine to use in order to perfom a search action in Indico.
-From here you can activate the different search engine adapters and choose the one to use
-by default, if there are more than one.
-
-Currently, the only search engine plugin is developed for *Invenio*. You need
-to setup the Invenio server and select the mode:
-
-* redirection to the search engine web server
-* fetching, only PUBLIC, results from the search engine server and rendering them using Indico UI
-* fetching, PUBLIC and PRIVATE, results from the search engine server and rendering them using Indico UI
-
-You will also need to activate the corresponding Livesync plugin in `Livesync plugin <#livesync-plugin>`_ in order to
-keep up-to-date the indexes and contents in the Search Engine Server.
-
-|image13|
-
-
-Outlook calendar notification plugin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This plugin allows to synchronize information about Indico events with the participants personal Microsoft Outlook calendars.
-If a user is added as a registrant/participant of the conference/meeting, a notification about the event is sent to his Outlook calendar.
-The calendar notification is updated every time the event details are changed.
-
-The calendar notification contains the following information about the event:
-
-* title
-* description
-* time
-* location
-* link to event page
-
-This plugin is enabled by default for each user but the user can disable it from the *User Personal Preferences* page.
-The Synchronization is run at a specific interval by the indico-scheduler.
-
-|image14|
-
 
 Administration scripts
 ========================
@@ -270,5 +214,3 @@ For more information type in console ::
 .. |image9| image:: AdminGuidePics/admin7.png
 .. |image10| image:: AdminGuidePics/admin8.png
 .. |image11| image:: AdminGuidePics/admin9.png
-.. |image13| image:: AdminGuidePics/admin11.png
-.. |image14| image:: AdminGuidePics/admin12.png
