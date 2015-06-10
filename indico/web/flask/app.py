@@ -56,46 +56,14 @@ from indico.web.assets import core_env, register_all_css, register_all_js, inclu
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
                                          equalto, call_template_hook)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
-                                   IndicoConfigWrapper)
+                                   IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field
 
-from indico.web.flask.blueprints.legacy import legacy
-from indico.web.flask.blueprints.misc import misc
-from indico.web.flask.blueprints.category import category
-from indico.web.flask.blueprints.category_management import category_mgmt
-from indico.web.flask.blueprints.event import event_display, event_creation, event_mgmt
-from indico.web.flask.blueprints.files import files
-from indico.web.flask.blueprints.admin import admin
 
-from indico.core.celery.blueprint import celery_blueprint
-from indico.core.plugins.blueprint import plugins_blueprint
-from indico.modules.api.blueprint import api_blueprint
-from indico.modules.auth.blueprint import auth_blueprint, auth_compat_blueprint
-from indico.modules.events.agreements.blueprint import agreements_blueprint
-from indico.modules.events.evaluation.blueprint import evaluation_blueprint
-from indico.modules.events.registration.blueprint import event_registration_blueprint
-from indico.modules.events.reminders.blueprint import event_reminders_blueprint
-from indico.modules.events.requests.blueprint import requests_blueprint
-from indico.modules.events.static.blueprint import static_site_blueprint
-from indico.modules.groups.blueprint import groups_blueprint
-from indico.modules.payment.blueprint import payment_blueprint
-from indico.modules.rb.blueprints.user import rooms_blueprint
-from indico.modules.rb.blueprints.admin import rooms_admin_blueprint
-from indico.modules.vc.blueprint import vc_blueprint, vc_compat_blueprint
-from indico.modules.oauth.blueprint import oauth_blueprint
-from indico.modules.users.blueprint import users_blueprint
-from indico.web.assets.blueprint import assets_blueprint
-
-
-BLUEPRINTS = (legacy, misc, rooms_blueprint, category, category_mgmt, event_display,
-              event_creation, event_mgmt, files, admin, rooms_admin_blueprint, celery_blueprint, plugins_blueprint,
-              payment_blueprint, event_registration_blueprint, requests_blueprint, agreements_blueprint,
-              evaluation_blueprint, event_reminders_blueprint, static_site_blueprint, vc_blueprint, assets_blueprint,
-              api_blueprint, users_blueprint, oauth_blueprint, auth_blueprint, groups_blueprint)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, rooms_blueprint, category, category_mgmt, event_display,
-                                                event_creation, event_mgmt, files, admin, rooms_admin_blueprint))
-COMPAT_BLUEPRINTS += (vc_compat_blueprint, auth_compat_blueprint)
+#: Blueprint names for which legacy rules are auto-generated based on the endpoint name
+AUTO_COMPAT_BLUEPRINTS = {'admin', 'category', 'category_mgmt', 'event', 'event_creation', 'event_mgmt', 'files',
+                          'misc', 'rooms', 'rooms_admin'}
 
 
 def fix_root_path(app):
@@ -276,13 +244,13 @@ def add_handlers(app):
 
 
 def add_blueprints(app):
-    for blueprint in BLUEPRINTS:
+    blueprints, compat_blueprints = discover_blueprints()
+    for blueprint in blueprints:
         app.register_blueprint(blueprint)
-
-
-def add_compat_blueprints(app):
-    for blueprint in COMPAT_BLUEPRINTS:
-        app.register_blueprint(blueprint)
+    if app.config['INDICO_COMPAT_ROUTES']:
+        compat_blueprints |= {make_compat_blueprint(bp) for bp in blueprints if bp.name in AUTO_COMPAT_BLUEPRINTS}
+        for blueprint in compat_blueprints:
+            app.register_blueprint(blueprint)
 
 
 def add_plugin_blueprints(app):
@@ -358,9 +326,6 @@ def make_app(set_path=False, db_setup=True, testing=False):
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
-
-    if app.config['INDICO_COMPAT_ROUTES']:
-        add_compat_blueprints(app)
     Logger.init_app(app)
     plugin_engine.init_app(app, Logger.get('plugins'))
     if not plugin_engine.load_plugins(app):

@@ -17,8 +17,10 @@
 from __future__ import absolute_import
 
 import inspect
+import os
 import re
 import time
+from importlib import import_module
 
 from flask import request, redirect, Blueprint, jsonify, render_template
 from flask import current_app as app
@@ -32,6 +34,48 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
+
+
+def discover_blueprints():
+    """Discovers all blueprints inside the indico package
+
+    Only blueprints in a ``blueprint.py`` module or inside a
+    ``blueprints`` package are loaded. Any other files are not touched
+    or even imported.
+
+    :return: a ``blueprints, compat_blueprints`` tuple containing two
+             sets of blueprints
+    """
+    # Don't use pkg_resources since `indico` is still a namespace package...`
+    up_segments = ['..'] * __name__.count('.')
+    package_root = os.path.normpath(os.path.join(__file__, *up_segments))
+    modules = set()
+    for root, dirs, files in os.walk(package_root):
+        for name in files:
+            if not name.endswith('.py') or name.endswith('_test.py'):
+                continue
+            segments = ['indico'] + os.path.relpath(root, package_root).replace(os.sep, '.').split('.') + [name[:-3]]
+            if segments[-1] == 'blueprint':
+                modules.add('.'.join(segments))
+            elif 'blueprints' in segments[:-1]:
+                if segments[-1] == '__init__':
+                    modules.add('.'.join(segments[:-1]))
+                else:
+                    modules.add('.'.join(segments))
+
+    blueprints = set()
+    compat_blueprints = set()
+    for module_name in sorted(modules):
+        module = import_module(module_name)
+        for name in dir(module):
+            obj = getattr(module, name)
+            if name.startswith('__') or not isinstance(obj, Blueprint):
+                continue
+            if obj.name.startswith('compat_'):
+                compat_blueprints.add(obj)
+            else:
+                blueprints.add(obj)
+    return blueprints, compat_blueprints
 
 
 def _convert_request_value(x):
