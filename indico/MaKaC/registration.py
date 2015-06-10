@@ -2815,7 +2815,8 @@ class PersonalDataForm(GeneralSectionForm):
 
     def getRegistrantValues(self, registrant):
         mg = registrant.getMiscellaneousGroupById(self.getId())
-        return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems() if not field.isDisabled())
+        return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems()
+                    if not field.isDisabled() and mg.getResponseItemById(field.getId()))
 
     def getValuesFromAvatar(self, av):
         r = dict((k, '') for k in ['title', 'firstName', 'surname', 'institution',
