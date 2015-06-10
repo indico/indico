@@ -86,8 +86,8 @@ class NewsSave(AdminService):
         self._content = pm.extract("content", pType=str, allowEmpty=True)
 
     def _getAnswer(self):
-        newsModule=ModuleHolder().getById("news")
-        item=newsModule.getNewsItemById(self._id)
+        newsModule = ModuleHolder().getById("news")
+        item = newsModule.getNewsItemById(self._id)
         if item:
             item.setTitle(self._title)
             item.setType(self._type)
@@ -103,5 +103,5 @@ methodMap = {
     "add": NewsAdd,
     "delete": NewsDelete,
     "save": NewsSave
-    }
+}
 

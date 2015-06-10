@@ -65,10 +65,10 @@ type("NewsItem", ["ServiceWidget"],
         },
 
         _saveResource: function() {
-            var params = {"id":this.id, "title": this.titleField.get(), "type": this.typeField.get(), "content": this.content.get()};
+            var params = {"id": this.id, "title": this.titleField.get(), "type": this.typeField.get(), "content": this.content.get()};
             var self = this;
             var killProgress = IndicoUI.Dialogs.Util.progress();
-            if(self.content.clean())
+            if (self.content.clean())
                 jsonRpc(Indico.Urls.JsonRpcService, 'news.save', params,
                         function(response, error){
                             if (exists(error))
@@ -84,15 +84,14 @@ type("NewsItem", ["ServiceWidget"],
             this.title = response.title;
             this.type = response.type;
             this.text = response.text;
-           this.id = response.id;
+            this.id = response.id;
 
             this.chooser.set('display');
         },
 
         draw: function() {
             var self = this;
-
-            var titleField = Html.input('text',{'className':'newsEditTitle'},'Write a title');
+            var titleField = Html.input('text', {'className':'newsEditTitle'}, 'Write a title');
             var typeField = Widget.select(self.parentList.newsTypesList);
             typeField.set('general');
 
