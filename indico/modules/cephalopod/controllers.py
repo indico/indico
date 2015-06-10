@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+import pkg_resources
+import sys
 from urlparse import urljoin
 
-from flask import flash, redirect, request
+from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, Timeout
 
 from indico.core.config import Config
@@ -31,6 +33,15 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.rh.admins import RHAdminBase
+from MaKaC.webinterface.rh.base import RH
+
+
+def _indico_version():
+    try:
+        indico_version = pkg_resources.get_distribution('indico').version
+    except pkg_resources.DistributionNotFound:
+        indico_version = 'dev'
+    return indico_version
 
 
 class RHCephalopod(RHAdminBase):
@@ -38,12 +49,17 @@ class RHCephalopod(RHAdminBase):
     def _process_GET(self):
         defaults = FormDefaults(**settings.get_all())
         form = CephalopodForm(request.form, obj=defaults)
+
         affiliation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
         enabled = settings.get('tracked')
-        tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
         instance_url = Config.getInstance().getBaseURL()
-        return WPCephalopod.render_template('cephalopod.html', form=form, instance_url=instance_url,
-                                            affiliation=affiliation, tracker_url=tracker_url, enabled=enabled)
+        language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+        python_version = sys.version.split()[0]
+        tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
+        return WPCephalopod.render_template('cephalopod.html', form=form, affiliation=affiliation,
+                                            indico_version=_indico_version(), enabled=enabled,
+                                            instance_url=instance_url, language=language, python_version=python_version,
+                                            tracker_url=tracker_url)
 
     def _process_POST(self):
         name = request.form.get('contact_name', settings.get('contact_name'))

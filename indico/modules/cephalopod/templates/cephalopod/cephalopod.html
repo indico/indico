@@ -31,20 +31,15 @@
     {% endcall %}
 
     {% call message_box('info', fixed_width=true) %}
-        <h3>{% trans %}Let us know that you exist!{% endtrans %}</h3>
-        {% trans %}By enabling this service you will receive updated news on latest releases as well as important security warnings.{% endtrans %}<br>
-        {% trans %}The following data will be sent back to us:{% endtrans %}
+        <strong>{% trans %}Let us know that you exist!{% endtrans %}</strong>
+        <p>
+            {% trans %}By enabling this service you will receive updated news on latest releases as well as important security warnings. The data in the form below will be sent back to us.{% endtrans %}
+        </p>
+        {% trans %}Alongside, the following public information will be periodically collected as well:{% endtrans %}
         <ul>
-            <li>{% trans %}Contact person{% endtrans %}</li>
-            <li>{% trans %}Contact email{% endtrans %}</li>
-            <li>{% trans %}Server URL{% endtrans %}</li>
-            <li>{% trans %}Name of the organisation{% endtrans %}</li>
-        </ul>
-        {% trans %}Alongside the previous data, the following public information will be periodically collected by us:{% endtrans %}
-        <ul>
-            <li>{% trans %}Server default language{% endtrans %}</li>
-            <li>{% trans %}Indico version installed{% endtrans %}</li>
-            <li>{% trans %}Python version used{% endtrans %}</li>
+            <li>{% trans %}Server default language{% endtrans %} ({{ language }})</li>
+            <li>{% trans %}Indico version installed{% endtrans %} ({{ indico_version }})</li>
+            <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
             <li>{% trans %}Statistical data (number of events, contributions, etc...){% endtrans %}</li>
         </ul>
     {% endcall %}
