@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.cephalopod.controllers import RHCephalopod, RHSystemInfo
+from indico.modules.cephalopod.controllers import RHCephalopod, RHCephalopodSync, RHSystemInfo
 from indico.web.flask.wrappers import IndicoBlueprint
 
 cephalopod_blueprint = _bp = IndicoBlueprint('cephalopod', __name__, template_folder='templates')
 
 _bp.add_url_rule('/admin/instance-tracking', 'index', RHCephalopod, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/instance-tracking/sync', 'sync', RHCephalopodSync)
 _bp.add_url_rule('/system-info', 'system-info', RHSystemInfo)
