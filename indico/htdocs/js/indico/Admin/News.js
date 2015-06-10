@@ -98,17 +98,17 @@ type("NewsItem", ["ServiceWidget"],
             this.titleField = titleField;
             this.typeField = typeField;
 
-            var saveButton = null;
+            var saveButton = Widget.button(command(function() {
+                if (self.id) {
+                    self._saveResource();
+                } else {
+                    self._createResource();
+                }
+            }, 'Save'));
+
             if (self.id) {
                 this.titleField.set(self.title);
                 this.typeField.set(self.type);
-                saveButton = Widget.button(command(function (){
-                    self._saveResource();
-                }, "Save"));
-            }else {
-                saveButton = Widget.button(command(function (){
-                    self._createResource();
-                }, "Save"));
             }
 
             var cancelButton = Widget.button(command(function (){
