@@ -14,14 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from flask import session
+
+from indico.core import signals
+from indico.web.flask.util import url_for
+from MaKaC.webinterface.wcomponents import SideMenuItem
 
 
-# Logs
-event_mgmt.add_url_rule('/logs-old', 'confModifLog', conferenceModif.RHConfModifLog)
-
-# Material
-event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow', conferenceModif.RHMaterialsShow)
-event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd', conferenceModif.RHMaterialsAdd,
-                        methods=('POST',))
+@signals.event_management.sidemenu_advanced.connect
+def _extend_event_management_menu(event, **kwargs):
+    if event.has_legacy_id:
+        return
+    return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), visible=event.canModify(session.user))
