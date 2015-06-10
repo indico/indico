@@ -1328,6 +1328,12 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifLog.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._logMenuItem)
 
+        self.extra_menu_items_advanced = {}
+        for name, item in sorted(values_from_signal(signals.event_management.sidemenu_advanced.send(self._conf)),
+                                 key=lambda x: x[1]._title):
+            self.extra_menu_items_advanced[name] = item
+            self._advancedOptionsSection.addItem(item)
+
         self._sideMenu.addSection(self._advancedOptionsSection)
 
         #we decide which side menu item appear and which don't
