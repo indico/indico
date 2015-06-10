@@ -19,7 +19,9 @@ from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import DBMgr
+from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _
+from indico.util.string import is_legacy_id
 from indico.web.flask.blueprints.event.display import event
 from MaKaC.webinterface.rh import conferenceDisplay
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
@@ -29,6 +31,7 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
     from MaKaC.conference import ConferenceHolder
     from MaKaC.common.url import ShortURLMapper
 
+    func = None
     with DBMgr.getInstance().global_connection():
         ch = ConferenceHolder()
         su = ShortURLMapper()
@@ -54,10 +57,14 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
                 # Old event namespace => 301-redirect to the new shorturl first to get Google etc. to update it
                 url = url_for('.shorturl', confId=confId)
                 func = lambda: redirect(url, 301)
-        else:
-            raise NotFound(
-                _('The specified event with id or tag "%s" does not exist or has been deleted') % confId)
+        elif is_legacy_id(confId):
+            mapping = LegacyEventMapping.find_first(legacy_event_id=confId)
+            if mapping is not None:
+                url = url_for('event.conferenceDisplay', confId=mapping.event_id)
+                func = lambda: redirect(url, 301)
 
+    if func is None:
+        raise NotFound(_('The specified event with id or tag "{}" does not exist or has been deleted').format(confId))
     return func()
 
 
