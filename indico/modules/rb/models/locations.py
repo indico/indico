@@ -92,7 +92,8 @@ class Location(db.Model):
     equipment_types = db.relationship(
         'EquipmentType',
         backref='location',
-        lazy='dynamic'
+        lazy='dynamic',
+        cascade='all, delete-orphan'
     )
 
     holidays = db.relationship(
