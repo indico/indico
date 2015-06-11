@@ -1818,10 +1818,6 @@ class UHRegistrantAttachmentFileAccess(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-getAttachedFile'
 
 
-class UHCategoryStatistics(URLHandler):
-    _endpoint = 'category.categoryStatistics'
-
-
 class UHCategoryToiCal(URLHandler):
     _endpoint = 'category.categoryDisplay-ical'
 
@@ -2351,7 +2347,6 @@ class UHHelper(object):
         "Category": UHCategoryDisplay,
         "CategoryMap": UHCategoryMap,
         "CategoryOverview": UHCategoryOverview,
-        "CategoryStatistics": UHCategoryStatistics,
         "CategoryCalendar": UHCategoryCalendarOverview,
         "Conference": UHConferenceDisplay,
         "Contribution": UHContributionDisplay,

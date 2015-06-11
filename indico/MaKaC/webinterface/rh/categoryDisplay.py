@@ -32,7 +32,6 @@ import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
-import MaKaC.statistics as statistics
 from indico.core import signals
 from indico.core.config import Config
 import MaKaC.common.info as info
@@ -83,29 +82,6 @@ class RHCategoryMap( RHCategDisplayBase ):
     def _process( self ):
         p = category.WPCategoryMap( self, self._target )
         return p.display()
-
-
-class RHCategoryStatistics(RHCategDisplayBase):
-    _uh = urlHandlers.UHCategoryStatistics
-
-    def _process(self):
-        wfReg = webFactoryRegistry.WebFactoryRegistry()
-        stats = statistics.CategoryStatistics(self._target).getStatistics()
-        if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
-            if stats is None:
-                stats = {'events': None,
-                         'contributions': None,
-                         'resources': None,
-                         'updated': None}
-            else:
-                stats = dict(stats)
-            if stats['updated']:
-                stats['updated'] = stats['updated'].strftime("%d %B %Y %H:%M")
-            return jsonify(stats)
-        else:
-            p = category.WPCategoryStatistics(self, self._target, wfReg, stats)
-            return p.display()
-
 
 
 class RHCategOverviewDisplay(RHCategDisplayBase):
