@@ -32,7 +32,7 @@ class WPCategoryStatistics(WPJinjaMixin, WPCategoryDisplayBase):
 
     def getJSFiles(self):
         return (WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('jqplot_js', prefix='')
-                + self._asset_env['modules_category_statistics_js'].urls())
+                + self._asset_env['statistics_js'].urls() + self._asset_env['modules_category_statistics_js'].urls())
 
     def getCSSFiles(self):
         return WPCategoryDisplayBase.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()
