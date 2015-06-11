@@ -1,0 +1,38 @@
+{% macro render_plot(id, title, data) %}
+    <div class="plot-container" {# style="float:${align};" #}>
+        <h2 class="center">{{ title }}: <b>{{ data.total }}</b></h2>
+        <div id="{{ id }}" class="plot" style="height:100%;"
+            data-title="{{ title }}"
+            data-min-year="{{ data.min_year }}"
+            data-max-year="{{ data.max_year }}"
+            data-max-val="{{ data.max_val }}"
+            data-values="{{ data.stats|tojson|forceescape }}"
+        ></div>
+    </div>
+{% endmacro %}
+
+<div class="category-container">
+    <div class="category-header">
+        <div class="category-statistics center">
+            <span class="right">
+                <a class="i-button icon-arrow-left2" href="{{ url_for('misc.index') if cat.isRoot() else url_for('category.categoryDisplay', cat)  }}" style="margin-top:0.4em;">{% trans %}Category page{% endtrans %}</a>
+            </span>
+            <div class="category-title" style="margin-left:0px; text-align:left;">
+                {{ cat.getName() }}&nbsp;
+                <span style="font-style: italic; font-size: 0.8em;">({% trans %}statistics{% endtrans %})</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-content-wrapper category-statistics center">
+        {% for plot in plots %}
+            {{ render_plot('chartdiv_%s'|format(loop.index), *plot) }}
+        {% endfor %}
+        <div style="text-align:left;">
+            {{ contents }}
+        </div>
+        <div class="footer right" style="margin-top: 2em;">{% trans %}Updated{% endtrans %} {{ updated }}</div>
+    </div>
+</div>
+
+

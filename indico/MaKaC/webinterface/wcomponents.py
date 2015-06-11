@@ -1415,42 +1415,6 @@ class WCategoryList(WTemplated):
         return vars
 
 
-class WCategoryStatisticsList(WTemplated):
-
-    def __init__(self, statsName, stats, align, tagName):
-        self._stats = stats
-        self._statsName = statsName
-        self._align = align
-        self._tagName = tagName
-
-    def getHTML(self, aw):
-        self._aw = aw
-        return WTemplated.getHTML(self)
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        # Construction of the tables from the dictionary (stats).
-        # Initialization:
-        stats = {}
-        years = self._stats.keys()
-        years.sort()
-        min_year = datetime.now().year
-        max_year = datetime.now().year + 1
-        if len(years) > 0:
-            min_year = min(min_year, years[0])
-            max_year = max(max_year, years[-1])
-            for y in range(min_year, max_year+1):
-                stats[y] = self._stats.get(y, 0)
-        wvars["min"] = min_year
-        wvars["max"] = max_year
-        wvars["stats"] = stats
-        wvars["statsName"] = self._statsName
-        wvars["align"] = self._align
-        wvars["tagName"] = self._tagName
-        wvars["total"] = sum(stats.values())
-        return wvars
-
-
 class WConfCreationControlFrame(WTemplated):
 
     def __init__( self, categ ):
