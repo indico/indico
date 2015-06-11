@@ -1,0 +1,25 @@
+<span class="summary">{{ entry.summary }}</span>
+<dl class="details">
+    {% if data.to %}
+        <dt>{% trans %}To{% endtrans %}</dt>
+        <dd>{{ data.to|join(', ') }}</dd>
+    {% endif %}
+    {% if data.cc %}
+        <dt>{% trans %}CC{% endtrans %}</dt>
+        <dd>{{ data.cc|join(', ') }}</dd>
+    {% endif %}
+    {% if data.bcc %}
+        <dt>{% trans %}BCC{% endtrans %}</dt>
+        <dd>{{ data.bcc|join(', ') }}</dd>
+    {% endif %}
+    <dt>{% trans %}Subject{% endtrans %}</dt>
+    <dd>{{ data.subject }}</dd>
+    <dt>{% trans %}Body{% endtrans %}</dt>
+    <dd>
+        {% if data.content_type == 'text/plain' %}
+            <pre class="mono">{{ data.body }}</pre>
+        {% else %}
+            {{ data.body | safe }}
+        {% endif %}
+    </dd>
+</dl>

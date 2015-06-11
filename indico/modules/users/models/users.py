@@ -252,6 +252,7 @@ class User(db.Model):
     # - static_sites (StaticSite.user)
     # - event_reminders (EventReminder.creator)
     # - oauth_tokens (OAuthToken.user)
+    # - event_log_entries (EventLogEntry.user)
 
     @property
     def as_principal(self):

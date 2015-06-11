@@ -118,3 +118,7 @@ and the following parameters are available:
 
 Should return ``True`` or ``False``.
 """)
+
+get_log_renderers = _signals.signal('get-log-renderers', """
+Expected to return `EventLogRenderer` classes.
+""")

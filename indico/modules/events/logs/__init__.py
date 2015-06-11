@@ -19,12 +19,35 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
+from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind, EventLogEntry
+from indico.modules.events.logs.renderers import SimpleRenderer, EmailRenderer
+from indico.modules.events.logs.util import get_log_renderers
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.wcomponents import SideMenuItem
 
 
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu(event, **kwargs):
-    if event.has_legacy_id:
-        return
+    from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), visible=event.canModify(session.user))
+
+
+@signals.event.deleted.connect
+def _event_deleted(event, **kwargs):
+    EventLogEntry.find(event_id=int(event.id)).delete()
+
+
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    EventLogEntry.find(user_id=source.id).update({EventLogEntry.user_id: target.id})
+
+
+@signals.event.get_log_renderers.connect
+def _get_log_renderers(sender, **kwargs):
+    yield SimpleRenderer
+    yield EmailRenderer
+
+
+@signals.app_created.connect
+def _check_agreement_definitions(app, **kwargs):
+    # This will raise RuntimeError if the log renderer types are not unique
+    get_log_renderers()
