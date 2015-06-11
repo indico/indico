@@ -1,15 +1,4 @@
-{% macro render_plot(id, title, data) %}
-    <div class="plot-container" {# style="float:${align};" #}>
-        <h2 class="center">{{ title }}: <b>{{ data.total }}</b></h2>
-        <div id="{{ id }}" class="plot" style="height:100%;"
-            data-title="{{ title }}"
-            data-min-year="{{ data.min_year }}"
-            data-max-year="{{ data.max_year }}"
-            data-max-val="{{ data.max_val }}"
-            data-values="{{ data.stats|tojson|forceescape }}"
-        ></div>
-    </div>
-{% endmacro %}
+{% from '_statistics.html' import scatter_plot, stats_badges, stats_box %}
 
 <div class="category-container">
     <div class="category-header">
@@ -25,14 +14,24 @@
     </div>
 
     <div class="category-content-wrapper category-statistics center">
-        {% for plot in plots %}
-            {{ render_plot('chartdiv_%s'|format(loop.index), *plot) }}
-        {% endfor %}
-        <div style="text-align:left;">
-            {{ contents }}
+        <div class="i-box-group horz vert">
+            {% for plot in plots %}
+                {% set title, subtitle, data = plot %}
+                {% call stats_box(title=title, subtitle=subtitle, label=data.total,
+                                  label_tooltip=_("Total"), classes='plot-container') %}
+                    {% if data['values'] %}
+                        {{ scatter_plot('plot-%s'|format(loop.index), data) }}
+                    {% else %}
+                       <span class="empty">{% trans %}No data available{% endtrans %}</span>
+                    {% endif %}
+                {% endcall %}
+            {% endfor %}
         </div>
-        <div class="footer right" style="margin-top: 2em;">{% trans %}Updated{% endtrans %} {{ updated }}</div>
+        {{ stats_badges(values, 'left') }}
+    </div>
+    <div class="category-content-wrapper category-statistics center">
+        <span class="footer right" style="margin-top: 2em;">
+            {% trans %}Updated{% endtrans %} {{ updated }}
+        </span>
     </div>
 </div>
-
-

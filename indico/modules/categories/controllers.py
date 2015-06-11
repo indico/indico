@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from math import ceil
+
 from flask import jsonify, request
 
 from indico.modules.categories.views import WPCategoryStatistics
@@ -25,32 +27,39 @@ from MaKaC.statistics import CategoryStatistics
 from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
 
 
-def _plot_data(stats):
+def _plot_data(stats, tooltip=''):
     years = sorted(stats.iterkeys())
     min_year = now_utc().year
-    max_year = min_year + 1
+    max_year = min_year
     if years:
-        min_year = min(min_year, years[0])
+        min_year = min(min_year, years[0]) - 1
         max_year = max(max_year, years[-1])
         data = {year: stats.get(year, 0) for year in xrange(min_year, max_year + 1)}
+        max_y = ceil(max(data.itervalues()) * 1.1)  # 1.1 for padding in the graph
     else:
-        data = []
-    return {'min_year': min_year, 'max_year': max_year, 'stats': data.items(),
-            'max_val': max(data.itervalues()), 'total': sum(data.itervalues())}
+        data = {}
+        max_y = 0
+    return {'min_x': min_year, 'max_x': max_year, 'min_y': 0, 'max_y': max_y, 'values': data,
+            'total': sum(data.itervalues()), 'label_x': _("Years"), 'label_y': '', 'tooltip': tooltip}
 
 
 def _process_stats(stats, root=False):
     if stats is None:
         return
 
+    # tooltip formatting is for ease of translation
     plots = [
-        (_('Number of events'), _plot_data(stats.get('events', {}))),  # tag: events
-        (_('Number of contributions'), _plot_data(stats.get('contributions', {})))  # tag contributions
+        (_('Number of events'), _('The year is the one of the start date of the event.'),
+         _plot_data(stats.get('events', {}),
+                    tooltip=_('{value} events in {year}').format(value='', year=''))),
+        (_('Number of contributions'), _('The year is the one of the start date of the contribution.'),
+         _plot_data(stats.get('contributions', {}),
+                    tooltip=_('{value} contributions in {year}').format(value='', year='')))
     ]
-    values = [
-        stats['resources'],  # title Number of attachments
-        stats.get('users') if root else None  # else _('No statistics for the users')
-    ]
+    values = [(_('Number of attachments'), stats['files'])]
+    if root:
+        values.append((_('Number of users'), stats.get('users', 0)))
+
     updated = stats['updated'].strftime('%d %B %Y %H:%M')
     return plots, values, updated
 
@@ -60,7 +69,7 @@ class RHCategoryStatistics(RHCategDisplayBase):
         stats = CategoryStatistics(self._target).getStatistics()
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
             if stats is None:
-                stats = {'events': None, 'contributions': None, 'resources': None, 'updated': None}
+                stats = {'events': None, 'contributions': None, 'files': None, 'updated': None}
             else:
                 stats = dict(stats)
 

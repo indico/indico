@@ -76,18 +76,36 @@
     margin: 0 0 2em 0;
 }
 
+
 .category-statistics {
     max-width: 1600px;
+    .i-box {
+        margin-left: 0.8em;
+        margin-right: 0.8em !important;
+        width: 45%;
+        &:first-child {
+            margin-left: 0;
+        }
+        .i-box-header {
+            text-align: left;
+        }
+        .i-box-content {
+            display: inline-block;
+
+            width: 96%;
+            height: 350px;
+            padding: 2% 2% 0 2%;
+        }
+    }
+    .i-badges-list > .i-badge {
+        width: 45%;
+        &:first-child {
+            margin-left: 0;
+        }
+    }
 }
 
-.category-statistics h2 {
-    color: $dark-gray;
-    font-weight: normal;
-}
 
-.category-statistics h2 b {
-    color: $black;
-}
 
 .category-sidebar {
     @include box-sizing(border-box);
@@ -324,11 +342,4 @@ ul.category-resource-qtip {
     vertical-align: middle;
     color: $yellow;
     margin-left: 0.2em;
-}
-
-div.category-statistics-plot-container {
-    height: 350px;
-    width: 45%;
-    margin-bottom: 50px;
-    padding: 0% 1% 0% 1%;
 }
