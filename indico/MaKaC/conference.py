@@ -103,7 +103,7 @@ import zope.interface
 from indico.core import signals
 from indico.util.date_time import utc_timestamp, format_datetime
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
 from indico.util.date_time import utc_timestamp
@@ -2180,6 +2180,32 @@ class Conference(CommonObjectBase, Locatable):
         """Returns the emails of all managers, including the creator"""
         emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
         return {e for e in emails if e}
+
+    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
+        """Creates a new log entry for the event
+
+        :param realm: A value from :class:`.EventLogRealm` indicating
+                      the realm of the action.
+        :param kind: A value from :class:`.EventLogKind` indicating
+                     the kind of the action that was performed.
+        :param module: A human-friendly string describing the module
+                       related to the action.
+        :param summmary: A one-line summary describing the logged action.
+        :param user: The user who performed the action.
+        :param type_: The type of the log entry. This is used for custom
+                      rendering of the log message/data
+        :param data: JSON-serializable data specific to the log type.
+
+        In most cases the ``simple`` log type is fine. For this type,
+        any items from data will be shown in the detailed view of the
+        log entry.  You may either use a dict (which will be sorted)
+        alphabetically or a list of ``key, value`` pairs which will
+        be displayed in the given order.
+        """
+        from indico.modules.events.logs import EventLogEntry
+        db.session.add(EventLogEntry(event_id=int(self.id), user=user, realm=realm, kind=kind, module=module,
+                                     type=type_, summary=summary, data=data or {}))
+
 
     @staticmethod
     def _cmpByDate(self, toCmp):

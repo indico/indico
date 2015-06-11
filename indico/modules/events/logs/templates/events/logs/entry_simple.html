@@ -1,0 +1,9 @@
+<span class="summary">{{ entry.summary }}</span>
+{% if data %}
+    <dl class="details">
+        {% for key, value in data %}
+            <dt>{{ key }}</dt>
+            <dd>{{ value }}</dd>
+        {% endfor %}
+    </dl>
+{% endif %}
