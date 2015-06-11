@@ -691,13 +691,13 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            edittype: "text"
                         },
                         {
-                           name:'billable',
-                           index:'billable',
-                           width:60,
+                           name: 'billable',
+                           index: 'billable',
+                           width: 60,
                            editable: true,
                            align: 'center',
                            defaultVal : false,
-                           edittype:'bool_select'
+                           edittype: 'bool_select'
                         },
                         {
                            name: 'price',
@@ -796,8 +796,8 @@ ndRegForm.directive('ndSectionDialog', function(url) {
                 $scope.tabSelected = $scope.config.tabs[0].id;
             };
 
-            $scope.addItem = function () {
-                 $scope.formData.items.push({id:'isNew', cancelled: false});
+            $scope.addItem = function (args) {
+                $scope.formData.items.push($.extend({id: 'isNew', cancelled: false, pricePerPlace: false}, args));
             };
         },
 

@@ -45,6 +45,7 @@
                     size="{{ elem.editoptions.size }}"
                     maxlength="{{ elem.editoptions.maxlength }}"
                     name="{{ elem.name }}"
+                    ng-required="elem.index == 'price' && !!item['billable']"
                     class="editable"/>
                 <ng-form name="nestedForm" ng-if="elem.editable == true && elem.edittype == 'int'">
                     <input type="number" name="{{ elem.name }}"
