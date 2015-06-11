@@ -686,7 +686,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            index:'caption',
                            align: 'center',
                            width:140,
-                           editoptions:{size:"25",maxlength:"50"},
+                           editoptions: {size: "25", maxlength: "50"},
                            editable: true,
                            edittype: "text"
                         },
@@ -700,13 +700,13 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            edittype:'bool_select'
                         },
                         {
-                           name:'price',
-                           index:'price',
+                           name: 'price',
+                           index: 'price',
                            align: 'center',
-                           width:50,
+                           width: 50,
                            editable: true,
                            edittype: "text",
-                           editoptions:{size:"7",maxlength:"20"}
+                           editoptions: {size: "7", maxlength: "20"},
                         },
                         {
                            name:'placesLimit',
