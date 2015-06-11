@@ -4927,7 +4927,7 @@ class BilledItemsWrapper(object):
 
 class BilledItem(object):
 
-    def __init__(self, caption, price, quantity, currency):
+    def __init__(self, caption, quantity, currency, price=0.0):
         self._caption = caption
         self._price = price
         self._quantity = quantity
@@ -5004,7 +5004,7 @@ class Accommodation(Persistent):
         return self._currency
 
     def getBilledItem(self):
-        return BilledItem(self._accommodationType.getCaption(), self.getPrice(), self.getNights(), self.getCurrency())
+        return BilledItem(self._accommodationType.getCaption(), self.getNights(), self.getCurrency(), self.getPrice())
 
     def getAccommodationType(self):
         return self._accommodationType
@@ -5090,7 +5090,7 @@ class SocialEvent(Persistent, Fossilizable):
         quantity = 1
         if self._pricePerPlace:
             quantity = self.getNoPlaces()
-        return BilledItem(self.getCaption(), self.getPrice(), quantity, self.getCurrency())
+        return BilledItem(self.getCaption(), quantity, self.getCurrency(), self.getPrice())
 
     def getSocialEventItem(self):
         return self._socialEventItem
@@ -5147,7 +5147,7 @@ class RegistrantSession(Persistent):
             return False
 
     def getBilledItem(self):
-        return BilledItem(self.getCaption(), self.getPrice(), 1, self.getCurrency())
+        return BilledItem(self.getCaption(), 1, self.getCurrency(), self.getPrice())
 
     def getRegSession(self):
         return self._regSession
