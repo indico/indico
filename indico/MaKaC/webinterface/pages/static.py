@@ -37,9 +37,6 @@ class WPStaticEventBase:
     def _getFooter(self):
         return ""
 
-    def getJSFiles(self):
-        return self._asset_env['base_js'].urls()
-
     def _getMenu(self):
         for link in self._sectionMenu.getLinkList():
             if isinstance(link, SystemLink) and link.getName() not in ContextManager.get("_menu_offline_items"):

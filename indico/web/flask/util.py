@@ -34,6 +34,7 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
+from indico.util.contextManager import ContextManager
 
 
 def discover_blueprints():
@@ -253,6 +254,9 @@ def url_for(endpoint, *targets, **values):
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
+
+    if ContextManager.get('offlineMode'):
+        values['_external'] = True
 
     for key, value in values.iteritems():
         # Avoid =True and =False in the URL
