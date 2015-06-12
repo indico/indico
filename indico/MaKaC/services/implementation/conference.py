@@ -32,7 +32,7 @@ from pytz import timezone
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, info, filters, log, timezoneUtils
+from MaKaC.common import indexes, info, filters, timezoneUtils
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize

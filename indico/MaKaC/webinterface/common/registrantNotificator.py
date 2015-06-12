@@ -16,8 +16,6 @@
 
 from indico.web.flask.util import url_for
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.review as review
-from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.common.baseNotificator import TplVar, Notification
 

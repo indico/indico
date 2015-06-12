@@ -106,7 +106,7 @@ legacy_endpoints = {
     'confModifEvaluation-edit', 'confModifEvaluation-editPerformChanges', 'confModifEvaluation-performDataModif',
     'confModifEvaluation-preview', 'confModifEvaluation-results', 'confModifEvaluation-resultsOptions',
     'confModifEvaluation-resultsSubmittersActions', 'confModifEvaluation-setup', 'confModifEvaluation-specialAction',
-    'confModifListings-allSpeakers', 'confModifListings-allSpeakersAction', 'confModifLog', 'confModifParticipants',
+    'confModifListings-allSpeakers', 'confModifListings-allSpeakersAction', 'confModifParticipants',
     'confModifParticipants-action', 'confModifParticipants-declinedParticipants', 'confModifParticipants-invitation',
     'confModifParticipants-pendingParticipants', 'confModifParticipants-refusal', 'confModifParticipants-setup',
     'confModifParticipants-statistics', 'confModifPendingQueues', 'confModifPendingQueues-actionConfSubmitters',

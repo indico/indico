@@ -840,10 +840,6 @@ class UHConfModifParticipants(URLHandler):
     _endpoint = 'event_mgmt.confModifParticipants'
 
 
-class UHConfModifLog(URLHandler):
-    _endpoint = 'event_mgmt.confModifLog'
-
-
 class UHInternalPageDisplay(URLHandler):
     _endpoint = 'event.internalPage'
 

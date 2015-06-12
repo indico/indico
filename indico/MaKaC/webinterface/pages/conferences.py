@@ -1324,10 +1324,6 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifDisplay.getURL(self._conf))
         self._advancedOptionsSection.addItem( self._layoutMenuItem)
 
-        self._logMenuItem = wcomponents.SideMenuItem(_("Logs"),
-            urlHandlers.UHConfModifLog.getURL( self._conf ) )
-        self._advancedOptionsSection.addItem( self._logMenuItem)
-
         self.extra_menu_items_advanced = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu_advanced.send(self._conf)),
                                  key=lambda x: x[1]._title):
@@ -2336,42 +2332,6 @@ class WPConfModifParticipantsRefuse(WPConfModifParticipantsInvitationBase):
         url.addParam("participantId",params["participantId"])
         return wc.getHTML( msg, url, {}, \
                         confirmButtonCaption= _("Refuse"), cancelButtonCaption= _("Cancel") )
-
-#---------------------------------------------------------------------------
-
-class WConferenceLog(wcomponents.WTemplated):
-
-    def __init__(self, conference):
-        wcomponents.WTemplated.__init__(self)
-        self.__conf = conference
-        self._tz = Config.getInstance().getDefaultTimezone()
-        if not self._tz:
-            self._tz = 'UTC'
-
-    def getVars(self):
-        log_vars = wcomponents.WTemplated.getVars(self)
-        log_vars["log_dict"] = self._getLogDict()
-        log_vars["timezone"] = timezone(self._tz)
-        return log_vars
-
-    def _getLogDict(self):
-        """Return a dictionary of log entries per day."""
-        log = self.__conf.getLogHandler().getLogList()
-        log_dict = collections.defaultdict(list)
-        for line in log:
-            date = line.getLogDate().date()
-            log_dict[date].append(line)
-        return log_dict
-
-
-class WPConfModifLog(WPConferenceModifBase):
-
-    def _setActiveSideMenuItem(self):
-        self._logMenuItem.setActive()
-
-    def _getPageContent(self, params):
-        p = WConferenceLog(self._conf)
-        return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 

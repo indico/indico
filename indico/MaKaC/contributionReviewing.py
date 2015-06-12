@@ -17,9 +17,7 @@
 from collections import defaultdict
 import datetime
 
-from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc

@@ -14,9 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc
@@ -29,8 +27,6 @@ import conference
 from MaKaC.common.Counter import Counter
 from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
-from persistent.list import PersistentList
-from MaKaC.i18n import _
 
 ###############################################
 # Conference-wide classes

@@ -26,7 +26,6 @@ from MaKaC.services.implementation.base import ParameterManager
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 
-from MaKaC.common import log
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.schedule import IConferenceScheduleDisplayFossil
@@ -40,7 +39,6 @@ from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, parseDate
 from MaKaC.common.contextManager import ContextManager
-import MaKaC.common.info as info
 from MaKaC.errors import TimingError
 from MaKaC.fossils.schedule import ILinkedTimeSchEntryMgmtFossil, IBreakTimeSchEntryMgmtFossil, \
         IContribSchEntryMgmtFossil

@@ -18,9 +18,6 @@ from MaKaC.webinterface.rh import conferenceModif
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
-# Logs
-event_mgmt.add_url_rule('/logs-old', 'confModifLog', conferenceModif.RHConfModifLog)
-
 # Material
 event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow', conferenceModif.RHMaterialsShow)
 event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd', conferenceModif.RHMaterialsAdd,

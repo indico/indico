@@ -87,7 +87,6 @@ from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.participant import Participation
-from MaKaC.common.log import LogHandler
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.common import mail
@@ -2146,7 +2145,6 @@ class Conference(CommonObjectBase, Locatable):
         self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
         self._sections = []
         self._participation = Participation(self)
-        self._logHandler = LogHandler()
         self._reportNumberHolder=ReportNumberHolder(self)
         self._enableSessionSlots = False
         self._enableSessions = False
@@ -2321,15 +2319,6 @@ class Conference(CommonObjectBase, Locatable):
         if type == "simple_event":
             type = "lecture"
         return type.capitalize()
-
-
-    def getLogHandler(self):
-        try :
-            if self._logHandler:
-                pass
-        except AttributeError :
-            self._logHandler = LogHandler()
-        return self._logHandler
 
 
     def getEnableSessionSlots(self):

@@ -595,27 +595,6 @@ class RHConfAllParticipants( RHConferenceModifBase ):
         return p.display()
 
 
-class RHConfModifLog (RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifLog
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams( self, params )
-
-        if params.get("view",None) is not None :
-            if params["view"] == "Action Log" :
-                params["view"] = "action"
-            elif params["view"] == "Email Log" :
-                params["view"] = "email"
-            elif params["view"] == "Custom Log" :
-                params["view"] = "custom"
-            elif params["view"] == "General Log" :
-                params["view"] = "general"
-
-    def  _process(self):
-        params = self._getRequestParams()
-        p = conferences.WPConfModifLog( self, self._target )
-        return p.display(**params)
-
 #######################################################################################
 
 class RHConfClone( RHConferenceModifBase ):
