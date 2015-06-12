@@ -67,8 +67,7 @@ def _extend_event_menu(sender, **kwargs):
     def _visible(event):
         if event.has_legacy_id:
             return False
-        return (bool(get_vc_plugins()) and
-                bool(VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).count()))
+        return bool(get_vc_plugins()) and bool(VCRoomEventAssociation.find_for_event(event).count())
     return EventMenuEntry('vc.event_videoconference', 'Videoconference Rooms', name='vc-event-page', visible=_visible)
 
 
