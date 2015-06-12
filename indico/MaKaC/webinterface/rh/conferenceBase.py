@@ -13,7 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+
+from flask import request, session
 
 import tempfile
 import os
@@ -32,9 +33,10 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from MaKaC.common.timezoneUtils import nowutc
 
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util import json
 from indico.util.contextManager import ContextManager
-from indico.util.string import is_legacy_id
+from indico.util.string import is_legacy_id, to_unicode
 from indico.util.user import principal_from_fossil
 
 BYTES_1MB = 1024 * 1024
@@ -347,9 +349,10 @@ class RHSubmitMaterialBase(object):
                     else:
                         resource.setName(self._displayName)
 
-                    if not type(self._target) is Category:
-                        log_info = {"subject":"Added file %s%s" % (fileEntry["fileName"], text)}
-                        self._target.getConference().getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
+                    if not isinstance(self._target, Category):
+                        log_msg = u'Added file {}{}'.format(to_unicode(fileEntry['fileName']), to_unicode(text))
+                        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Material',
+                                                         log_msg, session.user)
                     resources.append(resource)
                     # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
 
@@ -364,9 +367,10 @@ class RHSubmitMaterialBase(object):
                     else:
                         resource.setName(self._displayName)
 
-                    if not type(self._target) is Category:
-                        log_info = {"subject":"Added link %s%s" % (resource.getURL(), text)}
-                        self._target.getConference().getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
+                    if not isinstance(self._target, Category):
+                        log_msg = u'Added link {}{}'.format(to_unicode(resource.getURL()), to_unicode(text))
+                        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Material',
+                                                         log_msg, session.user)
                     resources.append(resource)
 
             status = "OK"

@@ -46,7 +46,7 @@ from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import L_
-from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii, is_legacy_id
+from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii, is_legacy_id, to_unicode
 from MaKaC.review import AbstractFieldContent
 
 
@@ -101,11 +101,12 @@ from MaKaC.common.contextManager import ContextManager
 import zope.interface
 
 from indico.core import signals
-from indico.util.date_time import utc_timestamp, format_datetime
+from indico.util.date_time import utc_timestamp, format_datetime, format_human_timedelta
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
+from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
 from indico.util.date_time import utc_timestamp
 from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
@@ -2181,7 +2182,7 @@ class Conference(CommonObjectBase, Locatable):
         emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
         return {e for e in emails if e}
 
-    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
+    def log(self, realm, kind, module, summary, user=None, type_=u'simple', data=None):
         """Creates a new log entry for the event
 
         :param realm: A value from :class:`.EventLogRealm` indicating
@@ -2202,7 +2203,6 @@ class Conference(CommonObjectBase, Locatable):
         alphabetically or a list of ``key, value`` pairs which will
         be displayed in the given order.
         """
-        from indico.modules.events.logs import EventLogEntry
         db.session.add(EventLogEntry(event_id=int(self.id), user=user, realm=realm, kind=kind, module=module,
                                      type=type_, summary=summary, data=data or {}))
 
@@ -5264,8 +5264,8 @@ class Session(CommonObjectBase, Locatable):
         data["session code"] = self._code
         data["title"] = self.title
         data["description"] = self.description
-        data["start date"] = self.startDate
-        data["duration"] = self.duration
+        data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
+        data["duration"] = format_human_timedelta(self.duration)
         for p in self.places :
             data["place"] = p.getName()
         for r in self.rooms :
@@ -5426,6 +5426,9 @@ class Session(CommonObjectBase, Locatable):
         if self.slots.has_key(slot.getId()):
             if len(self.slots)==1 and not force:
                 raise MaKaCError( _("A session must have at least one slot"), _("Session"))
+            msg = u'Deleted session block: {}'.format(to_unicode(slot.getTitle() or slot.getSession().getTitle()))
+            self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Timetable',
+                                     msg, session.user, data=slot.getLogInfo())
             self._removeSlot(slot)
             self.fit()
             self.notifyModification()
@@ -6527,8 +6530,8 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         data["id"] = self.id
         data["title"] = self.title
         data["session"] = self.session.getTitle()
-        data["start date"] = self.startDate
-        data["duration"] = self.duration
+        data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
+        data["duration"] = format_human_timedelta(self.duration)
         i = 0
         for p in self.places :
             data["place %s"%i] = p.getName()
@@ -7708,9 +7711,11 @@ class Contribution(CommonObjectBase, Locatable):
             afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
             for f in afm.getFields():
                 id = f.getId()
-                data[id] = self.getField(id)
-        data["start date"] = "%s" % self.startDate
-        data["duration"] = "%s" % self.duration
+                field = self.getField(id)
+                if field.value:
+                    data['Abstract field {}'.format(field.field._caption)] = field.value
+        data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
+        data["duration"] = format_human_timedelta(self.duration)
         if self._track is not None:
             data["track"] = self._track.getTitle()
         if self._type is not None:

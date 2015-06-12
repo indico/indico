@@ -13,7 +13,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from cStringIO import StringIO
+
+from flask import session
+
+from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.util.string import to_unicode
 
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -24,7 +30,6 @@ import MaKaC.user as user
 import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.common import log
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
 from indico.core.config import Config
@@ -343,10 +348,9 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
                 spk = self._newSpeaker(presenter)
                 sc.newSpeaker(spk)
 
-            logInfo = sc.getLogInfo()
-            logInfo["subject"] = "Created new subcontribution: %s" %sc.getTitle()
-            self._target.getConference().getLogHandler().logAction(logInfo,
-                                                       log.ModuleNames.TIMETABLE)
+            self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
+                                             u'Created new subcontribution: {}'.format(to_unicode(sc.getTitle())),
+                                             session.user, data=sc.getLogInfo())
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
         else:
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))

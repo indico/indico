@@ -17,7 +17,9 @@
 """
 Schedule-related services
 """
-from flask import session
+from flask import session as flask_session
+from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.util.string import to_unicode
 
 from MaKaC.services.implementation.base import ParameterManager
 
@@ -407,7 +409,6 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
 
 
     def _performOperation(self):
-
         conf = self._target
         session = conference.Session()
 
@@ -442,9 +443,9 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         self.__addConveners2Slot(slot)
         self._setLocationInfo(slot)
 
-        logInfo = session.getLogInfo()
-        logInfo["subject"] =  _("Created new session: %s")%session.getTitle()
-        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
+        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
+                                         u'Created new session: {}'.format(to_unicode(session.getTitle())),
+                                         flask_session.user, data=session.getLogInfo())
 
         schEntry = slot.getConfSchEntry()
         fossilizedData = schEntry.fossilize(ILinkedTimeSchEntryMgmtFossil, tz=conf.getTimezone())
@@ -460,14 +461,14 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
 
     def initializeFilteringCriteria(self, sessionId, conferenceId):
         # Filtering criteria: by default make new session type checked
-        sessionDict = session.setdefault('ContributionFilterConf%s' % conferenceId, {})
+        sessionDict = flask_session.setdefault('ContributionFilterConf%s' % conferenceId, {})
         if 'sessions' in sessionDict:
             #Append the new type to the existing list
             sessionDict['sessions'].append(sessionId)
         else:
             #Create a new entry for the dictionary containing the new type
             sessionDict['sessions'] = [sessionId]
-        session.modified = True
+        flask_session.modified = True
 
 class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
@@ -478,26 +479,25 @@ class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.Conf
         if session.isClosed():
             raise ServiceAccessError(_("""The modification of the session "%s" is not allowed because it is closed""")%session.getTitle())
 
-        logInfo = session.getLogInfo()
-        logInfo["subject"] = "Deleted session: %s"%session.getTitle()
-        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
-
+        self._conf.log(EventLogRealm.management, EventLogKind.negative, u'Timetable',
+                       u'Deleted session: {}'.format(to_unicode(session.getTitle())),
+                       flask_session.user, data=session.getLogInfo())
         self._conf.removeSession(session)
 
 class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 
     def _performOperation(self):
         contrib = self._schEntry.getOwner()
-        logInfo = contrib.getLogInfo()
-
+        log_info = contrib.getLogInfo()
         self._conf.getSchedule().removeEntry(self._schEntry)
 
         if self._conf.getType() == "meeting":
-            logInfo["subject"] =  _("Deleted contribution: %s")%contrib.getTitle()
+            msg = u'Deleted contribution: {}'
             contrib.delete()
         else:
-            logInfo["subject"] =  _("Unscheduled contribution: %s")%contrib.getTitle()
-        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
+            msg = u'Unscheduled contribution: {}'
+        self._conf.log(EventLogRealm.management, EventLogKind.negative, u'Timetable',
+                       msg.format(to_unicode(contrib.getTitle())), flask_session.user, data=log_info)
 
 
 class SessionScheduleDeleteSessionSlot(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
@@ -506,9 +506,9 @@ class SessionScheduleDeleteSessionSlot(ScheduleOperation, sessionServices.Sessio
         if len(self._session.getSlotList()) > 1:
             self._session.removeSlot(self._slot)
         else:
-            logInfo = self._session.getLogInfo()
-            logInfo["subject"] = "Deleted session: %s"%self._session.getTitle()
-            self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
+            self._conf.log(EventLogRealm.management, EventLogKind.negative, u'Timetable',
+                           u'Deleted session: {}'.format(to_unicode(self._session.getTitle())),
+                           flask_session.user, data=self._session.getLogInfo())
             self._conf.removeSession(self._session)
 
 class SessionScheduleChangeSessionColors(ScheduleOperation, sessionServices.SessionModifBase):
@@ -666,16 +666,16 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
 
         contrib = self._schEntry.getOwner()
 
-        logInfo = contrib.getLogInfo()
+        log_info = contrib.getLogInfo()
         self._slot.getSchedule().removeEntry(self._schEntry)
-
-        if type == "meeting":
-            logInfo["subject"] = "Deleted contribution: %s" %contrib.getTitle()
+        if contrib.getConference().getType() == "meeting":
+            msg = u'Deleted contribution: {}'
             contrib.delete()
         else:
-            logInfo["subject"] = "Unscheduled contribution: %s"%contrib.getTitle()
+            msg = u'Unscheduled contribution: {}'
 
-        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
+        self._conf.log(EventLogRealm.management, EventLogKind.negative, u'Timetable',
+                       msg.format(to_unicode(contrib.getTitle())), flask_session.user, data=log_info)
 
 
 class ModifyStartEndDate(ScheduleOperation):
@@ -868,9 +868,9 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 
         self._addToSchedule()
 
-        logInfo = self._slot.getLogInfo()
-        logInfo["subject"] = "Created new session block: %s" % self._slot.getTitle()
-        self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
+        self._conf.log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
+                       u'Created new session block: {}'.format(to_unicode(self._slot.getTitle())),
+                       flask_session.user, data=self._slot.getLogInfo())
 
         if self._isSessionTimetable:
             schEntry = self._slot.getSessionSchEntry()

@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
 
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
-from MaKaC.common import log
 from MaKaC.common.PickleJar import DictPickler
 
 import MaKaC.conference as conference
@@ -32,7 +33,9 @@ from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil
 
 
@@ -151,10 +154,10 @@ class ContributionAddSubContribution(ContributionModifBase):
         self.__addPresenters(sc)
 
         # log the event
-        logInfo = sc.getLogInfo()
-        logInfo["subject"] = "Created new subcontribution: %s"%sc.getTitle()
-        self._target.getConference().getLogHandler().logAction(logInfo,
-                                                       log.ModuleNames.TIMETABLE)
+        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Timetable',
+                                         u'Created new subcontribution: {}'.format(to_unicode(sc.getTitle())),
+                                         session.user, data=sc.getLogInfo())
+
 
 class ContributionDeleteSubContribution(ContributionModifBase):
 
