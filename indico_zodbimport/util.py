@@ -59,19 +59,24 @@ def get_storage(zodb_uri):
     return storage
 
 
-def convert_to_unicode(val):
+def convert_to_unicode(val, _control_char_re=re.compile(ur'[\x00-\x08\x0b-\x0c\x0e-\x1f]')):
     if isinstance(val, str):
         try:
-            return unicode(val, 'utf-8')
+            rv = unicode(val, 'utf-8')
         except UnicodeError:
-            return unicode(val, 'latin1')
+            rv = unicode(val, 'latin1')
     elif isinstance(val, unicode):
-        return val
+        rv = val
     elif isinstance(val, int):
-        return unicode(val)
+        rv = unicode(val)
     elif val is None:
-        return u''
-    raise RuntimeError('Unexpected type is found for unicode conversion')
+        rv = u''
+    else:
+        raise RuntimeError('Unexpected type is found for unicode conversion')
+    # get rid of hard tabs and control chars
+    rv = rv.replace(u'\t', u' ' * 4)
+    rv = _control_char_re.sub(u'', rv)
+    return rv
 
 
 def convert_principal_list(opt):
