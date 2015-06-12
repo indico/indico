@@ -72,5 +72,5 @@ def _process_evaluation(event):
     tpl = get_template_module('events/evaluation/emails/evaluation_started.txt', event=event, evaluation=evaluation)
     # XXX: This is terrible, putting possibly all the participants in `To`. We should really use BCC for this!
     email = make_email(notification.getToList(), notification.getCCList(), template=tpl)
-    send_email(email, event)
+    send_email(email, event, 'Evaluation')
     return True

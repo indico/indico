@@ -580,7 +580,7 @@ class ConferencePaperReview(Persistent):
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReferee, 'Referee', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
 
 
     def removeReferee(self, referee):
@@ -601,7 +601,7 @@ class ConferencePaperReview(Persistent):
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
         else:
             raise MaKaCError("Cannot remove a referee who is not yet referee")
 
@@ -667,7 +667,7 @@ class ConferencePaperReview(Persistent):
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingNotification(newEditor, 'Layout Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
 
     def removeEditor(self, editor):
         """ Remove a editor from the conference.
@@ -687,7 +687,7 @@ class ConferencePaperReview(Persistent):
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(editor, 'Layout Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
         else:
             raise MaKaCError("Cannot remove an editor who is not yet editor")
 
@@ -753,7 +753,7 @@ class ConferencePaperReview(Persistent):
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReviewer, 'Content Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
 
     def removeReviewer(self, reviewer):
         """ Remove a reviewer from the conference.
@@ -773,7 +773,7 @@ class ConferencePaperReview(Persistent):
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(reviewer, 'Content Reviewer', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
         else:
             raise MaKaCError("Cannot remove a reviewer who is not yet reviewer")
 
@@ -839,7 +839,7 @@ class ConferencePaperReview(Persistent):
         if self._enablePRMEmailNotif == True:
             notification = ConferenceReviewingNotification(newPaperReviewManager, 'Paper Review Manager', self._conference)
             GenericMailer.sendAndLog(notification, self._conference,
-                                     log.ModuleNames.PAPER_REVIEWING)
+                                     'Paper Reviewing')
 
     def removePaperReviewManager(self, paperReviewManager):
         """ Remove a paper review manager from the conference.
@@ -859,7 +859,7 @@ class ConferencePaperReview(Persistent):
             if self._enablePRMEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
                 GenericMailer.sendAndLog(notification, self._conference,
-                                         log.ModuleNames.PAPER_REVIEWING)
+                                         'Paper Reviewing')
         else:
             raise MaKaCError("Cannot remove a paper review manager who is not yet paper review manager")
 

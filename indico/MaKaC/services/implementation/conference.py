@@ -756,7 +756,7 @@ class ConferenceParticipantBase:
             data["subject"] = permissive_format(data["subject"], mailEnv)
             data["content-type"] = 'text/html'
             GenericMailer.sendAndLog(GenericNotification(data), self._conf,
-                                     log.ModuleNames.PARTICIPANTS)
+                                     'Participants')
 
 
 class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
@@ -901,7 +901,7 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
                         data = self.preparedNewParticipantMessage(pending)
                         GenericMailer.sendAndLog(GenericNotification(data),
                                                  self._conf,
-                                                 log.ModuleNames.PARTICIPANTS)
+                                                 'Participants')
                 else:
                     result["msg"] = _("The participant identified by email '%s' has been added to the list of pending participants"
                                     % pending.getEmail())

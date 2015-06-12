@@ -21,6 +21,7 @@ from email.mime.text import MIMEText
 from email import charset
 
 from indico.core.config import Config
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.string import to_unicode
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
@@ -144,23 +145,21 @@ class GenericMailer:
         Logger.get('mail').info('Mail sent to {}'.format(', '.join(to_addrs)))
 
     @classmethod
-    def _log(cls, data):
-        data['conference'].getLogHandler().logEmail(data['data'], data['module'], data['user'])
-
-    @classmethod
-    def sendAndLog(cls, notification, conference, module='', user=None, skipQueue=False):
+    def sendAndLog(cls, notification, conference, module=None, user=None, skipQueue=False):
         if isinstance(notification, dict):
             # Wrap a raw dictionary in a notification class
             from MaKaC.webinterface.mail import GenericNotification
             notification = GenericNotification(notification)
         cls.send(notification, skipQueue=skipQueue)
         log_data = {
-            'contentType': notification.getContentType(),
-            'fromAddr': notification.getFromAddr(),
-            'toList': notification.getToList(),
-            'ccList': notification.getCCList(),
-            'bccList': notification.getBCCList(),
-            'subject': notification.getSubject(),
-            'body': notification.getBody()
+            u'content_type': to_unicode(notification.getContentType()),
+            u'from': to_unicode(notification.getFromAddr()),
+            u'to': map(to_unicode, notification.getToList()),
+            u'cc': map(to_unicode, notification.getCCList()),
+            u'bcc': map(to_unicode, notification.getBCCList()),
+            u'subject': to_unicode(notification.getSubject()).strip(),
+            u'body': to_unicode(notification.getBody()).strip()
         }
-        conference.getLogHandler().logEmail(log_data, module, user)
+        summary = u'Sent email: {}'.format(log_data[u'subject'])
+        conference.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or u'Unknown'), summary, user,
+                       type_=u'email', data=log_data)

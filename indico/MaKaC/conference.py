@@ -3783,7 +3783,7 @@ class Conference(CommonObjectBase, Locatable):
                 self.getConference().getPendingQueuesMgr().addPendingConfManager(prin, False)
                 if sendEmail and isinstance(prin, ConferenceChair):
                     notif = pendingQueues._PendingConfManagerNotification( [prin] )
-                    mail.GenericMailer.sendAndLog( notif, self.getConference() )
+                    mail.GenericMailer.sendAndLog(notif, self.getConference(), 'Event')
             #The user is registered in Indico and is activated as well
             elif len(results) == 1 and results[0] is not None and results[0].isActivated():
                 self.__ac.grantModification(results[0])
@@ -6173,7 +6173,7 @@ class Session(CommonObjectBase, Locatable):
                 modificationEmailGranted = self.__ac.grantModificationEmail(sb.getEmail())
                 if modificationEmailGranted and sendEmail:
                     notif = pendingQueues._PendingManagerNotification( [sb] )
-                    mail.GenericMailer.sendAndLog( notif, self.getConference() )
+                    mail.GenericMailer.sendAndLog(notif, self.getConference(), 'Session')
         else:
             self.__ac.grantModification( sb )
             if isinstance(sb, AvatarUserWrapper):
@@ -9364,7 +9364,7 @@ class Contribution(CommonObjectBase, Locatable):
                 submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
                 if submissionEmailGranted and sendEmail:
                     notif = pendingQueues._PendingSubmitterNotification( [sb] )
-                    mail.GenericMailer.sendAndLog( notif, self.getConference() )
+                    mail.GenericMailer.sendAndLog(notif, self.getConference(), 'Contribution')
                     if self.getConference():
                         self.getConference().addContribSubmitter(self,sb)
         else:
