@@ -90,7 +90,7 @@ def terminal_size():
     return w, h
 
 
-def verbose_iterator(iterable, total, get_id, get_title):
+def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
     """Iterates large iterables verbosely
 
     :param iterable: An iterable
@@ -105,7 +105,7 @@ def verbose_iterator(iterable, total, get_id, get_title):
     )
 
     for i, item in enumerate(iterable, 1):
-        if i % 10 == 0 or i == total:
+        if i % print_every == 0 or i == total:
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
             title = to_unicode(get_title(item).replace('\n', ' '))

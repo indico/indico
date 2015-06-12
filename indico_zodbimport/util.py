@@ -72,7 +72,7 @@ def convert_to_unicode(val, _control_char_re=re.compile(ur'[\x00-\x08\x0b-\x0c\x
     elif val is None:
         rv = u''
     else:
-        raise RuntimeError('Unexpected type is found for unicode conversion')
+        raise RuntimeError('Unexpected type {} is found for unicode conversion: {!r}'.format(type(val), val))
     # get rid of hard tabs and control chars
     rv = rv.replace(u'\t', u' ' * 4)
     rv = _control_char_re.sub(u'', rv)
