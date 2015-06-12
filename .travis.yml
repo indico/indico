@@ -4,7 +4,7 @@ python:
 addons:
   postgresql: 9.2
 install:
-  - pip install -r requirements.txt
+  - pip install -r requirements.txt --trusted-host indico-software.org
   - python setup.py develop
 script:
   - py.test -v
