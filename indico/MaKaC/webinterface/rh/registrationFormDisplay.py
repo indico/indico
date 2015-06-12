@@ -26,6 +26,7 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.registration.notifications import (notify_registration_confirmation,
                                                               notify_registration_modification)
 from indico.modules.payment import event_settings as payment_event_settings
@@ -34,6 +35,7 @@ from indico.web.flask.util import send_file, url_for
 
 from indico.util import json
 from indico.util.i18n import set_best_lang, _
+from indico.util.string import to_unicode
 
 
 class RHBaseRegistrationForm(RHConferenceBaseDisplay):
@@ -156,6 +158,11 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
             rp.setAvatar(avatar)
 
         notify_registration_confirmation(self._conf, rp)
+        self._conf.log(EventLogRealm.management if self.is_manager else EventLogRealm.participants,
+                       EventLogKind.positive, u'Registration',
+                       u'User registered: {}'.format(to_unicode(rp.getFullName(title=False, firstNameFirst=True))),
+                       session.user,
+                       data={u'Indico user': u'{} ({})'.format(user.full_name, user.id) if user else u'None'})
 
         if self.is_manager:
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
@@ -263,7 +270,11 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                     raise FormValuesError(_("There is already a user with the email \"{email}\". "
                                             "Please choose another one.").format(email or "--no email--"))
                 rp.setValues(self._getRequestParams(), self._getUser())
-
+                log_msg = u'User modified his registration data: {}'
+                self._conf.log(EventLogRealm.participants, EventLogKind.positive, u'Registration',
+                               log_msg.format(to_unicode(rp.getFullName(title=False, firstNameFirst=True))),
+                               session.user,
+                               data={u'Indico user': u'{} ({})'.format(user.full_name, user.id) if user else u'None'})
                 notify_registration_modification(self._conf, rp)
                 flash(_(u"Your registration has been modified successfully."), 'success')
                 if rp.doPay():
