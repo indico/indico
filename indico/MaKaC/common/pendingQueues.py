@@ -607,7 +607,7 @@ class ConfPendingQueuesMgr(Persistent):
         from MaKaC.conference import Conference
         if isinstance(owner, Conference):
             self.addPendingConfSubmitter(ps, sendEmail=True)
-            mail.GenericMailer.sendAndLog(_PendingConfSubmitterNotification([ps]), owner)
+            mail.GenericMailer.sendAndLog(_PendingConfSubmitterNotification([ps]), owner, 'Submission')
 
     def removeSubmitter(self, ps, owner):
         from MaKaC.conference import Conference

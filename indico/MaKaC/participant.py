@@ -367,7 +367,7 @@ class Participation(Persistent):
             data = self.prepareAddedInfo(participant, eventManager)
             GenericMailer.sendAndLog(GenericNotification(data),
                                      self._conference,
-                                     log.ModuleNames.PARTICIPANTS)
+                                     'Participants')
 
         avatar = participant.getAvatar()
 
@@ -576,7 +576,7 @@ on behalf of %s %s
             return False
 
         GenericMailer.sendAndLog(GenericNotification(data), self._conference,
-                                 log.ModuleNames.PARTICIPANTS)
+                                 'Participants')
         return True
 
     def sendSpecialEmail(self, participantsIdList, eventManager, data):
@@ -599,7 +599,7 @@ on behalf of %s %s
                 toList.append(participant.getEmail())
         data["toList"] = toList
         GenericMailer.sendAndLog(GenericNotification(data), self._conference,
-                                 log.ModuleNames.PARTICIPANTS)
+                                 'Participants')
         return True
 
     def getPresentNumber(self):

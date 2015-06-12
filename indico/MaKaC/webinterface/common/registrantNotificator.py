@@ -174,7 +174,7 @@ class EmailNotificator(Notificator):
         if params.has_key("conf"):
             GenericMailer.sendAndLog(self.apply(registrant,params),
                                      params["conf"],
-                                     log.ModuleNames.REGISTRATION)
+                                     'Registration')
         else:
             GenericMailer.send(self.apply(registrant,params))
 
@@ -187,6 +187,6 @@ class EmailNotificator(Notificator):
         notification =  Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
         if params.has_key("conf"):
             GenericMailer.sendAndLog(notification, params["conf"],
-                                     log.ModuleNames.REGISTRATION)
+                                     'Registration')
         else:
             GenericMailer.send(notification)
