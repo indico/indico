@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
 from persistent import Persistent
 
-from MaKaC.common import log
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.mail import GenericMailer
@@ -27,9 +27,10 @@ from indico.core import signals
 from indico.core.config import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.contextManager import ContextManager
+from indico.util.string import to_unicode
 
 
 class Participation(Persistent):
@@ -72,35 +73,29 @@ class Participation(Persistent):
         return self._obligatory
 
     def setObligatory(self, responsibleUser = None):
+        # XXX this is never called!
         self._obligatory = True
-        logData = {}
-        logData["subject"] = "Event set to MANDATORY"
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                 u'Participation mode changed to mandatory', session.user)
 
     def setInobligatory(self, responsibleUser = None):
+        # XXX this is never called!
         self._obligatory = False
-        logData = {}
-        logData["subject"] = "Event set to NON MANDATORY"
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                 u'Participation mode changed to non-mandatory', session.user)
 
     def isAddedInfo(self):
         return self._addedInfo
 
     def setAddedInfo(self, responsibleUser = None):
         self._addedInfo = True
-        logData = {}
-        logData["subject"] = "Info about adding WILL be sent to participants"
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                 u'Email notification to new participants enabled', session.user)
 
     def setNoAddedInfo(self, responsibleUser = None):
         self._addedInfo = False
-        logData = {}
-        logData["subject"] = "Info about adding WON'T be sent to participants"
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                 u'Email notification to new participants disabled', session.user)
 
     def isAllowedForApplying(self):
         try :
@@ -112,18 +107,14 @@ class Participation(Persistent):
 
     def setAllowedForApplying(self, responsibleUser=None):
         self._allowedForApplying = True
-        logData = {}
-        logData["subject"] = "Applying for participation is ALLOWED"
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                 u'Applying for participation enabled', session.user)
         self.notifyModification()
 
     def setNotAllowedForApplying(self, responsibleUser=None):
         self._allowedForApplying = False
-        logData = {}
-        logData["subject"] = "Applying for participation is NOT ALLOWED"
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                 u'Applying for participation disabled', session.user)
         self.notifyModification()
 
     def isAutoAccept(self):
@@ -135,12 +126,12 @@ class Participation(Persistent):
 
     def setAutoAccept(self, value, responsibleUser = None):
         self._autoAccept = value
-        logData = {
-            "subject": "Auto accept of participation.",
-            "value": str(value)
-        }
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        if value:
+            self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                     u'Participation requests are automatically approved', session.user)
+        else:
+            self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                     u'Participation requests require manual approval', session.user)
         self.notifyModification()
 
     def getNumMaxParticipants(self):
@@ -152,12 +143,8 @@ class Participation(Persistent):
 
     def setNumMaxParticipants(self, value, responsibleUser = None):
         self._numMaxParticipants = value
-        logData = {
-            "subject": "Num max of participants.",
-            "value": str(value)
-        }
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.change, u'Participants',
+                                 u'Maximum number of participants: {}'.format(value or u'unlimited'), session.user)
         self.notifyModification()
 
     def isNotifyMgrNewParticipant(self):
@@ -168,17 +155,13 @@ class Participation(Persistent):
             return False
 
     def setNotifyMgrNewParticipant(self, value):
-        currentUser = ContextManager.get('currentUser')
         self._notifyMgrNewParticipant = value
-        logData = {}
-
         if value:
-            logData["subject"] = _("Manager notification of participant application has been enabled")
+            self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                     u'Email notification about new participants enabled', session.user)
         else:
-            logData["subject"] = _("Manager notification of participant application has been disabled")
-
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+            self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                     u'Email notification about new participants disabled', session.user)
         self.notifyModification()
 
     def isFull(self):
@@ -321,12 +304,10 @@ class Participation(Persistent):
             return False
         self.removePendingParticipant(participant)
         self.getDeclinedParticipantList()["%d"%self._newDeclinedId()] = participant
-        logData = participant.getParticipantData()
-        logData["subject"] = _("Participant declined : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                 u'Participation request declined: {}'.format(to_unicode(participant.getName())),
+                                 session.user, data=participant.getParticipantData())
         self.notifyModification()
-
 
     def getDeclinedParticipantByKey(self, key):
         if key is not None :
@@ -352,11 +333,9 @@ class Participation(Persistent):
                     del self._pendingParticipantList[k]
                     break
 
-        logData = participant.getParticipantData()
-        logData["subject"] = _("New participant added : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                 u'Participant added: {}'.format(to_unicode(participant.getName())),
+                                 session.user, data=participant.getParticipantData())
         participant.setStatusAdded()
 
         # check if an e-mail should be sent...
@@ -392,10 +371,9 @@ class Participation(Persistent):
         if self.alreadyParticipating(participant) != 0 :
             return False
         self._participantList["%d"%self._lastParticipantId()] = participant
-        logData = participant.getParticipantData()
-        logData["subject"] = _("New participant invited : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
+        self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                 u'Participant invited: {}'.format(to_unicode(participant.getName())),
+                                 session.user, data=participant.getParticipantData())
         participant.setStatusInvited()
         if participant.getAvatar() is not None:
             if not participant.getAvatar().getEmail():
@@ -423,11 +401,9 @@ class Participation(Persistent):
             participant = self._participantList[key]
             del self._participantList[key]
 
-        logData = participant.getParticipantData()
-        logData["subject"] = _("Removed participant %s %s (%s)")%(participant.getFirstName(),participant.getFamilyName(),participant.getEmail())
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                 u'Participant removed: {}'.format(to_unicode(participant.getName())),
+                                 session.user, data=participant.getParticipantData())
         avatar = participant.getAvatar()
         if avatar:
             avatar.unlinkTo(self._conference,"participant")
@@ -465,11 +441,9 @@ class Participation(Persistent):
         else:
             self._pendingParticipantList["%d"%self._newPendingId()] = participant
 
-            logData = participant.getParticipantData()
-            logData["subject"] = _("New pending participant : %s")%participant.getWholeName()
-            self._conference.getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
+            self.getConference().log(EventLogRealm.participants, EventLogKind.positive, u'Participants',
+                                     u'New participation request: {}'.format(to_unicode(participant.getName())),
+                                     session.user, data=participant.getParticipantData())
             participant.setStatusPending()
 
             profileURL = urlHandlers.UHConfModifParticipantsPending.getURL(self._conference)
@@ -514,11 +488,6 @@ class Participation(Persistent):
                 return False
             participant = self._pendingParticipantList[key]
             del self._pendingParticipantList[key]
-
-        logData = participant.getParticipantData()
-        logData["subject"] = _("Pending participant removed : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,
-                                                   log.ModuleNames.PARTICIPANTS)
 
         self.notifyModification()
         return True
@@ -883,20 +852,8 @@ class Participant(Persistent, Fossilizable):
     def setStatusAdded(self, responsibleUser=None):
         old_status = self._status
         self._status = "added"
-        #if self._status is None or self._status == "pending" :
-        #    self._status = "added"
-        #
-        #    logData = self.getParticipantData()
-        #    logData["subject"] = _("%s : status set to ADDED")%self.getWholeName()
-        #    self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
-
         signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                old_status=old_status, action='added')
-        logData = self.getParticipantData()
-        logData["subject"] = "%s : status set to ADDED"%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
         return True
 
     def setStatusRefused(self, responsibleUser=None):
@@ -907,11 +864,9 @@ class Participant(Persistent, Fossilizable):
 
         signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                old_status=old_status, action='removed')
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to REFUSED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.participants, EventLogKind.negative, u'Participants',
+                                 u'Participant refused to attend: {}'.format(to_unicode(self.getName())),
+                                 session.user, data=self.getParticipantData())
         return True
 
     def setStatusExcused(self, responsibleUser=None):
@@ -919,23 +874,15 @@ class Participant(Persistent, Fossilizable):
             return False
         self._status = "excused"
 
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to EXCUSED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Participants',
+                                 u'Participant marked as excused: {}'.format(to_unicode(self.getName())),
+                                 session.user, data=self.getParticipantData())
         return True
 
     def setStatusInvited(self, responsibleUser=None):
         if self._status is not None :
             return False
         self._status = "invited"
-
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to INVITED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
         return True
 
     def setStatusAccepted(self, responsibleUser=None):
@@ -947,11 +894,9 @@ class Participant(Persistent, Fossilizable):
         if old_status != 'added':
             signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                    old_status=old_status, action='added')
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to ACCEPTED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.participants, EventLogKind.positive, u'Participants',
+                                 u'Participant accepted the invitation: {}'.format(to_unicode(self.getName())),
+                                 session.user, data=self.getParticipantData())
         return True
 
     def setStatusRejected(self, responsibleUser=None):
@@ -963,35 +908,24 @@ class Participant(Persistent, Fossilizable):
         if old_status == 'added':
             signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                    old_status=old_status, action='removed')
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to REJECTED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.participants, EventLogKind.negative, u'Participants',
+                                 u'Participant rejected the invitation: {}'.format(to_unicode(self.getName())),
+                                 session.user, data=self.getParticipantData())
         return True
 
     def setStatusPending(self, responsibleUser=None):
         if self._status is not None :
             return False
         self._status = "pending"
-
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to PENDING")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
         return True
 
     def setStatusDeclined(self, responsibleUser=None):
         if self._status != "pending" :
             return False
         self._status = "declined"
-
-        logData = self.getParticipantData()
-        logData["subject"] = _("%s : status set to DECLINED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,
-                                                       log.ModuleNames.PARTICIPANTS)
-
+        self.getConference().log(EventLogRealm.management, EventLogKind.negative, u'Participants',
+                                 u"Participation request declined: {}".format(to_unicode(self.getName())),
+                                 session.user, data=self.getParticipantData())
         return True
 
 
