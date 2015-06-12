@@ -125,6 +125,10 @@ class EventLogEntry(db.Model):
         self.event_id = int(event.getId())
 
     @property
+    def logged_date(self):
+        return self.logged_dt.date()
+
+    @property
     def renderer(self):
         from indico.modules.events.logs.util import get_log_renderers
         return get_log_renderers().get(self.type)
