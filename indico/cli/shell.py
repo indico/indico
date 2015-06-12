@@ -16,6 +16,7 @@
 
 import datetime
 import itertools
+import re
 from functools import partial
 from operator import itemgetter, attrgetter
 
@@ -123,7 +124,7 @@ class IndicoShell(Shell):
             # Common stdlib modules
             self._info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
             add_to_context_multi([getattr(datetime, attr) for attr in ('date', 'time', 'datetime', 'timedelta')] +
-                                 [itertools],
+                                 [itertools, re],
                                  color='yellow')
             # Legacy Indico
             self._info.append(cformat('*** %{magenta!}Legacy%{reset} ***'))
