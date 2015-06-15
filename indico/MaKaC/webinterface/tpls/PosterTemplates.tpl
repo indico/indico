@@ -12,7 +12,7 @@
 <div class="template_list">
   <ul>
     % for template in templateList:
-    <li>
+    <li class="clear">
         <span class="name">${template['name']}</span>
         <div class="toolbar right thin inline">
           <div class="group">
