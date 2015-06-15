@@ -23,7 +23,7 @@ from operator import attrgetter
 from flask import session, request, flash, jsonify, redirect
 from markupsafe import Markup
 from pytz import timezone
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
 from indico.core.notifications import make_email
@@ -315,15 +315,47 @@ class RHUsersAdminCreate(RHAdminBase):
         return WPUsersAdmin.render_template('users_create.html', form=form)
 
 
+def _get_merge_problems(source, target):
+    errors = []
+    warnings = []
+    if source == target:
+        errors.append(_("Users are the same!"))
+    if (source.first_name.strip().lower() != target.first_name.strip().lower() or
+            source.last_name.strip().lower() != target.last_name.strip().lower()):
+        warnings.append(_("Users' names seem to be different!"))
+    if source.is_pending:
+        warnings.append(_("Source user has never logged in to Indico!"))
+    if target.is_pending:
+        warnings.append(_("Target user has never logged in to Indico!"))
+    if source.is_deleted:
+        errors.append(_("Source user has been deleted!"))
+    if target.is_deleted:
+        errors.append(_("Target user has been deleted!"))
+    if source.is_admin:
+        warnings.append(_("Source user is an administrator!"))
+    if target.is_admin:
+        warnings.append(_("Target user is an administrator!"))
+    if source.is_admin and not target.is_admin:
+        errors.append(_("Source user is an administrator but target user isn't!"))
+    return errors, warnings
+
+
 class RHUsersAdminMerge(RHAdminBase):
     """Merge users (admin)"""
 
     def _process(self):
         form = MergeForm()
         if form.validate_on_submit():
-            source = form['source_user'].data
-            target = form['target_user'].data
-            logger.info("User {} initiated merge of {} into {}".format(session.user, source, target))
+            source = form.source_user.data
+            target = form.target_user.data
+            errors, warnings = _get_merge_problems(source, target)
+            if errors:
+                raise BadRequest(_('Merge aborted due to failed sanity check'))
+            if warnings:
+                logger.info("User {} initiated merge of {} into {} (with {} warnings)".format(session.user, source,
+                                                                                              target, len(warnings)))
+            else:
+                logger.info("User {} initiated merge of {} into {}".format(session.user, source, target))
             merge_users(source, target)
             flash(_('The users have been successfully merged.'), 'success')
             return redirect(url_for('.user_profile', user_id=target.id))
@@ -335,37 +367,5 @@ class RHUsersAdminMergeCheck(RHAdminBase):
     def _process(self):
         source = User.get_one(request.args['source'])
         target = User.get_one(request.args['target'])
-
-        problems = []
-
-        if source == target:
-            problems.append((_("Users are the same!"), 'error'))
-
-        if (source.first_name.strip().lower() != target.first_name.strip().lower() or
-                source.last_name.strip().lower() != target.last_name.strip().lower()):
-            problems.append((_("Users' names seem to be different!"), 'warning'))
-
-        if source.is_pending:
-            problems.append((_("Source user has never logged in to Indico!"), 'warning'))
-
-        if target.is_pending:
-            problems.append((_("Target user has never logged in to Indico!"), 'warning'))
-
-        if source.is_deleted:
-            problems.append((_("Source user has been deleted!"), 'error'))
-
-        if target.is_deleted:
-            problems.append((_("Target user has been deleted!"), 'error'))
-
-        if source.is_admin:
-            problems.append((_("Source user is an administrator!"), 'warning'))
-
-        if target.is_admin:
-            problems.append((_("Target user is an administrator!"), 'warning'))
-
-        if source.is_admin and not target.is_admin:
-            problems.append((_("Source user is an administrator but target user isn't!"), 'error'))
-
-        return jsonify({
-            'problems': problems
-        })
+        errors, warnings = _get_merge_problems(source, target)
+        return jsonify(errors=errors, warnings=warnings)

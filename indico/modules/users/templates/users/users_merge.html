@@ -54,15 +54,25 @@
 
                 $('#flashed-messages').empty();
 
-                $(result.problems).each(function(_, item) {
-                    $('#flashed-messages').append($('<div class="' + item[1] + '-message-box">').append(
-                        $('<div class="message-text">').text(item[0])));
+                function showProblem(problem, isError) {
+                    $('#flashed-messages').append(
+                        $('<div>', {'class': (isError ? 'error' : 'warning') + '-message-box'}).append(
+                            $('<div>', {'class': 'message-text', text: problem})
+                        )
+                    );
 
-                    if (item[1] == 'error') {
+                    if(isError) {
                         allow_submit = false;
-                    } else if (item[1] == 'warning') {
+                    } else {
                         warnings = true;
                     }
+                }
+
+                $(result.warnings).each(function(_, problem) {
+                    showProblem(problem, false);
+                });
+                $(result.errors).each(function(_, problem) {
+                    showProblem(problem, true);
                 });
 
                 $submit.prop('disabled', !allow_submit);
