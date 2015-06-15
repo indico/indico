@@ -120,6 +120,7 @@ class WPBase():
         #store page specific CSS and JS
         self._extraCSS = []
         self._extraJS = []
+        self._extraJSFiles = []
 
     def _getBaseURL(self):
         if request.is_secure and Config.getInstance().getBaseSecureURL():
