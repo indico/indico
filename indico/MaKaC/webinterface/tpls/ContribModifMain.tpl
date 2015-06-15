@@ -259,7 +259,7 @@ var methods = {'addNew': 'contribution.participants.addNewParticipant',
     $('#inPlaceSpeakers').data('manager', speakerManager);
 
 //Drag and drop for the authors
-$('#sortspace').tablesorter({
+$('#sortspace').dragndrop({
 
     onDropFail: function() {
         var popup = new AlertPopup($T('Warning'), $T('You cannot move the user to this list because there is already an author with the same email address.'));

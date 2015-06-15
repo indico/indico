@@ -127,6 +127,7 @@ indico_management = rjs_bundle(
 indico_room_booking = rjs_bundle(
     'indico_room_booking',
     'js/lib/rrule.js',
+    'js/lib/jquery.tablesorter.js',
     *namespace('js/indico/RoomBooking',
 
                'util.js',

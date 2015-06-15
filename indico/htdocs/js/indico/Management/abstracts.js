@@ -46,7 +46,7 @@ $(function() {
     });
 
     // Drag and drop for the authors
-    $('#sortspace').tablesorter({
+    $('#sortspace').dragndrop({
         onDropFail: function() {
             var popup = new AlertPopup($T('Warning'), $T('You cannot move the author to this list because there is already an author with the same email address.'));
             popup.open();

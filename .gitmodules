@@ -56,3 +56,6 @@
 [submodule "ext_modules/chartist.js"]
 	path = ext_modules/chartist.js
 	url = git://github.com/gionkunz/chartist-js.git
+[submodule "ext_modules/jquery-tablesorter"]
+	path = ext_modules/jquery-tablesorter
+	url = https://github.com/Mottie/tablesorter.git

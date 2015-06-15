@@ -410,6 +410,14 @@ def install_jquery_typeahead():
         local('cp src/jquery.typeahead.css {0}'.format(dest_css_dir))
 
 
+@recipe('jquery-tablesorter')
+def install_jquery_tablesorter():
+    with lcd(os.path.join(env.ext_dir, 'jquery-tablesorter')):
+        dest_js_dir = lib_dir(env.src_dir, 'js')
+        local('mkdir -p {0}'.format(dest_js_dir))
+        local('cp dist/js/jquery.tablesorter.js {0}'.format(dest_js_dir))
+
+
 # Tasks
 
 @task
