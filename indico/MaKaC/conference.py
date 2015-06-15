@@ -2204,7 +2204,6 @@ class Conference(CommonObjectBase, Locatable):
         db.session.add(EventLogEntry(event_id=int(self.id), user=user, realm=realm, kind=kind, module=module,
                                      type=type_, summary=summary, data=data or {}))
 
-
     @staticmethod
     def _cmpByDate(self, toCmp):
         res = cmp(self.getStartDate(), toCmp.getStartDate())
