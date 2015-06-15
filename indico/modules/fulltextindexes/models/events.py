@@ -25,8 +25,9 @@ class IndexedEvent(db.Model):
                       {'schema': 'events'})
 
     id = db.Column(
-        db.String,
-        primary_key=True
+        db.Integer,
+        primary_key=True,
+        autoincrement=False
     )
 
     @property

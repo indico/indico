@@ -35,7 +35,7 @@ class EventSettingsMixin(object):
                 {'schema': 'events'})
 
     event_id = db.Column(
-        db.String,
+        db.Integer,
         index=True,
         nullable=False
     )
