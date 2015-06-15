@@ -17,8 +17,8 @@
 from indico.core.db import DBMgr
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.util.date_time import nowutc
-from MaKaC.user import AvatarHolder
+from indico.modules.users import User
+from indico.util.date_time import now_utc
 
 
 class Statistics(object):
@@ -118,8 +118,8 @@ class CategoryStatistics(Statistics):
             for event in cat.conferences:
                 cls._processEvent(dbi, event, stats)
 
-        stats["updated"] = nowutc()
-        stats["users"] = len(AvatarHolder()._getIdx())
+        stats["updated"] = now_utc()
+        stats["users"] = User.query.count()
         cat._statistics = stats
         cat._p_changed = 1
 
