@@ -41,8 +41,8 @@ class StatsBase(object):
         """
         Base class for statistics
 
-        Represents a stats "box" with a title, headline and some content derived
-        from a conference.
+        Represents a stats "box" with a title, headline and some content
+        derived from a conference.
 
         Each instance also holds the reference to a type which hints at
         how the data should be rendered. Each subclass can define it's
@@ -83,8 +83,8 @@ class StatsBase(object):
         """
         The currency used for payments by registrants to the conference.
 
-        Defaults to `CHF` if not set, which happens if e-payment was disabled
-        afterwards.
+        Defaults to `CHF` if not set, which happens if e-payment was
+        disabled afterwards.
 
         :returns: str -- the currency abbreviation
         """
@@ -98,38 +98,40 @@ class Cell(namedtuple('Cell', ['type', 'colspan', 'classes', 'qtip', 'data'])):
 
         Used by the `TableStats` class.
 
-        The format of the data depends on the value (`str`) passed to the type
-        argument.
-        The table below indicates the valid types and the format of the data
-        specific to the type.
+        The format of the data depends on the value (`str`) passed to
+        the type argument.
+        The table below indicates the valid types and the format of the
+        data specific to the type.
 
-        +--------------------+-------------------------------------------------+
-        | type               | data                                            |
-        +====================+=================================================+
-        | `str`              | `str` -- string value                           |
-        +--------------------+-------------------------------------------------+
-        | `progress`         | `(int, str)` -- a tuple with the progress (a    |
-        |                    | value between 0 and 1) and a label              |
-        +--------------------+-------------------------------------------------+
-        | `progress-stacked` | `([int], str)` -- a tuple with a list of        |
-        |                    | progresses (values which must sum up to 1) and  |
-        |                    | a label                                         |
-        +--------------------+-------------------------------------------------+
-        | `currency`         | `float` -- numeric value                        |
-        +--------------------+-------------------------------------------------+
-        | `icon`             | `str` -- icon name, must be a valid icon from   |
-        |                    | `_icons.scss ` (without the `icon-` prefix)     |
-        +--------------------+-------------------------------------------------+
-        | `default` / `None` | `None` -- renders a default cell with an        |
-        |                    | `&mdash;` (use `Cell(type='str')` for an empty  |
-        |                    | cell)                                           |
-        +--------------------+-------------------------------------------------+
+        +--------------------+-----------------------------------------+
+        | type               | data                                    |
+        +====================+=========================================+
+        | `str`              | `str` -- string value                   |
+        +--------------------+-----------------------------------------+
+        | `progress`         | `(int, str)` -- a tuple with the        |
+        |                    | progress (a value between 0 and 1) and  |
+        |                    | a label                                 |
+        +--------------------+-----------------------------------------+
+        | `progress-stacked` | `([int], str)` -- a tuple with a list   |
+        |                    | of progresses (values which must sum up |
+        |                    | to 1) and a label                       |
+        +--------------------+-----------------------------------------+
+        | `currency`         | `float` -- numeric value                |
+        +--------------------+-----------------------------------------+
+        | `icon`             | `str` -- icon name, must be a valid     |
+        |                    | icon from `_icons.scss ` (without the   |
+        |                    | `icon-` prefix)                         |
+        +--------------------+-----------------------------------------+
+        | `default` / `None` | `None` -- renders a default cell with   |
+        |                    | an `&mdash;` (use `Cell(type='str')`    |
+        |                    | for an empty cell)                      |
+        +--------------------+-----------------------------------------+
 
         :param type: str -- The type of data in the cell
         :param colspan: int -- HTML colspan value for the cell
         :param classes: [str] -- HTML classes to apply to the cell
-        :param qtip: str -- string to set as value for the HTML `title` attribute,
-                            used as content for qtip
+        :param qtip: str -- string to set as value for the HTML `title`
+                     attribute, used as content for qtip
         :param data: The data for the cell
         """
         if classes is None:
@@ -153,8 +155,8 @@ class Cell(namedtuple('Cell', ['type', 'colspan', 'classes', 'qtip', 'data'])):
         """
         Visitor-like function to render the cell content in Jinja.
 
-        The cell_macros is a mapping from the cell type to the macro rendering
-        it.
+        The cell_macros is a mapping from the cell type to the macro
+        rendering it.
         """
         try:
             macro = cell_macros[self.type]
@@ -168,24 +170,27 @@ class DataItem(namedtuple('DataItem', ['regs', 'attendance', 'capacity', 'billab
     def __new__(cls, regs=0, attendance=0, capacity=0, billable=False, cancelled=False, cancel_reason='', price=0,
                 fixed_price=False, paid=0, paid_amount=0, unpaid=0, unpaid_amount=0):
         """
-        Holds the aggregation of some data, intended for stats tables as a
-        aggregation from which to generate cells.
+        Holds the aggregation of some data, intended for stats tables as
+        a aggregation from which to generate cells.
 
         :param regs: int -- number of registrant
         :param attendance: int -- number of people attending
-        :param capacity: int -- maximum number of people allowed to attend (`0`
-                         if unlimited)
-        :param billable: bool -- whether the item is billable to the or not
-        :param cancelled: bool -- whether the item is canceled or not
-        :param cancel_reason: str -- reason the item has been canceled `None` if
-                              it is not canceled)
+        :param capacity: int -- maximum number of people allowed to
+                         attend (`0` if unlimited)
+        :param billable: bool -- whether the item is billable to the or
+                         not
+        :param cancelled: bool -- whether the item is cancelled or not
+        :param cancel_reason: str -- reason the item has been cancelled
+                              `None` if it is not cancelled)
         :param price: str -- the price of the item
-        :param fixed_price: bool -- `True` if the price is per registrant,
-                            `False` if accompanying guests must pay as well.
+        :param fixed_price: bool -- `True` if the price is per
+                            registrant, `False` if accompanying guests
+                            must pay as well.
         :param paid: int -- number of registrants who paid
         :param paid_amount: float -- amount already paid by registrants
         :param unpaid: int -- number of registrants who haven't paid
-        :param unpaid_amount: float -- amount not already paid by registrants
+        :param unpaid_amount: float -- amount not already paid by
+                              registrants
         """
         return super(DataItem, cls).__new__(cls, regs, attendance, capacity, billable, cancelled, cancel_reason, price,
                                             fixed_price, paid, paid_amount, unpaid, unpaid_amount)
@@ -196,9 +201,9 @@ class TableStats(object):
         """
         Generates a stats table.
 
-        Takes a list of `items` such as events, sessions, accommodations and so
-        on, as well as a list of registration objects (`reg_items`) for said
-        `items`.
+        Takes a list of `items` such as events, sessions, accommodations
+        and so on, as well as a list of registration objects
+        (`reg_items`) for said `items`.
         """
         kwargs.setdefault('type', 'table')
         super(TableStats, self).__init__(**kwargs)
@@ -215,11 +220,11 @@ class TableStats(object):
 
     def _compute_data(self):
         """
-        Aggregates and format data from `self._items` and `self._reg_items`
-        such that a table can be generated from it.
+        Aggregates and format data from `self._items` and
+        `self._reg_items` such that a table can be generated from it.
 
-        :returns: (dict, bool) -- the data and a boolean to indicate whether the
-                  data contains billing information or not.
+        :returns: (dict, bool) -- the data and a boolean to indicate
+                  whether the data contains billing information or not.
         """
         billed_items = {}
         for k, ritems in groupby((ritem for ritem in self._reg_items if self._is_billable(ritem)), self._key_fn):
@@ -247,16 +252,16 @@ class TableStats(object):
         """
         Returns a table containing the stats for each item.
 
-        If an item has multiple aggregations (determined by the key functions
-        `self._key_fn` and `self._alt_key_fn`), this item will have multiple sub
-        rows, one for each aggregation of data and a header row which contains
-        an aggregation of the sub rows.
-        If an item has a single aggregation if will have a single row as a main
-        row.
+        If an item has multiple aggregations (determined by the key
+        functions `self._key_fn` and `self._alt_key_fn`), this item will
+        have multiple sub rows, one for each aggregation of data and a
+        header row which contains an aggregation of the sub rows.
+        If an item has a single aggregation if will have a single row as
+        a main row.
 
-        :return: dict -- A table with a list of head cells (key: `'head'`) and
-                  a list of rows (key: `'rows'`) where each row is a list of
-                  cells.
+        :return: dict -- A table with a list of head cells
+                 (key: `'head'`) and a list of rows (key: `'rows'`)
+                 where each row is a list of cells.
         """
         table = defaultdict(list)
         table['head'] = self._get_table_head()
@@ -280,8 +285,8 @@ class TableStats(object):
 
     def __nonzero__(self):
         """
-        Used to indicate whether the stats should be displayed or not depending
-        if there is data or not.
+        Used to indicate whether the stats should be displayed or not
+        depending if there is data or not.
         """
         return bool(self._data)
 
@@ -291,25 +296,27 @@ class TableStats(object):
 
         This can be overridden by children.
 
-        :returns: bool -- `True` if the item is billable, false otherwise
+        :returns: bool -- `True` if the item is billable, false
+                  otherwise
         """
         return item.isBillable() and float(item.getPrice()) > 0
 
     def _get_billing(self, item_details):
         """
-        Returns the cells with billing information, in order, for a main row
-        (header or single row).
+        Returns the cells with billing information, in order, for a main
+        row (header or single row).
 
-        :params item_details: [DataItem] -- list of aggregation for which to
-                              generate the cells.
-        :returns: [Cell] -- a list of cells with billing information in order.
+        :params item_details: [DataItem] -- list of aggregation for
+                              which to generate the cells.
+        :returns: [Cell] -- a list of cells with billing information in
+                  order.
         """
         # hide billing details if no session require payments
         if not self._show_billing_info:
             return []
 
-        # Only paid or unpaid accommodation so we move the sub row up as the
-        # header row.
+        # Only paid or unpaid accommodation so we move the sub row up as
+        # the header row.
         if len(item_details) == 1:
             return self._get_billing_details(item_details[0])
 
@@ -332,13 +339,16 @@ class TableStats(object):
 
     def _get_billing_details(self, detail):
         """
-        Returns the cells with billing information, in order, for a sub row.
+        Returns the cells with billing information, in order, for a sub
+        row.
 
-        :params item_details: DataItem -- aggregation for which to generate the
-                              cells.
-        :returns: [Cell] -- a list of cells with billing information in order.
+        :params item_details: DataItem -- aggregation for which to
+                              generate the cells.
+        :returns: [Cell] -- a list of cells with billing information in
+                  order.
         """
-        if not self._show_billing_info:  # hide billing details if no events require payments
+        # hide billing details if no events require payments
+        if not self._show_billing_info:
             return []
 
         if not detail.billable:
@@ -361,10 +371,11 @@ class TableStats(object):
 
     def _item_from_ritem(self, ritem):
         """
-        Returns an "item: of similar type as the items in `self._items` given an
-        "ritem" from `self._reg_items`.
+        Returns an "item: of similar type as the items in `self._items`
+        given an "ritem" from `self._reg_items`.
 
-        Must be overridden by children accordingly based on items and reg items.
+        Must be overridden by children accordingly based on items and
+        reg items.
         """
         raise NotImplementedError
 
@@ -372,12 +383,14 @@ class TableStats(object):
         """
         The key function used to sort and group by reg items.
 
-        It must include the name (title or caption) and the id of the item.
-        This should also include the price or other billing information by which
-        to aggregate.
+        It must include the name (title or caption) and the id of the
+        item.
+        This should also include the price or other billing information
+        by which to aggregate.
 
         :param item: the item from which to derive a key.
-        :returns: tuple -- tuple to be used as a key to sort and group items by.
+        :returns: tuple -- tuple to be used as a key to sort and group
+                  items by.
         """
         raise NotImplementedError
 
@@ -385,19 +398,21 @@ class TableStats(object):
         """
         The alternate key function used to sort and group by reg items.
 
-        It must include the name (title or caption) and the id of the item.
+        It must include the name (title or caption) and the id of the
+        item.
         This should explicitly not include the price or other billing
         information in order to identify free reg items.
 
         :param item: the item from which to derive a key.
-        :returns: tuple -- tuple to be used as a key to sort and group items by.
+        :returns: tuple -- tuple to be used as a key to sort and group
+                  items by.
         """
         raise NotImplementedError
 
     def _billed_data_from_ritems(self, key, ritems):
         """
-        Returns a `DataItem` containing the aggregation of reg items (`ritems`)
-        which are billed to the registrants.
+        Returns a `DataItem` containing the aggregation of reg items
+        (`ritems`) which are billed to the registrants.
 
         :param ritems: list -- list of reg items to be aggregated
         :returns: DataItem -- the aggregation of the `ritems`
@@ -406,8 +421,8 @@ class TableStats(object):
 
     def _not_billed_data_from_ritems(self, key, ritems):
         """
-        Returns a `DataItem` containing the aggregation of reg items (`ritems`)
-        which are not billed to the registrants.
+        Returns a `DataItem` containing the aggregation of reg items
+        (`ritems`) which are not billed to the registrants.
 
         :param ritems: list -- list of reg items to be aggregated
         :returns: DataItem -- the aggregation of the `ritems`
@@ -416,8 +431,8 @@ class TableStats(object):
 
     def _billed_data_from_item(self, item):
         """
-        Returns a `DataItem` containing the aggregation of an item which is
-        billed to the registrants.
+        Returns a `DataItem` containing the aggregation of an item which
+        is billed to the registrants.
 
         :param item: list -- item to be aggregated
         :returns: DataItem -- the aggregation of the `item`
@@ -426,8 +441,8 @@ class TableStats(object):
 
     def _not_billed_data_from_item(self, item):
         """
-        Returns a `DataItem` containing the aggregation of an item which is not
-        billed to the registrants.
+        Returns a `DataItem` containing the aggregation of an item which
+        is not billed to the registrants.
 
         :param item: list -- item to be aggregated
         :returns: DataItem -- the aggregation of the `item`
@@ -438,9 +453,11 @@ class TableStats(object):
         """
         Returns the name and id of an item from its key.
 
-        The key corresponds to output of `self._key_fn` for a given item.
+        The key corresponds to output of `self._key_fn` for a given
+        item.
 
-        :returns: (name, id) -- a tuple containing the name and id of item
+        :returns: (name, id) -- a tuple containing the name and id of
+                  item
         """
         raise NotImplementedError
 
@@ -448,15 +465,18 @@ class TableStats(object):
         """
         Returns the name and id of an item from its key.
 
-        The key corresponds to output of `self._alt_key_fn` for a given item.
+        The key corresponds to output of `self._alt_key_fn` for a given
+        item.
 
-        :returns: (name, id) -- a tuple containing the name and id of item
+        :returns: (name, id) -- a tuple containing the name and id of
+                  item
         """
         raise NotImplementedError
 
     def _get_table_head(self):
         """
-        Returns a list of `Cell` corresponding to the headers of a the table.
+        Returns a list of `Cell` corresponding to the headers of a the
+        table.
 
         :returns: [Cell] -- the headers of the table.
         """
@@ -466,16 +486,17 @@ class TableStats(object):
         """
         Returns a cancel reason from a list of `DataItem`.
 
-        If any item in the list of `DataItem` has the cancelled flag set,
-        returns a first cancel_reason from the list of `DataItem`.
+        If any item in the list of `DataItem` has the cancelled flag
+        set, returns a first cancel_reason from the list of `DataItem`.
 
-        If no cancel reason is found, a default reason should be returned.
+        If no cancel reason is found, a default reason should be
+        returned.
 
         Returns `None` if nono of the `cancelled` flag are set.
 
         :param details: [DataItem] -- a list of items w
-        :returns: str -- a cancel reason if an item has the `cancelled` flag
-                         set, `None` otherwise.
+        :returns: str -- a cancel reason if an item has the `cancelled`
+                  flag set, `None` otherwise.
         """
         raise NotImplementedError
 
@@ -486,11 +507,12 @@ class TableStats(object):
         Each `item` has a main row. The row is a list of `Cell` which matches
         the table head.
 
-        :param item_details: [DataItem] -- list of aggregations for the item
+        :param item_details: [DataItem] -- list of aggregations for the
+                             item
         :param item_name: str -- the item's name
         :param num_regs: int -- the number of registrants for the item
-        :param cancel_reason: str -- the cancel reason for this item if it is
-                              canceled, `None` otherwise
+        :param cancel_reason: str -- the cancel reason for this item if
+                              it is canceled, `None` otherwise
 
         :returns: [Cell] -- the list of cells constituting the row.
         """
@@ -500,8 +522,8 @@ class TableStats(object):
         """
         Returns the cells of the sub row of the table.
 
-        An `item` cna have a sub row. The row is a list of `Cell` which matches
-        the table head.
+        An `item` can have a sub row. The row is a list of `Cell` which
+        matches the table head.
 
         :param details: DataItem -- aggregation for the item
         :param num_regs: int -- the number of registrants for the item
@@ -521,10 +543,10 @@ class OverviewStats(StatsBase):
             - days left to register
             - number of countries of origins from registrants
             - availability of the conference
-            - repartition of registrants per country of origin (for top 15
-              countries)
+            - repartition of registrants per country of origin (for top
+              15 countries)
         """
-        super(OverviewStats, self).__init__(conf=conf, title=_("Overview"), headline="", template='stats_overview.html')
+        super(OverviewStats, self).__init__(conf=conf, title=_("Overview"), headline="", type='overview')
         self.registrants_sorted = sorted(self.registrants, key=methodcaller('getCountry'))  # sort for groupby
         self.countries, self.num_countries = self._compute_countries()
         self.availability = self._compute_availibility()
@@ -559,7 +581,7 @@ class OverviewStats(StatsBase):
 class AccommodationStats(TableStats, StatsBase):
     def __init__(self, conf):
         super(AccommodationStats, self).__init__(
-            conf=conf, title=_("Accommodation"), headline="", template='stats_accomodation.html',
+            conf=conf, title=_("Accommodation"), headline="",
             items=conf.getRegistrationForm().getAccommodationForm().getAccommodationTypesList(),
             reg_items=(r.getAccommodation() for r in conf.getRegistrantsList()
                        if r.getAccommodation() is not None and r.getAccommodation().getAccommodationType() is not None)
@@ -678,7 +700,7 @@ class AccommodationStats(TableStats, StatsBase):
 class SessionStats(TableStats, StatsBase):
     def __init__(self, conf):
         super(SessionStats, self).__init__(
-            conf=conf, title=_("Sessions"), headline="", template='stats_sessions.html',
+            conf=conf, title=_("Sessions"), headline="",
             items=(reg_ses for reg_ses in conf.getRegistrationForm().getSessionsForm().getSessionList()
                    if reg_ses.getSession() is not None),
             reg_items=(reg_ses for r in conf.getRegistrantsList() for reg_ses in r.getSessionList()
@@ -757,16 +779,22 @@ class SessionStats(TableStats, StatsBase):
 class SocialEventsStats(TableStats, StatsBase):
     def __init__(self, conf):
         super(SocialEventsStats, self).__init__(
-            conf=conf, title=None, headline=None, template='stats_social_events.html',
+            conf=conf, title=None, headline=None,
             items=(e for e in conf.getRegistrationForm().getSocialEventForm().getSocialEventList() if e is not None),
             reg_items=(re for r in conf.getRegistrantsList() for re in r.getSocialEvents() if re is not None))
         self._form = self._conf.getRegistrationForm().getSocialEventForm()
         # Override title and headline
         self.title = self._form.getTitle()
-        self.headline = _("Registrants {} select {}.").format(
-            '<b>{}</b>'.format(_("must")) if self.mandatory else _("can"),
-            _("multiple events") if self.selection_type == "multiple" else _("a unique event")
-        )
+        if self.mandatory:
+            if self.selection_type == 'multiple':
+                self.headline = _("Registrants <strong>must</strong> select multiple events.")
+            else:
+                self.headline = _("Registrants <strong>must</strong> select a unique event.")
+        else:
+            if self.selection_type == 'multiple':
+                self.headline = _("Registrants <strong>can</strong> select multiple events.")
+            else:
+                self.headline = _("Registrants <strong>can</strong> select a unique event.")
 
     @property
     def selection_type(self):
@@ -909,7 +937,8 @@ class SocialEventsStats(TableStats, StatsBase):
         if not billing_cells:  # no billing details
             return billing_cells
 
-        # The users icon is displayed when accompanying guests must pay as well.
+        # The users icon is displayed when accompanying guests must pay
+        # as well.
         price_details = (Cell(type='str', classes=['stick-left']) if details.fixed_price else
                          Cell(type='icon', data='users', qtip='accompanying guests must pay', classes=['stick-left']))
 
