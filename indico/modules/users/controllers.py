@@ -357,6 +357,15 @@ class RHUsersAdminMergeCheck(RHAdminBase):
         if target.is_deleted:
             problems.append((_("Target user has been deleted!"), 'error'))
 
+        if source.is_admin:
+            problems.append((_("Source user is an administrator!"), 'warning'))
+
+        if target.is_admin:
+            problems.append((_("Target user is an administrator!"), 'warning'))
+
+        if source.is_admin and not target.is_admin:
+            problems.append((_("Source user is an administrator but target user isn't!"), 'error'))
+
         return jsonify({
             'problems': problems
         })
