@@ -54,7 +54,7 @@ from indico.modules.oauth import oauth
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         equalto, call_template_hook)
+                                         equalto, call_template_hook, groupby)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
@@ -181,6 +181,7 @@ def setup_jinja(app):
     app.add_template_filter(markdown)
     app.add_template_filter(dedent)
     app.add_template_filter(natsort)
+    app.add_template_filter(groupby)
     app.add_template_filter(any)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!

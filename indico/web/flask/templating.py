@@ -15,13 +15,14 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import itertools
 import re
 from heapq import heappush
 
 from flask import current_app as app
 from jinja2 import environmentfilter
 from jinja2.ext import Extension
-from jinja2.filters import make_attrgetter
+from jinja2.filters import make_attrgetter, _GroupTuple
 from jinja2.lexer import Token
 from markupsafe import Markup
 
@@ -72,6 +73,13 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
             return processor(getter(item))
 
     return sorted(value, key=sort_func, reverse=reverse)
+
+
+@environmentfilter
+def groupby(environment, value, attribute, reverse=False):
+    """Like Jinja's builtin `groupby` filter, but allows reversed order."""
+    expr = make_attrgetter(environment, attribute)
+    return sorted(map(_GroupTuple, itertools.groupby(sorted(value, key=expr), expr)), reverse=reverse)
 
 
 def instanceof(value, type_):
