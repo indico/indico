@@ -11,7 +11,7 @@
                 <span class="i-button label">
                     {% trans %}Filter by{% endtrans %}
                 </span>
-                {% for realm in realms %}
+                {% for realm in realms|sort(attribute='name') %}
                     <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
                     <label for="realm-{{ realm.name }}" class="i-button">
                         {{ realm.title }}
@@ -19,7 +19,7 @@
                 {% endfor %}
             </div>
             <div class="group left">
-                <a href="#" id="expand-all" class="i-button" title="{% trans %}Expand all{% endtrans %}" >
+                <a href="#" id="expand-all" class="i-button" title="{% trans %}Expand all{% endtrans %}">
                     <span class="icon-stack-plus"></span>
                 </a>
                 <a href="#" id="collapse-all" class="i-button" title="{% trans %}Collapse all{% endtrans %}">
@@ -45,13 +45,13 @@
         {% trans %}All results hidden{% endtrans %}
     </h3>
 
-    {% for group, entries in entries|groupby('logged_date') %}
+    {% for group, entries in entries|groupby('logged_date', reverse=true) %}
         <h3 class="i-table searchable">
             {{ group|format_human_date(format='full')|title }}
         </h3>
         <table id="log-table-{{ group }}" class="i-table log-table">
             {% for entry in entries %}
-                {{ entry.render() | safe}}
+                {{ entry.render() | safe }}
             {% endfor %}
         </table>
     {% endfor %}
@@ -74,7 +74,7 @@
                         var $set = $(this);
                         $set.replaceWith($set.contents());
                     });
-            };
+            }
 
             function collapseRow(row) {
                 row.removeClass("active");
@@ -86,7 +86,7 @@
                         row.removeClass("no-border-bottom");
                         row.next().addClass("weak-hidden");
                     });
-            };
+            }
 
             function applyFilters() {
                 var checkboxes = $(".i-selection input:checkbox:checked");
@@ -101,7 +101,7 @@
                 // Needed because $(window).scroll() is not called when hiding elements
                 // causing scrolling elements to be out of place.
                 $(window).trigger("scroll");
-            };
+            }
 
             function findEntries() {
                 var term = $("#search-input").val();
@@ -113,10 +113,10 @@
                                                                          .parents("tr.i-table.interactive"));
                 result_cache[term] = items;
                 return items;
-            };
+            }
 
             var buildFilter = function(checkboxes) {
-                var filters = {}
+                var filters = {};
                 checkboxes.each(function() {
                     filters[$(this).data('realm')] = true;
                 });
