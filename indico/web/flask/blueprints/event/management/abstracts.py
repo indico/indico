@@ -151,7 +151,7 @@ event_mgmt.add_url_rule('/call-for-abstracts/reviewing/team', 'abstractReviewing
 event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/', 'abstractReviewing-notifTpl',
                         abstractReviewing.RHNotifTpl)
 event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/add', 'abstractReviewing-notifTplNew',
-                        abstractReviewing.RHCFANotifTplNew, methods=('POST',))
+                        abstractReviewing.RHCFANotifTplNew, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/remove', 'abstractReviewing-notifTplRem',
                         abstractReviewing.RHCFANotifTplRem, methods=('POST',))
 event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/',

@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
 
 from MaKaC.webinterface.rh.conferenceModif import RHConfModifCFABase
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -49,8 +50,8 @@ class RHCFANotifTplBase(RHConfModifCFABase):
 
     def _checkParams( self, params):
         RHConfModifCFABase._checkParams( self, params)
-        self._cancel = params.get("cancel", None)
-        self._save = params.get("save", None)
+        self._cancel = request.form.get("cancel", None)
+        self._save = request.form.get("save", None)
         if self._save:
             self._title = params.get("title", "")
             self._description = params.get("description","")
