@@ -39,6 +39,7 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
@@ -314,6 +315,16 @@ class CommonObjectBase(CoreObject, Fossilizable):
 class CategoryManager(ObjectHolder):
     idxName = "categories"
     counterName = "CATEGORY"
+
+    def getById(self, id_, quiet=False):
+        orig_id = id_ = str(id_)
+        if is_legacy_id(id_):
+            mapping = LegacyCategoryMapping.find_first(legacy_category_id=id_)
+            id_ = str(mapping.category_id) if mapping is not None else None
+        category = self._getIdx().get(id_) if id_ is not None else None
+        if category is None and not quiet:
+            raise KeyError(id_ if id_ is not None else orig_id)
+        return category
 
     def add(self, category):
         ObjectHolder.add(self, category)

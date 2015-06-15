@@ -22,7 +22,7 @@ class IndexedCategory(db.Model):
 
     __tablename__ = 'category_index'
     __table_args__ = (db.Index(None, 'title_vector', postgresql_using='gin'),
-                      {'schema': 'indico'})
+                      {'schema': 'categories'})
 
     id = db.Column(
         db.String,

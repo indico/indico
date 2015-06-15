@@ -23,6 +23,7 @@ import pytz
 from datetime import datetime
 
 # indico imports
+from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 
@@ -32,9 +33,6 @@ from indico.web.http_api.fossils import IConferenceMetadataWithContribsFossil, I
     ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil, IContributionMetadataWithSubContribsFossil
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
-from indico.core.db.sqlalchemy import db
-from indico.modules.fulltextindexes.models.events import IndexedEvent
-from sqlalchemy import func
 
 # indico legacy imports
 from MaKaC.conference import CategoryManager
@@ -116,10 +114,13 @@ class CategoryEventHook(HTTPAPIHook):
 
     def export_categ(self, aw):
         expInt = CategoryEventFetcher(aw, self)
-        idList = list(self._idList)
+        id_list = set(self._idList)
         if self._wantFavorites and aw.getUser():
-            idList += [c.getId() for c in aw.getUser().user.favorite_categories]
-        return expInt.category(idList)
+            id_list.update(c.getId() for c in aw.getUser().user.favorite_categories)
+        legacy_id_map = {m.legacy_category_id: m.category_id
+                         for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
+        id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}
+        return expInt.category(id_list)
 
     def export_categ_extra(self, aw, resultList):
         ids = set((event['categoryId'] for event in resultList))

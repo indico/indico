@@ -62,10 +62,7 @@ class FavoriteCategory(db.Model):
     @property
     def target(self):
         from MaKaC.conference import CategoryManager
-        try:
-            return CategoryManager().getById(self.target_id)
-        except KeyError:
-            return None
+        return CategoryManager().getById(self.target_id, True)
 
     @target.setter
     def target(self, value):
