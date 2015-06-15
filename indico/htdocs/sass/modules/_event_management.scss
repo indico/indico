@@ -47,3 +47,37 @@
 .reminders {
     width: 650px;
 }
+
+
+// ============================================================================
+// Log tables
+// ============================================================================
+
+td.i-table {
+    &.log-caption {
+        width: 175px;
+    }
+
+    &.log-module {
+        font-weight: bold;
+        width: 150px;
+    }
+
+    &.log-subject {
+        width: auto;
+    }
+
+    &.log-stamp {
+        text-align: right;
+        text-overflow: clip;
+        width: 230px;
+
+        span.user-name {
+           display: inline-block;
+           max-width: 120px;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           vertical-align: bottom;
+        }
+    }
+}
