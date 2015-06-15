@@ -23,6 +23,9 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 class WPEventLogs(WPConferenceModifBase, WPJinjaMixin):
     template_prefix = 'events/logs/'
 
+    def getCSSFiles(self):
+            return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+
     def _setActiveSideMenuItem(self):
         self.extra_menu_items_advanced['logs'].setActive()
 

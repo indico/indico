@@ -52,13 +52,13 @@ td.i-table {
         font-style: italic;
     }
 
-    &[class*="icon-"] {
+    &.log-icon {
          width: 30px;
 
-         &:before {
+        i:before {
             color: $black !important;
             font-size: 1.2em;
-         }
+        }
     }
 
     & ~ td.i-table {
@@ -158,40 +158,6 @@ tr.i-table.content {
         > td.i-table.caption,
         > td.i-table.value {
             border-bottom: none;
-        }
-    }
-}
-
-
-// ============================================================================
-// View specifics
-// ============================================================================
-
-td.i-table {
-    &.log-caption {
-        width: 175px;
-    }
-
-    &.log-module {
-        font-weight: bold;
-        width: 150px;
-    }
-
-    &.log-subject {
-        width: auto;
-    }
-
-    &.log-stamp {
-        text-align: right;
-        text-overflow: clip;
-        width: 230px;
-
-        span.user-name {
-           display: inline-block;
-           max-width: 120px;
-           overflow: hidden;
-           text-overflow: ellipsis;
-           vertical-align: bottom;
         }
     }
 }

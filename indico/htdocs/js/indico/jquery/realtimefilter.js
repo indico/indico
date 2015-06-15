@@ -44,7 +44,7 @@
 
             if (opt.clearable) {
                 element.clearableinput({
-                    callback: function() {
+                    onClear: function() {
                         self._delayedCallback();
                     },
                     emptyvalue: opt.emptyvalue
@@ -73,7 +73,7 @@
         setValue: function(value) {
             var self = this;
 
-            self.element.clearableinput('setValue', value)
+            self.element.clearableinput('setValue', value);
         },
 
         update: function(delayed) {

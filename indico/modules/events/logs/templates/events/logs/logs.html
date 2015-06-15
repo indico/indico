@@ -1,7 +1,189 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}{% trans %}Logs{% endtrans %}{% endblock %}
+{% block title %}
+    {%- trans %}Logs{% endtrans -%}
+{% endblock %}
 
 {% block content %}
-    TODO
-{% endblock %}
+    <div class="follow-scroll">
+        <div class="toolbar">
+            <div class="group i-selection left">
+                <span class="i-button label">
+                    {% trans %}Filter by{% endtrans %}
+                </span>
+                {% for realm in realms %}
+                    <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
+                    <label for="realm-{{ realm.name }}" class="i-button">
+                        {{ realm.title }}
+                    </label>
+                {% endfor %}
+            </div>
+            <div class="group left">
+                <a href="#" id="expand-all" class="i-button" title="{% trans %}Expand all{% endtrans %}" >
+                    <span class="icon-stack-plus"></span>
+                </a>
+                <a href="#" id="collapse-all" class="i-button" title="{% trans %}Collapse all{% endtrans %}">
+                    <span class="icon-stack-minus"></span>
+                </a>
+            </div>
+            <div class="group right">
+                <span class="i-button label">
+                    <span class="icon-search"></span>
+                </span>
+                <input type="text" id="search-input">
+            </div>
+        </div>
+    </div>
+
+    {% if not entries %}
+        <h3 class="i-table emphasis border">
+            {% trans %}The log is empty{% endtrans %}
+        </h3>
+    {% endif %}
+
+    <h3 id="nothing-to-show" class="i-table emphasis border hidden">
+        {% trans %}All results hidden{% endtrans %}
+    </h3>
+
+    {% for group, entries in entries|groupby('logged_date') %}
+        <h3 class="i-table searchable">
+            {{ group|format_human_date(format='full')|title }}
+        </h3>
+        <table id="log-table-{{ group }}" class="i-table log-table">
+            {% for entry in entries %}
+                {{ entry.render() | safe}}
+            {% endfor %}
+        </table>
+    {% endfor %}
+
+    <script>
+        $(document).ready(function() {
+            'use strict';
+
+            var result_cache = [];
+            var table_titles = $("h3.i-table");
+            var tables = $(".log-table");
+            var log_entries = $("tr.i-table.interactive");
+            var log_entries_details = $("tr.i-table.content-wrapper");
+
+            function expandRow(row) {
+                row.addClass("active no-border-bottom");
+                row.next().removeClass("weak-hidden")
+                    .children("td").wrapInner('<div style="display: none;" />')
+                    .parent().find("td > div").slideDown(400, function() {
+                        var $set = $(this);
+                        $set.replaceWith($set.contents());
+                    });
+            };
+
+            function collapseRow(row) {
+                row.removeClass("active");
+                row.next()
+                    .children("td").wrapInner('<div style="display: block;" />')
+                    .parent().find("td > div").slideUp(400, function() {
+                        var $set = $(this);
+                        $set.replaceWith($set.contents());
+                        row.removeClass("no-border-bottom");
+                        row.next().addClass("weak-hidden");
+                    });
+            };
+
+            function applyFilters() {
+                var checkboxes = $(".i-selection input:checkbox:checked");
+                var items = findEntries().filter(buildFilter(checkboxes));
+                table_titles.show();
+                tables.show();
+                log_entries.hide();
+                log_entries_details.addClass("weak-hidden");
+                showAllEntries(items);
+                hideEmptyTables();
+
+                // Needed because $(window).scroll() is not called when hiding elements
+                // causing scrolling elements to be out of place.
+                $(window).trigger("scroll");
+            };
+
+            function findEntries() {
+                var term = $("#search-input").val();
+                if (result_cache[term] !== undefined) {
+                    return result_cache[term];
+                }
+                var items = $("h3.i-table.searchable").textContains(term).next().find("tr.i-table.interactive");
+                items = items.add($("tr.i-table.interactive .searchable").textContains(term)
+                                                                         .parents("tr.i-table.interactive"));
+                result_cache[term] = items;
+                return items;
+            };
+
+            var buildFilter = function(checkboxes) {
+                var filters = {}
+                checkboxes.each(function() {
+                    filters[$(this).data('realm')] = true;
+                });
+
+                return function() {
+                    return $(this).data('realm') in filters;
+                }
+            };
+
+            var showAllEntries = function(items) {
+                items.show();
+                items.each(function() {
+                    if ($(this).hasClass("active")) {
+                        $(this).next(".content-wrapper").removeClass("weak-hidden");
+                    } else {
+                        $(this).next(".content-wrapper").addClass("weak-hidden");
+                    }
+                });
+            };
+
+            var hideEmptyTables = function() {
+                var empty_tables = $("tr.i-table.interactive:hidden").parents("table.i-table")
+                                                                     .not($("tr.i-table.interactive:visible")
+                                                                     .parents("table.i-table"));
+                empty_tables.hide();
+                empty_tables.prev().hide();
+
+                if ((tables.length > 0) && ($(".log-table:visible").length === 0)) {
+                    $("#nothing-to-show").removeClass("hidden");
+                } else {
+                    $("#nothing-to-show").addClass("hidden");
+                }
+            };
+
+            $(window).scroll(function(){
+                IndicoUI.Effect.followScroll();
+            });
+
+            $("tr.i-table.interactive").on('click', function() {
+                if ($(this).hasClass("active")) {
+                    collapseRow($(this));
+                } else {
+                    expandRow($(this));
+                }
+            });
+
+            /* Event checkbox selector behavior */
+            $(".i-selection input[type=checkbox]").change(function() {
+                applyFilters();
+            });
+
+            /* Action buttons behavior */
+            $("#expand-all").click(function(e) {
+                e.preventDefault();
+                $("tr.i-table.interactive:visible").addClass("active no-border-bottom").next().removeClass("weak-hidden");
+            });
+
+            $("#collapse-all").click(function(e) {
+                e.preventDefault();
+                $("tr.i-table.interactive").removeClass("active no-border-bottom").next().addClass("weak-hidden");
+            });
+
+            $("#search-input").realtimefilter({
+                callback: function() {
+                    applyFilters();
+                }
+            });
+        });
+    </script>
+{% endblock %}z
