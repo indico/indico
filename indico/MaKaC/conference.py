@@ -38,6 +38,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
+from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
@@ -4791,23 +4792,19 @@ class ConferenceHolder( ObjectHolder ):
         id = ObjectHolder._newId( self )
         return "%s"%id
 
-    def getById( self, id, quiet=False ):
-        """returns an object from the index which id corresponds to the one
-            which is specified.
-        """
-
-        if (id == "default"):
+    def getById(self, id, quiet=False):
+        if id == 'default':
             return CategoryManager().getDefaultConference()
 
-        if type(id) is int:
-            id = str(id)
-        if self._getIdx().has_key(str(id)):
-            return self._getIdx()[str(id)]
-        elif quiet:
-            return None
-        else:
+        id = str(id)
+        if is_legacy_id(id):
+            mapping = LegacyEventMapping.find_first(legacy_event_id=id)
+            id = str(mapping.event_id) if mapping is not None else None
+        event = self._getIdx().get(id) if id is not None else None
+        if event is None and not quiet:
             raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(id),
                                 title=_("Event not found"))
+        return event
 
 
 class Observer(object):

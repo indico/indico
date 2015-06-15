@@ -344,6 +344,7 @@ if __name__ == '__main__':
             evaluation_alarms = indico_zodbimport.modules.evaluation_alarms:EvaluationAlarmImporter
             static_sites = indico_zodbimport.modules.static_sites:StaticSitesImporter
             event_alarms = indico_zodbimport.modules.event_alarms:EventAlarmImporter
+            legacy_events = indico_zodbimport.modules.legacy_events:LegacyEventImporter
             """,
           zip_safe=False,
           packages=foundPackages,
