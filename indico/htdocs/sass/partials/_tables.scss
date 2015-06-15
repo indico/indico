@@ -52,13 +52,13 @@ td.i-table {
         font-style: italic;
     }
 
-    &[class*="icon-"] {
+    &.log-icon {
          width: 30px;
 
-         &:before {
+        i:before {
             color: $black !important;
             font-size: 1.2em;
-         }
+        }
     }
 
     & ~ td.i-table {

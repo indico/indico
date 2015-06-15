@@ -1,0 +1,52 @@
+<tr class="i-table interactive" data-type="{{ entry.type }}" data-realm="{{ entry.realm.name }}">
+    <td class="i-table log-icon">
+        <i class="{% block icon %}icon-key-A{% endblock %}"></i>
+    </td>
+    <td class="i-table log-module searchable" title="{{ entry.module }}">
+        {{ entry.module }}
+    </td>
+    <td class="i-table log-subject searchable" title="{{ entry.summary }}">
+        {{ entry.summary }}
+    </td>
+    <td class="i-table log-stamp text-superfluous">
+        {% if entry.user %}
+            {% trans user=entry.user.name, time=entry.logged_dt|format_time('medium') -%}
+                by <span class="text-normal searchable user-name">{{ user }}</span>
+                at <span class="text-normal">{{ time }}</span>
+            {%- endtrans %}
+        {% else %}
+            <span class="text-normal">
+                {{ entry.logged_dt|format_time('medium') }}
+            </span>
+        {% endif %}
+    </td>
+</tr>
+
+<tr class="i-table content-wrapper weak-hidden">
+    <td class="i-table" colspan="4">
+        <table class="i-table no-margin">
+            {% block entry_detail_rows %}
+                {% if not entry.data %}
+                    <tr class="i-table content">
+                        <td class="i-table caption log-caption"></td>
+                        <td class="i-table value empty">
+                            {% trans %}No data to display{% endtrans %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% for key, value in entry.data.iteritems() %}
+                    {% if value %}
+                        <tr class="i-table content">
+                            <td class="i-table caption log-caption">
+                                {{ key }}
+                            </td>
+                            <td class="i-table value searchable">
+                                {{ value }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endblock %}
+        </table>
+    </td>
+</tr>

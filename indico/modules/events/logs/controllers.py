@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.logs.views import WPEventLogs
+from indico.modules.events.logs.models.entries import EventLogEntry
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -24,4 +25,6 @@ class RHEventLogs(RHConferenceModifBase):
     """Shows the modification/action log for the event"""
 
     def _process(self):
-        return WPEventLogs.render_template('logs.html', self._conf)
+        entries = EventLogEntry.find(event_id=int(self._conf.id)).order_by(EventLogEntry.logged_dt.desc()).all()
+        realms = {e.realm for e in entries}
+        return WPEventLogs.render_template('logs.html', self._conf, entries=entries, realms=realms)
