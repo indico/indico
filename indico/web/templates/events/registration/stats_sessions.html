@@ -1,5 +1,0 @@
-{% extends 'events/registration/_stats_box.html' %}
-{% block content -%}
-    <table class="registrant-stats">{{ data.html|safe }}</table>
-    {{ stats_table.generate_table(data.get_table()) }}
-{%- endblock %}

@@ -37,27 +37,28 @@ class RHRegistrationStats(RHRegistrationFormModifBase):
 
 
 class StatsBase(object):
-    def __init__(self, conf, title, headline, template, **kwargs):
+    def __init__(self, conf, title, headline, type, **kwargs):
         """
         Base class for statistics
 
         Represents a stats "box" with a title, headline and some content derived
         from a conference.
 
-        Each instance also holds the reference to the template used for
-        rendering. It should be a template extending
-        `events/registration/_stats_box.html`.
+        Each instance also holds the reference to a type which hints at
+        how the data should be rendered. Each subclass can define it's
+        own type; but a macro to render it must be defined and called in
+        `events/registration/stats.html`.
 
         :param conf: Conference -- the conference object
         :param title: str -- the title for the stats box
         :param headline: str -- the headline for the stats box
-        :param template: str -- the Jinja template to render the stats box
+        :param type: str -- the type used in Jinja to display the stats
         """
         super(StatsBase, self).__init__(**kwargs)
         self._conf = conf
         self.title = title
         self.headline = headline
-        self.template = template
+        self.type = type
 
     @property
     def show_currency_info(self):
@@ -199,6 +200,7 @@ class TableStats(object):
         on, as well as a list of registration objects (`reg_items`) for said
         `items`.
         """
+        kwargs.setdefault('type', 'table')
         super(TableStats, self).__init__(**kwargs)
         self._items = {item.getId(): item for item in items}
         self._reg_items = sorted(reg_items, key=self._key_fn)
