@@ -54,13 +54,14 @@ class RHAPIRegistrant(RH):
     def _get_result(self, **kwargs):
         checkin_date = None
         if self.registrant.isCheckedIn():
-            checkin_date = format_datetime(self.registrant.getAdjustedCheckInDate(), format='short')
+            checkin_date = self.registrant.getCheckInDate().isoformat()
         return jsonify(event_id=self.event.getId(),
                        registrant_id=self.registrant.getId(),
                        full_name=self.registrant.getFullName(title=True, firstNameFirst=True),
                        checked_in=self.registrant.isCheckedIn(),
                        checkin_secret=self.registrant.getCheckInUUID(),
                        checkin_date=checkin_date,
+                       registration_date=self.registrant.getRegistrationDate().isoformat(),
                        **kwargs)
 
     def _process_GET(self):
