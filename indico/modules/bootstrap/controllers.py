@@ -20,46 +20,41 @@ from operator import itemgetter
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
 from requests.exceptions import HTTPError, Timeout
-from wtforms import validators, TextField, SelectField, BooleanField
-from wtforms.fields.html5 import EmailField
 
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.errors import AccessError, FormValuesError
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.auth import Identity, login_user
-from indico.modules.auth.forms import LocalRegistrationForm
+from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales, parse_locale
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
-from indico.web.forms.validators import UsedIfChecked
-from indico.web.forms.widgets import SwitchWidget
 
-# TODO: set the time zone  here once communities settings are available.
+# TODO: set the time zone here once communities settings are available.
 
 
-class RHInitialSetup(RH):
+class RHBootstrap(RH):
 
     def _checkProtection(self):
-        if User.query.count() > 0:
-            raise AccessError
+        if db.session.query(db.session.query(User.id).exists()).one()[0]:
+            return redirect(url_for('misc.index'))
 
     def _process_GET(self):
-        return render_template('initial_setup.html',
+        return render_template('bootstrap/bootstrap.html',
                                selected_lang_name=parse_locale(session.lang).language_name,
                                language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
-                               form=InitialSetupForm(language=session.lang),
+                               form=BootstrapForm(language=session.lang),
                                timezone=Config.getInstance().getDefaultTimezone())
 
     def _process_POST(self):
-        setup_form = InitialSetupForm(request.form)
+        setup_form = BootstrapForm(request.form)
         if not setup_form.validate():
-            print setup_form.errors
-            raise FormValuesError(_("Some fields are invalid. Please, correct them and submit the form again."))
+            flash(_("Some fields are invalid. Please, correct them and submit the form again."), 'error')
+            return redirect(url_for('bootstrap.index'))
 
         # Creating new user
         user = User()
@@ -93,11 +88,11 @@ class RHInitialSetup(RH):
 
         # Activate instance tracking
         if setup_form.enable_tracking.data:
-            contact = setup_form.it_contact.data
-            email = setup_form.it_email.data
+            contact_name = setup_form.contact_name.data
+            contact_email = setup_form.contact_email.data
 
             try:
-                register_instance(contact, email)
+                register_instance(contact_name, contact_email)
             except (HTTPError, ValueError) as err:
                 flash(Markup(_("Instance tracking registration failed with: {err.message}.<br>"
                                "See the logs for details and try again <a href=\"{link}\">here</a>.").format(
@@ -105,22 +100,8 @@ class RHInitialSetup(RH):
             except Timeout:
                 flash(Markup(_("Instance tracking registration timed-out. Please try again in a while "
                                "<a href=\"{link}\">here</a>.").format(link=url_for('cephalopod.index'))), 'error')
+            else:
+                flash(Markup(_("Welcome to the Indico community, your server has been registered!<br>You can manage it "
+                               "<a href=\"{link}\">here</a>.").format(link=url_for('cephalopod.index'))), 'success')
 
         return redirect(url_for('misc.index'))
-
-
-class InitialSetupForm(LocalRegistrationForm):
-    first_name = TextField('First Name', [validators.Required()])
-    last_name = TextField('Last Name', [validators.Required()])
-    email = EmailField(_('Email address'), [validators.Required()])
-    language = SelectField('Language', [validators.Required()])
-    affiliation = TextField('Affiliation', [validators.Required()])
-    enable_tracking = BooleanField('Enable Instance Tracking', widget=SwitchWidget())
-    contact_name = TextField('Contact Name',
-                             [UsedIfChecked('enable_tracking'), validators.Required()])
-    contact_email = EmailField('Contact Email Address',
-                               [UsedIfChecked('enable_tracking'), validators.Required(), validators.Email()])
-
-    def __init__(self, *args, **kwargs):
-        super(InitialSetupForm, self).__init__(*args, **kwargs)
-        self.language.choices = sorted(get_all_locales().items(), key=itemgetter(1))
