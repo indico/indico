@@ -41,11 +41,9 @@ from MaKaC.common.info import HelperMaKaCInfo
 
 class RHBootstrap(RH):
 
-    def _checkProtection(self):
-        if db.session.query(db.session.query(User.id).exists()).one()[0]:
-            return redirect(url_for('misc.index'))
-
     def _process_GET(self):
+        if User.has_rows:
+            return redirect(url_for('misc.index'))
         python_version = sys.version.split()[0]
         return render_template('bootstrap/bootstrap.html',
                                selected_lang_name=parse_locale(session.lang).language_name,
@@ -56,6 +54,8 @@ class RHBootstrap(RH):
                                python_version=python_version)
 
     def _process_POST(self):
+        if User.has_rows:
+            return redirect(url_for('misc.index'))
         setup_form = BootstrapForm(request.form)
         if not setup_form.validate():
             flash(_("Some fields are invalid. Please, correct them and submit the form again."), 'error')
