@@ -16,8 +16,7 @@
 
 from __future__ import unicode_literals
 
-import pkg_resources
-import sys
+from platform import python_version
 from urlparse import urljoin
 
 from flask import flash, jsonify, redirect, request
@@ -48,11 +47,15 @@ class RHCephalopod(RHAdminBase):
         enabled = settings.get('joined')
         instance_url = Config.getInstance().getBaseURL()
         language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-        python_version = sys.version.split()[0]
         tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
-        return WPCephalopod.render_template('cephalopod.html', form=form, affiliation=affiliation,
-                                            indico_version=MaKaC.__version__, enabled=enabled,
-                                            instance_url=instance_url, language=language, python_version=python_version,
+        return WPCephalopod.render_template('cephalopod.html',
+                                            form=form,
+                                            affiliation=affiliation,
+                                            indico_version=MaKaC.__version__,
+                                            enabled=enabled,
+                                            instance_url=instance_url,
+                                            language=language,
+                                            python_version=python_version(),
                                             tracker_url=tracker_url)
 
     def _process_POST(self):
@@ -99,7 +102,7 @@ class RHSystemInfo(RH):
 
     def _process(self):
         language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-        stats = {'python_version': sys.version.split()[0],
+        stats = {'python_version': python_version(),
                  'indico_version': MaKaC.__version__,
                  'language': language}
         return jsonify(stats)
