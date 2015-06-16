@@ -827,10 +827,12 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
                 comment = i18nformat("""%s<font color="red">_("In conflict with"): <br> %s</font>""")%(comment, "<br>".join(l) )
         rl = self._abstract.getReallocationTargetedList( self._track )
         if rl:
-            comment = i18nformat("""%s<br><br><font color="green">_("Proposed by") <i>%s</i>(%s): <br>%s</font>""")%(comment, \
-                    self.htmlText( rl[0].getTrack().getTitle() ), \
-                    self._getAuthorHTML( rl[0].getResponsible() ), \
-                    self.htmlText( rl[0].getComment() ) )
+            comment = i18nformat("""%s<br><br><font color="green">_("Proposed by") <i>%s</i>(%s): <br>%s</font>""") % (
+                comment,
+                self.htmlText(rl[0].getTrack().getTitle()),
+                self._getAuthorHTML(rl[0].getResponsible()) if rl[0].getResponsible() else '',
+                self.htmlText(rl[0].getComment())
+            )
         return comment
 
     def _getContribHTML(self):
