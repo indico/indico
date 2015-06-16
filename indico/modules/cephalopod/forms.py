@@ -26,9 +26,9 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class CephalopodForm(IndicoForm):
-    tracked = BooleanField('Enable Tracking', widget=SwitchWidget())
+    joined = BooleanField('Join the community', widget=SwitchWidget())
     contact_name = TextField('Contact Name', [UsedIfChecked('enable_tracking'), validators.Required()],
-                             description=_('Name of the person responsible for your Indico instance.'))
+                             description=_('Name of the person responsible for your Indico server.'))
     contact_email = EmailField('Contact Email',
                                [UsedIfChecked('enable_tracking'), validators.Required(), validators.Email()],
-                               description=_('Email address of the person responsible for your Indico instance.'))
+                               description=_('Email address of the person responsible for your Indico server.'))

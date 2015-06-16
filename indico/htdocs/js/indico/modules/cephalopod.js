@@ -38,10 +38,10 @@ function _isSynced(cephalopodUrl, localData, quiet) {
 }
 
 function initCephalopdOnSettingsPage(cephalopodUrl) {
-    var $tracked = $('#tracked');
-    var enabled = $tracked.prop('checked');
+    var $joined = $('#joined');
+    var enabled = $joined.prop('checked');
 
-    $('#tracked').on('change', function() {
+    $joined.on('change', function() {
         enabled = $(this).prop('checked');
         $('#sync-button').prop('disabled', !enabled);
     });
@@ -63,7 +63,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
     if (!enabled) {
         defer.resolve({
             'title'   : $T('Disabled'),
-            'subtitle': $T('Your instance of Indico is not tracked.'),
+            'subtitle': $T('Your are not part of the community.'),
             'class'   : 'disabled',
             'icon'    : 'icon-close'
         });
@@ -71,16 +71,16 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
     }
 
     _isSynced(cephalopodUrl, {
-        'enabled'     : $('#tracked').prop('checked'),
+        'enabled'     : $('#joined').prop('checked'),
         'contact'     : $('#contact_name').val(),
         'email'       : $('#contact_email').val(),
-        'url'         : $('#instance-url').html(),
+        'url'         : $('#server-url').html(),
         'organisation': $('#affiliation').html()
     }, true).done(function onSuccess(synced) {
         if (synced) {
             defer.resolve({
                 'title'   : $T('Synchronized'),
-                'subtitle': $T('Your instance of Indico is tracked and up to date.'),
+                'subtitle': $T('You are part of the community and your Indico server is up to date.'),
                 'class'   : 'highlight',
                 'icon'    : 'icon-checkmark'
             });
@@ -88,7 +88,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
             $('#sync-tracking').show();
             defer.resolve({
                 'title'   : $T('Out of sync'),
-                'subtitle': $T('Your instance is out of sync. Synchronize your instance with the button on the right.'),
+                'subtitle': $T('You are part of the community but your Indico server is out of sync. Synchronize it with the button on the right.'),
                 'class'   : 'warning',
                 'icon'    : 'icon-warning'
             });
@@ -96,7 +96,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
     }).fail(function onError(err) {
         defer.reject({
             'title'   : $T('Error!'),
-            'subtitle': $T('The instance tracker returned the following error: {0}.').format(err),
+            'subtitle': $T('The Community Hub returned the following error: {0}.').format(err),
             'class'   : 'danger',
             'icon'    :'icon-disable'});
     });
@@ -107,7 +107,7 @@ function initCephalopodOnAdminPage(cephalopodUrl, checkData, settingsUrl) {
         if (!synced) {
             $('<div>', {
                 'class': 'message-text',
-                'html' : $T('Instance tracking data is out-of-sync! You can solve this <a href="{0}">here</a>.')
+                'html' : $T('Your Indico server is not synchronized with the Community Hub! You can solve this <a href="{0}">here</a>.')
                             .format(settingsUrl)
             }).appendTo(
                 $('<div>', { 'class': 'warning-message-box' })

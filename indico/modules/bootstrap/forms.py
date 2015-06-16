@@ -31,7 +31,7 @@ class BootstrapForm(LocalRegistrationForm):
     email = EmailField(_('Email address'), [validators.Required()])
     language = SelectField('Language', [validators.Required()])
     affiliation = TextField('Affiliation', [validators.Required()])
-    enable_tracking = BooleanField('Enable Instance Tracking', widget=SwitchWidget())
+    enable_tracking = BooleanField('Join the community', widget=SwitchWidget())
     contact_name = TextField('Contact Name',
                              [UsedIfChecked('enable_tracking'), validators.Required()])
     contact_email = EmailField('Contact Email Address',

@@ -39,14 +39,14 @@ def register_instance(contact, email):
     try:
         response.raise_for_status()
     except HTTPError:
-        settings.set('tracked', False)
+        settings.set('joined', False)
 
     json_response = response.json()
     if not ('uuid' in json_response):
-        settings.set('tracked', False)
+        settings.set('joined', False)
 
     settings.set_multi({
-        'tracked': True,
+        'joined': True,
         'uuid': json_response['uuid'],
         'contact_name': payload['contact'],
         'contact_email': payload['email']})
@@ -60,11 +60,11 @@ def disable_instance():
         response.raise_for_status()
     except HTTPError as err:
         if err.response.status_code == 404:
-            settings.set('tracked', False)
+            settings.set('joined', False)
         else:
             raise
     else:
-        settings.set('tracked', False)
+        settings.set('joined', False)
 
 
 def sync_instance(contact, email):
@@ -91,6 +91,6 @@ def sync_instance(contact, email):
             raise
     else:
         settings.set_multi({
-            'tracked': True,
+            'joined': True,
             'contact_name': payload['contact'],
             'contact_email': payload['email']})

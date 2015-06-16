@@ -3,13 +3,13 @@
 {% from 'forms/_form.html' import form_footer, form_header, form_row_static, form_rows %}
 {% from 'message_box.html' import message_box %}
 
-{% block title %}{% trans %}Instance Tracking{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Community{% endtrans %}{% endblock %}
 
 {% block content %}
     {% call message_box('info', fixed_width=true) %}
         <strong>{% trans %}Let us know that you exist!{% endtrans %}</strong>
         <p>
-            {% trans %}By enabling this service you will receive updated news on latest releases as well as important security warnings. The data in the form below will be sent back to us.{% endtrans %}
+            {% trans %}By registering your Indico server with the community hub, you will receive news on the latest releases as well as important security advisories. The data in the form below will be sent to the community hub.{% endtrans %}
         </p>
         {% trans %}Alongside, the following public information will be periodically collected as well:{% endtrans %}
         <ul>
@@ -26,7 +26,7 @@
             <span class="icon"></span>
             <div class="text">
                 <div class="label">{% trans %}Loading&hellip;{% endtrans %}</div>
-                <div>{% trans %}We are checking the status of your instance.{% endtrans %}</div>
+                <div>{% trans %}Contacting the community hub.{% endtrans %}</div>
             </div>
             <div class="toolbar thin right">
                 <a id="sync-tracking" class="i-button warning icon-loop" href="{{ url_for('cephalopod.sync') }}" style="display: none;">
@@ -37,14 +37,14 @@
     </div>
     <div class="i-box">
             {{ form_header(form, id='cephalopod-form')}}
-            {{ form_rows(form, fields=('tracked', 'contact_name', 'contact_email')) }}
+            {{ form_rows(form, fields=('joined', 'contact_name', 'contact_email')) }}
             {% call form_row_static(_('URL')) %}
-                <span id="instance-url" class="mono">{{ instance_url }}</span>
-                <p class="form-field-description"><em>{% trans %}URL of your Indico instance{% endtrans %}</em></p>
+                <span id="server-url" class="mono">{{ instance_url }}</span>
+                <p class="form-field-description"><em>{% trans %}URL of your Indico server{% endtrans %}</em></p>
             {% endcall %}
             {% call form_row_static(_('Affiliation')) %}
                 <span id="affiliation">{{ affiliation }}</span>
-                <p class="form-field-description"><em>{% trans %}Affiliation of your Indico instance{% endtrans %}</em></p>
+                <p class="form-field-description"><em>{% trans %}Affiliation of your Indico server{% endtrans %}</em></p>
             {% endcall %}
             {% call form_footer(form) %}
                     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">

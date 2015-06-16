@@ -175,7 +175,7 @@ class WAdmins(wcomponents.WTemplated):
                                                    key=methodcaller('getStraightFullName')))
         wvars['tracker_url'] = urljoin(Config.getInstance().getTrackerURL(),
                                        'api/instance/{}'.format(cephalopod_settings.get('uuid')))
-        wvars['cephalopod_data'] = {'enabled': cephalopod_settings.get('tracked'),
+        wvars['cephalopod_data'] = {'enabled': cephalopod_settings.get('joined'),
                                     'contact': cephalopod_settings.get('contact_name'),
                                     'email': cephalopod_settings.get('contact_email'),
                                     'url': Config.getInstance().getBaseURL(),
