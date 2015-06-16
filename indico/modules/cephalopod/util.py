@@ -42,14 +42,15 @@ def register_instance(contact, email):
         settings.set('joined', False)
 
     json_response = response.json()
-    if not ('uuid' in json_response):
+    if 'uuid' not in json_response:
         settings.set('joined', False)
 
     settings.set_multi({
         'joined': True,
         'uuid': json_response['uuid'],
         'contact_name': payload['contact'],
-        'contact_email': payload['email']})
+        'contact_email': payload['email']
+    })
 
 
 def disable_instance():

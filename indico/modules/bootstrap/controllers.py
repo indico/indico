@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import sys
 from operator import itemgetter
+from platform import python_version
 
 import transaction
 from flask import flash, redirect, render_template, request, session
@@ -28,7 +28,7 @@ from indico.modules.auth import Identity, login_user
 from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
 from indico.modules.users import User
-from indico.util.i18n import _, get_all_locales, parse_locale
+from indico.util.i18n import _, get_all_locales, get_current_locale, parse_locale
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 
@@ -44,14 +44,13 @@ class RHBootstrap(RH):
     def _process_GET(self):
         if User.has_rows:
             return redirect(url_for('misc.index'))
-        python_version = sys.version.split()[0]
         return render_template('bootstrap/bootstrap.html',
-                               selected_lang_name=parse_locale(session.lang).language_name,
+                               selected_lang_name=parse_locale(get_current_locale()).language_name,
                                language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
                                form=BootstrapForm(language=session.lang),
                                timezone=Config.getInstance().getDefaultTimezone(),
                                indico_version=MaKaC.__version__,
-                               python_version=python_version)
+                               python_version=python_version())
 
     def _process_POST(self):
         if User.has_rows:
@@ -68,15 +67,19 @@ class RHBootstrap(RH):
         user.affiliation = to_unicode(setup_form.affiliation.data)
         user.email = to_unicode(setup_form.email.data)
         user.is_admin = True
-        user.settings.set('timezone', Config.getInstance().getDefaultTimezone())
-        user.settings.set('lang', to_unicode(setup_form.language.data))
 
         identity = Identity(provider='indico', identifier=setup_form.username.data, password=setup_form.password.data)
         user.identities.add(identity)
-        full_name = user.full_name  # needed after the session closes
+
+        db.session.add(user)
+        db.session.flush()
+
+        user.settings.set('timezone', Config.getInstance().getDefaultTimezone())
+        user.settings.set('lang', to_unicode(setup_form.language.data))
 
         login_user(user, identity)
-        db.session.add(user)
+        full_name = user.full_name  # needed after the session closes
+
         transaction.commit()
 
         # Configuring server's settings
