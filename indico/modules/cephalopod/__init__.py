@@ -27,7 +27,7 @@ __all__ = ('settings',)
 
 
 settings = SettingsProxy('cephalopod', {
-    'tracked': False,
+    'joined': False,
     'contact_email': None,
     'contact_name': None,
     'uuid': None
@@ -36,4 +36,4 @@ settings = SettingsProxy('cephalopod', {
 
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
-    return 'cephalopod', SideMenuItem(_("Instance Tracking"), url_for('cephalopod.index'))
+    return 'cephalopod', SideMenuItem(_("Community Hub"), url_for('cephalopod.index'))

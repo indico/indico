@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import transaction
+import sys
 from operator import itemgetter
 
+import transaction
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
 from requests.exceptions import HTTPError, Timeout
-
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.common.info import HelperMaKaCInfo
 
 from indico.core.config import Config
 from indico.core.db import db
@@ -34,6 +32,10 @@ from indico.util.i18n import _, get_all_locales, parse_locale
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 
+import MaKaC
+from MaKaC.webinterface.rh.base import RH
+from MaKaC.common.info import HelperMaKaCInfo
+
 # TODO: set the time zone here once communities settings are available.
 
 
@@ -44,11 +46,14 @@ class RHBootstrap(RH):
             return redirect(url_for('misc.index'))
 
     def _process_GET(self):
+        python_version = sys.version.split()[0]
         return render_template('bootstrap/bootstrap.html',
                                selected_lang_name=parse_locale(session.lang).language_name,
                                language_options=sorted(get_all_locales().items(), key=itemgetter(1)),
                                form=BootstrapForm(language=session.lang),
-                               timezone=Config.getInstance().getDefaultTimezone())
+                               timezone=Config.getInstance().getDefaultTimezone(),
+                               indico_version=MaKaC.__version__,
+                               python_version=python_version)
 
     def _process_POST(self):
         setup_form = BootstrapForm(request.form)

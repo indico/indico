@@ -31,17 +31,11 @@ from indico.modules.cephalopod.views import WPCephalopod
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+
+import MaKaC
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
-
-
-def _indico_version():
-    try:
-        indico_version = pkg_resources.get_distribution('indico').version
-    except pkg_resources.DistributionNotFound:
-        indico_version = 'dev'
-    return indico_version
 
 
 class RHCephalopod(RHAdminBase):
@@ -51,20 +45,20 @@ class RHCephalopod(RHAdminBase):
         form = CephalopodForm(request.form, obj=defaults)
 
         affiliation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
-        enabled = settings.get('tracked')
+        enabled = settings.get('joined')
         instance_url = Config.getInstance().getBaseURL()
         language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
         python_version = sys.version.split()[0]
         tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
         return WPCephalopod.render_template('cephalopod.html', form=form, affiliation=affiliation,
-                                            indico_version=_indico_version(), enabled=enabled,
+                                            indico_version=MaKaC.__version__, enabled=enabled,
                                             instance_url=instance_url, language=language, python_version=python_version,
                                             tracker_url=tracker_url)
 
     def _process_POST(self):
         name = request.form.get('contact_name', settings.get('contact_name'))
         email = request.form.get('contact_email', settings.get('contact_email'))
-        enabled = request.form.get('tracked', False)
+        enabled = request.form.get('joined', False)
         uuid = settings.get('uuid')
         try:
             if not enabled:
@@ -74,9 +68,9 @@ class RHCephalopod(RHAdminBase):
             elif enabled and not uuid:
                 register_instance(name, email)
         except HTTPError as err:
-            flash(_('Operation failed, the instance tracker returned: {err.message}').format(err=err), 'error')
+            flash(_("Operation failed, the community hub returned: {err.message}").format(err=err), 'error')
         except Timeout:
-            flash(_('The operation timed-out. Please try again in a while.'), 'error')
+            flash(_("The operation timed-out. Please try again in a while."), 'error')
 
         return redirect(url_for('.index'))
 
@@ -84,8 +78,8 @@ class RHCephalopod(RHAdminBase):
 class RHCephalopodSync(RHAdminBase):
 
     def _process_GET(self):
-        if not settings.get('tracked'):
-            flash(_('Synchronization is not possible if instance tracking is disabled. Please enable it before.'),
+        if not settings.get('joined'):
+            flash(_("Synchronization is not possible if you don't join the community first."),
                   'error')
         else:
             contact_name = settings.get('contact_name')
@@ -93,10 +87,10 @@ class RHCephalopodSync(RHAdminBase):
             try:
                 sync_instance(contact_name, contact_email)
             except HTTPError as err:
-                flash(_('Synchronization failed, the instance tracker returned: {err.message}').format(err=err),
+                flash(_("Synchronization failed, the community hub returned: {err.message}").format(err=err),
                       'error')
             except Timeout:
-                flash(_('Synchronization timed-out. Please try again in a while.'), 'error')
+                flash(_("Synchronization timed-out. Please try again in a while."), 'error')
 
             return redirect(url_for('.index'))
 
@@ -106,6 +100,6 @@ class RHSystemInfo(RH):
     def _process(self):
         language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
         stats = {'python_version': sys.version.split()[0],
-                 'indico_version': _indico_version(),
+                 'indico_version': MaKaC.__version__,
                  'language': language}
         return jsonify(stats)

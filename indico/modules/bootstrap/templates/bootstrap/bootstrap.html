@@ -43,11 +43,16 @@
                 <h1 class="step-title">{% trans %}Administrator Account{% endtrans %}</h1>
                 <div class="step-description">
                     <div>{% trans %}Insert here all basic information needed to create your account.{% endtrans %}</div>
-                    <div class="additional-information">{% trans %}You can change any extra parameters (like your address or phone number) afterwards by accessing "Account Details" (from "My Profile").{% endtrans %}</div>
+                    <div class="additional-information">
+                        {%- trans -%}
+                            You can change any extra parameters (like your address or phone number) afterwards by
+                            accessing "Account Details" (from "My Profile").
+                        {%- endtrans -%}
+                    </div>
                 </div>
                 <div class="fields-container">
-                    {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'username', 'password', 'confirm_password'),
-                                 placeholder=True) }}
+                    {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'username', 'password',
+                                               'confirm_password'), placeholder=True) }}
                 </div>
             </div>
         </div>
@@ -60,8 +65,18 @@
                 <h1 class="step-title">{% trans %}Site configuration{% endtrans %}</h1>
                 <div class="step-description">
                     <div>{% trans %}These are the default parameters for your Indico site.{% endtrans %}</div>
-                    <div class="additional-information">{% trans %}Please note that this information will also be used for your own user profile. You can change it later.{% endtrans %}</div>
-                    <div class="additional-information">{% trans %}The time zone for the server has been set to {{ timezone }} and can be modified in <span class="mono">indico.conf</span>.{% endtrans %}</div>
+                    <div class="additional-information">
+                        {%- trans -%}
+                            Please note that this information will also be used for your own user profile. You can
+                            change it later.
+                        {%- endtrans -%}
+                    </div>
+                    <div class="additional-information">
+                        {%- trans -%}
+                            The time zone for the server has been set to {{ timezone }} and can be modified in
+                            <span class="mono">indico.conf</span>.
+                        {%- endtrans -%}
+                    </div>
                 </div>
                 <div class="fields-container">
                     {{ form_rows(form, fields=('language', 'affiliation'), placeholder=True) }}
@@ -76,16 +91,35 @@
             <div class="center step-container">
                 <h1 class="step-title">{% trans %}Let us know you exist!{% endtrans %}</h1>
                 <div class="step-description">
-                        <div>{% trans %}Be part of the ever growing Indico community! Choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.{% endtrans %}</div>
                         <div>
-                            {% trans %}The following data will be sent back to us:{% endtrans %}
+                            {%- trans -%}
+                                Be part of the ever growing Indico community! Choose to receive news on the latest
+                                releases (2&ndash;3 times per year) as well as important security advisories.
+                            {%- endtrans -%}
+                        </div>
+                        <div>
+                            {% trans %}The the following data will be sent to the Community Hub:{% endtrans %}
                             <ul>
                                 <li>{% trans %}Server URL{% endtrans %}</li>
+                                <li>{% trans %}Indico version installed{% endtrans %} ({{ indico_version }})</li>
+                                <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
+                                <li>
+                                    {%- trans -%}
+                                        Statistical public data (number of events, contributions, etc...)
+                                    {%- endtrans -%}
+                                </li>
+                                <li>{% trans %}Server default language{% endtrans %}</li>
                                 <li>{% trans %}Contact person{% endtrans %}</li>
-                                <li>{% trans %}Name of the organisation{% endtrans %}</li>
+                                <li>{% trans %}Affiliation of your Indico server{% endtrans %}</li>
                             </ul>
                         </div>
-                        <div>{% trans %}Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime (from "Server Admin", "Services", "Instance Tracking").{% endtrans %}</div>
+                        <div>
+                            {%- trans -%}
+                                Please note that <strong>no private information</strong> will ever be sent to the
+                                Community Hub or the Indico Project and that you can disable it any time (from the
+                                "Community Hub" section of the administrative area).
+                            {%- endtrans -%}
+                        </div>
                 </div>
                 <div class="fields-container">
                     {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=True) }}
@@ -94,7 +128,8 @@
         </div>
 
         {% call form_footer(form, i_form=true) %}
-            <input type="submit" id="submit-bootstrap" class="i-button highlight big" value="{% trans %}Finish{% endtrans %}"/>
+            <input type="submit" id="submit-bootstrap" class="i-button highlight big"
+                   value="{% trans %}Finish{% endtrans %}"/>
         {% endcall %}
     </div>
 {% endblock %}
