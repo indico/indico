@@ -85,7 +85,7 @@ class ReminderForm(IndicoForm):
         # Current email to avoid destructive modifications
         emails.setdefault(self.reply_to_address.object_data, self.reply_to_address.object_data)
         # Sanitize and format emails
-        emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(name, email)
+        emails = {to_unicode(email.strip().lower()): '{} <{}>'.format(to_unicode(name), to_unicode(email))
                   for email, name in emails.iteritems()
                   if email and email.strip()}
         self.reply_to_address.choices = sorted(emails.items(), key=lambda x: (x[0] != session.user.email, x[1].lower()))
