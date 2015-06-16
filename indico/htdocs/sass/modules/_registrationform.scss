@@ -965,31 +965,9 @@ textarea.regFormDescriptionInputMgmt {
 // RegistrantsListStats-related
 // ============================================================================
 
-.i-box.registrant-stats {
-    &> .i-box-header {
-        & > .i-box-title { float: left; }
-        & > .i-box-header-text {
-            color: $light-black;
-            font-style: italic;
-
-            &.currency-info {
-                @include border-radius();
-                font-style: normal;
-                font-weight: bold;
-                font-size: 0.8em;
-                float: right;
-                text-align: center;
-                color: $light-gray;
-                background-color: $dark-blue;
-                padding: 0.3em;
-
-            }
-
-            &.headline { clear: both; }
-        }
-    }
+.registrant-stats > .i-box {
     &> .i-box-content {
-        &> table.registrant-stats {
+        &> table {
             border-collapse: collapse;
 
             thead {

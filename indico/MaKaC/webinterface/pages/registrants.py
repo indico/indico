@@ -743,7 +743,8 @@ class WPEMail ( WPConfModifRegistrantListBase ):
 
 class WPRegistrationStats(registrationForm.WPConfModifRegFormBase):
     def getJSFiles(self):
-        return registrationForm.WPConfModifRegFormBase.getJSFiles(self) + self._includeJSPackage('jqplot_js', prefix='')
+        return (registrationForm.WPConfModifRegFormBase.getJSFiles(self)
+                + self._includeJSPackage('jqplot_js', prefix='') + self._asset_env['statistics_js'].urls())
 
     def _setActiveTab(self):
         self._tabStats.setActive()
