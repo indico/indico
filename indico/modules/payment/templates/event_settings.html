@@ -53,7 +53,7 @@
                 The following payment methods are available. You can enable, disable and configure them by clicking on them.
             {%- endtrans -%}
         </p>
-        <div class="i-badges-list-left i-badges-list-hover i-payments-list">
+        <div class="i-badges-list left i-badges-list-hover i-payments-list">
             {%- for short_name, plugin in plugins %}
                 <a id="plugin-{{ plugin.name }}" class="js-plugin-edit i-badge {%- if plugin in enabled_plugins %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
                    href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">

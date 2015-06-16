@@ -23,7 +23,7 @@
 
     {%- if plugins %}
         <p>{% trans %}The following payment plugins are available:{% endtrans %}</p>
-        <div class="i-badges-list-left i-badges-list-hover i-payments-list">
+        <div class="i-badges-list left i-badges-list-hover i-payments-list">
             {%- for plugin in plugins %}
                 <a class="js-plugin-details i-badge i-badge-gray" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">
                     <div class="i-badge-legend">

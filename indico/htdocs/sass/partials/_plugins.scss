@@ -19,7 +19,7 @@
 .i-plugins-list {
     & > h2 { margin-top: 2em; }
 
-    & > .i-badges-list-left {
+    & > .i-badges-list.left {
         & > .i-badge {
             @include transition(background-color $default-transition-duration $default-transition-function);
 

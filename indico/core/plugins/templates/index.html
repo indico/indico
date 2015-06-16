@@ -8,7 +8,7 @@
     {% for category, plugins in categorized_plugins.iteritems() %}
         <div class="i-plugins-list">
             <h2>{{ category }}</h2>
-            <div class="i-badges-list-left">
+            <div class="i-badges-list left">
                 {% for plugin in plugins %}
                     <a class="i-badge
                     {%- if not plugin.configurable %} i-badge-disabled{% endif %}"
