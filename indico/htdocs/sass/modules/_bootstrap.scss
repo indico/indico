@@ -1,7 +1,7 @@
 @import 'base';
 
-.init-setup-header {
-    @extend %font-family-initial-setup;
+.bootstrap-header {
+    @extend %font-family-form;
 
     font-weight: bolder;
 
@@ -16,14 +16,16 @@
     text-align: center;
 
     border-bottom: 5px solid white;
-    background-color: $dark-blue-logo;
+    background-color: $darker-blue;
     background-repeat: no-repeat;
     background-position: 20px 20px;
+
     .header-logo {
         height: 50%;
 
         color: white;
     }
+
     .header-title {
         @extend %font-family-logo;
 
@@ -31,6 +33,7 @@
 
         color: $pastel-blue;
     }
+
     .header-subtitle {
         @extend %font-family-logo;
 
@@ -38,6 +41,7 @@
 
         color: white;
     }
+
     &.mini {
         position: fixed;
         top: 0;
@@ -53,6 +57,7 @@
             padding-right: 30px;
         }
     }
+
     .language-selector {
         position: fixed;
         z-index: 1;
@@ -60,15 +65,18 @@
         right: 10px;
 
         padding: 0;
+
         .i-button.arrow {
             width: 102px;
 
             color: darken(white, 10%) !important;
             border: 0;
+
             &:hover:not(.disabled):not(:disabled) {
                 color: white !important;
             }
         }
+
         .dropdown {
             width: 100px;
 
@@ -77,8 +85,8 @@
     }
 }
 
-.init-setup-body:before,
-.init-setup-body:after {
+.bootstrap-body:before,
+.bootstrap-body:after {
     line-height: 0;
 
     display: table;
@@ -86,8 +94,8 @@
     content: '';
 }
 
-.init-setup-body {
-    @extend %font-family-initial-setup;
+.bootstrap-body {
+    @extend %font-family-form;
 
     width: 100%;
     min-width: 800px;
@@ -97,7 +105,7 @@
     padding-top: 30px;
     padding-bottom: 50px;
 
-    border-left: 3px $dark-blue-logo solid;
+    border-left: 3px $darker-blue solid;
     background: white;
     @media only screen and (min-width: 481px) and (max-width: 768px) {
         min-width: 480px;
@@ -113,10 +121,17 @@
     &.mini {
         margin-top: 120px;
     }
-    .init-setup-form {
+
+    #flashed-messages {
+        width: 85%;
+        margin: 0 auto;
+    }
+
+    .bootstrap-form {
         width: 100%;
         max-width: none;
         height: 100%;
+
         .step-wrapper {
             width: 100%;
             height: 100%;
@@ -126,6 +141,7 @@
             div {
                 @include clearfix;
             }
+
             .step-icon {
                 @include box-sizing(border-box);
 
@@ -139,7 +155,7 @@
 
                 border: 5px solid white;
                 border-radius: 50%;
-                background-color: $dark-blue-logo;
+                background-color: $darker-blue;
                 i {
                     font-size: 50px;
 
@@ -151,10 +167,12 @@
                     color: white;
                 }
             }
+
             .step-container {
                 width: 85%;
 
                 text-align: left;
+
                 .step-title {
                     @extend %font-family-logo;
 
@@ -164,8 +182,9 @@
                     padding-bottom: 0.6em;
                     padding-left: 2%;
 
-                    color: $dark-blue-logo;
+                    color: $darker-blue;
                 }
+
                 .step-description {
                     font-size: 1.4em;
 
@@ -177,32 +196,37 @@
                     text-align: justify;
 
                     color: #555555;
+
                     div {
                         padding-bottom: 1em;
                     }
+
                     .additional-information {
                         color: #d3d3d3;
                     }
                 }
+
                 .fields-container {
                     float: right;
 
                     width: 50%;
-                    > .form-group {
-                        > .form-label > .required {
-                            display: none;
-                        }
+
+                    > .form-group > .form-label > .required {
+                        display: none;
                     }
                 }
+
                 > div {
                     width: 100%;
                 }
+
                 input,
                 select,
                 label {
                     font-size: 1.2em;
                 }
             }
+
             .i-button {
                 @extend %font-family-logo;
             }
@@ -218,12 +242,14 @@
 .transparent-button {
     border-color: transparent;
     background-color: transparent !important;
+
     &:hover:not(.disabled):not(:disabled) {
         @include gradient(transparent, transparent);
 
         border-color: transparent;
         box-shadow: none;
     }
+
     &:active:not(.disabled):not(:disabled) {
         @include gradient(transparent, transparent);
 
@@ -243,10 +269,11 @@
     display: none;
 }
 
-#step4 .step-description {
+.form-group-footer {
     width: 100%;
 
     text-align: center;
+
     .i-button.big {
         font-size: 2em;
 

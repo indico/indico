@@ -15,8 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import (admins, announcement, maintenance, domains, templates, conferenceModif, services,
-                                   initial_setup)
+from MaKaC.webinterface.rh import admins, announcement, maintenance, domains, templates, conferenceModif, services
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -98,6 +97,3 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
                    methods=('POST',))
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
-
-# Initial Setup
-admin.add_url_rule('/initial-setup', 'initial-setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))

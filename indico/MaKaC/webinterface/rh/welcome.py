@@ -32,7 +32,7 @@ class RHWelcome(base.RHDisplayBaseProtected):
 
     def _process(self):
         if User.query.count() == 0:
-            self._redirect(url_for('admin.initial-setup'))
+            self._redirect(url_for('bootstrap.index'))
         else:
             wfReg = webFactoryRegistry.WebFactoryRegistry()
             p = welcome.WPWelcome(self, self._target, wfReg)
