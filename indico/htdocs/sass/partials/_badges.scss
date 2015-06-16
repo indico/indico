@@ -38,14 +38,29 @@
 
 }
 
-.i-badges-list-left {
+.i-badges-list.left {
     @extend %badges-list;
 
-    //TODO replace with justify-content mixin once Compass is updated
+    float: none; // disable default .left style
+
     text-align: left;
+
+    //TODO replace with justify-content mixin once Compass is updated
     -webkit-justify-content: flex-start;
-    justify-content: flex-start;
+            justify-content: flex-start;
 }
+
+.i-badges-list.center {
+    @extend %badges-list;
+
+    margin: -0.8em 0 0.8em 0; // disable default .center style
+
+    text-align: center;
+
+    -webkit-justify-content: center;
+            justify-content: center;
+}
+
 
 .i-badges-list-hover {
     @extend %badges-list;

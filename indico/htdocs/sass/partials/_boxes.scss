@@ -156,19 +156,24 @@
 
 .i-box.no-padding {
     padding: 0;
+
     &.titled > .i-box-content {
         margin-top: 0;
     }
+
     > .i-box-header {
         margin: 0;
         padding: 10px;
     }
+
     > .i-box-content {
         > .empty {
             padding: 10px;
         }
+
         > ul.group-list {
             margin: 0;
+
             > li {
                 margin: 0;
                 margin-right: 0;
@@ -178,6 +183,7 @@
         }
     }
 }
+
 
 
 
@@ -278,31 +284,3 @@
         }
     }
 }
-
-.i-box-group.glued {
-    &.vert {
-        .i-box:not(:first-child) {
-            @include border-top-radius(0px);
-        }
-
-        .i-box:not(:last-child) {
-            @include border-bottom-radius(0px);
-        }
-
-        .i-box + .i-box {
-            margin-top: 0px;
-            border-top: 0px;
-        }
-    }
-}
-
-.i-box-container{
-    @extend %container;
-    .groupTitle{
-        margin-bottom: 30px;
-        font-size: 25pt;
-        white-space: nowrap;
-    }
-}
-
-
