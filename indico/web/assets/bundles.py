@@ -317,6 +317,8 @@ presentation = rjs_bundle(
                'Ui/Widgets/WidgetMenu.js',
                'Ui/Widgets/WidgetGrid.js'))
 
+statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
+
 ie_compatibility = rjs_bundle('ie_compatibility', 'js/selectivizr.js')
 
 jed = rjs_bundle('jed', 'js/lib/jed.js')
@@ -438,6 +440,7 @@ def register_all_js(env):
     env.register('indico_badges_js', indico_badges_js)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
+    env.register('statistics_js', statistics_js)
     env.register('ie_compatibility', ie_compatibility)
     env.register('abstracts_js', abstracts_js)
     env.register('contributions_js', contributions_js)
