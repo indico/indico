@@ -53,21 +53,32 @@
 // Log tables
 // ============================================================================
 
-td.i-table {
-    &.log-caption {
+.log-table.i-table {
+    tr.log-kind-positive td.log-icon { color: $green; }
+    tr.log-kind-negative td.log-icon { color: $red; }
+    tr.log-kind-change td.log-icon { color: $blue; }
+
+    td.log-icon {
+        color: $dark-gray;
+        font-size: 1.2em;
+        width: 30px;
+    }
+
+
+    td.log-caption {
         width: 175px;
     }
 
-    &.log-module {
+    td.log-module {
         font-weight: bold;
         width: 150px;
     }
 
-    &.log-subject {
+    td.log-subject {
         width: auto;
     }
 
-    &.log-stamp {
+    td.log-stamp {
         text-align: right;
         text-overflow: clip;
         width: 230px;

@@ -1,6 +1,18 @@
-<tr class="i-table interactive" data-type="{{ entry.type }}" data-realm="{{ entry.realm.name }}">
+<tr class="i-table interactive log-kind-{{ entry.kind.name }}" data-type="{{ entry.type }}" data-realm="{{ entry.realm.name }}">
     <td class="i-table log-icon">
-        <i class="{% block icon %}icon-key-A{% endblock %}"></i>
+        <i class="{% block icon -%}
+            {%- if entry.realm.name == 'emails' -%}
+                icon-mail
+            {%- elif entry.realm.name == 'event' -%}
+                icon-circle-small
+            {%- elif entry.realm.name == 'reviewing' -%}
+                icon-reading
+            {%- elif entry.realm.name == 'participants' -%}
+                icon-users
+            {%- elif entry.realm.name == 'management' -%}
+                icon-medal
+            {%- endif -%}
+        {%- endblock %}"></i>
     </td>
     <td class="i-table log-module searchable" title="{{ entry.module }}">
         {{ entry.module }}

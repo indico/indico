@@ -52,15 +52,6 @@ td.i-table {
         font-style: italic;
     }
 
-    &.log-icon {
-         width: 30px;
-
-        i:before {
-            color: $black !important;
-            font-size: 1.2em;
-        }
-    }
-
     & ~ td.i-table {
         border-left: none !important;
     }

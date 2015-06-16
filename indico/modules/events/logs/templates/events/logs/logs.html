@@ -13,9 +13,7 @@
                 </span>
                 {% for realm in realms|sort(attribute='name') %}
                     <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
-                    <label for="realm-{{ realm.name }}" class="i-button">
-                        {{ realm.title }}
-                    </label>
+                    <label for="realm-{{ realm.name }}" class="i-button">{{ realm.title }}</label>
                 {% endfor %}
             </div>
             <div class="group left">
