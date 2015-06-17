@@ -7,15 +7,17 @@
 {% block content %}
     <div class="follow-scroll">
         <div class="toolbar">
-            <div class="group i-selection left">
-                <span class="i-button label">
-                    {% trans %}Show{% endtrans %}
-                </span>
-                {% for realm in realms|sort(attribute='name') %}
-                    <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
-                    <label for="realm-{{ realm.name }}" class="i-button">{{ realm.title }}</label>
-                {% endfor %}
-            </div>
+            {% if realms|length > 1 %}
+                <div class="group i-selection left">
+                    <span class="i-button label">
+                        {% trans %}Show{% endtrans %}
+                    </span>
+                    {% for realm in realms|sort(attribute='name') %}
+                        <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
+                        <label for="realm-{{ realm.name }}" class="i-button">{{ realm.title }}</label>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <div class="group left">
                 <a href="#" id="expand-all" class="i-button" title="{% trans %}Expand all{% endtrans %}">
                     <span class="icon-stack-plus"></span>
