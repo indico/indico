@@ -9,7 +9,7 @@
         <div class="toolbar">
             <div class="group i-selection left">
                 <span class="i-button label">
-                    {% trans %}Filter by{% endtrans %}
+                    {% trans %}Show{% endtrans %}
                 </span>
                 {% for realm in realms|sort(attribute='name') %}
                     <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>

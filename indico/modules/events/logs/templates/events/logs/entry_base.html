@@ -4,7 +4,7 @@
             {%- if entry.realm.name == 'emails' -%}
                 icon-mail
             {%- elif entry.realm.name == 'event' -%}
-                icon-circle-small
+                icon-time
             {%- elif entry.realm.name == 'reviewing' -%}
                 icon-reading
             {%- elif entry.realm.name == 'participants' -%}
@@ -13,6 +13,9 @@
                 icon-medal
             {%- endif -%}
         {%- endblock %}"></i>
+        {% if entry.kind == 'other' %}
+            <i class="icon-circle-small log-kind"></i>
+        {% endif %}
     </td>
     <td class="i-table log-module searchable" title="{{ entry.module }}">
         {{ entry.module }}
