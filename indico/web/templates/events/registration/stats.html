@@ -35,58 +35,40 @@
             <script>
                 $(document).ready(function generateBasicStats() {
                     var countries = {{ data.countries|tojson }};
-                    var countriesPlot = $.jqplot('countriesPlot', [countries], {
-                        animate: !$.jqplot.use_excanvas,
-                        animateReplot: !$.jqplot.use_excanvas,
-                        grid: { shadow: false },
-                        height: {{ height }},
-                        seriesDefaults: {
-                            renderer: $.jqplot.BarRenderer,
-                            rendererOptions: {
-                                animation: { speed: 1000 },
-                                barDirection: 'horizontal',
-                                barWidth: 18,
-                                shadow: true,
-                                shadowOffset: 1,
-                                shadowDepth: 3,
-                                highlightColors: '#0085B9'
-                            },
-                            pointLabels: {
-                                show: true,
-                                location: 'w',
-                                xpadding: 4,
-                                edgeTolerance: -2,
-                                color: 'white'
-                            }
-                        },
-                        seriesColors: ['#007CAC'],  // indico blue
-                        highlighter: {
-                            show: true,
-                            showMarker: false,
-                            showTooltip: false
-                        },
+                    var jqPlotOptions = {
                         axes: {
-                            yaxis: {
-                                pad: 8,
-                                renderer: $.jqplot.CategoryAxisRenderer,
-                                labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
-                                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
-                                tickOptions: {
-                                    showGridline: false,
-                                    markSize: 0,
-                                    tickSpacing: 24,
-                                    showLabel: true
-                                }
-                            },
                             xaxis: {
                                 min: 0,
                                 padMax: 0,
-                                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
-                                tickOptions: { markSize: 0 }
-                            }
+                            },
+                            yaxis: {
+                                pad: 8,
+                                renderer: $.jqplot.CategoryAxisRenderer,
+                                tickOptions: {
+                                    showGridline: false,
+                                    showLabel: true,
+                                    tickSpacing: 24
+                                }
+                            },
                         },
-                        legend: { show: false }
-                    });
+                        height: {{ height }},
+                        highlighter: {
+                            showMarker: false,
+                            showTooltip: false
+                        },
+                        seriesDefaults: {
+                            renderer: $.jqplot.BarRenderer,
+                            rendererOptions: {
+                                barDirection: 'horizontal',
+                                barWidth: 18,
+                                shadow: true,
+                                shadowDepth: 3,
+                                shadowOffset: 1
+                            },
+                            pointLabels: { show: true }
+                        },
+                    }
+                    var countriesPlot = $.jqplot('countriesPlot', [countries], processJqPlotOptions(jqPlotOptions));
                 });
             </script>
         {% endif %}

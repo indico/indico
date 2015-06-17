@@ -190,7 +190,6 @@ indico_jquery = rjs_bundle(
                'multiselect.js',
                'principalfield.js',
                'realtimefilter.js',
-               'plot.js',
                'scrollblocker.js',
                'timerange.js',
                'tooltips.js',
