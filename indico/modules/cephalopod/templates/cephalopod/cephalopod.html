@@ -32,8 +32,9 @@
                 <div>{% trans %}Contacting the community hub.{% endtrans %}</div>
             </div>
             <div class="toolbar thin right">
-                <a id="sync-tracking" class="i-button warning icon-loop" href="{{ url_for('cephalopod.sync') }}" style="display: none;">
-                    {% trans %}Synchronize{% endtrans %}
+                <a id="sync-tracking" class="i-button warning icon-loop" href="{{ url_for('cephalopod.sync') }}"
+                   style="display: none;">
+                    {%- trans %}Synchronize{% endtrans -%}
                 </a>
             </div>
         </div>
