@@ -62,7 +62,7 @@ def register_instance(contact, email):
     logger.info('successfully registered the server to the community hub')
 
 
-def disable_instance():
+def unregister_instance():
     payload = {'enabled': False}
     url = urljoin(_url, settings.get('uuid'))
     response = requests.patch(url, data=dumps(payload), headers=_headers)
