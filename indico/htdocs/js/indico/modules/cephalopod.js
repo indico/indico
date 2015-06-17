@@ -14,6 +14,7 @@ function _isSynced(cephalopodUrl, localData, quiet) {
         url: cephalopodUrl,
         type: 'GET',
         dataType: 'json',
+        timeout: 10000 // 10 seconds
     }).done(function onSuccess(response) {
         var synced = true;
         _.each(localData, function(localVal, key) {
@@ -21,18 +22,25 @@ function _isSynced(cephalopodUrl, localData, quiet) {
             synced = false;
         });
         defer.resolve(synced);
-    }).fail(function onError(response, status, error) {
+    }).fail(function onError(xhr, status, error) {
+        var errMsg = $T('Unknown error while contacting the Community Hub');
+        if (xhr.state() === 'rejected' && xhr.status === 200 && status === 'parsererror') {
+            errMsg = $T('Internal error: Parse error on the reply of the Community Hub.');
+        } else if (xhr.state() === 'rejected' && xhr.status === 0 && status === 'error') {
+            errMsg = $T('Unable to contact the Community Hub.');
+        } else if (xhr.state() === 'rejected' && xhr.status === 0 && status === 'timeout') {
+            errMsg = $T('The connection to the Community Hub timed out.');
+        } else if ((xhr.state() === 'rejected' && xhr.status === 404) || xhr.statusText === 'NOT FOUND') {
+            errMsg = $T('Your server is not registered with the Community Hub.');
+        }
         if (!quiet) {
-            $('<span>', { 'class': 'mono', 'text': error }).appendTo(
-                $('<div>', {
-                    'class': 'message-text',
-                    'html' : $T('Something went wrong while contacting the instance tracker.<br>It returned the following error: ')
-                }).appendTo(
-                    $('<div>', { 'class': 'error-message-box'})
-                        .appendTo($('#flashed-messages')))
+            $('<div>', { 'class': 'message-text', 'html' : errMsg })
+                .appendTo(
+                    $('<div>', { 'class': 'error-message-box' })
+                        .appendTo($('#flashed-messages'))
             );
         }
-        defer.reject(error);
+        defer.reject(errMsg);
     });
     return defer.promise();
 }
@@ -88,7 +96,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
             $('#sync-tracking').show();
             defer.resolve({
                 'title'   : $T('Out of sync'),
-                'subtitle': $T('You are part of the community but your Indico server is out of sync. Synchronize it with the button on the right.'),
+                'subtitle': $T('Your Indico server is out of sync. Synchronize it with the button on the right.'),
                 'class'   : 'warning',
                 'icon'    : 'icon-warning'
             });
@@ -96,7 +104,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
     }).fail(function onError(err) {
         defer.reject({
             'title'   : $T('Error!'),
-            'subtitle': $T('The Community Hub returned the following error: {0}.').format(err),
+            'subtitle': err,
             'class'   : 'danger',
             'icon'    :'icon-disable'});
     });
