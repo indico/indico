@@ -3,13 +3,16 @@
 {% from 'forms/_form.html' import form_footer, form_header, form_row_static, form_rows %}
 {% from 'message_box.html' import message_box %}
 
-{% block title %}{% trans %}Community{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Community Hub{% endtrans %}{% endblock %}
 
 {% block content %}
     {% call message_box('info', fixed_width=true) %}
         <strong>{% trans %}Let us know that you exist!{% endtrans %}</strong>
         <p>
-            {% trans %}By registering your Indico server with the community hub, you will receive news on the latest releases as well as important security advisories. The data in the form below will be sent to the community hub.{% endtrans %}
+            {%- trans -%}
+                By registering your Indico server with the community hub, you will receive news on the latest releases
+                as well as important security advisories. The data in the form below will be sent to the community hub.
+            {%- endtrans -%}
         </p>
         {% trans %}Alongside, the following public information will be periodically collected as well:{% endtrans %}
         <ul>
@@ -44,7 +47,9 @@
             {% endcall %}
             {% call form_row_static(_('Affiliation')) %}
                 <span id="affiliation">{{ affiliation }}</span>
-                <p class="form-field-description"><em>{% trans %}Affiliation of your Indico server{% endtrans %}</em></p>
+                <p class="form-field-description">
+                    <em>{% trans %}Affiliation of your Indico server{% endtrans %}</em>
+                </p>
             {% endcall %}
             {% call form_footer(form) %}
                     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">

@@ -25,7 +25,7 @@ from requests.exceptions import HTTPError, Timeout
 from indico.core.config import Config
 from indico.modules.cephalopod import settings
 from indico.modules.cephalopod.forms import CephalopodForm
-from indico.modules.cephalopod.util import disable_instance, register_instance, sync_instance
+from indico.modules.cephalopod.util import register_instance, sync_instance, unregister_instance
 from indico.modules.cephalopod.views import WPCephalopod
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -49,10 +49,10 @@ class RHCephalopod(RHAdminBase):
         language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
         tracker_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
         return WPCephalopod.render_template('cephalopod.html',
-                                            form=form,
                                             affiliation=affiliation,
-                                            indico_version=MaKaC.__version__,
                                             enabled=enabled,
+                                            form=form,
+                                            indico_version=MaKaC.__version__,
                                             instance_url=instance_url,
                                             language=language,
                                             python_version=python_version(),
@@ -65,7 +65,7 @@ class RHCephalopod(RHAdminBase):
         uuid = settings.get('uuid')
         try:
             if not enabled:
-                disable_instance()
+                unregister_instance()
             elif enabled and uuid:
                 sync_instance(name, email)
             elif enabled and not uuid:
