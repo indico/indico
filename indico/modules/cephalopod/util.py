@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 import requests
 from json import dumps
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, Timeout
 from urlparse import urljoin
 
 from indico.core.config import Config
-from indico.modules.cephalopod import settings
+from indico.modules.cephalopod import logger, settings
 from MaKaC.common.info import HelperMaKaCInfo
 
 _headers = {'Content-Type': 'application/json'}
@@ -38,12 +38,20 @@ def register_instance(contact, email):
     response = requests.post(_url, data=dumps(payload), headers=_headers)
     try:
         response.raise_for_status()
-    except HTTPError:
+    except HTTPError as err:
+        logger.error('failed to register the server to the community hub, got: {err.message}'.format(err=err))
         settings.set('joined', False)
+        return
+    except Timeout:
+        logger.error('failed to register: timeout while contacting the community hub')
+        settings.set('joined', False)
+        raise
 
     json_response = response.json()
     if 'uuid' not in json_response:
+        logger.error('invalid json reply from the community hub: uuid missing')
         settings.set('joined', False)
+        return
 
     settings.set_multi({
         'joined': True,
@@ -51,6 +59,7 @@ def register_instance(contact, email):
         'contact_name': payload['contact'],
         'contact_email': payload['email']
     })
+    logger.info('successfully registered the server to the community hub')
 
 
 def disable_instance():
@@ -60,12 +69,14 @@ def disable_instance():
     try:
         response.raise_for_status()
     except HTTPError as err:
-        if err.response.status_code == 404:
-            settings.set('joined', False)
-        else:
+        if err.response.status_code != 404:
+            logger.error('failed to unregister the server to the community hub, got: {err.message}'.format(err=err))
             raise
-    else:
-        settings.set('joined', False)
+    except Timeout:
+        logger.error('failed to unregister: timeout while contacting the community hub')
+        raise
+    settings.set('joined', False)
+    logger.info('successfully unregistered the server from the community hub')
 
 
 def sync_instance(contact, email):
@@ -73,7 +84,9 @@ def sync_instance(contact, email):
     email = email or settings.get('contact_email')
     # registration needed if the instance does not have a uuid
     if not settings.get('uuid'):
-        return register_instance(contact, email)
+        logger.warn('unable to synchronise: missing uuid, registering the server instead')
+        register_instance(contact, email)
+        return
 
     organisation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
     payload = {'enabled': True,
@@ -87,11 +100,17 @@ def sync_instance(contact, email):
         response.raise_for_status()
     except HTTPError as err:
         if err.response.status_code == 404:
+            logger.warn('unable to synchronise: the server was not registered, registering the server now')
             register_instance(contact, email)
         else:
+            logger.error('failed to synchronise the server with the community hub, got: {err.message}'.format(err=err))
             raise
+    except Timeout:
+        logger.error('failed to synchronise: timeout while contacting the community hub')
+        raise
     else:
         settings.set_multi({
             'joined': True,
             'contact_name': payload['contact'],
             'contact_email': payload['email']})
+        logger.info('successfully synchronized the server with the community hub')

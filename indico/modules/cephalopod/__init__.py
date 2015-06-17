@@ -17,14 +17,16 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
+from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
 
-__all__ = ('settings',)
+__all__ = ('logger', 'settings')
 
+logger = Logger.get('cephalopod')
 
 settings = SettingsProxy('cephalopod', {
     'joined': False,
