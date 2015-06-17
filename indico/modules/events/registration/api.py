@@ -25,7 +25,6 @@ from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.events.api import EventBaseHook
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
-from indico.util.date_time import format_datetime
 from indico.util.fossilize import fossilize
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.util import get_query_parameter
