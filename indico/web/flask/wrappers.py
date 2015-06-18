@@ -16,12 +16,15 @@
 
 from __future__ import absolute_import
 
+import os
 from contextlib import contextmanager
 
 from flask import Flask, Blueprint
 from flask.blueprints import BlueprintSetupState
+from flask.helpers import locked_cached_property
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
+from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
@@ -102,7 +105,14 @@ class IndicoBlueprint(Blueprint):
     def __init__(self, *args, **kwargs):
         self.__prefix = None
         self.__default_prefix = ''
+        self.__virtual_template_folder = kwargs.pop('virtual_template_folder', None)
         super(IndicoBlueprint, self).__init__(*args, **kwargs)
+
+    @locked_cached_property
+    def jinja_loader(self):
+        if self.template_folder is not None:
+            return IndicoFileSystemLoader(os.path.join(self.root_path, self.template_folder),
+                                          virtual_path=self.__virtual_template_folder)
 
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoBlueprintSetupState(self, app, options, first_registration)
@@ -126,3 +136,30 @@ class IndicoBlueprint(Blueprint):
         yield
         self.__prefix = None
         self.__default_prefix = ''
+
+
+class IndicoFileSystemLoader(FileSystemLoader):
+    """FileSystemLoader that makes namespacing easier.
+
+    The `virtual_path` kwarg lets you specify a path segment that's
+    handled as if all templates inside the loader's `searchpath` were
+    actually inside ``searchpath/virtual_path``.  That way you don't
+    have to create subdirectories in your template folder.
+    """
+
+    def __init__(self, searchpath, encoding='utf-8', virtual_path=None):
+        super(IndicoFileSystemLoader, self).__init__(searchpath, encoding)
+        self.virtual_path = virtual_path
+
+    def list_templates(self):
+        templates = super(IndicoFileSystemLoader, self).list_templates()
+        if self.virtual_path:
+            templates = [os.path.join(self.virtual_path, t) for t in templates]
+        return templates
+
+    def get_source(self, environment, template):
+        if self.virtual_path:
+            if not template.startswith(self.virtual_path):
+                raise TemplateNotFound(template)
+            template = template[len(self.virtual_path):]
+        return super(IndicoFileSystemLoader, self).get_source(environment, template)
