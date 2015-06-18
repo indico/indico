@@ -5,6 +5,7 @@ include =
     indico/core/db/sqlalchemy/*.py
     indico/core/settings/*.py
     indico/modules/events/agreements/*.py
+    indico/modules/events/notes/*.py
     indico/modules/oauth/*.py
     indico/modules/payment/*.py
     indico/modules/rb/*.py
