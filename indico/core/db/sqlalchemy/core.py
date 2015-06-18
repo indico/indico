@@ -26,7 +26,7 @@ from flask import session as flask_session
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.event import listen
-from sqlalchemy.orm import mapper, Session
+from sqlalchemy.orm import mapper, Session, CompositeProperty
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -91,7 +91,7 @@ def _mapper_configured(mapper, class_):
         return fn(value)
 
     for prop in mapper.iterate_properties:
-        if hasattr(prop, 'columns'):
+        if hasattr(prop, 'columns') and not isinstance(prop, CompositeProperty):
             func = getattr(prop.columns[0].type, 'coerce_set_value', None)
             if func is not None:
                 # Using partial here to avoid closure scoping issues
