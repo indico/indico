@@ -3240,7 +3240,7 @@ class Conference(CommonObjectBase, Locatable):
         """
         return str(self.__sessionGenerator.newCount())
 
-    def addSession(self, newSession, check=2, session_id=None):
+    def addSession(self, new_session, check=2, session_id=None):
         """Adds a new session object to the conference taking care of assigning
             a new unique id to it
         """
@@ -3249,33 +3249,33 @@ class Conference(CommonObjectBase, Locatable):
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        if self.hasSession(newSession):
+        if self.hasSession(new_session):
             return
-        if self.getSchedule().isOutside(newSession):
+        if self.getSchedule().isOutside(new_session):
             if check == 1:
                 raise MaKaCError(_("Cannot add this session  (Start:%s - End:%s) "
                                    "Outside of the event's time table(Start:%s - End:%s)").format(
-                    newSession.getStartDate(),
-                    newSession.getEndDate(),
+                    new_session.getStartDate(),
+                    new_session.getEndDate(),
                     self.getSchedule().getStartDate(),
                     self.getSchedule().getEndDate()),
                     "Event")
             elif check == 2:
-                if self.getSchedule().getStartDate() > newSession.getStartDate():
-                    self.setStartDate(newSession.getStartDate())
-                if self.getSchedule().getEndDate() < newSession.getEndDate():
-                    self.setEndDate(newSession.getEndDate())
+                if self.getSchedule().getStartDate() > new_session.getStartDate():
+                    self.setStartDate(new_session.getStartDate())
+                if self.getSchedule().getEndDate() < new_session.getEndDate():
+                    self.setEndDate(new_session.getEndDate())
         if session_id is not None:
-            sessionId = session_id
+            session_id = session_id
             # Keep ID counter up to date
             self.__sessionGenerator.sync(session_id)
         else:
-            sessionId = self.__generateNewSessionId()
-        self.sessions[sessionId] = newSession
-        newSession.includeInConference(self, sessionId)
+            session_id = self.__generateNewSessionId()
+        self.sessions[session_id] = new_session
+        new_session.includeInConference(self, session_id)
         # keep the session coordinator index updated
-        for sc in newSession.getCoordinatorList():
-            self.addSessionCoordinator(newSession, sc)
+        for sc in new_session.getCoordinatorList():
+            self.addSessionCoordinator(new_session, sc)
         self.notifyModification()
 
     def hasSession(self,session):
