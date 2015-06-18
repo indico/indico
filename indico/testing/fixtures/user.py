@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+from sqlalchemy import inspect
 
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.rb import settings as rb_settings
@@ -49,7 +50,8 @@ def create_user(db):
     yield _create_user
 
     for user in _users:
-        db.session.delete(user)
+        if inspect(user).persistent:  # avoid error if session was rolled back
+            db.session.delete(user)
 
 
 @pytest.fixture
@@ -81,7 +83,8 @@ def create_group(db):
     yield _create_group
 
     for group in _groups:
-        db.session.delete(group)
+        if inspect(group).persistent:  # avoid error if session was rolled back
+            db.session.delete(group)
 
 
 @pytest.fixture

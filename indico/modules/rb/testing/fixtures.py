@@ -18,8 +18,9 @@ from datetime import date
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from sqlalchemy import inspect
 
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
@@ -76,7 +77,8 @@ def create_reservation(db, dummy_room, dummy_avatar):
     yield _create_reservation
 
     for reservation in _reservations:
-        db.session.delete(reservation)
+        if inspect(reservation).persistent:  # avoid error if session was rolled back
+            db.session.delete(reservation)
     db.session.flush()
 
 
@@ -131,7 +133,8 @@ def create_room(db, dummy_location, dummy_avatar):
     yield _create_room
 
     for room in _rooms:
-        db.session.delete(room)
+        if inspect(room).persistent:  # avoid error if session was rolled back
+            db.session.delete(room)
     db.session.flush()
 
 
@@ -196,7 +199,8 @@ def create_blocking(db, dummy_room, dummy_avatar):
     yield _create_blocking
 
     for blocking in _blockings:
-        db.session.delete(blocking)
+        if inspect(blocking).persistent:  # avoid error if session was rolled back
+            db.session.delete(blocking)
     db.session.flush()
 
 
