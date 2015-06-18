@@ -16,8 +16,12 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 
 logger = Logger.get('attachments')
@@ -31,3 +35,10 @@ def _merge_users(target, source, **kwargs):
     AttachmentFile.find(user_id=source.id).update({AttachmentFile.user_id: target.id})
     AttachmentPrincipal.merge_users(target, source, 'attachment')
     AttachmentFolderPrincipal.merge_users(target, source, 'folder')
+
+
+@signals.event_management.sidemenu.connect
+def _extend_event_management_menu(event, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'attachments', SideMenuItem(_('Attachments'), url_for('attachments.index', event),
+                                       visible=event.canModify(session.user))

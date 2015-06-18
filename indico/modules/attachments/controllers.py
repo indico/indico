@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.attachments.controllers import RHEventAttachments
-from indico.web.flask.wrappers import IndicoBlueprint
+from indico.modules.attachments.views import WPEventAttachments
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-_bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
-_bp.add_url_rule('/event/<confId>/manage/attachments/', 'index', RHEventAttachments)
+class RHEventAttachments(RHConferenceModifBase):
+    """Shows the attachments of an event"""
+
+    def _process(self):
+        return WPEventAttachments.render_template('attachments.html', self._conf)

@@ -16,9 +16,15 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.attachments.controllers import RHEventAttachments
-from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
-_bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
-_bp.add_url_rule('/event/<confId>/manage/attachments/', 'index', RHEventAttachments)
+class WPEventAttachments(WPConferenceModifBase, WPJinjaMixin):
+    template_prefix = 'attachments/'
+
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['attachments'].setActive()
+
+    def _getPageContent(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
