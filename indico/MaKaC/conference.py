@@ -39,12 +39,14 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
+from indico.util.caching import memoize_request
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii, is_legacy_id, to_unicode
 from MaKaC.review import AbstractFieldContent
@@ -2179,6 +2181,11 @@ class Conference(CommonObjectBase, Locatable):
         """Returns the emails of all managers, including the creator"""
         emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
         return {e for e in emails if e}
+
+    @property
+    @memoize_request
+    def note(self):
+        return EventNote.get_for_linked_object(self)
 
     @unify_user_args
     def log(self, realm, kind, module, summary, user=None, type_=u'simple', data=None):
@@ -5202,6 +5209,11 @@ class Session(CommonObjectBase, Locatable):
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
+    @property
+    @memoize_request
+    def note(self):
+        return EventNote.get_for_linked_object(self)
+
     def getVerboseType(self):
         return 'Session'
 
@@ -6524,6 +6536,11 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         self._confSchEntry=LinkedTimeSchEntry(self)
         self._contributionDuration = None
 
+    @property
+    @memoize_request
+    def note(self):
+        return EventNote.get_for_linked_object(self.session)
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
@@ -7621,6 +7638,11 @@ class Contribution(CommonObjectBase, Locatable):
     def __repr__(self):
         parent_id = self.parent.getId() if self.parent else None
         return '<Contribution({}, {}, {})>'.format(self.getId(), self.getTitle(), parent_id)
+
+    @property
+    @memoize_request
+    def note(self):
+        return EventNote.get_for_linked_object(self)
 
     def getVerboseType(self):
         return 'Contribution'
@@ -9937,6 +9959,11 @@ class SubContribution(CommonObjectBase, Locatable):
             parent_id = None
             event_id = None
         return '<SubContribution({}, {}, {}.{})>'.format(self.getId(), self.getTitle(), event_id, parent_id)
+
+    @property
+    @memoize_request
+    def note(self):
+        return EventNote.get_for_linked_object(self)
 
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getOwner().updateNonInheritingChildren(elem, delete)
