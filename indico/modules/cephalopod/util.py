@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import requests
 from json import dumps
-from requests.exceptions import HTTPError, Timeout
+from requests.exceptions import HTTPError, RequestException, Timeout
 from urlparse import urljoin
 
 from indico.core.config import Config
@@ -27,6 +27,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 
 _headers = {'Content-Type': 'application/json'}
 _url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/')
+TIMEOUT = 10
 
 
 def register_instance(contact, email):
@@ -35,23 +36,27 @@ def register_instance(contact, email):
                'contact': contact,
                'email': email,
                'organisation': organisation}
-    response = requests.post(_url, data=dumps(payload), headers=_headers)
+    response = requests.post(_url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
     try:
         response.raise_for_status()
     except HTTPError as err:
         logger.error('failed to register the server to the community hub, got: {err.message}'.format(err=err))
         settings.set('joined', False)
-        return
+        raise
     except Timeout:
         logger.error('failed to register: timeout while contacting the community hub')
         settings.set('joined', False)
+        raise
+    except RequestException as err:
+        logger.error('unexpected exception while registering the server with the Community Hub: {err.message}'
+                     .format(err=err))
         raise
 
     json_response = response.json()
     if 'uuid' not in json_response:
         logger.error('invalid json reply from the community hub: uuid missing')
         settings.set('joined', False)
-        return
+        raise ValueError('invalid json reply from the community hub: uuid missing')
 
     settings.set_multi({
         'joined': True,
@@ -65,7 +70,7 @@ def register_instance(contact, email):
 def unregister_instance():
     payload = {'enabled': False}
     url = urljoin(_url, settings.get('uuid'))
-    response = requests.patch(url, data=dumps(payload), headers=_headers)
+    response = requests.patch(url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -74,6 +79,10 @@ def unregister_instance():
             raise
     except Timeout:
         logger.error('failed to unregister: timeout while contacting the community hub')
+        raise
+    except RequestException as err:
+        logger.error('unexpected exception while unregistering the server with the Community Hub: {err.message}'
+                     .format(err=err))
         raise
     settings.set('joined', False)
     logger.info('successfully unregistered the server from the community hub')
@@ -95,7 +104,7 @@ def sync_instance(contact, email):
                'email': email,
                'organisation': organisation}
     url = urljoin(_url, settings.get('uuid'))
-    response = requests.patch(url, data=dumps(payload), headers=_headers)
+    response = requests.patch(url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -107,6 +116,10 @@ def sync_instance(contact, email):
             raise
     except Timeout:
         logger.error('failed to synchronise: timeout while contacting the community hub')
+        raise
+    except RequestException as err:
+        logger.error('unexpected exception while synchronizing the server with the Community Hub: {err.message}'
+                     .format(err=err))
         raise
     else:
         settings.set_multi({

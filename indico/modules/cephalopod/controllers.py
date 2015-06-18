@@ -20,7 +20,7 @@ from platform import python_version
 from urlparse import urljoin
 
 from flask import flash, jsonify, redirect, request
-from requests.exceptions import HTTPError, Timeout
+from requests.exceptions import HTTPError, RequestException, Timeout
 
 from indico.core.config import Config
 from indico.modules.cephalopod import settings
@@ -74,6 +74,8 @@ class RHCephalopod(RHAdminBase):
             flash(_("Operation failed, the community hub returned: {err.message}").format(err=err), 'error')
         except Timeout:
             flash(_("The operation timed-out. Please try again in a while."), 'error')
+        except RequestException as err:
+            flash(_("Unexpected exception while contacting the Community Hub: {err.message}").format(err=err))
 
         return redirect(url_for('.index'))
 
@@ -94,6 +96,8 @@ class RHCephalopodSync(RHAdminBase):
                       'error')
             except Timeout:
                 flash(_("Synchronization timed-out. Please try again in a while."), 'error')
+            except RequestException as err:
+                flash(_("Unexpected exception while contacting the Community Hub: {err.message}").format(err=err))
 
             return redirect(url_for('.index'))
 
