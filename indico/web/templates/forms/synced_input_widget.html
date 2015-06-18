@@ -13,7 +13,7 @@
             <input id="{{ field.id }}" name="{{ field.name }}" type="text" value="{{ field._value() }}" {{ kwargs | html_params }}
                    data-synced-value="{{ field.synced_value|tojson|forceescape }}" {%- if field.synced %} readonly {% endif %}>
       {%- endif -%}
-      <label for="{{ field.id }}-action-button" class="i-button i-synced-label icon-refresh" data-tooltip-anchor
+      <label for="{{ field.id }}-action-button" class="i-button i-synced-label icon-loop" data-tooltip-anchor
              title="{% trans provider_name=field.provider_name %}Click to toggle synchronisation ({{ provider_name }}).{% endtrans %}"></label>
     </div>
 {% endblock %}

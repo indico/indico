@@ -24,7 +24,7 @@
         <td id="inPlaceEditAdditionalText" data-field-id="boa-text">
             <div class="wmd-panel">
               <div id="wmd-button-bar-f_boa-text" class="wmd-button-bar">
-                <button class="save-button i-button icon-disk">${_("Save")}</button>
+                <button class="save-button i-button icon-floppy">${_("Save")}</button>
               </div>
               <textarea class="wmd-input" id="wmd-input-f_boa-text" width="100%" rows="10" style="width:100%">${boaConfig.getText()}</textarea>
             </div>

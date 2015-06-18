@@ -32,7 +32,7 @@
 
   % if chairs:
   <div class="infoline chairs clear">
-      <span  title="${_("Chairpersons")}" class="icon icon-chair" aria-hidden="true"></span>
+      <span  title="${_("Chairpersons")}" class="icon icon-user-chairperson" aria-hidden="true"></span>
       <ul class="chair_list text">
         % for chair in chairs:
         <li>
@@ -53,7 +53,7 @@
 
   % if material or isSubmitter:
   <div class="infoline material">
-      <span title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
+      <span title="${_("Materials")}" class="icon icon-package-download" aria-hidden="true"></span>
       % if material:
           <ul class="text" style="float: left; padding: 0">
             % for mat in material:

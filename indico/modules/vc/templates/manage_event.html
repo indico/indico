@@ -33,7 +33,7 @@
                                     <div class="toolbar vc-toolbar">
                                         <div class="group">
                                             {% if vc_room.status.name != 'deleted' %}
-                                                <a class="i-button icon-refresh js-vcroom-refresh"
+                                                <a class="i-button icon-loop js-vcroom-refresh"
                                                    title="{% trans %}Check videoconference room status{% endtrans %}"
                                                    data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
                                                 <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"

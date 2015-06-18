@@ -46,7 +46,7 @@
                         <h3>
                             {% trans %}Your events at hand{% endtrans %}
                             {% if session.user.is_admin %}
-                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-refresh" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
+                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-loop" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
                                 <script>
                                     $('#refresh-redis-links').on('click', function(e) {
                                         e.preventDefault();
@@ -195,7 +195,7 @@
                                          <span class="event-title truncate-target">' + item.title + '</span> \
                                          <span class="item-legend"> \
                                              <span title="' + $T("You have management rights") + '" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
-                                             <span title="' + $T("You are a reviewer") + '" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
+                                             <span title="' + $T("You are a reviewer") + '" class="icon-user-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
                                              <span title="' + $T("You are an attendee") + '" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
                                          </span> \
                                      </a>\

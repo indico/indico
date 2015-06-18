@@ -57,7 +57,7 @@
 .log-table.i-table {
     tr.log-realm-emails td.log-icon i.log-realm { @include icon-before('icon-mail'); }
     tr.log-realm-event td.log-icon i.log-realm { @include icon-before('icon-time'); }
-    tr.log-realm-reviewing td.log-icon i.log-realm { @include icon-before('icon-reading'); }
+    tr.log-realm-reviewing td.log-icon i.log-realm { @include icon-before('icon-user-reading'); }
     tr.log-realm-participants td.log-icon i.log-realm { @include icon-before('icon-users'); }
     tr.log-realm-management td.log-icon i.log-realm { @include icon-before('icon-medal'); }
 

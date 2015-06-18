@@ -98,7 +98,7 @@ from MaKaC.webinterface.general import strfFileSize
                             <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
                         </div>
                     % endif
-                    <h2 class="icon-material-download">${ _("Files") }</h2>
+                    <h2 class="icon-package-download">${ _("Files") }</h2>
                 </div>
                 <ul>
                 % for material in materials:
