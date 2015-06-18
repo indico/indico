@@ -298,6 +298,8 @@ class Reservation(Serializer, db.Model):
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
+        if self.event_id is None:
+            return None
         return ConferenceHolder().getById(str(self.event_id))
 
     @event.setter

@@ -35,6 +35,8 @@ class MockConferenceHolder:
 
     @classmethod
     def getById(cls, id_, quiet=None):
+        if id_ is None:
+            return None
         return cls._events.get(int(id_))
 
 
