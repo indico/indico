@@ -84,37 +84,40 @@ h3.i-table {
 // ============================================================================
 
 tr.i-table.interactive {
-    &.active {
-        @include single-transition(background-color);
-        background-color: #F4F4F4;
-
-        > td.i-table {
-            border-left-color: lighten($gray, $color-variation);
-        }
-    }
-
-    &.no-border-bottom {
-        border-bottom: none !important;
-    }
-
-    > td.i-table {
+    > td {
         @include user-select(none);
         cursor: pointer;
     }
 
+    &.active {
+        @include single-transition(background-color);
+        background-color: $light-gray;
+
+        > td {
+            border-left-color: lighten($gray, $color-variation);
+        }
+    }
+
     &:hover {
-        > td.i-table,
-        + tr.i-table.content-wrapper > td.i-table {
+        > td,
+        + tr.details-row > td.i-table {
             border-left-color: $blue;
         }
     }
 
+    &.show-details {
+        border-bottom: none !important;
+    }
+
+    &:not(.show-details) + tr.details-row {
+        display: none;
+    }
 }
 
-tr.i-table.content-wrapper {
+tr.i-table.details-row {
     border-top: none;
 
-    > td.i-table {
+    > td {
         border-left-color: lighten($gray, $color-variation);
         padding: 0px;
     }

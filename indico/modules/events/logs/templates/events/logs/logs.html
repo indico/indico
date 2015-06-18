@@ -7,17 +7,15 @@
 {% block content %}
     <div class="follow-scroll">
         <div class="toolbar">
-            {% if realms|length > 1 %}
-                <div class="group i-selection left">
-                    <span class="i-button label">
-                        {% trans %}Show{% endtrans %}
-                    </span>
-                    {% for realm in realms|sort(attribute='name') %}
-                        <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
-                        <label for="realm-{{ realm.name }}" class="i-button">{{ realm.title }}</label>
-                    {% endfor %}
-                </div>
-            {% endif %}
+            <div class="group i-selection left {% if realms|length <= 1 %}hidden{% endif %}">
+                <span class="i-button label">
+                    {% trans %}Show{% endtrans %}
+                </span>
+                {% for realm in realms|sort(attribute='name') %}
+                    <input type="checkbox" id="realm-{{ realm.name }}" data-realm="{{ realm.name }}" checked>
+                    <label for="realm-{{ realm.name }}" class="i-button">{{ realm.title }}</label>
+                {% endfor %}
+            </div>
             <div class="group left">
                 <a href="#" id="expand-all" class="i-button" title="{% trans %}Expand all{% endtrans %}">
                     <span class="icon-stack-plus"></span>
@@ -60,58 +58,54 @@
         $(document).ready(function() {
             'use strict';
 
-            var result_cache = [];
-            var table_titles = $("h3.i-table");
-            var tables = $(".log-table");
-            var log_entries = $("tr.i-table.interactive");
-            var log_entries_details = $("tr.i-table.content-wrapper");
+            var resultCache = [];
+            var tableTitles = $('h3.i-table');
+            var tables = $('table.log-table');
+            var logEntries = tables.find('tr.interactive');
 
             function expandRow(row) {
-                row.addClass("active no-border-bottom");
-                row.next().removeClass("weak-hidden")
-                    .children("td").wrapInner('<div style="display: none;" />')
-                    .parent().find("td > div").slideDown(400, function() {
+                row.addClass('active show-details');
+                row.next()
+                    .children('td').wrapInner('<div style="display: none;" />')
+                    .parent().find('td > div').slideDown(400, function() {
                         var $set = $(this);
                         $set.replaceWith($set.contents());
                     });
             }
 
             function collapseRow(row) {
-                row.removeClass("active");
+                row.removeClass('active');
                 row.next()
-                    .children("td").wrapInner('<div style="display: block;" />')
-                    .parent().find("td > div").slideUp(400, function() {
+                    .children('td').wrapInner('<div style="display: block;" />')
+                    .parent().find('td > div').slideUp(400, function() {
                         var $set = $(this);
                         $set.replaceWith($set.contents());
-                        row.removeClass("no-border-bottom");
-                        row.next().addClass("weak-hidden");
+                        row.removeClass('show-details');
                     });
             }
 
             function applyFilters() {
-                var checkboxes = $(".i-selection input:checkbox:checked");
-                var items = findEntries().filter(buildFilter(checkboxes));
-                table_titles.show();
+                var checkboxes = $('.i-selection input:checkbox:checked');
+                var visibleEntries = findEntries().filter(buildFilter(checkboxes));
+                tableTitles.show();
                 tables.show();
-                log_entries.hide();
-                log_entries_details.addClass("weak-hidden");
-                showAllEntries(items);
+                logEntries.removeClass('active show-details').hide();
+                visibleEntries.show();
                 hideEmptyTables();
 
                 // Needed because $(window).scroll() is not called when hiding elements
                 // causing scrolling elements to be out of place.
-                $(window).trigger("scroll");
+                $(window).trigger('scroll');
             }
 
             function findEntries() {
-                var term = $("#search-input").val();
-                if (result_cache[term] !== undefined) {
-                    return result_cache[term];
+                var term = $('#search-input').val();
+                if (resultCache[term] !== undefined) {
+                    return resultCache[term];
                 }
-                var items = $("h3.i-table.searchable").textContains(term).next().find("tr.i-table.interactive");
-                items = items.add($("tr.i-table.interactive .searchable").textContains(term)
-                                                                         .parents("tr.i-table.interactive"));
-                result_cache[term] = items;
+                var items = tableTitles.filter('.searchable').textContains(term).next().find('tr.interactive');
+                items = items.add(logEntries.find('.searchable').textContains(term).parents('tr.interactive'));
+                resultCache[term] = items;
                 return items;
             }
 
@@ -126,28 +120,16 @@
                 }
             };
 
-            var showAllEntries = function(items) {
-                items.show();
-                items.each(function() {
-                    if ($(this).hasClass("active")) {
-                        $(this).next(".content-wrapper").removeClass("weak-hidden");
-                    } else {
-                        $(this).next(".content-wrapper").addClass("weak-hidden");
-                    }
-                });
-            };
-
             var hideEmptyTables = function() {
-                var empty_tables = $("tr.i-table.interactive:hidden").parents("table.i-table")
-                                                                     .not($("tr.i-table.interactive:visible")
-                                                                     .parents("table.i-table"));
-                empty_tables.hide();
-                empty_tables.prev().hide();
-
-                if ((tables.length > 0) && ($(".log-table:visible").length === 0)) {
-                    $("#nothing-to-show").removeClass("hidden");
+                var emptyTables = $('tr.interactive:hidden').parents('table.i-table')
+                                                            .not($('tr.interactive:visible')
+                                                            .parents('table.i-table'));
+                emptyTables.hide();
+                emptyTables.prev().hide();
+                if ((tables.length > 0) && ($('.log-table:visible').length === 0)) {
+                    $('#nothing-to-show').removeClass('hidden');
                 } else {
-                    $("#nothing-to-show").addClass("hidden");
+                    $('#nothing-to-show').addClass('hidden');
                 }
             };
 
@@ -155,8 +137,8 @@
                 IndicoUI.Effect.followScroll();
             });
 
-            $("tr.i-table.interactive").on('click', function() {
-                if ($(this).hasClass("active")) {
+            logEntries.on('click', function() {
+                if ($(this).hasClass('active')) {
                     collapseRow($(this));
                 } else {
                     expandRow($(this));
@@ -164,26 +146,26 @@
             });
 
             /* Event checkbox selector behavior */
-            $(".i-selection input[type=checkbox]").change(function() {
+            $('.i-selection input[type=checkbox]').change(function() {
                 applyFilters();
             });
 
             /* Action buttons behavior */
-            $("#expand-all").click(function(e) {
+            $('#expand-all').click(function(e) {
                 e.preventDefault();
-                $("tr.i-table.interactive:visible").addClass("active no-border-bottom").next().removeClass("weak-hidden");
+                $('.log-table tr.interactive:visible').addClass('active show-details');
             });
 
-            $("#collapse-all").click(function(e) {
+            $('#collapse-all').click(function(e) {
                 e.preventDefault();
-                $("tr.i-table.interactive").removeClass("active no-border-bottom").next().addClass("weak-hidden");
+                $('.log-table tr.interactive').removeClass('active show-details');
             });
 
-            $("#search-input").realtimefilter({
+            $('#search-input').realtimefilter({
                 callback: function() {
                     applyFilters();
                 }
             });
         });
     </script>
-{% endblock %}z
+{% endblock %}
