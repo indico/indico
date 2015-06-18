@@ -27,15 +27,15 @@ class MockConferenceHolder:
         if event.id in cls._events:
             __tracebackhide__ = True
             raise Exception("Event '{}' already exists".format(event.id))
-        cls._events[event.id] = event
+        cls._events[int(event.id)] = event
 
     @classmethod
     def remove(cls, event):
-        del cls._events[event.id]
+        del cls._events[int(event.id)]
 
     @classmethod
-    def getById(cls, id_):
-        return cls._events.get(id_)
+    def getById(cls, id_, quiet=None):
+        return cls._events.get(int(id_))
 
 
 class MockConference(object):
