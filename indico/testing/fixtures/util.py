@@ -26,7 +26,7 @@ from sqlalchemy.sql.functions import _FunctionGenerator
 def monkeypatch_methods(monkeypatch):
     """Monkeypatches all methods from `cls` onto `target`
 
-    This utility lets you eaasily mock multiple methods in an existing class.
+    This utility lets you easily mock multiple methods in an existing class.
     In case of classmethods the binding will not be changed, i.e. `cls` will
     keep pointing to the source class and not the target class.
     """
