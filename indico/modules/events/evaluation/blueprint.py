@@ -18,4 +18,4 @@ from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
-evaluation_blueprint = _bp = IndicoBlueprint('evaluation', __name__, template_folder='templates')
+_bp = IndicoBlueprint('evaluation', __name__, template_folder='templates', virtual_template_folder='events/evaluation')

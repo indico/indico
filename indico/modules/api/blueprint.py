@@ -24,7 +24,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
 
-api_blueprint = _bp = IndicoBlueprint('api', __name__, template_folder='templates')
+_bp = IndicoBlueprint('api', __name__, template_folder='templates', virtual_template_folder='api')
 
 # Legacy JSON-RPC API
 _bp.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, endpoint='jsonrpc', methods=('POST',))

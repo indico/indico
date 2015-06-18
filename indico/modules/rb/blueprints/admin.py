@@ -23,8 +23,8 @@ from indico.modules.rb.controllers.admin import (
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-rooms_admin_blueprint = _bp = IndicoBlueprint('rooms_admin', __name__, url_prefix='/admin/rooms',
-                                              template_folder='../templates')
+_bp = IndicoBlueprint('rooms_admin', __name__, template_folder='../templates', virtual_template_folder='rb',
+                      url_prefix='/admin/rooms')
 
 
 # Main settings

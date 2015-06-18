@@ -20,8 +20,8 @@ from indico.modules.events.reminders.controllers import (RHListReminders, RHDele
                                                          RHAddReminder, RHPreviewReminder)
 from indico.web.flask.wrappers import IndicoBlueprint
 
-event_reminders_blueprint = _bp = IndicoBlueprint('event_reminders', __name__, template_folder='templates',
-                                                  url_prefix='/event/<confId>/manage/tools/reminders')
+_bp = IndicoBlueprint('event_reminders', __name__, template_folder='templates',
+                      virtual_template_folder='events/reminders', url_prefix='/event/<confId>/manage/tools/reminders')
 
 _bp.add_url_rule('/', 'list', RHListReminders)
 _bp.add_url_rule('/add', 'add', RHAddReminder, methods=('GET', 'POST'))

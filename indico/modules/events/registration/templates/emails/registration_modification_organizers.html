@@ -1,12 +1,12 @@
-{% extends 'events/registration/emails/base_registration_details.html' %}
+{% extends 'events/registration//base_registration_details.html' %}
 
 {% block registration_subject -%}
-    New registrant
+    Registration modification
 {%- endblock %}
 
 {% block registration_header -%}
     <p>Dear organizer,</p>
-    <p>There is a new registrant in your event.</p>
+    <p>The information of one of the registrants in <a href="{{ event.getURL() }}">{{ event.getTitle() }}</a> has changed.</p>
     <p>To manage this registration, follow this link: <a href="{{ reg_page }}">Manage registration</a></p>
 {%- endblock %}
 

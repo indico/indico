@@ -15,8 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from MaKaC.webinterface.pages.base import WPJinjaMixin
 
+from indico.modules.users.views import WPUser
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.main import WPMainBase
 
 
@@ -25,3 +26,7 @@ class WPAuth(WPJinjaMixin, WPMainBase):
 
     def _getBody(self, params):
         return self._getPageContent(params)
+
+
+class WPAuthUser(WPUser):
+    template_prefix = 'auth/'

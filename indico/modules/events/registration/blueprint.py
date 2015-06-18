@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
 from indico.web.flask.wrappers import IndicoBlueprint
 
-event_registration_blueprint = _bp = IndicoBlueprint('event_registration', __name__, template_folder='templates')
+_bp = IndicoBlueprint('event_registration', __name__, template_folder='templates',
+                      virtual_template_folder='events/registration')
 
 
 # API

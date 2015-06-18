@@ -31,10 +31,9 @@ from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationFor
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
                                        AddLocalIdentityForm, EditLocalIdentityForm)
 from indico.modules.auth.util import load_identity_info
-from indico.modules.auth.views import WPAuth
+from indico.modules.auth.views import WPAuth, WPAuthUser
 from indico.modules.users import User
 from indico.modules.users.controllers import RHUserBase
-from indico.modules.users.views import WPUser
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
@@ -336,7 +335,7 @@ class RHAccounts(RHUserBase):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
         provider_titles = {name: provider.title for name, provider in multipass.identity_providers.iteritems()}
-        return WPUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
+        return WPAuthUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
 
 
 class RHRemoveAccount(RHUserBase):

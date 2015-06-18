@@ -25,7 +25,8 @@ from indico.modules.rb.controllers.user import (
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-rooms_blueprint = _bp = IndicoBlueprint('rooms', __name__, url_prefix='/rooms', template_folder='../templates')
+_bp = IndicoBlueprint('rooms', __name__, template_folder='../templates', virtual_template_folder='rb',
+                      url_prefix='/rooms')
 
 
 # Photos

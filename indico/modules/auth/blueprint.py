@@ -23,7 +23,7 @@ from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHR
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
-auth_blueprint = _bp = IndicoBlueprint('auth', __name__, template_folder='templates')
+_bp = IndicoBlueprint('auth', __name__, template_folder='templates', virtual_template_folder='auth')
 
 
 _bp.add_url_rule('/login/', 'login', RHLogin, methods=('GET', 'POST'))

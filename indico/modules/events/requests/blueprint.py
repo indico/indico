@@ -20,8 +20,8 @@ from indico.modules.events.requests.controllers import (RHRequestsEventRequests,
                                                         RHRequestsEventRequestWithdraw, RHRequestsEventRequestProcess)
 from indico.web.flask.wrappers import IndicoBlueprint
 
-requests_blueprint = _bp = IndicoBlueprint('requests', __name__, template_folder='templates',
-                                           url_prefix='/event/<confId>/manage/requests')
+_bp = IndicoBlueprint('requests', __name__, template_folder='templates', virtual_template_folder='events/requests',
+                      url_prefix='/event/<confId>/manage/requests')
 
 # Event management
 _bp.add_url_rule('/', 'event_requests', RHRequestsEventRequests)

@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.events.static.controllers import RHStaticSiteBuild, RHStaticSiteDownload, RHStaticSiteList
 from indico.web.flask.wrappers import IndicoBlueprint
 
-static_site_blueprint = _bp = IndicoBlueprint('static_site', __name__, template_folder='templates',
-                                              url_prefix='/event/<confId>/manage/tools/static-site')
+_bp = IndicoBlueprint('static_site', __name__, template_folder='templates', virtual_template_folder='events/static',
+                      url_prefix='/event/<confId>/manage/tools/static-site')
 
 # Event management
 _bp.add_url_rule('/', 'list', RHStaticSiteList)

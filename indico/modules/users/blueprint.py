@@ -27,7 +27,8 @@ from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, R
                                               RHUsersAdminMerge, RHUsersAdminMergeCheck)
 from indico.web.flask.wrappers import IndicoBlueprint
 
-users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates', url_prefix='/user')
+_bp = IndicoBlueprint('users', __name__, template_folder='templates', virtual_template_folder='users',
+                      url_prefix='/user')
 
 # Admin
 _bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdminSettings, methods=('GET', 'POST'))

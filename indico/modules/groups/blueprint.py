@@ -20,7 +20,8 @@ from indico.modules.groups.controllers import (RHGroups, RHGroupDetails, RHGroup
                                                RHGroupDeleteMember)
 from indico.web.flask.wrappers import IndicoBlueprint
 
-groups_blueprint = _bp = IndicoBlueprint('groups', __name__, template_folder='templates', url_prefix='/admin/groups')
+_bp = IndicoBlueprint('groups', __name__, template_folder='templates', virtual_template_folder='groups',
+                      url_prefix='/admin/groups')
 
 
 _bp.add_url_rule('/', 'groups', RHGroups, methods=('GET', 'POST'))

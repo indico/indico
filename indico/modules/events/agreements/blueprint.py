@@ -28,8 +28,8 @@ from indico.modules.events.agreements.controllers import (RHAgreementForm, RHAgr
                                                           RHAgreementManagerDetailsToggleNotifications,
                                                           RHAgreementManagerDetailsDownloadAgreement)
 
-agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates',
-                                             url_prefix='/event/<confId>')
+_bp = IndicoBlueprint('agreements', __name__, template_folder='templates', virtual_template_folder='events/agreements',
+                      url_prefix='/event/<confId>')
 
 # Event management
 _bp.add_url_rule('/manage/agreements/', 'event_agreements', RHAgreementManager)
