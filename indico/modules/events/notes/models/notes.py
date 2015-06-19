@@ -106,11 +106,12 @@ class EventNote(LinkMixin, db.Model):
         try:
             return g.event_notes.get(linked_object)
         except AttributeError:
-            if preload_event:
-                g.event_notes = {n.linked_object: n
-                                 for n in EventNote.find(event_id=int(linked_object.getConference().id),
-                                                         is_deleted=False)}
-            return cls.find_first(linked_object=linked_object, is_deleted=False)
+            if not preload_event:
+                return cls.find_first(linked_object=linked_object, is_deleted=False)
+            g.event_notes = {n.linked_object: n
+                             for n in EventNote.find(event_id=int(linked_object.getConference().id),
+                                                     is_deleted=False)}
+            return g.event_notes.get(linked_object)
 
     @classmethod
     def get_or_create(cls, linked_object):
@@ -151,7 +152,7 @@ class EventNote(LinkMixin, db.Model):
     def __repr__(self):
         return '<EventNote({}, current_revision={}{}, {})>'.format(
             self.id,
-            self.current_revision.id if self.current_revision else None,
+            self.current_revision_id,
             ', is_deleted=True' if self.is_deleted else '',
             self.link_repr
         )
