@@ -130,7 +130,7 @@ class LinkMixin(object):
             self.event_id = int(obj.id)
         elif isinstance(obj, Session):
             self.link_type = LinkType.session
-            self.event_id = int(obj.id)
+            self.event_id = int(obj.getConference().id)
             self.session_id = obj.id
         elif isinstance(obj, Contribution):
             self.link_type = LinkType.contribution
