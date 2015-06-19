@@ -22,7 +22,7 @@ import pprint
 import time
 import traceback
 
-from flask import current_app
+from flask import current_app, g
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
@@ -92,3 +92,4 @@ def apply_db_loggers(debug=False):
         logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
                                                                             'sql_duration': total,
                                                                             'sql_verb': statement.split()[0]})
+        g.sql_query_count = g.get('sql_query_count', 0) + 1

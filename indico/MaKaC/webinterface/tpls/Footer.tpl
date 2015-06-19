@@ -37,6 +37,7 @@ else:
   <!-- worker: ${ Config.getInstance().getWorkerName() } -->
 % endif
 % if _app.debug:
+  <!-- queries: ${ _g.sql_query_count } -->
   <!-- endpoint: ${ _request.endpoint } -->
   % if rh:
   <!-- rh: ${ rh.__class__.__module__ }.${ rh.__class__.__name__ } -->
