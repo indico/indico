@@ -1,0 +1,57 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% block title %}{% trans %}Registration requests{% endtrans %}{% endblock %}
+
+{%- block content %}
+    <table class="i-table-widget fixed-width">
+        <thead>
+            <tr>
+                <th>{% trans %}Email Address{% endtrans %}</th>
+                <th>{% trans %}Comment{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {%- for pending_request in pending_requests %}
+            <tr>
+                <td>{{ pending_request.email }}</td>
+                <td>{{ pending_request.comment }}</td>
+                <td>
+                    <a class="i-button highlight right registration-request js-accept" href="#"
+                       data-href="{{ url_for('.approve_registration_request', request_id=pending_request.id) }}">
+                        {% trans %}Accept{% endtrans %}
+                    </a>
+                    <a class="i-button highlight right registration-request js-reject" href="#"
+                       data-href="{{ url_for('.reject_registration_request', request_id=pending_request.id) }}">
+                       {% trans %}Reject{% endtrans %}
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td>{%trans %}No pending requests{% endtrans %}</td>
+                <td></td>
+                <td></td>
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        $('.registration-request').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var method = $this.hasClass('js-accept') ? 'POST' : 'DELETE';
+
+            $.ajax({
+                url: $this.data('href'),
+                method: method,
+                success: function() {
+                    $this.closest('tr').remove();
+                }
+            });
+        });
+    </script>
+{%- endblock %}
+

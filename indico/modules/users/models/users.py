@@ -571,3 +571,39 @@ define_unaccented_lowercase_index(User.first_name)
 define_unaccented_lowercase_index(User.last_name)
 define_unaccented_lowercase_index(User.phone)
 define_unaccented_lowercase_index(User.address)
+
+
+class RegistrationRequest(db.Model):
+
+    __tablename__ = 'registration_requests'
+    __table_args__ = (
+        db.Index(None, 'email', unique=True),
+        {'schema': 'users'}
+    )
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    comment = db.Column(
+        db.String,
+        nullable=True
+    )
+
+    email = db.Column(
+        db.String,
+        nullable=False,
+        index=True
+    )
+
+    approved = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+    def approve(self):
+        self.approved = True
+        db.session.add(self)
+        db.session.flush()

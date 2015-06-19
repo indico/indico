@@ -1,0 +1,17 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}Your request has been approved{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient %}{% endblock %}
+
+{% block body -%}
+    {% filter dedent -%}
+        {% trans -%}
+            Please click the following link to continue the registration process:
+        {%- endtrans %}
+
+        {{ url }}
+    {%- endfilter %}
+{%- endblock %}

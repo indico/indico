@@ -18,8 +18,11 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
+from flask import request
+
 from pytz import all_timezones
 from wtforms.fields.core import SelectField, BooleanField, StringField
+from wtforms.fields import SubmitField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
@@ -92,3 +95,16 @@ class MergeForm(IndicoForm):
                                  description=_('The user that will be merged into the target one'))
     target_user = PrincipalField(_('Target user'), [DataRequired()],
                                  description=_('The user that will remain active in the end'))
+
+
+class UserManagementForm(IndicoForm):
+    notify_on_new_account = BooleanField(_('Notify when new account is created'), widget=SwitchWidget(),
+                                         description=_('Send email to admins whenever a new account is created'))
+    local_account_creation = BooleanField(_('Enable local registration'), widget=SwitchWidget(),
+                                          description=_('Enable users to register locally'))
+    account_moderation_workflow = BooleanField(_('Account moderation'), widget=SwitchWidget(),
+                                               description=_('Let admins approve requests for account creation'))
+    submit_field = SubmitField(_('Save'))
+
+    def is_submitted(self):
+        return super(UserManagementForm, self).is_submitted() and 'submit_field' in request.form
