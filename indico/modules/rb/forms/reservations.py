@@ -151,6 +151,7 @@ class ModifyBookingForm(NewBookingSimpleForm):
         del self.submit_prebook
 
     def validate_start_dt(self, field):
+        super(NewBookingSimpleForm, self).validate_start_dt(field)
         new_start_dt = field.data
         now = datetime.now()
 
@@ -160,6 +161,7 @@ class ModifyBookingForm(NewBookingSimpleForm):
             raise ValidationError(_(u'The start time cannot be moved into the past.'))
 
     def validate_end_dt(self, field):
+        super(NewBookingSimpleForm, self).validate_end_dt(field)
         new_end_dt = field.data
         now = datetime.now()
 
