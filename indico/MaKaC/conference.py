@@ -5185,6 +5185,11 @@ class Session(CommonObjectBase, Locatable):
         self._modificationDS = nowutc()
         self._keywords = ""
 
+    @return_ascii
+    def __repr__(self):
+        event_id = self.conference.getId() if self.conference else None
+        return '<Session({}, {}, {})>'.format(self.getId(), self.getTitle(), event_id)
+
     def __cmp__(self, other):
         if type(self) is not type(other):
             # This is actually dangerous and the ZODB manual says not to do this
