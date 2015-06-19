@@ -2830,11 +2830,6 @@ class UHPaperReviewingDisplay(URLHandler):
     _endpoint = 'event.paperReviewingDisplay'
 
 
-#### End of reviewing
-class UHAbout(URLHandler):
-    _endpoint = 'misc.about'
-
-
 class UHContact(URLHandler):
     _endpoint = 'misc.contact'
 

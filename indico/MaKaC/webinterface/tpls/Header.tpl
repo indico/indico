@@ -73,10 +73,10 @@ urlMeeting.addParam("event_type","meeting")
         <a class="arrow" href="#" data-toggle="dropdown">${ _("Help") }</a>
         <ul class="dropdown">
             <li><a href="${ urlHandlers.UHConferenceHelp.getURL() }">${ _("Indico help") }</a></li>
-            <li><a href="${ urlHandlers.UHAbout.getURL() }">${ _("About Indico") }</a></li>
             % if show_contact:
                 <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
             % endif
+            <li><a href="http://indico-software.org">${ _("More about Indico") }</a></li>
         </ul>
     </div>
 </div>
