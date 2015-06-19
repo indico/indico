@@ -50,7 +50,7 @@ def prompt_email(prompt="Enter email: "):
         try:
             email = unicode(raw_input(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
         except (EOFError, KeyboardInterrupt):  # ^D or ^C
-            print
+            print()
             return None
         if is_valid_mail(email):
             return email
@@ -63,7 +63,7 @@ def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: "
         try:
             password = unicode(getpass(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
         except (EOFError, KeyboardInterrupt):  # ^D or ^C
-            print
+            print()
             return None
         # Empty, just prompt again
         if not password:
@@ -88,6 +88,11 @@ def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: "
 def terminal_size():
     h, w, hp, wp = struct.unpack('HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)))
     return w, h
+
+
+def clear_line():
+    """Clears the current line in the terminal"""
+    print('\r', ' ' * terminal_size()[0], '\r', end='', sep='')
 
 
 def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
