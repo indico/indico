@@ -363,6 +363,19 @@ def install_zeroclipboard():
         local('cp dist/ZeroClipboard.swf {0}/'.format(dest_dir))
 
 
+@recipe('dropzone.js')
+def install_dropzone_js():
+    """
+    Install Dropzone from Git
+    """
+    with lcd(os.path.join(env.ext_dir, 'dropzone')):
+        dest_js_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'dropzone.js/')
+        dest_css_dir = os.path.join(lib_dir(env.src_dir, 'css'), 'dropzone.js/')
+        local('mkdir -p {0} {1}'.format(dest_js_dir, dest_css_dir))
+        local('cp dist/dropzone.js {0}/'.format(dest_js_dir))
+        local('cp dist/dropzone.css {0}/'.format(dest_css_dir))
+
+
 @recipe('selectize.js')
 def install_selectize_js():
     with lcd(os.path.join(env.ext_dir, 'selectize.js')):

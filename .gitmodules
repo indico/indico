@@ -47,3 +47,6 @@
 [submodule "ext_modules/Jed"]
 	path = ext_modules/Jed
 	url = https://github.com/SlexAxton/Jed.git
+[submodule "ext_modules/dropzone"]
+	path = ext_modules/dropzone
+	url = https://github.com/enyo/dropzone.git
