@@ -20,8 +20,6 @@ from functools import wraps
 from flask import request
 from werkzeug.exceptions import NotFound
 
-from indico.core.errors import IndicoError, NotFoundError
-from indico.core.logger import Logger
 from indico.util.json import create_json_error_answer
 
 
@@ -85,6 +83,8 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
     """
+    from indico.core.errors import IndicoError, NotFoundError
+    from indico.core.logger import Logger
     no_tb_exceptions = (NotFound, NotFoundError)
 
     def _jsonify_error(f):

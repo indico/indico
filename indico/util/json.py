@@ -23,9 +23,6 @@ from flask import current_app
 from persistent.dict import PersistentDict
 from speaklater import _LazyString
 
-from indico.core.config import Config
-from indico.core.errors import IndicoError
-
 try:
     import simplejson as _json
 except ImportError:
@@ -73,6 +70,8 @@ def loads(string):
 
 
 def create_json_error_answer(exception, status=200):
+    from indico.core.config import Config
+    from indico.core.errors import IndicoError
     if isinstance(exception, IndicoError):
         details = exception.toDict()
     else:
