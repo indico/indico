@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import pytest
+from mock import PropertyMock
 
 from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError
@@ -126,6 +127,15 @@ def test_get_for_linked_object(note, dummy_user, create_event):
     note.create_revision(RenderMode.html, 'test', dummy_user)
     assert EventNote.get_for_linked_object(note.linked_object) == note
     assert EventNote.get_for_linked_object(create_event('123')) is None
+
+
+@pytest.mark.parametrize('preload', (True, False))
+def test_get_for_linked_object_preload(note, dummy_user, mocker, preload):
+    note.create_revision(RenderMode.html, 'test', dummy_user)
+    assert EventNote.get_for_linked_object(note.linked_object, preload_event=preload)
+    query = mocker.patch.object(EventNote, 'query', new=PropertyMock())
+    EventNote.get_for_linked_object(note.linked_object)
+    assert query.called == (not preload)
 
 
 def test_get_for_linked_object_deleted(note, dummy_user):

@@ -20,6 +20,7 @@ import re
 from functools import partial
 
 import bleach
+from flask import g
 from sqlalchemy.event import listens_for, listen
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -91,12 +92,25 @@ class EventNote(LinkMixin, db.Model):
     )
 
     @classmethod
-    def get_for_linked_object(cls, linked_object):
+    def get_for_linked_object(cls, linked_object, preload_event=True):
         """Gets the note for the given object.
 
         This only returns a note that hasn't been deleted.
+
+        :param linked_object: An event, session, contribution or
+                              subcontribution.
+        :param preload_event: If all notes for the same event should
+                              be pre-loaded and cached in the app
+                              context.
         """
-        return cls.find_first(linked_object=linked_object, is_deleted=False)
+        try:
+            return g.event_notes.get(linked_object)
+        except AttributeError:
+            if preload_event:
+                g.event_notes = {n.linked_object: n
+                                 for n in EventNote.find(event_id=int(linked_object.getConference().id),
+                                                         is_deleted=False)}
+            return cls.find_first(linked_object=linked_object, is_deleted=False)
 
     @classmethod
     def get_or_create(cls, linked_object):

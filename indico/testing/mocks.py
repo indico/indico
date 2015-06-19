@@ -46,3 +46,6 @@ class MockConference(object):
 
     def getId(self):
         return self.id
+
+    def getConference(self):
+        return self
