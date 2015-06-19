@@ -1,36 +1,40 @@
 Indico
 ======
+|build-status|
 
-|build-status|_
+|license|
 
-Following the tradition of CDS Agenda, the CERN Document Server Software
-Consortium developed a web application to schedule and organise events,
-from simple lectures to complex meetings, workshops and conferences with
-sessions and contributions. The tool also includes an advanced user
-delegation mechanism, allow paper reviewing, archival of conference
-information and electronic proceedings.
+Indico is a general-purpose event management web-based solution. It includes a full-blown conference organization workflow as well as tools for meeting management and room booking. It provides as well integration with video-conferencing solutions.
 
-The Indico software was originally developed in the framework of the EU
-InDiCo project. Nowadays, Indico is a free software licensed under terms
-of GNU General Public License (GPL) v3.
+A list of features `can be found here <https://indico.github.io/features/>`_. There is also a `video <https://www.youtube.com/watch?v=yo8rgg9dOcc>`_!
 
-Indico is currently in production at  CERN at  http://indico.cern.ch.
-You are welcome to have a look at the set of features, and subscribe to
-the mailing lists in order to be kept informed about future releases.
+Indico is free software, licensed under terms of the GNU General Public License (GPL) v3. It is currently in production `at CERN <http://indico.cern.ch>`_, as well as in many other scientific institutions around the world.
 
-Indico is free software licenced under terms of GNU General Public Licence
-(GPL) v3.  It is provided on an "as is" basis.
 
-Good luck, and thanks for choosing Indico.
+Getting Indico
+--------------
+
+|pypi-ver|
+
+Information on how to get the latest release can be found `at the project web site <http://indico.github.io/getting-started/>`_.
+If you are interested in contributing to Indico, you can consult the `project documentation <http://indico.readthedocs.org/>`_.
+
 
 Community
 ---------
 
-The project web site is http://indico-software.org and the developers can be
-reached via IRC in `#indico on Freenode`_.
+The project web site is http://indico.github.io and the developers can be
+reached via IRC (`#indico on Freenode <https://webchat.freenode.net/?channels=indico>`_).
+
+History
+-------
+
+Indico was created at CERN, originally as part of the European Union's InDiCo Project.
 
 
-.. |build-status| image:: https://travis-ci.org/indico/indico.svg?branch=master
+.. |build-status| image:: https://travis-ci.org/indico/indico.png?branch=master
                    :alt: Travis Build Status
-.. _build-status: https://travis-ci.org/indico/indico
-.. _#indico on Freenode: https://webchat.freenode.net/?channels=indico
+.. |pypi-ver| image:: https://img.shields.io/pypi/v/indico.png
+                   :alt: Available on PyPI
+.. |license| image:: https://img.shields.io/github/license/indico/indico.png
+                   :alt: License
