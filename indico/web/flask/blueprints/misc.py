@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (welcome, helpDisplay, newsDisplay, lang, resetTimezone, about, contact,
-                                   errors, materialDisplay)
+from MaKaC.webinterface.rh import (welcome, helpDisplay, newsDisplay, lang, resetTimezone, contact, errors,
+                                   materialDisplay)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
