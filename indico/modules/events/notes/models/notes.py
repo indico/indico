@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+import re
 from functools import partial
 
+import bleach
 from sqlalchemy.event import listens_for, listen
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -133,7 +135,12 @@ class EventNote(LinkMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<EventNote({})>'.format(self.id)
+        return '<EventNote({}, current_revision={}{}, {})>'.format(
+            self.id,
+            self.current_revision.id if self.current_revision else None,
+            ', is_deleted=True' if self.is_deleted else '',
+            self.link_repr
+        )
 
 
 class EventNoteRevision(db.Model):
@@ -193,7 +200,13 @@ class EventNoteRevision(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<EventNoteRevision({})>'.format(self.id)
+        render_mode = self.render_mode.name if self.render_mode is not None else None
+        source = bleach.clean(self.source, tags=[], strip=True).strip()
+        source = re.sub(r'\s+', ' ', source)
+        if len(source) > 50:
+            source = source[:50] + '...'
+        return '<EventNoteRevision({}, {}, {}, {}): "{}">'.format(self.id, self.note_id, render_mode, self.created_dt,
+                                                                  source)
 
 
 @listens_for(EventNote.current_revision, 'set')
