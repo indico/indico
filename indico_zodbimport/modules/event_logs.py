@@ -19,8 +19,6 @@ from __future__ import unicode_literals
 from datetime import timedelta, datetime
 from operator import attrgetter
 
-import click
-
 from indico.core.db import db
 from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
 from indico.modules.users import User
@@ -45,14 +43,7 @@ def _convert_data(event, value):
 
 class EventLogImporter(Importer):
     def __init__(self, **kwargs):
-        self.quiet = kwargs.pop('quiet')
         super(EventLogImporter, self).__init__(**kwargs)
-
-    @staticmethod
-    def decorate_command(command):
-        command = click.option('--quiet', is_flag=True, default=False,
-                               help="Use a less verbose output mode (about 40% faster)")(command)
-        return command
 
     def has_data(self):
         return bool(EventLogEntry.query.count())
@@ -66,21 +57,21 @@ class EventLogImporter(Importer):
             self.migrate_event_logs()
 
     def migrate_event_logs(self):
-        print cformat('%{white!}migrating event logs')
-        msg_email = cformat('%{green}+++%{reset} %{white!}{:6d}%{reset} %{cyan}{}')
-        msg_action = cformat('%{green}+++%{reset} %{white!}{:6d}%{reset} %{cyan!}{}')
+        self.print_step('migrating event logs')
+        msg_email = cformat('%{white!}{:6d}%{reset} %{cyan}{}')
+        msg_action = cformat('%{white!}{:6d}%{reset} %{cyan!}{}')
 
         for event in committing_iterator(self._iter_events()):
             for item in event._logHandler._logLists['emailLog']:
                 entry = self._migrate_email_log(event, item)
                 db.session.add(entry)
                 if not self.quiet:
-                    print msg_email.format(entry.event_id, entry)
+                    self.print_success(msg_email.format(entry.event_id, entry))
             for item in event._logHandler._logLists['actionLog']:
                 entry = self._migrate_action_log(event, item)
                 db.session.add(entry)
                 if not self.quiet:
-                    print msg_action.format(entry.event_id, entry)
+                    self.print_success(msg_action.format(entry.event_id, entry))
 
     def _migrate_log(self, event, item):
         user_id = None
