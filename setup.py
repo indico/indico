@@ -347,6 +347,7 @@ if __name__ == '__main__':
             legacy_events = indico_zodbimport.modules.legacy_events:LegacyEventImporter
             legacy_categories = indico_zodbimport.modules.legacy_categories:LegacyCategoryImporter
             event_logs = indico_zodbimport.modules.event_logs:EventLogImporter
+            event_notes = indico_zodbimport.modules.event_notes:EventNoteImporter
             """,
           zip_safe=False,
           packages=foundPackages,
