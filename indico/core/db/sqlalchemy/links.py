@@ -148,6 +148,12 @@ class LinkMixin(object):
     def linked_object(cls):
         return LinkedObjectComparator(cls)
 
+    @property
+    def link_repr(self):
+        info = [('link_type', self.link_type.name if self.link_type is not None else 'None')]
+        info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key)is not None)
+        return ', '.join('{}={}'.format(key, value) for key, value in info)
+
 
 class LinkedObjectComparator(Comparator):
     def __init__(self, cls):
