@@ -74,7 +74,9 @@ urlMeeting.addParam("event_type","meeting")
         <ul class="dropdown">
             <li><a href="${ urlHandlers.UHConferenceHelp.getURL() }">${ _("Indico help") }</a></li>
             <li><a href="${ urlHandlers.UHAbout.getURL() }">${ _("About Indico") }</a></li>
-            <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
+            % if show_contact:
+                <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
+            % endif
         </ul>
     </div>
 </div>

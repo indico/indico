@@ -35,5 +35,4 @@ class WContact(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["supportEmail"] = Config.getInstance().getPublicSupportEmail()
-        vars["teamEmail"] = Config.getInstance().getSupportEmail()
         return vars

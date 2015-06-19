@@ -35,7 +35,6 @@ from MaKaC import schedule
 from MaKaC.common import info
 from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
-from indico.core import config as Configuration
 from MaKaC.common.url import URL
 from indico.core.config import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
@@ -120,7 +119,7 @@ class WTemplated():
             if not it will look for a file called as the class name+".tpl"
             in the configured TPL directory.
         """
-        cfg = Configuration.Config.getInstance()
+        cfg = Config.getInstance()
 
         #file = cfg.getTPLFile(self.tplId)
 
@@ -147,7 +146,7 @@ class WTemplated():
         """
         self._rh = ContextManager.get('currentRH', None)
 
-        cfg = Configuration.Config.getInstance()
+        cfg = Config.getInstance()
         vars = cfg.getTPLVars()
 
         for paramName in self.__params:
@@ -269,7 +268,8 @@ class WHeader(WTemplated):
 
         vars["currentUser"] = self._currentuser
 
-        imgLogin = Configuration.Config.getInstance().getSystemIconURL("login")
+        config =  Config.getInstance()
+        imgLogin = config.getSystemIconURL("login")
 
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self._isFrontPage
@@ -316,6 +316,7 @@ class WHeader(WTemplated):
         announcement_header = getAnnoucementMgrInstance().getText()
         vars["announcement_header"] = announcement_header
         vars["announcement_header_hash"] = binascii.crc32(announcement_header)
+        vars["show_contact"] = config.getPublicSupportEmail() is not None
 
         return vars
 
@@ -367,7 +368,7 @@ class WConferenceHeader(WHeader):
         vars["conf"] = vars["target"] = self._conf;
         vars["urlICSFile"] = urlHandlers.UHConferenceToiCal.getURL(self._conf, detail = "events")
 
-        vars["imgLogo"] = Configuration.Config.getInstance().getSystemIconURL( "miniLogo" )
+        vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
 
         # Default values to avoid NameError while executing the template
@@ -514,15 +515,15 @@ class WMenuConferenceHeader( WConferenceHeader ):
         urlCustPrint.addParam("view", vars["currentView"])
         vars["printURL"]=str(urlCustPrint)
 
-        vars["printIMG"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "printer" )))
-        urlCustPDF=urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
+        vars["printIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("printer")))
+        urlCustPDF = urlHandlers.UHConfTimeTableCustomizePDF.getURL(self._conf)
         urlCustPDF.addParam("showDays", vars.get("selectedDate", "all"))
         urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
-        vars["pdfURL"]=quoteattr(str(urlCustPDF))
-        vars["pdfIMG"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "pdf" )))
-        urlMatPack=urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._conf)
-        vars["matPackURL"]=quoteattr(str(urlMatPack))
-        vars["zipIMG"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "smallzip" )))
+        vars["pdfURL"] = quoteattr(str(urlCustPDF))
+        vars["pdfIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
+        urlMatPack = urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._conf)
+        vars["matPackURL"] = quoteattr(str(urlMatPack))
+        vars["zipIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("smallzip")))
 
         return vars
 
@@ -937,10 +938,10 @@ class WCategModifHeader(WTemplated):
                 vars["categ"] = self._getMultipleCategHTML(ol, URLGen)
             else:
                 vars["categ"] = self._getSingleCategHTML( ol[0], URLGen)
-            vars["viewImageURL"] = Configuration.Config.getInstance().getSystemIconURL( "view" )
+            vars["viewImageURL"] = Config.getInstance().getSystemIconURL("view")
         except:
             vars["categ"] = self._getSingleCategHTML( ol, URLGen)
-            vars["viewImageURL"] = Configuration.Config.getInstance().getSystemIconURL( "view" )
+            vars["viewImageURL"] = Config.getInstance().getSystemIconURL("view")
 
         return vars
 
@@ -982,7 +983,7 @@ class WConfModifHeader(WTemplated):
             vars["creator"] = self._conf.getCreator().getFullName()
         except:
             vars["creator"] = ""
-        vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         vars["confTitle"] = escape(self._conf.getTitle())
         if self._conf.canModify( self._aw ):
             URLGen = vars.get("confModifURLGen", \
@@ -1016,7 +1017,7 @@ class WSessionModifHeader(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         vars["sessionTitle"] = escape(self._session.getTitle())
         vars["sessionDisplayURL"] = vars["sessionDisplayURLGen"](self._session)
         vars["sessionModificationURL"] = vars["sessionModifURLGen"](self._session)
@@ -1033,7 +1034,7 @@ class WBreakModifHeader(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         vars["breakTitle"] = escape(self._break.getTitle())
         return vars
 
@@ -1055,7 +1056,7 @@ class WContribModifHeader(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         vars["title"] = escape(self._contrib.getTitle())
         urlGen = vars.get( "contribDisplayURLGen", urlHandlers.UHContributionDisplay.getURL )
         vars["contribDisplayURL"] = urlGen(self._contrib)
@@ -1107,7 +1108,6 @@ class WContribModifSC(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)
-        cfg = Configuration.Config.getInstance()
         vars["subContList"] = self.getSubContItems(vars["subContModifURL"])
         vars["confId"] = self._contrib.getConference().getId()
         vars["contribId"] = self._contrib.getId()
@@ -1165,7 +1165,7 @@ class WMaterialModifHeader(WTemplated):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         vars["title"] = escape(self._mat.getTitle())
         vars["materialDisplayURL"] = vars["materialDisplayURLGen"](self._mat)
         vars["materialModificationURL"] = vars["materialModifURLGen"](self._mat)
@@ -1208,7 +1208,7 @@ class WCategoryModifFrame(WTemplated):
         #vars["context"] = WCategModifHeader(self.__conf).getHTML(p)
         vars["creator"] = ""#self.__conf.getCreator().getFullName()
         vars["context"] = ""
-        vars["imgGestionGrey"] = Configuration.Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         vars["categDisplayURL"] = vars["categDisplayURLGen"]( self.__conf )
         vars["title"] = escape(self.__conf.getTitle())
         vars["titleTabPixels"] = self.getTitleTabPixels()
@@ -1325,7 +1325,7 @@ class WMaterialModifFrame(WTemplated):
     def getVars( self ):
         closeHeaderTags = "</table></td></tr>"
         vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL( "gestionGrey" )
+        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
         owner = self._material.getOwner()
         if isinstance(owner, conference.Contribution):
             wc = WContribModifHeader( owner, self._aw )
@@ -1484,9 +1484,10 @@ class WSubContributionDisplayBase(WTemplated):
         vars["title"] = self._subContrib.getTitle()
         vars["description"] = self._subContrib.getDescription()
         vars["modifyItem"] = ""
-        if self._subContrib.canModify( self._aw ):
-            vars["modifyItem"] = """<a href="%s"><img src="%s" alt="Jump to the modification interface"></a> """%(vars["modifyURL"], Configuration.Config.getInstance().getSystemIconURL( "modify" ) )
-        l=[]
+        if self._subContrib.canModify(self._aw):
+            vars["modifyItem"] = '<a href="{}"><img src="{}" alt="Jump to the modification interface"></a>'.format(
+                vars["modifyURL"], Config.getInstance().getSystemIconURL("modify"))
+        l = []
         for speaker in self._subContrib.getSpeakerList():
             l.append( """<a href="mailto:%s">%s</a>"""%(speaker.getEmail(), \
                                                         speaker.getFullName()))
@@ -1513,7 +1514,7 @@ class WSubContributionDisplayMin(WSubContributionDisplayBase):
 
 class WMaterialDisplayItem(WTemplated):
 
-    def getHTML( self, aw, material, URL="", icon=Configuration.Config.getInstance().getSystemIconURL( "material" ) ):
+    def getHTML(self, aw, material, URL="", icon=Config.getInstance().getSystemIconURL("material")):
         if material.canView( aw ):
 
             return """<a href=%s>%s</a>"""%(quoteattr( str( URL ) ), WTemplated.htmlText( material.getTitle() ) )
@@ -1772,7 +1773,7 @@ class WInlineContextHelp(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["helpContent"] = self._content
-        vars["imgSrc"] = Config.getInstance().getSystemIconURL( "help" )
+        vars["imgSrc"] = Config.getInstance().getSystemIconURL("help")
         return vars
 
 class WResourceModification(WTemplated):
@@ -1838,7 +1839,7 @@ class WConfirmation(WTemplated):
         params["loading"] = loading
         params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("Yes"))
         params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
-        params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL("warning")
+        params["systemIconWarning"] = Config.getInstance().getSystemIconURL("warning")
         return WTemplated.getHTML(self, params)
 
 
@@ -1860,7 +1861,7 @@ class WDisplayConfirmation(WTemplated):
         params["passingArgs"] = "".join(pa)
         params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("OK"))
         params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
-        params["systemIconWarning"] = Configuration.Config.getInstance().getSystemIconURL("warning")
+        params["systemIconWarning"] = Config.getInstance().getSystemIconURL("warning")
         return WTemplated.getHTML(self, params)
 
 class WClosed(WTemplated):
@@ -2265,7 +2266,7 @@ class WStdTBDrawer(WTemplated):
     def _getCurrentIconHTML( self, style ):
         return """<td class="%s">&nbsp;<img src="%s"\
          style="vertical-align:middle" alt=""></td>"""%(style,\
-                         Configuration.Config.getInstance().getSystemIconURL("arrowLeft"))
+                         Config.getInstance().getSystemIconURL("arrowLeft"))
 
     def _getIconHTML( self, item, style ):
         return """<td class="%s">&nbsp;<img src="%s" alt="" hspace="3" vspace="2">
@@ -3597,10 +3598,10 @@ class WReportNumbersTable(WTemplated):
 
         for rn in rns:
             key = rn[0]
-            if key in Configuration.Config.getInstance().getReportNumberSystems().keys():
+            if key in Config.getInstance().getReportNumberSystems().keys():
                 number = rn[1]
                 reportNumberId="s%sr%s"%(key, number)
-                name=Configuration.Config.getInstance().getReportNumberSystems()[key]["name"]
+                name=Config.getInstance().getReportNumberSystems()[key]["name"]
                 reportCodes.append({"id" : reportNumberId, "number": number, "system": key, "name": name})
         return reportCodes
 
@@ -3621,7 +3622,7 @@ class WReportNumbersTable(WTemplated):
             vars["addAction"] = "reportNumbers.subcontribution.addReportNumber"
             vars["deleteAction"] = "reportNumbers.subcontribution.removeReportNumber"
         vars["items"]=self._getCurrentItems()
-        systems = Configuration.Config.getInstance().getReportNumberSystems()
+        systems = Config.getInstance().getReportNumberSystems()
         vars["reportNumberSystems"]= dict([(system, systems[system]["name"]) for system in systems])
         return vars
 
@@ -3638,7 +3639,8 @@ class WUtils:
                 attributes -- [dictionary] attributes for <img> (e.g. border="" name="" ...).
         """
         attr = utils.dictionaryToString(attributes)
-        return """<img src="%s" alt="%s" %s /> %s"""%(Config.getInstance().getSystemIconURL(imgId),imgInfo,attr,imgText)
+        return '<img src="{}" alt="{}" {} /> {}'.format(
+            Config.getInstance().getSystemIconURL(imgId), imgInfo, attr, imgText)
     createImg = classmethod(createImg)
 
     def createImgButton(cls, url, imgId, imgInfo="", imgText="", **attributes):
@@ -3651,9 +3653,8 @@ class WUtils:
                 attributes -- [dictionary] attributes for <a> (e.g. onclick="" onchange="" ...).
         """
         attr = utils.dictionaryToString(attributes)
-        return """<a href="%s" %s>
-              <img src="%s" alt="%s" /> %s
-          </a>"""%(url, attr, Config.getInstance().getSystemIconURL(imgId), imgInfo, imgText)
+        return '<a href="{}" {}><img src="{}" alt="{}" /> {}</a>'.format(
+            url, attr, Config.getInstance().getSystemIconURL(imgId), imgInfo, imgText)
     createImgButton = classmethod(createImgButton)
 
     def createChangingImgButton(cls, url, imgID, imgOverId, imgInfo="", imgText="", **attributes):
