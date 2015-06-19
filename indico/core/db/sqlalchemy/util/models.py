@@ -20,9 +20,12 @@ from importlib import import_module
 
 from flask import g
 from flask_sqlalchemy import Model
+from sqlalchemy import inspect
 from sqlalchemy.orm import joinedload, joinedload_all
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
+
+from indico.util.decorators import strict_classproperty
 
 
 class IndicoModel(Model):
@@ -68,6 +71,21 @@ class IndicoModel(Model):
         if obj is None:
             raise NoResultFound()
         return obj
+
+    @strict_classproperty
+    @classmethod
+    def has_rows(cls):
+        """Checks if the underlying table has any rows.
+
+        This is done in an efficient way and should preferred over
+        calling the `count` method unless you actually care about
+        the exact number of rows.
+        """
+        from indico.core.db import db
+        # we just need one "normal" column so sqlalchemy doesn't involve relationships
+        # it doesn't really matter which one it is - it's never even used in the query
+        pk_col = getattr(cls, inspect(cls).primary_key[0].name)
+        return db.session.query(db.session.query(pk_col).exists()).one()[0]
 
     def __committed__(self, change):
         """Called after a commit for this object.

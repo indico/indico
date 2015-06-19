@@ -28,6 +28,21 @@ class classproperty(property):
         return self.fget.__get__(None, type)()
 
 
+class strict_classproperty(classproperty):
+    """A classproperty that does not work on instances.
+
+    This is useful for properties which would be confusing when
+    accessed through an instance.  However, using this property
+    still won't allow you to set the attribute on the instance
+    itself, so it's really just to stop people from accessing
+    the property in an inappropriate way.
+    """
+    def __get__(self, obj, type=None):
+        if obj is not None:
+            raise AttributeError('Attribute is not available on instances of {}'.format(type.__name__))
+        return super(strict_classproperty, self).__get__(obj, type)
+
+
 class cached_classproperty(property):
     def __get__(self, obj, objtype=None):
         # The property name is the function's name
