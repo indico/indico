@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
 import re
+import sys
 from urlparse import urlparse
 
 from ZODB import DB, FileStorage
@@ -96,3 +98,29 @@ def option_value(opt):
     if isinstance(value, basestring):
         value = convert_to_unicode(value)
     return value
+
+
+def get_archived_file(f, archive_paths):
+    """Returns the name and path of an archived file
+
+    :param f: A `LocalFile` object
+    :param archive_paths: The path that was used in the ``ArchiveDir``
+                          config option ot a list of multiple paths.
+    """
+    # this is based pretty much on MaterialLocalRepository.__getFilePath, but we don't
+    # call any legacy methods in ZODB migrations to avoid breakage in the future.
+    if f is None:
+        return None, None
+    if isinstance(archive_paths, basestring):
+        archive_paths = [archive_paths]
+    archive_id = f._LocalFile__archivedId
+    repo = f._LocalFile__repository
+    for archive_path in archive_paths:
+        path = os.path.join(archive_path, repo._MaterialLocalRepository__files[archive_id])
+        if os.path.exists(path):
+            return f.fileName, path
+        for mode, enc in (('strict', 'iso-8859-1'), ('replace', sys.getfilesystemencoding()), ('replace', 'ascii')):
+            enc_path = path.decode('utf-8', mode).encode(enc, 'replace')
+            if os.path.exists(enc_path):
+                return f.fileName, enc_path
+    return f.fileName, None
