@@ -159,17 +159,15 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
             write(f, 'from indico.web.flask.wrappers import IndicoBlueprint')
             write(f)
             if templates:
-                write(f, "_bp = IndicoBlueprint('{}', __name__, template_folder='templates')".format(blueprint_name))
+                virtual_template_folder = 'events/{}'.format(name) if event else name
+                write(f, "_bp = IndicoBlueprint('{}', __name__, template_folder='templates',\n\
+                      virtual_template_folder='{}')".format(blueprint_name, virtual_template_folder))
             else:
                 write(f, "_bp = IndicoBlueprint('{}', __name__)".format(blueprint_name))
             write(f)
     if templates:
         templates_dir = os.path.join(module_dir, 'templates')
         os.mkdir(templates_dir)
-        if event:
-            os.makedirs(os.path.join(templates_dir, 'events', name))
-        else:
-            os.makedirs(os.path.join(templates_dir, name))
     if controllers:
         with open(os.path.join(module_dir, 'controllers.py'), 'w') as f:
             write_header(f)
