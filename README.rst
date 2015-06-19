@@ -34,7 +34,10 @@ Indico was created at CERN, originally as part of the European Union's InDiCo Pr
 
 .. |build-status| image:: https://travis-ci.org/indico/indico.png?branch=master
                    :alt: Travis Build Status
+                   :target: https://travis-ci.org/indico/indico
 .. |pypi-ver| image:: https://img.shields.io/pypi/v/indico.png
                    :alt: Available on PyPI
+                   :target: https://pypi.python.org/pypi/indico/
 .. |license| image:: https://img.shields.io/github/license/indico/indico.png
                    :alt: License
+                   :target: https://github.com/indico/indico/blob/master/COPYING
