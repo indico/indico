@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import request
 from indico.modules.attachments.views import WPEventAttachments
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -24,4 +25,14 @@ class RHEventAttachments(RHConferenceModifBase):
     """Shows the attachments of an event"""
 
     def _process(self):
-        return WPEventAttachments.render_template('attachments.html', self._conf)
+        return WPEventAttachments.render_template('attachments.html', self._conf, event=self._conf)
+
+
+class RHEventAttachmentsUpload(RHConferenceModifBase):
+    """Upload files"""
+
+    def _process(self):
+        if request.method == 'POST':
+            # TODO: Handle files
+            return
+        return WPEventAttachments.render_template('upload.html', self._conf, event=self._conf)

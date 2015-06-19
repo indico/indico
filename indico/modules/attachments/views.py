@@ -28,3 +28,11 @@ class WPEventAttachments(WPConferenceModifBase, WPJinjaMixin):
 
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
+
+    def getJSFiles(self):
+        return (WPConferenceModifBase.getJSFiles(self) +
+                self._asset_env['dropzone_js'].urls())
+
+    def getCSSFiles(self):
+        return (WPConferenceModifBase.getCSSFiles(self) +
+                self._asset_env['dropzone_css'].urls())

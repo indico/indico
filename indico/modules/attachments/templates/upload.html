@@ -1,0 +1,12 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
+
+{%- block content %}
+    <form action="{{ url_for('.upload', event)}}" class="dropzone" id="dropzone">
+        <div class="dz-message">
+          {% trans %}Drag files here (or click) to upload.{% endtrans %}
+        </div>
+    </form>
+    <script>
+        $("#dropzone").dropzone({ url: "{{ url_for('.upload', event) }}" });
+    </script>
+{%- endblock %}

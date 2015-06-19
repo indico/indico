@@ -3,5 +3,16 @@
 {% block title %}{% trans %}Attachments{% endtrans %}{% endblock %}
 
 {% block content %}
-    TODO
+    <a href="#" id="btn-add-attachment" class="i-button i-form-button icon-plus"
+       data-href="{{ url_for('.upload', event) }}">{% trans %}Add attachment{% endtrans %}</a>
+    <script>
+        $('#btn-add-attachment').ajaxDialog({
+            title: $T('Upload attachments'),
+            onClose: function(data) {
+                if (data) {
+                    location.reload();
+                }
+            }
+        });
+    </script>
 {% endblock %}
