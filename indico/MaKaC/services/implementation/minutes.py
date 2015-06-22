@@ -49,11 +49,11 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
         self._text = pm.extract("value", pType=str, allowEmpty=True)
 
     def _checkProtection(self):
-        if (type(self._target) == conference.Session and
-            not self._target.canCoordinate(self.getAW())) or \
-                (type(self._target) == conference.Contribution and
-                 not self._target.canUserSubmit(self._getUser())):
-            ProtectedModificationService._checkProtection(self)
+        if isinstance(self._target, conference.Session) and self._target.canCoordinate(self.getAW()):
+            return
+        if isinstance(self._target, conference.Contribution) and self._target.canUserSubmit(self._getUser()):
+            return
+        ProtectedModificationService._checkProtection(self)
 
     def _handleSet(self):
 
