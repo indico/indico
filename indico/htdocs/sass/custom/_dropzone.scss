@@ -18,6 +18,11 @@
 @import 'base';
 @import 'compass';
 
+$image-preview-width: 120;
+$image-preview-margin: 16;
+$dropzone-padding: 20;
+$dropzone-border-width: 2;
+
 .dropzone {
     @include border-radius(2px);
     border: 2px dashed $dark-blue;
