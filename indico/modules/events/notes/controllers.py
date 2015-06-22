@@ -84,12 +84,13 @@ class RHEditNote(RHProtected):
             db.session.flush()
             if is_new:
                 logger.info('Note {} created by {}'.format(note, session.user))
-                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Notes',
-                               'Added note to {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes',
+                               'Added minutes to {} {}'.format(self.object_type, self.object.getTitle()), session.user)
             elif is_changed:
                 logger.info('Note {} modified by {}'.format(note, session.user))
-                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Notes',
-                               'Updated note for {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes',
+                               'Updated minutes for {} {}'.format(self.object_type, self.object.getTitle()),
+                               session.user)
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/notes/edit_note.html', form=form, note=note,
                                             object_type=self.object_type, object=self.object)
@@ -105,6 +106,6 @@ class RHEditNote(RHProtected):
         if note is not None:
             note.delete(session.user)
             logger.info('Note {} deleted by {}'.format(note, session.user))
-            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Notes',
-                           'Removed note from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
+                           'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
         return jsonify(success=True)
