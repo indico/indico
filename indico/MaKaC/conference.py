@@ -6452,7 +6452,7 @@ class Session(CommonObjectBase, Locatable):
 
         return self._coordinators.values()
 
-    def canCoordinate(self,aw, right=""):
+    def canCoordinate(self, aw_or_user, right=""):
         """Tells if a user has coordination privileges.
 
             Only session coordinators have coordination privileges over a
@@ -6465,9 +6465,11 @@ class Session(CommonObjectBase, Locatable):
 
             Return value: (boolean)
         """
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
         if right != "":
-            return self.isCoordinator(aw.getUser()) and self.getConference().hasSessionCoordinatorRight(right)
-        return self.isCoordinator(aw.getUser())
+            return self.isCoordinator(aw_or_user) and self.getConference().hasSessionCoordinatorRight(right)
+        return self.isCoordinator(aw_or_user)
 
 
     def getScheduleType(self):
