@@ -51,10 +51,23 @@
             % endif
 
             % if 'minutesLink' in info:
-                menuOptions['editMinutes'] = {action: function(m) {
+                menuOptions['editMinutesOld'] = {action: function(m) {
                     IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
                     m.close();
-                    return false;}, display: $T('Edit minutes')};
+                    return false;}, display: $T('Edit minutes (old)')};
+                menuOptions['editMinutes'] = {action: function(m) {
+                    ajaxDialog({
+                        title: $T('Edit minutes'),
+                        url: ${ url_for('event_notes.edit', item) | n,j },
+                        onClose: function(data) {
+                            if (data) {
+                                location.reload();
+                            }
+                        }
+                    });
+                    m.close();
+                    return false;
+                }, display: $T('Edit minutes')};
             % endif
 
             <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>

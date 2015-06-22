@@ -16,7 +16,13 @@
 
 from __future__ import unicode_literals
 
-from indico.core.logger import Logger
+from wtforms.fields import TextAreaField
+
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.widgets import CKEditorWidget
+from indico.util.i18n import _
 
 
-logger = Logger.get('events.notes')
+class NoteForm(IndicoForm):
+    # TODO: use something switchable
+    source = TextAreaField(_("Minutes"), widget=CKEditorWidget())
