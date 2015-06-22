@@ -37,16 +37,18 @@
             validatePasswordConfirmation(passwordField, confirmField);
         });
 
-        var buttons = forms.find('[data-disabled-until-change]');
-        buttons.prop('disabled', true).closest('form').each(function() {
+        forms.find('[data-disabled-until-change]').prop('disabled', true);
+        forms.each(function() {
             var $this = $(this);
             $this.data('initialData', $this.serialize());
+            $this.data('fieldsChanged', false);
         }).on('change input', function() {
             var $this = $(this);
             var untouched = $this.serialize() == $this.data('initialData');
-            buttons.prop('disabled', untouched);
+            $this.find('[data-disabled-until-change]').prop('disabled', untouched);
+            $this.closest('form').data('fieldsChanged', !untouched);
         });
-    }
+    };
 
     $(document).ready(function() {
         initForms($('form'));

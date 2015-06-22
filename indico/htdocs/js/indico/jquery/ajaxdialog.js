@@ -54,8 +54,10 @@
             backSelector: '[data-button-back]', // elements in the form which will close the form
             clearFlashes: true, // clear existing flashed messages before showing new ones
             onClose: null, // callback to invoke after closing the dialog. first argument is null if closed manually,
-                           // otherwise the JSON returned by the server
-            getExtraData: function() {}  // callback to add data to the form. receives the <form> element as `this`
+                           // otherwise the JSON returned by the server. if it returns false, the dialog will remain
+                           // open; if it returns a Deferred object, the dialog remain open until the object is resolved
+            getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
+            confirmCloseUnsaved: false  // ask the user to confirm closing the dialog with unsaved changes
         }, options);
 
         var popup = null;
@@ -75,12 +77,19 @@
             }
         });
 
+        function confirmClose() {
+            var forms = popup.contentContainer.find('form');
+            var hasChanges = forms.length && forms.filter(function() {
+                return $(this).data('fieldsChanged');
+            }).length;
+            var message = $T('You have unsaved changes. Do you really want to close the dialog without saving?');
+            return hasChanges ? confirmPrompt(message, $T('Unsaved changes')) : $.Deferred().resolve();
+        }
+
         function showDialog(dialogData) {
             popup = new ExclusivePopup(options.title, function() {
-                if (options.onClose) {
-                    options.onClose(null);
-                }
-                return true;
+                closeDialog(null);
+                return false;
             }, false, false);
             popup.draw = function() {
                 this.ExclusivePopup.prototype.draw.call(this, dialogData.html);
@@ -92,11 +101,20 @@
             popup.open();
         }
 
-        function closeDialog(callbackData) {
-            if (options.onClose) {
-                options.onClose(callbackData);
-            }
-            popup.close();
+        function closeDialog(callbackData, submitted) {
+            var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
+            confirmDeferred.then(function() {
+                var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData);
+                if (onCloseResult === false) {
+                    return;
+                }
+                else if (!onCloseResult || onCloseResult === true) {
+                    onCloseResult = $.Deferred().resolve();
+                }
+                onCloseResult.then(function() {
+                    popup.close();
+                });
+            });
         }
 
         function ajaxifyForms() {
@@ -140,7 +158,7 @@
                         }
 
                         if (data.close_dialog || data.success) {
-                            closeDialog(data);
+                            closeDialog(data, true);
                         } else if (data.html) {
                             popup.contentContainer.html(data.html);
                             ajaxifyForms();

@@ -59,6 +59,7 @@
                     ajaxDialog({
                         title: $T('Edit minutes'),
                         url: ${ url_for('event_notes.edit', item) | n,j },
+                        confirmCloseUnsaved: true,
                         onClose: function(data) {
                             if (data) {
                                 location.reload();
