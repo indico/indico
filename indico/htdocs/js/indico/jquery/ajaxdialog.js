@@ -103,6 +103,7 @@
             var killProgress = null;
             var forms = popup.contentContainer.find('form');
             showFormErrors(popup.resultContainer);
+            initForms(forms);
             forms.on('click', options.backSelector, function(e) {
                 e.preventDefault();
                 closeDialog();

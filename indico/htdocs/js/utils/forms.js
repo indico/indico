@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(globals) {
     'use strict';
 
     function validatePasswordConfirmation(passwordField, confirmField) {
@@ -30,14 +30,14 @@
         }
     }
 
-    $(document).ready(function() {
-        $('form input[data-confirm-password]').each(function() {
+    globals.initForms = function initForms(forms) {
+        forms.find('input[data-confirm-password]').each(function() {
             var confirmField = $(this);
             var passwordField = $(this.form).find('input[name="' + confirmField.data('confirmPassword') + '"]');
             validatePasswordConfirmation(passwordField, confirmField);
         });
 
-        var buttons = $('form [data-disabled-until-change]');
+        var buttons = forms.find('[data-disabled-until-change]');
         buttons.prop('disabled', true).closest('form').each(function() {
             var $this = $(this);
             $this.data('initialData', $this.serialize());
@@ -46,5 +46,9 @@
             var untouched = $this.serialize() == $this.data('initialData');
             buttons.prop('disabled', untouched);
         });
+    }
+
+    $(document).ready(function() {
+        initForms($('form'));
     });
-})();
+})(window);
