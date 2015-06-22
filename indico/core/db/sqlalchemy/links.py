@@ -180,9 +180,9 @@ class LinkedObjectComparator(Comparator):
                            self.cls.event_id == int(other.getConference().id),
                            self.cls.contribution_id == other.id)
         elif isinstance(other, SubContribution):
-            return db.and_(self.cls.link_type == LinkType.contribution,
+            return db.and_(self.cls.link_type == LinkType.subcontribution,
                            self.cls.event_id == int(other.getConference().id),
                            self.cls.contribution_id == other.getContribution().id,
                            self.cls.subcontribution_id == other.id)
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(obj), obj))
+            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
