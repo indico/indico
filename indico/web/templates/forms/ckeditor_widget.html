@@ -17,7 +17,7 @@
             editor.set(field.val());
             editor.onLoad(function() {
                 editor.onChange(function() {
-                    field.val(editor.get());
+                    field.val(editor.get()).trigger('change');
                 });
             });
             $E('{{ field.id }}-editor').set(editor.draw());
