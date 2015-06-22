@@ -60,13 +60,12 @@ def _process_stats(stats, root=False):
     if root:
         values.append((_('Number of users'), stats.get('users', 0)))
 
-    updated = stats['updated'].strftime('%d %B %Y %H:%M')
-    return plots, values, updated
+    return plots, values, stats['updated']
 
 
 class RHCategoryStatistics(RHCategDisplayBase):
     def _process(self):
-        stats = CategoryStatistics(self._target).getStatistics()
+        stats = CategoryStatistics(self._target).getStatistics().copy()
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
             if stats is None:
                 stats = {'events': None, 'contributions': None, 'files': None, 'updated': None}
@@ -74,7 +73,7 @@ class RHCategoryStatistics(RHCategDisplayBase):
                 stats = dict(stats)
 
             if stats['updated']:
-                stats['updated'] = stats['updated'].strftime("%d %B %Y %H:%M")
+                stats['updated'] = stats['updated'].isoformat()
             return jsonify(stats)
         else:
             plots, values, updated = _process_stats(stats, root=self._target.isRoot())
