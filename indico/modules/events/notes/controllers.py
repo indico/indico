@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request, redirect, jsonify
+from flask import session, request
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.core.db import db
@@ -26,8 +26,8 @@ from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.conference import ConferenceHolder
-from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -91,9 +91,9 @@ class RHEditNote(RHProtected):
                 self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes',
                                'Updated minutes for {} {}'.format(self.object_type, self.object.getTitle()),
                                session.user)
-            return jsonify(success=True)
-        return WPJinjaMixin.render_template('events/notes/edit_note.html', form=form, note=note,
-                                            object_type=self.object_type, object=self.object)
+            return jsonify_data(flash=False)
+        return jsonify_template('events/notes/edit_note.html', form=form, note=note, object_type=self.object_type,
+                                object=self.object)
 
     def _process_GET(self):
         return self._process_form()
@@ -108,4 +108,4 @@ class RHEditNote(RHProtected):
             logger.info('Note {} deleted by {}'.format(note, session.user))
             self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
                            'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
-        return jsonify(success=True)
+        return jsonify_data(flash=False)
