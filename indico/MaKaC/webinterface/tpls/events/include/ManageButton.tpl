@@ -50,30 +50,53 @@
                 menuOptions['cloneEvent'] = {action: '${info["cloneLink"]}', display: $T('Clone event')};
             % endif
 
+            <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
             % if 'minutesLink' in info:
                 menuOptions['editMinutesOld'] = {action: function(m) {
                     IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
                     m.close();
                     return false;}, display: $T('Edit minutes (old)')};
-                menuOptions['editMinutes'] = {action: function(m) {
-                    ajaxDialog({
-                        title: $T('Edit minutes'),
-                        url: ${ url_for('event_notes.edit', item) | n,j },
-                        confirmCloseUnsaved: true,
-                        onClose: function(data) {
-                            if (data) {
-                                location.reload();
+                menuOptions['editMinutes'] = {
+                    action: function(m) {
+                        ajaxDialog({
+                            title: $T('Edit minutes'),
+                            url: ${ url_for('event_notes.edit', note_item) | n,j },
+                            confirmCloseUnsaved: true,
+                            onClose: function(data) {
+                                if (data) {
+                                    location.reload();
+                                }
                             }
-                        }
-                    });
-                    m.close();
-                    return false;
-                }, display: $T('Edit minutes')};
+                        });
+                        m.close();
+                        return false;
+                    },
+                    display: ${ note_item.note is not None | n,j } ? $T('Edit minutes') : $T('Add minutes')
+                };
+                % if note_item.note:
+                    menuOptions['deleteMinutes'] = {
+                        action: function(m) {
+                            confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {
+                                $.ajax({
+                                    url: ${ url_for('event_notes.edit', note_item) | n,j },
+                                    method: 'DELETE',
+                                    error: handleAjaxError,
+                                    success: function() {
+                                        location.reload();
+                                    }
+                                });
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Delete minutes')
+                    };
+                % endif
             % endif
 
             <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
             % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
-                menuOptions['deleteMinutes'] = {action: function(m) {
+                menuOptions['deleteMinutesOld'] = {action: function(m) {
                     var popupHandler = function(action){
                         if(action){
                             IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
@@ -82,7 +105,7 @@
 
                     };
                     (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete these minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
-                    return false;}, display: $T('Delete minutes')};
+                    return false;}, display: $T('Delete minutes (old)')};
             % endif
 
             % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
