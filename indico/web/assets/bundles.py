@@ -229,7 +229,8 @@ dropzone_js = rjs_bundle('dropzone_js',
                          'js/lib/dropzone.js/dropzone.js')
 
 dropzone_css = Bundle('css/lib/dropzone.js/dropzone.css',
-                      filters='cssmin', output='css/dropzone_css_%(version)s.min.css')
+                      'sass/custom/_dropzone.scss',
+                      filters=('pyscss', 'cssmin'), output='css/dropzone_css_%(version)s.min.css')
 
 selectize_js = rjs_bundle('selectize_js',
                           'js/lib/selectize.js/selectize.js')

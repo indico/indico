@@ -1,0 +1,37 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+@import 'compass';
+
+.dropzone {
+    @include border-radius(2px);
+    border: 2px dashed $dark-blue;
+    padding: 30px 20px;
+    margin-bottom: 3em;
+    width: (($dropzone-padding + $dropzone-border-width) * 2 + ($image-preview-width + ($image-preview-margin * 2)) * 5) + 'px';
+
+    .dz-preview.dz-file-preview .dz-image,
+    .dz-preview .dz-image {
+        @include border-radius(5px);
+    }
+
+    .dz-message {
+        font-size: 1.5em;
+        color: $dark-gray;
+    }
+}
