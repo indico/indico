@@ -7,7 +7,7 @@
 <li class="meetingSession">
     <span class="containerTitle confModifPadding">
         <a name="${session.getId()}"></a>
-        <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="ManageButton.tpl" args="item=item, alignRight=True, showMinutes=minutes"/>
         ${ template_hook('vc-actions', event=conf, item=item) }
 
         <span class="topLevelTime">
@@ -57,14 +57,8 @@
         </tbody>
     </table>
 
-    % if minutes:
-        <% minutesText = item.getSession().getMinutes().getText() if item.getSession().getMinutes() else None %>
-        % if minutesText:
-            <div class="minutesTable">
-                <h2>${_("Minutes")}</h2>
-                <span>${common.renderDescription(minutesText)}</span>
-            </div>
-        % endif
+    % if item.note:
+        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes) }
     % endif
 
     % if len(item.getSchedule().getEntries()) > 0:

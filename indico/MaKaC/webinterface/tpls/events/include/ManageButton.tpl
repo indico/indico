@@ -1,4 +1,4 @@
-<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False"/>
+<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False, showMinutes=False"/>
 
 <%
     info = extractInfoForButton(item)
@@ -10,9 +10,14 @@
         <div class="manageLink" style="background: ${bgColor};">
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
     % else:
-        <div class="toolbar right">
+        <div class="toolbar right thin">
+            % if item.note:
+                <div class="group">
+                    ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=not showMinutes) }
+                </div>
+            % endif
             <div class="group">
-                <a class="meeting-timetable-item-edit i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
+                <a class="meeting-timetable-item-edit i-button icon-edit arrow" id="${menuName}"></a>
             </div>
         </div>
     % endif

@@ -15,6 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base';
+@import 'compass';
+@import 'partials/buttons';
+
 #flashed-messages {
     margin: 1em auto 0 auto;
     width: 1000px;
@@ -25,4 +29,15 @@
 
 #confSectionsBox > #flashed-messages {
     width: 950px;
+}
+
+#event-note-section {
+    @include border-bottom($gray);
+    background: white;
+    padding: 10px 50px;
+}
+
+.note-visibility-toggle {
+    &:not(.note-is-hidden) .do-show-text{ display: none; }
+    &.note-is-hidden .do-hide-text { display: none; }
 }

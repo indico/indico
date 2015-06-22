@@ -20,4 +20,13 @@ $(function() {
             duration: 'fast'
         });
     });
+
+    $('.js-show-note-toggle').on('click', function() {
+        var $this = $(this);
+        var noteId = $this.data('noteId');
+        var note = $('#event-note-{0}'.format(noteId));
+        $this.toggleClass('note-is-hidden');
+        content = note.hasClass('togglable') ? note : note.find('.togglable');
+        content.slideToggle();
+    });
 });

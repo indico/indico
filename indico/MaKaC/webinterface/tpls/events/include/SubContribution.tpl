@@ -3,7 +3,7 @@
 <%namespace name="common" file="Common.tpl"/>
 
 <li>
-    <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
+    <%include file="ManageButton.tpl" args="item=item, alignRight=True, showMinutes=minutes"/>
     <span class="subLevelTitle confModifPadding">${item.getTitle()}</span>
 
     % if item.getDuration():
@@ -51,13 +51,7 @@
         </tbody>
     </table>
 
-    % if minutes:
-        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
-        % if minutesText:
-            <div class="minutesTable">
-                <h2>${_("Minutes")}</h2>
-                <span>${common.renderDescription(minutesText)}</span>
-            </div>
-        % endif
+    % if item.note:
+        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes) }
     % endif
 </li>

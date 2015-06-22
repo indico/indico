@@ -13,6 +13,13 @@ var videoServiceInfo = {};
     </table>
 </div>
 
+## TODO: show if manager
+% if conf.note:
+    <div id="event-note-section">
+        ${ render_template('events/notes/note_event.html', note=conf.note, hidden=not minutes) }
+    </div>
+% endif
+
 <div class="meetingEventBody">
     <div style="position: absolute; right: 50px; top: 3px;"><span class="fakeLink dropDownMenu" id="goToDayLink"><strong>Go to day</strong></span></div>
     <script type="text/javascript">

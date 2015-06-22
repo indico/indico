@@ -41,17 +41,6 @@
             <%include file="Material.tpl" args="material=material"/>
         % endfor
         </div>
-        % if minutes:
-            <% minutesText = conf.getMinutes().getText() if conf.getMinutes() else None %>
-            % if minutesText:
-            <center>
-                <div class="minutesTable">
-                    <h2>${_("Minutes")}</h2>
-                    <span>${common.renderDescription(minutesText)}</span>
-                </div>
-            </center>
-            % endif
-        % endif
     </td>
 </tr>
 % endif
