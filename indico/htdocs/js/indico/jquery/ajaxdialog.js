@@ -18,9 +18,10 @@
 (function(global, $) {
     'use strict';
 
-    // Ajaxifies a link to open the target page (which needs to be using WPJinjaMixin.render_template) in a
-    // modal dialog. Any forms on the page are ajaxified and should be using redirect_or_jsonify() in case
-    // of success (or just return a JSON response containing success=true and possibly flashedmessages).
+    // Ajaxifies a link to open the target page (which needs to be using jsonify_template or
+    // WPJinjaMixin.render_template) in a  modal dialog. Any forms on the page are ajaxified and should be using
+    // redirect_or_jsonify() (when used with WPJinjaMixin) or jsonify_data (when used with jsonify_template)
+    // in case of success (or just return a JSON response containing success=true and possibly flashed messages).
     // The link target MUST point to a page which is also valid when loaded directly in the browser since the
     // link could still be opened in a new tab manually. If you don't have a non-AJAX version, place the url in
     // data-href.

@@ -16,7 +16,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
-from flask import g, request, session, has_request_context
+from flask import g, render_template, jsonify, request, session, has_request_context
 from markupsafe import Markup
 
 
@@ -28,6 +28,31 @@ def inject_js(js):
     if 'injected_js' not in g:
         g.injected_js = []
     g.injected_js.append(Markup(js))
+
+
+def jsonify_template(template, _render_func=render_template, **context):
+    """Returns a json response containing a rendered template"""
+    html = _render_func(template, **context)
+    js = None
+    if 'injected_js' in g:
+        js = g.injected_js
+        del g.injected_js
+    return jsonify(html=html, js=js)
+
+
+def jsonify_data(flash=True, **json_data):
+    """Returns a json response with some default fields.
+
+    This behaves similar to :func:`~flask.jsonify`, but includes
+    ``success=True`` and flashed messages by default.
+
+    :param flash: if the json data should contain flashed messages
+    :param json_data: the data to include in the json response
+    """
+    json_data.setdefault('success', True)
+    if flash:
+        json_data['flashed_messages'] = render_template('flashed_messages.html')
+    return jsonify(**json_data)
 
 
 def _format_request_data(data, hide_passwords):

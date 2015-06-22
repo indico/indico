@@ -17,7 +17,7 @@
 import posixpath
 from urlparse import urlparse
 
-from flask import request, session, render_template, g, jsonify
+from flask import request, session, render_template, g
 
 import MaKaC.webinterface.wcomponents as wcomponents
 from indico.core import signals
@@ -26,6 +26,7 @@ from indico.core.config import Config
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
+from indico.web.util import jsonify_template
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 
@@ -62,12 +63,7 @@ class WPJinjaMixin:
         """
         template = cls._prefix_template(template_name_or_list or cls._template)
         if request.is_xhr:
-            html = cls.render_template_func(template, **context)
-            js = None
-            if 'injected_js' in g:
-                js = g.injected_js
-                del g.injected_js
-            return jsonify(html=html, js=js)
+            return jsonify_template(template, _render_func=cls.render_template_func, **context)
         else:
             context['_jinja_template'] = template
             return cls(g.rh, *wp_args, **context).display()

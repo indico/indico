@@ -22,7 +22,7 @@ import re
 import time
 from importlib import import_module
 
-from flask import request, redirect, Blueprint, jsonify, render_template
+from flask import request, redirect, Blueprint
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
@@ -35,6 +35,7 @@ from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
 from indico.util.contextManager import ContextManager
+from indico.web.util import jsonify_data
 
 
 def discover_blueprints():
@@ -318,10 +319,7 @@ def redirect_or_jsonify(location, flash=True, **json_data):
     :param json_data: the data to include in the json response
     """
     if request.is_xhr:
-        json_data.setdefault('success', True)
-        if flash:
-            json_data['flashed_messages'] = render_template('flashed_messages.html')
-        return jsonify(**json_data)
+        return jsonify_data(flash=flash, **json_data)
     else:
         return redirect(location)
 
