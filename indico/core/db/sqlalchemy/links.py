@@ -58,17 +58,28 @@ def _make_checks(allowed_link_types):
         yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
 
 
+def _make_uniques(allowed_link_types):
+    for link_type in allowed_link_types:
+        yield db.Index(None, *_columns_for_types[link_type], unique=True,
+                       postgresql_where=db.text('link_type = {}'.format(link_type.value)))
+
+
 class LinkMixin(object):
     #: The link types that are supported.  Can be overridden in the
     #: model using the mixin.  Affects the table structure, so any
     #: changes to it should go along with a migration step!
     allowed_link_types = frozenset(LinkType)
+    #: If only one link per object should be allowed
+    unique_links = False
 
     @classproperty
     @classmethod
     def _link_table_args(cls):
         # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
-        return tuple(_make_checks(cls.allowed_link_types))
+        args = tuple(_make_checks(cls.allowed_link_types))
+        if cls.unique_links:
+            args = args + tuple(_make_uniques(cls.allowed_link_types))
+        return args
 
     link_type = db.Column(
         PyIntEnum(LinkType),
