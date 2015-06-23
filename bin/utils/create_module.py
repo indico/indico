@@ -109,7 +109,7 @@ def write_model(f, class_name, event):
     f.write(textwrap.dedent(b"""
         class {cls}(db.Model):
             __tablename__ = '{table}'
-            __table_args = {{'schema': '{schema}'}}
+            __table_args__ = {{'schema': '{schema}'}}
 
             #: The ID of the object
             id = db.Column(
