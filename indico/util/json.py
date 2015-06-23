@@ -83,7 +83,8 @@ def create_json_error_answer(exception, status=200):
         details = {
             'code': type(exception).__name__,
             'type': 'unknown',
-            'message': unicode(exception.message),
+            # werkzeug HTTPExceptions have a description instead of a message.
+            'message': unicode(getattr(exception, 'description', exception.message)),
             'data': exception_data,
             'requestInfo': {},
             'inner': traceback.format_exc()
