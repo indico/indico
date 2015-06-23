@@ -71,6 +71,7 @@ class EventNote(LinkMixin, db.Model):
         nullable=True  # needed for post_update :(
     )
 
+    #: The list of all revisions for the note
     revisions = db.relationship(
         'EventNoteRevision',
         primaryjoin=lambda: EventNote.id == EventNoteRevision.note_id,
@@ -83,6 +84,7 @@ class EventNote(LinkMixin, db.Model):
             lazy=False
         )
     )
+    #: The currently active revision of the note
     current_revision = db.relationship(
         'EventNoteRevision',
         primaryjoin=lambda: EventNote.current_revision_id == EventNoteRevision.id,
