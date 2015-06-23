@@ -2162,7 +2162,7 @@ class Conference(CommonObjectBase, Locatable):
 
     @return_ascii
     def __repr__(self):
-        return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
+        return '<Conference({0}, {1}, {2})>'.format(self.getId(), self.getTitle(), self.getStartDate())
 
     @property
     def has_legacy_id(self):
