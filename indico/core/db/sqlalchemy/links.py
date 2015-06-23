@@ -58,10 +58,13 @@ def _make_checks(allowed_link_types):
         yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
 
 
-def _make_uniques(allowed_link_types):
+def _make_uniques(allowed_link_types, extra_criteria=None):
     for link_type in allowed_link_types:
+        where = ['link_type = {}'.format(link_type.value)]
+        if extra_criteria is not None:
+            where += list(extra_criteria)
         yield db.Index(None, *_columns_for_types[link_type], unique=True,
-                       postgresql_where=db.text('link_type = {}'.format(link_type.value)))
+                       postgresql_where=db.text(' AND '.join(where)))
 
 
 class LinkMixin(object):
@@ -69,7 +72,9 @@ class LinkMixin(object):
     #: model using the mixin.  Affects the table structure, so any
     #: changes to it should go along with a migration step!
     allowed_link_types = frozenset(LinkType)
-    #: If only one link per object should be allowed
+    #: If only one link per object should be allowed.  This may also
+    #: be a string containing an SQL string to specify the criterion
+    #: for the unique index to be applied, e.g. ``'is_foo = true'``.
     unique_links = False
 
     @classproperty
@@ -78,7 +83,8 @@ class LinkMixin(object):
         # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
-            args = args + tuple(_make_uniques(cls.allowed_link_types))
+            extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, basestring) else None
+            args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
     link_type = db.Column(
