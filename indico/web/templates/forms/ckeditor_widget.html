@@ -21,6 +21,12 @@
                 });
             });
             $E('{{ field.id }}-editor').set(editor.draw());
+            // Re-position the dialog if we have one since the initial position is
+            // wrong due to the editor being loaded after the dialog has been opened.
+            var dialog = field.closest('.ui-dialog-content');
+            if (dialog.length) {
+                dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
+            }
         })();
     </script>
 {% endblock %}
