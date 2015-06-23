@@ -21,7 +21,7 @@ down_revision = '9f0a44f8035'
 def upgrade():
     op.create_table(
         'notes',
-        sa.Column('link_type', PyIntEnum(LinkType), nullable=False),
+        sa.Column('link_type', PyIntEnum(LinkType, exclude_values={LinkType.category}), nullable=False),
         sa.Column('category_id', sa.Integer(), nullable=True, index=True),
         sa.Column('event_id', sa.Integer(), nullable=True, index=True),
         sa.Column('session_id', sa.String(), nullable=True),
@@ -48,7 +48,6 @@ def upgrade():
         sa.CheckConstraint('link_type != 5 OR (contribution_id IS NULL AND subcontribution_id IS NULL AND '
                            'category_id IS NULL AND event_id IS NOT NULL AND session_id IS NOT NULL)',
                            name='valid_session_link'),
-        sa.CheckConstraint('link_type NOT IN (1)', name='allowed_link_type'),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )

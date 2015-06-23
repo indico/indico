@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 
 from indico.core.db import db
@@ -43,12 +44,6 @@ _columns_for_types = {
 
 
 def _make_checks(allowed_link_types):
-    disallowed_link_types = set(LinkType) - allowed_link_types
-    if disallowed_link_types:
-        yield db.CheckConstraint(
-            'link_type NOT IN ({})'.format(','.join(unicode(x.value) for x in disallowed_link_types)),
-            'allowed_link_type'
-        )
     for link_type in allowed_link_types:
         required_cols = _all_columns & _columns_for_types[link_type]
         forbidden_cols = _all_columns - required_cols
@@ -86,10 +81,12 @@ class LinkMixin(object):
             args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
-    link_type = db.Column(
-        PyIntEnum(LinkType),
-        nullable=False
-    )
+    @declared_attr
+    def link_type(cls):
+        return db.Column(
+            PyIntEnum(LinkType, exclude_values=set(LinkType) - cls.allowed_link_types),
+            nullable=False
+        )
     category_id = db.Column(
         db.Integer,
         nullable=True,
