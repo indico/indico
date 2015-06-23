@@ -73,7 +73,7 @@ class RHEditNote(RHProtected):
 
     def _process_form(self):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        form = NoteForm(obj=self._get_defaults(note))
+        form = NoteForm(obj=self._get_defaults(note), linked_object=self.object)
         if form.validate_on_submit():
             note = EventNote.get_or_create(self.object)
             is_new = note.id is None
