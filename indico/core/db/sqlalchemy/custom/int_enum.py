@@ -37,15 +37,19 @@ class PyIntEnum(TypeDecorator, SchemaType):
 
     In addition to the Python-side validation this also creates a
     CHECK constraint to ensure only valid enum members are stored.
+    By default all enum members are allowed, but `exclude_values`
+    can be used to exclude some.
 
     :param enum: the Enum repesented by this type's values
+    :param exclude_values: a set of Enum values which are not allowed
     :raise ValueError: when using/loading a value not in the Enum.
     """
 
     impl = SmallInteger
 
-    def __init__(self, enum=None):
+    def __init__(self, enum=None, exclude_values=None):
         self.enum = enum
+        self.exclude_values = set(exclude_values or ())
         TypeDecorator.__init__(self)
         SchemaType.__init__(self)
 
@@ -69,7 +73,7 @@ class PyIntEnum(TypeDecorator, SchemaType):
         return self.enum(value)
 
     def _set_table(self, column, table):
-        e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum),
+        e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum if x not in self.exclude_values),
                             'valid_enum_{}'.format(column.name))
         e.info['alembic_dont_render'] = True
         assert e.table is table
@@ -78,4 +82,9 @@ class PyIntEnum(TypeDecorator, SchemaType):
         imports = autogen_context['imports']
         imports.add('from indico.core.db.sqlalchemy import PyIntEnum')
         imports.add('from {} import {}'.format(self.enum.__module__, self.enum.__name__))
-        return '{}({})'.format(type(self).__name__, self.enum.__name__)
+        if self.exclude_values:
+            return '{}({}, exclude_values={{{}}})'.format(type(self).__name__, self.enum.__name__, ', '.join(
+                '{}.{}'.format(self.enum.__name__, x.name) for x in sorted(self.exclude_values)
+            ))
+        else:
+            return '{}({})'.format(type(self).__name__, self.enum.__name__)
