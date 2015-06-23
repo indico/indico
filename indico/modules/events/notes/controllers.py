@@ -25,9 +25,9 @@ from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
+from indico.modules.events.util import get_object_from_args
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
-from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -35,21 +35,7 @@ class RHEditNote(RHProtected):
     """Create/edit a note attached to an object inside an event"""
 
     def _checkParams(self):
-        self.object = None
-        self.object_type = request.view_args['object_type']
-        self.event = ConferenceHolder().getById(request.view_args['confId'], True)
-        if self.event is None:
-            raise NotFound
-        if self.object_type == 'event':
-            self.object = self.event
-        elif self.object_type == 'session':
-            self.object = self.event.getSessionById(request.view_args['sessionId'])
-        elif self.object_type == 'contribution':
-            self.object = self.event.getContributionById(request.view_args['contribId'])
-        elif self.object_type == 'subcontribution':
-            contrib = self.event.getContributionById(request.view_args['contribId'])
-            if contrib is not None:
-                self.object = contrib.getSubContributionById(request.view_args['subContId'])
+        self.object_type, self.event, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound
 
