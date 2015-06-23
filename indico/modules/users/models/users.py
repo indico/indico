@@ -253,6 +253,7 @@ class User(db.Model):
     # - event_reminders (EventReminder.creator)
     # - oauth_tokens (OAuthToken.user)
     # - event_log_entries (EventLogEntry.user)
+    # - event_notes_revisions (EventNoteRevision.user)
 
     @property
     def as_principal(self):
