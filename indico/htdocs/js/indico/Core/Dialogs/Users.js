@@ -72,8 +72,6 @@ function create_favorite_button(user_id) {
 
 $(function() {
     $(document).on('favorites.remove-user', function(e, user_id) {
-        var $target = $(e.target);
-
         $.ajax({
             url: build_url(Indico.Urls.FavoriteUserRemove, {fav_user_id: user_id}),
             method: 'DELETE',
@@ -83,8 +81,6 @@ $(function() {
             delete Indico.User.favorite_users[user_id];
         });
     }).on('favorites.add-user', function(e, user_id) {
-        var $target = $(e.target);
-
         $.ajax({
             url: Indico.Urls.FavoriteUserAdd,
             method: 'POST',
