@@ -37,7 +37,6 @@ def email_sender(fn):
     return wrapper
 
 
-@unify_user_args(legacy=True)
 def send_email(email, event=None, module='', user=None, skip_queue=False):
     """Sends an email created by :func:`make_email`.
 

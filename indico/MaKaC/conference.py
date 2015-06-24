@@ -2180,6 +2180,7 @@ class Conference(CommonObjectBase, Locatable):
         emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
         return {e for e in emails if e}
 
+    @unify_user_args
     def log(self, realm, kind, module, summary, user=None, type_=u'simple', data=None):
         """Creates a new log entry for the event
 
