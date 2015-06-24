@@ -26,11 +26,11 @@ _bp = IndicoBlueprint('event_notes', __name__, template_folder='templates', virt
 _bp.add_url_rule('/note/', 'edit', RHEditNote, methods=('GET', 'POST', 'DELETE'), defaults={'object_type': 'event'})
 _bp.add_url_rule('/note/delete', 'delete', RHDeleteNote, methods=('POST',), defaults={'object_type': 'event'})
 
-_bp.add_url_rule('/session/<sessionId>/note', 'edit', RHEditNote, defaults={'object_type': 'session'},
+_bp.add_url_rule('/session/<sessionId>/note/', 'edit', RHEditNote, defaults={'object_type': 'session'},
                  methods=('GET', 'POST', 'DELETE'))
 
 with _bp.add_prefixed_rules('/session/<sessionId>'):
-    _bp.add_url_rule('/contribution/<contribId>/note', 'edit', RHEditNote, defaults={'object_type': 'contribution'},
+    _bp.add_url_rule('/contribution/<contribId>/note/', 'edit', RHEditNote, defaults={'object_type': 'contribution'},
                      methods=('GET', 'POST', 'DELETE'))
-    _bp.add_url_rule('/contribution/<contribId>/<subContId>/note', 'edit', RHEditNote,
+    _bp.add_url_rule('/contribution/<contribId>/<subContId>/note/', 'edit', RHEditNote,
                      defaults={'object_type': 'subcontribution'}, methods=('GET', 'POST', 'DELETE'))
