@@ -56,7 +56,8 @@ class FavoriteCategory(db.Model):
     target_id = db.Column(
         db.Integer,
         primary_key=True,
-        nullable=False
+        nullable=False,
+        autoincrement=False
     )
 
     @property
