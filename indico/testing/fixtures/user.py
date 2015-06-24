@@ -56,7 +56,7 @@ def create_user(db):
 
 @pytest.fixture
 def dummy_user(create_user):
-    """Creates a mocked used"""
+    """Creates a mocked user"""
     return create_user(1337, legacy=False)
 
 
