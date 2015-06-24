@@ -16,11 +16,14 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.attachments.controllers import RHEventAttachments, RHEventAttachmentsUpload
+from indico.modules.attachments.controllers import (RHEventAttachments, RHEventAttachmentsUpload,
+                                                    RHEventAttachmentsAddLink)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
 _bp.add_url_rule('/event/<confId>/manage/attachments/', 'index', RHEventAttachments)
 _bp.add_url_rule('/event/<confId>/manage/attachments/upload', 'upload', RHEventAttachmentsUpload,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/attachments/add-link', 'add_link', RHEventAttachmentsAddLink,
                  methods=('GET', 'POST'))

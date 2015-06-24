@@ -17,16 +17,23 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import SelectField, BooleanField
+from wtforms.fields.html5 import URLField
+from wtforms.validators import DataRequired
 
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.util.i18n import _
 
 
-class UploadFilesForm(IndicoForm):
+class AddAttachmentsForm(IndicoForm):
     protected = BooleanField(_('Protected'), widget=SwitchWidget(),
-                             description=_('By default, the files will inherit the protection of the parent. Checking '
-                                           'this field will restrict all access. The protection can be modified later '
-                                           'on from the file settings.'))
+                             description=_('By default, the attachments will inherit the protection of the parent. '
+                                           'Checking this field will restrict all access. The protection can be '
+                                           'modified later on from the attachment settings.'))
     folder = SelectField(_('Folder'), choices=[(None, ''), ('lorem', 'ipsum')],
-                         description=_('Adding files to folders allow grouping and easier permission management.'))
+                         description=_('Adding attachments to folders allow grouping and easier permission '
+                                       'management.'))
+
+
+class AddLinkForm(AddAttachmentsForm):
+    link = URLField(_('URL'), [DataRequired()])
