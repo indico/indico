@@ -19,17 +19,16 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import merge_table_args
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.settings.models.base import JSONSettingsBase, PrincipalSettingsBase
-from indico.util.decorators import classproperty
+from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
 
 
 class EventSettingsMixin(object):
-    @classproperty
+    @strict_classproperty
     @staticmethod
-    def __table_args__():
-        # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
+    def __auto_table_args():
         return (db.Index(None, 'event_id', 'module', 'name'),
                 db.Index(None, 'event_id', 'module'),
                 {'schema': 'events'})
@@ -51,10 +50,14 @@ class EventSettingsMixin(object):
 
 
 class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
+    @strict_classproperty
+    @staticmethod
+    def __auto_table_args():
+        return db.UniqueConstraint('event_id', 'module', 'name'),
+
     @declared_attr
     def __table_args__(cls):
-        local_args = db.UniqueConstraint('event_id', 'module', 'name'),
-        return merge_table_args(EventSettingsMixin, local_args)
+        return auto_table_args(cls)
 
     @return_ascii
     def __repr__(self):
@@ -67,7 +70,7 @@ class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model)
 
     @declared_attr
     def __table_args__(cls):
-        return merge_table_args(PrincipalSettingsBase, EventSettingsMixin)
+        return auto_table_args(cls)
 
     @return_ascii
     def __repr__(self):

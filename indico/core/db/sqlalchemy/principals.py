@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
-from indico.util.decorators import classproperty
+from indico.util.decorators import strict_classproperty
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -46,10 +46,9 @@ class PrincipalMixin(object):
     #: mixin is used.
     principal_backref_name = None
 
-    @classproperty
+    @strict_classproperty
     @staticmethod
-    def __table_args__():
-        # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
+    def __auto_table_args():
         return (db.Index(None, 'mp_group_provider', 'mp_group_name'),
                 _make_check(PrincipalType.user, 'user_id'),
                 _make_check(PrincipalType.local_group, 'local_group_id'),

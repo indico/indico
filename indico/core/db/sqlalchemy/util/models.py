@@ -134,31 +134,36 @@ def attrs_changed(obj, *attrs):
     return any(get_history(obj, attr).has_changes() for attr in attrs)
 
 
-def merge_table_args(*table_args, **extra_kwargs):
+def auto_table_args(cls, **extra_kwargs):
     """Merges SQLAlchemy ``__table_args__`` values.
 
-    This supports any number of ``__table_args__`` values in any
-    notations supported by SQLAlchemy, i.e. a dict, a tuple with
-    the last element being a dict and a tuple with only non-dict
-    entries.
+    This is useful when using mixins to compose model classes if the
+    mixins need to define custom ``__table_args__``. Since defining
+    them directly they can define ``__auto_table_args`` classproperties
+    which will then merged in the final model class using the regular
+    table args attribute::
 
-    :param table_args: Any number of ``__table_args``-style values.
-                       For your convenience, you can also pass an
-                       object with a ``__table_args`` attribute.
+        @declared_attr
+        def __table_args__(cls):
+            return auto_table_args(cls)
+
+
+    :param cls: A class that has one or more `__auto_table_args`
+                classproperties (usually from mixins)
     :param extra_kwargs: Additional keyword arguments that will be
-                         added after processing the list of tableargs.
+                         added after merging the table args.
                          This is mostly for convenience so you can
-                         quickly specify e.g. a schema after merging
-                         constraints, indexes, etc. from mixins.
+                         quickly specify e.g. a schema.
     :return: A value suitable for ``__table_args__``.
     """
     posargs = []
     kwargs = {}
-    for value in table_args:
+    for attr in dir(cls):
+        if not attr.endswith('__auto_table_args'):
+            continue
+        value = getattr(cls, attr)
         if not value:
             continue
-        if hasattr(value, '__table_args__'):
-            value = value.__table_args__
         if isinstance(value, dict):
             kwargs.update(value)
         elif isinstance(value, tuple):

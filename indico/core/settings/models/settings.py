@@ -19,26 +19,29 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.util.models import merge_table_args
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.settings.models.base import JSONSettingsBase, PrincipalSettingsBase
-from indico.util.decorators import classproperty
+from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
 
 
 class CoreSettingsMixin(object):
-    @classproperty
+    @strict_classproperty
     @staticmethod
-    def __table_args__():
-        # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
+    def __auto_table_args():
         return (db.Index(None, 'module', 'name'),
                 {'schema': 'indico'})
 
 
 class Setting(JSONSettingsBase, CoreSettingsMixin, db.Model):
+    @strict_classproperty
+    @staticmethod
+    def __auto_table_args():
+        return db.UniqueConstraint('module', 'name'),
+
     @declared_attr
     def __table_args__(cls):
-        local_args = db.UniqueConstraint('module', 'name'),
-        return merge_table_args(JSONSettingsBase, CoreSettingsMixin, local_args)
+        return auto_table_args(cls)
 
     @return_ascii
     def __repr__(self):
@@ -50,7 +53,7 @@ class SettingPrincipal(PrincipalSettingsBase, CoreSettingsMixin, db.Model):
 
     @declared_attr
     def __table_args__(cls):
-        return merge_table_args(PrincipalSettingsBase, CoreSettingsMixin)
+        return auto_table_args(cls)
 
     @return_ascii
     def __repr__(self):

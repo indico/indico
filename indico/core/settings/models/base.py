@@ -23,7 +23,8 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalType
-from indico.util.decorators import classproperty
+from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.util.decorators import strict_classproperty
 
 
 def _coerce_value(value):
@@ -50,10 +51,9 @@ class SettingsBase(object):
         nullable=False
     )
 
-    @classproperty
+    @strict_classproperty
     @staticmethod
-    def __table_args__():
-        # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
+    def __auto_table_args():
         return (db.CheckConstraint('module = lower(module)', 'lowercase_module'),
                 db.CheckConstraint('name = lower(name)', 'lowercase_name'))
 

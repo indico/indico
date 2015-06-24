@@ -20,7 +20,7 @@ from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.util.decorators import classproperty
+from indico.util.decorators import strict_classproperty
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -77,10 +77,9 @@ class LinkMixin(object):
     #: for the unique index to be applied, e.g. ``'is_foo = true'``.
     unique_links = False
 
-    @classproperty
+    @strict_classproperty
     @classmethod
-    def _link_table_args(cls):
-        # not using declared_attr here since reading such an attribute manually from a non-model triggers a warning
+    def __auto_table_args(cls):
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
             extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, basestring) else None
