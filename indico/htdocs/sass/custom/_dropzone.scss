@@ -38,5 +38,25 @@ $dropzone-border-width: 2;
     .dz-message {
         font-size: 1.5em;
         color: $dark-gray;
+        margin: 0 0 1em 0;
+
+        .message-seperator {
+            display: block;
+            margin-top: 1em;
+            font-size: small;
+        }
     }
+
+    .select-files-btn {
+        text-align: center;
+        cursor: pointer;
+
+        .i-button {
+            cursor: pointer;
+        }
+    }
+}
+
+.dropzone-upload-btn {
+    text-align: right;
 }

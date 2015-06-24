@@ -1,17 +1,58 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    <form action="{{ url_for('.upload', event)}}" class="dropzone" id="dropzone">
-        <div class="dz-message">
-          {% trans %}Drag files here (or click) to upload.{% endtrans %}
+    <div class="dropzone" id="dropzone">
+        <div class="dropzone-previews">
+            <div class="dz-message">
+              {% trans %}Drag files here{% endtrans %}
+              <span class="message-seperator">- or -</span>
+            </div>
         </div>
-    </form>
+        <div class="select-files-btn">
+            <button class="i-button" onclick="return false;">
+                {%- trans %}Choose from your computer{% endtrans -%}
+            </button>
+        </div>
+    </div>
     {{ form_header(form)}}
     {{ form_rows(form) }}
     {% call form_footer(attach_form) %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Upload{% endtrans %}">
+        <div class="dropzone-upload-btn">
+            <input class="i-button big highlight js-dropzone-upload" type="submit" disabled
+                   value="{% trans %}Upload{% endtrans %}">
+        </div>
     {% endcall %}
     <script>
-        $("#dropzone").dropzone({ url: "{{ url_for('.upload', event) }}" });
+        // Disabling autoDiscover, otherwise Dropzone will try to attach twice.
+        Dropzone.autoDiscover = false;
+
+        $(function() {
+          var myDropzone = new Dropzone('#dropzone', {
+            url: {{ url_for('.upload', event) | tojson }},
+            clickable: ['#dropzone', '.select-files-btn'],
+            previewsContainer: '.dropzone-previews',
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 10,
+            maxFiles: 10,
+            init: function() {
+                var uploadButton = $('.js-dropzone-upload')
+                    myDropzone = this;
+
+                uploadButton.on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $('.dz-progress').show();
+                    myDropzone.processQueue();
+                });
+
+                myDropzone.on('addedfile', function() {
+                    uploadButton.removeAttr('disabled');
+                    $('.dz-message').hide();
+                    $('.dz-progress').hide();
+                });
+            }
+          });
+        })
     </script>
 {%- endblock %}
