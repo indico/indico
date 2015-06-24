@@ -56,7 +56,7 @@
             % endif
 
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if 'minutesLink' in info:
+            % if 'minutesLink' in info and getItemType(item) != 'Conference':
                 menuOptions['editMinutesOld'] = {action: function(m) {
                     IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
                     m.close();
@@ -78,7 +78,7 @@
                     },
                     display: ${ note_item.note is not None | n,j } ? $T('Edit minutes') : $T('Add minutes')
                 };
-                % if note_item.note and getItemType(item) != 'Conference':
+                % if note_item.note:
                     menuOptions['deleteMinutes'] = {
                         action: function(m) {
                             confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {

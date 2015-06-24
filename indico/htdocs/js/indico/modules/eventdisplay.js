@@ -29,4 +29,14 @@ $(function() {
         content = note.hasClass('togglable') ? note : note.find('.togglable');
         content.slideToggle();
     });
+
+    $('.js-note-editor').ajaxDialog({
+        title: $T("Edit minutes"),
+        confirmCloseUnsaved: true,
+        onClose: function(data) {
+            if (data) {
+                location.reload();
+            }
+        }
+    });
 });

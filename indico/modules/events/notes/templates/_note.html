@@ -22,7 +22,8 @@
                 {{ render_toggle_button(note=note, note_is_hidden=hidden) }}
             </div>
             <div class="group">
-                <button class="i-button icon-edit js-confirm-warning" title="{% trans %}Edit{% endtrans %}"></button>
+                <button class="i-button icon-edit js-note-editor" title="{% trans %}Edit{% endtrans %}"
+                        data-href="{{ url_for('event_notes.edit', event) }}"></button>
             </div>
             <div class="group">
                 <button class="i-button icon-remove js-confirm-warning" title="{% trans %}Delete{% endtrans %}"
@@ -32,12 +33,14 @@
             </div>
         {% else %}
             <div class="group">
-                <button class="i-button highlight icon-plus">
+                <button class="i-button highlight icon-plus js-note-editor"
+                        data-href="{{ url_for('event_notes.edit', event) }}">
                     {% trans %}Create minutes{% endtrans %}
                 </button>
             </div>
             <div class="group">
-                <button class="i-button icon-stack">
+                <button class="i-button icon-stack js-note-editor"
+                        data-href="{{ url_for('event_notes.edit', event) }}">
                     {% trans %}Compile minutes{% endtrans %}
                 </button>
             </div>
