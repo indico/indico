@@ -254,6 +254,8 @@ class User(db.Model):
     # - oauth_tokens (OAuthToken.user)
     # - event_log_entries (EventLogEntry.user)
     # - event_notes_revisions (EventNoteRevision.user)
+    # - attachments (Attachment.user)
+    # - attachment_files (AttachmentFile.user)
 
     @property
     def as_principal(self):
