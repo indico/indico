@@ -93,6 +93,10 @@ class EventNote(LinkMixin, db.Model):
         post_update=True
     )
 
+    @property
+    def locator(self):
+        return self.linked_object.getLocator()
+
     @classmethod
     def get_for_linked_object(cls, linked_object, preload_event=True):
         """Gets the note for the given object.
