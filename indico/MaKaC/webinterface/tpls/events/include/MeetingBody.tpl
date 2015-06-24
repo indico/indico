@@ -13,7 +13,7 @@ var videoServiceInfo = {};
     </table>
 </div>
 
-% if conf.note:
+% if conf.note or conf.canModify(user):
     <div id="event-note-section">
         ${ render_template('events/notes/note_event.html', note=conf.note, hidden=not minutes, for_event=conf) }
     </div>
