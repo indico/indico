@@ -25,6 +25,7 @@ from speaklater import _LazyString
 
 from indico.core.config import Config
 from indico.core.errors import IndicoError
+from indico.web.util import get_request_info
 
 try:
     import simplejson as _json
@@ -87,7 +88,7 @@ def create_json_error_answer(exception, status=200):
             # werkzeug HTTPExceptions have a description instead of a message.
             'message': unicode(getattr(exception, 'description', exception.message)),
             'data': exception_data,
-            'requestInfo': {},
+            'requestInfo': get_request_info(),
             'inner': traceback.format_exc()
         }
 
