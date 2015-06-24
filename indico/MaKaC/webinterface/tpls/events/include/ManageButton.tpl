@@ -78,7 +78,7 @@
                     },
                     display: ${ note_item.note is not None | n,j } ? $T('Edit minutes') : $T('Add minutes')
                 };
-                % if note_item.note:
+                % if note_item.note and getItemType(item) != 'Conference':
                     menuOptions['deleteMinutes'] = {
                         action: function(m) {
                             confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {

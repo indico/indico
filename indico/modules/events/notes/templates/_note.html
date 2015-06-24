@@ -1,20 +1,47 @@
-{% macro render_note(note, for_event, hidden=true) %}
+{% macro render_note(note, hidden=true, for_event=none) %}
     <div id="event-note-{{ note.id }}" class="note-block i-box titled {% if not for_event %}{{ _togglable_classes(hidden) }}{% endif %}">
         <div class="i-box-header">
             <div class="i-box-title">
                 {% trans %}Minutes{% endtrans %}
             </div>
             {% if for_event %}
-                <div class="i-box-buttons toolbar right">
-                    <div class="group">
-                        {{ render_toggle_button(note=note, note_is_hidden=hidden)|safe }}
-                    </div>
-                </div>
+                {{ render_event_note_buttons(event=for_event, note=note, hidden=hidden) }}
             {% endif %}
         </div>
         <div class="i-box-content {% if for_event %}{{ _togglable_classes(hidden) }}{% endif %}">
             {{ note.html }}
         </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_event_note_buttons(event, note=none, hidden=true) %}
+    <div class="i-box-buttons toolbar right">
+        {% if note %}
+            <div class="group">
+                {{ render_toggle_button(note=note, note_is_hidden=hidden) }}
+            </div>
+            <div class="group">
+                <button class="i-button icon-edit js-confirm-warning" title="{% trans %}Edit{% endtrans %}"></button>
+            </div>
+            <div class="group">
+                <button class="i-button icon-remove js-confirm-warning" title="{% trans %}Delete{% endtrans %}"
+                        data-href="{{ url_for('event_notes.delete', event) }}" data-method="POST"
+                        data-title="{% trans %}Delete minutes?{% endtrans %}"
+                        data-confirm="{% trans %}Do you want to delete the minutes of this event{% endtrans %}"></button>
+            </div>
+        {% else %}
+            <div class="group">
+                <button class="i-button highlight icon-plus">
+                    {% trans %}Create minutes{% endtrans %}
+                </button>
+            </div>
+            <div class="group">
+                <button class="i-button icon-stack">
+                    {% trans %}Compile minutes{% endtrans %}
+                </button>
+            </div>
+        {% endif %}
     </div>
 {% endmacro %}
 

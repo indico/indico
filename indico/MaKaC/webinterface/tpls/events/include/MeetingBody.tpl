@@ -13,10 +13,9 @@ var videoServiceInfo = {};
     </table>
 </div>
 
-## TODO: show if manager
 % if conf.note:
     <div id="event-note-section">
-        ${ render_template('events/notes/note_event.html', note=conf.note, hidden=not minutes) }
+        ${ render_template('events/notes/note_event.html', note=conf.note, hidden=not minutes, for_event=conf) }
     </div>
 % endif
 

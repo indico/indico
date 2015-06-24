@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request
+from flask import redirect, session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.core.db import db
@@ -26,13 +26,14 @@ from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.util import get_object_from_args
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.base import RHProtected
 
 
-class RHEditNote(RHProtected):
-    """Create/edit a note attached to an object inside an event"""
+class RHEventNoteBase(RHProtected):
+    """Base handler for notes attached to an object inside an event"""
 
     def _checkParams(self):
         self.object_type, self.event, self.object = get_object_from_args()
@@ -49,6 +50,18 @@ class RHEditNote(RHProtected):
             return
         if not self.object.canModify(session.avatar):
             raise Forbidden
+
+    def _delete_note(self):
+        note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        if note is not None:
+            note.delete(session.user)
+            logger.info('Note {} deleted by {}'.format(note, session.user))
+            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
+                           'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+
+
+class RHEditNote(RHEventNoteBase):
+    """Create/edit/delete a note attached to an object inside an event"""
 
     def _get_defaults(self, note):
         if note:
@@ -88,10 +101,11 @@ class RHEditNote(RHProtected):
         return self._process_form()
 
     def _process_DELETE(self):
-        note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        if note is not None:
-            note.delete(session.user)
-            logger.info('Note {} deleted by {}'.format(note, session.user))
-            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
-                           'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+        self._delete_note()
         return jsonify_data(flash=False)
+
+
+class RHDeleteNote(RHEventNoteBase):
+    def _process(self):
+        self._delete_note()
+        return redirect(url_for('event.conferenceDisplay', self.event))

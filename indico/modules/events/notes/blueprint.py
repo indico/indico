@@ -16,14 +16,16 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.notes.controllers import RHEditNote
+from indico.modules.events.notes.controllers import RHEditNote, RHDeleteNote
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_notes', __name__, template_folder='templates', virtual_template_folder='events/notes',
                       url_prefix='/event/<confId>')
 
-_bp.add_url_rule('/note', 'edit', RHEditNote, methods=('GET', 'POST', 'DELETE'), defaults={'object_type': 'event'})
+_bp.add_url_rule('/note/', 'edit', RHEditNote, methods=('GET', 'POST', 'DELETE'), defaults={'object_type': 'event'})
+_bp.add_url_rule('/note/delete', 'delete', RHDeleteNote, methods=('POST',), defaults={'object_type': 'event'})
+
 _bp.add_url_rule('/session/<sessionId>/note', 'edit', RHEditNote, defaults={'object_type': 'session'},
                  methods=('GET', 'POST', 'DELETE'))
 
