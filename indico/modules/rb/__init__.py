@@ -17,10 +17,8 @@
 from __future__ import unicode_literals
 
 from flask import session
-from sqlalchemy.orm import joinedload
 
 from indico.core import signals
-from indico.core.db import db
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -48,13 +46,7 @@ def _import_tasks(sender, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    source_principals = set(source.in_blocking_acls.options(joinedload(BlockingPrincipal.blocking)))
-    target_blockings = {x.blocking for x in target.in_blocking_acls.options(joinedload(BlockingPrincipal.blocking))}
-    for principal in source_principals:
-        if principal.blocking not in target_blockings:
-            principal.user_id = target.id
-        else:
-            db.session.delete(principal)
+    BlockingPrincipal.merge_users(target, source, 'blocking')
     Blocking.find(created_by_id=source.id).update({Blocking.created_by_id: target.id})
     Reservation.find(created_by_id=source.id).update({Reservation.created_by_id: target.id})
     Reservation.find(booked_for_id=source.id).update({Reservation.booked_for_id: target.id})

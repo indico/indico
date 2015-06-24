@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.util.decorators import strict_classproperty
@@ -138,3 +139,24 @@ class PrincipalMixin(object):
         else:
             self.type = PrincipalType.user
             self.user = value
+
+    @classmethod
+    def merge_users(cls, target, source, relationship_attr):
+        """Merges two users in the ACL.
+
+        :param target: The target user of the merge.
+        :param source: The user that is being merged into `target`.
+        :param relationship_attr: The name of the relationship pointing
+                                  to the object associated with the ACL
+                                  entry.
+        """
+        relationship = getattr(cls, relationship_attr)
+        source_principals = set(getattr(source, cls.principal_backref_name).options(joinedload(relationship)))
+        target_objects = {getattr(x, relationship_attr)
+                          for x in getattr(target, cls.principal_backref_name).options(joinedload(relationship))}
+        for principal in source_principals:
+            if getattr(principal, relationship_attr) not in target_objects:
+                principal.user_id = target.id
+            else:
+                db.session.delete(principal)
+        db.session.flush()
