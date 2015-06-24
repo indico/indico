@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import render_template
+from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
 from indico.modules.auth.util import url_for_login
@@ -45,6 +46,7 @@ def generate_global_file(config):
         'FileTypeIcons': file_type_icons,
 
         'Urls': {
+            'BasePath': url_parse(config.getBaseURL()).path.rstrip('/'),
             'JsonRpcService': url_for('api.jsonrpc'),
             'ExportAPIBase': url_for('api.httpapi', prefix='export'),
             'APIBase': url_for('api.httpapi', prefix='api'),

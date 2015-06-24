@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from pprint import pformat
+
 from MaKaC.services.implementation.base import ParameterManager, ServiceBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.errors import MaKaCError
@@ -38,10 +40,12 @@ class SendErrorReport(ServiceBase):
             fromAddr = 'indico-reports@example.org'
 
         toAddr = Config.getInstance().getSupportEmail()
-
         Logger.get('errorReport').debug('mailing %s' % toAddr)
-
         subject = "[Indico@%s] Error report"%cfg.getBaseURL()
+
+        request_info = self._requestInfo or ''
+        if isinstance(request_info, (dict, list)):
+            request_info = pformat(request_info)
 
         # build the message body
         body = [
@@ -50,12 +54,10 @@ class SendErrorReport(ServiceBase):
             self._code,
             self._message,
             "Inner error: " + str(self._inner),
-            str(self._requestInfo) if self._requestInfo else '',
+            request_info,
             "-" * 20
         ]
         maildata = {"fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join(body)}
-
-        # send it
         GenericMailer.send(GenericNotification(maildata))
 
     def _checkParams(self):

@@ -16,7 +16,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
-from flask import g
+from flask import g, request, session, has_request_context
 from markupsafe import Markup
 
 
@@ -28,3 +28,47 @@ def inject_js(js):
     if 'injected_js' not in g:
         g.injected_js = []
     g.injected_js.append(Markup(js))
+
+
+def _format_request_data(data, hide_passwords):
+    if not hasattr(data, 'iterlists'):
+        data = ((k, [v]) for k, v in data.iteritems())
+    else:
+        data = data.iterlists()
+    rv = {}
+    for key, values in data:
+        if hide_passwords and 'password' in key:
+            values = [v if not v else '<{} chars hidden>'.format(len(v)) for v in values]
+        rv[key] = values if len(values) != 1 else values[0]
+    return rv
+
+
+def get_request_info(hide_passwords=True):
+    """Gets various information about the current HTTP request.
+
+    This is especially useful for logging purposes where you want
+    as many information as possible.
+
+    :param hide_passwords: Hides the actual value of POST fields
+                           if their name contains ``password``.
+
+    :return: a dictionary containing request information, or ``None``
+             when called outside a request context
+    """
+    if not has_request_context():
+        return None
+    return {
+        'id': request.id,
+        'url': request.url,
+        'endpoint': request.url_rule.endpoint if request.url_rule else None,
+        'method': request.method,
+        'user': repr(session.user),
+        'ip': request.remote_addr,
+        'user_agent': unicode(request.user_agent),
+        'referrer': request.referrer,
+        'data': {
+            'url': _format_request_data(request.view_args, False),
+            'get': _format_request_data(request.args, False),
+            'post': _format_request_data(request.form, hide_passwords)
+        }
+    }

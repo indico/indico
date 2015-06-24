@@ -23,6 +23,8 @@ from flask import current_app
 from persistent.dict import PersistentDict
 from speaklater import _LazyString
 
+from indico.web.util import get_request_info
+
 try:
     import simplejson as _json
 except ImportError:
@@ -86,7 +88,7 @@ def create_json_error_answer(exception, status=200):
             # werkzeug HTTPExceptions have a description instead of a message.
             'message': unicode(getattr(exception, 'description', exception.message)),
             'data': exception_data,
-            'requestInfo': {},
+            'requestInfo': get_request_info(),
             'inner': traceback.format_exc()
         }
 
