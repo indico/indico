@@ -148,6 +148,10 @@ class Attachment(ProtectionMixin, db.Model):
     #: The ACL of the folder (used for ProtectionMode.protected)
     acl = association_proxy('_acl', 'principal', creator=lambda v: AttachmentPrincipal(principal=v))
 
+    @property
+    def protection_parent(self):
+        return self.folder
+
     @return_ascii
     def __repr__(self):
         return '<Attachment({}, {}, {}{}, {}, {})>'.format(

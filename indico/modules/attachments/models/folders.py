@@ -85,6 +85,10 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     # relationship backrefs:
     # - attachments (Attachment.folder)
 
+    @property
+    def protection_parent(self):
+        return self.linked_object
+
     @return_ascii
     def __repr__(self):
         return '<AttachmentFolder({}, {}{}{}, {}, {})>'.format(

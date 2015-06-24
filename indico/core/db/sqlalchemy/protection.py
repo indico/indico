@@ -23,6 +23,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.util.struct.enum import TitledIntEnum
+from indico.util.user import iter_acl
 
 
 class ProtectionMode(TitledIntEnum):
@@ -65,3 +66,60 @@ class ProtectionMixin(object):
     def protection_repr(self):
         protection_mode = self.protection_mode.name if self.protection_mode is not None else None
         return 'protection_mode={}'.format(protection_mode)
+
+    @property
+    def protection_parent(self):
+        """The parent object to consult for ProtectionMode.inheriting"""
+        raise NotImplementedError
+
+    def can_access(self, user, acl_attr='acl', legacy_ac_method='canUserAccess', allow_admin=True):
+        """Checks if the user can access the object.
+
+        When using a custom acl_attr on an object that supports
+        inherited proection, ALL possible `protection_parent` objects
+        need to have an ACL with the same name, too!
+
+        :param user: The :class:`.User` to check
+        :param acl_attr: The name of the property that contains the
+                         set of authorized principals.
+        :param legacy_ac_method: The AccessController method name to
+                                 use when inheriting the protection
+                                 from a legacy object
+        :param allow_admin: If admin users should always have access
+        """
+        if allow_admin and user.is_admin:
+            return True
+
+        # TODO send a signal that allows to override the result of this function
+        # e.g. to give full access to "harvester ips"
+
+        if self.protection_mode == ProtectionMode.public:
+            # if it's public we completely ignore the parent protection
+            # this is quite ugly which is why it should only be allowed
+            # in rare cases (e.g. events which might be in a protected
+            # category but should be public nonetheless)
+            return True
+        elif self.protection_mode == ProtectionMode.protected:
+            # if it's protected, we also ignore the parent protection
+            # and only check our own ACL
+            return any(user in principal for principal in iter_acl(getattr(self, acl_attr)))
+        elif self.protection_mode == ProtectionMode.inheriting:
+            # if it's inheriting, we only check the parent protection.
+            # the parent can be either an object inheriting from this
+            # mixin or a legacy object with an AccessController
+            parent = self.protection_parent
+            if parent is None:
+                # This should be the case for the top-level object,
+                # i.e. the root category, which shouldn't allow
+                # ProtectionMode.inheriting as it makes no sense.
+                raise TypeError('protection_parent of {} is None'.format(self))
+            elif hasattr(parent, 'can_access'):
+                return parent.can_access(user, acl_attr=acl_attr)
+            elif hasattr(parent, 'getAccessController') and legacy_ac_method is not None:
+                return getattr(parent.getAccessController(), legacy_ac_method)(user.as_avatar)
+            else:
+                raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
+        else:
+            # should never happen, but since this is a sensitive area
+            # we better fail loudly if we have garbage
+            raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
