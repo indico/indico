@@ -9,7 +9,7 @@
             {% endif %}
         </div>
         <div class="i-box-content {% if for_event %}{{ _togglable_classes(hidden) }}{% endif %}">
-            {{ note.html }}
+            {{ note.html|safe }}
         </div>
     </div>
 {% endmacro %}
