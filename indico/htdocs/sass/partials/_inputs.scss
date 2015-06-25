@@ -819,3 +819,17 @@ dd > .i-has-action {
         width: 110px;
     }
 }
+
+
+.PluginOptionPeopleListDiv.disabled {
+    background-color: lighten($pastel-gray, $light-color-variation);
+    background: repeating-linear-gradient(
+        -40deg,
+        lighten($pastel-gray, 0.5*$color-variation),
+        lighten($pastel-gray, 0.5*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 20px
+    );
+    font-style: italic;
+    color: $dark-gray !important;
+}
