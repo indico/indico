@@ -16,13 +16,16 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import SelectField, BooleanField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.fields import BooleanField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 
+from indico.core.db import db
+from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
-from indico.util.i18n import _
 
 
 class AddAttachmentsForm(IndicoForm):
@@ -30,9 +33,16 @@ class AddAttachmentsForm(IndicoForm):
                              description=_('By default, the attachments will inherit the protection of the parent. '
                                            'Checking this field will restrict all access. The protection can be '
                                            'modified later on from the attachment settings.'))
-    folder = SelectField(_('Folder'), choices=[(None, ''), ('lorem', 'ipsum')],
-                         description=_('Adding attachments to folders allow grouping and easier permission '
-                                       'management.'))
+
+    folder = QuerySelectField(_('Folder'), allow_blank=True, blank_text=_('No folder selected'), get_label='title',
+                              description=_('Adding attachments to folders allow grouping and easier permission '
+                                            'management.'))
+
+    def __init__(self, *args, **kwargs):
+        linked_object = kwargs.pop('linked_object')
+        super(AddAttachmentsForm, self).__init__(*args, **kwargs)
+        self.folder.query = (AttachmentFolder.find(linked_object=linked_object)
+                                             .order_by(db.func.lower(AttachmentFolder.title)))
 
 
 class AddLinkForm(AddAttachmentsForm):

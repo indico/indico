@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from flask import request
 from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -70,8 +69,8 @@ class RHEventAttachmentsUpload(RHConferenceModifBase):
     """Upload files"""
 
     def _process(self):
-        form = AddAttachmentsForm()
-        if request.method == 'POST':
+        form = AddAttachmentsForm(linked_object=self._conf)
+        if form.validate_on_submit():
             # TODO: Handle files
             return
         return WPEventAttachments.render_template('upload.html', self._conf, event=self._conf, form=form)
@@ -81,7 +80,7 @@ class RHEventAttachmentsAddLink(RHConferenceModifBase):
     """Attach link"""
 
     def _process(self):
-        form = AddLinkForm()
+        form = AddLinkForm(linked_object=self._conf)
         if form.validate_on_submit():
             # TODO
             return

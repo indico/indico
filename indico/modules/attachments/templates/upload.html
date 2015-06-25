@@ -1,7 +1,8 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    <div class="dropzone" id="dropzone">
+    {{ form_header(form, id='dropzone', classes='dropzone')}}
+    <div class="dropzone-area">
         <div class="dropzone-previews">
             <div class="dz-message">
               {% trans %}Drag files here{% endtrans %}
@@ -14,7 +15,6 @@
             </button>
         </div>
     </div>
-    {{ form_header(form)}}
     {{ form_rows(form) }}
     {% call form_footer(attach_form) %}
         <div class="dropzone-upload-btn">
@@ -29,7 +29,7 @@
         $(function() {
           var myDropzone = new Dropzone('#dropzone', {
             url: {{ url_for('.upload', event) | tojson }},
-            clickable: ['#dropzone', '.select-files-btn'],
+            clickable: '.dropzone-area',
             previewsContainer: '.dropzone-previews',
             autoProcessQueue: false,
             uploadMultiple: true,

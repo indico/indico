@@ -24,39 +24,47 @@ $dropzone-padding: 20;
 $dropzone-border-width: 2;
 
 .dropzone {
-    @include border-radius(2px);
-    border: 2px dashed $dark-blue;
-    padding: 30px 20px;
-    margin-bottom: 3em;
-    width: (($dropzone-padding + $dropzone-border-width) * 2 + ($image-preview-width + ($image-preview-margin * 2)) * 5) + 'px';
+    border: 0;
+    margin: 0;
+    padding: 0;
 
-    .dz-preview.dz-file-preview .dz-image,
-    .dz-preview .dz-image {
-        @include border-radius(5px);
-    }
-
-    .dz-message {
-        font-size: 1.5em;
-        color: $dark-gray;
-        margin: 0 0 1em 0;
-
-        .message-seperator {
-            display: block;
-            margin-top: 1em;
-            font-size: small;
-        }
-    }
-
-    .select-files-btn {
-        text-align: center;
+    .dropzone-area {
+        @include border-radius(2px);
+        border: 2px dashed $dark-blue;
+        padding: 30px 20px;
+        margin-bottom: 3em;
+        width: (($dropzone-padding + $dropzone-border-width) * 2 + ($image-preview-width + ($image-preview-margin * 2)) * 5) + 'px';
         cursor: pointer;
 
-        .i-button {
-            cursor: pointer;
+        .dz-preview.dz-file-preview .dz-image,
+        .dz-preview .dz-image {
+            @include border-radius(5px);
         }
+
+        .dz-message {
+            font-size: 1.5em;
+            color: $dark-gray;
+            margin: 0 0 1em 0;
+
+            .message-seperator {
+                display: block;
+                margin-top: 1em;
+                font-size: small;
+            }
+        }
+
+        .select-files-btn {
+            text-align: center;
+            cursor: pointer;
+
+            .i-button {
+                cursor: pointer;
+            }
+        }
+    }
+
+    .dropzone-upload-btn {
+        text-align: right;
     }
 }
 
-.dropzone-upload-btn {
-    text-align: right;
-}
