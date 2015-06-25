@@ -60,11 +60,13 @@
                 <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
             </div>
             <div class="toolbar right">
-                <div class="group">
-                    <a href="#" class="i-button icon-file" id="btn-add-files"
-                       data-href="{{ url_for('.upload', event) }}">Upload files</a>
-                    <a href="#" class="i-button icon-link" title="Edit" id="btn-add-link"
-                       data-href="{{ url_for('.add_link', event) }}">Add link</a>
+                <div class="group js-attachment-actions">
+                    <a href="#" class="i-button icon-file" data-href="{{ url_for('.upload', event) }}">
+                        {%- trans %}Upload files{% endtrans -%}
+                    </a>
+                    <a href="#" class="i-button icon-link" data-href="{{ url_for('.add_link', event) }}">
+                        {%- trans %}Add link{% endtrans -%}
+                    </a>
                 </div>
             </div>
         </div>
@@ -75,19 +77,17 @@
         {% else  %}
             <span class="empty">This event has no attachments.</span>
         {% endif %}
+        <div class="i-box-footer create-folder js-attachment-actions">
+            <a href="#" class="icon-plus" data-href="{{ url_for('.create_folder', event) }}">{#
+                #}&nbsp;{%- trans %}Add new folder{% endtrans -%}
+            </a>
+        </div>
     </div>
     <script>
-        $('#btn-add-files').ajaxDialog({
-            title: $T('Upload attachments'),
-            onClose: function(data) {
-                if (data) {
-                    location.reload();
-                }
-            }
-        });
-
-        $('#btn-add-link').ajaxDialog({
-            title: $T('Add link'),
+        $('.js-attachment-actions > a').ajaxDialog({
+            title: function() {
+                return $(this.trigger).text();
+            },
             onClose: function(data) {
                 if (data) {
                     location.reload();

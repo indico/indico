@@ -16,8 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask import flash
+from indico.core.db import db
 from indico.modules.attachments.views import WPEventAttachments
-from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm
+from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm
+from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.util.i18n import _
+from indico.web.flask.util import url_for, redirect_or_jsonify
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -85,3 +90,19 @@ class RHEventAttachmentsAddLink(RHConferenceModifBase):
             # TODO
             return
         return WPEventAttachments.render_template('add_link.html', self._conf, event=self._conf, form=form)
+
+
+class RHEventAttachmentsCreateFolder(RHConferenceModifBase):
+    """Create a new empty folder"""
+
+    def _process(self):
+        form = CreateFolderForm()
+        if form.validate_on_submit():
+            folder = AttachmentFolder(linked_object=self._conf)
+            form.populate_obj(folder, skip={'acl'})
+            if folder.is_protected:
+                folder.acl = form.acl.data
+            db.session.add(folder)
+            flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
+            return redirect_or_jsonify(url_for('.index', self._conf), flash=False)
+        return WPEventAttachments.render_template('create_folder.html', self._conf, event=self._conf, form=form)

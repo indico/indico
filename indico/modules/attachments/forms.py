@@ -17,26 +17,30 @@
 from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField
+from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
+from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.fields import PrincipalListField
+from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 
 class AddAttachmentsForm(IndicoForm):
-    protected = BooleanField(_('Protected'), widget=SwitchWidget(),
-                             description=_('By default, the attachments will inherit the protection of the parent. '
-                                           'Checking this field will restrict all access. The protection can be '
-                                           'modified later on from the attachment settings.'))
+    protected = BooleanField(_("Protected"), widget=SwitchWidget(),
+                             description=_("By default, the attachments will inherit the protection of the parent. "
+                                           "Checking this field will restrict all access. The protection can be "
+                                           "modified later on from the attachment settings."))
 
-    folder = QuerySelectField(_('Folder'), allow_blank=True, blank_text=_('No folder selected'), get_label='title',
-                              description=_('Adding attachments to folders allow grouping and easier permission '
-                                            'management.'))
+    folder = QuerySelectField(_("Folder"), allow_blank=True, blank_text=_("No folder selected"), get_label='title',
+                              description=_("Adding attachments to folders allow grouping and easier permission "
+                                            "management."))
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
@@ -46,4 +50,20 @@ class AddAttachmentsForm(IndicoForm):
 
 
 class AddLinkForm(AddAttachmentsForm):
-    link = URLField(_('URL'), [DataRequired()])
+    link = URLField(_("URL"), [DataRequired()])
+
+
+class CreateFolderForm(IndicoForm):
+    title = StringField(_("Name"), description=_("The name of the folder."))
+    description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
+    protected = BooleanField(_("Protected"), widget=SwitchWidget(),
+                             description=_("By default, the folder will inherit the protection of the event. "
+                                           "Checking this field will restrict all access. The protection can be "
+                                           "modified later on from the folder settings."))
+    acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
+                             groups=True, serializable=False, allow_external=True,
+                             description=_("The list of users and groups with access to the folder"))
+
+    @generated_data
+    def protection_mode(self):
+        return ProtectionMode.protected if self.protected.data else ProtectionMode.inheriting
