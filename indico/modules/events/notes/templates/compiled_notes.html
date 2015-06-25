@@ -1,9 +1,11 @@
-{% macro render_note(note) %}
+{% macro render_note(note, last) %}
     <h1>● {{ note.linked_object.getTitle() }}</h1>
     {{ note.html|safe }}
-    <hr>
+    {% if not last %}
+        <hr>
+    {% endif %}
 {% endmacro %}
 
 {% for note in notes %}
-    {{ render_note(note) }}
+    {{ render_note(note, last=loop.last) }}
 {% endfor %}

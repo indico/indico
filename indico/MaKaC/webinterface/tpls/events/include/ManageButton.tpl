@@ -113,18 +113,6 @@
                     return false;}, display: $T('Delete minutes (old)')};
             % endif
 
-            % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
-                menuOptions['compileMinutes'] = {action: function(m) {
-                    var popupHandler = function(action){
-                        if(action){
-                            IndicoUI.Dialogs.writeMinutes('${conf.getId()}','','','',true);
-                        }
-                        m.close();
-                    };
-                    (new ConfirmPopup($T('Compile minutes'),$T('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.'),popupHandler, $T("Yes"), $T("No"))).open();
-                    return false;}, display: $T('Compile minutes')};
-            % endif
-
             % if 'materialLink' in info:
                 menuOptions['addMaterial'] = {action: function(m) {
                     IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',

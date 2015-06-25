@@ -35,13 +35,13 @@
             <div class="group">
                 <button class="i-button highlight icon-plus js-note-editor"
                         data-href="{{ url_for('event_notes.edit', event) }}">
-                    {% trans %}Create minutes{% endtrans %}
+                    {% trans %}Add{% endtrans %}
                 </button>
             </div>
             <div class="group">
                 <button class="i-button icon-stack js-note-editor"
-                        data-href="{{ url_for('event_notes.edit', event) }}">
-                    {% trans %}Compile minutes{% endtrans %}
+                        data-href="{{ url_for('event_notes.compile', event) }}">
+                    {% trans %}Compile{% endtrans %}
                 </button>
             </div>
         {% endif %}

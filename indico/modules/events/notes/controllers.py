@@ -21,11 +21,14 @@ from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
+from indico.core.errors import NoReportError
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
+from indico.modules.events.notes.util import compile_notes
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.util import get_object_from_args
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
@@ -63,16 +66,22 @@ class RHEventNoteBase(RHProtected):
 class RHEditNote(RHEventNoteBase):
     """Create/edit/delete a note attached to an object inside an event"""
 
-    def _get_defaults(self, note):
-        if note:
+    def _get_defaults(self, note=None, source=None):
+        if source:
+            return FormDefaults(source=source)
+        elif note:
             return FormDefaults(note.current_revision)
         else:
             # TODO: set default render mode once it can be selected
             return FormDefaults()
 
-    def _process_form(self):
-        note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        form = NoteForm(obj=self._get_defaults(note), linked_object=self.object)
+    def _make_form(self, source=None):
+        note = None
+        if not source:
+            note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        return NoteForm(obj=self._get_defaults(note=note, source=source), linked_object=self.object)
+
+    def _process_form(self, form):
         if form.validate_on_submit():
             note = EventNote.get_or_create(self.object)
             is_new = note.id is None
@@ -91,18 +100,29 @@ class RHEditNote(RHEventNoteBase):
                                'Updated minutes for {} {}'.format(self.object_type, self.object.getTitle()),
                                session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/notes/edit_note.html', form=form, note=note, object_type=self.object_type,
+        return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
                                 object=self.object)
 
     def _process_GET(self):
-        return self._process_form()
+        form = self._make_form()
+        return self._process_form(form)
 
     def _process_POST(self):
-        return self._process_form()
+        form = self._make_form()
+        return self._process_form(form)
 
     def _process_DELETE(self):
         self._delete_note()
         return jsonify_data(flash=False)
+
+
+class RHCompileNotes(RHEditNote):
+    def _process(self):
+        if self.event.note:
+            raise NoReportError(_("This event already has a note attached."))
+        source = compile_notes(self.event)
+        form = self._make_form(source=source)
+        return self._process_form(form)
 
 
 class RHDeleteNote(RHEventNoteBase):
