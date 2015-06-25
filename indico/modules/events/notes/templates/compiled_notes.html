@@ -1,0 +1,9 @@
+{% macro render_note(note) %}
+    <h1>● {{ note.linked_object.getTitle() }}</h1>
+    {{ note.html|safe }}
+    <hr>
+{% endmacro %}
+
+{% for note in notes %}
+    {{ render_note(note) }}
+{% endfor %}
