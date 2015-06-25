@@ -34,5 +34,5 @@ class WPEventAttachments(WPConferenceModifBase, WPJinjaMixin):
                 self._asset_env['dropzone_js'].urls())
 
     def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) +
-                self._asset_env['dropzone_css'].urls())
+        return (WPConferenceModifBase.getCSSFiles(self) + self._asset_env['dropzone_css'].urls()
+                + self._asset_env['attachments_sass'].urls())

@@ -384,6 +384,7 @@ def sass_module_bundle(module_name, depends=[]):
                   depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
 
 agreements_sass = sass_module_bundle('agreements')
+attachments_sass = sass_module_bundle('attachments')
 contributions_sass = sass_module_bundle('contributions')
 registrationform_sass = sass_module_bundle('registrationform')
 roombooking_sass = sass_module_bundle('roombooking')
@@ -462,6 +463,7 @@ def register_all_css(env, main_css_file):
 
     # SASS/SCSS
     env.register('agreements_sass', agreements_sass)
+    env.register('attachments_sass', attachments_sass)
     env.register('registrationform_sass', registrationform_sass)
     env.register('roombooking_sass', roombooking_sass)
     env.register('contributions_sass', contributions_sass)

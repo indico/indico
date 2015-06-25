@@ -1,0 +1,170 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base/palette';
+@import 'base/utilities';
+@import 'compass';
+@import 'compass/css3/user-interface';
+
+ul.attachments {
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+
+    list-style-type: none;
+    li {
+        &:before,
+        *,
+        *:before {
+            line-height: 1.2em;
+
+            vertical-align: middle;
+        }
+        &:before {
+            font-size: 1.4em;
+            font-weight: bold;
+
+            display: inline-block;
+
+            margin-top: -0.1em;
+            margin-right: -0.3em;
+
+            content: '\2001';
+        }
+        > .attachment-entry {
+            font-size: 1.1em;
+
+            position: relative;
+
+            display: inline-block;
+
+            width: 95%;
+            padding: 0.3em;
+
+            &[class*='icon-material-download'] {
+                font-weight: bold;
+            }
+            &:hover {
+                @include border-radius(2px);
+
+                background: $pastel-blue;
+                > .details > .actions {
+                    visibility: visible;
+
+                    opacity: 1;
+                }
+            }
+            &:before {
+                padding-right: 0.3em;
+            }
+            & > .attachment-name {
+                color: $light-black;
+                display: inline-block;
+                overflow: hidden;
+
+                max-width: 37em;
+
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                &:hover {
+                    color: $black;
+                }
+            }
+        }
+        .details {
+            position: relative;
+
+            float: right;
+
+            min-width: 11em;
+            .actions {
+                @include transition(opacity 0.15s ease-out);
+                float: right;
+
+                position: relative;
+
+                visibility: hidden;
+                padding-right: 0.2em;
+
+                opacity: 0;
+                > * {
+                    padding: 0 0.2em;
+                }
+                > .icon-remove:hover {
+                    color: $red;
+                }
+                > .icon-edit:hover,
+                > .icon-file-download:hover {
+                    color: $blue;
+                }
+
+            }
+            .date {
+                font-weight: normal;
+                font-size: 0.9em;
+                position: relative;
+
+                float: right;
+
+                margin-top: 0.2em;
+
+                color: $gray;
+            }
+        }
+        &.expandable {
+            @include icon-before('icon-arrow-down');
+            > .attachment-entry {
+                @include user-select(none);
+
+                cursor: pointer;
+            }
+            &:before {
+                @include user-select(none);
+                @include transition(transform 0.15s ease-out);
+
+                cursor: pointer;
+                -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+            }
+            &.collapsed {
+                &:before {
+                    @include rotate(-90deg);
+                }
+            }
+        }
+    }
+    &.sub-attachments {
+        margin-left: 1.4em;
+        & > li {
+            > .attachment-entry {
+                &:not(:hover) {
+                    background: $light-gray;
+                }
+                & > .attachment-name {
+                    max-width: 35.6em;
+                }
+            }
+            &:first-child > .attachment-entry {
+                @include border-top-left-radius(2px);
+                @include border-top-right-radius(2px);
+            }
+            &:last-child > .attachment-entry {
+                @include border-bottom-left-radius(2px);
+                @include border-bottom-right-radius(2px);
+            }
+        }
+    }
+}

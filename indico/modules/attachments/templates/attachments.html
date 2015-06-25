@@ -1,16 +1,80 @@
 {% extends 'layout/base.html' %}
 
+{% macro attachment_row(attachment) %}
+    {%- set type_icons = {
+        'text/directory': 'icon-material-download',
+        'application/pdf': 'icon-file-pdf',
+        'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-excel',
+        'text/vnd.indico.link': 'icon-link',
+        'image/jpeg': 'icon-image'
+    }  -%}
+    {%- set is_folder = attachment['content-type'] == 'text/directory' -%}
+    <li class="{% if attachment.content %}expandable{% endif %}">
+        <div class="{{ type_icons.get(attachment['content-type'], 'icon-file') }} attachment-entry">
+            {%- if is_folder -%}
+                <span class="attachment-name">{{ attachment.title }}</span>
+            {%- else -%}
+                <a href="dummy_link" target="_blank" class="attachment-name">{{- attachment.title -}}</a>
+            {%- endif -%}
+            <span class="details">
+                <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
+                <span class="actions">
+                    {%- if not is_folder -%}
+                        <span class="icon-file-download"></span>
+                    {%- endif -%}
+                    <span class="icon-edit"></span>
+                    <a class="icon-remove"
+                       data-method="DELETE"
+                       data-href="dummy_delete"
+                       data-title="{% trans attachment_name=attachment.title %}Remove {{ attachment_name }}?{% endtrans %}"
+                       data-confirm="{% trans attachment_name=attachment.title %}
+                              Are you sure you want to remove &quot;{{ attachment_name }}&quot;?<br>
+                              This will remove the attachment permanantly.
+                          {% endtrans %}">
+                    </a>
+                </span>
+            </span>
+        </div>
+        {%- if attachment.content -%}
+            {{- render_tree(attachment.content, classes='sub-attachments') -}}
+        {%- endif -%}
+    </li>
+{% endmacro %}
+
+{% macro render_tree(node, classes=none) -%}
+    <ul class="attachments {%- if classes %} {{ classes }}{% endif %}">
+        {%- for sub_node in node -%}
+            {{ attachment_row(sub_node) }}
+        {%- endfor %}
+    </ul>
+{%- endmacro %}
+
 {% block title %}{% trans %}Attachments{% endtrans %}{% endblock %}
 
 {% block content %}
-    <div class="toolbar">
-        <div class="group">
-            <span class="i-button label">Add attachments</span>
-            <a href="#" class="i-button icon-upload" id="btn-add-files"
-               data-href="{{ url_for('.upload', event) }}">Upload files</a>
-            <a href="#" class="i-button icon-link" title="Edit" id="btn-add-link"
-               data-href="{{ url_for('.add_link', event) }}">Add link</a>
+    <div class="action-box fixed-width">
+        <div class="section">
+            <span class="icon icon-upload"></span>
+            <div class="text">
+                <div class="label">{% trans %}Add attachments to the event.{% endtrans %}</div>
+                <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
+            </div>
+            <div class="toolbar right">
+                <div class="group">
+                    <a href="#" class="i-button icon-file" id="btn-add-files"
+                       data-href="{{ url_for('.upload', event) }}">Upload files</a>
+                    <a href="#" class="i-button icon-link" title="Edit" id="btn-add-link"
+                       data-href="{{ url_for('.add_link', event) }}">Add link</a>
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="i-box fixed-width">
+        {% if attachments %}
+            {{ render_tree(attachments) }}
+        {% else  %}
+            <span class="empty">This event has no attachments.</span>
+        {% endif %}
     </div>
     <script>
         $('#btn-add-files').ajaxDialog({
@@ -21,6 +85,7 @@
                 }
             }
         });
+
         $('#btn-add-link').ajaxDialog({
             title: $T('Add link'),
             onClose: function(data) {
@@ -29,5 +94,16 @@
                 }
             }
         });
+
+        $(document)
+            .on('click', 'ul.attachments > li.expandable', function toggleSubRows() {
+                $(this)
+                    .toggleClass('collapsed')
+                    .children('ul.sub-attachments')
+                        .slideToggle(150);
+            })
+            .on('click', 'ul.attachments > li.expandable > .sub-attachments', function(evt) {
+                evt.stopPropagation();
+            });
     </script>
 {% endblock %}
