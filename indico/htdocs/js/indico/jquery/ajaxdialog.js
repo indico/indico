@@ -127,44 +127,56 @@
                 e.preventDefault();
                 closeDialog();
             }).each(function() {
+                var $this = $(this);
+                $this.on('ajaxDialog:beforeSubmit', function() {
+                    killProgress = IndicoUI.Dialogs.Util.progress();
+                }).on('ajaxDialog:error', function(e, xhr) {
+                    if (killProgress) {
+                        killProgress();
+                    }
+                    closeDialog();
+                    handleAjaxError(xhr);
+                }).on('ajaxDialog:success', function(e, data) {
+                    if (killProgress) {
+                        killProgress();
+                    }
+                    if (handleAjaxError(data)) {
+                        closeDialog();
+                        return;
+                    }
+
+                    if (options.clearFlashes) {
+                        $('#flashed-messages').empty();
+                    }
+                    if (data.flashed_messages) {
+                        var flashed = $(data.flashed_messages.trim()).children();
+                        $('#flashed-messages').append(flashed);
+                    }
+
+                    if (data.close_dialog || data.success) {
+                        closeDialog(data, true);
+                    } else if (data.html) {
+                        popup.contentContainer.html(data.html);
+                        ajaxifyForms();
+                        injectJS(data.js);
+                    }
+                });
                 // We often use forms with an empty action; those need to go to
                 // their page and not the page that loaded the dialog!
-                var action = $(this).attr('action') || options.url;
-                $(this).ajaxForm({
+                var action = $this.attr('action') || options.url;
+                $this.ajaxForm({
                     url: action,
                     dataType: 'json',
                     data: options.getExtraData.call(this, options.trigger),
                     traditional: true,
                     beforeSubmit: function() {
-                        killProgress = IndicoUI.Dialogs.Util.progress();
+                        $this.trigger('ajaxDialog:beforeSubmit');
                     },
                     error: function(xhr) {
-                        killProgress();
-                        closeDialog();
-                        handleAjaxError(xhr);
+                        $this.trigger('ajaxDialog:error', [xhr]);
                     },
                     success: function(data) {
-                        killProgress();
-                        if (handleAjaxError(data)) {
-                            closeDialog();
-                            return;
-                        }
-
-                        if (options.clearFlashes) {
-                            $('#flashed-messages').empty();
-                        }
-                        if (data.flashed_messages) {
-                            var flashed = $(data.flashed_messages.trim()).children();
-                            $('#flashed-messages').append(flashed);
-                        }
-
-                        if (data.close_dialog || data.success) {
-                            closeDialog(data, true);
-                        } else if (data.html) {
-                            popup.contentContainer.html(data.html);
-                            ajaxifyForms();
-                            injectJS(data.js);
-                        }
+                        $this.trigger('ajaxDialog:success', [data]);
                     }
                 });
             });
