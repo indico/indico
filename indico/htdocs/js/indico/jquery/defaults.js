@@ -65,3 +65,8 @@ $.ajaxSetup({
         }
     }
 });
+
+// Disabling autoDiscover, otherwise Dropzone will try to attach twice.
+if (window.Dropzone) {
+    Dropzone.autoDiscover = false;
+}

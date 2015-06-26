@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    {{ form_header(form, id='dropzone', classes='dropzone', action="{{ url_for('.upload', event) | tojson }}")}}
+    {{ form_header(form, id='dropzone', classes='dropzone', action=url_for('.upload', event)) }}
     <div class="dropzone-area">
         <div class="dropzone-previews">
             <div class="dz-message">
@@ -23,16 +23,13 @@
         </div>
     {% endcall %}
     <script>
-        // Disabling autoDiscover, otherwise Dropzone will try to attach twice.
-        Dropzone.autoDiscover = false;
 
         $(function() {
             'use strict';
 
             $('#folder').nullableselector();
 
-            var myDropzone = new Dropzone('#dropzone', {
-                url: {{ url_for('.upload', event) | tojson }},
+            $('#dropzone').dropzone({
                 clickable: '.dropzone-area',
                 previewsContainer: '.dropzone-previews',
                 autoProcessQueue: false,
@@ -40,20 +37,26 @@
                 parallelUploads: 10,
                 maxFiles: 10,
                 init: function() {
-                    var uploadButton = $('.js-dropzone-upload')
-                        myDropzone = this;
+                    var uploadButton = $('.js-dropzone-upload');
+                    var self = this;
 
                     uploadButton.on('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         $('.dz-progress').show();
-                        myDropzone.processQueue();
+                        self.processQueue();
                     });
 
-                    myDropzone.on('addedfile', function() {
+                    self.on('addedfile', function() {
                         uploadButton.removeAttr('disabled');
                         $('.dz-message').hide();
                         $('.dz-progress').hide();
+                    });
+
+                    self.on('queuecomplete', function() {
+                        setTimeout(function() {
+                            /* TODO: close the dialog */
+                        }, 1000);
                     });
                 }
             });
