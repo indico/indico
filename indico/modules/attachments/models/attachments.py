@@ -208,7 +208,7 @@ class AttachmentFile(db.Model):
         db.String,
         nullable=False
     )
-    #: The size of the file (in bytes)
+    #: The size of the file (in bytes) - assigned automatically when `save()` is called
     size = db.Column(
         db.BigInteger,
         nullable=False
@@ -217,7 +217,7 @@ class AttachmentFile(db.Model):
         db.String,
         nullable=False
     )
-    storage_name = db.Column(
+    storage_file_id = db.Column(
         db.String,
         nullable=False
     )
@@ -252,7 +252,7 @@ class AttachmentFile(db.Model):
 
         :param data: bytes or a file-like object
         """
-        assert self.storage_backend is None and self.storage_name is None
+        assert self.storage_backend is None and self.storage_file_id is None and self.size is None
         assert self.attachment is not None
         folder = self.attachment.folder
         assert folder.linked_object is not None
@@ -274,18 +274,18 @@ class AttachmentFile(db.Model):
         self.attachment.assign_id()
         self.assign_id()
         filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
-        path = posixpath.join(*path_segments)
+        path = posixpath.join(*(path_segments + [filename]))
         self.storage_backend = Config.getInstance().getAttachmentStorage()
-        self.storage_name = posixpath.join(path, filename)
-        self.storage.save(self.storage_name, self.content_type, self.filename, data)
+        self.storage_file_id = self.storage.save(path, self.content_type, self.filename, data)
+        self.size = self.storage.getsize(self.storage_file_id)
 
     def open(self):
         """Returns the stored file as a file-like object"""
-        return self.storage.open(self.storage_name)
+        return self.storage.open(self.storage_file_id)
 
     def send(self):
         """Sends the file to the user"""
-        return self.storage.send_file(self.storage_name, self.content_type, self.filename)
+        return self.storage.send_file(self.storage_file_id, self.content_type, self.filename)
 
     @return_ascii
     def __repr__(self):
