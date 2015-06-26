@@ -539,8 +539,8 @@ class Config:
         'CheckinAppClientId'        : None,
         'FlowerClientId'            : None,
         'FlowerURL'                 : None,
-        'StorageBackends'           : {},
-        'AttachmentStorage'         : None,
+        'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
+        'AttachmentStorage'         : 'default',
     }
 
     if sys.platform == 'win32':
