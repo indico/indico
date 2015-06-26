@@ -192,7 +192,8 @@ indico_jquery = rjs_bundle(
                'realtimefilter.js',
                'scrollblocker.js',
                'timerange.js',
-               'tooltips.js'))
+               'tooltips.js',
+               'nullableselector.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
