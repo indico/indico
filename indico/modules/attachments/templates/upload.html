@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    {{ form_header(form, id='dropzone', classes='dropzone')}}
+    {{ form_header(form, id='dropzone', classes='dropzone', action="{{ url_for('.upload', event) | tojson }}")}}
     <div class="dropzone-area">
         <div class="dropzone-previews">
             <div class="dz-message">
@@ -27,32 +27,36 @@
         Dropzone.autoDiscover = false;
 
         $(function() {
-          var myDropzone = new Dropzone('#dropzone', {
-            url: {{ url_for('.upload', event) | tojson }},
-            clickable: '.dropzone-area',
-            previewsContainer: '.dropzone-previews',
-            autoProcessQueue: false,
-            uploadMultiple: true,
-            parallelUploads: 10,
-            maxFiles: 10,
-            init: function() {
-                var uploadButton = $('.js-dropzone-upload')
-                    myDropzone = this;
+            'use strict';
 
-                uploadButton.on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    $('.dz-progress').show();
-                    myDropzone.processQueue();
-                });
+            $('#folder').nullableselector();
 
-                myDropzone.on('addedfile', function() {
-                    uploadButton.removeAttr('disabled');
-                    $('.dz-message').hide();
-                    $('.dz-progress').hide();
-                });
-            }
-          });
+            var myDropzone = new Dropzone('#dropzone', {
+                url: {{ url_for('.upload', event) | tojson }},
+                clickable: '.dropzone-area',
+                previewsContainer: '.dropzone-previews',
+                autoProcessQueue: false,
+                uploadMultiple: true,
+                parallelUploads: 10,
+                maxFiles: 10,
+                init: function() {
+                    var uploadButton = $('.js-dropzone-upload')
+                        myDropzone = this;
+
+                    uploadButton.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $('.dz-progress').show();
+                        myDropzone.processQueue();
+                    });
+
+                    myDropzone.on('addedfile', function() {
+                        uploadButton.removeAttr('disabled');
+                        $('.dz-message').hide();
+                        $('.dz-progress').hide();
+                    });
+                }
+            });
         })
     </script>
 {%- endblock %}
