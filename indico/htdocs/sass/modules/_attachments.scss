@@ -16,6 +16,7 @@
  */
 
 @import 'base/palette';
+@import 'base/defaults';
 @import 'base/utilities';
 @import 'compass';
 @import 'compass/css3/user-interface';
@@ -54,11 +55,10 @@ ul.attachments {
 
             width: 95%;
             padding: 0.3em;
-
             &[class*='icon-material-download'] {
                 font-weight: bold;
             }
-            &:hover {
+            &:hover:not(.empty) {
                 @include border-radius(2px);
 
                 background: $pastel-blue;
@@ -67,12 +67,14 @@ ul.attachments {
 
                     opacity: 1;
                 }
+                & > .attachment-name {
+                    color: $black;
+                }
             }
             &:before {
                 padding-right: 0.3em;
             }
             & > .attachment-name {
-                color: $light-black;
                 display: inline-block;
                 overflow: hidden;
 
@@ -80,8 +82,15 @@ ul.attachments {
 
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                &:hover {
-                    color: $black;
+
+                color: $light-black;
+            }
+            &.empty > .attachment-name {
+                font-style: italic;
+
+                color: $dark-gray;
+                &:before {
+                    content: '\2001';
                 }
             }
         }
@@ -93,11 +102,12 @@ ul.attachments {
             min-width: 11em;
             .actions {
                 @include transition(opacity 0.15s ease-out);
-                float: right;
 
                 position: relative;
 
                 visibility: hidden;
+                float: right;
+
                 padding-right: 0.2em;
 
                 opacity: 0;
@@ -107,15 +117,14 @@ ul.attachments {
                 > .icon-remove:hover {
                     color: $red;
                 }
-                > .icon-edit:hover,
-                > .icon-file-download:hover {
+                > .icon-edit:hover, > .icon-file-download:hover {
                     color: $blue;
                 }
-
             }
             .date {
-                font-weight: normal;
                 font-size: 0.9em;
+                font-weight: normal;
+
                 position: relative;
 
                 float: right;
@@ -150,7 +159,8 @@ ul.attachments {
         margin-left: 1.4em;
         & > li {
             > .attachment-entry {
-                &:not(:hover) {
+                &:not(:hover),
+                &.empty {
                     background: $light-gray;
                 }
                 & > .attachment-name {
