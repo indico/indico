@@ -89,6 +89,16 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     def protection_parent(self):
         return self.linked_object
 
+    @classmethod
+    def get_or_create_default(cls, linked_object):
+        """Gets the default folder for the given object or creates it."""
+        folder = cls.find_first(is_default=True, linked_object=linked_object)
+        if folder is None:
+            folder = cls(is_default=True, linked_object=linked_object)
+        elif folder.is_deleted:  # should never happen...
+            folder.is_deleted = False
+        return folder
+
     @return_ascii
     def __repr__(self):
         return '<AttachmentFolder({}, {}{}{}, {}, {})>'.format(
