@@ -1,0 +1,70 @@
+{% set type_icons = {
+    'text/directory': 'icon-material-download',
+    'application/pdf': 'icon-file-pdf',
+    'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-excel',
+    'text/vnd.indico.link': 'icon-link',
+    'image/jpeg': 'icon-image'
+} %}
+
+{% macro _attachment_row(attachment) %}
+    {%- set is_folder = attachment['content-type'] == 'text/directory' -%}
+    <li {% if is_folder %}class="expandable {%- if not attachment.content %} collapsed{% endif %}"{% endif %}>
+        <div class="{{ type_icons.get(attachment['content-type'], 'icon-file') }} attachment-entry">
+            {%- if is_folder -%}
+                <span class="attachment-name">{{ attachment.title }}</span>
+            {%- else -%}
+                <a href="dummy_link" target="_blank" class="attachment-name">{{- attachment.title -}}</a>
+            {%- endif -%}
+            <span class="details">
+                <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
+                <span class="actions">
+                    {%- if not is_folder -%}
+                        <span class="icon-file-download"></span>
+                    {%- endif -%}
+                    <span class="icon-edit"></span>
+                    <a class="icon-remove"
+                       data-method="DELETE"
+                       data-href="dummy_delete"
+                       data-title="{% trans attachment_name=attachment.title %}Remove {{ attachment_name }}?{% endtrans %}"
+                       data-confirm="{% trans attachment_name=attachment.title %}
+                              Are you sure you want to remove &quot;{{ attachment_name }}&quot;?<br>
+                              This will remove the attachment permanantly.
+                          {% endtrans %}">
+                    </a>
+                </span>
+            </span>
+        </div>
+        {% if is_folder %}
+            {{- _render_tree(attachment.content, classes='sub-attachments') -}}
+        {%- endif -%}
+    </li>
+{% endmacro %}
+
+{% macro _render_tree(node, classes=none) -%}
+    <ul class="attachments {%- if classes %} {{ classes }}{% endif %}" {%- if not node %} style="display: none;"{% endif %}>
+        {%- if node -%}
+            {%- for sub_node in node -%}
+                {{ _attachment_row(sub_node) }}
+            {%- endfor -%}
+        {%- else -%}
+            <li>
+                <div class="attachment-entry empty">
+                    <span class="attachment-name">{% trans %}empty folder{% endtrans %}</span>
+                </div>
+            </li>
+        {%- endif -%}
+    </ul>
+{%- endmacro %}
+
+{% macro render_attachments(attachments, linked_object) %}
+    {% if attachments %}
+        {{ _render_tree(attachments) }}
+    {% else  %}
+        <span class="empty">{% trans %}There are no attachments yet.{% endtrans %}</span>
+    {% endif %}
+    <div class="i-box-footer create-folder js-attachment-actions">
+        <a href="#" class="icon-plus" data-href="{{ url_for('.create_folder', linked_object) }}">{#
+            #}&nbsp;{%- trans %}Add new folder{% endtrans -%}
+        </a>
+    </div>
+{% endmacro %}

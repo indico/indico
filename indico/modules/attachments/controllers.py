@@ -24,7 +24,8 @@ from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -39,39 +40,46 @@ def _random_date():
     return datetime(year, month, day)
 
 
+def _get_attachment_list(linked_object):
+    root_folders = [
+        {'title': 'images', 'content-type': 'text/directory', 'modified_dt': _random_date(), 'content': [
+            {'title': 'img001.jpg', 'content-type': 'image/jpeg', 'modified_dt': _random_date()},
+            {'title': 'img002.jpg', 'content-type': 'image/jpeg', 'modified_dt': _random_date()},
+            {'title': 'img003.jpg', 'content-type': 'image/jpeg', 'modified_dt': _random_date()},
+            {'title': 'here_is_an_image_in_a_nested_folder_with_an_extremely_long_name_and_a_weird_extension.jpag',
+             'content-type': 'audio/vorbis', 'modified_dt': _random_date()}
+        ]},
+        {'title': 'some folder', 'content-type': 'text/directory', 'modified_dt': _random_date(), 'content': []},
+        {'title': 'Poster', 'content-type': 'text/directory', 'modified_dt': _random_date(), 'content': [
+            {'title': 'poster_final.pdf', 'content-type': 'application/pdf', 'modified_dt': _random_date()}
+        ]},
+
+    ]
+    root_files = [
+        {'title': 'data1.ods', 'content-type': 'application/vnd.oasis.opendocument.spreadsheet',
+         'modified_dt': _random_date()},
+        {'title': 'raw_data1.ods', 'content-type': 'application/vnd.oasis.opendocument.spreadsheet',
+         'modified_dt': _random_date()},
+        {'title': 'final_report.pdf', 'content-type': 'application/pdf', 'modified_dt': _random_date()},
+        {'title': 'Some link', 'content-type': 'text/vnd.indico.link', 'modified_dt': _random_date()},
+        {'title': 'unknown_type.ogg', 'content-type': 'audio/vorbis', 'modified_dt': _random_date()},
+        {'title': 'this_is_a_completely_random_file_whose_name_is_long_extremely_extremely_extremely_long.ogg',
+         'content-type': 'audio/vorbis', 'modified_dt': _random_date()}
+    ]
+    return sorted(root_folders + root_files, key=lambda a: (a['content-type'] != 'text/directory', a['title'].lower()))
+
+
+def _render_attachment_list(linked_object):
+    tpl = get_template_module('attachments/_attachments.html')
+    return tpl.render_attachments(attachments=_get_attachment_list(linked_object), linked_object=linked_object)
+
+
 class RHEventAttachments(RHConferenceModifBase):
     """Shows the attachments of an event"""
 
     def _process(self):
-        root_folders = [
-            {'title': 'images', 'content-type': 'text/directory', 'modified_dt': _random_date(), 'content': [
-                {'title': 'img001.jpg', 'content-type': 'image/jpeg', 'modified_dt': _random_date()},
-                {'title': 'img002.jpg', 'content-type': 'image/jpeg', 'modified_dt': _random_date()},
-                {'title': 'img003.jpg', 'content-type': 'image/jpeg', 'modified_dt': _random_date()},
-                {'title': 'here_is_an_image_in_a_nested_folder_with_an_extremely_long_name_and_a_weird_extension.jpag',
-                 'content-type': 'audio/vorbis', 'modified_dt': _random_date()}
-            ]},
-            {'title': 'some folder', 'content-type': 'text/directory', 'modified_dt': _random_date(), 'content': []},
-            {'title': 'Poster', 'content-type': 'text/directory', 'modified_dt': _random_date(), 'content': [
-                {'title': 'poster_final.pdf', 'content-type': 'application/pdf', 'modified_dt': _random_date()}
-            ]},
-
-        ]
-        root_files = [
-            {'title': 'data1.ods', 'content-type': 'application/vnd.oasis.opendocument.spreadsheet',
-             'modified_dt': _random_date()},
-            {'title': 'raw_data1.ods', 'content-type': 'application/vnd.oasis.opendocument.spreadsheet',
-             'modified_dt': _random_date()},
-            {'title': 'final_report.pdf', 'content-type': 'application/pdf', 'modified_dt': _random_date()},
-            {'title': 'Some link', 'content-type': 'text/vnd.indico.link', 'modified_dt': _random_date()},
-            {'title': 'unknown_type.ogg', 'content-type': 'audio/vorbis', 'modified_dt': _random_date()},
-            {'title': 'this_is_a_completely_random_file_whose_name_is_long_extremely_extremely_extremely_long.ogg',
-             'content-type': 'audio/vorbis', 'modified_dt': _random_date()}
-        ]
-        attachments = sorted(root_folders + root_files,
-                             key=lambda a: (a['content-type'] != 'text/directory', a['title'].lower()))
-        return WPEventAttachments.render_template('attachments.html', self._conf, event=self._conf,
-                                                  attachments=attachments)
+        return WPEventAttachments.render_template('attachments.html', self._conf, linked_object=self._conf,
+                                                  attachments=_get_attachment_list(self._conf))
 
 
 class RHEventAttachmentsUpload(RHConferenceModifBase):
@@ -80,14 +88,17 @@ class RHEventAttachmentsUpload(RHConferenceModifBase):
     def _process(self):
         form = AddAttachmentsForm(linked_object=self._conf)
         if form.validate_on_submit():
-            for f in request.files.getlist('file'):
+            files = request.files.getlist('file')
+            for f in files:
                 filename = secure_filename(f.filename) or 'attachment'
                 folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file)
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
                 attachment.file.save(f.file)
                 db.session.add(attachment)
-            return jsonify_data(flash=False)
+            flash(ngettext("The attachment has been uploaded", "%(num)d attachments have been uploaded", len(files)),
+                  'success')
+            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
         return jsonify_template('attachments/upload.html', event=self._conf, form=form)
 
 
@@ -98,7 +109,7 @@ class RHEventAttachmentsAddLink(RHConferenceModifBase):
         form = AddLinkForm(linked_object=self._conf)
         if form.validate_on_submit():
             # TODO
-            return
+            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
         return WPEventAttachments.render_template('add_link.html', self._conf, event=self._conf, form=form)
 
 
@@ -114,5 +125,6 @@ class RHEventAttachmentsCreateFolder(RHConferenceModifBase):
                 folder.acl = form.acl.data
             db.session.add(folder)
             flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
-            return redirect_or_jsonify(url_for('.index', self._conf), flash=False)
+            return redirect_or_jsonify(url_for('.index', self._conf),
+                                       attachment_list=_render_attachment_list(self._conf))
         return WPEventAttachments.render_template('create_folder.html', self._conf, event=self._conf, form=form)
