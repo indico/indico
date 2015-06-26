@@ -23,19 +23,19 @@
         </div>
     {% endcall %}
     <script>
-
         $(function() {
             'use strict';
 
+            var form = $('#dropzone');
             $('#folder').nullableselector();
-
             $('#dropzone').dropzone({
                 clickable: '.dropzone-area',
                 previewsContainer: '.dropzone-previews',
                 autoProcessQueue: false,
                 uploadMultiple: true,
-                parallelUploads: 10,
+                parallelUploads: 999,
                 maxFiles: 10,
+                paramName: function() { return 'file'; },
                 init: function() {
                     var uploadButton = $('.js-dropzone-upload');
                     var self = this;
@@ -48,15 +48,23 @@
                     });
 
                     self.on('addedfile', function() {
-                        uploadButton.removeAttr('disabled');
+                        uploadButton.prop('disabled', false);
                         $('.dz-message').hide();
                         $('.dz-progress').hide();
                     });
 
-                    self.on('queuecomplete', function() {
-                        setTimeout(function() {
-                            /* TODO: close the dialog */
-                        }, 1000);
+                    self.on('sendingmultiple', function() {
+                        form.trigger('ajaxDialog:beforeSubmit');
+                    });
+
+                    self.on('successmultiple', function(e, response) {
+                        form.trigger('ajaxDialog:success', [response]);
+                    });
+
+                    self.on('error', function(e, msg, xhr) {
+                        if (xhr) {
+                            form.trigger('ajaxDialog:error', [xhr]);
+                        }
                     });
                 }
             });

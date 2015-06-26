@@ -17,6 +17,8 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, session
+from werkzeug.utils import secure_filename
+
 from indico.core.db import db
 from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm
@@ -24,6 +26,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, redirect_or_jsonify
+from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -77,13 +80,15 @@ class RHEventAttachmentsUpload(RHConferenceModifBase):
     def _process(self):
         form = AddAttachmentsForm(linked_object=self._conf)
         if form.validate_on_submit():
-            for f in request.files.itervalues():
+            for f in request.files.getlist('file'):
+                filename = secure_filename(f.filename) or 'attachment'
                 folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
-                attachment = Attachment(folder=folder, user=session.user, title=f.filename,
-                                        type=AttachmentType.file)
-                attachment.file = AttachmentFile(user=session.user, filename=f.filename, content_type=f.mimetype)
+                attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file)
+                attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
                 attachment.file.save(f.file)
-        return WPEventAttachments.render_template('upload.html', self._conf, event=self._conf, form=form)
+                db.session.add(attachment)
+            return jsonify_data(flash=False)
+        return jsonify_template('attachments/upload.html', event=self._conf, form=form)
 
 
 class RHEventAttachmentsAddLink(RHConferenceModifBase):
