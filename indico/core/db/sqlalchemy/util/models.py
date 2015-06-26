@@ -87,6 +87,33 @@ class IndicoModel(Model):
         pk_col = getattr(cls, inspect(cls).primary_key[0].name)
         return db.session.query(db.session.query(pk_col).exists()).one()[0]
 
+    def assign_id(self):
+        """Immediately assigns an ID to the object.
+
+        This only works if the table has exactly one serial column.
+        It also "wastes" the ID if the new object is not actually
+        committed, but it allows you to use it e.g. in a filename
+        that needs to be stored in that row.
+
+        If the object already has an ID, calling this function does
+        nothing so it is safe to call it unconditionally in places
+        where you always need an ID but don't really care if the
+        object already has one or not.
+        """
+        from indico.core.db import db
+        table_name = type(self).__table__.fullname
+        mapper = inspect(type(self))
+        candidates = [(attr, col.name) for attr, col in mapper.columns.items()
+                      if col.primary_key and col.autoincrement and isinstance(col.type, db.Integer)]
+        if len(candidates) != 1:
+            raise TypeError('assign_id only works for tables with exactly one auto-incrementing PK column')
+        attr_name, col_name = candidates[0]
+        if getattr(self, attr_name) is not None:
+            return
+        with db.session.no_autoflush:
+            id_ = db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table_name, col_name))).one()[0]
+        setattr(self, attr_name, id_)
+
     def __committed__(self, change):
         """Called after a commit for this object.
 
