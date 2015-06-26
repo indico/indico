@@ -57,6 +57,9 @@ def test_fs_errors(fs_storage):
         fs_storage.delete('xxx')
     assert 'Could not delete' in unicode(exc_info.value)
     with pytest.raises(StorageError) as exc_info:
+        fs_storage.getsize('xxx')
+    assert 'Could not get size' in unicode(exc_info.value)
+    with pytest.raises(StorageError) as exc_info:
         fs_storage.open('../xxx')
     assert 'Invalid path' in unicode(exc_info.value)
     os.mkdir(fs_storage._resolve_path('secret'), 0o000)
@@ -97,6 +100,7 @@ def test_fs_operations(fs_storage):
         assert fd.read() == b'hello there'
     with fs_storage.open(f3) as fd:
         assert fd.read() == b'hello test'
+    assert fs_storage.getsize(f1) == 11
     fs_storage.delete(f1)
     # only f1 should have been deleted
     with pytest.raises(StorageError):

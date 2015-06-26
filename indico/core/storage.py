@@ -140,6 +140,13 @@ class Storage(object):
         """
         raise NotImplementedError
 
+    def getsize(self, file_id):  # pragma: no cover
+        """Gets the size in bytes of a file
+
+        :param file_id: The ID of the file within the storage backend.
+        """
+        raise NotImplementedError
+
     def send_file(self, file_id, content_type, filename):  # pragma: no cover
         """Sends the file to the client.
 
@@ -199,6 +206,12 @@ class FileSystemStorage(Storage):
             os.remove(self._resolve_path(file_id))
         except Exception as e:
             raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    def getsize(self, file_id):
+        try:
+            return os.path.getsize(self._resolve_path(file_id))
+        except Exception as e:
+            raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
     def send_file(self, file_id, content_type, filename):
         try:
