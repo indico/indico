@@ -457,3 +457,9 @@ MaxUploadFileSize = 0
 # Other backends may accept different options - see the documentation of these
 # backends for details.
 #StorageBackends = {'default': 'fs:/opt/indico/archive'}
+#
+# You need to set the storage backend used for event attachments to backend that
+# has been defined in StorageBackends.  Note that this only affects new uploads.
+# Existing files are taken from whatever backend was used when they have been
+# uploaded.
+#AttachmentStorage = 'default'

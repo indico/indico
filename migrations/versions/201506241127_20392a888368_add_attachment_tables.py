@@ -95,6 +95,8 @@ def upgrade():
         sa.Column('filename', sa.String(), nullable=False),
         sa.Column('content_type', sa.String(), nullable=False),
         sa.Column('size', sa.BigInteger(), nullable=False),
+        sa.Column('storage_backend', sa.String(), nullable=False),
+        sa.Column('storage_name', sa.String(), nullable=False),
         sa.ForeignKeyConstraint(['attachment_id'], ['attachments.attachments.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),

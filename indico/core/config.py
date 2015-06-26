@@ -540,6 +540,7 @@ class Config:
         'FlowerClientId'            : None,
         'FlowerURL'                 : None,
         'StorageBackends'           : {},
+        'AttachmentStorage'         : None,
     }
 
     if sys.platform == 'win32':
@@ -687,6 +688,10 @@ class Config:
 
         if self.getDefaultTimezone() not in pytz.all_timezones_set:
             raise ValueError('Invalid default timezone: {}'.format(self.getDefaultTimezone()))
+
+        if self.getAttachmentStorage() not in self.getStorageBackends():
+            raise ValueError('Attachment storage "{}" is not defined in storage backends'.format(
+                self.getAttachmentStorage()))
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf

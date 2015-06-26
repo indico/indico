@@ -16,12 +16,17 @@
 
 from __future__ import unicode_literals
 
+import posixpath
+
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
+from indico.core.storage import get_storage
 from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -208,7 +213,14 @@ class AttachmentFile(db.Model):
         db.BigInteger,
         nullable=False
     )
-    # TODO: storage-specific columns
+    storage_backend = db.Column(
+        db.String,
+        nullable=False
+    )
+    storage_name = db.Column(
+        db.String,
+        nullable=False
+    )
 
     #: The user who uploaded the file
     user = db.relationship(
@@ -222,6 +234,58 @@ class AttachmentFile(db.Model):
 
     # relationship backrefs:
     # - attachment (Attachment.all_files)
+
+    @property
+    def storage(self):
+        """The Storage object used to store the file."""
+        if self.storage_backend is None:
+            raise RuntimeError('No storage backend set')
+        return get_storage(self.storage_backend)
+
+    def save(self, data):
+        """Saves a file in the file storage.
+
+        This requires the AttachmentFile to be associated with
+        an Attachment which needs to be associated with a Folder since
+        the data from these objects is needed to generate the path
+        used to store the file.
+
+        :param data: bytes or a file-like object
+        """
+        assert self.storage_backend is None and self.storage_name is None
+        assert self.attachment is not None
+        folder = self.attachment.folder
+        assert folder.linked_object is not None
+        if folder.link_type == LinkType.category:
+            # category/<id>/...
+            path_segments = ['category', unicode(folder.category_id)]
+        else:
+            # event/<id>/event/...
+            path_segments = ['event', unicode(folder.event_id), folder.link_type.name]
+            if folder.link_type == LinkType.session:
+                # event/<id>/session/<session_id>/...
+                path_segments.append(unicode(folder.session_id))
+            elif folder.link_type == LinkType.contribution:
+                # event/<id>/contribution/<contribution_id>/...
+                path_segments.append(unicode(folder.contribution_id))
+            elif folder.link_type == LinkType.subcontribution:
+                # event/<id>/subcontribution/<contribution_id>-<subcontribution_id>/...
+                path_segments.append('{}-{}'.format(folder.contribution_id, folder.subcontribution_id))
+        self.attachment.assign_id()
+        self.assign_id()
+        filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
+        path = posixpath.join(*path_segments)
+        self.storage_backend = Config.getInstance().getAttachmentStorage()
+        self.storage_name = posixpath.join(path, filename)
+        self.storage.save(self.storage_name, self.content_type, self.filename, data)
+
+    def open(self):
+        """Returns the stored file as a file-like object"""
+        return self.storage.open(self.storage_name)
+
+    def send(self):
+        """Sends the file to the user"""
+        return self.storage.send_file(self.storage_name, self.content_type, self.filename)
 
     @return_ascii
     def __repr__(self):
