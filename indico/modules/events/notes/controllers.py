@@ -81,7 +81,7 @@ class RHEditNote(RHEventNoteBase):
             note = EventNote.get_for_linked_object(self.object, preload_event=False)
         return NoteForm(obj=self._get_defaults(note=note, source=source), linked_object=self.object)
 
-    def _process_form(self, form):
+    def _process_form(self, form, **kwargs):
         if form.validate_on_submit():
             note = EventNote.get_or_create(self.object)
             is_new = note.id is None
@@ -101,7 +101,7 @@ class RHEditNote(RHEventNoteBase):
                                session.user)
             return jsonify_data(flash=False)
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
-                                object=self.object)
+                                object=self.object, **kwargs)
 
     def _process_GET(self):
         form = self._make_form()
@@ -122,7 +122,7 @@ class RHCompileNotes(RHEditNote):
             raise NoReportError(_("This event already has a note attached."))
         source = compile_notes(self.event)
         form = self._make_form(source=source)
-        return self._process_form(form)
+        return self._process_form(form, is_compilation=True)
 
 
 class RHDeleteNote(RHEventNoteBase):
