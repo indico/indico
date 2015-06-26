@@ -442,3 +442,18 @@ MaxUploadFileSize = 0
 # within `Server admin > Applications` and then fill in here the client_id
 # assigned to it.
 #CheckinAppClientId = ''
+
+
+# ------------------------------------------------------------------------------
+# Storage
+# ------------------------------------------------------------------------------
+
+# Indico needs to store various files such as event attachments somewhere. You
+# need to configure the storage backends here.  By default only a filesystem
+# based storage backend is available, but plugins could add additional backends.
+# You can define multiple backends, but once a backend has been used, you MUST
+# NOT remove it or all files stored in that backend will become unavailable.
+# To define a filesystem-based backend, use the string `fs:/base/path`.
+# Other backends may accept different options - see the documentation of these
+# backends for details.
+#StorageBackends = {'default': 'fs:/opt/indico/archive'}

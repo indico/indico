@@ -1,0 +1,222 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+import os
+from shutil import copyfileobj
+import sys
+
+from werkzeug.security import safe_join
+
+from indico.core import signals
+from indico.core.config import Config
+from indico.util.signals import named_objects_from_signal
+from indico.util.string import return_ascii
+from indico.web.flask.util import send_file
+
+
+def get_storage(backend_name):
+    """Returns an FS object for the given backend.
+
+    The backend must be defined in the StorageBackends dict in the
+    indico config.  Once a backend has been used it is assumed to
+    stay there forever or at least as long as it is referenced
+    somewhere.
+
+    Each backend definition uses the ``name:data`` notation, e.g.
+    ``fs:/some/folder/`` or ``foo:host=foo.host,token=secret``.
+    """
+    try:
+        definition = Config.getInstance().getStorageBackends()[backend_name]
+    except KeyError:
+        raise RuntimeError('Storage backend does not exist: {}'.format(backend_name))
+    name, data = definition.split(':', 1)
+    try:
+        backend = get_storage_backends()[name]
+    except KeyError:
+        raise RuntimeError('Storage backend does not exist: {}'.format(backend_name))
+    return backend(data)
+
+
+def get_storage_backends():
+    return named_objects_from_signal(signals.get_storage_backends.send(), plugin_attr='plugin')
+
+
+class StorageError(Exception):
+    """Exception used when a storage operation fails for any reason"""
+
+
+class Storage(object):
+    """Base class for storage backends
+
+    To create a new storage backend, subclass this class and register
+    it using the `get_storage_backends` signal.
+
+    In case you wonder why both `save` and `send_file` require certain
+    file metadata: Depending on the storage backend, the information
+    needs to be set when saving the file (usually with external storage
+    services such as S3) or provided when sending the file back to the
+    client (for example if the file is accessed through the local file
+    system).
+
+    :param data: A string of data used to initialize the backend.
+                 This could be a path, an url, or any other kind of
+                 information needed by the backend.  If `simple_data`
+                 is set, it should be a plain string. Otherwise it is
+                 expected to be a string containing comma-separatey
+                 key-value pairs: ``key=value,key2=value2,..``
+
+    """
+    #: unique name of the storage backend
+    name = None
+    #: plugin containing this backend - assigned automatically
+    plugin = None
+    #: if the backend uses a simple data string instead of key-value pairs
+    simple_data = True
+
+    def __init__(self, data):  # pragma: no cover
+        pass
+
+    def _parse_data(self, data):
+        """Util to parse a key=value data string to a dict"""
+        return dict((x.strip() for x in item.split('=', 1)) for item in data.split(',')) if data else {}
+
+    def open(self, file_id):  # pragma: no cover
+        """Opens a file in the storage for reading.
+
+        This returns a file-like object which contains the content of
+        the file.
+
+        :param file_id: The ID of the file within the storage backend.
+        """
+        raise NotImplementedError
+
+    def save(self, name, content_type, filename, fileobj):  # pragma: no cover
+        """Creates a new file in the storage.
+
+        This returns a a string identifier which can be used later to
+        retrieve the file from the storage.
+
+        :param name: A unique name for the file.  This must be usable
+                     as a filesystem path even though it depends on
+                     the backend whether this name is used in such a
+                     way or used at all.  It SHOULD not contain ``..``
+                     as this could result in two apparently-different
+                     names to actually end up being the same on
+                     storage backends that use the regular file system.
+                     Using slashes in the name is allowed, but when
+                     doing so extra caution is needed to avoid cases
+                     which fail on a filesystem backend such as trying
+                     to save 'foo' and 'foo/bar.txt'
+        :param content_type: The content-type of the file (may or may
+                             not be used depending on the backend).
+        :param filename: The original filename of the file, used e.g.
+                         when sending the file to a client (may or may
+                         not be used depending on the backend).
+        :param fileobj: A file-like object containing the file data as
+                        bytes.
+        :return: unicode -- A unique identifier for the file.
+        """
+        raise NotImplementedError
+
+    def delete(self, file_id):  # pragma: no cover
+        """Deletes a file from the storage.
+
+        :param file_id: The ID of the file within the storage backend.
+        """
+        raise NotImplementedError
+
+    def send_file(self, file_id, content_type, filename):  # pragma: no cover
+        """Sends the file to the client.
+
+        This returns a flask response that will eventually result in
+        the user being offered to download the file (or view it in the
+        browser).  Depending on the storage backend it may actually
+        send a redirect to an external URL where the file is available.
+
+        :param file_id: The ID of the file within the storage backend.
+        :param content_type: The content-type of the file (may or may
+                             not be used depending on the backend)
+        :param filename: The file name to use when sending the file to
+                         the client (may or may not be used depending
+                         on the backend).
+        """
+        raise NotImplementedError
+
+    def __repr__(self):
+        return '<{}()>'.format(type(self).__name__)
+
+
+class FileSystemStorage(Storage):
+    name = 'fs'
+    simple_data = True
+
+    def __init__(self, data):
+        self.path = data
+
+    def _resolve_path(self, path):
+        full_path = safe_join(self.path, path)
+        if full_path is None:
+            raise ValueError('Invalid path: {}'.format(path))
+        return full_path
+
+    def open(self, file_id):
+        try:
+            return open(self._resolve_path(file_id), 'rb')
+        except Exception as e:
+            raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    def save(self, name, content_type, filename, fileobj):
+        try:
+            filepath = self._resolve_path(name)
+            if os.path.exists(filepath):
+                raise ValueError('A file with this name already exists')
+            basedir = os.path.dirname(filepath)
+            if not os.path.isdir(basedir):
+                os.makedirs(basedir)
+            with open(filepath, 'wb') as f:
+                copyfileobj(fileobj, f, 1024 * 1024)
+            return name
+        except Exception as e:
+            raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
+
+    def delete(self, file_id):
+        try:
+            os.remove(self._resolve_path(file_id))
+        except Exception as e:
+            raise StorageError('Could not delete "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    def send_file(self, file_id, content_type, filename):
+        try:
+            return send_file(filename, self._resolve_path(file_id), content_type)
+        except Exception as e:
+            raise StorageError('Could not send "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    @return_ascii
+    def __repr__(self):
+        return '<FileSystemStorage: {}>'.format(self.path)
+
+
+@signals.get_storage_backends.connect
+def _get_storage_backends(sender, **kwargs):
+    return FileSystemStorage
+
+
+@signals.app_created.connect
+def _check_storage_backends(app, **kwargs):
+    # This will raise RuntimeError if the backend names are not unique
+    get_storage_backends()

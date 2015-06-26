@@ -539,6 +539,7 @@ class Config:
         'CheckinAppClientId'        : None,
         'FlowerClientId'            : None,
         'FlowerURL'                 : None,
+        'StorageBackends'           : {},
     }
 
     if sys.platform == 'win32':
