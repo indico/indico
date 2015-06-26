@@ -57,10 +57,6 @@
 
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
             % if 'minutesLink' in info and getItemType(item) != 'Conference':
-                menuOptions['editMinutesOld'] = {action: function(m) {
-                    IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
-                    m.close();
-                    return false;}, display: $T('Edit minutes (old)')};
                 menuOptions['editMinutes'] = {
                     action: function(m) {
                         ajaxDialog({
@@ -97,20 +93,6 @@
                         display: $T('Delete minutes')
                     };
                 % endif
-            % endif
-
-            <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
-                menuOptions['deleteMinutesOld'] = {action: function(m) {
-                    var popupHandler = function(action){
-                        if(action){
-                            IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
-                        }
-                        m.close();
-
-                    };
-                    (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete these minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
-                    return false;}, display: $T('Delete minutes (old)')};
             % endif
 
             % if 'materialLink' in info:

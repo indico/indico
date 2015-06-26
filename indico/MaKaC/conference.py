@@ -555,47 +555,6 @@ class Category(CommonObjectBase):
             self.poster = None
         return self.poster
 
-    def setMinutes(self, newMinutes):
-        if self.getMinutes() is not None:
-            raise MaKaCError(_("The Minutes for this conference has already been set"))
-        self.minutes = newMinutes
-        self.minutes.setOwner(self)
-        self.notifyModification()
-
-    def createMinutes(self):
-        if self.getMinutes() is not None:
-            raise MaKaCError(_("The minutes for this conference have already been created"), _("Conference"))
-        self.minutes = Minutes()
-        self.minutes.setOwner(self)
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes(self):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner(None)
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes()  # To ensure that the current minutes are put in
-                              # the trash can.
-        self.minutes = min
-        self.minutes.setOwner(self)
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes(self):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
-
     def addMaterial(self, newMat):
         try:
             newMat.setId(str(self.__materialGenerator.newCount()))
@@ -612,9 +571,6 @@ class Category(CommonObjectBase):
             self.materials[mat.getId()].setOwner(None)
             del self.materials[mat.getId()]
             self.notifyModification()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
             return "done: %s" % mat.getId()
         elif mat.getId().lower() == 'paper':
             self.removePaper()
@@ -653,8 +609,6 @@ class Category(CommonObjectBase):
             return self.getVideo()
         elif matId.lower() == 'poster':
             return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
         elif self.materials.has_key(matId):
             return self.materials[matId]
         return None
@@ -676,8 +630,6 @@ class Category(CommonObjectBase):
             l.append(self.getVideo())
         if self.getPoster():
             l.append(self.getPoster())
-        if self.getMinutes():
-            l.append(self.getMinutes())
         return l
 
     def getTaskList(self):
@@ -2109,7 +2061,6 @@ class Conference(CommonObjectBase, Locatable):
         self.slides = None
         self.video = None
         self.poster = None
-        self.minutes=None
         self.__schedule=None
         self.__owners = []
         if creationDate:
@@ -3875,9 +3826,6 @@ class Conference(CommonObjectBase, Locatable):
         elif mat.getId().lower() == 'slides':
             self.removeSlides()
             self.notifyModification()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            self.notifyModification()
         elif mat.getId().lower() == 'video':
             self.removeVideo()
             self.notifyModification()
@@ -3908,8 +3856,6 @@ class Conference(CommonObjectBase, Locatable):
             return self.getVideo()
         elif matId.lower() == 'poster':
             return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
@@ -3927,8 +3873,6 @@ class Conference(CommonObjectBase, Locatable):
             l.append( self.getVideo() )
         if self.getPoster():
             l.append( self.getPoster() )
-        if self.getMinutes():
-            l.append( self.getMinutes() )
         if sort:
             l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
@@ -3995,10 +3939,6 @@ class Conference(CommonObjectBase, Locatable):
                 materialNode = {}
                 materialNode['type'] = 'material'
                 materialNode['title'] = material.getTitle()
-
-                if material.getTitle() != 'Minutes':
-                    materialNode['title'] += ' - ' + f['title']
-
                 materialNode['materialType'] = f['type']
                 materialNode['url'] = str(f['url'])
 
@@ -4114,47 +4054,6 @@ class Conference(CommonObjectBase, Locatable):
             self.poster = None
         return self.poster
 
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The Minutes for this conference has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
-        self.notifyModification()
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this conference have already been created"), _("Conference"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
-
     def _setSchedule( self, sch=None ):
         self.__schedule=ConferenceSchedule(self)
         for session in self.getSessionList():
@@ -4268,8 +4167,6 @@ class Conference(CommonObjectBase, Locatable):
                 conf.setVideo(self.getVideo().clone(conf))
             if self.getPoster() is not None:
                 conf.setPoster(self.getPoster().clone(conf))
-            if self.getMinutes() is not None:
-                conf.setMinutes(self.getMinutes().clone(conf))
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
@@ -5175,7 +5072,6 @@ class Session(CommonObjectBase, Locatable):
         self.__ac=AccessController(self)
         self.materials={}
         self.__materialGenerator=Counter()
-        self.minutes=None
         self._comments = ""
         self.slots={}
         self.__slotGenerator=Counter()
@@ -5339,7 +5235,6 @@ class Session(CommonObjectBase, Locatable):
             self.removeConvener(self.getConvenerList()[0])
         while len(self.getMaterialList()) > 0:
             self.removeMaterial(self.getMaterialList()[0])
-        self.removeMinutes()
         for c in self.getCoordinatorList()[:]:
             self.removeCoordinator(c)
         while len(self.contributions.values())>0:
@@ -6230,9 +6125,6 @@ class Session(CommonObjectBase, Locatable):
             del self.materials[ mat.getId() ]
             self.notifyModification()
             return "done: %s"%mat.getId()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            return "done: %s"%mat.getId()
         return "not done: %s"%mat.getId()
 
     def recoverMaterial(self, recMat):
@@ -6250,9 +6142,7 @@ class Session(CommonObjectBase, Locatable):
         return SessionMFRegistry
 
     def getMaterialById( self, matId ):
-        if matId.lower() == 'minutes':
-            return self.getMinutes()
-        elif self.materials.has_key(matId):
+        if self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
 
@@ -6261,8 +6151,6 @@ class Session(CommonObjectBase, Locatable):
 
     def getAllMaterialList(self, sort=True):
         l = self.getMaterialList()
-        if self.getMinutes():
-            l.append( self.getMinutes() )
         if sort:
             l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
@@ -6303,41 +6191,6 @@ class Session(CommonObjectBase, Locatable):
         except AttributeError,e:
             self._comments=""
         return self._comments
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this session have already been created"), _("Session"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.minutes is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-
-        return self.minutes
 
     def _addCoordinator(self, av):
         if av is None or self._coordinators.has_key(av.getId()):
@@ -7606,7 +7459,6 @@ class Contribution(CommonObjectBase, Locatable):
         self.slides = None
         self.video = None
         self.poster = None
-        self.minutes = None
         self.reviewing = None
         self._authorGen = Counter()
         self._authors = OOBTree()
@@ -7950,8 +7802,6 @@ class Contribution(CommonObjectBase, Locatable):
                 cont.setVideo(self.getVideo().clone(cont))
             if self.getPoster() is not None:
                 cont.setPoster(self.getPoster().clone(cont))
-            if self.getMinutes() is not None:
-                cont.setMinutes(self.getMinutes().clone(cont))
             if self.getReviewing() is not None:
                 cont.setReviewing(self.getReviewing().clone(cont))
 
@@ -8033,7 +7883,6 @@ class Contribution(CommonObjectBase, Locatable):
             self.removeSlides()
             self.removeVideo()
             self.removePoster()
-            self.removeMinutes()
             self.removeReviewing()
 
             self.notify_protection_to_owner(self, delete=True)
@@ -8957,8 +8806,6 @@ class Contribution(CommonObjectBase, Locatable):
             self.removePaper()
         elif mat.getId().lower() == 'slides':
             self.removeSlides()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
         elif mat.getId().lower() == 'video':
             self.removeVideo()
         elif mat.getId().lower() == 'poster':
@@ -8989,8 +8836,6 @@ class Contribution(CommonObjectBase, Locatable):
             return self.getVideo()
         elif matId.lower() == 'poster':
             return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
@@ -9008,8 +8853,6 @@ class Contribution(CommonObjectBase, Locatable):
             l.append( self.getVideo() )
         if self.getPoster():
             l.append( self.getPoster() )
-        if self.getMinutes():
-            l.append( self.getMinutes() )
         if sort:
             l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
@@ -9173,47 +9016,6 @@ class Contribution(CommonObjectBase, Locatable):
         except AttributeError:
             self.poster = None
         return self.poster
-
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("the Minutes for this contribution has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
-        self.notifyModification()
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this contribution have already been created"), _("Contribution"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
 
     def setReviewing( self, newReviewing ):
         if self.getReviewing() != None:
@@ -10028,8 +9830,6 @@ class SubContribution(CommonObjectBase, Locatable):
                 sCont.setVideo(self.getVideo().clone(sCont))
             if self.getPoster() is not None:
                 sCont.setPoster(self.getPoster().clone(sCont))
-            if self.getMinutes() is not None:
-                sCont.setMinutes(self.getMinutes().clone(sCont))
 
 
         sCont.notifyModification()
@@ -10287,9 +10087,6 @@ class SubContribution(CommonObjectBase, Locatable):
         elif mat.getId().lower() == 'slides':
             self.removeSlides()
             self.notifyModification()
-        elif mat.getId().lower() == 'minutes':
-            self.removeMinutes()
-            self.notifyModification()
         elif mat.getId().lower() == 'video':
             self.removeVideo()
             self.notifyModification()
@@ -10320,8 +10117,6 @@ class SubContribution(CommonObjectBase, Locatable):
             return self.getVideo()
         elif matId.lower() == 'poster':
             return self.getPoster()
-        elif matId.lower() == 'minutes':
-            return self.getMinutes()
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
@@ -10337,8 +10132,6 @@ class SubContribution(CommonObjectBase, Locatable):
             l.append( self.getSlides() )
         if self.getVideo():
             l.append( self.getVideo() )
-        if self.getMinutes():
-            l.append( self.getMinutes() )
         if self.getPoster():
             l.append( self.getPoster() )
         if sort:
@@ -10443,47 +10236,6 @@ class SubContribution(CommonObjectBase, Locatable):
             self.poster = None
         return self.poster
 
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("the Minutes for this subcontribution has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
-        self.notifyModification()
-
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this subcontribution have already been created"), _("Sub Contribution"))
-        self.minutes = Minutes()
-        self.minutes.setOwner( self )
-        self.notifyModification()
-        return self.minutes
-
-    def removeMinutes( self ):
-        if self.getMinutes() is None:
-            return
-        self.minutes.delete()
-        self.minutes.setOwner( None )
-        self.minutes = None
-        self.notifyModification()
-
-    def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
-        self.minutes = min
-        self.minutes.setOwner( self )
-        min.recover()
-        self.notifyModification()
-        return self.minutes
-
-    def getMinutes( self ):
-        #To be removed
-        try:
-           if self.minutes:
-            pass
-        except AttributeError, e:
-            self.minutes = None
-        return self.minutes
-
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
 
@@ -10498,7 +10250,6 @@ class SubContribution(CommonObjectBase, Locatable):
         self.removeSlides()
         self.removeVideo()
         self.removePoster()
-        self.removeMinutes()
         TrashCanManager().add(self)
 
         #self.unindex()
@@ -10674,7 +10425,6 @@ class Material(CommonObjectBase):
         return None
 
     @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -10688,7 +10438,6 @@ class Material(CommonObjectBase):
         return self.title
 
     @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -10839,7 +10588,6 @@ class Material(CommonObjectBase):
 
 
     @Updates (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -10855,7 +10603,6 @@ class Material(CommonObjectBase):
         return self.__ac.isHidden()
 
     @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
                'MaKaC.conference.Paper',
                'MaKaC.conference.Slides',
                'MaKaC.conference.Video',
@@ -10867,7 +10614,6 @@ class Material(CommonObjectBase):
 
 
     @Updates (['MaKaC.conference.Material',
-               'MaKaC.conference.Minutes',
                'MaKaC.conference.Paper',
                'MaKaC.conference.Slides',
                'MaKaC.conference.Video',
@@ -11049,114 +10795,6 @@ class Poster(BuiltinMaterial):
 
     def setId( self, newId ):
         return
-
-class Minutes(BuiltinMaterial):
-
-    def __init__( self, materialData = None ):
-        Material.__init__( self, materialData )
-        self.id = "minutes"
-        self.title = "Minutes"
-        self.file = None
-
-    def clone ( self, owner):
-        mat = Minutes()
-        mat.setTitle(self.getTitle())
-        mat.setDescription(self.getDescription())
-        mat.notifyModification()
-
-        mat.setId(self.getId())
-        mat.setOwner(owner)
-        mat.setType(self.getType())
-
-        mat.setProtection(self.getAccessController()._getAccessProtection())
-        mat.setAccessKey(self.getAccessKey())
-        lrep = self._getRepository()
-        flist = lrep.getFiles()
-        rlist = self.getResourceList()
-        for r in rlist :
-            if r.getId()=="minutes":
-                mat.setText(self.getText())
-            elif  isinstance(r,Link):
-                newlink = Link()
-                newlink.setOwner(mat)
-                newlink.setName(r.getName())
-                newlink.setDescription(r.getDescription())
-                newlink.setURL(r.getURL())
-                mat.addResource(newlink)
-            elif isinstance(r,LocalFile):
-                newfile = LocalFile()
-                newfile.setOwner(mat)
-                newfile.setName(r.getName())
-                newfile.setDescription(r.getDescription())
-                newfile.setFilePath(r.getFilePath())
-                newfile.setFileName(r.getFileName())
-                mat.addResource(newfile)
-            else :
-                raise Exception( _("Unexpected object type in Resource List : ")+str(type(r)))
-
-        mat.setMainResource(self.getMainResource())
-
-        return mat
-
-    def setId( self, newId ):
-        return
-
-    def setTitle( self, newTitle ):
-        self.title = newTitle.strip()
-        self.notifyModification()
-
-    def _setFile( self, forcedFileId = None ):
-        #XXX: unsafe; it must be changed by mkstemp when migrating to python 2.3
-        tmpFileName = tempfile.mktemp()
-        fh = open(tmpFileName, "w")
-        fh.write(" ")
-        fh.close()
-        self.file = LocalFile()
-        self.file.setId("minutes")
-        self.file.setName("minutes")
-        self.file.setFilePath(tmpFileName)
-        self.file.setFileName("minutes.txt")
-        self.file.setOwner(self)
-        self.file.archive(self._getRepository(), forcedFileId = forcedFileId)
-
-    def setText( self, text, forcedFileId = None ):
-        if self.file:
-            self.file.delete()
-        self._setFile(forcedFileId = forcedFileId)
-        self.file.replaceContent( text )
-        self.getOwner().notifyModification()
-
-    def getText( self ):
-        if not self.file:
-            return ""
-        return self.file.readBin()
-
-    def getResourceList(self, sort=True):
-        res = Material.getResourceList(self, sort=sort)
-        if self.file:
-            res.insert(0, self.file)
-        return res
-
-    def getResourceById( self, id ):
-        if id.strip() == "minutes":
-            return self.file
-        return Material.getResourceById( self, id )
-
-    def removeResource(self, res):
-        Material.removeResource(self, res)
-        if self.file is not None and res.getId().strip() == "minutes":
-            self.file = None
-            res.delete()
-            self.notifyModification()
-
-    def recoverResource(self, recRes):
-        if recRes.getId() == "minutes":
-            recRes.setOwner(self)
-            self.file = recRes
-            recRes.recover()
-            self.notifyModification()
-        else:
-            Material.recoverResource(self, recRes)
 
 
 class Resource(CommonObjectBase):
@@ -11535,15 +11173,11 @@ class LocalFile(Resource):
 
     def getLocator(self):
         locator = Resource.getLocator(self)
-        if self.fileName == 'minutes.txt' and isinstance(self._owner, Minutes):
-            # Hack to get a html extension when viewing minutes
-            locator['fileExt'] = 'html'
-        else:
-            try:
-                locator['fileExt'] = (self.fileType.lower() or
-                                      os.path.splitext(self.fileName)[1].lower().lstrip('.') or None)
-            except Exception:
-                locator['fileExt'] = 'bin'  # no extension => use a dummy
+        try:
+            locator['fileExt'] = (self.fileType.lower() or
+                                  os.path.splitext(self.fileName)[1].lower().lstrip('.') or None)
+        except Exception:
+            locator['fileExt'] = 'bin'  # no extension => use a dummy
         return locator
 
     def setFileName( self, newFileName, checkArchive=True ):

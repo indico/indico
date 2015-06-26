@@ -72,14 +72,3 @@ class WVideoFlash( wcomponents.WTemplated ):
         if url.find("http://") != -1:
             vars["download"] = """<a href="%s">Download File</a>""" % url
         return vars
-
-class WPMinutesDisplay(WPNotDecorated):
-    navigationEntry=navigation.NEMaterialDisplay
-
-    def __init__(self,rh,file):
-        WPNotDecorated.__init__(self,rh)
-        self._file=file
-
-    def _getBody(self,params):
-        wc=wcomponents.WMinutesDisplay(self._file)
-        return wc.getHTML(params)

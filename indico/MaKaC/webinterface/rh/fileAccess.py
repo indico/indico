@@ -61,9 +61,6 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
         signals.event.material_downloaded.send(self._conf, resource=self._file)
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())
-        elif self._file.getId() == "minutes":
-            p = files.WPMinutesDisplay(self, self._file )
-            return p.display()
         else:
             return send_file(self._file.getFileName(), self._file.getFilePath(), self._file.getFileType(),
                              self._file.getCreationDate())

@@ -255,43 +255,6 @@ class PosterFactory(MaterialFactory):
         return m
     create = classmethod( create )
 
-class MinutesFactory(MaterialFactory):
-
-    _id = "minutes"
-    _title = "Minutes"
-    _iconURL = Config.getInstance().getSystemIconURL("material")
-    _needsCreationPage = False
-    _materialKlasses=[conference.Minutes]
-
-    def get( owner ):
-        """returns the material"""
-        return owner.getMinutes()
-    get = staticmethod(get)
-
-    def remove( owner ):
-        """performs the deletion of the minutes from the owner"""
-        owner.removeMinutes()
-    remove = staticmethod( remove )
-
-    def canAdd( target ):
-        #only one minutes can be added to a contribution
-        return target.getMinutes() == None
-    canAdd = staticmethod( canAdd )
-
-    def canDelete( target ):
-        #only a minutes which is already set in a contribution can be deleted
-        return target.getMinutes() != None
-    canDelete = staticmethod( canDelete )
-
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-    getModificationURL = classmethod(getModificationURL)
-
-    def create( target ):
-        return target.createMinutes()
-    create = staticmethod( create )
 
 class ReviewingFactory(MaterialFactory):
 
@@ -388,24 +351,23 @@ class MaterialFactoryRegistry:
     """
     _registry = { PaperFactory._id: PaperFactory, \
                   SlidesFactory._id: SlidesFactory, \
-                  MinutesFactory._id: MinutesFactory, \
                   VideoFactory._id: VideoFactory, \
                   PosterFactory._id: PosterFactory, \
                   ReviewingFactory._id: ReviewingFactory }
 
     _allowedMaterials = {
-        'simple_event': ["paper", "slides", "poster", "minutes", "agenda", "pictures",
+        'simple_event': ["paper", "slides", "poster", "agenda", "pictures",
                          "text", "more information", "document", "list of actions",
                          "drawings", "proceedings", "live broadcast", "video",
                          "streaming video", "downloadable video", "notes", "summary"],
 
-        'meeting': ["paper", "slides", "poster", "minutes", "agenda", "video",
+        'meeting': ["paper", "slides", "poster", "agenda", "video",
                     "pictures", "text", "more information", "document", "list of actions",
                     "drawings", "proceedings", "live broadcast", "notes", "summary"],
 
-        'conference': ["paper", "slides", "poster", "minutes", "notes", "summary"],
+        'conference': ["paper", "slides", "poster", "notes", "summary"],
 
-        'category': ["paper", "slides", "poster", "minutes", "agenda", "video", "pictures",
+        'category': ["paper", "slides", "poster", "agenda", "video", "pictures",
                      "text", "more information", "document", "list of actions", "drawings",
                      "proceedings", "live broadcast"]
     }
@@ -465,8 +427,7 @@ class ConfMFRegistry(MaterialFactoryRegistry):
 
 
 class SessionMFRegistry(MaterialFactoryRegistry):
-
-    _registry = { MinutesFactory._id: MinutesFactory }
+    pass
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):

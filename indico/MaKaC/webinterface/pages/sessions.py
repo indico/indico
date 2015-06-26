@@ -759,12 +759,6 @@ class WSessionModContribList(wcomponents.WTemplated):
                 quoteattr(str(matUrlHandler.getURL(video))),
                 quoteattr(str(materialFactories.VideoFactory.getIconURL())),
                 self.htmlText(materialFactories.VideoFactory.getTitle())))
-        minutes=contrib.getMinutes()
-        if minutes is not None:
-            materials.append("""<a href=%s><img src=%s border="0" alt="minutes"> %s</a>"""%(
-                quoteattr(str(matUrlHandler.getURL(minutes))),
-                quoteattr(str(materialFactories.MinutesFactory.getIconURL())),
-                self.htmlText(materialFactories.MinutesFactory.getTitle())))
         iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
         for material in contrib.getMaterialList():
             url=matUrlHandler.getURL(material)

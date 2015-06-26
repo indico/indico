@@ -2628,15 +2628,6 @@ class WConfCreationControlFrame(WTemplated):
         vars["confCreators"] = fossilize(self._categ.getConferenceCreatorList())
         return vars
 
-class WMinutesDisplay(WTemplated):
-
-    def __init__( self, target ):
-        self._target = target
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["text"] = self.textToHTML(self._target.readBin())
-        return vars
 
 class TabControl:
 

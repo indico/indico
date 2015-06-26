@@ -170,8 +170,6 @@ class CDSConvFileConverter(FileConverter):
             return owner.getSlides()
         elif id=="poster":
             return owner.getPoster()
-        elif id=="minutes":
-            return owner.getMinutes()
         elif id=="reviewing":
             return owner.getReviewing()
         else:

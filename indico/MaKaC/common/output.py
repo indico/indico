@@ -831,10 +831,6 @@ class outputGenerator(object):
         out.writeTag("type",mat.type)
         if vars:
             out.writeTag("displayURL",vars["materialURLGen"](mat))
-        from MaKaC.conference import Minutes
-        if isinstance(mat, Minutes):
-            out.writeTag("minutesText",mat.getText())
-
         types = {"pdf"   :{"mapsTo" : "pdf",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "pdf_small.png"),  "imgAlt" : "pdf file"},
                  "doc"   :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},
                  "docx"  :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},

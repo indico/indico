@@ -4036,10 +4036,6 @@ class WConfModifContribList(wcomponents.WTemplated):
             materials.append("""<a href=%s>%s</a>"""%(
                 quoteattr(str(urlHandlers.UHContribModifMaterials.getURL(contrib))),
                 self.htmlText(materialFactories.VideoFactory.getTitle())))
-        if contrib.getMinutes() is not None:
-            materials.append("""<a href=%s>%s</a>"""%(
-                quoteattr(str(urlHandlers.UHContribModifMaterials.getURL(contrib))),
-                self.htmlText(materialFactories.MinutesFactory.getTitle())))
         for material in contrib.getMaterialList():
             url=urlHandlers.UHContribModifMaterials.getURL(contrib)
             materials.append("""<a href=%s>%s</a>"""%(
@@ -5724,13 +5720,6 @@ class WContributionStaticDisplay(wcomponents.WTemplated):
                 quoteattr(str(urlHandlers.UHStaticMaterialDisplay.getRelativeURL(video))),
                 quoteattr(str(self._staticPars["video"])),
                 self.htmlText(materialFactories.VideoFactory().getTitle())))
-        iconURL=quoteattr(str(self._staticPars["material"]))
-        minutes=self._contrib.getMinutes()
-        if minutes is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="minutes"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHStaticMaterialDisplay.getRelativeURL(minutes))),
-                iconURL,
-                self.htmlText(materialFactories.MinutesFactory().getTitle())))
         iconURL=quoteattr(str(self._staticPars["material"]))
         for material in self._contrib.getMaterialList():
             url=urlHandlers.UHStaticMaterialDisplay.getRelativeURL(material)
