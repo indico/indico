@@ -40,6 +40,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         default_inheriting = 'not (is_default and protection_mode != {})'.format(ProtectionMode.inheriting.value)
         return (db.CheckConstraint(default_inheriting, 'default_inheriting'),
                 db.CheckConstraint('is_default = (title IS NULL)', 'default_or_title'),
+                db.CheckConstraint('not (is_default and is_deleted)', 'default_not_deleted'),
                 {'schema': 'attachments'})
 
     @declared_attr
@@ -106,8 +107,6 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         folder = cls.find_first(is_default=True, linked_object=linked_object)
         if folder is None:
             folder = cls(is_default=True, linked_object=linked_object)
-        elif folder.is_deleted:  # should never happen...
-            folder.is_deleted = False
         return folder
 
     @return_ascii

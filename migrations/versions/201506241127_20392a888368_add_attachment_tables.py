@@ -62,6 +62,7 @@ def upgrade():
                            name='valid_session_link'),
         sa.CheckConstraint('not (is_default and protection_mode != 1)', name='default_inheriting'),
         sa.CheckConstraint('is_default = (title IS NULL)', name='default_or_title'),
+        sa.CheckConstraint('not (is_default and is_deleted)', name='default_not_deleted'),
         sa.PrimaryKeyConstraint('id'),
         schema='attachments'
     )
