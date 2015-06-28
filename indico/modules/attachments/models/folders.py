@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -23,6 +24,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkMixin
 from indico.core.db.sqlalchemy.protection import ProtectionMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
@@ -82,8 +84,17 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     #: The ACL of the folder (used for ProtectionMode.protected)
     acl = association_proxy('_acl', 'principal', creator=lambda v: AttachmentFolderPrincipal(principal=v))
 
+    #: The list of attachments that are not deleted, ordered by name
+    attachments = db.relationship(
+        'Attachment',
+        primaryjoin=lambda: (Attachment.folder_id == AttachmentFolder.id) & ~Attachment.is_deleted,
+        order_by=lambda: db.func.lower(Attachment.title),
+        viewonly=True,
+        lazy=True
+    )
+
     # relationship backrefs:
-    # - attachments (Attachment.folder)
+    # - all_attachments (Attachment.folder)
 
     @property
     def protection_parent(self):
@@ -109,3 +120,9 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             self.protection_repr,
             self.link_repr
         )
+
+
+@listens_for(AttachmentFolder.attachments, 'append')
+@listens_for(AttachmentFolder.attachments, 'remove')
+def _wrong_attachments_modified(target, value, *unused):
+    raise Exception('AttachmentFolder.attachments is view-only. Use all_attachments for write operations!')

@@ -140,8 +140,7 @@ class Attachment(ProtectionMixin, db.Model):
         'AttachmentFolder',
         lazy=True,
         backref=db.backref(
-            'attachments',
-            order_by=lambda: db.func.lower(Attachment.title),
+            'all_attachments',
             lazy=True
         )
     )

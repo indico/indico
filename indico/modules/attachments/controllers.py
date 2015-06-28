@@ -34,7 +34,7 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 def _get_attachment_list(linked_object):
     folders = (AttachmentFolder
-               .find(linked_object=linked_object)
+               .find(linked_object=linked_object, is_deleted=False)
                .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
                .options(joinedload(AttachmentFolder.attachments))
                .all())
