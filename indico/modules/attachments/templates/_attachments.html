@@ -1,5 +1,4 @@
 {% set type_icons = {
-    'text/directory': 'icon-material-download',
     'application/pdf': 'icon-file-pdf',
     'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-excel',
     'text/vnd.indico.link': 'icon-link',
@@ -7,59 +6,85 @@
 } %}
 
 {% macro _attachment_row(attachment) %}
-    {%- set is_folder = attachment['content-type'] == 'text/directory' -%}
-    <li {% if is_folder %}class="expandable {%- if not attachment.content %} collapsed{% endif %}"{% endif %}>
+    <li>
         <div class="{{ type_icons.get(attachment['content-type'], 'icon-file') }} attachment-entry">
-            {%- if is_folder -%}
-                <span class="attachment-name">{{ attachment.title }}</span>
-            {%- else -%}
-                <a href="dummy_link" target="_blank" class="attachment-name">{{- attachment.title -}}</a>
-            {%- endif -%}
+            <a href="#" target="_blank" class="attachment-name">{{- attachment.title -}}</a>
             <span class="details">
-                <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
+                {% if attachment.type.name == 'file' %}
+                    <span class="date">{{ attachment.file.created_dt|format_datetime('short') }}</span>
+                {% endif %}
                 <span class="actions">
-                    {%- if not is_folder -%}
+                    {% if attachment.type.name == 'file' %}
                         <span class="icon-file-download"></span>
-                    {%- endif -%}
+                    {% else %}
+                        <span class="icon-link"></span>
+                    {% endif %}
                     <span class="icon-edit"></span>
                     <a class="icon-remove"
-                       data-method="DELETE"
-                       data-href="dummy_delete"
-                       data-title="{% trans attachment_name=attachment.title %}Remove {{ attachment_name }}?{% endtrans %}"
-                       data-confirm="{% trans attachment_name=attachment.title %}
-                              Are you sure you want to remove &quot;{{ attachment_name }}&quot;?<br>
+                       href="#"
+                       data-title="{% trans name=attachment.title %}Remove {{ name }}?{% endtrans %}"
+                       data-confirm="{% trans name=attachment.title -%}
+                              Are you sure you want to remove &quot;{{ name }}&quot;?<br>
                               This will remove the attachment permanantly.
-                          {% endtrans %}">
+                          {%- endtrans %}">
                     </a>
                 </span>
             </span>
         </div>
-        {% if is_folder %}
-            {{- _render_tree(attachment.content, classes='sub-attachments') -}}
-        {%- endif -%}
     </li>
 {% endmacro %}
 
-{% macro _render_tree(node, classes=none) -%}
-    <ul class="attachments {%- if classes %} {{ classes }}{% endif %}" {%- if not node %} style="display: none;"{% endif %}>
-        {%- if node -%}
-            {%- for sub_node in node -%}
-                {{ _attachment_row(sub_node) }}
-            {%- endfor -%}
-        {%- else -%}
-            <li>
-                <div class="attachment-entry empty">
-                    <span class="attachment-name">{% trans %}empty folder{% endtrans %}</span>
-                </div>
-            </li>
-        {%- endif -%}
-    </ul>
+{% macro _folder_row(folder) %}
+    <li class="expandable {%- if not folder.attachments %} collapsed{% endif %}">
+        <div class="icon-material-download attachment-entry">  {# TODO: use folder icon #}
+            <span class="folder-name">{{ folder.title }}</span>
+            <span class="details">
+                <span class="actions">
+                    <span class="icon-edit"></span>
+                    <a class="icon-remove"
+                       href="#" {# TODO #}
+                       data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
+                       data-confirm="{% trans name=folder.title -%}
+                              Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                              This will remove the folder and its contents permanantly.
+                          {%- endtrans %}">
+                    </a>
+                </span>
+            </span>
+        </div>
+        <ul class="attachments sub-attachments" {%- if not folder.attachments %} style="display: none;"{% endif %}>
+            {{- _render_tree(folder.attachments, false) -}}
+        </ul>
+    </li>
+{% endmacro %}
+
+{% macro _render_tree(nodes, is_folder) -%}
+    {%- for sub_node in nodes -%}
+        {% if is_folder %}
+            {{ _folder_row(sub_node) }}
+        {% else %}
+            {{ _attachment_row(sub_node) }}
+        {% endif %}
+    {%- else -%}
+        <li>
+            <div class="attachment-entry empty">
+                <span class="attachment-name">{% trans %}empty folder{% endtrans %}</span>
+            </div>
+        </li>
+    {%- endfor -%}
 {%- endmacro %}
 
 {% macro render_attachments(attachments, linked_object) %}
     {% if attachments %}
-        {{ _render_tree(attachments) }}
-    {% else  %}
+        <ul class="attachments">
+            {% if attachments.folders %}
+                {{ _render_tree(attachments.folders, true) }}
+            {% endif %}
+            {% if attachments.files %}
+                {{ _render_tree(attachments.files, false) }}
+            {% endif %}
+        </ul>
+    {% else %}
         <span class="empty">{% trans %}There are no attachments yet.{% endtrans %}</span>
     {% endif %}
     <div class="i-box-footer create-folder js-attachment-actions">

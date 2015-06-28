@@ -132,7 +132,7 @@ class Attachment(ProtectionMixin, db.Model):
         'AttachmentFile',
         primaryjoin=lambda: Attachment.file_id == AttachmentFile.id,
         foreign_keys=file_id,
-        lazy=True,  # TODO: change to false
+        lazy=False,
         post_update=True
     )
     #: The folder containing the attachment
@@ -141,6 +141,7 @@ class Attachment(ProtectionMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'attachments',
+            order_by=lambda: db.func.lower(Attachment.title),
             lazy=True
         )
     )
