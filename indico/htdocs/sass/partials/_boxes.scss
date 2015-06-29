@@ -52,6 +52,17 @@
 }
 
 
+%i-box-empty {
+    font-size: 1em;
+    font-style: italic;
+
+    display: block;
+
+    text-align: left;
+
+    color: $dark-gray;
+}
+
 // ============================================================================
 // Boxes
 // ============================================================================
@@ -68,6 +79,9 @@
 
     hr {
         @extend %box-hr;
+    }
+    > .empty {
+        @extend %i-box-empty;
     }
 }
 
@@ -120,14 +134,7 @@
     .i-box-content {
         margin-top: 20px;
         > .empty {
-            font-size: 1em;
-            font-style: italic;
-
-            display: block;
-
-            text-align: left;
-
-            color: $dark-gray;
+            @extend %i-box-empty;
         }
     }
 }

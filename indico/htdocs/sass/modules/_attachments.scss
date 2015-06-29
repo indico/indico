@@ -21,6 +21,7 @@
 @import 'compass';
 @import 'compass/css3/user-interface';
 
+
 ul.attachments {
     max-height: 100%;
     margin: 0;
@@ -112,6 +113,7 @@ ul.attachments {
 
                 opacity: 0;
                 > * {
+                    color: $light-black;
                     padding: 0 0.2em;
                 }
                 > .icon-remove:hover {
