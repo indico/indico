@@ -44,13 +44,14 @@
             <span class="node-label">{{ folder.title }}</span>
             <span class="details">
                 <span class="actions">
-                    <a class="icon-remove"
-                       href="#" {# TODO #}
-                       data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
-                       data-confirm="{% trans name=folder.title -%}
-                              Are you sure you want to remove &quot;{{ name }}&quot;?<br>
-                              This will remove the folder and its contents permanantly.
-                          {%- endtrans %}">
+                    <a href="#" class="icon-remove js-delete-folder"
+                            data-method="DELETE"
+                            data-href="{{ url_for('.delete_folder', folder) }}"
+                            data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
+                            data-confirm="{% trans name=folder.title -%}
+                                Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                                This will remove the folder and its contents permanantly.
+                            {%- endtrans %}">
                     </a>
                     <span class="icon-edit"></span>
                 </span>

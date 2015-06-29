@@ -108,3 +108,13 @@ class RHEventAttachmentsCreateFolder(RHConferenceModifBase):
             return redirect_or_jsonify(url_for('.index', self._conf),
                                        attachment_list=_render_attachment_list(self._conf))
         return WPEventAttachments.render_template('create_folder.html', self._conf, event=self._conf, form=form)
+
+
+class RHEventAttachmentsDeleteFolder(RHConferenceModifBase):
+    """Delete a folder"""
+
+    def _process(self):
+        folder = AttachmentFolder.get_one(request.view_args['folder_id'])
+        folder.is_deleted = True
+        flash(_("Folder \"{name}\" deleted").format(name=folder.title), 'success')
+        return jsonify_data(attachment_list=_render_attachment_list(self._conf))

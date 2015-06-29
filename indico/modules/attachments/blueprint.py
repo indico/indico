@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.attachments.controllers import (RHEventAttachments, RHEventAttachmentsAddLink,
-                                                    RHEventAttachmentsCreateFolder, RHEventAttachmentsUpload)
+                                                    RHEventAttachmentsCreateFolder, RHEventAttachmentsDeleteFolder,
+                                                    RHEventAttachmentsUpload)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
@@ -29,3 +30,5 @@ _bp.add_url_rule('/event/<confId>/manage/attachments/add-link', 'add_link', RHEv
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/attachments/create-folder', 'create_folder', RHEventAttachmentsCreateFolder,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/attachments/<folder_id>/', 'delete_folder', RHEventAttachmentsDeleteFolder,
+                 methods=('DELETE',))
