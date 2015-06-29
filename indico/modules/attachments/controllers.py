@@ -27,7 +27,6 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -90,7 +89,7 @@ class RHEventAttachmentsAddLink(RHConferenceModifBase):
         if form.validate_on_submit():
             # TODO
             return jsonify_data(attachment_list=_render_attachment_list(self._conf))
-        return WPEventAttachments.render_template('add_link.html', self._conf, event=self._conf, form=form)
+        return jsonify_template('attachments/add_link.html', event=self._conf, form=form)
 
 
 class RHEventAttachmentsCreateFolder(RHConferenceModifBase):
@@ -105,9 +104,8 @@ class RHEventAttachmentsCreateFolder(RHConferenceModifBase):
                 folder.acl = form.acl.data
             db.session.add(folder)
             flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
-            return redirect_or_jsonify(url_for('.index', self._conf),
-                                       attachment_list=_render_attachment_list(self._conf))
-        return WPEventAttachments.render_template('create_folder.html', self._conf, event=self._conf, form=form)
+            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
+        return jsonify_template('attachments/create_folder.html', event=self._conf, form=form)
 
 
 class RHEventAttachmentsDeleteFolder(RHConferenceModifBase):
