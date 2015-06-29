@@ -19,12 +19,14 @@
             <span class="details">
                 <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
                 <span class="actions">
-                    <a href="#" class="icon-remove"
+                    <a href="#" class="icon-remove js-delete"
+                       data-method="DELETE"
+                       data-href="{{ url_for('.delete_attachment', attachment) }}"
                        data-title="{% trans name=attachment.title %}Remove {{ name }}?{% endtrans %}"
                        data-confirm="{% trans name=attachment.title -%}
-                              Are you sure you want to remove &quot;{{ name }}&quot;?<br>
-                              This will remove the attachment permanantly.
-                          {%- endtrans %}">
+                           Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                           This will remove the attachment permanantly.
+                           {%- endtrans %}">
                     </a>
                     <span class="icon-edit"></span>
                     {% if attachment.type.name == 'file' %}
@@ -44,14 +46,14 @@
             <span class="node-label">{{ folder.title }}</span>
             <span class="details">
                 <span class="actions">
-                    <a href="#" class="icon-remove js-delete-folder"
-                            data-method="DELETE"
-                            data-href="{{ url_for('.delete_folder', folder) }}"
-                            data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
-                            data-confirm="{% trans name=folder.title -%}
-                                Are you sure you want to remove &quot;{{ name }}&quot;?<br>
-                                This will remove the folder and its contents permanantly.
-                            {%- endtrans %}">
+                    <a href="#" class="icon-remove js-delete"
+                       data-method="DELETE"
+                       data-href="{{ url_for('.delete_folder', folder) }}"
+                       data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
+                       data-confirm="{% trans name=folder.title -%}
+                           Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                           This will remove the folder and its contents permanantly.
+                       {%- endtrans %}">
                     </a>
                     <span class="icon-edit"></span>
                 </span>

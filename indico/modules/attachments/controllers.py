@@ -116,3 +116,13 @@ class RHEventAttachmentsDeleteFolder(RHConferenceModifBase):
         folder.is_deleted = True
         flash(_("Folder \"{name}\" deleted").format(name=folder.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self._conf))
+
+
+class RHEventAttachmentsDeleteAttachment(RHConferenceModifBase):
+    """Delete a folder"""
+
+    def _process(self):
+        attachment = Attachment.get_one(request.view_args['attachment_id'])
+        attachment.is_deleted = True
+        flash(_("\"{name}\" deleted").format(name=attachment.title), 'success')
+        return jsonify_data(attachment_list=_render_attachment_list(self._conf))
