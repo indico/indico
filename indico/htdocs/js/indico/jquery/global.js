@@ -132,9 +132,14 @@ $(document).ready(function() {
         }
 
         function execute() {
-            if (method == 'GET') {
+            var evt = $.Event('indico:confirmed');
+            $this.trigger(evt);
+            if (evt.isDefaultPrevented()) {
+                return;
+            }
+            if (method === 'GET') {
                 location.href = build_url(url, params);
-            } else {
+            } else if (method === 'POST') {
                 var form = $('<form>', {
                     action: url,
                     method: method
@@ -148,15 +153,13 @@ $(document).ready(function() {
         }
 
         var promptMsg = $this.data('confirm');
-        if (promptMsg) {
-            new ConfirmPopup($(this).data('title') || $T('Confirm action'), promptMsg, function(confirmed) {
-                if (confirmed) {
-                    execute();
-                }
-            }).open();
+        var confirmed;
+        if (!promptMsg) {
+            confirmed = $.Deferred().resolve();
         } else {
-            execute();
+            confirmed = confirmPrompt(promptMsg, $(this).data('title') || $T('Confirm action'));
         }
+        confirmed.then(execute);
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {
