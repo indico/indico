@@ -107,7 +107,7 @@ $(document).ready(function() {
         }
     });
 
-    $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href])', function() {
+    $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href])', function() {
         var $this = $(this);
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){
             if (confirmed){
@@ -121,7 +121,7 @@ $(document).ready(function() {
         return false;
     });
 
-    $('body').on('click', 'button[data-method][data-href], input:button[data-method][data-href]', function() {
+    $('body').on('click', 'button[data-method][data-href], input:button[data-method][data-href], a[data-method][data-href]', function() {
         var $this = $(this);
         var url = $this.data('href');
         var method = $this.data('method').toUpperCase();
