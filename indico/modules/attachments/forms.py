@@ -45,8 +45,9 @@ class AddAttachmentsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
         super(AddAttachmentsForm, self).__init__(*args, **kwargs)
-        self.folder.query = (AttachmentFolder.find(linked_object=linked_object, is_default=False)
-                                             .order_by(db.func.lower(AttachmentFolder.title)))
+        self.folder.query = (AttachmentFolder
+                             .find(linked_object=linked_object, is_default=False, is_deleted=False)
+                             .order_by(db.func.lower(AttachmentFolder.title)))
 
 
 class AddLinkForm(AddAttachmentsForm):
