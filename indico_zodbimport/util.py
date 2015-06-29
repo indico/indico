@@ -17,12 +17,18 @@
 import os
 import re
 import sys
+from contextlib import contextmanager
 from urlparse import urlparse
 
 from ZODB import DB, FileStorage
 from ZODB.broken import find_global, Broken
 from ZEO.ClientStorage import ClientStorage
 
+from indico.core.auth import IndicoMultipass, multipass
+from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.groups import GroupProxy
+from indico.modules.groups.legacy import GroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.console import colored
 
 
@@ -128,3 +134,53 @@ def get_archived_file(f, archive_paths):
             if os.path.exists(enc_path):
                 return f.fileName, enc_path
     return f.fileName, None
+
+
+def protection_from_ac(target, ac, acl_attr='acl', ac_attr='allowed', allow_public=False):
+    """Converts AccessController data to ProtectionMixin style
+
+    This needs to run inside the context of `patch_default_group_provider`.
+
+    :param target: The new object that uses ProtectionMixin
+    :param ac: The old AccessController
+    :param acl_attr: The attribute name for the acl of `target`
+    :param ac_attr: The attribute name for the acl in `ac`
+    :param allow_public: If the object allows `ProtectionMode.public`.
+                         Otherwise, public is converted to inheriting.
+    """
+    if ac._accessProtection == -1:
+        target.protection_mode = ProtectionMode.public if allow_public else ProtectionMode.inheriting
+    elif ac._accessProtection == 0:
+        target.protection_mode = ProtectionMode.inheriting
+    elif ac._accessProtection == 1:
+        target.protection_mode = ProtectionMode.protected
+        acl = getattr(target, acl_attr)
+        for principal in getattr(ac, ac_attr):
+            if isinstance(principal, AvatarUserWrapper):
+                principal = principal.user
+            elif isinstance(principal, GroupWrapper):
+                principal = principal.group
+            elif principal.__class__.__name__ == 'Avatar':
+                principal = AvatarUserWrapper(principal.id).user
+            elif principal.__class__.__name__ == 'Group':
+                principal = GroupProxy(principal.id)
+            elif principal.__class__.__name__ in {'CERNGroup', 'LDAPGroup', 'NiceGroup'}:
+                principal = GroupProxy(principal.id, multipass.default_group_provider.name)
+            assert principal is not None
+            acl.add(principal)
+    else:
+        raise ValueError('Unexpected protection: {}'.format(ac._accessProtection))
+
+
+@contextmanager
+def patch_default_group_provider(provider_name):
+    """Monkeypatches Multipass to use a certain default group provider"""
+    class FakeProvider(object):
+        name = provider_name
+    provider = FakeProvider()
+    prop = IndicoMultipass.default_group_provider
+    IndicoMultipass.default_group_provider = property(lambda m: provider)
+    try:
+        yield
+    finally:
+        IndicoMultipass.default_group_provider = prop
