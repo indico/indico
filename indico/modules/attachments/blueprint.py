@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.modules.attachments.controllers import (RHEventAttachments, RHEventAttachmentsAddLink,
                                                     RHEventAttachmentsCreateFolder, RHEventAttachmentsDeleteAttachment,
-                                                    RHEventAttachmentsDeleteFolder, RHEventAttachmentsUpload)
+                                                    RHEventAttachmentsDeleteFolder, RHEventAttachmentsUpload,
+                                                    RHEventAttachmentsEditFile)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
@@ -26,11 +27,13 @@ _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virt
 _bp.add_url_rule('/event/<confId>/manage/attachments/', 'index', RHEventAttachments)
 _bp.add_url_rule('/event/<confId>/manage/attachments/upload', 'upload', RHEventAttachmentsUpload,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
+                 RHEventAttachmentsEditFile, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/attachments/add-link', 'add_link', RHEventAttachmentsAddLink,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/attachments/create-folder', 'create_folder', RHEventAttachmentsCreateFolder,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/attachments/<folder_id>/', 'delete_folder', RHEventAttachmentsDeleteFolder,
+_bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/', 'delete_folder', RHEventAttachmentsDeleteFolder,
                  methods=('DELETE',))
-_bp.add_url_rule('/event/<confId>/manage/attachments/<folder_id>/<attachment_id>/', 'delete_attachment',
+_bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/<int:attachment_id>/', 'delete_attachment',
                  RHEventAttachmentsDeleteAttachment, methods=('DELETE',))

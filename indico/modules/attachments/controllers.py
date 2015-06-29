@@ -23,11 +23,13 @@ from werkzeug.utils import secure_filename
 
 from indico.core.db import db
 from indico.modules.attachments.views import WPEventAttachments
-from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm
+from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm, EditAttachmentsForm
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -80,14 +82,36 @@ class RHEventAttachmentsUpload(RHConferenceModifBase):
             for f in files:
                 filename = secure_filename(f.filename) or 'attachment'
                 folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
-                attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file)
+                attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
+                                        protection_mode=form.protection_mode.data)
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
                 attachment.file.save(f.file)
                 db.session.add(attachment)
             flash(ngettext("The attachment has been uploaded", "%(num)d attachments have been uploaded", len(files)),
                   'success')
             return jsonify_data(attachment_list=_render_attachment_list(self._conf))
-        return jsonify_template('attachments/upload.html', event=self._conf, form=form)
+        return jsonify_template('attachments/upload.html', event=self._conf, form=form,
+                                action=url_for('.upload', self._conf))
+
+
+class RHEventAttachmentsEditFile(RHEventAttachmentsMixin, RHConferenceModifBase):
+    """Edit an uploaded file"""
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        RHEventAttachmentsMixin._checkParams(self)
+
+    def _process(self):
+        defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected)
+        form = EditAttachmentsForm(linked_object=self._conf, obj=defaults)
+        if form.validate_on_submit():
+            form.populate_obj(self.attachment, skip={'acl'})
+            if self.attachment.is_protected:
+                self.attachment.acl = form.acl.data
+            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
+        return jsonify_template('attachments/upload.html', event=self._conf, form=form,
+                                existing_attachment=self.attachment,
+                                action=url_for('.modify_attachment', self.attachment))
 
 
 class RHEventAttachmentsAddLink(RHConferenceModifBase):

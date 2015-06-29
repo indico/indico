@@ -49,6 +49,18 @@ class AddAttachmentsForm(IndicoForm):
                              .find(linked_object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
 
+    @generated_data
+    def protection_mode(self):
+        return ProtectionMode.protected if self.protected.data else ProtectionMode.inheriting
+
+
+class EditAttachmentsForm(AddAttachmentsForm):
+    title = StringField(_("Title"), description=_("The title of the file."))
+    description = TextAreaField(_("Description"))
+    acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
+                             groups=True, serializable=False, allow_external=True,
+                             description=_("The list of users and groups with access to the file"))
+
 
 class AddLinkForm(AddAttachmentsForm):
     link = URLField(_("URL"), [DataRequired()])

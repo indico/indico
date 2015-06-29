@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    {{ form_header(form, id='dropzone', classes='dropzone', action=url_for('.upload', event)) }}
+    {{ form_header(form, id='dropzone', classes='dropzone', action=action) }}
     <div class="dropzone-area">
         <div class="dropzone-previews">
             <div class="dz-message">
@@ -18,8 +18,13 @@
     {{ form_rows(form) }}
     {% call form_footer(attach_form) %}
         <div class="dropzone-upload-btn">
-            <input class="i-button big highlight js-dropzone-upload" type="submit" disabled
+            {%- if existing_attachment -%}
+                <input class="i-button big highlight js-dropzone-save" type="submit"
+                       value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
+            {%- else -%}
+                <input class="i-button big highlight js-dropzone-upload" type="submit" disabled
                    value="{% trans %}Upload{% endtrans %}">
+            {% endif %}
         </div>
     {% endcall %}
     <script>
