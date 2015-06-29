@@ -36,6 +36,10 @@ class NotBroken(Broken):
 class UnbreakingDB(DB):
     def classFactory(self, connection, modulename, globalname):
         modulename = re.sub(r'^IndexedCatalog\.BTrees\.', 'BTrees.', modulename)
+        if globalname == 'PersistentMapping':
+            modulename = 'persistent.mapping'
+        elif globalname == 'PersistentList':
+            modulename = 'persistent.list'
         return find_global(modulename, globalname, Broken=NotBroken)
 
 
