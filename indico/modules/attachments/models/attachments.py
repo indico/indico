@@ -88,6 +88,13 @@ class Attachment(ProtectionMixin, db.Model):
         nullable=False,
         default=''
     )
+    #: The date/time when the attachment was created/modified
+    modified_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        default=now_utc,
+        onupdate=now_utc
+    )
     #: The type of the attachment (file or link)
     type = db.Column(
         PyIntEnum(AttachmentType),

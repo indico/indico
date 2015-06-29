@@ -74,6 +74,7 @@ def upgrade():
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
+        sa.Column('modified_dt', UTCDateTime, nullable=False),
         sa.Column('type', PyIntEnum(AttachmentType), nullable=False),
         sa.Column('link_url', sa.String(), nullable=True),
         sa.Column('file_id', sa.Integer(), nullable=True),

@@ -10,9 +10,7 @@
         <div class="{{ type_icons.get(attachment['content-type'], 'icon-file') }} attachment-entry">
             <a href="#" target="_blank" class="attachment-name">{{- attachment.title -}}</a>
             <span class="details">
-                {% if attachment.type.name == 'file' %}
-                    <span class="date">{{ attachment.file.created_dt|format_datetime('short') }}</span>
-                {% endif %}
+                <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
                 <span class="actions">
                     {% if attachment.type.name == 'file' %}
                         <span class="icon-file-download"></span>
