@@ -393,6 +393,11 @@ i[class^="icon-"]:before {
     opacity: 0.6; // full opacity is too dark compared to the text in a button
 }
 
+/* Custom "empty" icon to have a space equivalent to an icon*/
+.icon-none:before {
+    content: "\2001";
+}
+
 .disabled .icon-spinner:before {
     opacity: 0.4; // "disabled feel" for the bg image with the spinner
 
