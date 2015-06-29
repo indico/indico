@@ -7491,7 +7491,7 @@ class Contribution(CommonObjectBase, Locatable):
     @return_ascii
     def __repr__(self):
         parent_id = self.parent.getId() if self.parent else None
-        return '<Contribution({}, {}, {})>'.format(self.getId(), self.getTitle(), parent_id)
+        return u'<Contribution({}, {}, {})>'.format(self.getId(), to_unicode(self.getTitle()), parent_id)
 
     @property
     @memoize_request
