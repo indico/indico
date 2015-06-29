@@ -129,3 +129,14 @@ class RHDeleteNote(RHEventNoteBase):
     def _process(self):
         self._delete_note()
         return redirect(url_for('event.conferenceDisplay', self.event))
+
+
+class RHViewNote(RHEventNoteBase):
+    def _checkParams(self):
+        RHEventNoteBase._checkParams(self)
+        self.note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        if not self.note:
+            raise NotFound
+
+    def _process(self):
+        return self.note.html
