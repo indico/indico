@@ -27,26 +27,30 @@
         {{ render_attachments(attachments, linked_object) }}
     </div>
     <script>
-        $('.js-attachment-actions > a').ajaxDialog({
-            title: function() {
-                return $(this.trigger).text();
-            },
-            onClose: function(data) {
-                if (data) {
-                    $('#attachments-container').html(data.attachment_list);
-                }
-            }
-        });
-
         $(document)
-            .on('click', 'ul.attachments > li.expandable', function toggleSubRows() {
+            .on('click', 'ul.tree > li.expandable .actions > a', function(evt) {
+                evt.stopPropagation();
+            })
+            .on('click', 'ul.tree > li.expandable', function() {
                 $(this)
                     .toggleClass('collapsed')
-                    .children('ul.sub-attachments')
+                    .children('ul.sub-tree')
                         .slideToggle(150);
             })
-            .on('click', 'ul.attachments > li.expandable > .sub-attachments', function(evt) {
+            .on('click', 'ul.tree > li.expandable > .sub-tree', function(evt) {
                 evt.stopPropagation();
+            })
+            .on('click', '.js-attachment-actions > a', function() {
+                var $this = $(this);
+                ajaxDialog({
+                    url: $this.data('href'),
+                    title: $this.text(),
+                    onClose: function(data) {
+                        if (data) {
+                            $('#attachments-container').html(data.attachment_list);
+                        }
+                    }
+                });
             });
     </script>
 {% endblock %}

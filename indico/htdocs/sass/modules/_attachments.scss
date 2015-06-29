@@ -21,20 +21,33 @@
 @import 'compass';
 @import 'compass/css3/user-interface';
 
+%node {
+    color: $light-black;
+}
 
-ul.attachments {
+%node-hover {
+    color: $black;
+}
+
+ul.tree {
     max-height: 100%;
     margin: 0;
     padding: 0;
 
     list-style-type: none;
     li {
+        @include empty-icon-before();
         &:before,
         *,
         *:before {
+            @extend %node;
+
             line-height: 1.2em;
 
             vertical-align: middle;
+            &:hover {
+                @extend %node-hover;
+            }
         }
         &:before {
             font-size: 1.4em;
@@ -44,10 +57,8 @@ ul.attachments {
 
             margin-top: -0.1em;
             margin-right: -0.3em;
-
-            content: '\2001';
         }
-        > .attachment-entry {
+        > .node {
             font-size: 1.1em;
 
             position: relative;
@@ -63,19 +74,21 @@ ul.attachments {
                 @include border-radius(2px);
 
                 background: $pastel-blue;
-                > .details > .actions {
-                    visibility: visible;
+                & > .details {
+                    & > .actions {
+                        visibility: visible;
 
-                    opacity: 1;
-                }
-                & > .attachment-name {
-                    color: $black;
+                        opacity: 1;
+                    }
+                    & > .date {
+                        color: $dark-gray;
+                    }
                 }
             }
             &:before {
                 padding-right: 0.3em;
             }
-            & > .attachment-name {
+            & > .node-label {
                 display: inline-block;
                 overflow: hidden;
 
@@ -83,16 +96,12 @@ ul.attachments {
 
                 white-space: nowrap;
                 text-overflow: ellipsis;
-
-                color: $light-black;
             }
-            &.empty > .attachment-name {
+            &.empty > .node-label {
+                @include empty-icon-before();
                 font-style: italic;
 
                 color: $dark-gray;
-                &:before {
-                    content: '\2001';
-                }
             }
         }
         .details {
@@ -104,28 +113,36 @@ ul.attachments {
             .actions {
                 @include transition(opacity 0.15s ease-out);
 
-                position: relative;
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
 
                 visibility: hidden;
-                float: right;
 
+                width: 100%;
+                height: 1.1em;
+                margin-right: 7.2em;
                 padding-right: 0.2em;
 
                 opacity: 0;
-                > * {
-                    color: $light-black;
+                & > * {
+                    float: right;
+
                     padding: 0 0.2em;
+
+                    cursor: pointer;
                 }
-                > .icon-remove:hover {
+                & > .icon-remove:hover:before {
                     color: $red;
                 }
-                > .icon-edit:hover, > .icon-file-download:hover {
+                & > .icon-edit:hover:before,
+                & > .icon-file-download:hover:before {
                     color: $blue;
                 }
             }
             .date {
                 font-size: 0.9em;
-                font-weight: normal;
 
                 position: relative;
 
@@ -138,42 +155,39 @@ ul.attachments {
         }
         &.expandable {
             @include icon-before('icon-arrow-down');
-            > .attachment-entry {
+            &:before,
+            & > .node {
                 @include user-select(none);
 
                 cursor: pointer;
             }
             &:before {
-                @include user-select(none);
                 @include transition(transform 0.15s ease-out);
 
-                cursor: pointer;
                 -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
             }
-            &.collapsed {
-                &:before {
-                    @include rotate(-90deg);
-                }
+            &.collapsed:before {
+                @include rotate(-90deg);
             }
         }
     }
-    &.sub-attachments {
+    &.sub-tree {
         margin-left: 1.4em;
         & > li {
-            > .attachment-entry {
+            > .node {
                 &:not(:hover),
                 &.empty {
                     background: $light-gray;
                 }
-                & > .attachment-name {
+                & > .node-label {
                     max-width: 35.6em;
                 }
             }
-            &:first-child > .attachment-entry {
+            &:first-child > .node {
                 @include border-top-left-radius(2px);
                 @include border-top-right-radius(2px);
             }
-            &:last-child > .attachment-entry {
+            &:last-child > .node {
                 @include border-bottom-left-radius(2px);
                 @include border-bottom-right-radius(2px);
             }
