@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+// Roboto
 @font-face {
     font-family: "Roboto";
     src: font-url("fonts/roboto/Roboto-Regular-webfont.eot");
@@ -26,6 +27,7 @@
     font-weight: normal;
 }
 
+// Roboto Light
 @font-face {
     font-family: "Roboto Light";
     src: font-url("fonts/roboto/Roboto-Light-webfont.eot");
@@ -46,4 +48,150 @@
          font-url("fonts/maven_pro/maven_pro_medium-webfont.svg") format("svg");
     font-style: normal;
     font-weight: normal;
+
+// Liberation Sans
+@font-face {
+    font-family: 'Liberation Sans';
+    src: font-url('fonts/liberation_sans/liberationsans-regular-webfont.eot');
+    src: font-url('fonts/liberation_sans/liberationsans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_sans/liberationsans-regular-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_sans/liberationsans-regular-webfont.woff') format('woff'),
+         font-url('fonts/liberation_sans/liberationsans-regular-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_sans/liberationsans-regular-webfont.svg#liberation_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liberation Sans';
+    src: font-url('fonts/liberation_sans/liberationsans-bold-webfont.eot');
+    src: font-url('fonts/liberation_sans/liberationsans-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_sans/liberationsans-bold-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_sans/liberationsans-bold-webfont.woff') format('woff'),
+         font-url('fonts/liberation_sans/liberationsans-bold-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_sans/liberationsans-bold-webfont.svg#liberation_sansbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liberation Sans';
+    src: font-url('fonts/liberation_sans/liberationsans-italic-webfont.eot');
+    src: font-url('fonts/liberation_sans/liberationsans-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_sans/liberationsans-italic-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_sans/liberationsans-italic-webfont.woff') format('woff'),
+         font-url('fonts/liberation_sans/liberationsans-italic-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_sans/liberationsans-italic-webfont.svg#liberation_sansitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Liberation Sans';
+    src: font-url('fonts/liberation_sans/liberationsans-bolditalic-webfont.eot');
+    src: font-url('fonts/liberation_sans/liberationsans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_sans/liberationsans-bolditalic-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_sans/liberationsans-bolditalic-webfont.woff') format('woff'),
+         font-url('fonts/liberation_sans/liberationsans-bolditalic-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_sans/liberationsans-bolditalic-webfont.svg#liberation_sansbold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+// Liberation Serif
+@font-face {
+    font-family: 'Liberation Serif';
+    src: font-url('fonts/liberation_serif/liberationserif-regular-webfont.eot');
+    src: font-url('fonts/liberation_serif/liberationserif-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_serif/liberationserif-regular-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_serif/liberationserif-regular-webfont.woff') format('woff'),
+         font-url('fonts/liberation_serif/liberationserif-regular-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_serif/liberationserif-regular-webfont.svg#liberation_serifregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liberation Serif';
+    src: font-url('fonts/liberation_serif/liberationserif-bold-webfont.eot');
+    src: font-url('fonts/liberation_serif/liberationserif-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_serif/liberationserif-bold-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_serif/liberationserif-bold-webfont.woff') format('woff'),
+         font-url('fonts/liberation_serif/liberationserif-bold-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_serif/liberationserif-bold-webfont.svg#liberation_serifbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liberation Serif';
+    src: font-url('fonts/liberation_serif/liberationserif-italic-webfont.eot');
+    src: font-url('fonts/liberation_serif/liberationserif-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_serif/liberationserif-italic-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_serif/liberationserif-italic-webfont.woff') format('woff'),
+         font-url('fonts/liberation_serif/liberationserif-italic-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_serif/liberationserif-italic-webfont.svg#liberation_serifitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Liberation Serif';
+    src: font-url('fonts/liberation_serif/liberationserif-bolditalic-webfont.eot');
+    src: font-url('fonts/liberation_serif/liberationserif-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_serif/liberationserif-bolditalic-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_serif/liberationserif-bolditalic-webfont.woff') format('woff'),
+         font-url('fonts/liberation_serif/liberationserif-bolditalic-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_serif/liberationserif-bolditalic-webfont.svg#liberation_serifbold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+// Liberation Mono
+@font-face {
+    font-family: 'Liberation Mono';
+    src: font-url('fonts/liberation_mono/liberationmono-regular-webfont.eot');
+    src: font-url('fonts/liberation_mono/liberationmono-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_mono/liberationmono-regular-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_mono/liberationmono-regular-webfont.woff') format('woff'),
+         font-url('fonts/liberation_mono/liberationmono-regular-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_mono/liberationmono-regular-webfont.svg#liberation_monoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liberation Mono';
+    src: font-url('fonts/liberation_mono/liberationmono-bold-webfont.eot');
+    src: font-url('fonts/liberation_mono/liberationmono-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_mono/liberationmono-bold-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_mono/liberationmono-bold-webfont.woff') format('woff'),
+         font-url('fonts/liberation_mono/liberationmono-bold-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_mono/liberationmono-bold-webfont.svg#liberation_monobold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liberation Mono';
+    src: font-url('fonts/liberation_mono/liberationmono-italic-webfont.eot');
+    src: font-url('fonts/liberation_mono/liberationmono-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_mono/liberationmono-italic-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_mono/liberationmono-italic-webfont.woff') format('woff'),
+         font-url('fonts/liberation_mono/liberationmono-italic-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_mono/liberationmono-italic-webfont.svg#liberation_monoitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Liberation Mono';
+    src: font-url('fonts/liberation_mono/liberationmono-bolditalic-webfont.eot');
+    src: font-url('fonts/liberation_mono/liberationmono-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('fonts/liberation_mono/liberationmono-bolditalic-webfont.woff2') format('woff2'),
+         font-url('fonts/liberation_mono/liberationmono-bolditalic-webfont.woff') format('woff'),
+         font-url('fonts/liberation_mono/liberationmono-bolditalic-webfont.ttf') format('truetype'),
+         font-url('fonts/liberation_mono/liberationmono-bolditalic-webfont.svg#liberation_monobold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
 }
