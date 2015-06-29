@@ -145,13 +145,7 @@
                         return;
                     }
 
-                    if (options.clearFlashes) {
-                        $('#flashed-messages').empty();
-                    }
-                    if (data.flashed_messages) {
-                        var flashed = $(data.flashed_messages.trim()).children();
-                        $('#flashed-messages').append(flashed);
-                    }
+                    handleFlashes(data, options.clearFlashes);
 
                     if (data.close_dialog || data.success) {
                         closeDialog(data, true);

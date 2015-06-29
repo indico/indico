@@ -29,5 +29,15 @@
             }
         }).open();
         return dfd.promise();
-    }
+    };
+
+    global.handleFlashes = function handleFlashes(data, clear) {
+        if (clear === undefined || clear) {
+            $('#flashed-messages').empty();
+        }
+        if (data.flashed_messages) {
+            var flashed = $(data.flashed_messages.trim()).children();
+            $('#flashed-messages').append(flashed);
+        }
+    };
 })(window);
