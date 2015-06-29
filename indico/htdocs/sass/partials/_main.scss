@@ -142,6 +142,17 @@ div.session-bar {
     }
 
     .i-button {
+        &.protection-public {
+            background: $green;
+            border-color: $green;
+            color: #fff !important;
+
+            &:hover {
+                color: #fafafa !important;
+                background: lighten($green, 5%);
+            }
+        }
+
         &.protection-restricted {
             background: $red;
             border-color: $red;
