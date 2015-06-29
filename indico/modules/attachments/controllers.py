@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import flash, request, session
 from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import NotFound
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
@@ -51,6 +52,14 @@ def _get_attachment_list(linked_object):
 def _render_attachment_list(linked_object):
     tpl = get_template_module('attachments/_attachments.html')
     return tpl.render_attachments(attachments=_get_attachment_list(linked_object), linked_object=linked_object)
+
+
+class RHEventAttachmentsMixin:
+    def _checkParams(self):
+        self.attachment = Attachment.find_one(id=request.view_args['attachment_id'])
+        self.folder = self.attachment.folder
+        if self.folder.id != request.view_args['folder_id']:
+            raise NotFound
 
 
 class RHEventAttachments(RHConferenceModifBase):
