@@ -279,8 +279,6 @@ class outputGenerator(object):
         if conf.canModify(self.__aw) and vars and modificons:
             out.writeTag("modifyLink", vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("minutesLink", True)
-        if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("materialLink", True)
         if conf.canModify( self.__aw ) and vars and vars.has_key("cloneURL") and modificons:
             out.writeTag("cloneLink", vars["cloneURL"])
@@ -502,7 +500,6 @@ class outputGenerator(object):
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
             out.writeTag("modifyLink",vars["sessionModifyURLGen"](session))
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
-            out.writeTag("minutesLink",True)
             out.writeTag("materialLink", True)
         out.writeTag("title",session.title)
         out.writeTag("description",session.description)
@@ -595,7 +592,6 @@ class outputGenerator(object):
             ttLink = "%s#%s.s%sl%s" % (url, session.getStartDate().strftime('%Y%m%d'), session.getId(), slotId)
             out.writeTag("sessionTimetableLink",ttLink)
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
-            out.writeTag("minutesLink",True)
             out.writeTag("materialLink", True)
         title = session.title
         if slot.getTitle() != "" and slot.getTitle() != title:
@@ -683,8 +679,6 @@ class outputGenerator(object):
             out.closeTag("type")
         if contribution.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["contribModifyURLGen"](contribution))
-        if (contribution.canModify( self.__aw ) or contribution.canUserSubmit(self.__aw.getUser())) and vars and modificons:
-            out.writeTag("minutesLink", True)
         if (contribution.canModify( self.__aw ) or contribution.canUserSubmit(self.__aw.getUser())) and vars and modificons:
             out.writeTag("materialLink", True)
         keywords = contribution.getKeywords()
@@ -789,8 +783,6 @@ class outputGenerator(object):
 
         if subCont.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["subContribModifyURLGen"](subCont))
-        if (subCont.canModify( self.__aw ) or subCont.canUserSubmit( self.__aw.getUser())) and vars and modificons:
-            out.writeTag("minutesLink",True)
         if (subCont.canModify( self.__aw ) or subCont.canUserSubmit( self.__aw.getUser())) and vars and modificons:
             out.writeTag("materialLink", True)
         rnh = subCont.getReportNumberHolder()
