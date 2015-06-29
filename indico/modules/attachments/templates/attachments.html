@@ -12,11 +12,15 @@
                 <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
             </div>
             <div class="toolbar right">
-                <div class="group js-attachment-actions">
-                    <a href="#" class="i-button icon-file" data-href="{{ url_for('.upload', linked_object) }}">
+                <div class="group">
+                    <a href="#" class="i-button icon-file js-dialog-action"
+                       data-href="{{ url_for('.upload', linked_object) }}"
+                       data-title="{%- trans %}Upload files{% endtrans -%}">
                         {%- trans %}Upload files{% endtrans -%}
                     </a>
-                    <a href="#" class="i-button icon-link" data-href="{{ url_for('.add_link', linked_object) }}">
+                    <a href="#" class="i-button icon-link js-dialog-action"
+                       data-href="{{ url_for('.add_link', linked_object) }}"
+                       data-title="{%- trans %}Add link{% endtrans -%}">
                         {%- trans %}Add link{% endtrans -%}
                     </a>
                 </div>
@@ -40,11 +44,11 @@
             .on('click', 'ul.tree > li.expandable > .sub-tree', function(evt) {
                 evt.stopPropagation();
             })
-            .on('click', '.js-attachment-actions > a', function() {
+            .on('click', '.js-dialog-action', function() {
                 var $this = $(this);
                 ajaxDialog({
                     url: $this.data('href'),
-                    title: $this.text(),
+                    title: $this.data('title'),
                     onClose: function(data) {
                         if (data) {
                             $('#attachments-container').html(data.attachment_list);

@@ -28,7 +28,9 @@
                            This will remove the attachment permanantly.
                            {%- endtrans %}">
                     </a>
-                    <span class="icon-edit"></span>
+                    <a class="icon-edit js-dialog-action"
+                       data-href="{{ url_for('.modify_attachment', attachment) }}"
+                       data-title="{% trans name=attachment.title %}Edit {{ name }}{% endtrans %}"></a>
                     {% if attachment.type.name == 'file' %}
                         <span class="icon-file-download"></span>
                     {% else %}
@@ -95,7 +97,8 @@
         <span class="empty">{% trans %}There are no attachments yet.{% endtrans %}</span>
     {%- endif -%}
     <div class="i-box-footer text-right js-attachment-actions">
-        <a href="#" class="i-button icon-plus" data-href="{{ url_for('.create_folder', linked_object) }}">
+        <a href="#" class="i-button icon-plus" data-href="{{ url_for('.create_folder', linked_object) }}"
+           data-title="{% trans %}Add new folder{% endtrans %}">
             {% trans %}Add new folder{% endtrans -%}
         </a>
     </div>
