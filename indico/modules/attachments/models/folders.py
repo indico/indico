@@ -109,6 +109,10 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             folder = cls(is_default=True, linked_object=linked_object)
         return folder
 
+    @property
+    def locator(self):
+        return dict(self.linked_object.getLocator(), folder_id=self.id)
+
     @return_ascii
     def __repr__(self):
         return '<AttachmentFolder({}, {}{}{}, {}, {})>'.format(

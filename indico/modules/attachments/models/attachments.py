@@ -164,6 +164,10 @@ class Attachment(ProtectionMixin, db.Model):
     def protection_parent(self):
         return self.folder
 
+    @property
+    def locator(self):
+        return dict(self.folder.locator, attachment_id=self.id)
+
     @return_ascii
     def __repr__(self):
         return '<Attachment({}, {}, {}{}, {}, {})>'.format(
