@@ -1,13 +1,20 @@
 {% set type_icons = {
     'application/pdf': 'icon-file-pdf',
     'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-excel',
-    'text/vnd.indico.link': 'icon-link',
     'image/jpeg': 'icon-image'
 } %}
 
+{% macro _attachment_icon(attachment) -%}
+    {%- if attachment.type.name == 'link' -%}
+        icon-link
+    {%- else -%}
+        {{ type_icons.get(attachment.file.content_type, 'icon-file') }}
+    {%- endif -%}
+{%- endmacro %}
+
 {% macro _attachment_row(attachment) %}
     <li>
-        <div class="{{ type_icons.get(attachment['content-type'], 'icon-file') }} attachment-entry">
+        <div class="{{ _attachment_icon(attachment) }} attachment-entry">
             <a href="#" target="_blank" class="attachment-name">{{- attachment.title -}}</a>
             <span class="details">
                 <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
