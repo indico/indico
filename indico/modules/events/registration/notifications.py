@@ -57,7 +57,8 @@ def _get_reg_details(reg_form, registrant):
                 if not response_item:
                     continue
                 input_field = response_item.getGeneralField().getInput()
-                form_field = {'value': response_item.getValue()}
+                form_field = {'value': response_item.getValue(),
+                              'caption': to_unicode(response_item.getCaption())}
                 if response_item.isBillable():
                     form_field['price'] = response_item.getPrice()
                     form_field['currency'] = response_item.getCurrency()
@@ -66,7 +67,7 @@ def _get_reg_details(reg_form, registrant):
                         form_field['value'] = to_unicode(input_field.getValueDisplay(form_field['value']))
                     except Exception:
                         form_field['value'] = to_unicode(form_field['value']).strip()
-                fields[to_unicode(response_item.getCaption())] = form_field
+                fields[field.getId()] = form_field
             if isinstance(section, PersonalDataForm):
                 reg_details['personal_data'][title] = fields
             else:

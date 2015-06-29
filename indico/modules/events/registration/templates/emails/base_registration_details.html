@@ -30,12 +30,12 @@
                 <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
                     <h2>{{ title }}</h2>
                     <dl>
-                        {%- for name, value_attrs in fields.iteritems() if value_attrs.value %}
-                            {{ print_dt(name, value_attrs.value) }}
-                            {%- if value_attrs.value -%}
-                                {% set description = value_attrs.value %}
-                                {% if value_attrs.price -%}
-                                    {% set description = description + ' (' + value_attrs.price + ' ' + value_attrs.currency + ')' %}
+                        {%- for field in fields.itervalues() if field.value %}
+                            {{ print_dt(field.caption, field.value) }}
+                            {%- if field.value -%}
+                                {% set description = field.value %}
+                                {% if field.price -%}
+                                    {% set description = description + ' (' + field.price + ' ' + field.currency + ')' %}
                                 {%- endif %}
                                 {{ print_dd(description) }}
                             {%- endif %}
@@ -107,12 +107,12 @@
                     <div style="padding-bottom: 20px;{% if not loop.first %} border-top: 1px solid #EBEBEB;{% endif %}">
                         <h2>{{ title }}</h2>
                         <dl>
-                            {%- for name, value_attrs in fields.iteritems() if value_attrs.value %}
-                                {{ print_dt(name, value_attrs.value) }}
-                                {%- if value_attrs.value -%}
-                                    {% set description = value_attrs.value %}
-                                    {% if value_attrs.price -%}
-                                        {% set description = description + ' (' + value_attrs.price + ' ' + value_attrs.currency + ')' %}
+                            {%- for field in fields.itervalues() if field.value %}
+                                {{ print_dt(field.caption, field.value) }}
+                                {%- if field.value -%}
+                                    {% set description = field.value %}
+                                    {% if field.price -%}
+                                        {% set description = description + ' (' + field.price + ' ' + field.currency + ')' %}
                                     {%- endif %}
                                     {{ print_dd(description) }}
                                 {%- endif %}
