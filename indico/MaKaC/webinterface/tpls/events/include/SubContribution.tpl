@@ -3,7 +3,7 @@
 <%namespace name="common" file="Common.tpl"/>
 
 <li>
-    <%include file="ManageButton.tpl" args="item=item, alignRight=True, showMinutes=minutes"/>
+    <%include file="ManageButton.tpl" args="item=item, alignRight=True, minutesHidden=not minutes"/>
     <span class="subLevelTitle confModifPadding">${item.getTitle()}</span>
 
     % if item.getDuration():

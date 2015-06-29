@@ -1,9 +1,10 @@
-<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False, showMinutes=False"/>
+<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False, minutesHidden=True, minutesToggle=True"/>
 
 <%
     info = extractInfoForButton(item)
     menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info
 %>
+
 % if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
 
     % if manageLink:
@@ -11,9 +12,9 @@
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
     % else:
         <div class="toolbar right thin">
-            % if item.note:
+            % if minutesToggle and item.note:
                 <div class="group">
-                    ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=not showMinutes) }
+                    ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=minutesHidden) }
                 </div>
             % endif
             <div class="group">

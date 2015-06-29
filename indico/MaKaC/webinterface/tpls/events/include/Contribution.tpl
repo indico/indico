@@ -4,7 +4,7 @@
 <%namespace name="common" file="Common.tpl"/>
 
 <li class="meetingContrib">
-        <%include file="ManageButton.tpl" args="item=item, alignRight=True, showMinutes=minutes"/>
+        <%include file="ManageButton.tpl" args="item=item, alignRight=True, minutesHidden=not minutes"/>
         ${ template_hook('vc-actions', event=conf, item=item) }
 
     <span class="${timeClass}">

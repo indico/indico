@@ -7,7 +7,7 @@
 <li class="meetingSession">
     <span class="containerTitle confModifPadding">
         <a name="${session.getId()}"></a>
-        <%include file="ManageButton.tpl" args="item=item, alignRight=True, showMinutes=minutes"/>
+        <%include file="ManageButton.tpl" args="item=item, alignRight=True, minutesHidden=not minutes"/>
         ${ template_hook('vc-actions', event=conf, item=item) }
 
         <span class="topLevelTime">

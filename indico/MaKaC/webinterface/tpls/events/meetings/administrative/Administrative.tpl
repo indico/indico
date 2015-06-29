@@ -31,7 +31,7 @@
         <br/>&nbsp;<br/>
 
         <div class="eventInfo">
-            <%include file="../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
+            <%include file="../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False"/>
             ${conf.getTitle()}<br/>
             <%block name="locationAndTime">
                 % if getLocationInfo(conf) != ('', '', ''):
@@ -42,6 +42,9 @@
             <br/>
             <%block name="eventMaterial">
             </%block>
+            % if conf.note:
+                <a href="${ url_for('event_notes.view', conf) }">${ _("Minutes") }</a>
+            % endif
             <br/>
         </div>
 
@@ -56,11 +59,9 @@
         % endif
 
         <br/><br/>
-        % if self.attr.minutes:
-            <% minutesText = conf.getMinutes().getText() if conf.getMinutes() else None %>
-            % if minutesText:
-                ${common.renderDescription(minutesText)}
-            % endif
+
+        % if self.attr.minutes and conf.note:
+            ${ common.renderDescription(conf.note.html) }
         % endif
 
         <%block name="printSchedule" args="showOrder=True">
@@ -91,9 +92,9 @@
                         </tr>
                     % endif
                     % if getItemType(item) == "Session":
-                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=showOrder, print_mode=self.attr.print_mode"/>
+                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, inlineMinutes=self.attr.minutes, showOrder=showOrder, print_mode=self.attr.print_mode"/>
                     % else:
-                        <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=showOrder"/>
+                        <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, inlineMinutes=self.attr.minutes, order=order, showOrder=showOrder"/>
                     % endif
                     % if getItemType(item) != "Break":
                         <% order +=1 %>

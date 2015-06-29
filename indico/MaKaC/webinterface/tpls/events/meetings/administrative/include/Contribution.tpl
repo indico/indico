@@ -1,4 +1,4 @@
-<%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1, showOrder=True" />
+<%page args="item, parent, hideTime=False, allMaterial=False, inlineMinutes=False, order=1, showOrder=True" />
 
 <%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
@@ -20,19 +20,13 @@
 
     </td>
     <td class="itemTopAlign itemLeftAlign itemTitle">
-        ${item.getTitle()}
-        <br/>
-        % if minutes:
-            <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
-            % if minutesText:
-                ${common.renderDescription(minutesText)}
-            % endif
-        % endif
+        ${item.getTitle()}<br/>
         % if item.getDescription():
-           <br/>
            ${common.renderDescription(item.getDescription())}
         % endif
-
+        % if inlineMinutes and item.note:
+            ${common.renderDescription(item.note.html)}
+        % endif
     </td>
     <td class="itemTopAlign itemRightAlign">
         % if item.getSpeakerList() or item.getSpeakerText():
@@ -81,10 +75,13 @@
                 % endfor
             % endif
         % endif
+        % if item.note:
+            <a href="${ url_for('event_notes.view', item) }">${ _("Minutes") }</a>
+        % endif
         </span>
     </td>
     <td class="itemTopAlign">
-        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
     </td>
 </tr>
 % if item.getSubContributionList():

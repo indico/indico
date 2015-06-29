@@ -1,4 +1,4 @@
-<%page args="item, parent=None, allMaterial=False, hideTime=True, materialSession=False, order=1, showOrder=True, print_mode=False"/>
+<%page args="item, parent=None, allMaterial=False, hideTime=True, materialSession=False, order=1, showOrder=True, print_mode=False, inlineMinutes=False"/>
 
 <%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
@@ -7,12 +7,7 @@
 <% conf = item.getConference() %>
 
 <tr>
-    % if not print_mode:
-    <td>
-        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
-    </td>
-    % endif
-    <td class="itemLeftAlign sessionInfo" colspan="${3 if print_mode else 2}"><br/>
+    <td class="itemLeftAlign sessionInfo" colspan="${3 if print_mode else 2}">
         <span class="sessionTitle">
             ${session.getTitle()}
         </span>
@@ -29,7 +24,6 @@
                 <span class="locationParenthesis">)</span>
             </span>
         % endif
-        <br/>
     </td>
     <td class="itemRightAlign" >
         <span class="materialDisplayName">
@@ -48,9 +42,16 @@
                 % endif
             % endfor
         % endif
+        % if item.note:
+            <a href="${ url_for('event_notes.view', item) }">${ _("Minutes") }</a>
+        % endif
         </span>
     </td>
-
+    % if not print_mode:
+    <td>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
+    </td>
+    % endif
 </tr>
 <tr>
     <td class="itemLeftAlign sessionInfo sessionDescription" colspan="4">
@@ -72,7 +73,7 @@
                 if not subitem.canView(accessWrapper):
                     continue
         %>
-        <%include file="${getItemType(subitem)}.tpl" args="item=subitem, parent=item, hideTime=hideTime, order=order, showOrder=showOrder"/>
+        <%include file="${getItemType(subitem)}.tpl" args="item=subitem, parent=item, hideTime=hideTime, order=order, showOrder=showOrder, inlineMinutes=inlineMinutes"/>
         % if getItemType(subitem) == "Contribution":
             <% order +=1 %>
         % endif

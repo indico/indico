@@ -1,4 +1,4 @@
-<%page args="item, allMaterial=False, minutes=False, order=1, suborder=1"/>
+<%page args="item, allMaterial=False, inlineMinutes=False, order=1, suborder=1"/>
 
 <%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
@@ -12,11 +12,8 @@
                 </td>
                 <td class="itemTopAlign">
                     <span class="subItemText">${item.getTitle()}</span>
-                    % if minutes:
-                        <% minutesText = item.getMinutes().getText() if item.getMinutes() else None %>
-                        % if minutesText:
-                            ${common.renderDescription(minutesText)}
-                        % endif
+                    % if inlineMinutes and item.note:
+                        ${common.renderDescription(item.note.html)}
                     % endif
                 </td>
             </tr>
@@ -65,10 +62,13 @@
                 % endfor
             % endif
         % endif
+        % if item.note:
+            <a href="${ url_for('event_notes.view', item) }">${ _("Minutes") }</a>
+        % endif
         </span>
     </td>
 
     <td class="itemTopAlign">
-         <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+         <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
     </td>
 </tr>
