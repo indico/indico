@@ -24,8 +24,9 @@
     </span>
   </td>
   <td valign="top" align="right">
-    % if session.getDescription() or len(item.getOwnConvenerList()) > 0 or session.getConvenerText() or (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation) or len(session.getAllMaterialList()) > 0:
+    % if session.getDescription() or len(item.getOwnConvenerList()) > 0 or session.getConvenerText() or (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation) or len(session.getAllMaterialList()) > 0 or item.note:
     <table bgcolor="#f0c060" cellpadding="2" cellspacing="0" border="0" class="results">
+    </tr>
     % if session.getDescription():
       <tr>
       % if showDescriptionTitle:
@@ -64,7 +65,7 @@
       </td>
     </tr>
     % endif
-    % if len(session.getAllMaterialList()) > 0:
+    % if item.note or len(session.getAllMaterialList()) > 0:
     <tr>
       <td valign="top" class="headerTitle">
         Material:
@@ -75,6 +76,11 @@
                 <%include file="../../${INCLUDE}/Material.tpl" args="material=material"/>
             % endif
         % endfor
+        % if item.note:
+            <a href="${ url_for('event_notes.view', item) }">
+                ${ _("Minutes") }
+            </a>
+        % endif
       </td>
     </tr>
     % endif
@@ -84,7 +90,7 @@
     % endif
   </td>
   <td style="padding-right:4px; width:23px">
-      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
   </td>
 </tr>
 </table>

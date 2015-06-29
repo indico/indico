@@ -12,15 +12,13 @@
           <td width="35">
             <img src="${Config.getInstance().getBaseURL()}/images/meeting.png" width="32" height="32" alt="lecture"/>
           </td>
-          <td class="headerselected" align="right">
-            <span style="font-weight:bold;">
-                <span class="confTitle">
-                    ${conf.getTitle()}
-                </span>
-                <div style="float: right; height: 15px; width: 15px; padding-top: 7px; padding-left: 5px;">
-                    <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True"/>
-                </div>
+          <td class="headerselected">
+            <span class="confTitle" style="font-weight:bold;">
+                ${conf.getTitle()}
             </span>
+            <div style="float: right; height: 15px;">
+                <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True, minutesToggle=False"/>
+            </div>
             % if conf.getReportNumberHolder().listReportNumbers():
                 <span style="font-size:x-small;">
                     % for reportNumber in conf.getReportNumberHolder().listReportNumbers():
@@ -121,6 +119,18 @@
             % endfor
           </td>
         </tr>
+        % endif
+        % if conf.note:
+            <tr>
+                <td valign="top" align="right" class="headerTitle">
+                    ${ _("Minutes") }:
+                </td>
+                <td>
+                    <a href="${ url_for('event_notes.view', conf) }">
+                        ${ _("Download") }
+                    </a>
+                </td>
+            </tr>
         % endif
         </table>
       </td>
