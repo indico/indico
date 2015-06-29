@@ -11,7 +11,7 @@ protection = getProtection(target) if target else None
 <div id="session-bar" class="${'ui-follow-scroll' if target and protection[0] != 'Public' else ''} session-bar${" session-bar-dark" if dark_ == True else ""}">
     <div class="toolbar right">
       <div class="group">
-        % if target and protection[0] != "Public":
+        % if target and not isFrontPage and currentUser:
             <%include file="ProtectionWidget.tpl" args="protection=protection"/>
             <script type="text/javascript">
             $.ui.sticky({
