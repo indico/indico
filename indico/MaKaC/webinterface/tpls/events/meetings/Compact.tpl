@@ -40,7 +40,16 @@
     </td>
     <td colspan="1" bgcolor="#90c0f0">
     <div style="float:right">
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
+        % if item.note:
+            <div class="toolbar right thin">
+                <div class="group">
+                    <a href="${ url_for('event_notes.view', item) }" class="i-button">
+                        ${ _("Minutes") }
+                    </a>
+                </div>
+            </div>
+        % endif
     </div>
     <span style="font-weight:bold;">${session.getTitle()}</span>
     %  if len(item.getOwnConvenerList()) > 0 or session.getConvenerText():
@@ -104,7 +113,16 @@
                           % endfor
                       </div>
                       <div style="float:right">
-                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False"/>
+                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False, minutesToggle=False"/>
+                        % if item.note:
+                            <div class="toolbar right thin">
+                                <div class="group">
+                                    <a href="${ url_for('event_notes.view', item) }" class="i-button">
+                                        ${ _("Minutes") }
+                                    </a>
+                                </div>
+                            </div>
+                        % endif
                       </div>
                   </div>
         </td>
@@ -126,13 +144,22 @@
 <tr>
     <td>
     <span style="font-weight:bold;">
-    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
+    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False"/>
+    % if conf.note:
+        <div class="toolbar right thin">
+            <div class="group">
+                <a href="${ url_for('event_notes.view', conf) }" class="i-button normal-button">
+                    ${ _("Minutes") }
+                </a>
+            </div>
+        </div>
+    % endif
     ${conf.getTitle()}
     </span><br/>
     ${common.renderEventTimeCompact(startDate, endDate)}
     <br/><br/>
     </td>
-    <td>
+    <td style="width: 1%; white-space: nowrap;">
     <table class="headerLegendsBorder" cellpadding="1" align="right">
     <tr>
         <td>

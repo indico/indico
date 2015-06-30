@@ -33,13 +33,6 @@ td {
    color: #000;
 }
 
-a:link {
-   color: #0000FF;
-   background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
-   text-decoration: none;
-}
 a:visited {
    color: #0000FF;
    background: transparent;
