@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 import os
-from shutil import copyfileobj
 import sys
+from shutil import copyfileobj
 
 from werkzeug.security import safe_join
 
