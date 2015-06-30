@@ -4,9 +4,16 @@
             <div class="i-box-title">
                 {% trans %}Minutes{% endtrans %}
             </div>
-            {% if for_event %}
-                {{ render_event_note_buttons(event=for_event, note=note, hidden=hidden) }}
-            {% endif %}
+            <div class="i-box-buttons toolbar right">
+                {% if for_event %}
+                    {{ render_event_note_buttons(event=for_event, note=note, hidden=hidden) }}
+                {% else %}
+                    <div class="group">
+                        <a href="{{ url_for('event_notes.view', note) }}" target="_blank"
+                           class="i-button icon-file-download" title="{% trans %}Open{% endtrans %}"></a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
         <div class="i-box-content {% if for_event %}{{ _togglable_classes(hidden) }}{% endif %}">
             {{ note.html|safe }}
@@ -16,36 +23,38 @@
 
 
 {% macro render_event_note_buttons(event, note=none, hidden=true) %}
-    <div class="i-box-buttons toolbar right">
-        {% if note %}
-            <div class="group">
-                {{ render_toggle_button(note_is_hidden=hidden) }}
-            </div>
-            <div class="group">
-                <button class="i-button icon-edit js-note-editor" title="{% trans %}Edit{% endtrans %}"
-                        data-href="{{ url_for('event_notes.edit', event) }}"></button>
-            </div>
-            <div class="group">
-                <button class="i-button icon-remove js-confirm-warning" title="{% trans %}Delete{% endtrans %}"
-                        data-href="{{ url_for('event_notes.delete', event) }}" data-method="POST"
-                        data-title="{% trans %}Delete minutes?{% endtrans %}"
-                        data-confirm="{% trans %}Do you want to delete the minutes of this event{% endtrans %}"></button>
-            </div>
-        {% else %}
-            <div class="group">
-                <button class="i-button highlight icon-plus js-note-editor"
-                        data-href="{{ url_for('event_notes.edit', event) }}">
-                    {% trans %}Add{% endtrans %}
-                </button>
-            </div>
-            <div class="group">
-                <button class="i-button icon-stack js-note-editor"
-                        data-href="{{ url_for('event_notes.compile', event) }}">
-                    {% trans %}Compile{% endtrans %}
-                </button>
-            </div>
-        {% endif %}
-    </div>
+    {% if note %}
+        <div class="group">
+            {{ render_toggle_button(note_is_hidden=hidden) }}
+        </div>
+        <div class="group">
+            <a href="{{ url_for('event_notes.view', event) }}" target="_blank"
+               class="i-button icon-file-download" title="{% trans %}Open{% endtrans %}"></a>
+        </div>
+        <div class="group">
+            <button class="i-button icon-edit js-note-editor" title="{% trans %}Edit{% endtrans %}"
+                    data-href="{{ url_for('event_notes.edit', event) }}"></button>
+        </div>
+        <div class="group">
+            <button class="i-button icon-remove js-confirm-warning" title="{% trans %}Delete{% endtrans %}"
+                    data-href="{{ url_for('event_notes.delete', event) }}" data-method="POST"
+                    data-title="{% trans %}Delete minutes?{% endtrans %}"
+                    data-confirm="{% trans %}Do you want to delete the minutes of this event{% endtrans %}"></button>
+        </div>
+    {% else %}
+        <div class="group">
+            <button class="i-button highlight icon-plus js-note-editor"
+                    data-href="{{ url_for('event_notes.edit', event) }}">
+                {% trans %}Add{% endtrans %}
+            </button>
+        </div>
+        <div class="group">
+            <button class="i-button icon-stack js-note-editor"
+                    data-href="{{ url_for('event_notes.compile', event) }}">
+                {% trans %}Compile{% endtrans %}
+            </button>
+        </div>
+    {% endif %}
 {% endmacro %}
 
 
