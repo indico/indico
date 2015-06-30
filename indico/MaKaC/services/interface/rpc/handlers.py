@@ -72,7 +72,6 @@ endpointMap = {
     "search": importModule('MaKaC.services.implementation.search'),
     "material": importModule('MaKaC.services.implementation.material'),
     "reviewing": importModule('MaKaC.services.implementation.reviewing'),
-    "minutes": importModule('MaKaC.services.implementation.minutes'),
     "news": importModule('MaKaC.services.implementation.news'),
     "category": importModule('MaKaC.services.implementation.category'),
     "upcomingEvents": importModule('MaKaC.services.implementation.upcoming'),
