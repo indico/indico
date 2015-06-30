@@ -1,5 +1,5 @@
 {% macro render_note(note, hidden=true, for_event=none) %}
-    <div id="event-note-{{ note.id }}" class="note-block i-box titled {% if not for_event %}{{ _togglable_classes(hidden) }}{% endif %}">
+    <div class="note-block i-box titled {% if not for_event %}{{ _togglable_classes(hidden) }}{% endif %}">
         <div class="i-box-header">
             <div class="i-box-title">
                 {% trans %}Minutes{% endtrans %}
@@ -19,7 +19,7 @@
     <div class="i-box-buttons toolbar right">
         {% if note %}
             <div class="group">
-                {{ render_toggle_button(note=note, note_is_hidden=hidden) }}
+                {{ render_toggle_button(note_is_hidden=hidden) }}
             </div>
             <div class="group">
                 <button class="i-button icon-edit js-note-editor" title="{% trans %}Edit{% endtrans %}"
@@ -49,9 +49,8 @@
 {% endmacro %}
 
 
-{% macro render_toggle_button(note, note_is_hidden) %}
-    <span class="i-button note-visibility-toggle js-show-note-toggle {% if note_is_hidden %}note-is-hidden{% endif %}"
-          data-note-id="{{ note.id }}">
+{% macro render_toggle_button(note_is_hidden) %}
+    <span class="i-button note-visibility-toggle js-show-note-toggle {% if note_is_hidden %}note-is-hidden{% endif %}">
         <span class="do-show-text">
             {% trans %}Show minutes{% endtrans %}
         </span>

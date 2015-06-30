@@ -22,10 +22,13 @@ $(function() {
     });
 
     $('.js-show-note-toggle').on('click', function() {
-        var $this = $(this);
-        var noteId = $this.data('noteId');
-        var note = $('#event-note-{0}'.format(noteId));
-        $this.toggleClass('note-is-hidden');
+        $(this).toggleClass('note-is-hidden');
+        // Note for event
+        var note = $(this).closest('.note-block');
+        // Note for other elements
+        if (note.length === 0) {
+            note = $(this).closest('li').children('.note-block');
+        }
         content = note.hasClass('togglable') ? note : note.find('.togglable');
         content.slideToggle();
     });
