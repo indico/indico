@@ -23,8 +23,8 @@ from indico.web.flask.wrappers import IndicoBlueprint
 _bp = IndicoBlueprint('event_notes', __name__, template_folder='templates', virtual_template_folder='events/notes',
                       url_prefix='/event/<confId>')
 
-_bp.add_url_rule('/note/', 'edit', RHEditNote, methods=('GET', 'POST', 'DELETE'), defaults={'object_type': 'event'})
-_bp.add_url_rule('/note/view', 'view', RHViewNote, methods=('GET',), defaults={'object_type': 'event'})
+_bp.add_url_rule('/note/', 'view', RHViewNote, defaults={'object_type': 'event'})
+_bp.add_url_rule('/note/edit', 'edit', RHEditNote, methods=('GET', 'POST', 'DELETE'), defaults={'object_type': 'event'})
 _bp.add_url_rule('/note/delete', 'delete', RHDeleteNote, methods=('POST',), defaults={'object_type': 'event'})
 _bp.add_url_rule('/note/compile', 'compile', RHCompileNotes, methods=('GET', 'POST'), defaults={'object_type': 'event'})
 

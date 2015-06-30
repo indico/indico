@@ -33,9 +33,10 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.base import RHProtected
+from MaKaC.accessControl import AccessWrapper
 
 
-class RHEventNoteBase(RHProtected):
+class RHNoteBase(RHProtected):
     """Base handler for notes attached to an object inside an event"""
 
     def _checkParams(self):
@@ -43,8 +44,12 @@ class RHEventNoteBase(RHProtected):
         if self.object is None:
             raise NotFound
 
+
+class RHManageNoteBase(RHNoteBase):
+    """Base handler for managing notes attached to an object inside an event"""
+
     def _checkProtection(self):
-        RHProtected._checkProtection(self)
+        RHNoteBase._checkProtection(self)
         if not self._doProcess:
             return
         if self.object_type == 'session' and self.object.canCoordinate(session.avatar):
@@ -63,7 +68,7 @@ class RHEventNoteBase(RHProtected):
                            'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
 
 
-class RHEditNote(RHEventNoteBase):
+class RHEditNote(RHManageNoteBase):
     """Create/edit/delete a note attached to an object inside an event"""
 
     def _get_defaults(self, note=None, source=None):
@@ -117,6 +122,8 @@ class RHEditNote(RHEventNoteBase):
 
 
 class RHCompileNotes(RHEditNote):
+    """Handle note edits a note attached to an object inside an event"""
+
     def _process(self):
         if self.event.note:
             raise NoReportError(_("This event already has a note attached."))
@@ -125,18 +132,24 @@ class RHCompileNotes(RHEditNote):
         return self._process_form(form, is_compilation=True)
 
 
-class RHDeleteNote(RHEventNoteBase):
+class RHDeleteNote(RHManageNoteBase):
+    """Handles deletion of a note attached to an object inside an event"""
+
     def _process(self):
         self._delete_note()
         return redirect(url_for('event.conferenceDisplay', self.event))
 
 
-class RHViewNote(RHEventNoteBase):
-    def _checkParams(self):
-        RHEventNoteBase._checkParams(self)
-        self.note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        if not self.note:
-            raise NotFound
+class RHViewNote(RHNoteBase):
+    """Handles display of a note attached to an object inside an event"""
+
+    def _checkProtection(self):
+        RHNoteBase._checkProtection(self)
+        if not self.object.canAccess(AccessWrapper(session.avatar)):
+            raise Forbidden
 
     def _process(self):
-        return self.note.html
+        note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        if not note:
+            raise NotFound
+        return note.html
