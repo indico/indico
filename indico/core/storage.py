@@ -48,7 +48,7 @@ def get_storage(backend_name):
     try:
         backend = get_storage_backends()[name]
     except KeyError:
-        raise RuntimeError('Storage backend does not exist: {}'.format(backend_name))
+        raise RuntimeError('Storage backend {} has invalid type {}'.format(backend_name, name))
     return backend(data)
 
 
