@@ -21,7 +21,7 @@ import os
 
 import pytest
 
-from indico.core.storage import Storage, FileSystemStorage, StorageError
+from indico.core.storage import Storage, FileSystemStorage, StorageError, ReadOnlyFileSystemStorage
 
 
 @pytest.fixture
@@ -118,3 +118,18 @@ def test_fs_send_file(fs_storage):
     assert 'text/plain' in response.headers['Content-type']
     assert 'filename.txt' in response.headers['Content-disposition']
     assert ''.join(response.response) == 'hello world'
+
+
+@pytest.mark.usefixtures('request_context')
+def test_fs_readonly(fs_storage):
+    f = fs_storage.save('test.txt', 'unused/unused', 'unused', BytesIO(b'hello world'))
+    readonly = ReadOnlyFileSystemStorage(fs_storage.path)
+    assert readonly.open(f).read() == b'hello world'
+    assert readonly.send_file(f, 'test/plain', 'test.txt')
+    assert readonly.getsize(f) == 11
+    with pytest.raises(StorageError):
+        readonly.delete(f)
+    with pytest.raises(StorageError):
+        readonly.save('test2.txt', 'unused/unused', 'unused', BytesIO(b'hello fail'))
+    # just to make sure the file is still there
+    assert readonly.open(f).read() == b'hello world'

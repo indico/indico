@@ -168,6 +168,16 @@ class Storage(object):
         return '<{}()>'.format(type(self).__name__)
 
 
+class ReadOnlyStorageMixin(object):
+    """Mixin that makes write operations fail with an error"""
+
+    def save(self, name, content_type, filename, fileobj):
+        raise StorageError('Cannot write to read-only storage')
+
+    def delete(self, file_id):
+        raise StorageError('Cannot delete from read-only storage')
+
+
 class FileSystemStorage(Storage):
     name = 'fs'
     simple_data = True
@@ -224,9 +234,18 @@ class FileSystemStorage(Storage):
         return '<FileSystemStorage: {}>'.format(self.path)
 
 
+class ReadOnlyFileSystemStorage(ReadOnlyStorageMixin, FileSystemStorage):
+    name = 'fs-readonly'
+
+    @return_ascii
+    def __repr__(self):
+        return '<ReadOnlyFileSystemStorage: {}>'.format(self.path)
+
+
 @signals.get_storage_backends.connect
 def _get_storage_backends(sender, **kwargs):
-    return FileSystemStorage
+    yield FileSystemStorage
+    yield ReadOnlyFileSystemStorage
 
 
 @signals.app_created.connect
