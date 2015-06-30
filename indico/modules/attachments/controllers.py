@@ -105,9 +105,18 @@ class RHEventAttachmentsEditFile(RHEventAttachmentsMixin, RHConferenceModifBase)
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected)
         form = EditAttachmentsForm(linked_object=self._conf, obj=defaults)
         if form.validate_on_submit():
+            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
             form.populate_obj(self.attachment, skip={'acl'})
+            self.attachment.folder = folder
             if self.attachment.is_protected:
                 self.attachment.acl = form.acl.data
+            file = request.files['file'] if request.files else None
+            if file:
+                self.attachment.file = AttachmentFile(user=session.user, filename=secure_filename(file.filename),
+                                                      content_type=file.mimetype)
+                self.attachment.file.save(file.file)
+
+            flash(_("The attachment has been updated"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self._conf))
         return jsonify_template('attachments/upload.html', event=self._conf, form=form,
                                 existing_attachment=self.attachment,

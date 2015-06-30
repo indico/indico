@@ -43,6 +43,7 @@
                 paramName: function() { return 'file'; },
                 init: function() {
                     var uploadButton = $('.js-dropzone-upload');
+                    var saveButton = $('.js-dropzone-save');
                     var self = this;
 
                     uploadButton.on('click', function(e) {
@@ -52,10 +53,25 @@
                         self.processQueue();
                     });
 
+                    saveButton.on('click', function(e) {
+                        if (self.getQueuedFiles().length) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        $('.dz-progress').show();
+                        self.processQueue();
+                    });
+
                     self.on('addedfile', function() {
                         uploadButton.prop('disabled', false);
                         $('.dz-message').hide();
                         $('.dz-progress').hide();
+                    });
+
+                    self.on('removedfile', function() {
+                        if (self.files.length == 0) {
+                            $('.dz-message').show();
+                        }
                     });
 
                     self.on('sendingmultiple', function() {
@@ -71,6 +87,17 @@
                             form.trigger('ajaxDialog:error', [xhr]);
                         }
                     });
+
+                    {% if existing_attachment %}
+                        self.options.addRemoveLinks = true;
+                        self.options.maxFiles = 1;
+                        var existingFile = {name: {{ existing_attachment.file.filename | tojson}},
+                                             size: {{ existing_attachment.file.size | tojson }},
+                                             accepted: true}
+
+                        self.emit('addedfile', existingFile);
+                        self.files[0] = existingFile;
+                    {% endif %}
                 }
             });
         })
