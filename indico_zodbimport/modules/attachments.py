@@ -23,6 +23,7 @@ from operator import attrgetter
 from uuid import uuid4
 
 import click
+from werkzeug.utils import secure_filename
 
 from indico.core.db import db
 from indico.core.config import Config
@@ -177,8 +178,8 @@ class AttachmentImporter(Importer):
                 self.print_error(cformat('%{red!}File {} not found on disk').format(resource._LocalFile__archivedId),
                                  event_id=event.id)
                 return None
-            data['file'] = AttachmentFile(user=self.janitor_user, created_dt=data['modified_dt'],
-                                          filename=convert_to_unicode(resource.fileName),
+            filename = secure_filename(convert_to_unicode(resource.fileName)) or 'attachment'
+            data['file'] = AttachmentFile(user=self.janitor_user, created_dt=data['modified_dt'], filename=filename,
                                           content_type='application/octet-stream',  # TODO
                                           size=size, storage_backend=self.storage_backend, storage_file_id=storage_path)
         attachment = Attachment(**data)
