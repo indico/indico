@@ -37,6 +37,10 @@
     padding: 10px 50px;
 }
 
+li > .note-block {
+    margin-top: 1em;
+}
+
 .note-visibility-toggle {
     &:not(.note-is-hidden) .do-show-text{ display: none; }
     &.note-is-hidden .do-hide-text { display: none; }
