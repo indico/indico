@@ -20,6 +20,7 @@ Schedule-related services
 from flask import session as flask_session
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.string import to_unicode
+from indico.util.user import create_pending_user, send_email_to_pending_contributors
 
 from MaKaC.services.implementation.base import ParameterManager
 
@@ -168,6 +169,8 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
                 DictPickler.update(element, elemValues)
                 # call the appropriate method
                 addMethod(contribution, element)
+                pending_user = create_pending_user(elemValues)
+                send_email_to_pending_contributors(pending_user.email, contribution.getParent().getTitle())
                 peopleIds.append(element.getId())
 
             # rights that are set individually per participant

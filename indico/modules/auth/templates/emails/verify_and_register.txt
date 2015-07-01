@@ -1,0 +1,18 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}Verify your email{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {% trans %}user{% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        To have a full access to its details, please verify that e-mail address {{ email }} is yours indeed.
+        To start the registration process, please click the link provided below:
+
+        {{ url }}
+    {%- endfilter -%}
+{%- endblock %}
