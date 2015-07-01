@@ -23,21 +23,25 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHCreateEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment)
+from indico.modules.events import event_object_url_prefixes
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
-_bp.add_url_rule('/event/<confId>/manage/attachments/', 'event_management', RHManageEventAttachments,
-                 defaults={'object_type': 'event'})
-_bp.add_url_rule('/event/<confId>/manage/attachments/add/files', 'upload', RHAddEventAttachmentFiles,
-                 methods=('GET', 'POST'), defaults={'object_type': 'event'})
-_bp.add_url_rule('/event/<confId>/manage/attachments/add/link', 'add_link', RHAddEventAttachmentLink,
-                 methods=('GET', 'POST'), defaults={'object_type': 'event'})
-_bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
-                 RHEditEventAttachment, methods=('GET', 'POST'), defaults={'object_type': 'event'})
-_bp.add_url_rule('/event/<confId>/manage/attachments/create-folder', 'create_folder', RHCreateEventFolder,
-                 methods=('GET', 'POST'), defaults={'object_type': 'event'})
-_bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/', 'delete_folder', RHDeleteEventFolder,
-                 methods=('DELETE',), defaults={'object_type': 'event'})
-_bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/<int:attachment_id>/', 'delete_attachment',
-                 RHDeleteEventAttachment, methods=('DELETE',), defaults={'object_type': 'event'})
+for object_type, prefixes in event_object_url_prefixes.iteritems():
+    for prefix in prefixes:
+        prefix = '/event/<confId>/manage' + prefix
+        _bp.add_url_rule(prefix + '/attachments/', 'event_management', RHManageEventAttachments,
+                         defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/add/files', 'upload', RHAddEventAttachmentFiles,
+                         methods=('GET', 'POST'), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/add/link', 'add_link', RHAddEventAttachmentLink,
+                         methods=('GET', 'POST'), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
+                         RHEditEventAttachment, methods=('GET', 'POST'), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/create-folder', 'create_folder', RHCreateEventFolder,
+                         methods=('GET', 'POST'), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'delete_folder', RHDeleteEventFolder,
+                         methods=('DELETE',), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/', 'delete_attachment',
+                         RHDeleteEventAttachment, methods=('DELETE',), defaults={'object_type': object_type})
