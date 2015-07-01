@@ -5,6 +5,7 @@
     {{ form_row(form.link, widget_attrs={'placeholder': 'Example: http://www.example.com/YourPDFFile.pdf'}) }}
     {{ form_rows(form, skip=(form.link.short_name,)) }}
     {% call form_footer(attach_form) %}
+        <button class="i-button big" data-button-back>{% trans %}Back{% endtrans %}</button>
         <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
     {% endcall %}
     <script>
