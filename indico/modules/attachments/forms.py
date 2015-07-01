@@ -55,7 +55,7 @@ class AddAttachmentsForm(IndicoForm):
 
 
 class EditAttachmentsForm(AddAttachmentsForm):
-    title = StringField(_("Title"), description=_("The title of the file."))
+    title = StringField(_("Title"), [DataRequired()], description=_("The title of the file."))
     description = TextAreaField(_("Description"))
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
                              groups=True, serializable=False, allow_external=True,
@@ -67,7 +67,7 @@ class AddLinkForm(AddAttachmentsForm):
 
 
 class CreateFolderForm(IndicoForm):
-    title = StringField(_("Name"), description=_("The name of the folder."))
+    title = StringField(_("Name"), [DataRequired()], description=_("The name of the folder."))
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget(),
                              description=_("By default, the folder will inherit the protection of the event. "
