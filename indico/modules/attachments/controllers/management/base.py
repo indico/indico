@@ -20,7 +20,6 @@ from flask import flash, request, session
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
-from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm, EditAttachmentsForm
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -30,7 +29,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _render_attachment_list(linked_object):
@@ -38,7 +36,9 @@ def _render_attachment_list(linked_object):
     return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)
 
 
-class RHEventAttachmentsMixin:
+class SpecificAttachmentsMixin:
+    """Mixin for RHs that reference a specific attachment"""
+
     normalize_url_spec = {
         'folder_id': lambda self: self.attachment.folder_id,
         None: lambda self: self.attachment.folder.linked_object
@@ -48,24 +48,25 @@ class RHEventAttachmentsMixin:
         self.attachment = Attachment.find_one(id=request.view_args['attachment_id'])
 
 
-class RHEventAttachments(RHConferenceModifBase):
-    """Shows the attachments of an event"""
+class ManageAttachmentsMixin:
+    """Shows the attachment management page"""
+    wp = None
 
     def _process(self):
-        return WPEventAttachments.render_template('attachments.html', self._conf, linked_object=self._conf,
-                                                  attachments=get_attached_items(self._conf))
+        return self.wp.render_template('attachments.html', self.base_object, linked_object=self.object,
+                                       attachments=get_attached_items(self.object))
 
 
-class RHEventAttachmentsUpload(RHConferenceModifBase):
-    """Upload files"""
+class AddAttachmentFilesMixin:
+    """Upload file attachments"""
 
     def _process(self):
-        form = AddAttachmentsForm(linked_object=self._conf)
+        form = AddAttachmentsForm(linked_object=self.object)
         if form.validate_on_submit():
             files = request.files.getlist('file')
+            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
                 filename = secure_filename(f.filename) or 'attachment'
-                folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
                                         protection_mode=form.protection_mode.data)
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
@@ -73,23 +74,29 @@ class RHEventAttachmentsUpload(RHConferenceModifBase):
                 db.session.add(attachment)
             flash(ngettext("The attachment has been uploaded", "%(num)d attachments have been uploaded", len(files)),
                   'success')
-            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
-        return jsonify_template('attachments/upload.html', event=self._conf, form=form,
-                                action=url_for('.upload', self._conf))
+            return jsonify_data(attachment_list=_render_attachment_list(self.object))
+        return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object))
 
 
-class RHEventAttachmentsEditFile(RHEventAttachmentsMixin, RHConferenceModifBase):
-    """Edit an uploaded file"""
+class AddAttachmentLinkMixin:
+    """Add link attachment"""
 
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        RHEventAttachmentsMixin._checkParams(self)
+    def _process(self):
+        form = AddLinkForm(linked_object=self.object)
+        if form.validate_on_submit():
+            # TODO
+            return jsonify_data(attachment_list=_render_attachment_list(self.object))
+        return jsonify_template('attachments/add_link.html', form=form)
+
+
+class EditAttachmentFileMixin(SpecificAttachmentsMixin):
+    """Edit an attachment"""
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected)
-        form = EditAttachmentsForm(linked_object=self._conf, obj=defaults)
+        form = EditAttachmentsForm(linked_object=self.object, obj=defaults)
         if form.validate_on_submit():
-            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
+            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             form.populate_obj(self.attachment, skip={'acl'})
             self.attachment.folder = folder
             if self.attachment.is_protected:
@@ -101,54 +108,42 @@ class RHEventAttachmentsEditFile(RHEventAttachmentsMixin, RHConferenceModifBase)
                 self.attachment.file.save(file.file)
 
             flash(_("The attachment has been updated"), 'success')
-            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
-        return jsonify_template('attachments/upload.html', event=self._conf, form=form,
-                                existing_attachment=self.attachment,
+            return jsonify_data(attachment_list=_render_attachment_list(self.object))
+        return jsonify_template('attachments/upload.html', form=form, existing_attachment=self.attachment,
                                 action=url_for('.modify_attachment', self.attachment))
 
 
-class RHEventAttachmentsAddLink(RHConferenceModifBase):
-    """Attach link"""
-
-    def _process(self):
-        form = AddLinkForm(linked_object=self._conf)
-        if form.validate_on_submit():
-            # TODO
-            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
-        return jsonify_template('attachments/add_link.html', event=self._conf, form=form)
-
-
-class RHEventAttachmentsCreateFolder(RHConferenceModifBase):
+class CreateFolderMixin:
     """Create a new empty folder"""
 
     def _process(self):
         form = CreateFolderForm()
         if form.validate_on_submit():
-            folder = AttachmentFolder(linked_object=self._conf)
+            folder = AttachmentFolder(linked_object=self.object)
             form.populate_obj(folder, skip={'acl'})
             if folder.is_protected:
                 folder.acl = form.acl.data
             db.session.add(folder)
             flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
-            return jsonify_data(attachment_list=_render_attachment_list(self._conf))
-        return jsonify_template('attachments/create_folder.html', event=self._conf, form=form)
+            return jsonify_data(attachment_list=_render_attachment_list(self.object))
+        return jsonify_template('attachments/create_folder.html', form=form)
 
 
-class RHEventAttachmentsDeleteFolder(RHConferenceModifBase):
+class DeleteFolderMixin:
     """Delete a folder"""
 
     def _process(self):
         folder = AttachmentFolder.get_one(request.view_args['folder_id'])
         folder.is_deleted = True
         flash(_("Folder \"{name}\" deleted").format(name=folder.title), 'success')
-        return jsonify_data(attachment_list=_render_attachment_list(self._conf))
+        return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
 
-class RHEventAttachmentsDeleteAttachment(RHConferenceModifBase):
-    """Delete a folder"""
+class DeleteAttachmentMixin:
+    """Delete an attachment"""
 
     def _process(self):
         attachment = Attachment.get_one(request.view_args['attachment_id'])
         attachment.is_deleted = True
-        flash(_("\"{name}\" deleted").format(name=attachment.title), 'success')
-        return jsonify_data(attachment_list=_render_attachment_list(self._conf))
+        flash(_("Attachment \"{name}\" deleted").format(name=attachment.title), 'success')
+        return jsonify_data(attachment_list=_render_attachment_list(self.object))
