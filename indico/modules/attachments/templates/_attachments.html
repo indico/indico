@@ -1,20 +1,32 @@
 {% set type_icons = {
     'application/pdf': 'icon-file-pdf',
-    'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-excel',
-    'image/jpeg': 'icon-image'
+    'application/vnd.ms-excel': 'icon-file-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'icon-file-excel',
+    'application/msword': 'icon-file-word',
+    'application/application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'icon-file-word',
+    'application/vnd.ms-powerpoint': 'icon-file-presentation',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'icon-file-presentation',
+    'application/vnd.oasis.opendocument.text': 'icon-file-openoffice',
+    'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-openoffice',
+    'application/vnd.oasis.opendocument.presentation': 'icon-file-openoffice',
+    'image/jpeg': 'icon-image',
+    'image/png': 'icon-image',
+    'image/tiff': 'icon-image',
+    'image/gif': 'icon-image',
+    'image/x-ms-bmp': 'icon-image'
 } %}
 
-{% macro _attachment_icon(attachment) -%}
+{% macro get_attachment_icon(attachment) -%}
     {%- if attachment.type.name == 'link' -%}
         icon-link
     {%- else -%}
-        {{ type_icons.get(attachment.file.content_type, 'icon-file') }}
+        {{ type_icons.get(attachment.file.content_type, 'icon-file-empty2') }}
     {%- endif -%}
 {%- endmacro %}
 
 {% macro _attachment_row(attachment) %}
     <li>
-        <div class="{{ _attachment_icon(attachment) }} node">
+        <div class="{{ get_attachment_icon(attachment) }} node">
             <a href="#" target="_blank" class="node-label">{{ attachment.title }}</a>
             <span class="details">
                 <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
