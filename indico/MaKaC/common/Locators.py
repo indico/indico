@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from UserDict import UserDict
-from types import ListType
-from indico.util.json import dumps
+from markupsafe import escape
 
-class Locator(UserDict):
+
+# XXX: do not use this in new code! use a plain dict instead!
+class Locator(dict):
     """Helper class specialising UserDict (dictionary) which contains a locator
         for an object. This is needed due to the id schema chosen and to the
         web needs: it is a relative id schema (a suboject is given an id which
@@ -28,38 +28,16 @@ class Locator(UserDict):
         and provide methods for using it on the web pages so it's use is
         transparent for client.
     """
-    def getJSONForm( self ):
-        """Returns the current locator data as a JSON string.
-        """
-        return dumps(self.data)
 
-    def getURLForm( self ):
-        """Returns the current locator ready for being included in a URL.
-        """
-        l = []
-        for item in self.data.keys():
-            val = self.data[item]
-            if isinstance( val, ListType ):
-                for v in val:
-                    l.append("%s=%s"%(item, v))
-            else:
-                l.append("%s=%s"%(item, val))
-        return "&".join( l )
-
-    def getWebForm( self ):
+    def getWebForm(self):
         """Returns the current locator for being used in web pages forms
             (hidden parameters)
         """
         l = []
-        for item in self.data.keys():
-            val = self.data[item]
-            if isinstance( val, ListType ):
+        for item, val in self.iteritems():
+            if isinstance(val, list):
                 for v in val:
-                    l.append("""<input type="hidden" name="%s" value="%s">"""%(item, v))
+                    l.append('<input type="hidden" name="{}" value="{}">'.format(item, escape(v)))
             else:
-                l.append("""<input type="hidden" name="%s" value="%s">"""%(item, val))
-        return "\n".join( l )
-
-
-
-
+                l.append('<input type="hidden" name="{}" value="{}">'.format(item, escape(val)))
+        return "\n".join(l)

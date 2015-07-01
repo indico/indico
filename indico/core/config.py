@@ -901,9 +901,6 @@ class Config:
             return id
         return self.__systemIcons[id]
 
-    def getArchivedFileURL(self, localFile):
-        return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )
-
     def hasFileConverter(self):
         return self.getFileConverter().get("conversion_server", "") != ""
 
