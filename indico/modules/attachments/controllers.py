@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, session
-from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import secure_filename
 
@@ -26,6 +25,7 @@ from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm, EditAttachmentsForm
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
+from indico.modules.attachments.util import get_attached_items
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -34,26 +34,9 @@ from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-def _get_attachment_list(linked_object):
-    folders = (AttachmentFolder
-               .find(linked_object=linked_object, is_deleted=False)
-               .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
-               .options(joinedload(AttachmentFolder.attachments))
-               .all())
-    if not folders:
-        return {}
-    # the default folder is never shown as a folder. instead, its
-    # files are shown on the same level as other folders
-    files = folders.pop(0).attachments if folders[0].is_default else []
-    return {
-        'folders': folders,
-        'files': files
-    }
-
-
 def _render_attachment_list(linked_object):
     tpl = get_template_module('attachments/_attachments.html')
-    return tpl.render_attachments(attachments=_get_attachment_list(linked_object), linked_object=linked_object)
+    return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)
 
 
 class RHEventAttachmentsMixin:
@@ -69,7 +52,7 @@ class RHEventAttachments(RHConferenceModifBase):
 
     def _process(self):
         return WPEventAttachments.render_template('attachments.html', self._conf, linked_object=self._conf,
-                                                  attachments=_get_attachment_list(self._conf))
+                                                  attachments=get_attached_items(self._conf))
 
 
 class RHEventAttachmentsUpload(RHConferenceModifBase):
