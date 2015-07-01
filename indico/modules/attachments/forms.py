@@ -32,7 +32,7 @@ from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 
-class AddAttachmentsForm(IndicoForm):
+class AttachmentFormBase(IndicoForm):
     protected = BooleanField(_("Protected"), widget=SwitchWidget(),
                              description=_("By default, the attachments will inherit the protection of the parent. "
                                            "Checking this field will restrict all access. The protection can be "
@@ -44,7 +44,7 @@ class AddAttachmentsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
-        super(AddAttachmentsForm, self).__init__(*args, **kwargs)
+        super(AttachmentFormBase, self).__init__(*args, **kwargs)
         self.folder.query = (AttachmentFolder
                              .find(linked_object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
@@ -54,7 +54,7 @@ class AddAttachmentsForm(IndicoForm):
         return ProtectionMode.protected if self.protected.data else ProtectionMode.inheriting
 
 
-class EditAttachmentsForm(AddAttachmentsForm):
+class EditAttachmentFormBase(AttachmentFormBase):
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the file."))
     description = TextAreaField(_("Description"))
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
@@ -62,8 +62,16 @@ class EditAttachmentsForm(AddAttachmentsForm):
                              description=_("The list of users and groups with access to the file"))
 
 
-class AddLinkForm(AddAttachmentsForm):
-    link = URLField(_("URL"), [DataRequired()])
+class AddAttachmentFilesForm(AttachmentFormBase):
+    pass
+
+
+class EditAttachmentFileForm(EditAttachmentFormBase):
+    pass
+
+
+class AttachmentLinkForm(EditAttachmentFormBase):
+    link_url = URLField(_("URL"), [DataRequired()])
 
 
 class CreateFolderForm(IndicoForm):
