@@ -4825,6 +4825,10 @@ class Registrant(Persistent, Fossilizable):
     def getStatusesList(self):
         return self.getStatuses().values()
 
+    def get_statuses_with_values(self):
+        return {status.getCaption(): status.getStatusValue().getCaption()
+                for status in self._statuses.itervalues()}
+
     def addStatus(self, s):
         self.getStatuses()[s.getId()] = s
         self.notifyModification()
