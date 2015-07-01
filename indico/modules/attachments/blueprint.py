@@ -26,7 +26,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
-_bp.add_url_rule('/event/<confId>/manage/attachments/', 'index', RHEventAttachments)
+_bp.add_url_rule('/event/<confId>/manage/attachments/', 'event_management', RHEventAttachments)
 _bp.add_url_rule('/event/<confId>/manage/attachments/upload', 'upload', RHEventAttachmentsUpload,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
