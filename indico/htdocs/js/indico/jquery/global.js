@@ -121,7 +121,8 @@ $(document).ready(function() {
         return false;
     });
 
-    $('body').on('click', 'button[data-method][data-href], input:button[data-method][data-href], a[data-method][data-href]', function() {
+    $('body').on('click', 'button[data-method][data-href], input:button[data-method][data-href], a[data-method][data-href]', function(e) {
+        e.preventDefault();
         var $this = $(this);
         var url = $this.data('href');
         var method = $this.data('method').toUpperCase();
