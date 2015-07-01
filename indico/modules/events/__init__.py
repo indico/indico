@@ -26,6 +26,15 @@ from indico.web.flask.util import url_for
 from indico.util.string import is_legacy_id
 
 
+#: URL prefixed for the various event objects
+event_object_url_prefixes = {
+    'event': [''],
+    'session': ['/session/<sessionId>'],
+    'contribution': ['/session/<sessionId>/contribution/<contribId>', '/contribution/<contribId>'],
+    'subcontribution': ['/session/<sessionId>/contribution/<contribId>/<subContId>',
+                        '/contribution/<contribId>/<subContId>']
+}
+
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
     EventSetting.delete_event(int(event.id))

@@ -80,8 +80,8 @@
                         action: function(m) {
                             confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {
                                 $.ajax({
-                                    url: ${ url_for('event_notes.edit', note_item) | n,j },
-                                    method: 'DELETE',
+                                    url: ${ url_for('event_notes.delete', note_item) | n,j },
+                                    method: 'POST',
                                     error: handleAjaxError,
                                     success: function() {
                                         location.reload();

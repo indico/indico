@@ -59,14 +59,6 @@ class RHManageNoteBase(RHNoteBase):
         if not self.object.canModify(session.avatar):
             raise Forbidden
 
-    def _delete_note(self):
-        note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        if note is not None:
-            note.delete(session.user)
-            logger.info('Note {} deleted by {}'.format(note, session.user))
-            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
-                           'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
-
 
 class RHEditNote(RHManageNoteBase):
     """Create/edit/delete a note attached to an object inside an event"""
@@ -116,10 +108,6 @@ class RHEditNote(RHManageNoteBase):
         form = self._make_form()
         return self._process_form(form)
 
-    def _process_DELETE(self):
-        self._delete_note()
-        return jsonify_data(flash=False)
-
 
 class RHCompileNotes(RHEditNote):
     """Handle note edits a note attached to an object inside an event"""
@@ -136,7 +124,12 @@ class RHDeleteNote(RHManageNoteBase):
     """Handles deletion of a note attached to an object inside an event"""
 
     def _process(self):
-        self._delete_note()
+        note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        if note is not None:
+            note.delete(session.user)
+            logger.info('Note {} deleted by {}'.format(note, session.user))
+            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
+                           'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
         return redirect(url_for('event.conferenceDisplay', self.event))
 
 
