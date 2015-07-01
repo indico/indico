@@ -75,9 +75,11 @@
 
                     {% if existing_attachment %}
                         self.options.maxFiles = 1;
-                        var existingFile = {name: {{ existing_attachment.file.filename | tojson}},
-                                             size: {{ existing_attachment.file.size | tojson }},
-                                             accepted: true}
+                        var existingFile = {
+                            name: {{ existing_attachment.file.filename | tojson}},
+                            size: {{ existing_attachment.file.size | tojson }},
+                            accepted: true
+                        };
 
                         self.emit('addedfile', existingFile);
                         $('.dz-progress').hide();
