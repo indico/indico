@@ -107,6 +107,7 @@ from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
 from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
+from indico.modules.attachments.util import get_attached_items
 from indico.util.date_time import utc_timestamp
 from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
@@ -311,6 +312,17 @@ class CommonObjectBase(CoreObject, Fossilizable):
             return any(domain.belongsTo(ip) for domain in domains)
         else:
             return True
+
+    @property
+    def attached_items(self):
+        """
+        CAUTION: this won't return empty directories (used by interface), nor things the
+        current user can't see
+        """
+        if isinstance(self, (Contribution, Session, SubContribution, Conference)):
+            return get_attached_items(self, include_empty=False, include_hidden=False)
+        else:
+            raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 
 
 class CategoryManager(ObjectHolder):

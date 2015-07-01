@@ -114,7 +114,7 @@
           <td>
             % for material in conf.getAllMaterialList():
                 % if material.canView(accessWrapper):
-                    <%include file="../../${INCLUDE}/Material.tpl" args="material=material"/>
+                    ${ render_template('attachments/mako_compat/materials.html', attachments=attachments, folders=folders) }
                 % endif
             % endfor
           </td>

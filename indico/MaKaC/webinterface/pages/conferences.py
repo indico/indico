@@ -18,6 +18,7 @@ import collections
 from flask import session, request
 import os
 import random
+import re
 import time
 import urllib
 
@@ -74,9 +75,12 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
+from indico.modules.attachments.util import get_attached_items
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
+
+LECTURE_SERIES_RE = re.compile(r'^part\d+$')
 
 
 def stringToDate(str):
@@ -734,21 +738,23 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         if conf.getParticipation().displayParticipantList() :
             wvars['participants']  = conf.getParticipation().getPresentParticipantListText()
 
-        wvars['files'] = {}
-        lectureTitles = ['part%s' % nr for nr in xrange(1, 11)]
-        materials, lectures, minutesText = [], [], []
-        for material in conf.getAllMaterialList():
-            if not material.canView(accessWrapper):
-                continue
-            if material.getTitle() in lectureTitles:
-                lectures.append(material)
-            elif material.getTitle() != "Internal Page Files":
-                materials.append(material)
+        attached_items = conf.attached_items
 
-        wvars['materials'] = materials
-        wvars['minutesText'] = minutesText
-        byTitleNumber = lambda x, y: int(x.getTitle()[4:]) - int(y.getTitle()[4:])
-        wvars['lectures'] = sorted(lectures, cmp=byTitleNumber)
+        lectures, folders = [], []
+
+        for folder in attached_items.get('folders', []):
+            if LECTURE_SERIES_RE.match(folder.title):
+                lectures.append(folder)
+            elif folder.title != "Internal Page Files":
+                folders.append(folder)
+
+        cmp_title_number = lambda x, y: int(x.title()[4:]) - int(y.title()[4:])
+
+        wvars.update({
+            'files': attached_items.get('files', []),
+            'folders': folders,
+            'lectures': sorted(lectures, cmp=cmp_title_number)
+        })
 
         if (conf.getType() in ("meeting", "simple_event")
                 and conf.getParticipation().isAllowedForApplying()

@@ -63,8 +63,6 @@ p.clone-description {
 a:link {
    color: #00c;
    font-weight: normal;
-   text-decoration: underline;
-   background: transparent;
 }
 a:visited {
    color: #006;
@@ -79,8 +77,6 @@ a:active {
 }
 a:hover {
    color: #fff;
-   background: #006;
-   text-decoration: underline;
 }
 a.img:hover {
    color: #00c;

@@ -32,20 +32,18 @@
 </tr>
 % endif
 
-% if len(materials) > 0:
+% if files or folders:
 <tr id="materialList">
     <td class="leftCol">${_("Material")}:</td>
     <td>
-        <div class="materialList clearfix">
-        % for material in materials:
-            <%include file="Material.tpl" args="material=material"/>
-        % endfor
+        <div class="material-list clearfix">
+            ${ render_template('attachments/mako_compat/materials.html', files=files, folders=folders) }
         </div>
     </td>
 </tr>
 % endif
 
-% if len(lectures) > 0:
+% if lectures:
 <tr id="lectureLinks">
     <td class="leftCol">${_("Other occasions")}</td>
     <td>

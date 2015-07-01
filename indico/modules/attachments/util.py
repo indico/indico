@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask import session
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 
 
-def get_attached_items(linked_object, include_deleted=False):
+def get_attached_items(linked_object, include_empty=True, include_hidden=True):
     """
     Return a structured representation of all the attachments linked
     to an object.
@@ -32,15 +33,18 @@ def get_attached_items(linked_object, include_deleted=False):
     """
     from indico.modules.attachments.models.folders import AttachmentFolder
 
-    kwargs = {}
-    if not include_deleted:
-        kwargs['is_deleted'] = False
-
     folders = (AttachmentFolder
-               .find(linked_object=linked_object, **kwargs)
+               .find(linked_object=linked_object, is_deleted=False)
                .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
                .options(joinedload(AttachmentFolder.attachments))
                .all())
+
+    if not include_hidden:
+        folders = [f for f in folders if f.can_view(session.user)]
+
+    if not include_empty:
+        folders = [f for f in folders if f.attachments]
+
     if not folders:
         return {}
     # the default folder is never shown as a folder. instead, its
@@ -48,7 +52,7 @@ def get_attached_items(linked_object, include_deleted=False):
     files = folders.pop(0).attachments if folders[0].is_default else []
     return {
         'folders': folders,
-        'files': files
+        'files': [f for f in files]
     }
 
 

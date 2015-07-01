@@ -132,10 +132,12 @@ class WPBase():
     def getCSSFiles(self):
         return (self._asset_env['base_css'].urls() +
                 self._asset_env['screen_sass'].urls() +
+                self._asset_env['attachments_sass'].urls() +
                 self._asset_env['users_sass'].urls())
 
     def getJSFiles(self):
-        return self._asset_env['base_js'].urls()
+        return (self._asset_env['base_js'].urls() +
+                self._asset_env['modules_attachments_js'].urls())
 
     def _includeJSPackage(self, pkg_names, prefix='indico_'):
         if not isinstance(pkg_names, list):
