@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.modules.attachments.controllers.management.event import (RHManageEventAttachments,
                                                                      RHAddEventAttachmentFiles,
                                                                      RHAddEventAttachmentLink,
-                                                                     RHEditEventAttachmentFile,
+                                                                     RHEditEventAttachment,
                                                                      RHCreateEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment)
@@ -34,7 +34,7 @@ _bp.add_url_rule('/event/<confId>/manage/attachments/add/files', 'upload', RHAdd
 _bp.add_url_rule('/event/<confId>/manage/attachments/add/link', 'add_link', RHAddEventAttachmentLink,
                  methods=('GET', 'POST'), defaults={'object_type': 'event'})
 _bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
-                 RHEditEventAttachmentFile, methods=('GET', 'POST'), defaults={'object_type': 'event'})
+                 RHEditEventAttachment, methods=('GET', 'POST'), defaults={'object_type': 'event'})
 _bp.add_url_rule('/event/<confId>/manage/attachments/create-folder', 'create_folder', RHCreateEventFolder,
                  methods=('GET', 'POST'), defaults={'object_type': 'event'})
 _bp.add_url_rule('/event/<confId>/manage/attachments/<int:folder_id>/', 'delete_folder', RHDeleteEventFolder,

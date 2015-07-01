@@ -89,27 +89,34 @@ class AddAttachmentLinkMixin:
         return jsonify_template('attachments/add_link.html', form=form)
 
 
-class EditAttachmentFileMixin(SpecificAttachmentsMixin):
+class EditAttachmentMixin(SpecificAttachmentsMixin):
     """Edit an attachment"""
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected)
-        form = EditAttachmentsForm(linked_object=self.object, obj=defaults)
+        # TODO: use different form class if it's a link attachment
+        form_cls = EditAttachmentsForm if self.attachment.type == AttachmentType.file else EditAttachmentsForm
+        form = form_cls(linked_object=self.object, obj=defaults)
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             form.populate_obj(self.attachment, skip={'acl'})
             self.attachment.folder = folder
             if self.attachment.is_protected:
                 self.attachment.acl = form.acl.data
-            file = request.files['file'] if request.files else None
-            if file:
-                self.attachment.file = AttachmentFile(user=session.user, filename=secure_filename(file.filename),
-                                                      content_type=file.mimetype)
-                self.attachment.file.save(file.file)
+            # files need special handling; links are already updated in `populate_obj`
+            if self.attachment.type == AttachmentType.file:
+                file = request.files['file'] if request.files else None
+                if file:
+                    self.attachment.file = AttachmentFile(user=session.user, filename=secure_filename(file.filename),
+                                                          content_type=file.mimetype)
+                    self.attachment.file.save(file.file)
 
             flash(_("The attachment has been updated"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
-        return jsonify_template('attachments/upload.html', form=form, existing_attachment=self.attachment,
+
+        template = ('attachments/upload.html' if self.attachment.type == AttachmentType.file else
+                    'attachments/add_link.html')
+        return jsonify_template(template, form=form, existing_attachment=self.attachment,
                                 action=url_for('.modify_attachment', self.attachment))
 
 

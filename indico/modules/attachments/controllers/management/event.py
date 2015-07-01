@@ -20,7 +20,7 @@ from flask import session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.attachments.controllers.management.base import (ManageAttachmentsMixin, AddAttachmentFilesMixin,
-                                                                    AddAttachmentLinkMixin, EditAttachmentFileMixin,
+                                                                    AddAttachmentLinkMixin, EditAttachmentMixin,
                                                                     CreateFolderMixin, DeleteFolderMixin,
                                                                     DeleteAttachmentMixin)
 from indico.modules.attachments.views import WPEventAttachments
@@ -61,10 +61,10 @@ class RHAddEventAttachmentLink(AddAttachmentLinkMixin, RHEventAttachmentManageme
     pass
 
 
-class RHEditEventAttachmentFile(EditAttachmentFileMixin, RHEventAttachmentManagementBase):
+class RHEditEventAttachment(EditAttachmentMixin, RHEventAttachmentManagementBase):
     def _checkParams(self, params):
         RHEventAttachmentManagementBase._checkParams(self, params)
-        EditAttachmentFileMixin._checkParams(self)
+        EditAttachmentMixin._checkParams(self)
 
 
 class RHCreateEventFolder(CreateFolderMixin, RHEventAttachmentManagementBase):
