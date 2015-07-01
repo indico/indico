@@ -160,7 +160,8 @@ class _ActionNewStatus:
         self._params=params
 
     def perform( self ):
-        if self._params.get("caption","").strip() !="":
+        status_caption = self._params.get('caption', '').strip()
+        if status_caption and not self._conf.getRegistrationForm().has_status_defined(status_caption):
             self._conf.getRegistrationForm().addStatus(Status(self._conf.getRegistrationForm(), self._params))
 
 class _ActionRemoveStatuses:
