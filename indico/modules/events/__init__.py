@@ -26,7 +26,9 @@ from indico.web.flask.util import url_for
 from indico.util.string import is_legacy_id
 
 
-#: URL prefixed for the various event objects
+#: URL prefixes for the various event objects (public area)
+#: All prefixes are expected to be used inside the '/event/<confId>'
+#: url space.
 event_object_url_prefixes = {
     'event': [''],
     'session': ['/session/<sessionId>'],
@@ -34,6 +36,18 @@ event_object_url_prefixes = {
     'subcontribution': ['/session/<sessionId>/contribution/<contribId>/<subContId>',
                         '/contribution/<contribId>/<subContId>']
 }
+
+#: URL prefixes for the various event objects (management area)
+#: All prefixes are expected to be used inside the '/event/<confId>'
+#: url space.
+event_management_object_url_prefixes = {
+    'event': ['/manage'],
+    'session': ['/manage/session/<sessionId>'],
+    'contribution': ['/manage/session/<sessionId>/contribution/<contribId>', '/manage/contribution/<contribId>'],
+    'subcontribution': ['/manage/session/<sessionId>/contribution/<contribId>/subcontribution/<subContId>',
+                        '/manage/contribution/<contribId>/subcontribution/<subContId>']
+}
+
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):

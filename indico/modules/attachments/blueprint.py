@@ -23,14 +23,14 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHCreateEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment)
-from indico.modules.events import event_object_url_prefixes
+from indico.modules.events import event_management_object_url_prefixes
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
-for object_type, prefixes in event_object_url_prefixes.iteritems():
+for object_type, prefixes in event_management_object_url_prefixes.iteritems():
     for prefix in prefixes:
-        prefix = '/event/<confId>/manage' + prefix
+        prefix = '/event/<confId>' + prefix
         _bp.add_url_rule(prefix + '/attachments/', 'event_management', RHManageEventAttachments,
                          defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/add/files', 'upload', RHAddEventAttachmentFiles,
