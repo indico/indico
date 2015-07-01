@@ -92,10 +92,10 @@ class EventNoteImporter(Importer):
         return False
 
     def _get_minutes(self, obj):
-        material = obj.getMinutes()
+        material = obj.minutes
         if material is None:
             return None, None
-        resource = material.getResourceById('minutes')
+        resource = material._Material__resources.get('minutes')
         if resource is None:
             return None, None
         return resource, self._has_special_protection(material, resource)
