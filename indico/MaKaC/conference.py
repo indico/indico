@@ -39,7 +39,6 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
@@ -2136,6 +2135,7 @@ class Conference(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self)
 
     @unify_user_args
@@ -5108,6 +5108,7 @@ class Session(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self)
 
     def getVerboseType(self):
@@ -6392,6 +6393,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     @property
     @memoize_request
     def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self.session)
 
     def getTimezone( self ):
@@ -7494,6 +7496,7 @@ class Contribution(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self)
 
     def getVerboseType(self):
@@ -9765,6 +9768,7 @@ class SubContribution(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
+        from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self)
 
     def updateNonInheritingChildren(self, elem, delete=False):
