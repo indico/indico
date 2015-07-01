@@ -59,7 +59,7 @@ class EditAttachmentFormBase(AttachmentFormBase):
     description = TextAreaField(_("Description"))
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
                              groups=True, serializable=False, allow_external=True,
-                             description=_("The list of users and groups with access to the file"))
+                             description=_("The list of users and groups with access to the attachment"))
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):
@@ -72,6 +72,10 @@ class EditAttachmentFileForm(EditAttachmentFormBase):
 
 class AttachmentLinkForm(EditAttachmentFormBase):
     link_url = URLField(_("URL"), [DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(AttachmentLinkForm, self).__init__(*args, **kwargs)
+        self.title.description = _("The title of the link")
 
 
 class CreateFolderForm(IndicoForm):

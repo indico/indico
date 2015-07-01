@@ -20,7 +20,8 @@ from flask import flash, request, session
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
-from indico.modules.attachments.forms import AddAttachmentsForm, AddLinkForm, CreateFolderForm, EditAttachmentsForm
+from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, CreateFolderForm,
+                                              EditAttachmentFileForm)
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.util import get_attached_items
@@ -61,7 +62,7 @@ class AddAttachmentFilesMixin:
     """Upload file attachments"""
 
     def _process(self):
-        form = AddAttachmentsForm(linked_object=self.object)
+        form = AddAttachmentFilesForm(linked_object=self.object)
         if form.validate_on_submit():
             files = request.files.getlist('file')
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
@@ -82,9 +83,15 @@ class AddAttachmentLinkMixin:
     """Add link attachment"""
 
     def _process(self):
-        form = AddLinkForm(linked_object=self.object)
+        form = AttachmentLinkForm(linked_object=self.object)
         if form.validate_on_submit():
-            # TODO
+            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
+            link = Attachment(user=session.user, type=AttachmentType.link)
+            form.populate_obj(link, skip={'acl'})
+            link.folder = folder
+            if link.is_protected:
+                link.acl = form.acl.data
+            flash(_("The link has been added"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form)
 
@@ -94,8 +101,7 @@ class EditAttachmentMixin(SpecificAttachmentsMixin):
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected)
-        # TODO: use different form class if it's a link attachment
-        form_cls = EditAttachmentsForm if self.attachment.type == AttachmentType.file else EditAttachmentsForm
+        form_cls = EditAttachmentFileForm if self.attachment.type == AttachmentType.file else AttachmentLinkForm
         form = form_cls(linked_object=self.object, obj=defaults)
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
