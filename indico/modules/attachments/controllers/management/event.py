@@ -76,4 +76,6 @@ class RHDeleteEventFolder(DeleteFolderMixin, RHEventAttachmentManagementBase):
 
 
 class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagementBase):
-    pass
+    def _checkParams(self, params):
+        RHEventAttachmentManagementBase._checkParams(self, params)
+        DeleteAttachmentMixin._checkParams(self)

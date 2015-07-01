@@ -20,6 +20,7 @@ from flask import flash, request, session
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
+from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
 from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, CreateFolderForm,
                                               EditAttachmentFileForm)
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -35,18 +36,6 @@ from indico.web.util import jsonify_template, jsonify_data
 def _render_attachment_list(linked_object):
     tpl = get_template_module('attachments/_attachments.html')
     return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)
-
-
-class SpecificAttachmentsMixin:
-    """Mixin for RHs that reference a specific attachment"""
-
-    normalize_url_spec = {
-        'folder_id': lambda self: self.attachment.folder_id,
-        None: lambda self: self.attachment.folder.linked_object
-    }
-
-    def _checkParams(self):
-        self.attachment = Attachment.find_one(id=request.view_args['attachment_id'])
 
 
 class ManageAttachmentsMixin:
@@ -96,7 +85,7 @@ class AddAttachmentLinkMixin:
         return jsonify_template('attachments/add_link.html', form=form)
 
 
-class EditAttachmentMixin(SpecificAttachmentsMixin):
+class EditAttachmentMixin(SpecificAttachmentMixin):
     """Edit an attachment"""
 
     def _process(self):
@@ -152,11 +141,11 @@ class DeleteFolderMixin:
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
 
-class DeleteAttachmentMixin:
+class DeleteAttachmentMixin(SpecificAttachmentMixin):
     """Delete an attachment"""
 
     def _process(self):
-        attachment = Attachment.get_one(request.view_args['attachment_id'])
-        attachment.is_deleted = True
-        flash(_("Attachment \"{name}\" deleted").format(name=attachment.title), 'success')
+        self.attachment = Attachment.get_one(request.view_args['attachment_id'])
+        self.attachment.is_deleted = True
+        flash(_("Attachment \"{name}\" deleted").format(name=self.attachment.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))

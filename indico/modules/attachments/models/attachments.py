@@ -32,6 +32,7 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
+from indico.web.flask.util import url_for
 
 
 class AttachmentType(TitledIntEnum):
@@ -167,6 +168,11 @@ class Attachment(ProtectionMixin, db.Model):
     @property
     def locator(self):
         return dict(self.folder.locator, attachment_id=self.id)
+
+    @property
+    def download_url(self):
+        filename = self.file.filename if self.type == AttachmentType.file else 'redirect'
+        return url_for('attachments.download', self, filename=filename)
 
     @return_ascii
     def __repr__(self):

@@ -27,7 +27,7 @@
 {% macro _attachment_row(attachment) %}
     <li>
         <div class="{{ get_attachment_icon(attachment) }} node">
-            <a href="#" target="_blank" class="node-label">{{ attachment.title }}</a>
+            <a href="{{ attachment.download_url }}" target="_blank" class="node-label">{{ attachment.title }}</a>
             <span class="details">
                 <span class="date">{{ attachment.modified_dt|format_datetime('short') }}</span>
                 <span class="actions">
@@ -43,11 +43,6 @@
                     <a class="icon-edit js-dialog-action"
                        data-href="{{ url_for('.modify_attachment', attachment) }}"
                        data-title="{% trans name=attachment.title %}Edit {{ name }}{% endtrans %}"></a>
-                    {% if attachment.type.name == 'file' %}
-                        <span class="icon-file-download"></span>
-                    {% else %}
-                        <span class="icon-link"></span>
-                    {% endif %}
                 </span>
             </span>
         </div>

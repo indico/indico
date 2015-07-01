@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+import itertools
+
+from indico.modules.attachments.controllers.display.event import RHDownloadEventAttachment
 from indico.modules.attachments.controllers.management.event import (RHManageEventAttachments,
                                                                      RHAddEventAttachmentFiles,
                                                                      RHAddEventAttachmentLink,
@@ -23,7 +26,7 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHCreateEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment)
-from indico.modules.events import event_management_object_url_prefixes
+from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
@@ -45,3 +48,9 @@ for object_type, prefixes in event_management_object_url_prefixes.iteritems():
                          methods=('DELETE',), defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/', 'delete_attachment',
                          RHDeleteEventAttachment, methods=('DELETE',), defaults={'object_type': object_type})
+
+
+for prefix in itertools.chain.from_iterable(event_object_url_prefixes.itervalues()):
+    prefix = '/event/<confId>' + prefix
+    _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
+                     RHDownloadEventAttachment)
