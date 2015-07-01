@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, session
-from werkzeug.exceptions import NotFound
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
@@ -40,11 +39,13 @@ def _render_attachment_list(linked_object):
 
 
 class RHEventAttachmentsMixin:
+    normalize_url_spec = {
+        'folder_id': lambda self: self.attachment.folder_id,
+        None: lambda self: self.attachment.folder.linked_object
+    }
+
     def _checkParams(self):
         self.attachment = Attachment.find_one(id=request.view_args['attachment_id'])
-        self.folder = self.attachment.folder
-        if self.folder.id != request.view_args['folder_id']:
-            raise NotFound
 
 
 class RHEventAttachments(RHConferenceModifBase):
