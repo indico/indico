@@ -239,6 +239,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
     'js/jquery/jquery-ui.js',
     'js/lib/jquery.multiselect.js',
     'js/lib/jquery.multiselect.filter.js',
+    'js/lib/jquery.tablesorter.js',
     'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
     namespace('js/jquery',
 

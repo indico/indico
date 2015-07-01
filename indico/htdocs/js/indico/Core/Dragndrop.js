@@ -17,7 +17,7 @@
 
 // drag and drop, table element
 
-$.widget('indico.tablesorter', {
+$.widget('indico.dragndrop', {
     // Default options
     options: {
         sortableContainer: '.sortblock', // relative to element
