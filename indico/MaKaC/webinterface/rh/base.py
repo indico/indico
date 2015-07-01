@@ -28,7 +28,7 @@ from urlparse import urljoin
 from xml.sax.saxutils import escape
 
 import transaction
-from flask import request, session, g, current_app
+from flask import request, session, g, current_app, redirect
 from itsdangerous import BadData
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden
@@ -64,7 +64,7 @@ from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.redis import RedisError
-from indico.web.flask.util import ResponseUtil
+from indico.web.flask.util import ResponseUtil, url_for
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
@@ -178,6 +178,19 @@ class RH(RequestHandlerBase):
     _isMobile = True  # this value means that the generated web page can be mobile
     CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
 
+    #: A dict or list of items (in case ``None`` needs to be used more
+    #: than once) specifying how the url should be normalized.
+    #: Each key may be a key that is guaranteed to be present in
+    #: ``request.view_args`` or ``None``.
+    #: The value needs to be a callable (accepting the RH instance as
+    #: its only argument) which returns an object with a locator in
+    #: case of a ``None`` key or a plain value otherwise.
+    #: If the view args built from the returned objects do not match
+    #: the request's view args, a redirect is issued automatically.
+    #: If the request is not using GET/HEAD, no normalization is
+    #: performed since POST requests cannot be redirected properly.
+    normalize_url_spec = None
+
     def __init__(self):
         self._responseUtil = ResponseUtil()
         self._requestStarted = False
@@ -263,6 +276,38 @@ class RH(RequestHandlerBase):
         legacy data not supported by the RH. It is called before
         `checkParams` and should raise an exception if necessary.
         """
+
+    def normalize_url(self):
+        """Performs URL normalization.
+
+        This uses the :attr:`normalize_url_spec` to check if the URL
+        params are what they should be.
+
+        :return: ``None`` or a redirect response
+        """
+        if not self.normalize_url_spec or request.method not in {'GET', 'HEAD'}:
+            return
+        new_view_args = request.view_args.copy()
+        items = (self.normalize_url_spec.iteritems() if hasattr(self.normalize_url_spec, 'iteritems')
+                 else self.normalize_url_spec)
+        for key, getter in items:
+            value = getter(self)
+            if key is not None:
+                provided = {key: request.view_args[key]}
+                expected = {key: value}
+            else:
+                try:
+                    expected = value.locator
+                except AttributeError:
+                    try:
+                        expected = value.getLocator()
+                    except AttributeError:
+                        raise AttributeError("'{}' object has neither 'locator' nor 'getLocator'".format(type(value)))
+                provided = {k: request.view_args[k] for k in expected}
+            if provided != expected:
+                new_view_args.update(expected)
+        if new_view_args != request.view_args:
+            return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
 
     def _checkParams(self, params):
         """This method is called before _checkProtection and is a good place
@@ -513,6 +558,10 @@ class RH(RequestHandlerBase):
 
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
+
+        rv = self.normalize_url()
+        if rv is not None:
+            return '', rv
 
         self._checkProtection()
         func = getattr(self, '_checkProtection_' + request.method, None)
