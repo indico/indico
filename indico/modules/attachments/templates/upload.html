@@ -2,19 +2,45 @@
 
 {%- block content %}
     {{ form_header(form, id='dropzone', classes='dropzone', action=action) }}
-    <div class="dropzone-area">
-        <div class="dropzone-previews">
-            <div class="dz-message">
-              {% trans %}Drag files here{% endtrans %}
-              <span class="message-seperator">- or -</span>
+    {% if existing_attachment %}
+        <div class="form-group" id="form-group-protected">
+            <div class="form-label form-block">
+                <label>{% trans %}File{% endtrans %}</label>
+            </div>
+            <div class="form-field form-block">
+                <div class="dropzone-area">
+                    <div class="dropzone-area-inner">
+                        <div class="dropzone-previews">
+                            <div class="dz-message"></div>
+                        </div>
+                        <div class="select-files-btn">
+                            <button class="i-button" onclick="return false;">
+                                {%- trans %}Choose from your computer{% endtrans -%}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="form-field-description">
+                    <em>{% trans %}Already uploaded file. Replace it by adding a new file.{% endtrans %}</em>
+                </p>
             </div>
         </div>
-        <div class="select-files-btn">
-            <button class="i-button" onclick="return false;">
-                {%- trans %}Choose from your computer{% endtrans -%}
-            </button>
+        <input id="file-change-trigger" type="hidden" value="0" name="__file_change_trigger">
+    {% else %}
+        <div class="dropzone-area">
+            <div class="dropzone-previews">
+                <div class="dz-message">
+                  {% trans %}Drag files here{% endtrans %}
+                  <span class="message-seperator">- or -</span>
+                </div>
+            </div>
+            <div class="select-files-btn">
+                <button class="i-button" onclick="return false;">
+                    {%- trans %}Choose from your computer{% endtrans -%}
+                </button>
+            </div>
         </div>
-    </div>
+    {% endif %}
     {{ form_rows(form) }}
     {% call form_footer(attach_form) %}
         <div class="dropzone-upload-btn">
@@ -46,6 +72,17 @@
                     var saveButton = $('.js-dropzone-save');
                     var self = this;
 
+                    {% if existing_attachment %}
+                        self.options.maxFiles = 1;
+                        var existingFile = {name: {{ existing_attachment.file.filename | tojson}},
+                                             size: {{ existing_attachment.file.size | tojson }},
+                                             accepted: true}
+
+                        self.emit('addedfile', existingFile);
+                        $('.dz-progress').hide();
+                        self.files[0] = existingFile;
+                    {% endif %}
+
                     uploadButton.on('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -63,15 +100,14 @@
                     });
 
                     self.on('addedfile', function() {
+                        {% if existing_attachment %}
+                            self.removeFile(self.files[0]);
+                            $('#file-change-trigger').val('1');
+                            $('#dropzone').trigger('change');
+                        {% endif %}
                         uploadButton.prop('disabled', false);
                         $('.dz-message').hide();
                         $('.dz-progress').hide();
-                    });
-
-                    self.on('removedfile', function() {
-                        if (self.files.length == 0) {
-                            $('.dz-message').show();
-                        }
                     });
 
                     self.on('sendingmultiple', function() {
@@ -87,17 +123,6 @@
                             form.trigger('ajaxDialog:error', [xhr]);
                         }
                     });
-
-                    {% if existing_attachment %}
-                        self.options.addRemoveLinks = true;
-                        self.options.maxFiles = 1;
-                        var existingFile = {name: {{ existing_attachment.file.filename | tojson}},
-                                             size: {{ existing_attachment.file.size | tojson }},
-                                             accepted: true}
-
-                        self.emit('addedfile', existingFile);
-                        self.files[0] = existingFile;
-                    {% endif %}
                 }
             });
         })
