@@ -97,7 +97,7 @@
         <span class="empty">{% trans %}There are no attachments yet.{% endtrans %}</span>
     {%- endif -%}
     <div class="i-box-footer text-right js-attachment-actions">
-        <a href="#" class="i-button icon-plus" data-href="{{ url_for('.create_folder', linked_object) }}"
+        <a href="#" class="i-button icon-plus js-dialog-action" data-href="{{ url_for('.create_folder', linked_object) }}"
            data-title="{% trans %}Add new folder{% endtrans %}">
             {% trans %}Add new folder{% endtrans -%}
         </a>
