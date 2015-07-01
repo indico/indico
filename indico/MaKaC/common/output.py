@@ -44,6 +44,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.util.event import uniqueId
+from indico.web.flask.util import url_for
 
 
 # TODO This really needs to be fixed... no i18n and strange implementation using month names as keys
@@ -1138,6 +1139,9 @@ class outputGenerator(object):
                     self.materialToXMLMarc21(mat, out=out)
         #out.closeTag("datafield")
 
+        if conf.note:
+            self.noteToXMLMarc21(conf.note, out=out)
+
         #if respEmail != "":
         #    out.openTag("datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
         #   out.writeTag("subfield",respEmail,[["code","f"]])
@@ -1327,6 +1331,9 @@ class outputGenerator(object):
                 if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
 
+        if cont.note:
+            self.noteToXMLMarc21(cont.note, out=out)
+
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield","INDICO.%s"%uniqueId(cont.getConference()),[["code","b"]])
         out.closeTag("datafield")
@@ -1488,6 +1495,9 @@ class outputGenerator(object):
                 if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
 
+        if subCont.note:
+            self.noteToXMLMarc21(subCont.note, out=out)
+
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield","INDICO.%s"%uniqueId(subCont.getConference()),[["code","b"]])
         out.closeTag("datafield")
@@ -1565,6 +1575,17 @@ class outputGenerator(object):
         out.writeTag("subfield", "stored", [["code","z"]])
         out.writeTag("subfield", "resource", [["code","x"]])
         out.closeTag("datafield")
+
+    def noteToXMLMarc21(self, note, out=None):
+        if not out:
+            out = self._XMLGen
+        out.openTag('datafield', [['tag', '856'], ['ind1', '4'], ['ind2', ' ']])
+        out.writeTag('subfield', url_for('event_notes.view', note, _external=True), [['code', 'u']])
+        out.writeTag('subfield', '{} - Minutes'.format(note.linked_object.getTitle()), [['code', 'y']])
+        out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
+        out.writeTag('subfield', 'resource', [['code', 'x']])
+        out.closeTag('datafield')
+
 
 class XMLCacheEntry(MultiLevelCacheEntry):
     def __init__(self, objId):

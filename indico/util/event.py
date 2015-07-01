@@ -20,13 +20,15 @@ Event-related utils
 
 import re
 
+
 UID_RE = re.compile(r'^(?P<event>\w+)(?:\.s(?P<session>\w+))?(?:\.(?P<contrib>\w+))?(?:\.(?P<subcont>\w+))?$')
 
 
 def uniqueId(obj):
+    from indico.modules.events.notes.models.notes import EventNote
     from MaKaC import conference
 
-    ret = obj.getId()
+    ret = obj.getId() if hasattr(obj, 'getId') else obj.id
 
     if isinstance(obj, conference.Contribution):
         ret = "%s.%s" % (obj.getConference().getId(), ret)
@@ -42,6 +44,8 @@ def uniqueId(obj):
         ret = "%sm%s" % (uniqueId(obj.getOwner()), ret)
     elif isinstance(obj, conference.Resource):
         ret = "%s.%s" % (uniqueId(obj.getOwner()), ret)
+    elif isinstance(obj, EventNote):
+        ret = '{}.n{}'.format(uniqueId(obj.linked_object), ret)
 
     return ret
 
