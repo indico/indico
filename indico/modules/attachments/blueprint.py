@@ -16,10 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.attachments.controllers import (RHEventAttachments, RHEventAttachmentsAddLink,
-                                                    RHEventAttachmentsCreateFolder, RHEventAttachmentsDeleteAttachment,
-                                                    RHEventAttachmentsDeleteFolder, RHEventAttachmentsUpload,
-                                                    RHEventAttachmentsEditFile)
+from indico.modules.attachments.controllers.management.base import (RHEventAttachments, RHEventAttachmentsAddLink,
+                                                                    RHEventAttachmentsCreateFolder,
+                                                                    RHEventAttachmentsDeleteAttachment,
+                                                                    RHEventAttachmentsDeleteFolder,
+                                                                    RHEventAttachmentsUpload,
+                                                                    RHEventAttachmentsEditFile)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
