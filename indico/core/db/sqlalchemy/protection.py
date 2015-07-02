@@ -24,6 +24,7 @@ from indico.core.db import db
 from indico.util.i18n import _
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.user import iter_acl
+from MaKaC.accessControl import AccessWrapper
 
 
 class ProtectionMode(TitledIntEnum):
@@ -72,7 +73,7 @@ class ProtectionMixin(object):
         """The parent object to consult for ProtectionMode.inheriting"""
         raise NotImplementedError
 
-    def can_access(self, user, acl_attr='acl', legacy_ac_method='canUserAccess', allow_admin=True):
+    def can_access(self, user, acl_attr='acl', legacy_method='canAccess', allow_admin=True):
         """Checks if the user can access the object.
 
         When using a custom acl_attr on an object that supports
@@ -87,7 +88,7 @@ class ProtectionMixin(object):
                                  from a legacy object
         :param allow_admin: If admin users should always have access
         """
-        if allow_admin and user.is_admin:
+        if allow_admin and user and user.is_admin:
             return True
 
         # TODO send a signal that allows to override the result of this function
@@ -115,8 +116,8 @@ class ProtectionMixin(object):
                 raise TypeError('protection_parent of {} is None'.format(self))
             elif hasattr(parent, 'can_access'):
                 return parent.can_access(user, acl_attr=acl_attr)
-            elif hasattr(parent, 'getAccessController') and legacy_ac_method is not None:
-                return getattr(parent.getAccessController(), legacy_ac_method)(user.as_avatar)
+            elif legacy_method is not None and hasattr(parent, legacy_method):
+                return getattr(parent, legacy_method)(AccessWrapper(user.as_avatar if user else None))
             else:
                 raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
         else:
