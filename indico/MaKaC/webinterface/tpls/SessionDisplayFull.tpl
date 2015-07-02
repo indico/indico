@@ -21,7 +21,7 @@
 <div class="sessionMainContent abstractMainContent">
     <div class="sessionRightPanel abstractRightPanel">
         <% canEditFiles = self_._aw.getUser() and session.canModify(self_._aw) %>
-        % if session.getAllMaterialList() or canEditFiles:
+        % if session.attached_items or canEditFiles:
             <div class="sessionRightPanelSection" style="border: none;">
                 <h2 class="sessionSectionTitle">${_("Files")}</h2>
                     % if canEditFiles:
@@ -29,15 +29,17 @@
                             <a class="fakeLink" id="manageMaterial">${_("Edit files")}</a>
                         </div>
                     % endif
+                <ul class="subList">
+                % for attachment in session.attached_items.get('files', []):
+                    <li><a href="${attachment.download_url}" target="_blank" title="${attachment.title}">${attachment.title}</a></li>
+                % endfor
+                </ul>
                 <ul>
-                % for material in session.getAllMaterialList():
-                    <% if not material.canView(self_._aw):
-                        continue
-                    %>
-                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">${material.getTitle()}</a>
+                % for folder in session.attached_items.get('folders',[]):
+                    <li>${folder.title}
                         <ul class="subList">
-                         % for resource in material.getResourceList():
-                            <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" title="${resource.getDescription()}">${getResourceName(resource)}</a></li>
+                         % for attachment in folder.attachments:
+                            <li><a href="${attachment.download_url}" target="_blank" title="${attachment.title}">${attachment.title}</a></li>
                          % endfor
                         </ul>
                     </li>

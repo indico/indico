@@ -90,10 +90,9 @@
                             % endif
 
 
-                            <% materialList = Contribution.getAllViewableMaterialList() %>
                             <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
 
-                            % if materialList or canEditFiles:
+                            % if Contribution.attached_items or canEditFiles:
                                 <div class="column ${'highlighted-area' if canEditFiles else ''}">
                                     % if canEditFiles:
                                         <div class="right">
@@ -102,17 +101,14 @@
                                     % endif
                                     <h2>${_("Files")}</h2>
                                     <ul>
-                                    % for material in materialList:
-
+                                    % for folder in Contribution.attached_items.get('folders', []):
                                         <li>
-                                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="titleWithLink" title="${material.getDescription()}">
-                                                <h3>${material.getTitle()}</h3>
-                                            </a>
+                                            <h3>${folder.title}</h3>
                                             <ul>
-                                            % for resource in material.getResourceList():
+                                            % for attachment in folder.attachments:
                                                 <li class="icon-file">
-                                                    <a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" title="${resource.getDescription()}">
-                                                        ${getResourceName(resource)}
+                                                    <a href="${attachment.download_url}" target="_blank" title="${attachment.title}">
+                                                        ${attachment.title}
                                                     </a>
                                                 </li>
                                             % endfor
