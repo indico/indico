@@ -46,9 +46,11 @@ from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
 
+from indico.core import signals
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
+from indico.util.signals import values_from_signal
 
 
 class WPCategoryBase (main.WPMainBase):
@@ -1216,6 +1218,12 @@ class WPCategoryModifBase( WPCategoryBase ):
         mainSection.addItem( self._tasksMenuItem)
         if not self._target.tasksAllowed() :
             self._tasksMenuItem.setVisible(False)
+
+        self.extra_menu_items = {}
+        for name, item in sorted(values_from_signal(signals.category.management_sidemenu.send(self._target)),
+                                 key=lambda x: x[1]._title):
+            self.extra_menu_items[name] = item
+            mainSection.addItem(item)
 
         self._sideMenu.addSection(mainSection)
 
