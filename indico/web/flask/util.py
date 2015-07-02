@@ -334,7 +334,7 @@ def _is_office_mimetype(mimetype):
     return False
 
 
-def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):
+def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False, safe=True):
     """Sends a file to the user.
 
     `name` is required and should be the filename visible to the user.
@@ -346,6 +346,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     much nicer if e.g. a PDF file can be displayed inline so don't disable it unless really necessary.
     `conditional` is very useful when sending static files such as CSS/JS/images. It will allow the browser to retrieve
     the file only if it has been modified (based on mtime and size).
+    `safe` adds some basic security features such a adding a content-security-policy and forcing inline=False for
+    text/html mimetypes
     """
 
     name = secure_filename(name)
@@ -358,6 +360,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
     if _is_office_mimetype(mimetype):
         inline = False
+    if safe and mimetype == 'text/html':
+        inline = False
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional)
@@ -366,6 +370,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         if not app.debug:
             raise
         raise NotFound('File not found: %s' % path_or_fd)
+    if safe:
+        rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
     if inline:
         # send_file does not add this header if as_attachment is False
         rv.headers.add('Content-Disposition', 'inline', filename=name)
