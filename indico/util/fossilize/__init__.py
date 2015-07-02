@@ -348,6 +348,8 @@ class Fossilizable(object):
                 converterArgs = dict((name, kwargs[name])
                                      for name in converterArgNames
                                      if name in kwargs)
+                if '_obj' in converterArgNames:
+                    converterArgs['_obj'] = obj
                 try:
                     methodResult = convertFunction(methodResult, **converterArgs)
                 except:
