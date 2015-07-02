@@ -1,4 +1,4 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 {% block content -%}
     {{ form_header(form)}}
@@ -7,19 +7,6 @@
         <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
     {% endcall %}
     <script>
-        (function() {
-            _.defer(function() {
-                $('#form-group-protected input.switch-input')
-                .on('click', function disableACL() {
-                    var checked = $(this).prop('checked');
-                    $('#form-group-acl')
-                        .find('input.i-button')
-                            .prop('disabled', !checked)
-                        .end()
-                        .find('.PluginOptionPeopleListDiv')
-                            .toggleClass('disabled', !checked);
-                }).triggerHandler('click');
-            });
-        })();
+        aclIfProtected($('#protected'), $('#acl'));
     </script>
 {%- endblock %}

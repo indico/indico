@@ -1,4 +1,4 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 {%- block content %}
     {{ form_header(form, id='dropzone', classes='dropzone', action=action) }}
@@ -55,11 +55,11 @@
         </div>
     {% endcall %}
     <script>
-        $(function() {
+        (function() {
             'use strict';
 
-            var form = $('#dropzone');
             $('#folder').nullableselector();
+            aclIfProtected($('#protected'), $('#acl'));
             $('#dropzone').dropzone({
                 clickable: '.dropzone-area',
                 previewsContainer: '.dropzone-previews',
@@ -72,6 +72,7 @@
                     var uploadButton = $('.js-dropzone-upload');
                     var saveButton = $('.js-dropzone-save');
                     var self = this;
+                    var form = $('#dropzone');
 
                     {% if existing_attachment %}
                         self.options.maxFiles = 1;
@@ -128,6 +129,6 @@
                     });
                 }
             });
-        })
+        })();
     </script>
 {%- endblock %}
