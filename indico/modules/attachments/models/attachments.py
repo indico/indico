@@ -28,6 +28,7 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
 from indico.core.storage import get_storage
 from indico.modules.attachments.models.principals import AttachmentPrincipal
+from indico.modules.attachments.util import can_manage_attachments
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii
@@ -173,6 +174,15 @@ class Attachment(ProtectionMixin, db.Model):
     def download_url(self):
         filename = self.file.filename if self.type == AttachmentType.file else 'redirect'
         return url_for('attachments.download', self, filename=filename)
+
+    def can_access(self, user, *args, **kwargs):
+        """Checks if the user is allowed to access the attachment.
+
+        This is the case if the user has access to see the attachment
+        or if the user can manage attachments for the linked object.
+        """
+        return (super(Attachment, self).can_access(user, *args, **kwargs) or
+                can_manage_attachments(self.folder.linked_object, user))
 
     @return_ascii
     def __repr__(self):

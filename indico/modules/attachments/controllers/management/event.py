@@ -23,6 +23,7 @@ from indico.modules.attachments.controllers.management.base import (ManageAttach
                                                                     AddAttachmentLinkMixin, EditAttachmentMixin,
                                                                     CreateFolderMixin, DeleteFolderMixin,
                                                                     DeleteAttachmentMixin)
+from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.events.util import get_object_from_args
 from MaKaC.webinterface.rh.base import RHProtected
@@ -39,13 +40,7 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
-        if not self._doProcess:
-            return
-        if self.object_type == 'session' and self.object.canCoordinate(session.avatar):
-            return
-        if self.object_type == 'contribution' and self.object.canUserSubmit(session.avatar):
-            return
-        if not self.object.canModify(session.avatar):
+        if not can_manage_attachments(self.object, session.user):
             raise Forbidden
 
 

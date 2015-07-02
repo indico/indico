@@ -27,8 +27,7 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
     """Download an attachment"""
 
     def _checkProtection(self):
-        if (not self.attachment.can_access(session.user) and
-                (not session.user or not self.attachment.folder.linked_object.canModify(session.user))):
+        if not self.attachment.can_access(session.user):
             raise Forbidden
 
     def _process(self):

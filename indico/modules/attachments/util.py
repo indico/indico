@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 def get_attached_items(linked_object, include_deleted=False):
@@ -31,6 +30,8 @@ def get_attached_items(linked_object, include_deleted=False):
     :param include_deleted: Whether to return deleted attachments or
                             folders as well
     """
+    from indico.modules.attachments.models.folders import AttachmentFolder
+
     kwargs = {}
     if not include_deleted:
         kwargs['is_deleted'] = False
@@ -49,3 +50,15 @@ def get_attached_items(linked_object, include_deleted=False):
         'folders': folders,
         'files': files
     }
+
+
+def can_manage_attachments(obj, user):
+    """Checks if a user can manage attachments for the object"""
+    from MaKaC.conference import Contribution, Session
+    if not user:
+        return False
+    if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
+        return True
+    if isinstance(obj, Contribution) and obj.canUserSubmit(user.as_avatar):
+        return True
+    return obj.canModify(user.as_avatar)
