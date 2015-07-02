@@ -38,17 +38,19 @@
     </div>
 {%- endmacro %}
 
-{% macro form_row(field, widget_attrs={}, orientation='') %}
-    <div class="form-group{% if field.errors %} has-error{% endif %} {{ orientation }}" id="form-group-{{ field.id }}">
-        <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
-                    {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
-            {%- if field.widget.input_type != 'checkbox' -%}
-                {{ field.label() }}
-            {%- endif -%}
-            {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
+{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false) %}
+    {% if field or not allow_missing %}
+        <div class="form-group{% if field.errors %} has-error{% endif %} {{ orientation }}" id="form-group-{{ field.id }}">
+            <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
+                        {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
+                {%- if field.widget.input_type != 'checkbox' -%}
+                    {{ field.label() }}
+                {%- endif -%}
+                {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
+            </div>
+            {{ form_field(field, "form-field form-block", widget_attrs) }}
         </div>
-        {{ form_field(field, "form-field form-block", widget_attrs) }}
-    </div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro form_rows(form, fields=none, skip=(), orientation='', widget_attrs={}) %}
