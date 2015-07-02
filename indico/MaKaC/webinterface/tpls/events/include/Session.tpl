@@ -42,15 +42,11 @@
             </tr>
         % endif
 
-        % if len(session.getAllMaterialList()) > 0:
+        % if item.session.attached_items:
         <tr>
             <td class="leftCol">${ _("Material")}:</td>
-            <td>
-            % for material in session.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                <%include file="Material.tpl" args="material=material, sessionId=session.getId()"/>
-                % endif
-            % endfor
+            <td class="material-list">
+                ${ render_template('attachments/mako_compat/materials.html', item=item.session) }
             </td>
         </tr>
         % endif
