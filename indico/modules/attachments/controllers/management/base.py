@@ -20,8 +20,8 @@ from flask import flash, request, session
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
-from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
-from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, CreateFolderForm,
+from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
+from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, AttachmentFolderForm,
                                               EditAttachmentFileForm)
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -119,7 +119,7 @@ class CreateFolderMixin:
     """Create a new empty folder"""
 
     def _process(self):
-        form = CreateFolderForm()
+        form = AttachmentFolderForm()
         if form.validate_on_submit():
             folder = AttachmentFolder(linked_object=self.object)
             form.populate_obj(folder, skip={'acl'})
@@ -131,13 +131,27 @@ class CreateFolderMixin:
         return jsonify_template('attachments/create_folder.html', form=form)
 
 
-class DeleteFolderMixin:
+class EditFolderMixin(SpecificFolderMixin):
+    """Edit a folder"""
+
+    def _process(self):
+        defaults = FormDefaults(self.folder, protected=self.folder.is_protected)
+        form = AttachmentFolderForm(obj=defaults)
+        if form.validate_on_submit():
+            form.populate_obj(self.folder, skip={'acl'})
+            if self.folder.is_protected:
+                self.folder.acl = form.acl.data
+            flash(_("Folder \"{name}\" updated").format(name=self.folder.title), 'success')
+            return jsonify_data(attachment_list=_render_attachment_list(self.object))
+        return jsonify_template('attachments/create_folder.html', form=form)
+
+
+class DeleteFolderMixin(SpecificFolderMixin):
     """Delete a folder"""
 
     def _process(self):
-        folder = AttachmentFolder.get_one(request.view_args['folder_id'])
-        folder.is_deleted = True
-        flash(_("Folder \"{name}\" deleted").format(name=folder.title), 'success')
+        self.folder.is_deleted = True
+        flash(_("Folder \"{name}\" deleted").format(name=self.folder.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
 

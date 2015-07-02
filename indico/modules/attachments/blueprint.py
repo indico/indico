@@ -24,6 +24,7 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHAddEventAttachmentLink,
                                                                      RHEditEventAttachment,
                                                                      RHCreateEventFolder,
+                                                                     RHEditEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
@@ -43,6 +44,8 @@ for object_type, prefixes in event_management_object_url_prefixes.iteritems():
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
                          RHEditEventAttachment, methods=('GET', 'POST'), defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/create-folder', 'create_folder', RHCreateEventFolder,
+                         methods=('GET', 'POST'), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'edit_folder', RHEditEventFolder,
                          methods=('GET', 'POST'), defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'delete_folder', RHDeleteEventFolder,
                          methods=('DELETE',), defaults={'object_type': object_type})

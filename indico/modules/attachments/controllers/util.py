@@ -20,6 +20,7 @@ from flask import request
 from werkzeug.exceptions import NotFound
 
 from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 class SpecificAttachmentMixin:
@@ -34,3 +35,14 @@ class SpecificAttachmentMixin:
         self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
         if self.attachment.folder.is_deleted:
             raise NotFound
+
+
+class SpecificFolderMixin:
+    """Mixin for RHs that reference a specific folder"""
+
+    normalize_url_spec = {
+        None: lambda self: self.folder.linked_object
+    }
+
+    def _checkParams(self):
+        self.folder = AttachmentFolder.find_one(id=request.view_args['folder_id'], is_deleted=False)

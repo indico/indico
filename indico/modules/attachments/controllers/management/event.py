@@ -21,8 +21,8 @@ from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.attachments.controllers.management.base import (ManageAttachmentsMixin, AddAttachmentFilesMixin,
                                                                     AddAttachmentLinkMixin, EditAttachmentMixin,
-                                                                    CreateFolderMixin, DeleteFolderMixin,
-                                                                    DeleteAttachmentMixin)
+                                                                    CreateFolderMixin, EditFolderMixin,
+                                                                    DeleteFolderMixin, DeleteAttachmentMixin)
 from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.views import WPEventAttachments
 from indico.modules.events.util import get_object_from_args
@@ -66,8 +66,16 @@ class RHCreateEventFolder(CreateFolderMixin, RHEventAttachmentManagementBase):
     pass
 
 
+class RHEditEventFolder(EditFolderMixin, RHEventAttachmentManagementBase):
+    def _checkParams(self, params):
+        RHEventAttachmentManagementBase._checkParams(self, params)
+        EditFolderMixin._checkParams(self)
+
+
 class RHDeleteEventFolder(DeleteFolderMixin, RHEventAttachmentManagementBase):
-    pass
+    def _checkParams(self, params):
+        RHEventAttachmentManagementBase._checkParams(self, params)
+        DeleteFolderMixin._checkParams(self)
 
 
 class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagementBase):

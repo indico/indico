@@ -78,7 +78,7 @@ class AttachmentLinkForm(EditAttachmentFormBase):
         self.title.description = _("The title of the link")
 
 
-class CreateFolderForm(IndicoForm):
+class AttachmentFolderForm(IndicoForm):
     title = StringField(_("Name"), [DataRequired()], description=_("The name of the folder."))
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget(),

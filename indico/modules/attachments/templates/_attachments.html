@@ -42,7 +42,7 @@
                     </a>
                     <a class="icon-edit js-dialog-action"
                        data-href="{{ url_for('.modify_attachment', attachment) }}"
-                       data-title="{% trans name=attachment.title %}Edit {{ name }}{% endtrans %}"></a>
+                       data-title="{% trans name=attachment.title %}Edit attachment: {{ name }}{% endtrans %}"></a>
                 </span>
             </span>
         </div>
@@ -64,7 +64,9 @@
                            This will remove the folder and its contents permanantly.
                        {%- endtrans %}">
                     </a>
-                    <span class="icon-edit"></span>
+                    <a class="icon-edit js-dialog-action"
+                       data-href="{{ url_for('.edit_folder', folder) }}"
+                       data-title="{% trans name=folder.title %}Edit folder: {{ name }}{% endtrans %}"></a>
                 </span>
             </span>
         </div>
