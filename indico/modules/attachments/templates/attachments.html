@@ -44,17 +44,15 @@
     </div>
     <script>
         $(document)
-            .on('click', 'ul.tree > li.expandable .actions > a', function(e) {
-                e.stopPropagation();
+            .on('click', '.tree .expandable > .actions > a', function(evt) {
+                evt.stopPropagation();
             })
-            .on('click', 'ul.tree > li.expandable', function() {
+            .on('click', '.tree .expandable', function() {
                 $(this)
                     .toggleClass('collapsed')
-                    .children('ul.sub-tree')
+                    .next('.sub-tree')
+                    .find('td > div')
                         .slideToggle(150);
-            })
-            .on('click', 'ul.tree > li.expandable > .sub-tree', function(e) {
-                e.stopPropagation();
             })
             .on('click', '.js-dialog-action', function(e) {
                 e.preventDefault();
