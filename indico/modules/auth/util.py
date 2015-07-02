@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session, redirect, request
 from werkzeug.datastructures import MultiDict
 
+from indico.core.config import Config
 from indico.web.flask.util import url_for
 
 
@@ -69,3 +70,11 @@ def url_for_login(next_url=None):
 
 def url_for_logout(next_url=None):
     return url_for('auth.logout', next=next_url)
+
+
+def url_for_register(next_url=None):
+    if Config.getInstance().getLocalIdentities():
+        return url_for('auth.register', next=next_url)
+
+    external_url = Config.getInstance().getExternalRegistrationURL()
+    return external_url or url_for_login()

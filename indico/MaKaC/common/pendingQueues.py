@@ -24,7 +24,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.logger import Logger
-from indico.modules.auth.util import url_for_login
+from indico.modules.auth.util import url_for_register
 
 
 logger = Logger.get('pending')
@@ -144,7 +144,7 @@ class _PendingConfSubmitterNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for_login()
+        url = url_for_register()
         return """
     You have been granted with file submission rights for the following event:%s
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -217,7 +217,7 @@ class _PendingSubmitterNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for_login()
+        url = url_for_register()
         return """
     You have been added as author/speaker of the following contributions:%s
     and material submission rights have been granted to you.
@@ -299,7 +299,7 @@ class _PendingManagerNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for_login()
+        url = url_for_register()
         return """
     You have been added as convener of the following sessions:%s
     And session modification rights have been granted to you.
@@ -373,7 +373,7 @@ class _PendingConfManagerNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for_login()
+        url = url_for_register()
         return """
     You have been added as manager of the following Event:%s
     And modification rights have been granted to you.
@@ -445,7 +445,7 @@ class _PendingCoordinatorNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for_login()
+        url = url_for_register()
         return """
     You have been added as convener of the following sessions:%s
     And session coordination rights have been granted to you.
