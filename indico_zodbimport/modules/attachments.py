@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import mimetypes
 import os
 import sys
 from itertools import chain
@@ -207,8 +208,8 @@ class AttachmentImporter(Importer):
                                  event_id=base_object.id)
                 return None
             filename = secure_filename(convert_to_unicode(resource.fileName)) or 'attachment'
-            data['file'] = AttachmentFile(user=self.janitor_user, created_dt=data['modified_dt'], filename=filename,
-                                          content_type='application/octet-stream',  # TODO
+            data['file'] = AttachmentFile(user=self.janitor_user, created_dt=modified_dt, filename=filename,
+                                          content_type=mimetypes.guess_type(filename)[0] or 'application/octet-stream',
                                           size=size, storage_backend=storage_backend, storage_file_id=storage_path)
         attachment = Attachment(**data)
         protection_from_ac(attachment, resource._Resource__ac)
