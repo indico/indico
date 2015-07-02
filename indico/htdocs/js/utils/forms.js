@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(globals) {
+(function(global) {
     'use strict';
 
     function validatePasswordConfirmation(passwordField, confirmField) {
@@ -30,7 +30,7 @@
         }
     }
 
-    globals.initForms = function initForms(forms) {
+    global.initForms = function initForms(forms) {
         forms.find('input[data-confirm-password]').each(function() {
             var confirmField = $(this);
             var passwordField = $(this.form).find('input[name="' + confirmField.data('confirmPassword') + '"]');
@@ -47,6 +47,17 @@
             var untouched = $this.serialize() == $this.data('initialData');
             $this.find('[data-disabled-until-change]').prop('disabled', untouched);
             $this.closest('form').data('fieldsChanged', !untouched);
+        });
+    };
+
+    global.aclIfProtected = function aclIfProtected(protectionField, aclField) {
+        protectionField.on('change', function() {
+            aclField.closest('.form-group')
+                .find('input.i-button').prop('disabled', !this.checked).end()
+                .find('.PluginOptionPeopleListDiv').toggleClass('disabled', !this.checked);
+        });
+        _.defer(function() {
+            protectionField.triggerHandler('change');
         });
     };
 
