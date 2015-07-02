@@ -16,7 +16,17 @@
 
 import itertools
 
+from indico.web.flask.util import url_for
 from MaKaC.conference import Conference, Contribution, SessionSlot
+
+
+def build_note_api_data(note):
+    if note is None:
+        return {}
+    return {'html': note.html,
+            'url': url_for('event_notes.view', note, _external=True),
+            'modified_dt': note.current_revision.created_dt.isoformat(),
+            'user': note.current_revision.user.id}
 
 
 def get_all_notes(obj):

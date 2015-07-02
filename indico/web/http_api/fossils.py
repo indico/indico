@@ -20,6 +20,7 @@ Basic fossils for data export
 
 from hashlib import md5
 
+from indico.modules.events.notes.util import build_note_api_data
 from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
@@ -220,6 +221,10 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFoss
     def getTimezone(self):
         pass
 
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
+
     def getChairList(self):
         pass
     getChairList.name = 'chairs'
@@ -343,6 +348,10 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFo
         pass
     getKeywords.produce = lambda x: x.getKeywords().splitlines() if x.getKeywords().strip() else []
 
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
+
 
 class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
 
@@ -360,6 +369,10 @@ class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
         pass
     getSpeakerList.name = 'speakers'
     getSpeakerList.result = IContributionParticipationMetadataFossil
+
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
 
 
 class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
@@ -405,6 +418,10 @@ class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
 
     def getDescription(self):
         pass
+
+    def getNote(self):
+        pass
+    getNote.produce = lambda x: build_note_api_data(x.note)
 
 
 class ISessionMetadataFossil(ISessionMetadataBaseFossil):
