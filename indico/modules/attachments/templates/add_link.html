@@ -3,7 +3,9 @@
 {%- block content %}
     {{ form_header(form)}}
     {{ form_row(form.link_url, widget_attrs={'placeholder': 'Example: http://www.example.com/YourPDFFile.pdf'}) }}
-    {{ form_rows(form, skip=('link_url',)) }}
+    {{ form_rows(form, skip=('link_url', 'protected', 'acl')) }}
+    {{ form_row(form.protected) }}
+    {{ form_row(form.acl) }}
     {% call form_footer(attach_form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
         <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
