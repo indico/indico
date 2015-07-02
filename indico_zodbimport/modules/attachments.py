@@ -32,6 +32,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.principals import AttachmentPrincipal, AttachmentFolderPrincipal
 from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
+from indico.util.date_time import now_utc
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import protection_from_ac, patch_default_group_provider
@@ -81,7 +82,7 @@ class AttachmentImporter(Importer):
     def migrate(self):
         self.janitor_user = User.get_one(Config.getInstance().getJanitorUserId())
         with patch_default_group_provider(self.default_group_provider):
-            # TODO: category attachments
+            self.migrate_category_attachments()
             self.migrate_event_attachments()
         self.update_merged_ids()
 
@@ -99,6 +100,26 @@ class AttachmentImporter(Importer):
                 p.user = p.user.merged_into_user
             self.print_success(cformat('%{cyan}{}%{reset} -> %{cyan}{}%{reset}').format(user, p.user), always=True)
         db.session.commit()
+
+    def migrate_category_attachments(self):
+        self.print_step('migrating category attachments')
+
+        for category, material, resources in committing_iterator(self._iter_category_materials(), n=1000):
+            folder = self._folder_from_material(material, category)
+            db.session.add(folder)
+            if not self.quiet:
+                self.print_success(cformat('%{cyan}[{}]').format(folder.title),
+                                   event_id=category.id)
+            for resource in resources:
+                attachment = self._attachment_from_resource(folder, material, resource, category)
+                if attachment is None:
+                    continue
+                db.session.add(attachment)
+                if not self.quiet:
+                    if attachment.type == AttachmentType.link:
+                        self.print_success(cformat('- %{cyan}{}').format(attachment.title), event_id=category.id)
+                    else:
+                        self.print_success(cformat('- %{cyan!}{}').format(attachment.title), event_id=category.id)
 
     def migrate_event_attachments(self):
         self.print_step('migrating event attachments')
@@ -169,12 +190,13 @@ class AttachmentImporter(Importer):
             else:
                 return self.storage_backend, rel_path, size
 
-    def _attachment_from_resource(self, folder, material, resource, event):
+    def _attachment_from_resource(self, folder, material, resource, base_object=None):
         data = {'folder': folder,
                 'user': self.janitor_user,
                 'title': convert_to_unicode(resource.name).strip() or folder.title,
                 'description': convert_to_unicode(resource.description),
-                'modified_dt': getattr(material, '_modificationDS', None) or event.startDate}
+                'modified_dt': getattr(material, '_modificationDS', None) or getattr(base_object, 'startDate',
+                                                                                     now_utc())}
         if resource.__class__.__name__ == 'Link':
             data['type'] = AttachmentType.link
             data['link_url'] = resource.url
@@ -183,7 +205,7 @@ class AttachmentImporter(Importer):
             storage_backend, storage_path, size = self._get_file_info(resource)
             if storage_path is None:
                 self.print_error(cformat('%{red!}File {} not found on disk').format(resource._LocalFile__archivedId),
-                                 event_id=event.id)
+                                 event_id=base_object.id)
                 return None
             filename = secure_filename(convert_to_unicode(resource.fileName)) or 'attachment'
             data['file'] = AttachmentFile(user=self.janitor_user, created_dt=data['modified_dt'], filename=filename,
@@ -236,3 +258,11 @@ class AttachmentImporter(Importer):
                 for subcontrib in contrib._subConts:
                     for material, resources in self._iter_attachments(subcontrib):
                         yield event, subcontrib, material, resources
+
+    def _iter_category_materials(self):
+        it = self.zodb_root['categories'].itervalues()
+        if self.quiet:
+            it = verbose_iterator(it, len(self.zodb_root['categories']), attrgetter('id'), attrgetter('name'))
+        for category in self.flushing_iterator(it):
+            for material, resources in self._iter_attachments(category):
+                yield category, material, resources
