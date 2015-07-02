@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 import copy
 import inspect
+import itertools
 import time
 import os
 import profile as profiler
@@ -178,13 +179,18 @@ class RH(RequestHandlerBase):
     _isMobile = True  # this value means that the generated web page can be mobile
     CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
 
-    #: A dict or list of items (in case ``None`` needs to be used more
-    #: than once) specifying how the url should be normalized.
-    #: Each key may be a key that is guaranteed to be present in
-    #: ``request.view_args`` or ``None``.
-    #: The value needs to be a callable (accepting the RH instance as
-    #: its only argument) which returns an object with a locator in
-    #: case of a ``None`` key or a plain value otherwise.
+    #: A dict specifying how the url should be normalized.
+    #: `args` is a dictionary mapping view args keys to callables
+    #: used to retrieve the expected value for those arguments if they
+    #: are present in the request's view args.
+    #: `locators` is a set of callables returning objects with locators.
+    #: `preserved_args` is a set of view arg names which will always
+    #: be copied from the current request if present.
+    #: The callables are always invoked with a single `self` argument
+    #: containing the RH instance.
+    #: Arguments specified in the `defaults` of any rule matching the
+    #: current endpoint are always excluded when checking if the args
+    #: match or when building a new URL.
     #: If the view args built from the returned objects do not match
     #: the request's view args, a redirect is issued automatically.
     #: If the request is not using GET/HEAD, a 404 error is raised
@@ -192,7 +198,11 @@ class RH(RequestHandlerBase):
     #: but executing them on the wrong URL may pose a security risk in
     #: case and of the non-relevant URL segments is used for access
     #: checks.
-    normalize_url_spec = None
+    normalize_url_spec = {
+        'args': {},
+        'locators': set(),
+        'preserved_args': set()
+    }
 
     def __init__(self):
         self._responseUtil = ResponseUtil()
@@ -284,32 +294,40 @@ class RH(RequestHandlerBase):
         """Performs URL normalization.
 
         This uses the :attr:`normalize_url_spec` to check if the URL
-        params are what they should be.
+        params are what they should be and redirects or fails depending
+        on the HTTP method used if it's not the case.
 
         :return: ``None`` or a redirect response
         """
-        if not self.normalize_url_spec:
+        if not self.normalize_url_spec or not any(self.normalize_url_spec.itervalues()):
             return
-        new_view_args = request.view_args.copy()
-        items = (self.normalize_url_spec.iteritems() if hasattr(self.normalize_url_spec, 'iteritems')
-                 else self.normalize_url_spec)
-        for key, getter in items:
+        spec = {
+            'args': self.normalize_url_spec.get('args', {}),
+            'locators': self.normalize_url_spec.get('locators', set()),
+            'preserved_args': self.normalize_url_spec.get('preserved_args', set()),
+        }
+        # Initialize the new view args with preserved arguments (since those would be lost otherwise)
+        new_view_args = {k: v for k, v in request.view_args.iteritems() if k in spec['preserved_args']}
+        # Retrieve the expected values for all simple arguments (if they are currently present)
+        for key, getter in spec['args'].iteritems():
+            if key in request.view_args:
+                new_view_args[key] = getter(self)
+        # Retrieve the expected values from locators
+        for getter in spec['locators']:
             value = getter(self)
-            if key is not None:
-                provided = {key: request.view_args[key]}
-                expected = {key: value}
-            else:
+            try:
+                expected = value.locator
+            except AttributeError:
                 try:
-                    expected = value.locator
+                    expected = value.getLocator()
                 except AttributeError:
-                    try:
-                        expected = value.getLocator()
-                    except AttributeError:
-                        raise AttributeError("'{}' object has neither 'locator' nor 'getLocator'".format(type(value)))
-                provided = {k: request.view_args[k] for k in expected}
-            if provided != expected:
-                new_view_args.update(expected)
-        if new_view_args != request.view_args:
+                    raise AttributeError("'{}' object has neither 'locator' nor 'getLocator'".format(type(value)))
+            new_view_args.update(expected)
+        # Get all default values provided by the url map for the endpoint
+        defaults = set(itertools.chain.from_iterable(r.defaults for r in
+                                                     current_app.url_map.iter_rules(request.endpoint)))
+        provided = {k: v for k, v in request.view_args.iteritems() if k not in defaults}
+        if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
                 return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
             else:

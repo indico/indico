@@ -27,8 +27,14 @@ class SpecificAttachmentMixin:
     """Mixin for RHs that reference a specific attachment"""
 
     normalize_url_spec = {
-        'folder_id': lambda self: self.attachment.folder_id,
-        None: lambda self: self.attachment.folder.linked_object
+        'args': {
+            'folder_id': lambda self: self.attachment.folder_id,
+            'filename': lambda self: self.attachment.file.filename
+        },
+        'locators': {
+            lambda self: self.attachment.folder.linked_object
+        },
+        'preserved_args': {'attachment_id'}
     }
 
     def _checkParams(self):
@@ -41,7 +47,10 @@ class SpecificFolderMixin:
     """Mixin for RHs that reference a specific folder"""
 
     normalize_url_spec = {
-        None: lambda self: self.folder.linked_object
+        'locators': {
+            lambda self: self.folder.linked_object
+        },
+        'preserved_args': {'folder_id'}
     }
 
     def _checkParams(self):
