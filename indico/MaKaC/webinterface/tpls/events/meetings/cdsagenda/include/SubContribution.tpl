@@ -6,6 +6,11 @@
     <td align="left">
     <ul>
     <li>
+    % if item.attached_items:
+      <span class="material-list">
+          ${ render_template('attachments/mako_compat/materials.html', item=item) }
+      </span>
+    % endif
     <span class="headline" style="font-size:x-small;">${item.getTitle()}</span>
     % if item.getDuration():
          <span class="itemDuration">(${prettyDuration(item.getDuration())})</span>
@@ -21,14 +26,6 @@
             % endfor
             )
         % endif
-    % if len(item.getAllMaterialList()) > 0:
-        % for material in item.getAllMaterialList():
-            % if material.canView(accessWrapper):
-            <%include file="../../${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
-            &nbsp;
-            % endif
-        % endfor
-    % endif
     % if item.getDescription():
         <br/><span class="headerInfo">${common.renderDescription(item.getDescription())}</span>
     % endif

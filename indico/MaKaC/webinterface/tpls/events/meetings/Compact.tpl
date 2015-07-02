@@ -64,11 +64,7 @@
         (${getLocationInfo(item)[1]})
     % endif
     <div style="float:right">
-        % for material in session.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                    <%include file="${INCLUDE}/Material.tpl" args="material=material, sessionId=item.getId()"/>
-                    % endif
-        % endfor
+        ${ render_template('attachments/mako_compat/materials.html', item=session) }
     </div>
     </td>
     </tr>
@@ -106,11 +102,7 @@
                   &nbsp;
                   <div style="float:right">
                       <div style="float:left">
-                          % for material in item.getAllMaterialList():
-                                    % if material.canView(accessWrapper):
-                                    <%include file="${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
-                                    % endif
-                          % endfor
+                          ${ render_template('attachments/mako_compat/materials.html', item=item) }
                       </div>
                       <div style="float:right">
                         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False, minutesToggle=False"/>

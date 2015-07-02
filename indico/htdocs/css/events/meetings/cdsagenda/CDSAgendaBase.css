@@ -422,3 +422,8 @@ a.material:visited {
 .headerTitle{
     font-weight:bold;
 }
+
+.material-list {
+    display: inline-block;
+    vertical-align: middle;
+}

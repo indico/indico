@@ -36,21 +36,15 @@ td {
 a:visited {
    color: #0000FF;
    background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
    text-decoration: none;
 }
 a:active {
    color: #E25300;
    background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
 }
 a:hover {
    color: #E25300;
    background: transparent;
-   font-family: verdana, arial, sans-serif;
-   font-weight: normal;
 }
 a.img:hover {
    color: #00c;
