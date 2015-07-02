@@ -17,67 +17,66 @@
 from __future__ import unicode_literals
 
 from flask import session
-from werkzeug.exceptions import NotFound, Forbidden
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.attachments.controllers.management.base import (ManageAttachmentsMixin, AddAttachmentFilesMixin,
                                                                     AddAttachmentLinkMixin, EditAttachmentMixin,
                                                                     CreateFolderMixin, EditFolderMixin,
                                                                     DeleteFolderMixin, DeleteAttachmentMixin)
 from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.attachments.views import WPEventAttachments
-from indico.modules.events.util import get_object_from_args
-from MaKaC.webinterface.rh.base import RHProtected
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.modules.attachments.views import WPCategoryAttachments
+from MaKaC.webinterface.rh.categoryMod import RHCategModifBase
 
 
-class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
+class RHCategoryAttachmentManagementBase(RHCategModifBase):
     def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self.object_type, self.base_object, self.object = get_object_from_args()
-        if self.object is None:
-            raise NotFound
+        RHCategModifBase._checkParams(self, params)
+        self.object_type = 'category'
+        self.object = self.base_object = self._target
 
     def _checkProtection(self):
-        RHProtected._checkProtection(self)
+        RHCategModifBase._checkProtection(self)
+        # This is already covered by CategModifBase, but if we ever add more
+        # checks to can_manage_attachments we are on the safe side...
         if not can_manage_attachments(self.object, session.user):
             raise Forbidden
 
 
-class RHManageEventAttachments(ManageAttachmentsMixin, RHEventAttachmentManagementBase):
-    wp = WPEventAttachments
+class RHManageCategoryAttachments(ManageAttachmentsMixin, RHCategoryAttachmentManagementBase):
+    wp = WPCategoryAttachments
 
 
-class RHAddEventAttachmentFiles(AddAttachmentFilesMixin, RHEventAttachmentManagementBase):
+class RHAddCategoryAttachmentFiles(AddAttachmentFilesMixin, RHCategoryAttachmentManagementBase):
     pass
 
 
-class RHAddEventAttachmentLink(AddAttachmentLinkMixin, RHEventAttachmentManagementBase):
+class RHAddCategoryAttachmentLink(AddAttachmentLinkMixin, RHCategoryAttachmentManagementBase):
     pass
 
 
-class RHEditEventAttachment(EditAttachmentMixin, RHEventAttachmentManagementBase):
+class RHEditCategoryAttachment(EditAttachmentMixin, RHCategoryAttachmentManagementBase):
     def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
+        RHCategoryAttachmentManagementBase._checkParams(self, params)
         EditAttachmentMixin._checkParams(self)
 
 
-class RHCreateEventFolder(CreateFolderMixin, RHEventAttachmentManagementBase):
+class RHCreateCategoryFolder(CreateFolderMixin, RHCategoryAttachmentManagementBase):
     pass
 
 
-class RHEditEventFolder(EditFolderMixin, RHEventAttachmentManagementBase):
+class RHEditCategoryFolder(EditFolderMixin, RHCategoryAttachmentManagementBase):
     def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
+        RHCategoryAttachmentManagementBase._checkParams(self, params)
         EditFolderMixin._checkParams(self)
 
 
-class RHDeleteEventFolder(DeleteFolderMixin, RHEventAttachmentManagementBase):
+class RHDeleteCategoryFolder(DeleteFolderMixin, RHCategoryAttachmentManagementBase):
     def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
+        RHCategoryAttachmentManagementBase._checkParams(self, params)
         DeleteFolderMixin._checkParams(self)
 
 
-class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagementBase):
+class RHDeleteCategoryAttachment(DeleteAttachmentMixin, RHCategoryAttachmentManagementBase):
     def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
+        RHCategoryAttachmentManagementBase._checkParams(self, params)
         DeleteAttachmentMixin._checkParams(self)

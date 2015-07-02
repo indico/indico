@@ -40,5 +40,11 @@ def _merge_users(target, source, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'attachments', SideMenuItem(_('Attachments'), url_for('attachments.event_management', event),
+    return 'attachments', SideMenuItem(_('Attachments'), url_for('attachments.management', event),
                                        visible=event.canModify(session.user))
+
+
+@signals.category.management_sidemenu.connect
+def _extend_category_management_menu(category, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'attachments', SideMenuItem(_('Attachments'), url_for('attachments.management', category))

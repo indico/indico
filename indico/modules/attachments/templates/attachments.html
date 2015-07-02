@@ -8,7 +8,19 @@
         <div class="section">
             <span class="icon icon-upload"></span>
             <div class="text">
-                <div class="label">{% trans %}Add attachments to the event.{% endtrans %}</div>
+                <div class="label">
+                    {% if linked_object_type == 'category' %}
+                        {% trans %}Add attachments to the category.{% endtrans %}
+                    {% elif linked_object_type == 'event' %}
+                        {% trans %}Add attachments to the event.{% endtrans %}
+                    {% elif linked_object_type == 'session' %}
+                        {% trans %}Add attachments to the session.{% endtrans %}
+                    {% elif linked_object_type == 'contribution' %}
+                        {% trans %}Add attachments to the contribution.{% endtrans %}
+                    {% elif linked_object_type == 'subcontribution' %}
+                        {% trans %}Add attachments to the subcontribution.{% endtrans %}
+                    {% endif %}
+                </div>
                 <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
             </div>
             <div class="toolbar right">

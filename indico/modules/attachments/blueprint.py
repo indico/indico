@@ -18,7 +18,16 @@ from __future__ import unicode_literals
 
 import itertools
 
+from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
 from indico.modules.attachments.controllers.display.event import RHDownloadEventAttachment
+from indico.modules.attachments.controllers.management.category import (RHManageCategoryAttachments,
+                                                                        RHAddCategoryAttachmentFiles,
+                                                                        RHAddCategoryAttachmentLink,
+                                                                        RHEditCategoryAttachment,
+                                                                        RHCreateCategoryFolder,
+                                                                        RHEditCategoryFolder,
+                                                                        RHDeleteCategoryFolder,
+                                                                        RHDeleteCategoryAttachment)
 from indico.modules.attachments.controllers.management.event import (RHManageEventAttachments,
                                                                      RHAddEventAttachmentFiles,
                                                                      RHAddEventAttachmentLink,
@@ -28,32 +37,64 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
+from indico.util.caching import memoize
+from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 
-for object_type, prefixes in event_management_object_url_prefixes.iteritems():
+
+@memoize
+def _dispatch(event_rh, category_rh):
+    event_view = make_view_func(event_rh)
+    categ_view = make_view_func(category_rh)
+
+    def view_func(**kwargs):
+        return categ_view(**kwargs) if kwargs['object_type'] == 'category' else event_view(**kwargs)
+
+    return view_func
+
+
+items = itertools.chain(event_management_object_url_prefixes.iteritems(), [('category', ['/manage'])])
+for object_type, prefixes in items:
     for prefix in prefixes:
-        prefix = '/event/<confId>' + prefix
-        _bp.add_url_rule(prefix + '/attachments/', 'event_management', RHManageEventAttachments,
+        if object_type == 'category':
+            prefix = '/category/<categId>' + prefix
+        else:
+            prefix = '/event/<confId>' + prefix
+        _bp.add_url_rule(prefix + '/attachments/', 'management',
+                         _dispatch(RHManageEventAttachments, RHManageCategoryAttachments),
                          defaults={'object_type': object_type})
-        _bp.add_url_rule(prefix + '/attachments/add/files', 'upload', RHAddEventAttachmentFiles,
+        _bp.add_url_rule(prefix + '/attachments/add/files', 'upload',
+                         _dispatch(RHAddEventAttachmentFiles, RHAddCategoryAttachmentFiles),
                          methods=('GET', 'POST'), defaults={'object_type': object_type})
-        _bp.add_url_rule(prefix + '/attachments/add/link', 'add_link', RHAddEventAttachmentLink,
+        _bp.add_url_rule(prefix + '/attachments/add/link', 'add_link',
+                         _dispatch(RHAddEventAttachmentLink, RHAddCategoryAttachmentLink),
                          methods=('GET', 'POST'), defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/', 'modify_attachment',
-                         RHEditEventAttachment, methods=('GET', 'POST'), defaults={'object_type': object_type})
-        _bp.add_url_rule(prefix + '/attachments/create-folder', 'create_folder', RHCreateEventFolder,
+                         _dispatch(RHEditEventAttachment, RHEditCategoryAttachment),
                          methods=('GET', 'POST'), defaults={'object_type': object_type})
-        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'edit_folder', RHEditEventFolder,
+        _bp.add_url_rule(prefix + '/attachments/create-folder', 'create_folder',
+                         _dispatch(RHCreateEventFolder, RHCreateCategoryFolder),
                          methods=('GET', 'POST'), defaults={'object_type': object_type})
-        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'delete_folder', RHDeleteEventFolder,
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'edit_folder',
+                         _dispatch(RHEditEventFolder, RHEditCategoryFolder),
+                         methods=('GET', 'POST'), defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'delete_folder',
+                         _dispatch(RHDeleteEventFolder, RHDeleteCategoryFolder),
                          methods=('DELETE',), defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/', 'delete_attachment',
-                         RHDeleteEventAttachment, methods=('DELETE',), defaults={'object_type': object_type})
+                         _dispatch(RHDeleteEventAttachment, RHDeleteCategoryAttachment),
+                         methods=('DELETE',), defaults={'object_type': object_type})
 
 
-for prefix in itertools.chain.from_iterable(event_object_url_prefixes.itervalues()):
-    prefix = '/event/<confId>' + prefix
-    _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
-                     RHDownloadEventAttachment)
+items = itertools.chain(event_object_url_prefixes.iteritems(), [('category', [''])])
+for object_type, prefixes in items:
+    for prefix in prefixes:
+        if object_type == 'category':
+            prefix = '/category/<categId>' + prefix
+        else:
+            prefix = '/event/<confId>' + prefix
+        _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
+                         _dispatch(RHDownloadEventAttachment, RHDownloadCategoryAttachment),
+                         defaults={'object_type': object_type})

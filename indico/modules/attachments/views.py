@@ -16,22 +16,32 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.category import WPCategoryModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
-class WPEventAttachments(WPConferenceModifBase, WPJinjaMixin):
+class AttachmentsMixin(WPJinjaMixin):
     template_prefix = 'attachments/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['attachments'].setActive()
+    base_wp = None
 
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['attachments'].setActive()
+
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['dropzone_js'].urls()
+        return self.base_wp.getJSFiles(self) + self._asset_env['dropzone_js'].urls()
 
     def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) + self._asset_env['dropzone_css'].urls()
+        return (self.base_wp.getCSSFiles(self) + self._asset_env['dropzone_css'].urls()
                 + self._asset_env['attachments_sass'].urls())
+
+
+class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
+    base_wp = WPConferenceModifBase  # old-style, so we can't use super :(
+
+
+class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
+    base_wp = WPCategoryModifBase  # old-style, so we can't use super :(
