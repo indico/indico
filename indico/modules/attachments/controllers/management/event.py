@@ -31,6 +31,12 @@ from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 
 
 class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.object
+        }
+    }
+
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
         self.object_type, self.base_object, self.object = get_object_from_args()
