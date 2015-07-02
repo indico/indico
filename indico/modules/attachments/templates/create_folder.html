@@ -5,6 +5,7 @@
     {{ form_rows(form) }}
     {% call form_footer(attach_form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
+        <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     {% endcall %}
     <script>
         aclIfProtected($('#protected'), $('#acl'));
