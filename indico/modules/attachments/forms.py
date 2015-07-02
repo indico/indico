@@ -34,12 +34,12 @@ from indico.web.forms.widgets import SwitchWidget
 
 class AttachmentFormBase(IndicoForm):
     protected = BooleanField(_("Protected"), widget=SwitchWidget(),
-                             description=_("By default, the attachments will inherit the protection of the parent. "
+                             description=_("By default, the materials will inherit the protection of the parent. "
                                            "Checking this field will restrict all access. The protection can be "
-                                           "modified later on from the attachment settings."))
+                                           "modified later on from the material settings."))
 
     folder = QuerySelectField(_("Folder"), allow_blank=True, blank_text=_("No folder selected"), get_label='title',
-                              description=_("Adding attachments to folders allow grouping and easier permission "
+                              description=_("Adding materials to folders allow grouping and easier permission "
                                             "management."))
 
     def __init__(self, *args, **kwargs):
@@ -59,7 +59,7 @@ class EditAttachmentFormBase(AttachmentFormBase):
     description = TextAreaField(_("Description"))
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
                              groups=True, serializable=False, allow_external=True,
-                             description=_("The list of users and groups with access to the attachment"))
+                             description=_("The list of users and groups with access to the material"))
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):

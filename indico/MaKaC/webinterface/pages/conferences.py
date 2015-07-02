@@ -1261,7 +1261,7 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifSchedule.getURL( self._conf ))
         self._generalSection.addItem( self._timetableMenuItem)
 
-        self._materialMenuItem = wcomponents.SideMenuItem(_("Material"),
+        self._materialMenuItem = wcomponents.SideMenuItem(_("Material (old)"),
             urlHandlers.UHConfModifShowMaterials.getURL( self._conf ))
         self._generalSection.addItem( self._materialMenuItem)
 

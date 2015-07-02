@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% from 'attachments/_attachments.html' import render_attachments %}
 
-{% block title %}{% trans %}Attachments{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Materials{% endtrans %}{% endblock %}
 
 {% block content %}
     <div class="action-box fixed-width">
@@ -10,15 +10,15 @@
             <div class="text">
                 <div class="label">
                     {% if linked_object_type == 'category' %}
-                        {% trans %}Add attachments to the category.{% endtrans %}
+                        {% trans %}Add materials to the category.{% endtrans %}
                     {% elif linked_object_type == 'event' %}
-                        {% trans %}Add attachments to the event.{% endtrans %}
+                        {% trans %}Add materials to the event.{% endtrans %}
                     {% elif linked_object_type == 'session' %}
-                        {% trans %}Add attachments to the session.{% endtrans %}
+                        {% trans %}Add materials to the session.{% endtrans %}
                     {% elif linked_object_type == 'contribution' %}
-                        {% trans %}Add attachments to the contribution.{% endtrans %}
+                        {% trans %}Add materials to the contribution.{% endtrans %}
                     {% elif linked_object_type == 'subcontribution' %}
-                        {% trans %}Add attachments to the subcontribution.{% endtrans %}
+                        {% trans %}Add materials to the subcontribution.{% endtrans %}
                     {% endif %}
                 </div>
                 <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
