@@ -832,4 +832,7 @@ dd > .i-has-action {
     );
     font-style: italic;
     color: $dark-gray !important;
+    pointer-events: none;
+
+    .actions { display: none; }
 }
