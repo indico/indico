@@ -127,13 +127,21 @@
 
                         -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
                     }
+                    > span {
+                        @include icon-before('icon-folder-open');
+                    }
                 }
                 &:last-child {
                     @include border-top-right-radius(2px);
                 }
             }
-            &.collapsed > td:first-child:before {
-                @include rotate(-90deg);
+            &.collapsed > td:first-child {
+                > span {
+                    @include icon-before('icon-folder');
+                }
+                &:before {
+                    @include rotate(-90deg);
+                }
             }
         }
         &.sub-tree > td {

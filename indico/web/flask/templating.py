@@ -187,7 +187,6 @@ def call_template_hook(*name, **kwargs):
         return Markup(u'\n').join(x[1] for x in values) if values else u''
 
 
-
 class EnsureUnicodeExtension(Extension):
     """Ensures all strings in Jinja are unicode"""
 

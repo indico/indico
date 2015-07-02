@@ -1,26 +1,8 @@
-{% set type_icons = {
-    'application/pdf': 'icon-file-pdf',
-    'application/vnd.ms-excel': 'icon-file-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'icon-file-excel',
-    'application/msword': 'icon-file-word',
-    'application/application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'icon-file-word',
-    'application/vnd.ms-powerpoint': 'icon-file-presentation',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'icon-file-presentation',
-    'application/vnd.oasis.opendocument.text': 'icon-file-openoffice',
-    'application/vnd.oasis.opendocument.spreadsheet': 'icon-file-openoffice',
-    'application/vnd.oasis.opendocument.presentation': 'icon-file-openoffice',
-    'image/jpeg': 'icon-image',
-    'image/png': 'icon-image',
-    'image/tiff': 'icon-image',
-    'image/gif': 'icon-image',
-    'image/x-ms-bmp': 'icon-image'
-} %}
-
 {% macro get_attachment_icon(attachment) -%}
     {%- if attachment.type.name == 'link' -%}
         icon-link
     {%- else -%}
-        {{ type_icons.get(attachment.file.content_type, 'icon-file-empty2') }}
+        {{ icon_from_mimetype(attachment.file.content_type, 'icon-file-empty2') }}
     {%- endif -%}
 {%- endmacro %}
 
@@ -51,8 +33,8 @@
 
 {% macro _folder_row(folder) -%}
     <tr class="expandable {%- if not folder.attachments %} collapsed{% endif %}">
-        <td>  {# TODO: use folder icon #}
-            <span class="icon-material-download"> {{ folder.title }}</span>
+        <td>
+            <span> {{ folder.title }}</span>
         </td>
         <td class="actions">
             <a class="icon-edit js-dialog-action"
@@ -110,9 +92,8 @@
         <span class="empty">{% trans %}There are no attachments yet.{% endtrans %}</span>
     {%- endif -%}
     <div class="i-box-footer text-right js-attachment-actions">
-        <a href="#" class="i-button icon-plus js-dialog-action" data-href="{{ url_for('.create_folder', linked_object) }}"
-           data-title="{% trans %}Add new folder{% endtrans %}">
-            {% trans %}Add new folder{% endtrans -%}
-        </a>
+        <a href="#" class="i-button icon-folder-plus js-dialog-action"
+           data-href="{{ url_for('.create_folder', linked_object) }}"
+           data-title="{% trans %}Create a new folder{% endtrans %}">{% trans %}new folder{% endtrans -%}</a>
     </div>
 {%- endmacro %}
