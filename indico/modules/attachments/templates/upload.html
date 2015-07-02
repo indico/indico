@@ -41,14 +41,10 @@
             </div>
         </div>
     {% endif %}
-    {% if existing_attachment %}
-        {{ form_rows(form, skip=('protected', 'acl')) }}
-        {{ form_row(form.protected) }}
-        {{ form_row(form.acl) }}
-    {% else %}
-        {{ form_rows(form, skip=('protected')) }}
-        {{ form_row(form.protected) }}
-    {% endif %}
+    {{ form_rows(form, skip=('folder', 'protected', 'acl')) }}
+    {{ form_row(form.folder) }}
+    {{ form_row(form.protected) }}
+    {{ form_row(form.acl, allow_missing=true) }}
     {% call form_footer(attach_form) %}
         <div class="dropzone-upload-btn">
             {% if existing_attachment -%}
