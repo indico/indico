@@ -181,3 +181,7 @@ from indico.util.mimetypes import icon_from_mimetype
 ))
 def test_icon_from_mimetype(mimetype, expected_icon):
     assert icon_from_mimetype(mimetype, default_icon='default_icon') == expected_icon
+
+
+def test_icon_from_mimetype_case_insensitive():
+    assert icon_from_mimetype('IMAGE/gif', default_icon='default_icon') == 'icon-file-image'
