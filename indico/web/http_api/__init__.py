@@ -26,5 +26,6 @@ from indico.web.http_api.hooks.file import FileHook
 import indico.modules.events.api
 import indico.modules.events.agreements.api
 import indico.modules.events.registration.api
+import indico.modules.events.notes.api
 import indico.modules.rb.api
 import indico.modules.users.api
