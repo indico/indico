@@ -16,28 +16,21 @@
 
 import itertools
 
-from flask import render_template
-
-from MaKaC.conference import SessionSlot, Contribution
+from MaKaC.conference import Conference, Contribution, SessionSlot
 
 
-def _get_all_notes(obj):
+def get_all_notes(obj):
     """Gets all notes linked to the object and its nested objects.
 
     :param obj: A :class:`SessionSlot`, :class:`Contribution` or
                 :class:`SubContribution` object.
     """
     notes = [obj.note] if obj.note else []
-    nested_obj = []
+    nested_objects = []
+    if isinstance(obj, Conference):
+        nested_objects = [e.getOwner() for e in obj.getSchedule().getEntries()]
     if isinstance(obj, SessionSlot):
-        nested_obj = obj.getContributionList()
+        nested_objects = obj.getContributionList()
     elif isinstance(obj, Contribution):
-        nested_obj = obj.getSubContributionList()
-    return itertools.chain(notes, *map(_get_all_notes, nested_obj))
-
-
-def compile_notes(event):
-    """Compiles the text of all notes for a given event."""
-    objects = [e.getOwner() for e in event.getSchedule().getEntries()]
-    notes = itertools.chain.from_iterable(map(_get_all_notes, objects))
-    return render_template('events/notes/compiled_notes.html', notes=notes)
+        nested_objects = obj.getSubContributionList()
+    return itertools.chain(notes, *map(get_all_notes, nested_objects))
