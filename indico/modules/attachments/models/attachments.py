@@ -172,7 +172,7 @@ class Attachment(ProtectionMixin, db.Model):
 
     @property
     def download_url(self):
-        filename = self.file.filename if self.type == AttachmentType.file else 'redirect'
+        filename = self.file.filename if self.type == AttachmentType.file else 'go'
         return url_for('attachments.download', self, filename=filename)
 
     def can_access(self, user, *args, **kwargs):

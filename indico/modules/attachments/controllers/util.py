@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import request
 from werkzeug.exceptions import NotFound
 
-from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 
 
@@ -29,7 +29,8 @@ class SpecificAttachmentMixin:
     normalize_url_spec = {
         'args': {
             'folder_id': lambda self: self.attachment.folder_id,
-            'filename': lambda self: self.attachment.file.filename
+            'filename': lambda self: (self.attachment.file.filename if self.attachment.type == AttachmentType.file
+                                      else 'go')
         },
         'locators': {
             lambda self: self.attachment.folder.linked_object
