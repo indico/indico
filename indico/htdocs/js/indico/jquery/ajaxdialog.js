@@ -98,6 +98,9 @@
             popup.postDraw = function() {
                 ajaxifyForms();
                 injectJS(dialogData.js);
+                _.defer(function() {
+                    popup.canvas.data('ui-dialog')._focusTabbable();
+                });
             };
             popup.open();
         }
