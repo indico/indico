@@ -20,7 +20,7 @@ import itertools
 
 from indico.modules.attachments.controllers.compat import compat_folder, compat_attachment
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
-from indico.modules.attachments.controllers.display.event import RHDownloadEventAttachment
+from indico.modules.attachments.controllers.display.event import RHDownloadEventAttachment, RHListEventAttachmentFolder
 from indico.modules.attachments.controllers.management.category import (RHManageCategoryAttachments,
                                                                         RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
@@ -99,6 +99,12 @@ for object_type, prefixes in items:
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
                          _dispatch(RHDownloadEventAttachment, RHDownloadCategoryAttachment),
                          defaults={'object_type': object_type})
+
+        # attachments folders cannot be consulted in categories
+        if object_type != 'category':
+            _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/', 'list_folder',
+                             RHListEventAttachmentFolder,
+                             defaults={'object_type': object_type})
 
 
 # Setup legacy redirects for the old URLs

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryModifBase
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
@@ -73,3 +74,10 @@ class WPContributionAttachments(EventObjectAttachmentsMixin, WPContributionModif
 
 class WPSubContributionAttachments(EventObjectAttachmentsMixin, WPSubContributionModifBase):
     base_wp = WPSubContributionModifBase  # old-style, so we can't use super
+
+
+class WPEventFolderDisplay(WPMeetingDisplay, WPJinjaMixin):
+    template_prefix = 'attachments/'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)

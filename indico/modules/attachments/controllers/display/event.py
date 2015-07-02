@@ -16,12 +16,36 @@
 
 from __future__ import unicode_literals
 
+from flask import request, session, redirect
+from werkzeug.exceptions import Forbidden
+
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
+from indico.modules.attachments.controllers.util import SpecificFolderMixin
+from indico.modules.attachments.views import WPEventFolderDisplay
 
 
 class RHDownloadEventAttachment(DownloadAttachmentMixin, RHConferenceBase):
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
         DownloadAttachmentMixin._checkParams(self)
+
+
+class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        SpecificFolderMixin._checkParams(self)
+
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        if not self.folder.can_access(session.user):
+            raise Forbidden
+
+    def _process(self):
+        if request.args.get('redirect_if_single') == '1' and len(self.folder.attachments) == 1:
+            return redirect(self.folder.attachments[0].download_url)
+
+        return WPEventFolderDisplay.render_template('folder.html', self._target,
+                                                    folder=self.folder, event=self._target)

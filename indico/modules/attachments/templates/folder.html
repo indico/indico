@@ -1,0 +1,9 @@
+{% from 'attachments/_display.html' import render_attachment %}
+
+<div class="folder-main">
+    <h1><a href="{{ event.getURL() }}">{{ event.title }}</a></h1>
+    <h2>{{ folder.title }}</h2>
+    {% for attachment in folder.attachments %}
+        {{ render_attachment(attachment) }}
+    {% endfor %}
+</div>
