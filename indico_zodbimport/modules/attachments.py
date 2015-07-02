@@ -135,7 +135,6 @@ class AttachmentImporter(Importer):
                 attachment = self._attachment_from_resource(folder, material, resource, event)
                 if attachment is None:
                     continue
-                db.session.add(attachment)
                 # TODO: mapping table entry for old/new ids
                 if not self.quiet:
                     if attachment.type == AttachmentType.link:
@@ -191,12 +190,12 @@ class AttachmentImporter(Importer):
                 return self.storage_backend, rel_path, size
 
     def _attachment_from_resource(self, folder, material, resource, base_object=None):
+        modified_dt = (getattr(material, '_modificationDS', None) or getattr(base_object, 'startDate', None) or
+                       getattr(base_object, '_modificationDS', None) or now_utc())
         data = {'folder': folder,
                 'user': self.janitor_user,
                 'title': convert_to_unicode(resource.name).strip() or folder.title,
-                'description': convert_to_unicode(resource.description),
-                'modified_dt': getattr(material, '_modificationDS', None) or getattr(base_object, 'startDate',
-                                                                                     now_utc())}
+                'description': convert_to_unicode(resource.description)}
         if resource.__class__.__name__ == 'Link':
             data['type'] = AttachmentType.link
             data['link_url'] = resource.url
@@ -213,6 +212,10 @@ class AttachmentImporter(Importer):
                                           size=size, storage_backend=storage_backend, storage_file_id=storage_path)
         attachment = Attachment(**data)
         protection_from_ac(attachment, resource._Resource__ac)
+        db.session.add(attachment)
+        # https://bitbucket.org/zzzeek/sqlalchemy/issue/3471/onupdate-runs-for-post_update-updates
+        db.session.flush()
+        attachment.modified_dt = modified_dt
         return attachment
 
     def _has_special_protection(self, material, resource):
