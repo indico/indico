@@ -324,8 +324,9 @@ class RH(RequestHandlerBase):
                     raise AttributeError("'{}' object has neither 'locator' nor 'getLocator'".format(type(value)))
             new_view_args.update(expected)
         # Get all default values provided by the url map for the endpoint
-        defaults = set(itertools.chain.from_iterable(r.defaults for r in
-                                                     current_app.url_map.iter_rules(request.endpoint)))
+        defaults = set(itertools.chain.from_iterable(r.defaults
+                                                     for r in current_app.url_map.iter_rules(request.endpoint)
+                                                     if r.defaults))
         provided = {k: v for k, v in request.view_args.iteritems() if k not in defaults}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
