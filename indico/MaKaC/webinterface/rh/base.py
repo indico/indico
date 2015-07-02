@@ -187,8 +187,11 @@ class RH(RequestHandlerBase):
     #: case of a ``None`` key or a plain value otherwise.
     #: If the view args built from the returned objects do not match
     #: the request's view args, a redirect is issued automatically.
-    #: If the request is not using GET/HEAD, no normalization is
-    #: performed since POST requests cannot be redirected properly.
+    #: If the request is not using GET/HEAD, a 404 error is raised
+    #: instead of a redirect since such requests cannot be redirected
+    #: but executing them on the wrong URL may pose a security risk in
+    #: case and of the non-relevant URL segments is used for access
+    #: checks.
     normalize_url_spec = None
 
     def __init__(self):
@@ -285,7 +288,7 @@ class RH(RequestHandlerBase):
 
         :return: ``None`` or a redirect response
         """
-        if not self.normalize_url_spec or request.method not in {'GET', 'HEAD'}:
+        if not self.normalize_url_spec:
             return
         new_view_args = request.view_args.copy()
         items = (self.normalize_url_spec.iteritems() if hasattr(self.normalize_url_spec, 'iteritems')
@@ -307,7 +310,10 @@ class RH(RequestHandlerBase):
             if provided != expected:
                 new_view_args.update(expected)
         if new_view_args != request.view_args:
-            return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
+            if request.method in {'GET', 'HEAD'}:
+                return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
+            else:
+                raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
     def _checkParams(self, params):
         """This method is called before _checkProtection and is a good place
