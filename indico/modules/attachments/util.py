@@ -25,8 +25,7 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     to an object.
 
     :param linked_object: The object whose attachments are to be returned
-    :param include_deleted: Whether to return deleted attachments or
-                            folders as well
+    :param include_empty: Whether to return empty folders as well.
     :param include_hidden: Include folders that the user can't see
     :param preload_event: in the process, preload all objects tied to the
                           corresponding event and keep them in cache
