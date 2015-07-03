@@ -21,45 +21,46 @@ from indico.web.flask.wrappers import IndicoBlueprint
 files = IndicoBlueprint('files', __name__)
 
 # Material (event)
-files.add_url_rule('/event/<confId>/material/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
-files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/', 'materialDisplay',
+files.add_url_rule('/event/<confId>/material-old/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
+files.add_url_rule('/event/<confId>/contribution/<contribId>/material-old/<materialId>/', 'materialDisplay',
                    materialDisplay.RHMaterialDisplay)
-files.add_url_rule('/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/',
+files.add_url_rule('/event/<confId>/session/<sessionId>/contribution/<contribId>/material-old/<materialId>/',
                    'materialDisplay', materialDisplay.RHMaterialDisplay)
-files.add_url_rule('/event/<confId>/material/<materialId>/accesskey', 'materialDisplay-accessKey',
+files.add_url_rule('/event/<confId>/material-old/<materialId>/accesskey', 'materialDisplay-accessKey',
                    materialDisplay.RHMaterialDisplayStoreAccessKey, methods=('POST',))
 
 # Material (category)
-files.add_url_rule('/category/<categId>/material/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
-files.add_url_rule('/category/<categId>/material/<materialId>/accesskey', 'materialDisplay-accessKey',
+files.add_url_rule('/category/<categId>/material-old/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
+files.add_url_rule('/category/<categId>/material-old/<materialId>/accesskey', 'materialDisplay-accessKey',
                    materialDisplay.RHMaterialDisplayStoreAccessKey, methods=('POST',))
 
 # File access (event)
 files.add_url_rule(
-    '/event/<confId>/session/<sessionId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
+    '/event/<confId>/session/<sessionId>/material-old/<materialId>/<resId>.<fileExt>', 'getFile-access',
     fileAccess.RHFileAccess)
 files.add_url_rule(
-    '/event/<confId>/session/<sessionId>/material/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
+    '/event/<confId>/session/<sessionId>/material-old/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule(
-    '/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>',
+    '/event/<confId>/session/<sessionId>/contribution/<contribId>/material-old/<materialId>/<resId>.<fileExt>',
     'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule(
-    '/event/<confId>/session/<sessionId>/contribution/<contribId>/<subContId>/material/<materialId>/<resId>.<fileExt>',
+    '/event/<confId>/session/<sessionId>/contribution/<contribId>/<subContId>/material-old/<materialId>/<resId>.<fileExt>',
     'getFile-access', fileAccess.RHFileAccess)
-files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
+files.add_url_rule('/event/<confId>/contribution/<contribId>/material-old/<materialId>/<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
-files.add_url_rule('/event/<confId>/contribution/<contribId>/<subContId>/material/<materialId>/<resId>.<fileExt>',
+files.add_url_rule('/event/<confId>/contribution/<contribId>/<subContId>/material-old/<materialId>/<resId>.<fileExt>',
                    'getFile-access', fileAccess.RHFileAccess)
-files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access', fileAccess.RHFileAccess)
+files.add_url_rule('/event/<confId>/material-old/<materialId>/<resId>.<fileExt>', 'getFile-access', fileAccess.RHFileAccess)
+# XXX: keep this one when removing the old material stuff
 files.add_url_rule('/event/<confId>/registration/attachments/<registrantId>-<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
-files.add_url_rule('/event/<confId>/material/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
+files.add_url_rule('/event/<confId>/material-old/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
 
 
 # File access (category)
-files.add_url_rule('/category/<categId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
+files.add_url_rule('/category/<categId>/material-old/<materialId>/<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
-files.add_url_rule('/category/<categId>/material/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
+files.add_url_rule('/category/<categId>/material-old/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
 
 # File access (generic)
 files.add_url_rule('/file/video.swf', 'getFile-flash', fileAccess.RHVideoFlashAccess)

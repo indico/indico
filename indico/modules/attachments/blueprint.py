@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import itertools
 
+from indico.modules.attachments.controllers.compat import compat_folder, compat_attachment
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
 from indico.modules.attachments.controllers.display.event import RHDownloadEventAttachment
 from indico.modules.attachments.controllers.management.category import (RHManageCategoryAttachments,
@@ -98,3 +99,26 @@ for object_type, prefixes in items:
         _bp.add_url_rule(prefix + '/attachments/<int:folder_id>/<int:attachment_id>/<filename>', 'download',
                          _dispatch(RHDownloadEventAttachment, RHDownloadCategoryAttachment),
                          defaults={'object_type': object_type})
+
+
+# Setup legacy redirects for the old URLs
+_compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<event_id>')
+compat_folder_rules = [
+    '/material/<material_id>/',
+    '/session/<session_id>/contribution/<contrib_id>/material/<material_id>/',
+    '/contribution/<contrib_id>/material/<material_id>/'
+]
+compat_attachment_rules = [
+    '/material/<material_id>/<resource_id>',
+    '/material/<material_id>/<resource_id>.<ext>',
+    '/session/<session_id>/material/<material_id>/<resource_id>',
+    '/session/<session_id>/material/<material_id>/<resource_id>.<ext>',
+    '/session/<session_id>/contribution/<contrib_id>/material/<material_id>/<resource_id>.<ext>',
+    '/session/<session_id>/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>',
+    '/contribution/<contrib_id>/material/<material_id>/<resource_id>.<ext>',
+    '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>',
+]
+for rule in compat_folder_rules:
+    _compat_bp.add_url_rule(rule, 'folder', compat_folder)
+for rule in compat_attachment_rules:
+    _compat_bp.add_url_rule(rule, 'attachment', compat_attachment)

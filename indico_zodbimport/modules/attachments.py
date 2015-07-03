@@ -30,6 +30,7 @@ from indico.core.db import db
 from indico.core.config import Config
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType, AttachmentFile
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
 from indico.modules.attachments.models.principals import AttachmentPrincipal, AttachmentFolderPrincipal
 from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
@@ -107,7 +108,6 @@ class AttachmentImporter(Importer):
 
         for category, material, resources in committing_iterator(self._iter_category_materials(), n=1000):
             folder = self._folder_from_material(material, category)
-            db.session.add(folder)
             if not self.quiet:
                 self.print_success(cformat('%{cyan}[{}]').format(folder.title),
                                    event_id=category.id)
@@ -127,8 +127,7 @@ class AttachmentImporter(Importer):
 
         for event, obj, material, resources in committing_iterator(self._iter_event_materials(), n=1000):
             folder = self._folder_from_material(material, obj)
-            db.session.add(folder)
-            # TODO: mapping table entry for old/new ids
+            db.session.add(LegacyAttachmentFolderMapping(linked_object=obj, material_id=material.id, folder=folder))
             if not self.quiet:
                 self.print_success(cformat('%{cyan}[{}]%{reset} %{blue!}({})').format(folder.title, folder.link_repr),
                                    event_id=event.id)
@@ -136,7 +135,8 @@ class AttachmentImporter(Importer):
                 attachment = self._attachment_from_resource(folder, material, resource, event)
                 if attachment is None:
                     continue
-                # TODO: mapping table entry for old/new ids
+                db.session.add(LegacyAttachmentMapping(linked_object=obj, material_id=material.id,
+                                                       resource_id=resource.id, attachment=attachment))
                 if not self.quiet:
                     if attachment.type == AttachmentType.link:
                         self.print_success(cformat('- %{cyan}{}').format(attachment.title), event_id=event.id)
@@ -149,6 +149,7 @@ class AttachmentImporter(Importer):
                                   linked_object=linked_object,
                                   is_always_visible=not material._Material__ac._hideFromUnauthorizedUsers)
         protection_from_ac(folder, material._Material__ac)
+        db.session.add(folder)
         return folder
 
     def _get_file_info(self, resource):
