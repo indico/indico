@@ -18,7 +18,7 @@
 """
 import copy
 from persistent import Persistent
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError,\
     EntryTimingError
@@ -27,15 +27,13 @@ from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
 from indico.util.date_time import iterdays
-from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.schedule import IContribSchEntryDisplayFossil,\
-        IContribSchEntryMgmtFossil, IBreakTimeSchEntryFossil,\
-        IBreakTimeSchEntryMgmtFossil,\
-        ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil
+from MaKaC.fossils.schedule import (IContribSchEntryDisplayFossil, IContribSchEntryMgmtFossil,
+                                    IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil,
+                                    ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil,
+                                    IAttachmentFossil, IFolderFossil)
 from MaKaC.common.cache import GenericCache
-from MaKaC.errors import NoReportError
 from indico.util.decorators import classproperty
 
 
@@ -1499,15 +1497,14 @@ class ScheduleToJson(object):
     @staticmethod
     def processEntry(obj, tz, aw, mgmtMode = False, useAttrCache = False):
 
+        fossil_mgmt_dict = {
+            BreakTimeSchEntry: IBreakTimeSchEntryMgmtFossil,
+            ContribSchEntry: IContribSchEntryMgmtFossil,
+            LinkedTimeSchEntry: ILinkedTimeSchEntryMgmtFossil
+        }
+
         if mgmtMode:
-            if isinstance(obj, BreakTimeSchEntry):
-                entry = ScheduleToJson.obtainFossil(obj, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
-            elif isinstance(obj, ContribSchEntry):
-                entry = ScheduleToJson.obtainFossil(obj, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
-            elif isinstance(obj, LinkedTimeSchEntry):
-                entry = ScheduleToJson.obtainFossil(obj, tz, ILinkedTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
-            else:
-                entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
+            entry = ScheduleToJson.obtainFossil(obj, tz, fossil_mgmt_dict, mgmtMode, useAttrCache)
         else:
             # the fossils used for the display of entries
             # will be taken by default, since they're first

@@ -167,6 +167,29 @@ class IContribSchEntryFossil(ISchEntryFossil):
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
 
+class IAttachmentFossil(IFossil):
+    def id(self):
+        pass
+
+    def title(self):
+        pass
+
+    def download_url(self):
+        pass
+
+
+class IFolderFossil(IFossil):
+    def id(self):
+        pass
+
+    def title(self):
+        pass
+
+    def attachments(self):
+        pass
+    attachments.result = IAttachmentFossil
+
+
 class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
 
     def getURL(self):
@@ -183,6 +206,14 @@ class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
         """ Entry Material """
     getMaterial.produce = lambda s: s.getOwner().getAllViewableMaterialList()
     getMaterial.result = IMaterialMinimalFossil
+
+    def getAttachments(self):
+        """ Entry Material """
+    getAttachments.produce = lambda s: s.getOwner().attached_items
+    getAttachments.result = {
+        'indico.modules.attachments.models.folders.AttachmentFolder': IFolderFossil,
+        'indico.modules.attachments.models.attachments.Attachment': IAttachmentFossil
+    }
 
     def getPresenters(self):
         """ Entry Presenters """
@@ -360,6 +391,14 @@ class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
         """ Entry Conveners """
     getConveners.produce = lambda s: s.getOwner().getOwnConvenerList()
     getConveners.result = IConferenceParticipationMinimalFossil
+
+    def getAttachments(self):
+        """ Entry Material """
+    getAttachments.produce = lambda s: s.getOwner().getSession().attached_items
+    getAttachments.result = {
+        'indico.modules.attachments.models.folders.AttachmentFolder': IFolderFossil,
+        'indico.modules.attachments.models.attachments.Attachment': IAttachmentFossil
+    }
 
 
 class ILinkedTimeSchEntryMgmtFossil(ILinkedTimeSchEntryFossil):

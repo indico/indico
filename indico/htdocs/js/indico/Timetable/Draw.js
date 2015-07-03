@@ -63,41 +63,57 @@ type("TimetableBlockBase", [],
              this.popup.close();
          },
 
-         createMaterialMenu: function(material, triggerElement, closeHandler) {
-             var sections = {};
-             each(material, function(value) {
-                 var section = value.title;
-                 var menuItems = {};
-                 sections[section] = {content: menuItems, description: value.description };
-                 each(value.resources, function(item) {
-                     var name = item.name;
-                     // set the URL instead of the title, if there's no title
-                     menuItems["material" + item.url] = {
-                         action: item.url,
-                         display: name ? name : item.url,
-                         description: item.description};
-                 });
-             });
-             return new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
+         createMaterialMenu: function(attachments, triggerElement, closeHandler) {
+             var menuItems = {},
+                 sections = {'': {content: menuItems, description: ''}};
+
+            $.each(attachments.files, function(i, attachment) {
+                menuItems["material" + attachment.download_url] = {
+                    action: attachment.download_url,
+                    display: attachment.title ,
+                    description: attachment.description};
+            });
+
+            $.each(attachments.folders, function(i, folder) {
+                var sectionItems = {},
+                    section = folder.title;
+
+                $.each(folder.attachments, function(i, attachment) {
+                    sectionItems["material" + attachment.download_url] = {
+                        action: attachment.download_url,
+                        display: attachment.title ,
+                        description: attachment.description
+                    };
+                });
+                sections[section] = {content: sectionItems, description: folder.description };
+
+            });
+            return new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
          },
 
-         getMaterialMenu: function (materials) {
-             var root = $('<ul class="material_list"/>');
-             each(materials, function(material) {
-                 var resources = $('<ul class="resource_list"/>');
-                 each(material.resources, function(resource) {
-                     var resource_html = $('<li/>').append(
-                         $('<a/>').attr('href', resource.url).text(
-                             resource.name ? resource.name : resource.url));
-                     resources.append(resource_html);
-                 });
-                 var material_html = $('<li/>').append($('<h3/>').append(material.title), resources);
-                 root.append(material_html);
-             });
-             return root;
+         getMaterialMenu: function (attachments) {
+            var root = $('<ul class="material_list"/>');
+
+            each(attachments.files, function(attachment) {
+                var resource_html = $('<li/>').append(
+                    $('<a/>').attr('href', attachment.download_url).text(attachment.title));
+                root.append(resource_html);
+            });
+
+            each(attachments.folders, function(folder) {
+                var resources = $('<ul class="resource_list"/>');
+                each(folder.attachments, function(attachment) {
+                    var resource_html = $('<li/>').append(
+                        $('<a/>').attr('href', attachment.download_url).text(attachment.title));
+                    resources.append(resource_html);
+                });
+                var material_html = $('<li/>').append($('<h3/>').append(folder.title), resources);
+                root.append(material_html);
+            });
+            return root;
          },
 
-         createMaterialButton: function(material) {
+         createMaterialButton: function(attachments) {
              var self = this;
 
              var button = Html.div('timetableBlockMaterial');
@@ -108,7 +124,7 @@ type("TimetableBlockBase", [],
                  button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
                  $(".timetableBlockMaterialActive").qtip({
                          content: {
-                             text: self.getMaterialMenu(material)
+                             text: self.getMaterialMenu(attachments)
                          },
                          show: {
                              event: 'click'
@@ -213,8 +229,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     }
 
                     // Add material menu
-                    if (!self.managementActions && self.eventData.material && self.eventData.material.length > 0) {
-                        this.titleWrapper.insert(this.createMaterialButton(this.eventData.material));
+                    if (!self.managementActions && self.eventData.attachments && self.eventData.attachments.files) {
+                        this.titleWrapper.insert(this.createMaterialButton(this.eventData.attachments));
                     }
 
                     //this.titleWrapper.insert(this.createManageButton());
@@ -485,8 +501,8 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
                 this.div.insert(this.timeDiv);
 
                 // Add material menu
-                if (self.eventData.material && self.eventData.material.length > 0) {
-                    this.titleWrapper.insert(this.createMaterialButton(this.eventData.material));
+                if (self.eventData.attachments && self.eventData.attachments.files) {
+                    this.titleWrapper.insert(this.createMaterialButton(this.eventData.attachments));
                 }
 
                 return this.div;
@@ -828,10 +844,10 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);
 
-        if (self.eventData.material && self.eventData.material.length > 0) {
+        if (self.eventData.attachments && self.eventData.attachments.files) {
             var materialLink = Html.a('dropDownMenu fakeLink', "Material");
             materialLink.observeClick(function(e) {
-                var menu = self.createMaterialMenu(self.eventData.material, materialLink);
+                var menu = self.createMaterialMenu(self.eventData.attachments, materialLink);
 
                 var pos = materialLink.getAbsolutePosition();
                 menu.open(pos.x + materialLink.dom.offsetWidth + 2, pos.y + materialLink.dom.offsetHeight + 2);
