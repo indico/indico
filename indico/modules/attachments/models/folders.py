@@ -16,9 +16,13 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
+from flask import g
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkMixin
@@ -126,6 +130,37 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         It just determines if it is visible to him or not.
         """
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
+
+    @classmethod
+    def get_for_linked_object(cls, linked_object, preload_event=True):
+        """Gets the attachments for the given object.
+
+        This only returns attachments that haven't been deleted.
+
+        :param linked_object: An event, session, contribution or
+                              subcontribution.
+        :param preload_event: If all attachments for the same event should
+                              be pre-loaded and cached in the app context.
+        """
+        try:
+            return g.event_attachments.get(linked_object)
+        except AttributeError:
+            if not preload_event:
+                return (cls.find(linked_object=linked_object, is_deleted=False)
+                           .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
+                           .options(joinedload(AttachmentFolder.attachments))
+                           .all())
+
+            g.event_attachments = defaultdict(list)
+            query = (cls.find(event_id=int(linked_object.getConference().id), is_deleted=False)
+                        .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
+                        .options(joinedload(AttachmentFolder.attachments)))
+
+            # populate cache
+            for obj in query:
+                g.event_attachments[obj.linked_object].append(obj)
+
+            return g.event_attachments.get(linked_object)
 
     @return_ascii
     def __repr__(self):

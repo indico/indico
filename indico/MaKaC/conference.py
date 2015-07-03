@@ -314,13 +314,14 @@ class CommonObjectBase(CoreObject, Fossilizable):
             return True
 
     @property
+    @memoize_request
     def attached_items(self):
         """
         CAUTION: this won't return empty directories (used by interface), nor things the
         current user can't see
         """
         if isinstance(self, (Contribution, Session, SubContribution, Conference)):
-            return get_attached_items(self, include_empty=False, include_hidden=False)
+            return get_attached_items(self, include_empty=False, include_hidden=False, preload_event=True)
         else:
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 

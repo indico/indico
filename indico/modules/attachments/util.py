@@ -17,12 +17,9 @@
 from __future__ import unicode_literals
 
 from flask import session
-from sqlalchemy.orm import joinedload
-
-from indico.core.db import db
 
 
-def get_attached_items(linked_object, include_empty=True, include_hidden=True):
+def get_attached_items(linked_object, include_empty=True, include_hidden=True, preload_event=False):
     """
     Return a structured representation of all the attachments linked
     to an object.
@@ -30,14 +27,13 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True):
     :param linked_object: The object whose attachments are to be returned
     :param include_deleted: Whether to return deleted attachments or
                             folders as well
+    :param include_hidden: Include folders that the user can't see
+    :param preload_event: in the process, preload all objects tied to the
+                          corresponding event and keep them in cache
     """
     from indico.modules.attachments.models.folders import AttachmentFolder
 
-    folders = (AttachmentFolder
-               .find(linked_object=linked_object, is_deleted=False)
-               .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
-               .options(joinedload(AttachmentFolder.attachments))
-               .all())
+    folders = AttachmentFolder.get_for_linked_object(linked_object, preload_event=preload_event)
 
     if not include_hidden:
         folders = [f for f in folders if f.can_view(session.user)]
