@@ -74,7 +74,7 @@ class AddAttachmentLinkMixin:
     def _process(self):
         form = AttachmentLinkForm(linked_object=self.object)
         if form.validate_on_submit():
-            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self._conf)
+            folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             link = Attachment(user=session.user, type=AttachmentType.link)
             form.populate_obj(link, skip={'acl'})
             link.folder = folder
