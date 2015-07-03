@@ -82,6 +82,9 @@ class AttachmentImporter(Importer):
         return AttachmentFolder.has_rows or Attachment.has_rows
 
     def migrate(self):
+        # disable onupdate for attachment lastmod timestamp
+        # see https://bitbucket.org/zzzeek/sqlalchemy/issue/3471/ why it's needed
+        Attachment.__table__.columns.modified_dt.onupdate = None
         self.janitor_user = User.get_one(Config.getInstance().getJanitorUserId())
         with patch_default_group_provider(self.default_group_provider):
             self.migrate_category_attachments()
@@ -198,7 +201,8 @@ class AttachmentImporter(Importer):
         data = {'folder': folder,
                 'user': self.janitor_user,
                 'title': convert_to_unicode(resource.name).strip() or folder.title,
-                'description': convert_to_unicode(resource.description)}
+                'description': convert_to_unicode(resource.description),
+                'modified_dt': modified_dt}
         if resource.__class__.__name__ == 'Link':
             data['type'] = AttachmentType.link
             data['link_url'] = resource.url
@@ -216,9 +220,6 @@ class AttachmentImporter(Importer):
         attachment = Attachment(**data)
         protection_from_ac(attachment, resource._Resource__ac)
         db.session.add(attachment)
-        # https://bitbucket.org/zzzeek/sqlalchemy/issue/3471/onupdate-runs-for-post_update-updates
-        db.session.flush()
-        attachment.modified_dt = modified_dt
         return attachment
 
     def _has_special_protection(self, material, resource):
