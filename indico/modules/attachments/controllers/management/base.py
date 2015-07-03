@@ -119,7 +119,7 @@ class CreateFolderMixin:
     """Create a new empty folder"""
 
     def _process(self):
-        form = AttachmentFolderForm()
+        form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True))
         if form.validate_on_submit():
             folder = AttachmentFolder(linked_object=self.object)
             form.populate_obj(folder, skip={'acl'})

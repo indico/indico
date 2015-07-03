@@ -146,7 +146,8 @@ class AttachmentImporter(Importer):
     def _folder_from_material(self, material, linked_object):
         folder = AttachmentFolder(title=convert_to_unicode(material.title).strip() or 'Material',
                                   description=convert_to_unicode(material.description),
-                                  linked_object=linked_object)
+                                  linked_object=linked_object,
+                                  is_always_visible=not material._Material__ac._hideFromUnauthorizedUsers)
         protection_from_ac(folder, material._Material__ac)
         return folder
 

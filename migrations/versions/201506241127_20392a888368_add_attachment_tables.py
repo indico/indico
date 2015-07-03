@@ -37,6 +37,7 @@ def upgrade():
         sa.Column('description', sa.Text(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('is_default', sa.Boolean(), nullable=False),
+        sa.Column('is_always_visible', sa.Boolean(), nullable=False),
         sa.Column('protection_mode', PyIntEnum(ProtectionMode, exclude_values={ProtectionMode.public}), nullable=False),
         sa.Index(None, 'category_id', unique=True, postgresql_where=sa.text('link_type = 1 AND is_default')),
         sa.Index(None, 'event_id', unique=True, postgresql_where=sa.text('link_type = 2 AND is_default')),

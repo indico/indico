@@ -75,6 +75,12 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         nullable=False,
         default=False
     )
+    #: If the folder is always visible (even if you cannot access it)
+    is_always_visible = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
 
     _acl = db.relationship(
         'AttachmentFolderPrincipal',
@@ -113,12 +119,21 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     def locator(self):
         return dict(self.linked_object.getLocator(), folder_id=self.id)
 
+    def can_view(self, user):
+        """Checks if the user can see the folder.
+
+        This does not mean the user can actually access its contents.
+        It just determines if it is visible to him or not.
+        """
+        return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
+
     @return_ascii
     def __repr__(self):
-        return '<AttachmentFolder({}, {}{}{}, {}, {})>'.format(
+        return '<AttachmentFolder({}, {}{}{}{}, {}, {})>'.format(
             self.id,
             self.title,
             ', is_default=True' if self.is_default else '',
+            ', is_always_visible=False' if not self.is_always_visible else '',
             ', is_deleted=True' if self.is_deleted else '',
             self.protection_repr,
             self.link_repr

@@ -88,6 +88,10 @@ class AttachmentFolderForm(IndicoForm):
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
                              groups=True, serializable=False, allow_external=True,
                              description=_("The list of users and groups with access to the folder"))
+    is_always_visible = BooleanField(_("Always Visible"), widget=SwitchWidget(),
+                                     description=_("By default, folders are always visible, even if a user cannot "
+                                                   "access them. You can disable this behavior here, hiding the folder "
+                                                   "for anyone who does not have permission to access it."))
 
     @generated_data
     def protection_mode(self):
