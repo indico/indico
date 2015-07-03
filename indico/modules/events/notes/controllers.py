@@ -102,11 +102,7 @@ class RHEditNote(RHManageNoteBase):
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
                                 object=self.object, **kwargs)
 
-    def _process_GET(self):
-        form = self._make_form()
-        return self._process_form(form)
-
-    def _process_POST(self):
+    def _process(self):
         form = self._make_form()
         return self._process_form(form)
 
