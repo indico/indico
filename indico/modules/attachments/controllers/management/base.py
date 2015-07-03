@@ -20,6 +20,8 @@ from flask import flash, request, session
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
+from indico.core import signals
+from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
 from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, AttachmentFolderForm,
                                               EditAttachmentFileForm)
@@ -62,6 +64,8 @@ class AddAttachmentFilesMixin:
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
                 attachment.file.save(f.file)
                 db.session.add(attachment)
+                logger.info('File attachment {} added by {}'.format(attachment, session.user))
+                signals.attachments.attachment_created.send(attachment, user=session.user)
             flash(ngettext("The attachment has been uploaded", "%(num)d attachments have been uploaded", len(files)),
                   'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
@@ -80,6 +84,9 @@ class AddAttachmentLinkMixin:
             link.folder = folder
             if link.is_protected:
                 link.acl = form.acl.data
+
+            logger.info('Link attachment {} added by {}'.format(link, session.user))
+            signals.attachments.attachment_created.send(link, user=session.user)
             flash(_("The link has been added"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form)
@@ -94,6 +101,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
         form = form_cls(linked_object=self.object, obj=defaults)
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
+            logger.info('Edited attachment {} by {}'.format(self.attachment, session.user))
             form.populate_obj(self.attachment, skip={'acl'})
             self.attachment.folder = folder
             if self.attachment.is_protected:
@@ -106,6 +114,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                                                           content_type=file.mimetype)
                     self.attachment.file.save(file.file)
 
+            signals.attachments.attachment_updated.send(self.attachment, user=session.user)
             flash(_("The attachment has been updated"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
@@ -126,6 +135,8 @@ class CreateFolderMixin:
             if folder.is_protected:
                 folder.acl = form.acl.data
             db.session.add(folder)
+            logger.info('Folder {} created by {}'.format(folder, session.user))
+            signals.attachments.folder_created.send(folder, user=session.user)
             flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/create_folder.html', form=form)
@@ -151,6 +162,8 @@ class DeleteFolderMixin(SpecificFolderMixin):
 
     def _process(self):
         self.folder.is_deleted = True
+        logger.info('Folder {} deleted by {}'.format(self.folder, session.user))
+        signals.attachments.folder_deleted.send(self.folder, user=session.user)
         flash(_("Folder \"{name}\" deleted").format(name=self.folder.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
@@ -161,5 +174,7 @@ class DeleteAttachmentMixin(SpecificAttachmentMixin):
     def _process(self):
         self.attachment = Attachment.get_one(request.view_args['attachment_id'])
         self.attachment.is_deleted = True
+        logger.info('Deleted attachment {} by {}'.format(self.attachment, session.user))
+        signals.attachments.attachment_deleted.send(self.attachment, user=session.user)
         flash(_("Attachment \"{name}\" deleted").format(name=self.attachment.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
