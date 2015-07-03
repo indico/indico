@@ -234,3 +234,11 @@ class Conversion(object):
 
         return {'users': allowed_emails,
                 'groups': allowed_groups}
+
+    @classmethod
+    def addLegacyMinutes(cls, result, _obj=None):
+        from indico.modules.events.notes.util import build_note_legacy_api_data
+        data = build_note_legacy_api_data(_obj.note)
+        if data:
+            result.append(data)
+        return result

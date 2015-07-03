@@ -176,6 +176,7 @@ class _IncludeMaterialFossil(IFossil):
     getAllMaterialList.name = 'material'
     getAllMaterialList.result = IMaterialMetadataFossil
     getAllMaterialList.filterBy = 'access'
+    getAllMaterialList.convert = Conversion.addLegacyMinutes
 
 
 class _IncludeACLFossil(IFossil):

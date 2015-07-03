@@ -29,6 +29,24 @@ def build_note_api_data(note):
             'user': note.current_revision.user.id}
 
 
+def build_note_legacy_api_data(note):
+    if note is None:
+        return {}
+    data = {'_deprecated': True,
+            '_fossil': 'localFileMetadata',
+            '_type': 'LocalFile',
+            'id': 'minutes',
+            'name': 'minutes',
+            'fileName': 'minutes.txt',
+            'url': url_for('event_notes.view', note, _external=True)}
+    return {'_deprecated': True,
+            '_fossil': 'materialMetadata',
+            '_type': 'Minutes',
+            'id': 'minutes',
+            'resources': [data],
+            'title': 'Minutes'}
+
+
 def get_all_notes(obj):
     """Gets all notes linked to the object and its nested objects.
 
