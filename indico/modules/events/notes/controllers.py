@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, render_template, session
 from werkzeug.exceptions import NotFound, Forbidden
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.core.errors import NoReportError
@@ -81,17 +82,19 @@ class RHEditNote(RHManageNoteBase):
     def _process_form(self, form, **kwargs):
         if form.validate_on_submit():
             note = EventNote.get_or_create(self.object)
-            is_new = note.id is None
+            is_new = note.id is None or note.is_deleted
             # TODO: get render mode from form data once it can be selected
             note.create_revision(RenderMode.html, form.source.data, session.user)
             is_changed = attrs_changed(note, 'current_revision')
             db.session.add(note)
             db.session.flush()
             if is_new:
+                signals.event.notes.note_added.send(note)
                 logger.info('Note {} created by {}'.format(note, session.user))
                 self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes',
                                'Added minutes to {} {}'.format(self.object_type, self.object.getTitle()), session.user)
             elif is_changed:
+                signals.event.notes.note_modified.send(note)
                 logger.info('Note {} modified by {}'.format(note, session.user))
                 self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes',
                                'Updated minutes for {} {}'.format(self.object_type, self.object.getTitle()),
@@ -127,6 +130,7 @@ class RHDeleteNote(RHManageNoteBase):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
         if note is not None:
             note.delete(session.user)
+            signals.event.notes.note_deleted.send(note)
             logger.info('Note {} deleted by {}'.format(note, session.user))
             self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
                            'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)

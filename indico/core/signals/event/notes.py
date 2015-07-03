@@ -18,6 +18,15 @@ from blinker import Namespace
 
 _signals = Namespace()
 
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.notes import *
+
+note_added = _signals.signal('note-added', """
+Called when a note is added. The `sender` is the note.
+""")
+
+note_modified = _signals.signal('note-modified', """
+Called when a note is modified. The `sender` is the note.
+""")
+
+note_deleted = _signals.signal('note-deleted', """
+Called when a note is deleted. The `sender` is the note.
+""")
