@@ -23,6 +23,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.decorators import strict_classproperty
 from indico.util.struct.enum import IndicoEnum
+from indico.util.string import to_unicode
 
 
 class LinkType(int, IndicoEnum):
@@ -163,9 +164,30 @@ class LinkMixin(object):
 
     @property
     def link_repr(self):
+        """A kwargs-style string suitable for the object's repr"""
         info = [('link_type', self.link_type.name if self.link_type is not None else 'None')]
         info.extend((key, getattr(self, key)) for key in _all_columns if getattr(self, key)is not None)
         return ', '.join('{}={}'.format(key, value) for key, value in info)
+
+    @property
+    def link_event_log_data(self):
+        """
+        Returns a dict containing information about the linked object
+        suitable for the event log.
+
+        It does not return any information for an object linked to a
+        category or the event itself.
+        """
+        data = {}
+        if self.link_type == LinkType.session:
+            data['Session'] = to_unicode(self.linked_object.getTitle())
+        elif self.link_type == LinkType.contribution:
+            data['Contribution'] = to_unicode(self.linked_object.getTitle())
+        elif self.link_type == LinkType.subcontribution:
+            obj = self.linked_object
+            data['Contribution'] = to_unicode(obj.getContribution().getTitle())
+            data['Subcontribution'] = to_unicode(obj.getTitle())
+        return data
 
 
 class LinkedObjectComparator(Comparator):

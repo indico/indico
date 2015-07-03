@@ -24,7 +24,6 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.events.logs import EventLogKind, EventLogRealm
-from indico.util.string import to_unicode
 
 
 def connect_log_signals():
@@ -51,17 +50,9 @@ def _ignore_category(f):
 
 
 def _get_folder_data(folder, for_attachment=False):
-    data = {}
+    data = folder.link_event_log_data
     if for_attachment and not folder.is_default:
         data['Folder'] = folder.title
-    if folder.link_type == LinkType.session:
-        data['Session'] = to_unicode(folder.linked_object.getTitle())
-    elif folder.link_type == LinkType.contribution:
-        data['Contribution'] = to_unicode(folder.linked_object.getTitle())
-    elif folder.link_type == LinkType.subcontribution:
-        obj = folder.linked_object
-        data['Contribution'] = to_unicode(obj.getContribution().getTitle())
-        data['Subcontribution'] = to_unicode(obj.getTitle())
     return data
 
 
