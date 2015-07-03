@@ -72,7 +72,7 @@
       <td class="headerInfo" >
         % if session.attached_items:
           <span class="material-list">
-            ${ render_template('attachments/mako_compat/materials.html', item=session) }
+            ${ render_template('attachments/mako_compat/attachments.html', item=session) }
           </span>
         % endif
 

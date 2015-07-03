@@ -8,7 +8,7 @@
     <li>
     % if item.attached_items:
       <span class="material-list">
-          ${ render_template('attachments/mako_compat/materials.html', item=item) }
+          ${ render_template('attachments/mako_compat/attachments.html', item=item) }
       </span>
     % endif
     <span class="headline" style="font-size:x-small;">${item.getTitle()}</span>
