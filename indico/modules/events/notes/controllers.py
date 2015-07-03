@@ -91,14 +91,13 @@ class RHEditNote(RHManageNoteBase):
             if is_new:
                 signals.event.notes.note_added.send(note)
                 logger.info('Note {} created by {}'.format(note, session.user))
-                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes',
-                               'Added minutes to {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
+                               session.user, data=note.link_event_log_data)
             elif is_changed:
                 signals.event.notes.note_modified.send(note)
                 logger.info('Note {} modified by {}'.format(note, session.user))
-                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes',
-                               'Updated minutes for {} {}'.format(self.object_type, self.object.getTitle()),
-                               session.user)
+                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
+                               session.user, data=note.link_event_log_data)
             return jsonify_data(flash=False)
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
                                 object=self.object, **kwargs)
@@ -132,8 +131,8 @@ class RHDeleteNote(RHManageNoteBase):
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
             logger.info('Note {} deleted by {}'.format(note, session.user))
-            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes',
-                           'Removed minutes from {} {}'.format(self.object_type, self.object.getTitle()), session.user)
+            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
+                           session.user, data=note.link_event_log_data)
         return redirect(url_for('event.conferenceDisplay', self.event))
 
 
