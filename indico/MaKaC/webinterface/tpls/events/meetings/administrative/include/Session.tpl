@@ -1,6 +1,8 @@
 <%page args="item, parent=None, allMaterial=False, hideTime=True, materialSession=False, order=1, showOrder=True, print_mode=False, inlineMinutes=False"/>
 
 <%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="base" file="../Administrative.tpl"/>
+
 
 <% session = item.getSession() %>
 
@@ -27,18 +29,12 @@
     </td>
     <td class="itemRightAlign" >
         <span class="materialDisplayName">
-        % if len(session.getAllMaterialList()) > 0 and allMaterial:
-            % for material in session.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
-                % endif
-            % endfor
-        % elif materialSession and len(session.getAllMaterialList()) > 0:
-            % for material in session.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                    % if material.getTitle()!='document' or not conf.getReportNumberHolder().listReportNumbers():
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
-                    % endif
+        % if allMaterial:
+            ${base.render_materials(conf)}
+        % elif materialSession:
+            % for material in session.attached_items.get('files', []):
+                % if material.title != 'document' or not conf.getReportNumberHolder().listReportNumbers():
+                    <a href="${material.download_url}">${material.title}</a>
                 % endif
             % endfor
         % endif

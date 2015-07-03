@@ -1,4 +1,4 @@
-<%inherit file="Administrative.tpl"/>
+<%inherit file="AdministrativeAllMaterial.tpl"/>
 
 <%!
   allMaterial = False
@@ -13,14 +13,4 @@
         <span class="CERNTitle"> CERN </span>
         STAFF ASSOCIATION
     </div>
-</%block>
-
-<%block name="eventMaterial">
-    % if len(conf.getAllMaterialList()) > 0:
-        % for material in conf.getAllMaterialList():
-            % if material.canView(accessWrapper):
-                <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
-            % endif
-        % endfor
-    % endif
 </%block>

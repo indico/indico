@@ -1,6 +1,7 @@
 <%page args="item, allMaterial=False, inlineMinutes=False, order=1, suborder=1"/>
 
 <%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="base" file="../Administrative.tpl"/>
 
 <tr>
 
@@ -27,41 +28,33 @@
         <span class="materialDisplayName">
         % if not allMaterial:
             <% materialDocuments = False %>
-            % for material in item.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                     % if material.getTitle()=='document' and item.getReportNumberHolder().listReportNumbers():
-                     <% materialDocuments = True %>
-                     <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">
-                     % for rn in item.getReportNumberHolder().listReportNumbers():
-                        ${rn[1]}
-                     % endfor
-                     </a><br/>
-                     % endif
+
+            % for folder in item.attached_items.get('folders', []):
+                % if folder.title == 'document' and  item.getReportNumberHolder().listReportNumbers():
+                    <% materialDocuments = True %>
+                    <a href="${url_for('attachments.list_folder', folder, redirect_if_single=True)}">
+                        % for rn in item.getReportNumberHolder().listReportNumbers():
+                             ${rn[1]}
+                        % endfor
+                    </a><br>
                 % endif
             % endfor
+
             % if not materialDocuments and item.getReportNumberHolder().listReportNumbers():
                 % for rn in item.getReportNumberHolder().listReportNumbers():
                     ${rn[1]}<br/>
                 % endfor
             % endif
-            % if len(item.getAllMaterialList()) > 0:
-                % for material in item.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                        % if material.getTitle()!='document' or not item.getReportNumberHolder().listReportNumbers():
-                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a><br/>
-                        % endif
-                    % endif
-                % endfor
+
+            % if item.attached_items:
+                ${base.render_materials(item, exclude_document=True)}
             % endif
         % else:
-            % if len(item.getAllMaterialList()) > 0:
-                % for material in item.getAllMaterialList():
-                    % if material.canView(accessWrapper):
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a><br/>
-                    % endif
-                % endfor
+            % if item.attached_items:
+                ${base.render_materials(item)}
             % endif
         % endif
+
         % if item.note:
             <a href="${ url_for('event_notes.view', item) }">${ _("Minutes") }</a>
         % endif

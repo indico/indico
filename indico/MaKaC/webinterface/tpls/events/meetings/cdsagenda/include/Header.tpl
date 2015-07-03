@@ -106,17 +106,13 @@
           </td>
         </tr>
         % endif
-        % if len(conf.getAllMaterialList()) > 0:
+        % if conf.attached_items:
          <tr>
           <td valign="top" align="right" class="headerTitle">
             Material:
           </td>
-          <td>
-            % for material in conf.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                    ${ render_template('attachments/mako_compat/materials.html', attachments=attachments, folders=folders) }
-                % endif
-            % endfor
+          <td class="material-list">
+            ${ render_template('attachments/mako_compat/materials.html', item=conf) }
           </td>
         </tr>
         % endif

@@ -7,6 +7,20 @@
   minutes = False
   print_mode = False
 %>
+
+<%def name="render_materials(item, exclude_document=False)">
+    % if item.attached_items:
+        % for folder in item.attached_items['folders']:
+            % if not exclude_document or folder.title != 'document':
+                <a href="${url_for('attachments.list_folder', folder, redirect_if_single=True)}">${folder.title}</a>&nbsp;
+            % endif
+        % endfor
+        % for file in item.attached_items['files']:
+            <a href="${file.download_url}">${file.title}</a>&nbsp;
+        % endfor
+    % endif
+</%def>
+
 <table class="eventWrapper">
     <tr>
         <td>
