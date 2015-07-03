@@ -152,6 +152,8 @@ class EditFolderMixin(SpecificFolderMixin):
             form.populate_obj(self.folder, skip={'acl'})
             if self.folder.is_protected:
                 self.folder.acl = form.acl.data
+            logger.info('Folder {} updated by {}'.format(self.folder, session.user))
+            signals.attachments.folder_updated.send(self.folder, user=session.user)
             flash(_("Folder \"{name}\" updated").format(name=self.folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/create_folder.html', form=form)

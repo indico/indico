@@ -34,6 +34,13 @@ Called when a folder is deleted.  The *sender* is the
 is passed in the `user` kwarg.
 """)
 
+folder_updated = _signals.signal('folder-updated', """
+Called when a folder is updated.  The *sender* is the
+`AttachmentFolder` that was updated.  The user who updated the folder
+is passed in the `user` kwarg.
+""")
+
+
 attachment_created = _signals.signal('attachment-created', """
 Called when a new attachment is created.  The *sender* object is the
 new `Attachment`.  The user who created the attachment is passed in
