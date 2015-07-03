@@ -33,6 +33,13 @@ def note(db, dummy_event):
         db.session.delete(note)
 
 
+@pytest.mark.parametrize('deleted', (True, False))
+def test_create_revision_previously_deleted(db, note, dummy_user, deleted):
+    note.is_deleted = deleted
+    note.create_revision(RenderMode.html, 'revision', dummy_user)
+    assert not note.is_deleted
+
+
 def test_revisions(db, note, dummy_user):
     rev1 = note.create_revision(RenderMode.html, 'first', dummy_user)
     db.session.add(note)

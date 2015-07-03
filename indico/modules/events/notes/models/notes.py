@@ -124,14 +124,11 @@ class EventNote(LinkMixin, db.Model):
         """Gets the note for the given object or creates a new one.
 
         If there is an existing note for the object, it will be returned
-        even if it's marked as deleted (in which case it is automatically
-        marked as undeleted).  Otherwise a new note is created.
+        even.  Otherwise a new note is created.
         """
         note = cls.find_first(linked_object=linked_object)
         if note is None:
             note = cls(linked_object=linked_object)
-        else:
-            note.is_deleted = False
         return note
 
     def delete(self, user):
@@ -140,13 +137,14 @@ class EventNote(LinkMixin, db.Model):
         self.is_deleted = True
 
     def create_revision(self, render_mode, source, user):
-        """Creates a new revision of the note if needed.
+        """Creates a new revision if needed and marks it as undeleted if it was
 
         Any change to the render mode or the source causes a new
         revision to be created.  The user is not taken into account
         since a user "modifying" a note without changing things is
         not really a change.
         """
+        self.is_deleted = False
         with db.session.no_autoflush:
             current = self.current_revision
         if current is not None and current.render_mode == render_mode and current.source == source:
