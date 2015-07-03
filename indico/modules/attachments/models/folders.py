@@ -132,18 +132,20 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
 
     @classmethod
-    def get_for_linked_object(cls, linked_object, preload_event=True):
+    def get_for_linked_object(cls, linked_object, preload_event=False):
         """Gets the attachments for the given object.
 
         This only returns attachments that haven't been deleted.
 
-        :param linked_object: An event, session, contribution or
+        :param linked_object: A category, event, session, contribution or
                               subcontribution.
         :param preload_event: If all attachments for the same event should
                               be pre-loaded and cached in the app context.
+                              This must not be used when ``linked_object``
+                              is a category.
         """
         try:
-            return g.event_attachments.get(linked_object)
+            return g.event_attachments.get(linked_object, [])
         except AttributeError:
             if not preload_event:
                 return (cls.find(linked_object=linked_object, is_deleted=False)
@@ -160,7 +162,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             for obj in query:
                 g.event_attachments[obj.linked_object].append(obj)
 
-            return g.event_attachments.get(linked_object)
+            return g.event_attachments.get(linked_object, [])
 
     @return_ascii
     def __repr__(self):
