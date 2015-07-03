@@ -101,6 +101,15 @@
                                     % endif
                                     <h2>${_("Files")}</h2>
                                     <ul>
+                                    % for attachment in Contribution.attached_items.get('files', []):
+                                        <li class="icon-file">
+                                            <a href="${attachment.download_url}" target="_blank" title="${attachment.title}">
+                                                ${attachment.title}
+                                            </a>
+                                        </li>
+                                    % endfor
+                                    </ul>
+                                    <ul>
                                     % for folder in Contribution.attached_items.get('folders', []):
                                         <li>
                                             <h3>${folder.title}</h3>
