@@ -25,7 +25,7 @@ from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.linking import RoomLinker
-from MaKaC.fossils.conference import ISessionSlotFossil
+from MaKaC.fossils.conference import ISessionSlotFossil, ISessionFossil
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -401,7 +401,15 @@ class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferen
     getContributionList.filterBy = 'access'
 
 
+class ISessionMinimalFossil(_IncludeMaterialFossil, ISessionFossil):
+    pass
+
+
 class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
+
+    def getSession(self):
+        pass
+    getSession.result = ISessionMinimalFossil
 
     def getId(self):
         pass
