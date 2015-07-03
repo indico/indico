@@ -192,7 +192,7 @@ class Attachment(ProtectionMixin, db.Model):
             self.file if self.type == AttachmentType.file else self.link_url,
             ', is_deleted=True' if self.is_deleted else '',
             self.protection_repr,
-            self.folder
+            self.folder_id
         )
 
 
