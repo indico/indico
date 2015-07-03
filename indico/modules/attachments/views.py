@@ -19,6 +19,9 @@ from __future__ import unicode_literals
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryModifBase
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.sessions import WPSessionModifBase
+from MaKaC.webinterface.pages.contributions import WPContributionModifBase
+from MaKaC.webinterface.pages.subContributions import WPSubContributionModifBase
 
 
 class AttachmentsMixin(WPJinjaMixin):
@@ -28,9 +31,6 @@ class AttachmentsMixin(WPJinjaMixin):
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['attachments'].setActive()
-
     def getJSFiles(self):
         return self.base_wp.getJSFiles(self) + self._asset_env['dropzone_js'].urls()
 
@@ -39,9 +39,38 @@ class AttachmentsMixin(WPJinjaMixin):
                 + self._asset_env['attachments_sass'].urls())
 
 
-class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
-    base_wp = WPConferenceModifBase  # old-style, so we can't use super :(
+class EventObjectAttachmentsMixin(AttachmentsMixin):
+    def _getPageContent(self, params):
+        return self.base_wp._getPageContent(self, params)
+
+    def _getTabContent(self, params):
+        return AttachmentsMixin._getPageContent(self, params)
+
+    def _setActiveTab(self):
+        self._tab_attachments.setActive()
 
 
 class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
     base_wp = WPCategoryModifBase  # old-style, so we can't use super :(
+
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['attachments'].setActive()
+
+
+class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
+    base_wp = WPConferenceModifBase  # old-style, so we can't use super :(
+
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['attachments'].setActive()
+
+
+class WPSessionAttachments(EventObjectAttachmentsMixin, WPSessionModifBase):
+    base_wp = WPSessionModifBase  # old-style, so we can't use super
+
+
+class WPContributionAttachments(EventObjectAttachmentsMixin, WPContributionModifBase):
+    base_wp = WPContributionModifBase  # old-style, so we can't use super
+
+
+class WPSubContributionAttachments(EventObjectAttachmentsMixin, WPSubContributionModifBase):
+    base_wp = WPSubContributionModifBase  # old-style, so we can't use super

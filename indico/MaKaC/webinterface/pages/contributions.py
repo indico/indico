@@ -37,6 +37,7 @@ from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
+from indico.web.flask.util import url_for
 
 from MaKaC.common.TemplateExec import render
 
@@ -195,8 +196,8 @@ class WPContributionDisplay(WPContributionDefaultDisplayBase):
 
 class WPContributionModifBase(WPConferenceModifBase):
 
-    def __init__(self, rh, contribution):
-        WPConferenceModifBase.__init__(self, rh, contribution.getConference())
+    def __init__(self, rh, contribution, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, contribution.getConference(), **kwargs)
         self._contrib = self._target = contribution
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
@@ -216,6 +217,8 @@ class WPContributionModifBase(WPConferenceModifBase):
                                              urlHandlers.UHContributionModification.getURL(self._target))
         self._tabMaterials = self._tabCtrl.newTab("materials", _("Material"),
                                                   urlHandlers.UHContribModifMaterials.getURL(self._target))
+        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
+                                                     url_for('attachments.management', self._contrib))
         self._tabSubCont = self._tabCtrl.newTab("subCont", _("Sub Contribution"),
                                                 urlHandlers.UHContribModifSubCont.getURL(self._target))
         if self._canModify:

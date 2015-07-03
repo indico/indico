@@ -43,7 +43,7 @@ class ManageAttachmentsMixin:
     wp = None
 
     def _process(self):
-        return self.wp.render_template('attachments.html', self.base_object, linked_object=self.object,
+        return self.wp.render_template('attachments.html', self.object, linked_object=self.object,
                                        linked_object_type=self.object_type, attachments=get_attached_items(self.object))
 
 

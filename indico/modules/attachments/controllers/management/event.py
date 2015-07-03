@@ -24,7 +24,8 @@ from indico.modules.attachments.controllers.management.base import (ManageAttach
                                                                     CreateFolderMixin, EditFolderMixin,
                                                                     DeleteFolderMixin, DeleteAttachmentMixin)
 from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.attachments.views import WPEventAttachments
+from indico.modules.attachments.views import (WPContributionAttachments, WPEventAttachments, WPSessionAttachments,
+                                              WPSubContributionAttachments)
 from indico.modules.events.util import get_object_from_args
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
@@ -50,7 +51,16 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
 
 
 class RHManageEventAttachments(ManageAttachmentsMixin, RHEventAttachmentManagementBase):
-    wp = WPEventAttachments
+    _wp_mapping = {
+        'event': WPEventAttachments,
+        'session': WPSessionAttachments,
+        'contribution': WPContributionAttachments,
+        'subcontribution': WPSubContributionAttachments
+    }
+
+    @property
+    def wp(self):
+        return self._wp_mapping[self.object_type]
 
 
 class RHAddEventAttachmentFiles(AddAttachmentFilesMixin, RHEventAttachmentManagementBase):

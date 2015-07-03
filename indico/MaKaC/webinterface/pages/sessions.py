@@ -50,6 +50,7 @@ from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.common.TemplateExec import render
 
 from indico.core.config import Config
+from indico.web.flask.util import url_for
 
 
 class WPSessionBase(WPConferenceBase):
@@ -184,8 +185,8 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
 
 class WPSessionModifBase( WPConferenceModifBase ):
 
-    def __init__(self, rh, session):
-        WPConferenceModifBase.__init__(self, rh, session.getConference())
+    def __init__(self, rh, session, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, session.getConference(), **kwargs)
         self._session = session
 
     def _setActiveSideMenuItem( self ):
@@ -204,6 +205,8 @@ class WPSessionModifBase( WPConferenceModifBase ):
                 urlHandlers.UHSessionModifComm.getURL( self._session ) )
         self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
                 urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
+        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
+                                                     url_for('attachments.management', self._session))
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHSessionModifAC.getURL( self._session ) )
 

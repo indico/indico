@@ -33,6 +33,8 @@ from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 
+from indico.web.flask.util import url_for
+
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
 
@@ -106,8 +108,8 @@ class WPSubContributionDisplay(WPSubContributionDefaultDisplayBase):
 
 class WPSubContributionModifBase( WPConferenceModifBase ):
 
-    def __init__( self, rh, subContribution ):
-        WPConferenceModifBase.__init__( self, rh, subContribution.getConference() )
+    def __init__(self, rh, subContribution, **kwargs):
+        WPConferenceModifBase.__init__(self, rh, subContribution.getConference(), **kwargs)
         self._subContrib = self._target = subContribution
         self._conf = self._target.getConference()
         self._contrib = self._subContrib.getOwner()
@@ -136,6 +138,8 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
         #self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
         self._tabMaterials = self._tabCtrl.newTab( "materials", _("Material"), \
                 urlHandlers.UHSubContribModifMaterials.getURL( self._target ) )
+        self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
+                                                     url_for('attachments.management', self._subContrib))
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
                 urlHandlers.UHSubContribModifTools.getURL( self._target ) )
         self._setActiveTab()
