@@ -69,7 +69,9 @@
                 autoProcessQueue: false,
                 uploadMultiple: true,
                 parallelUploads: 999,
-                maxFiles: 10,
+                maxFiles: {% if existing_attachment %}1{% else %}10{% endif %},
+                addRemoveLinks: {% if existing_attachment %}false{% else %}true{% endif %},
+
                 paramName: function() { return 'file'; },
                 init: function() {
                     var uploadButton = $('.js-dropzone-upload');
@@ -78,7 +80,6 @@
                     var form = $('#dropzone');
 
                     {% if existing_attachment %}
-                        self.options.maxFiles = 1;
                         var existingFile = {
                             name: {{ existing_attachment.file.filename | tojson}},
                             size: {{ existing_attachment.file.size | tojson }},
@@ -88,6 +89,11 @@
                         self.emit('addedfile', existingFile);
                         $('.dz-progress').hide();
                         self.files[0] = existingFile;
+
+                        /* Disable opening the upload dialog when clicking on the file's preview element */
+                        $('.dz-preview').on('click', function(e) {
+                            e.stopPropagation();
+                        });
                     {% endif %}
 
                     uploadButton.on('click', function(e) {
@@ -106,7 +112,7 @@
                         self.processQueue();
                     });
 
-                    self.on('addedfile', function() {
+                    self.on('addedfile', function(file) {
                         {% if existing_attachment %}
                             self.removeFile(self.files[0]);
                             $('#file-change-trigger').val('1');
@@ -115,6 +121,9 @@
                         uploadButton.prop('disabled', false);
                         $('.dz-message').hide();
                         $('.dz-progress').hide();
+                        $(file.previewElement).on('click', function(e) {
+                            e.stopPropagation();
+                        });
                     });
 
                     self.on('sendingmultiple', function() {
