@@ -52,15 +52,11 @@
             )
         % endif
 
-        % if len(item.getAllMaterialList()) > 0:
+        % if item.attached_items:
         <tr>
             <td class="leftCol">${ _("Material")}:</td>
-            <td>
-            % for material in item.getAllMaterialList():
-                % if material.canView(accessWrapper):
-                <%include file="Material.tpl" args="material=material, contribId=item.getId()"/>
-                % endif
-            % endfor
+            <td class="material-list">
+                ${ render_template('attachments/mako_compat/materials.html', item=item) }
             </td>
         </tr>
         % endif
