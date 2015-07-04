@@ -150,7 +150,8 @@ class AttachmentImporter(Importer):
         folder = AttachmentFolder(title=convert_to_unicode(material.title).strip() or 'Material',
                                   description=convert_to_unicode(material.description),
                                   linked_object=linked_object,
-                                  is_always_visible=not material._Material__ac._hideFromUnauthorizedUsers)
+                                  is_always_visible=not getattr(material._Material__ac, '_hideFromUnauthorizedUsers',
+                                                                False))
         protection_from_ac(folder, material._Material__ac)
         db.session.add(folder)
         return folder
