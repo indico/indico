@@ -1,4 +1,4 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 {%- block content %}
     {{ form_header(form, id='dropzone', classes='dropzone', action=action) }}
@@ -42,9 +42,7 @@
         </div>
     {% endif %}
     {{ form_rows(form, skip=('folder', 'protected', 'acl')) }}
-    {{ form_row(form.folder) }}
-    {{ form_row(form.protected) }}
-    {{ form_row(form.acl, allow_missing=true) }}
+    {{ form_rows(form, fields=('folder', 'protected', 'acl')) }}
     {% call form_footer(attach_form) %}
         <div class="dropzone-upload-btn">
             {% if existing_attachment -%}
