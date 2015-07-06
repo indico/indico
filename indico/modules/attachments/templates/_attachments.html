@@ -2,16 +2,20 @@
     {%- if attachment.type.name == 'link' -%}
         icon-link
     {%- else -%}
-        {{ icon_from_mimetype(attachment.file.content_type, 'icon-file-empty2') }}
+        {{ icon_from_mimetype(attachment.file.content_type, 'icon-file-filled') }}
     {%- endif -%}
 {%- endmacro %}
 
 {% macro _attachment_row(attachment) %}
     <tr>
         <td>
-            <a href="{{ attachment.download_url }}" target="_blank" class="{{ get_attachment_icon(attachment) }}">
-                {{ attachment.title }}
-            </a>
+            <a href="{{ attachment.download_url }}" target="_blank"
+               class="{{ get_attachment_icon(attachment) }}"> {{ attachment.title }}</a> {# Spaces needed for :before icon #}
+            {%- if attachment.is_protected %}
+                <i class="icon-lock-center custom-protection"
+                   title="{% trans %}The access to this material is restricted, regardless of the protection scheme of
+                          the parent.{% endtrans %}"></i>
+            {% endif %}
         </td>
         <td class="actions">
             <a class="icon-edit js-dialog-action"
@@ -34,7 +38,12 @@
 {% macro _folder_row(folder) -%}
     <tr class="expandable {%- if not folder.attachments %} collapsed{% endif %}">
         <td>
-            <span> {{ folder.title }}</span>
+            <span> {{ folder.title }}</span> {# Spaces needed for :before icon #}
+            {%- if folder.is_protected %}
+                <i class="icon-lock-center custom-protection"
+                   title="{% trans %}The access to this folder is restricted, regardless of the protection scheme of
+                          the parent.{% endtrans %}"></i>
+            {% endif %}
         </td>
         <td class="actions">
             <a class="icon-edit js-dialog-action"
@@ -50,7 +59,7 @@
                {%- endtrans %}">
             </a>
         </td>
-        <td></td>
+        <td class="date"></td>
     </tr>
     <tr class="sub-tree">
         <td colspan="3">

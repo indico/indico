@@ -265,6 +265,9 @@ i[class^="icon-"]:before {
 .icon-lock:before {
     content: "\e008";
 }
+.icon-lock-center:before {
+    content: "\eb4e";
+}
 .icon-loop:before {
     content: "\2c";
 }
@@ -441,15 +444,12 @@ i[class^="icon-"]:before {
 .icon-arrow-down-after:after {
     content: "\24";
 }
-
+.icon-location-after:after {
+    content: "\e002";
+}
 .icon-next-after:after{
     content: "\4c";
 }
-
 .icon-time-after:after {
     content: "\e004";
-}
-
-.icon-location-after:after {
-    content: "\e002";
 }

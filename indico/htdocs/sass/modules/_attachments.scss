@@ -21,6 +21,23 @@
 @import 'compass';
 @import 'compass/css3/user-interface';
 
+%attachment-line {
+    line-height: 1rem;
+
+    vertical-align: middle;
+}
+
+%attachment-icon {
+    @extend %attachment-line;
+
+    font-size: 0.8rem;
+
+    width: 1px;
+
+    white-space: nowrap;
+}
+
+
 .tree {
     width: 100%;
 
@@ -42,10 +59,14 @@
                 &:before {
                     display: inline-block;
                 }
+                > .custom-protection:before {
+                    @extend %attachment-icon;
+
+                    color: $pastel-red;
+                }
             }
             > * {
-                vertical-align: middle;
-                line-height: 1rem;
+                @extend %attachment-line;
             }
         }
         &:not(.sub-tree) {
@@ -56,16 +77,14 @@
                 > a:hover {
                     color: $black;
                 }
+                &.actions,
                 &.actions > *,
                 &.date {
-                    font-size: 0.8rem;
-                    vertical-align: middle;
-                    line-height: 1rem;
+                    @extend %attachment-icon;
 
                     color: $gray;
                 }
                 &.actions {
-                    vertical-align: middle;
                     width: 2.2rem;
 
                     text-align: right;
@@ -83,11 +102,6 @@
                             color: $blue;
                         }
                     }
-                }
-                &.date {
-                    width: 1px;
-
-                    white-space: nowrap;
                 }
             }
             &:hover:not(.empty) > td {
@@ -168,11 +182,9 @@
 
 %protected-colors {
     border-bottom: 2px solid $red;
-
     &:hover:before {
         color: $red !important;
     }
-
     &:hover {
         border-bottom-color: $red !important;
     }
@@ -182,7 +194,6 @@
     &:before {
         color: $color !important;
     }
-
     &:hover:not(.disabled):not(disabled) {
         color: lighten($color, 5%) !important;
     }
@@ -215,42 +226,43 @@
 .material-list {
     .folder .attachment {
         display: inline-block;
-        max-width: 100px;
         overflow: hidden;
-        text-overflow: ellipsis;
+
+        max-width: 100px;
         padding-left: 0.2em !important;
 
+        text-overflow: ellipsis;
         .title {
             font-size: 0.9em;
-            color: $light-black;
+
             text-overflow: ellipsis;
+
+            color: $light-black;
         }
     }
-
-    .folder .i-button.attachment, .folder .attachments {
+    .folder .i-button.attachment,
+    .folder .attachments {
         font-family: Roboto;
-        display: inline-block;
-        margin-top: 0.2em;
 
+        display: inline-block;
+
+        margin-top: 0.2em;
         &:not(first-child) {
             margin-left: 0.2em;
         }
-
         &.is-protected {
             @extend %protected-colors;
         }
     }
-
     .folder.toolbar.is-protected {
         .i-button.label {
-            border-bottom-color: $red !important;
             @extend %protected-colors;
+
+            border-bottom-color: $red !important;
         }
     }
-
     .folder .dropdown .attachment {
         max-width: 250px;
-
         &.is-protected {
             color: $red;
         }
@@ -258,9 +270,10 @@
 }
 
 .folder-main {
-    margin-top: 2em;
-    padding: 2em;
     max-width: 1024px;
     margin: auto;
+    margin-top: 2em;
+    padding: 2em;
+
     background-color: $light-gray;
 }
