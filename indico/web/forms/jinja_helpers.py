@@ -16,7 +16,7 @@
 
 import re
 
-from wtforms.widgets.core import Input, Select
+from wtforms.widgets.core import Input, Select, HiddenInput
 from wtforms.validators import Length, Regexp, NumberRange
 
 from indico.web.forms.validators import ConfirmPassword
@@ -61,3 +61,28 @@ def render_field(field, widget_attrs):
     args['required'] = field.flags.required and not field.flags.conditional
     args.update(widget_attrs)
     return field(**args)
+
+
+def iter_form_fields(form, fields=None, skip=None, hidden_fields=False):
+    """Iterates over the fields in a WTForm
+
+    :param fields: If specified only fields that are in this list are
+                   yielded. This also overrides the field order.
+    :param skip: If specified, only fields NOT in this set/list are
+                 yielded.
+    :param hidden_fields: How to handle hidden fields. Setting this to
+                          ``True`` or ``False`` will yield only hidden
+                          or non-hidden fields.  Setting it to ``None``
+                          will yield all fields.
+    """
+    if fields is not None:
+        field_iter = (form[field_name] for field_name in fields if field_name in form)
+    else:
+        field_iter = iter(form)
+    if skip:
+        skip = set(skip)
+        field_iter = (field for field in field_iter if field.short_name not in skip)
+    if hidden_fields is not None:
+        field_iter = (field for field in field_iter if isinstance(field.widget, HiddenInput) == hidden_fields)
+    for field in field_iter:
+        yield field

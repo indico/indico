@@ -54,11 +54,8 @@
 {%- endmacro %}
 
 {% macro form_rows(form, fields=none, skip=(), orientation='', widget_attrs={}) %}
-    {% for field in (form.visible_fields if form.visible_fields is defined else form) %}
-        {% if (fields is none or field.short_name in fields) and field.short_name not in skip and
-                   field.widget.__class__.__name__ != 'HiddenInput' %}
-            {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation) }}
-        {% endif %}
+    {% for field in _iter_form_fields(form, fields=fields, skip=skip) %}
+        {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation) }}
     {% endfor %}
 {% endmacro %}
 
