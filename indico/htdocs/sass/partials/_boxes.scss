@@ -36,6 +36,21 @@
     font-size: 14px;
 }
 
+%box-hr {
+    height: 0;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid $gray;
+    margin-left: -10px;
+    margin-right: -10px;
+
+    &.inline {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
 
 // ============================================================================
 // Boxes
@@ -52,18 +67,7 @@
     padding: 10px;
 
     hr {
-        height: 0;
-        overflow: hidden;
-        background: transparent;
-        border: 0;
-        border-bottom: 1px solid $gray;
-        margin-left: -10px;
-        margin-right: -10px;
-
-        &.inline {
-            margin-left: 0;
-            margin-right: 0;
-        }
+        @extend %box-hr;
     }
 }
 

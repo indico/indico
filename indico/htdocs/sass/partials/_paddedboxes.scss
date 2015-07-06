@@ -1,0 +1,55 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+.padded-box {
+    @include border-radius();
+    @include box-sizing(border-box);
+    @include border-all($color: $pastel-gray, $width: 2px);
+    background: $pastel-gray;
+    display: table;
+    width: 100%;
+
+    &:before {
+        display: table-row;
+    }
+
+    .padded-box-pad {
+        color: $light-black;
+        display: table-cell;
+        font-size: 25px;
+        padding: 10px 0 5px;
+        text-align: center;
+        width: 40px;
+    }
+
+    .padded-box-content {
+        @include border-radius();
+        color: $black;
+        display: table-cell;
+        padding: 10px;
+        margin-left: 40px;
+        background: white;
+        vertical-align: middle;
+        word-break: break-word;
+
+        hr {
+            @extend %box-hr;
+            @include border-bottom($color: $pastel-gray, $width: 2px);
+        }
+    }
+}
