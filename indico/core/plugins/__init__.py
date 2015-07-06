@@ -370,4 +370,10 @@ class WPJinjaMixinPlugin(WPJinjaMixin):
     render_template_func = staticmethod(render_plugin_template)
 
 
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'plugins', SideMenuItem(_("Plugins"), url_for('plugins.index'))
+
+
 plugin_engine = IndicoPluginEngine()

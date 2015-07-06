@@ -93,9 +93,6 @@ class WPAdminsBase(WPMainBase):
         self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"), urlHandlers.UHIPBasedACL.getURL())
         mainSection.addItem(self._servicesMenuItem)
 
-        self._pluginsMenuItem = wcomponents.SideMenuItem(_("Plugins"), url_for('plugins.index'))
-        mainSection.addItem(self._pluginsMenuItem)
-
         self._homepageMenuItem = wcomponents.SideMenuItem(_("Homepage"),
             urlHandlers.UHUpdateNews.getURL())
         mainSection.addItem( self._homepageMenuItem)
