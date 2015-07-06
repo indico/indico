@@ -67,8 +67,8 @@ class AddAttachmentFilesMixin:
                 db.session.flush()
                 logger.info('Attachment {} uploaded by {}'.format(attachment, session.user))
                 signals.attachments.attachment_created.send(attachment, user=session.user)
-            flash(ngettext("The attachment has been uploaded", "%(num)d attachments have been uploaded", len(files)),
-                  'success')
+            flash(ngettext("The attachment has been uploaded", "{count} attachments have been uploaded", len(files))
+                  .format(count=len(files)), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object))
 
