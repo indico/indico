@@ -107,4 +107,9 @@
         @include action-box-colors($color: $light-black, $emphasis-color: $black,
                                    $background-color: $pastel-gray, $border-color: $black);
     }
+
+    &.accept {
+        @include action-box-colors($color: $light-black, $emphasis-color: $green,
+                                   $background-color: $light-green, $border-color: $green);
+    }
 }
