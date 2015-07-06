@@ -62,3 +62,27 @@ the admin side menu.
 get_storage_backends = _signals.signal('get-storage-backends', """
 Expected to return one or more Storage subclasses.
 """)
+
+add_form_fields = _signals.signal('add-form-fields', """
+Lets you add extra fields to a form.  The *sender* is the form class
+and should always be specified when subscribing to this signal.
+
+The signal handler should return one or more ``'name', Field`` tuples.
+Each field will be added to the form as ``ext__<name>`` and is
+automatically excluded from the form's `data` property and its
+`populate_obj` method.
+
+To actually process the data, you can use e.g. the `form_validated`
+signal and then store it in `flask.g` until another signal informs
+you that the operation the user was performing has been successful.
+""")
+
+form_validated = _signals.signal('form-validated', """
+Triggered when an IndicoForm was validated successfully.  The *sender*
+is the form object.
+
+This signal may return ``False`` to mark the form as invalid even
+though WTForms validation was successful.  In this case it is highly
+recommended to mark a field as erroneous or indicate the error in some
+other way.
+""")

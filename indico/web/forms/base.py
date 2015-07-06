@@ -19,10 +19,13 @@ from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import FieldList
+from wtforms.form import FormMeta
 from wtforms.widgets.core import HiddenInput
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.util.string import strip_whitespace
 
 
@@ -46,7 +49,32 @@ class generated_data(property):
         return _DataWrapper(self.fget(obj))
 
 
+class IndicoFormMeta(FormMeta):
+    def __call__(cls, *args, **kwargs):
+        # If we are instantiating a form that was just extended, don't
+        # send the signal again - it's pointless to extend the extended
+        # form and doing so could actually result in infinite recursion
+        # if the signal receiver didn't specify a sender.
+        if kwargs.pop('__extended', False):
+            return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
+        extra_fields = values_from_signal(signals.add_form_fields.send(cls))
+        # If there are no extra fields, we don't need any custom logic
+        # and simply create an instance of the original form.
+        if not extra_fields:
+            return super(IndicoFormMeta, cls).__call__(*args, **kwargs)
+        kwargs['__extended'] = True
+        ext_cls = type(b'_Extended' + cls.__name__, (cls,), {})
+        for name, field in extra_fields:
+            name = 'ext__' + name
+            if hasattr(ext_cls, name):
+                raise RuntimeError(u'Preference collision in {}: {}'.format(cls.__name__, name))
+            setattr(ext_cls, name, field)
+        return ext_cls(*args, **kwargs)
+
+
 class IndicoForm(Form):
+    __metaclass__ = IndicoFormMeta
+
     class Meta:
         def bind_field(self, form, unbound_field, options):
             # We don't set default filters for query-based fields as it breaks them if no query_factory is set
@@ -72,12 +100,20 @@ class IndicoForm(Form):
                 g.flashed_csrf_message = True
             raise ValidationError(_(u'CSRF token missing'))
 
+    def validate(self):
+        valid = super(IndicoForm, self).validate()
+        return valid and all(values_from_signal(signals.form_validated.send(self), single_value=True))
+
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.
 
         If `fields` is set, only fields from that list are populated.
         If `skip` is set, fields in that list are skipped.
         If `existing_only` is True, only attributes that already exist on `obj` are populated.
+
+        Attributes starting with ``ext__`` are always skipped as they
+        are from plugin-defined fields which should always be handled
+        separately.
         """
         def _included(field_name):
             if fields and field_name not in fields:
@@ -85,6 +121,8 @@ class IndicoForm(Form):
             if skip and field_name in skip:
                 return False
             if existing_only and not hasattr(obj, field_name):
+                return False
+            if field_name.startswith('ext__'):
                 return False
             return True
 
@@ -130,7 +168,7 @@ class IndicoForm(Form):
     @property
     def data(self):
         """Extends form.data with generated data from properties"""
-        data = super(IndicoForm, self).data
+        data = {k: v for k, v in super(IndicoForm, self).data.iteritems() if not k.startswith('ext__')}
         data.update(self.generated_data)
         return data
 
