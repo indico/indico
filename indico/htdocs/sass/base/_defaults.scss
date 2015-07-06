@@ -26,6 +26,7 @@ $default-transition-function: ease-out;
 
 $default-border-color: $gray;
 $default-border-style: solid;
+$default-border-width: 1px;
 
 $color-variation: 15%;
 $light-color-variation: 5%;
@@ -60,29 +61,29 @@ $default-box-shadow-v-offset: 1px;
 // Custom mixins
 // -----------------------------------------------------------------------------
 
-@mixin border-top($color: $default-border-color, $style: $default-border-style) {
-    border-top: 1px $style $color;
+@mixin border-top($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-top: $width $style $color;
 }
-@mixin border-right($color: $default-border-color, $style: $default-border-style) {
-    border-right: 1px $style $color;
+@mixin border-right($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-right: $width $style $color;
 }
-@mixin border-bottom($color: $default-border-color, $style: $default-border-style) {
-    border-bottom: 1px $style $color;
+@mixin border-bottom($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-bottom: $width $style $color;
 }
-@mixin border-left($color: $default-border-color, $style: $default-border-style) {
-    border-left: 1px $style $color;
+@mixin border-left($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    border-left: $width $style $color;
 }
-@mixin border-vert($color: $default-border-color, $style: $default-border-style) {
-    @include border-top($color, $style);
-    @include border-bottom($color, $style);
+@mixin border-vert($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @include border-top($color, $style, $width);
+    @include border-bottom($color, $style, $width);
 }
-@mixin border-horz($color: $default-border-color, $style: $default-border-style) {
-    @include border-right($color, $style);
-    @include border-left($color, $style);
+@mixin border-horz($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @include border-right($color, $style, $width);
+    @include border-left($color, $style, $width);
 }
-@mixin border-all($color: $default-border-color, $style: $default-border-style) {
-    @include border-vert($color, $style);
-    @include border-horz($color, $style);
+@mixin border-all($color: $default-border-color, $style: $default-border-style, $width: $default-border-width) {
+    @include border-vert($color, $style, $width);
+    @include border-horz($color, $style, $width);
 }
 
 @mixin gradient($start-color, $end-color) {
