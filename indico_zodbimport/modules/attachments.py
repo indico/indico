@@ -206,7 +206,11 @@ class AttachmentImporter(Importer):
                 'modified_dt': modified_dt}
         if resource.__class__.__name__ == 'Link':
             data['type'] = AttachmentType.link
-            data['link_url'] = resource.url
+            data['link_url'] = convert_to_unicode(resource.url).strip()
+            if not data['link_url']:
+                self.print_error(cformat('%{red!}[{}] Skipping link, missing URL').format(data['title']),
+                                 event_id=base_object.id)
+                return None
         else:
             data['type'] = AttachmentType.file
             storage_backend, storage_path, size = self._get_file_info(resource)
