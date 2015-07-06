@@ -51,29 +51,29 @@ class EventObjectAttachmentsMixin(AttachmentsMixin):
 
 
 class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
-    base_wp = WPCategoryModifBase  # old-style, so we can't use super :(
+    base_wp = WPCategoryModifBase
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items['attachments'].setActive()
 
 
 class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
-    base_wp = WPConferenceModifBase  # old-style, so we can't use super :(
+    base_wp = WPConferenceModifBase
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items['attachments'].setActive()
 
 
 class WPSessionAttachments(EventObjectAttachmentsMixin, WPSessionModifBase):
-    base_wp = WPSessionModifBase  # old-style, so we can't use super
+    base_wp = WPSessionModifBase
 
 
 class WPContributionAttachments(EventObjectAttachmentsMixin, WPContributionModifBase):
-    base_wp = WPContributionModifBase  # old-style, so we can't use super
+    base_wp = WPContributionModifBase
 
 
 class WPSubContributionAttachments(EventObjectAttachmentsMixin, WPSubContributionModifBase):
-    base_wp = WPSubContributionModifBase  # old-style, so we can't use super
+    base_wp = WPSubContributionModifBase
 
 
 class WPEventFolderDisplay(WPMeetingDisplay, WPJinjaMixin):
