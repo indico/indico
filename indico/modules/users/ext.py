@@ -53,7 +53,7 @@ class ExtraUserPreferences(object):
     def process_form_data(self, data):
         """Processes and saves submitted data.
 
-        This modifies `data` to the core code doesn't receive any extra
+        This modifies `data` so the core code doesn't receive any extra
         data it doesn't expect.
         """
         local_data = {}
