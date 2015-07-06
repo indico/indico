@@ -242,6 +242,7 @@
     }
     .folder .i-button.attachment,
     .folder .attachments {
+        display: inline-block;
         font-family: Roboto;
 
         display: inline-block;
@@ -254,11 +255,15 @@
             @extend %protected-colors;
         }
     }
-    .folder.toolbar.is-protected {
-        .i-button.label {
-            @extend %protected-colors;
+    .folder.toolbar {
+        display: inline-block;
 
-            border-bottom-color: $red !important;
+        &.is-protected {
+            .i-button.label {
+                @extend %protected-colors;
+
+                border-bottom-color: $red !important;
+            }
         }
     }
     .folder .dropdown .attachment {
