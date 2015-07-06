@@ -64,6 +64,7 @@ class AddAttachmentFilesMixin:
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
                 attachment.file.save(f.file)
                 db.session.add(attachment)
+                db.session.flush()
                 logger.info('Attachment {} uploaded by {}'.format(attachment, session.user))
                 signals.attachments.attachment_created.send(attachment, user=session.user)
             flash(ngettext("The attachment has been uploaded", "%(num)d attachments have been uploaded", len(files)),

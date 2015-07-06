@@ -22,7 +22,6 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.logging import connect_log_signals
 
 
