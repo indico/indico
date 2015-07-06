@@ -474,15 +474,6 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         self._conf = conf
         self._aw = aw
 
-    def _getMaterialHTML( self ):
-        l = []
-        for mat in self._conf.getAllMaterialList():
-            if mat.getTitle() != _("Internal Page Files"):
-                temp = wcomponents.WMaterialDisplayItem()
-                url = urlHandlers.UHMaterialDisplay.getURL( mat )
-                l.append( temp.getHTML( self._aw, mat, url ) )
-        return l
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
@@ -513,7 +504,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
                 vars["room"] = roomLink
 
         vars["chairs"] = self._conf.getChairList()
-        vars["material"] = self._getMaterialHTML()
+        vars["attachments"] = self._conf.attached_items
         vars["conf"] = self._conf
 
         info = self._conf.getContactInfo()
