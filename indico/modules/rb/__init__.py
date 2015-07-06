@@ -25,6 +25,8 @@ from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.web.flask.util import url_for
+from indico.util.i18n import _
 
 
 logger = Logger.get('rb')
@@ -42,6 +44,12 @@ settings = SettingsProxy('roombooking', {
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks
+
+
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'))
 
 
 @signals.users.merged.connect
