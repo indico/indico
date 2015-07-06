@@ -45,9 +45,11 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     # the default folder is never shown as a folder. instead, its
     # files are shown on the same level as other folders
     files = folders.pop(0).attachments if folders[0].is_default else []
+    if not files and not folders:
+        return {}
     return {
         'folders': folders,
-        'files': [f for f in files]
+        'files': files
     }
 
 
