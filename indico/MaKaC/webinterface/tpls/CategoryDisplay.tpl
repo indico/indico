@@ -13,6 +13,29 @@ from MaKaC.conference import Link
 from MaKaC.webinterface.general import strfFileSize
 %>
 
+<%def name="render_attachments(attachments)">
+    % for attachment in attachments:
+        <li class="icon-file">
+            % if attachment.type.name == 'link':
+            <a href="${attachment.download_url}" target="_blank" class="resource"
+               data-name="${attachment.title}">
+                ${attachment.title}
+            </a>
+            % else:
+            <a href="${attachment.download_url}" target="_blank" class="resource"
+               data-name="${attachment.file.filename}"
+               data-size="${attachment.file.size}"
+               data-date="${attachment.modified_dt}">
+                ${attachment.title}
+            </a>
+            % endif
+            % if attachment.is_protected:
+                <i class="icon-lock"></i>
+            % endif
+        </li>
+    % endfor
+</%def>
+
 <div class="category-container">
     <div class="category-header">
         <div id="category-toolbar" class="toolbar right">
@@ -68,7 +91,7 @@ from MaKaC.webinterface.general import strfFileSize
         </h1>
     </div>
 
-    % if isRootCategory or materials or managers or allowUserModif:
+    % if isRootCategory or categ.attached_items or managers or allowUserModif:
     <div class="category-sidebar">
         % if isRootCategory:
             % if isNewsActive:
@@ -91,7 +114,7 @@ from MaKaC.webinterface.general import strfFileSize
                 % endfor
                 </ul>
             % endif
-            % if materials or allowUserModif:
+            % if categ.attached_items or allowUserModif:
                 <div>
                     % if allowUserModif:
                         <div class="right">
@@ -100,34 +123,21 @@ from MaKaC.webinterface.general import strfFileSize
                     % endif
                     <h2 class="icon-package-download">${ _("Files") }</h2>
                 </div>
+                <ul class="resource-list">
+                    ${render_attachments(categ.attached_items.get('files', []))}
+                </ul>
                 <ul>
-                % for material in materials:
+                % for folder in categ.attached_items.get('folders', []):
                     <li>
-                        <a class="material-show" data-hidden="true" title="${material.getDescription()}">
+                        <a class="material-show" data-hidden="true" title="${folder.title}">
                            <div class="left material-title-icon icon-next" ></div>
-                           <h3>${material.getTitle()}</h3>
+                           <h3>${folder.title}</h3>
+                           % if folder.is_protected:
+                               <i class="icon-lock"></i>
+                           % endif
                         </a>
                         <ul class="resource-list" style="display: none">
-                        % for resource in material.getResourceList():
-                            <li class="icon-file">
-                                % if isinstance(resource, Link):
-                                <a href="${resource.getURL()}" target="_blank" class="resource"
-                                   data-name="${getResourceName(resource)}">
-                                    ${getResourceName(resource)}
-                                </a>
-                                % else:
-                                <a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" class="resource"
-                                   data-name="${getResourceName(resource)}"
-                                   data-size="${strfFileSize(resource.getSize())}"
-                                   data-date="${resource.getCreationDate().strftime("%d %b %Y %H:%M")}">
-                                    ${getResourceName(resource)}
-                                </a>
-                                % endif
-                                % if resource.isItselfProtected():
-                                    <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
-                                % endif
-                            </li>
-                        % endfor
+                            ${render_attachments(folder.attachments)}
                         </ul>
                      </li>
                 % endfor

@@ -129,6 +129,12 @@
         &.resource-list {
             font-size: 0.9em;
             li {
+                a {
+                    display: inline-block;
+                    max-width: 200px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
                 margin-bottom: 0.5em;
                 margin-left: 1.5em;
             }
