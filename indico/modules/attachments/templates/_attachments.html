@@ -81,11 +81,11 @@
 {% macro render_attachments(attachments, linked_object) -%}
     {%- if attachments -%}
         <table class="tree">
-            {%- if attachments.folders -%}
-                {{ _render_tree(attachments.folders, true) }}
-            {%- endif -%}
             {%- if attachments.files -%}
                 {{ _render_tree(attachments.files, false) }}
+            {%- endif -%}
+            {%- if attachments.folders -%}
+                {{ _render_tree(attachments.folders, true) }}
             {%- endif -%}
         </table>
     {%- else -%}
