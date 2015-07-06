@@ -50,3 +50,9 @@ def _extend_event_management_menu(event, **kwargs):
 def _extend_category_management_menu(category, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'attachments', SideMenuItem(_('Attachments'), url_for('attachments.management', category))
+
+
+@signals.event_management.clone.connect
+def _get_attachment_cloner(event, **kwargs):
+    from indico.modules.attachments.clone import AttachmentCloner
+    return AttachmentCloner(event)
