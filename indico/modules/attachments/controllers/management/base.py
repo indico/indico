@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, session
+from flask import flash, request, session, render_template
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
@@ -38,6 +38,27 @@ from indico.web.util import jsonify_template, jsonify_data
 def _render_attachment_list(linked_object):
     tpl = get_template_module('attachments/_attachments.html')
     return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)
+
+
+def _render_protection_message(linked_object):
+    return render_template('attachments/_protection_message.html', parent=_get_parent_info(linked_object))
+
+
+def _get_parent_info(parent):
+    from MaKaC.conference import Conference, Session, Contribution, SubContribution, Category
+    parent_data = {'is_protected': parent.isProtected()}
+    if isinstance(parent, Conference):
+        parent_data['type'] = _('Event')
+    elif isinstance(parent, Session):
+        parent_data['type'] = _('Session')
+    elif isinstance(parent, Contribution):
+        parent_data['type'] = _('Contribution')
+    elif isinstance(parent, SubContribution):
+        parent_data['type'] = _('Sub contribution')
+    elif isinstance(parent, Category):
+        parent_data['type'] = _('Category')
+    parent_data['title'] = parent.name if isinstance(parent, Category) else parent.title
+    return parent_data
 
 
 class ManageAttachmentsMixin:
@@ -70,7 +91,8 @@ class AddAttachmentFilesMixin:
             flash(ngettext("The attachment has been uploaded", "{count} attachments have been uploaded", len(files))
                   .format(count=len(files)), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
-        return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object))
+        return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object),
+                                protection_message=_render_protection_message(self.object))
 
 
 class AddAttachmentLinkMixin:
@@ -90,7 +112,8 @@ class AddAttachmentLinkMixin:
             signals.attachments.attachment_created.send(link, user=session.user)
             flash(_("The link has been added"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
-        return jsonify_template('attachments/add_link.html', form=form)
+        return jsonify_template('attachments/add_link.html', form=form,
+                                protection_message=_render_protection_message(self.object))
 
 
 class EditAttachmentMixin(SpecificAttachmentMixin):
@@ -122,7 +145,8 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
         template = ('attachments/upload.html' if self.attachment.type == AttachmentType.file else
                     'attachments/add_link.html')
         return jsonify_template(template, form=form, existing_attachment=self.attachment,
-                                action=url_for('.modify_attachment', self.attachment))
+                                action=url_for('.modify_attachment', self.attachment),
+                                protection_message=_render_protection_message(self.object))
 
 
 class CreateFolderMixin:
@@ -140,7 +164,8 @@ class CreateFolderMixin:
             signals.attachments.folder_created.send(folder, user=session.user)
             flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
-        return jsonify_template('attachments/create_folder.html', form=form)
+        return jsonify_template('attachments/create_folder.html', form=form,
+                                protection_message=_render_protection_message(self.object))
 
 
 class EditFolderMixin(SpecificFolderMixin):
@@ -157,7 +182,8 @@ class EditFolderMixin(SpecificFolderMixin):
             signals.attachments.folder_updated.send(self.folder, user=session.user)
             flash(_("Folder \"{name}\" updated").format(name=self.folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
-        return jsonify_template('attachments/create_folder.html', form=form)
+        return jsonify_template('attachments/create_folder.html', form=form,
+                                protection_message=_render_protection_message(self.object))
 
 
 class DeleteFolderMixin(SpecificFolderMixin):

@@ -50,11 +50,15 @@
         });
     };
 
-    global.aclIfProtected = function aclIfProtected(protectionField, aclField) {
+    global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection) {
         protectionField.on('change', function() {
             aclField.closest('.form-group')
                 .find('input.i-button').prop('disabled', !this.checked).end()
                 .find('.PluginOptionPeopleListDiv').toggleClass('disabled', !this.checked);
+            if (selfProtection && inheritedProtection) {
+                selfProtection.toggle(this.checked);
+                inheritedProtection.toggle(!this.checked);
+            }
         });
         _.defer(function() {
             protectionField.triggerHandler('change');

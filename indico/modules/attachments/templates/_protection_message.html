@@ -1,0 +1,45 @@
+<div class="form-group" id="form-group-protected">
+    <div class="form-label form-block">
+    </div>
+    <div class="form-field form-block">
+        <div class="action-box message-only for-form self-protection-message danger">
+            <div class="section">
+                <div class="icon icon-lock"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Custom protection: Protected{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans %}The access to this object is restricted, regardless of the protection scheme of the
+                        parent.{% endtrans %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="action-box message-only for-form inherited-protection-message {%- if parent.is_protected %} warning{% else %} accept{% endif %}">
+            <div class="section">
+                <div class="icon icon-arrow-up"></div>
+                <div class="text">
+                    {% if parent.is_protected %}
+                        <div class="label">
+                            {% trans %}Inherited protection: Protected{% endtrans %}
+                        </div>
+                        <div>
+                            {% trans parent_type=parent.type, parent_title = parent.title %}The access to this object
+                            is restricted, inheriting the protection scheme from <strong>{{ parent_title }}</strong>
+                            ({{ parent_type }})
+                            {%- endtrans %}
+                        </div>
+                    {% else %}
+                        <div class="label">
+                            {% trans %}Inherited protection: Public{% endtrans %}
+                        </div>
+                        <div>
+                            {% trans %}The access to this material is public.{% endtrans %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
