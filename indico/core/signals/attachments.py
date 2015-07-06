@@ -58,3 +58,9 @@ Called when an attachment is updated.  The *sender* is the
 `Attachment` that was updated.  The user who updated the attachment
 is passed in the `user` kwarg.
 """)
+
+attachment_accessed = _signals.signal('attachment-accessed', """
+Called when an attachment is accessed.  The *sender* is the
+`Attachment` that was accessed.  The user who accessed the attachment
+is passed in the `user` kwarg.
+""")

@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, session
 from werkzeug.exceptions import Forbidden
 
+from indico.core import signals
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
 
@@ -31,7 +32,7 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
             raise Forbidden
 
     def _process(self):
-        # TODO: trigger an 'attachment downloaded' signal
+        signals.attachments.attachment_accessed.send(self.attachment, user=session.user)
         if self.attachment.type == AttachmentType.link:
             return redirect(self.attachment.link_url)
         else:
