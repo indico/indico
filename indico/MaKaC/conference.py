@@ -320,7 +320,7 @@ class CommonObjectBase(CoreObject, Fossilizable):
         CAUTION: this won't return empty directories (used by interface), nor things the
         current user can't see
         """
-        if isinstance(self, (Contribution, Session, SubContribution, Conference)):
+        if isinstance(self, (Contribution, Session, SubContribution, Conference, Category)):
             return get_attached_items(self, include_empty=False, include_hidden=False, preload_event=True)
         else:
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
