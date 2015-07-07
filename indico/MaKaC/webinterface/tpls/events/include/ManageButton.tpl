@@ -3,25 +3,31 @@
 <%
     info = extractInfoForButton(item)
     menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info
+    showManageButton = not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink'])
 %>
 
-% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
 
-    % if manageLink:
+% if manageLink:
+    % if showManageButton:
         <div class="manageLink" style="background: ${bgColor};">
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
-    % else:
-        <div class="toolbar right thin">
-            % if minutesToggle and item.note:
-                <div class="group">
-                    ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=minutesHidden) }
-                </div>
-            % endif
+    % endif
+% else:
+    <div class="toolbar right thin">
+        % if minutesToggle and item.note:
+            <div class="group">
+                ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=minutesHidden) }
+            </div>
+        % endif
+        % if showManageButton:
             <div class="group">
                 <a class="meeting-timetable-item-edit i-button icon-edit arrow" id="${menuName}"></a>
             </div>
-        </div>
-    % endif
+        % endif
+    </div>
+% endif
+
+% if showManageButton:
     <script type="text/javascript">
         var menuLink = null;
         $E('${menuName}').observeClick(function() {
