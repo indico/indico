@@ -53,7 +53,6 @@
             % endif
         </div>
         % endif
-        % if SubContrib.getAllMaterialList():
             <div class="subContributionRightPanelSection">
                 <h2 class="subContributionSectionTitle">${_("Material")}</h2>
                % if (SubContrib.canUserSubmit(self_._aw.getUser()) or SubContrib.canModify(self_._aw)) and not isWithdrawn:
@@ -61,24 +60,32 @@
                     <a class="fakeLink" id="manageMaterial">Edit files</a>
                 </div>
                 % endif
-                <ul>
-                % for material in SubContrib.getAllMaterialList():
-                    <li><a href="${urlHandlers.UHMaterialDisplay.getURL(material)}"  class="titleWithLink">
-                        ${material.getTitle()}
-                        </a>
-                     <ul class="subList">
-                     % for resource in material.getResourceList():
-                     <li><a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank">
-                        ${resource.getName()}
-                        </a>
+                % if SubContrib.attached_items:
+                 <ul class="subList">
+                    % for attachment in SubContrib.attached_items.get('files'):
+                        <li>
+                            <a href="${attachment.download_url}" target="_blank">
+                                ${attachment.title}
+                            </a>
                         </li>
-                     % endfor
-                     </ul>
-                     </li>
-                % endfor
+                    % endfor
                 </ul>
+                <ul>
+                    % for folder in SubContrib.attached_items.get('folders'):
+                        <li>${folder.title}
+                         <ul class="subList">
+                         % for attachment in folder.attachments:
+                         <li><a href="${attachment.download_url}" target="_blank">
+                            ${attachment.title}
+                            </a>
+                            </li>
+                         % endfor
+                         </ul>
+                         </li>
+                    % endfor
+                </ul>
+                % endif
             </div>
-        % endif
     </div>
 </div>
 <script type="text/javascript">
