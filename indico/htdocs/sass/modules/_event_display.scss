@@ -19,6 +19,7 @@
 @import 'compass';
 @import 'partials/buttons';
 
+
 #flashed-messages {
     margin: 1em auto 0 auto;
     width: 1000px;
@@ -37,11 +38,58 @@
     padding: 10px 50px;
 }
 
-li > .note-block {
-    margin-top: 1em;
+
+.i-selection.note-visibility-toggle input[type=checkbox] {
+    & + label {
+        border-style: dashed !important;
+    }
+
+    &:not(:checked) + label,
+    &:not(:checked) + label:hover {
+        background: transparent;
+    }
+
+    &:checked + label {
+        background: $postit-yellow !important;
+        color: $light-black !important;
+    }
+
+    &:checked + label:hover {
+        color: $black !important;
+    }
 }
 
-.note-visibility-toggle {
-    &:not(.note-is-hidden) .do-show-text{ display: none; }
-    &.note-is-hidden .do-hide-text { display: none; }
+
+li > table + .note-area-wrapper {
+    margin-top: 0.7em;
+}
+
+.note-area-wrapper {
+
+    .padded-box-content {
+        .permalink {
+            @include transition;
+            @include transition-property(opacity);
+            float: right;
+            color: darken($pastel-blue, $color-variation);
+
+            &:hover {
+                color: $blue;
+            }
+        }
+    }
+
+    .note-text {
+        h2, h1 {
+            color: $black;
+        }
+
+        > :first-child:not(.permalink) {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
 }

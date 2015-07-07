@@ -15,9 +15,7 @@
 % else:
     <div class="toolbar right thin">
         % if minutesToggle and item.note:
-            <div class="group">
-                ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=minutesHidden) }
-            </div>
+            ${ render_template('events/notes/toggle-button.html', note=item.note, note_is_hidden=minutesHidden) }
         % endif
         % if showManageButton:
             <div class="group">

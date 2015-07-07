@@ -24,10 +24,10 @@ $(function() {
     $('.js-show-note-toggle').on('click', function() {
         $(this).toggleClass('note-is-hidden');
         // Note for event
-        var note = $(this).closest('.note-block');
+        var note = $(this).closest('.toolbar').siblings('.note-area-wrapper');
         // Note for other elements
         if (note.length === 0) {
-            note = $(this).closest('li').children('.note-block');
+            note = $(this).closest('li').children('.note-area-wrapper');
         }
         content = note.hasClass('togglable') ? note : note.find('.togglable');
         content.slideToggle();
