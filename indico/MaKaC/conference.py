@@ -7824,7 +7824,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if options.get("subcontribs", False) :
             for sc in self.getSubContributionList() :
-                cont.addSubContribution(sc.clone(cont, self, options))
+                cont.addSubContribution(sc.clone(cont, self, options), subcontrib_id=sc.getId())
         return cont
 
     def notifyModification( self, date = None, raiseEvent = True, cleanCache = True):
@@ -8886,8 +8886,12 @@ class Contribution(CommonObjectBase, Locatable):
         signals.event.subcontribution_created.send(newSub, parent=self)
         return newSub
 
-    def addSubContribution( self, newSubCont ):
-        newSubCont.setId(str( self.__subContGenerator.newCount()) )
+    def addSubContribution(self, newSubCont, subcontrib_id=None):
+        if subcontrib_id is None:
+            newSubCont.setId(str(self.__subContGenerator.newCount()))
+        else:
+            newSubCont.setId(str(subcontrib_id))
+            self.__subContGenerator.sync(subcontrib_id)
         newSubCont.setOwner( self )
         self._subConts.append( newSubCont )
         self.notifyModification(cleanCache = False)
