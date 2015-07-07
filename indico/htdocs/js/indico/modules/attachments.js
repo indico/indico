@@ -58,4 +58,24 @@
             }
         });
     };
+
+    global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo, selfProtection, inheritedProtection, folderProtection) {
+        folderField.on('change', function() {
+            var selectedFolder = $(this)
+            if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
+                selfProtection.hide();
+                inheritedProtection.hide();
+                folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text())
+                folderProtection.show();
+            }
+            else {
+                folderProtection.hide();
+                selfProtection.toggle(protectionField.prop('checked'));
+                inheritedProtection.toggle(!protectionField.prop('checked'));
+            }
+        });
+        _.defer(function() {
+            folderField.triggerHandler('change');
+        });
+    };
 })(window);

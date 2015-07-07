@@ -50,7 +50,7 @@
         });
     };
 
-    global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection) {
+    global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection, folderField, folderProtection) {
         protectionField.on('change', function() {
             aclField.closest('.form-group')
                 .find('input.i-button').prop('disabled', !this.checked).end()
@@ -58,10 +58,39 @@
             if (selfProtection && inheritedProtection) {
                 selfProtection.toggle(this.checked);
                 inheritedProtection.toggle(!this.checked);
+                if (folderField) {
+                    folderField.triggerHandler('change');
+                }
+                else {
+                    folderProtection.hide();
+                }
             }
         });
         _.defer(function() {
             protectionField.triggerHandler('change');
+            if (folderField) {
+                folderField.triggerHandler('change');
+            }
+        });
+    };
+
+    global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo, selfProtection, inheritedProtection, folderProtection) {
+        folderField.on('change', function() {
+            var selectedFolder = $(this)
+            if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
+                selfProtection.hide();
+                inheritedProtection.hide();
+                folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text())
+                folderProtection.show();
+            }
+            else {
+                folderProtection.hide();
+                selfProtection.toggle(protectionField.prop('checked'));
+                inheritedProtection.toggle(!protectionField.prop('checked'));
+            }
+        });
+        _.defer(function() {
+            folderField.triggerHandler('change');
         });
     };
 

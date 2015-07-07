@@ -19,8 +19,9 @@ from __future__ import unicode_literals
 from flask import flash, request, session, render_template
 from werkzeug.utils import secure_filename
 
-from indico.core.db import db
 from indico.core import signals
+from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
 from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, AttachmentFolderForm,
@@ -61,6 +62,11 @@ def _get_parent_info(parent):
     return parent_data
 
 
+def _get_folders_protection_info(linked_object):
+    folders = AttachmentFolder.find(linked_object=linked_object, is_deleted=False)
+    return {folder.id: folder.is_protected for folder in folders}
+
+
 class ManageAttachmentsMixin:
     """Shows the attachment management page"""
     wp = None
@@ -92,7 +98,8 @@ class AddAttachmentFilesMixin:
                   .format(count=len(files)), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object),
-                                protection_message=_render_protection_message(self.object))
+                                protection_message=_render_protection_message(self.object),
+                                folders_protection_info=_get_folders_protection_info(self.object))
 
 
 class AddAttachmentLinkMixin:
@@ -113,7 +120,8 @@ class AddAttachmentLinkMixin:
             flash(_("The link has been added"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form,
-                                protection_message=_render_protection_message(self.object))
+                                protection_message=_render_protection_message(self.object),
+                                folders_protection_info=_get_folders_protection_info(self.object))
 
 
 class EditAttachmentMixin(SpecificAttachmentMixin):
@@ -146,7 +154,8 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                     'attachments/add_link.html')
         return jsonify_template(template, form=form, existing_attachment=self.attachment,
                                 action=url_for('.modify_attachment', self.attachment),
-                                protection_message=_render_protection_message(self.object))
+                                protection_message=_render_protection_message(self.object),
+                                folders_protection_info=_get_folders_protection_info(self.object))
 
 
 class CreateFolderMixin:

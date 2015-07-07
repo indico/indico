@@ -4,7 +4,7 @@
     <div class="form-field form-block">
         <div class="action-box message-only for-form self-protection-message danger">
             <div class="section">
-                <div class="icon icon-lock"></div>
+                <div class="icon icon-lock-center"></div>
                 <div class="text">
                     <div class="label">
                         {% trans %}Custom protection: Protected{% endtrans %}
@@ -25,9 +25,9 @@
                             {% trans %}Inherited protection: Protected{% endtrans %}
                         </div>
                         <div>
-                            {% trans parent_type=parent.type, parent_title = parent.title %}The access to this object
-                            is restricted, inheriting the protection scheme from <strong>{{ parent_title }}</strong>
-                            ({{ parent_type }})
+                            {% trans parent_type=parent.type, parent_title = parent.title -%}
+                                The access to this object is restricted, inheriting the protection scheme from
+                                <strong>{{ parent_title }}</strong> ({{ parent_type }})
                             {%- endtrans %}
                         </div>
                     {% else %}
@@ -38,6 +38,22 @@
                             {% trans %}The access to this material is public.{% endtrans %}
                         </div>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="action-box message-only for-form folder-protection-message warning">
+            <div class="section">
+                <div class="icon icon-folder"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Inherited protection: Protected{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans -%}
+                            The access to this object is restricted, inheriting the protection scheme from
+                            <strong class="folder-name"></strong> (Folder)
+                        {%- endtrans %}
+                    </div>
                 </div>
             </div>
         </div>
