@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import os
 import sys
 from contextlib import contextmanager
+from io import BytesIO
 from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
 
@@ -97,6 +98,10 @@ class Storage(object):
         """Util to parse a key=value data string to a dict"""
         return dict((x.strip() for x in item.split('=', 1)) for item in data.split(',')) if data else {}
 
+    def _ensure_fileobj(self, fileobj):
+        """Ensures that fileobj is a file-like object and not a string"""
+        return BytesIO(fileobj) if not hasattr(fileobj, 'read') else fileobj
+
     def open(self, file_id):  # pragma: no cover
         """Opens a file in the storage for reading.
 
@@ -147,7 +152,7 @@ class Storage(object):
                          when sending the file to a client (may or may
                          not be used depending on the backend).
         :param fileobj: A file-like object containing the file data as
-                        bytes.
+                        bytes or a bytestring.
         :return: unicode -- A unique identifier for the file.
         """
         raise NotImplementedError
@@ -222,6 +227,7 @@ class FileSystemStorage(Storage):
 
     def save(self, name, content_type, filename, fileobj):
         try:
+            fileobj = self._ensure_fileobj(fileobj)
             filepath = self._resolve_path(name)
             if os.path.exists(filepath):
                 raise ValueError('A file with this name already exists')
