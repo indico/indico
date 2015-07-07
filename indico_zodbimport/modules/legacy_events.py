@@ -78,14 +78,14 @@ class LegacyEventImporter(Importer):
                 EventSetting.find(event_id=event._old_id).update({EventSetting.event_id: event.id})
                 EventSettingPrincipal.find(event_id=event._old_id).update({EventSettingPrincipal.event_id: event.id})
                 db.session.add(LegacyEventMapping(legacy_event_id=event._old_id, event_id=int(event.id)))
-                print cformat('%{green}+++%{reset} '
-                              '%{white!}{:6s}%{reset} %{cyan}{}').format(event._old_id, int(event.id))
+                if not self.quiet:
+                    self.print_success(cformat('%{cyan}{}').format(event.id), event_id=event._old_id)
             else:
                 # happens if this importer was executed before but you want to add the mapping to your DB again
                 db.session.add(LegacyEventMapping(legacy_event_id=event._old_id, event_id=int(event.id)))
-                msg = cformat('%{green}+++%{reset} '
-                              '%{white!}{:6s}%{reset} %{cyan}{}%{reset} %{yellow}(already updated in zodb)')
-                print msg.format(event._old_id, int(event.id))
+                if not self.quiet:
+                    self.print_success(cformat('%{cyan}{}%{reset} %{yellow}(already updated in zodb)').format(event.id),
+                                       event_id=event._old_id)
 
     def gen_event_id(self):
         counter = self.zodb_root['counters']['CONFERENCE']
