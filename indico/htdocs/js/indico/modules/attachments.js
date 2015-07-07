@@ -47,4 +47,15 @@
                 });
             });
     };
+
+    global.openAttachmentManager = function openAttachmentManager(itemLocator) {
+        ajaxDialog({
+            url: build_url(Indico.Urls.AttachmentManager, itemLocator),
+            title: $T.gettext("Manage material"),
+            confirmCloseUnsaved: false,
+            onClose: function() {
+                location.reload();
+            }
+        });
+    };
 })(window);

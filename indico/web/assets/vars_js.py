@@ -85,6 +85,7 @@ def generate_global_file(config):
                 'conference': urlHandlers.UHConfModifAddMaterials.getURL(_ignore_static=True).js_router,
                 'category': urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router
             },
+            'AttachmentManager': url_rule_to_js('attachments.management'),
 
             'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
             'RoomBookingBook': url_rule_to_js('rooms.book'),

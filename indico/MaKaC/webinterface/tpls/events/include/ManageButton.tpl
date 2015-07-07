@@ -82,21 +82,13 @@
             % endif
 
             % if 'materialLink' in info:
-                menuOptions['addMaterial'] = {action: function(m) {
-                    IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                        ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);
-                    m.close();
-                    return false;}, display: $T('Add material')};
-                % if getItemType(item) == 'Conference' and item.getConference().getAllMaterialList() or \
-                getItemType(item) == 'SubContribution' and item.getAllMaterialList() or \
-                getItemType(item) == 'Contribution' and item.getContribution().getAllMaterialList() or \
-                getItemType(item) == 'Session' and item.getSession().getAllMaterialList():
-                    menuOptions['editMaterial'] = {action: function(m) {
-                         IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
-                             ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, false);
-                         m.close();
-                         return false;}, display: $T('Edit material')};
-                % endif
+                menuOptions['editMaterial'] = {
+                    action: function(m) {
+                        openAttachmentManager(${item.getLocator() | n,j});
+                        m.close();
+                    },
+                    display: $T('Manage material')
+                };
             % endif
 
             if (menuLink && menuLink.isOpen()) {
