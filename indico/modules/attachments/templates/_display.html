@@ -10,7 +10,7 @@
     </a>
 {% endmacro %}
 
-{% macro render_folder(folder) %}
+{% macro render_folder(folder) -%}
     <div class="folder toolbar {% if folder.is_protected %}is-protected{% endif %}">
         <div class="attachments group">
             <span class="i-button label">{{ folder.title }}</span>
@@ -26,7 +26,7 @@
             </ul>
         </div>
     </div>
-{% endmacro %}
+{%- endmacro %}
 
 {% macro render_attachments_folders(item=none, files=[], folders=[]) %}
     {% set files = item.attached_items.files if item else files %}
@@ -39,7 +39,7 @@
         {% endfor %}
     </span>
 
-    {% for folder in folders %}
+    {%- for folder in folders -%}
         {{ render_folder(folder) }}
-    {% endfor %}
+    {%- endfor %}
 {% endmacro %}
