@@ -102,7 +102,7 @@ def _log_attachment_created(attachment, user, **kwargs):
     if attachment.folder.link_type == LinkType.category:
         return
     event = attachment.folder.linked_object.getConference()
-    _log(event, EventLogKind.positive, 'Added attachment "{}"'.format(attachment.title), user,
+    _log(event, EventLogKind.positive, 'Added material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
 
 
@@ -111,7 +111,7 @@ def _log_attachment_deleted(attachment, user, **kwargs):
     if attachment.folder.link_type == LinkType.category:
         return
     event = attachment.folder.linked_object.getConference()
-    _log(event, EventLogKind.negative, 'Deleted attachment "{}"'.format(attachment.title), user,
+    _log(event, EventLogKind.negative, 'Deleted material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
 
 
@@ -120,5 +120,5 @@ def _log_attachment_updated(attachment, user, **kwargs):
     if attachment.folder.link_type == LinkType.category:
         return
     event = attachment.folder.linked_object.getConference()
-    _log(event, EventLogKind.change, 'Updated attachment "{}"'.format(attachment.title), user,
+    _log(event, EventLogKind.change, 'Updated material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
