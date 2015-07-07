@@ -133,3 +133,26 @@ def test_fs_readonly(fs_storage):
         readonly.save('test2.txt', 'unused/unused', 'unused', BytesIO(b'hello fail'))
     # just to make sure the file is still there
     assert readonly.open(f).read() == b'hello world'
+
+
+def test_fs_get_local_path(fs_storage):
+    f = fs_storage.save('test.txt', 'unused/unused', 'unused', BytesIO(b'hello world'))
+    with fs_storage.get_local_path(f) as path:
+        assert path == fs_storage._resolve_path(f)
+        with open(path, 'rb') as fd:
+            assert fd.read() == b'hello world'
+    # fs storage returns the real path so it should still exist afterwards
+    assert os.path.exists(path)
+
+
+def test_storage_get_local_path(fs_storage):
+    class CustomStorage(FileSystemStorage):
+        def get_local_path(self, file_id):
+            return Storage.get_local_path(self, file_id)
+
+    storage = CustomStorage(fs_storage.path)
+    f = storage.save('test.txt', 'unused/unused', 'unused', BytesIO(b'hello world'))
+    with storage.get_local_path(f) as path:
+        with open(path, 'rb') as fd:
+            assert fd.read() == b'hello world'
+    assert not os.path.exists(path)

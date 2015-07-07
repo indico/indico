@@ -18,7 +18,9 @@ from __future__ import unicode_literals
 
 import os
 import sys
+from contextlib import contextmanager
 from shutil import copyfileobj
+from tempfile import NamedTemporaryFile
 
 from werkzeug.security import safe_join
 
@@ -104,6 +106,23 @@ class Storage(object):
         :param file_id: The ID of the file within the storage backend.
         """
         raise NotImplementedError
+
+    @contextmanager
+    def get_local_path(self, file_id):
+        """Returns a local path for the file.
+
+        While this path MAY point to the permanent location of the
+        stored file, it MUST NOT be used for anything but read
+        operations and MUST NOT be used after existing this function's
+        contextmanager.
+
+        :param file_id: The ID of the file within the storage backend.
+        """
+        with self.open(file_id) as fd:
+            with NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getUploadedFilesTempDir()) as tmpfile:
+                copyfileobj(fd, tmpfile, 1024 * 1024)
+                tmpfile.flush()
+                yield tmpfile.name
 
     def save(self, name, content_type, filename, fileobj):  # pragma: no cover
         """Creates a new file in the storage.
@@ -196,6 +215,10 @@ class FileSystemStorage(Storage):
             return open(self._resolve_path(file_id), 'rb')
         except Exception as e:
             raise StorageError('Could not open "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
+
+    @contextmanager
+    def get_local_path(self, file_id):
+        yield self._resolve_path(file_id)
 
     def save(self, name, content_type, filename, fileobj):
         try:
