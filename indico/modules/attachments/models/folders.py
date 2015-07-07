@@ -106,6 +106,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
 
     # relationship backrefs:
     # - all_attachments (Attachment.folder)
+    # - legacy_mapping (LegacyAttachmentFolderMapping.folder)
 
     @property
     def protection_parent(self):

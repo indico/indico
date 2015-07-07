@@ -51,7 +51,8 @@ class LegacyAttachmentFolderMapping(LinkMixin, db.Model):
     )
     folder = db.relationship(
         'AttachmentFolder',
-        lazy=False
+        lazy=False,
+        backref=db.backref('legacy_mapping', uselist=False, lazy=True)
     )
 
     @return_ascii
