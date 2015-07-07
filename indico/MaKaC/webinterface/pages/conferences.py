@@ -739,7 +739,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             elif folder.title != "Internal Page Files":
                 folders.append(folder)
 
-        cmp_title_number = lambda x, y: int(x.title()[4:]) - int(y.title()[4:])
+        cmp_title_number = lambda x, y: int(x.title[4:]) - int(y.title[4:])
 
         wvars.update({
             'files': attached_items.get('files', []),

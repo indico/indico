@@ -14,18 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 from cStringIO import StringIO
-
+import re
 from datetime import timedelta, datetime
 
-#################################
-# Fermi timezone awareness      #
-#################################
+from flask import session
 from pytz import timezone
-import re
+
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-#################################
-# Fermi timezone awareness(end) #
-#################################
 from MaKaC.common.url import ShortURLMapper
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.locators as locators
@@ -47,6 +42,9 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
+from indico.core.db import db
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.api import CategoryEventHook
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
@@ -208,20 +206,17 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
                 self.alertCreation(lectures)
                 lectures.sort(sortByStartDate)
                 # create links
-                for i in range(0,len(lectures)):
-                    lecture = lectures[i]
+                for i, source in enumerate(lectures, 1):
                     if len(lectures) > 1:
-                        lecture.setTitle("%s (%s/%s)" % (lecture.getTitle(),i+1,len(lectures)))
-                    for j in range(0,len(lectures)):
+                        source.setTitle("{} ({}/{})".format(source.getTitle(), i, len(lectures)))
+
+                    for j, target in enumerate(lectures, 1):
                         if j != i:
-                            mat = conference.Material()
-                            mat.setTitle("part%s"%(j+1))
-                            url = str(urlHandlers.UHConferenceDisplay.getURL(lectures[j]))
-                            link = conference.Link()
-                            link.setURL(url)
-                            link.setName(url)
-                            mat.addResource(link)
-                            lecture.addMaterial(mat)
+                            folder = AttachmentFolder(linked_object=source, title="part{}".format(j))
+                            link = Attachment(user=session.user, type=AttachmentType.link,
+                                              folder=folder, title="Part {}".format(j),
+                                              link_url=target.getURL())
+                            db.session.add(link)
                 c = lectures[0]
             self._redirect(urlHandlers.UHConferenceModification.getURL( c ) )
         else :
