@@ -3351,7 +3351,7 @@ class Conference(CommonObjectBase, Locatable):
         self.__contribGenerator.sync(self.getAbstractMgr()._getOldAbstractCounter())
         return self.__contribGenerator._getCount()
 
-    def addContribution(self,newContrib,id=""):
+    def addContribution(self, newContrib, contrib_id=None):
         """Adds a new contribution object to the conference taking care of
             assigning a new unique id to it
         """
@@ -3359,12 +3359,13 @@ class Conference(CommonObjectBase, Locatable):
             return
         if isinstance(newContrib.getCurrentStatus(),ContribStatusWithdrawn):
             raise MaKaCError( _("Cannot add a contribution which has been withdrawn"), _("Event"))
-        if id is None or id=="":
+        if contrib_id is None or contrib_id == '':
             contribId=self._generateNewContributionId()
             while self.contributions.has_key(contribId):
                 contribId=self._generateNewContributionId()
         else:
-            contribId=str(id)
+            contribId = str(contrib_id)
+            self.__contribGenerator.sync(contribId)
             if self.contributions.has_key(contribId):
                 raise MaKaCError( _("Cannot add this contribution id:(%s) as it has already been used")%contribId, _("Event"))
         newContrib.includeInConference(self,contribId)
@@ -5939,13 +5940,13 @@ class Session(CommonObjectBase, Locatable):
     def appendConvenerText( self, newText ):
         self.setConvenerText( "%s, %s"%(self.getConvenerText(), newText.strip()) )
 
-    def addContribution(self, newContrib, id=None):
+    def addContribution(self, newContrib, contrib_id=None):
         """Registers the contribution passed as parameter within the session
             assigning it a unique id.
         """
         if self.hasContribution(newContrib):
             return
-        self.getConference().addContribution(newContrib,id)
+        self.getConference().addContribution(newContrib, contrib_id=contrib_id)
         self.contributions[newContrib.getId()]=newContrib
         newContrib.setSession(self)
 
@@ -7747,7 +7748,7 @@ class Contribution(CommonObjectBase, Locatable):
 
     def clone(self, parent, options, deltaTime = 0):
         cont = Contribution()
-        parent.addContribution(cont)
+        parent.addContribution(cont, contrib_id=self.getId())
         cont.setTitle( self.getTitle() )
         cont.setDescription( self.getDescription() )
         for k, v in self.getFields().items():
