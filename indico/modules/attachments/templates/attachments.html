@@ -4,83 +4,47 @@
 {% block title %}{% trans %}Materials{% endtrans %}{% endblock %}
 
 {% block content %}
-    <div class="action-box fixed-width">
-        <div class="section">
-            <span class="icon icon-upload"></span>
-            <div class="text">
-                <div class="label">
-                    {% if linked_object_type == 'category' %}
-                        {% trans %}Add materials to the category.{% endtrans %}
-                    {% elif linked_object_type == 'event' %}
-                        {% trans %}Add materials to the event.{% endtrans %}
-                    {% elif linked_object_type == 'session' %}
-                        {% trans %}Add materials to the session.{% endtrans %}
-                    {% elif linked_object_type == 'contribution' %}
-                        {% trans %}Add materials to the contribution.{% endtrans %}
-                    {% elif linked_object_type == 'subcontribution' %}
-                        {% trans %}Add materials to the subcontribution.{% endtrans %}
-                    {% endif %}
+    <div class="attachment-editor">
+        <div class="action-box fixed-width">
+            <div class="section">
+                <span class="icon icon-upload"></span>
+                <div class="text">
+                    <div class="label">
+                        {% if linked_object_type == 'category' %}
+                            {% trans %}Add materials to the category.{% endtrans %}
+                        {% elif linked_object_type == 'event' %}
+                            {% trans %}Add materials to the event.{% endtrans %}
+                        {% elif linked_object_type == 'session' %}
+                            {% trans %}Add materials to the session.{% endtrans %}
+                        {% elif linked_object_type == 'contribution' %}
+                            {% trans %}Add materials to the contribution.{% endtrans %}
+                        {% elif linked_object_type == 'subcontribution' %}
+                            {% trans %}Add materials to the subcontribution.{% endtrans %}
+                        {% endif %}
+                    </div>
+                    <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
                 </div>
-                <div>{% trans %}You can attach files or links using the buttons on the right.{% endtrans %}</div>
-            </div>
-            <div class="toolbar right">
-                <div class="group">
-                    <a href="#" class="i-button icon-file js-dialog-action"
-                       data-href="{{ url_for('.upload', linked_object) }}"
-                       data-title="{%- trans %}Upload files{% endtrans -%}">
-                        {%- trans %}Upload files{% endtrans -%}
-                    </a>
-                    <a href="#" class="i-button icon-link js-dialog-action"
-                       data-href="{{ url_for('.add_link', linked_object) }}"
-                       data-title="{%- trans %}Add link{% endtrans -%}">
-                        {%- trans %}Add link{% endtrans -%}
-                    </a>
+                <div class="toolbar right">
+                    <div class="group">
+                        <a href="#" class="i-button icon-file js-dialog-action"
+                           data-href="{{ url_for('.upload', linked_object) }}"
+                           data-title="{%- trans %}Upload files{% endtrans -%}">
+                            {%- trans %}Upload files{% endtrans -%}
+                        </a>
+                        <a href="#" class="i-button icon-link js-dialog-action"
+                           data-href="{{ url_for('.add_link', linked_object) }}"
+                           data-title="{%- trans %}Add link{% endtrans -%}">
+                            {%- trans %}Add link{% endtrans -%}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="i-box fixed-width" id="attachments-container">
-        {{ render_attachments(attachments, linked_object) }}
+        <div class="i-box fixed-width" id="attachments-container">
+            {{ render_attachments(attachments, linked_object) }}
+        </div>
     </div>
     <script>
-        $(document)
-            .on('click', '.tree .expandable > .actions > a', function(evt) {
-                evt.stopPropagation();
-            })
-            .on('click', '.tree .expandable', function() {
-                $(this)
-                    .toggleClass('collapsed')
-                    .next('.sub-tree')
-                    .find('td > div')
-                        .slideToggle(150);
-            })
-            .on('click', '.js-dialog-action', function(e) {
-                e.preventDefault();
-                var $this = $(this);
-                ajaxDialog({
-                    url: $this.data('href'),
-                    title: $this.data('title'),
-                    onClose: function(data) {
-                        if (data) {
-                            $('#attachments-container').html(data.attachment_list);
-                        }
-                    }
-                });
-            })
-            .on('indico:confirmed', '.js-delete', function(e) {
-                e.preventDefault();
-
-                var $this = $(this);
-                $.ajax({
-                    url: $this.data('href'),
-                    method: $this.data('method'),
-                    complete: IndicoUI.Dialogs.Util.progress(),
-                    error: handleAjaxError,
-                    success: function(data) {
-                        $('#attachments-container').html(data.attachment_list);
-                        handleFlashes(data);
-                    }
-                });
-            })
+        setupAttachmentEditor();
     </script>
 {% endblock %}
