@@ -95,10 +95,9 @@ class EventNoteImporter(Importer):
         material = obj.minutes
         if material is None:
             return None, None
-        resource = material._Material__resources.get('minutes')
-        if resource is None:
+        if material.file is None:
             return None, None
-        return resource, self._has_special_protection(material, resource)
+        return material.file, self._has_special_protection(material, material.file)
 
     def _iter_minutes(self):
         it = self.zodb_root['conferences'].itervalues()
