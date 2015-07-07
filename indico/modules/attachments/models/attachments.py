@@ -183,6 +183,11 @@ class Attachment(ProtectionMixin, db.Model):
     def download_url(self):
         return self.get_download_url()
 
+    @property
+    def absolute_download_url(self):
+        filename = self.file.filename if self.type == AttachmentType.file else 'go'
+        return url_for('attachments.download', self, filename=filename, _external=True)
+
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the attachment.
 
