@@ -90,8 +90,6 @@
 </div>
 <script type="text/javascript">
     $("#manageMaterial").click(function(){
-        IndicoUI.Dialogs.Material.editor('${SubContrib.getConference().getOwner().getId()}', '${SubContrib.getConference().getId()}',
-            '${SubContrib.getSession().getId() if SubContrib.getSession() else ""}','${SubContrib.getParent().getId()}','${SubContrib.getId()}',
-                ${jsonEncode(SubContrib.getAccessController().isProtected())}, ${jsonEncode(SubContrib.getMaterialRegistry().getMaterialList(SubContrib.getConference()))}, ${'Indico.Urls.UploadAction.subcontribution'}, true);
-     });
+        openAttachmentManager(${SubContrib.getLocator() | n,j});
+    });
 </script>

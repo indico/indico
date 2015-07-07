@@ -148,10 +148,7 @@ ${ actions }
 
 
     $("#manageMaterials").click(function(){
-      IndicoUI.Dialogs.Material.editor(${conf.getOwner().getId() |n,j}, ${conf.getId() |n,j}, '','','',
-                                       ${conf.getAccessController().isProtected() |n,j},
-                                       ${conf.getMaterialRegistry().getMaterialList(conf) |n,j},
-                                       ${'Indico.Urls.UploadAction.conference'}, true);
+        openAttachmentManager(${conf.getLocator() | n,j});
     });
 
 % endif

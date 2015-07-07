@@ -160,11 +160,7 @@
     });
 
     $("#manageMaterial").click(function(){
-      IndicoUI.Dialogs.Material.editor(${session.getConference().getOwner().getId() |n,j},
-                                       ${session.getConference().getId() |n,j}, ${session.getId() |n,j},'','',
-                                       ${session.getAccessController().isProtected() |n,j},
-                                       ${session.getMaterialRegistry().getMaterialList(session.getConference()) |n,j},
-                                       ${'Indico.Urls.UploadAction.session'}, true);
+        openAttachmentManager(${session.getLocator() | n,j});
     });
     $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
   });

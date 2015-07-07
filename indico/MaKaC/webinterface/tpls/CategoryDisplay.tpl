@@ -241,10 +241,8 @@ $(document).ready(function(){
     <script type="text/javascript">
         $(document).ready(function(){
             $("#manageMaterial").click(function(){
-                    IndicoUI.Dialogs.Material.editor('${categ.getId()}', null, null, null, null,
-                            ${jsonEncode(categ.getAccessController().isProtected())}, ${jsonEncode(categ.getMaterialRegistry().getMaterialList(categ))},
-                            ${'Indico.Urls.UploadAction.category'}, true);
-                 });
+                openAttachmentManager(${categ.getLocator() | n,j});
+            });
 
             $('.toolbar .i-button').qtip({
                 position: {
