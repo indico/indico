@@ -32,12 +32,6 @@ class AttachmentsMixin(WPJinjaMixin):
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
-    def getJSFiles(self):
-        return self.base_wp.getJSFiles(self) + self._asset_env['dropzone_js'].urls()
-
-    def getCSSFiles(self):
-        return self.base_wp.getCSSFiles(self) + self._asset_env['dropzone_css'].urls()
-
 
 class EventObjectAttachmentsMixin(AttachmentsMixin):
     def _getPageContent(self, params):
