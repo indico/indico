@@ -19,6 +19,7 @@ from __future__ import absolute_import
 import os
 import re
 import traceback
+import uuid
 
 from babel.numbers import format_currency, get_currency_name
 from flask import send_from_directory, request, _app_ctx_stack
@@ -168,6 +169,7 @@ def setup_jinja(app):
     app.add_template_global(get_currency_name)
     app.add_template_global(url_for_login)
     app.add_template_global(url_for_logout)
+    app.add_template_global(lambda: unicode(uuid.uuid4()), 'uuid')
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
