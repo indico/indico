@@ -85,7 +85,7 @@ class AttachmentImporter(Importer):
         # disable onupdate for attachment lastmod timestamp
         # see https://bitbucket.org/zzzeek/sqlalchemy/issue/3471/ why it's needed
         Attachment.__table__.columns.modified_dt.onupdate = None
-        self.janitor_user = User.get_one(Config.getInstance().getJanitorUserId())
+        self.janitor_user_id = User.get_one(Config.getInstance().getJanitorUserId()).id
         with patch_default_group_provider(self.default_group_provider):
             self.migrate_category_attachments()
             self.migrate_event_attachments()
@@ -200,7 +200,7 @@ class AttachmentImporter(Importer):
         modified_dt = (getattr(material, '_modificationDS', None) or getattr(base_object, 'startDate', None) or
                        getattr(base_object, '_modificationDS', None) or now_utc())
         data = {'folder': folder,
-                'user': self.janitor_user,
+                'user_id': self.janitor_user_id,
                 'title': convert_to_unicode(resource.name).strip() or folder.title,
                 'description': convert_to_unicode(resource.description),
                 'modified_dt': modified_dt}
@@ -219,7 +219,7 @@ class AttachmentImporter(Importer):
                                  event_id=base_object.id)
                 return None
             filename = secure_filename(convert_to_unicode(resource.fileName)) or 'attachment'
-            data['file'] = AttachmentFile(user=self.janitor_user, created_dt=modified_dt, filename=filename,
+            data['file'] = AttachmentFile(user_id=self.janitor_user_id, created_dt=modified_dt, filename=filename,
                                           content_type=mimetypes.guess_type(filename)[0] or 'application/octet-stream',
                                           size=size, storage_backend=storage_backend, storage_file_id=storage_path)
         attachment = Attachment(**data)
