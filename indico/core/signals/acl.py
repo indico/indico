@@ -19,6 +19,7 @@ from blinker import Namespace
 _signals = Namespace()
 
 
+# legacy
 access_granted = _signals.signal('access-granted', """
 Called when a principal in an `AccessController` is granted access. The `sender`
 is the `AccessController`; the `principal` is passed as a kwarg.
@@ -37,4 +38,21 @@ is the `AccessController`; the `principal` is passed as a kwarg.
 modification_revoked = _signals.signal('modification-revoked', """
 Called when a principal in an `AccessController` is revoked modification access. The `sender`
 is the `AccessController`; the `principal` is passed as a kwarg.
+""")
+
+
+# new
+can_access = _signals.signal('can-access', """
+Called when `ProtectionMixin.can_access` is used to determine if a
+user can access something or not.
+
+The `sender` is the type of the object that's using the mixin.  The
+actual instance is passed as `obj`.  The `user`, `acl_attr`,
+`legacy_method` and `allow_admin` arguments of `can_access` are passed
+as kwargs with the same name.
+
+If the signal returns ``True`` or ``False``, the access check succeeds
+or fails without any further checks.  If multiple subscribers to the
+signal return contradictory results, ``False`` wins and access is
+denied.
 """)

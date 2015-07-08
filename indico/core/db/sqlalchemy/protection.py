@@ -19,9 +19,11 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db import db
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.user import iter_acl
 from MaKaC.accessControl import AccessWrapper
@@ -88,11 +90,19 @@ class ProtectionMixin(object):
                               the protection from a legacy object.
         :param allow_admin: If admin users should always have access
         """
+
+        # Trigger signals for protection overrides
+        rv = values_from_signal(signals.acl.can_access.send(type(self), obj=self, user=user, acl_attr=acl_attr,
+                                                            legacy_method=legacy_method, allow_admin=allow_admin),
+                                single_value=True)
+        if rv:
+            # in case of contradictory results (shouldn't happen at all)
+            # we stay on the safe side and deny access
+            return all(rv)
+
+        # Usually admins can access everything, so no need for checks
         if allow_admin and user and user.is_admin:
             return True
-
-        # TODO send a signal that allows to override the result of this function
-        # e.g. to give full access to "harvester ips"
 
         if self.protection_mode == ProtectionMode.public:
             # if it's public we completely ignore the parent protection
