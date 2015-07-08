@@ -1149,21 +1149,3 @@ class WMTimeTableCustomizePDF(wcomponents.WTemplated):
         url.addParam("view", self._view)
         vars["getPDFURL"]=quoteattr(str(url))
         return vars
-
-
-######################## Get file package ######################
-class WPMDisplayFullMaterialPackage(WPMeetingDisplay, conferences.WPDisplayFullMaterialPackage):
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-        # An hack to make sure that the background is the same as the header
-        self._extraCSS.append("body { background: #424242; } ")
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"dark":True}
-        return wc.getHTML(p)
-
-    def _getBody(self, params):
-        html = """<div class="evaluationForm">%s</div>"""
-        return html%conferences.WPDisplayFullMaterialPackage._getBody(self, params)

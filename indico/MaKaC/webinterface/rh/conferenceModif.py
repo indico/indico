@@ -3153,46 +3153,6 @@ class RHAbstractBookToogleShowIds( RHConfModifCFABase ):
         self._conf.getBOAConfig().setShowIds(not self._conf.getBOAConfig().getShowIds())
         self._redirect( urlHandlers.UHConfModAbstractBook.getURL( self._conf ) )
 
-class RHFullMaterialPackage(RHConferenceModifBase):
-    _uh=urlHandlers.UHConfModFullMaterialPackage
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        p = conferences.WPFullMaterialPackage(self,self._target)
-        return p.display()
-
-
-class RHFullMaterialPackagePerform(RHConferenceModifBase):
-    _uh=urlHandlers.UHConfModFullMaterialPackagePerform
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._days=self._normaliseListParam(params.get("days",[]))
-        self._mainResource = (params.get("mainResource","") != "")
-        self._fromDate = ""
-        fromDay = params.get("fromDay","")
-        fromMonth = params.get("fromMonth","")
-        fromYear = params.get("fromYear","")
-        if fromDay != "" and fromMonth != "" and fromYear != "" and \
-           fromDay != "dd" and fromMonth != "mm" and fromYear != "yyyy":
-            self._fromDate = "%s %s %s"%(fromDay, fromMonth, fromYear)
-        self._cancel = params.has_key("cancel")
-        self._materialTypes=self._normaliseListParam(params.get("materialType",[]))
-        self._sessionList = self._normaliseListParam(params.get("sessionList",[]))
-
-    def _process( self ):
-        if not self._cancel:
-            if self._materialTypes:
-                p=ConferencePacker(self._conf, self._aw)
-                path=p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(),self._sessionList)
-                if not p.getItems():
-                    raise NoReportError(_("The selected package does not contain any items."))
-                return send_file('full-material.zip', path, 'ZIP', inline=False)
-            raise NoReportError(_("You have to select at least one material type"))
-        else:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
 
 class RHModifSessionCoordRights( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfPerformDataModif

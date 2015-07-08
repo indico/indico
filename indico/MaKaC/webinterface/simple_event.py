@@ -487,21 +487,3 @@ class WPSEEvaluationInactive (WPSEEvaluationBase, evaluations.WPEvaluationInacti
 
     def _getBody(self, params):
         return evaluations.WPEvaluationInactive._getBody(self, params)
-
-
-######################## Get file package ######################
-class WPSEDisplayFullMaterialPackage(WPSimpleEventDisplay, conferences.WPDisplayFullMaterialPackage):
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-        # An hack to make sure that the background is the same as the header
-        self._extraCSS.append("body { background: #424242; } ")
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"dark":True}
-        return wc.getHTML(p)
-
-    def _getBody(self, params):
-        html = """<div class="evaluationForm">%s</div>"""
-        return html%conferences.WPDisplayFullMaterialPackage._getBody(self, params)

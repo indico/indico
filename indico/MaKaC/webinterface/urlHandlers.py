@@ -1752,14 +1752,6 @@ class UHConfModMoveContribsToSession(URLHandler):
     _endpoint = 'event_mgmt.confModifContribList-moveToSession'
 
 
-class UHConferenceDisplayMaterialPackage(URLHandler):
-    _endpoint = 'event.conferenceDisplay-matPkg'
-
-
-class UHConferenceDisplayMaterialPackagePerform(URLHandler):
-    _endpoint = 'event.conferenceDisplay-performMatPkg'
-
-
 class UHConfAbstractBook(URLHandler):
     _endpoint = 'event.conferenceDisplay-abstractBook'
 
@@ -1802,14 +1794,6 @@ class UHConfModMaterialPackage(URLHandler):
 
 class UHConfModProceedings(URLHandler):
     _endpoint = 'event_mgmt.confModifContribList-proceedings'
-
-
-class UHConfModFullMaterialPackage(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-matPkg'
-
-
-class UHConfModFullMaterialPackagePerform(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-performMatPkg'
 
 
 class UHUpdateNews(URLHandler):

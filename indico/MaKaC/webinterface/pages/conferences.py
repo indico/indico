@@ -5102,55 +5102,6 @@ class WPModAbstractBook(WPConferenceModifAbstractBase):
                        for url in self._asset_env['mathjax_js'].urls()])
 
 
-class WPFullMaterialPackage(WPConfModifToolsBase):
-
-    def _setActiveTab(self):
-        self._tabMatPackage.setActive()
-
-    def _getTabContent(self, params):
-        wc = WFullMaterialPackage(self._conf)
-        return wc.getHTML()
-
-
-class WFullMaterialPackage(wcomponents.WTemplated):
-
-    def __init__(self,conf):
-        self._conf=conf
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        if not vars.has_key("getPkgURL"):
-            vars["getPkgURL"] = quoteattr(str(urlHandlers.UHConfModFullMaterialPackagePerform.getURL(self._conf)))
-
-        #######################################
-        # Fermi timezone awareness            #
-        #######################################
-        sDate = self._conf.getSchedule().getAdjustedStartDate()
-        eDate = self._conf.getSchedule().getAdjustedEndDate()
-        #######################################
-        # Fermi timezone awareness(end)       #
-        #######################################
-        vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
-        vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
-        htmlDay = []
-        while sDate <= eDate:
-            htmlDay.append("""
-                    <tr>
-                        <td nowrap="nowrap" valign="top"><input name="days" type="checkbox" checked="checked" value="%s">%s</td>
-                    </tr>
-                  """%(format_date(sDate, format='dMMMMyyyy'), format_date(sDate, format='long') ) )
-            sDate += timedelta(days=1)
-        vars["dayList"] = "".join(htmlDay)
-        vars["sessionList"] = ""
-        if len(self._conf.getSessionList()) == 0:
-            vars["sessionList"] = "No session in this event"
-        for session in self._conf.getSessionList():
-            vars["sessionList"] += i18nformat("""
-                 <input name="sessionList" type="checkbox" value="%s" checked="checked">%s _("(last modified: %s)")<br>""") % (session.getId(),session.getTitle(), format_datetime(session.getModificationDate(), format='d MMMM yyyy H:mm'))
-
-        vars["materialTypes"] = MaterialFactoryRegistry.getAllowed(self._conf)
-        return vars
-
 # ------------------ Static web pages ------------------
 
 class WPConferenceStaticDefaultDisplayBase( WPConferenceDefaultDisplayBase ):
@@ -7150,14 +7101,6 @@ class WPConfModifRelocate(WPConferenceModifBase):
         wc=wcomponents.WSchRelocate(self._entry)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifScheduleRelocate.getURL(self._entry))), \
                 "targetDay":quoteattr(str(self._targetDay))}
-        return wc.getHTML(p)
-
-
-class WPDisplayFullMaterialPackage(WPConferenceDefaultDisplayBase):
-
-    def _getBody(self, params):
-        wc = WFullMaterialPackage(self._conf)
-        p = {"getPkgURL": urlHandlers.UHConferenceDisplayMaterialPackagePerform.getURL(self._conf)}
         return wc.getHTML(p)
 
 

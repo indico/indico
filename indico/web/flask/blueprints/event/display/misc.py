@@ -18,11 +18,6 @@ from MaKaC.webinterface.rh import conferenceDisplay
 from indico.web.flask.blueprints.event.display import event
 
 
-# Material package
-event.add_url_rule('/material/download', 'conferenceDisplay-matPkg', conferenceDisplay.RHFullMaterialPackage)
-event.add_url_rule('/material/download', 'conferenceDisplay-performMatPkg',
-                   conferenceDisplay.RHFullMaterialPackagePerform, methods=('POST',))
-
 # My conference
 event.add_url_rule('/my-conference/', 'myconference', conferenceDisplay.RHMyStuff)
 event.add_url_rule('/my-conference/contributions', 'myconference-myContributions',
