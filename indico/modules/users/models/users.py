@@ -272,6 +272,8 @@ class User(db.Model):
         avatar.user
         return avatar
 
+    as_legacy = as_avatar
+
     @property
     def external_identities(self):
         """The external identities of the user"""

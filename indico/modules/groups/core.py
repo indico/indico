@@ -87,6 +87,10 @@ class GroupProxy(object):
         # TODO: remove once groups are gone from ZODB
         raise NotImplementedError
 
+    @property
+    def as_legacy(self):
+        return self.as_legacy_group
+
     def has_member(self, user):
         """Checks if the user is a member of the group.
 
