@@ -210,7 +210,6 @@ class DeleteAttachmentMixin(SpecificAttachmentMixin):
     """Delete an attachment"""
 
     def _process(self):
-        self.attachment = Attachment.get_one(request.view_args['attachment_id'])
         self.attachment.is_deleted = True
         logger.info('Attachment {} deleted by {}'.format(self.attachment, session.user))
         signals.attachments.attachment_deleted.send(self.attachment, user=session.user)
