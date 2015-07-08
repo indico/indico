@@ -17,16 +17,14 @@
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.conference as conference
 import MaKaC.user as user
 import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.errors import FormValuesError
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
+
 
 class RHSubContribModifBase( RHModificationBaseProtected ):
 
@@ -107,27 +105,6 @@ class RHSubContributionModifData( RHSubContribModifBase ):
         self._redirect(urlHandlers.UHSubContributionModification.getURL( self._target ) )
 
 
-
-class RHMaterialsAdd(RHSubmitMaterialBase, RHSubContribModifBase):
-    _uh = urlHandlers.UHSubContribModifAddMaterials
-
-    def _checkProtection(self):
-        material, _ = self._getMaterial(forceCreate = False)
-        if self._target.canUserSubmit(self._aw.getUser()) \
-            and (not material or material.getReviewingState() < 3):
-            self._loggedIn = True
-            return
-        RHSubmitMaterialBase._checkProtection(self)
-
-    def __init__(self):
-        RHSubContribModifBase.__init__(self)
-        RHSubmitMaterialBase.__init__(self)
-
-    def _checkParams(self, params):
-        RHSubContribModifBase._checkParams(self, params)
-        RHSubmitMaterialBase._checkParams(self, params)
-
-
 class RHSubContributionDeletion( RHSubContributionTools ):
     _uh = urlHandlers.UHSubContributionDelete
 
@@ -152,22 +129,3 @@ class RHSubContributionDeletion( RHSubContributionTools ):
         else:
             p = subContributions.WPSubContributionDeletion( self, self._target )
             return p.display(**self._getRequestParams())
-
-
-class RHMaterials(RHSubContribModifBase):
-    _uh = urlHandlers.UHSubContribModifMaterials
-
-    def _checkParams(self, params):
-        RHSubContribModifBase._checkParams(self, params)
-        #if not hasattr(self, "_rhSubmitMaterial"):
-        #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        #self._rhSubmitMaterial._checkParams(params)
-
-    def _process( self ):
-        if self._target.getOwner().getOwner().isClosed():
-            p = subContributions.WPSubContributionModificationClosed( self, self._target )
-            return p.display()
-
-        p = subContributions.WPSubContributionModifMaterials( self, self._target )
-        return p.display(**self._getRequestParams())
-

@@ -94,10 +94,6 @@ with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/modify/save',
                             'subContributionModification-modifData', subContribMod.RHSubContributionModifData,
                             methods=('POST',))
-    event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/material/',
-                            'subContributionModification-materials', subContribMod.RHMaterials, methods=('GET', 'POST'))
-    event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/material/add',
-                            'subContributionModification-materialsAdd', subContribMod.RHMaterialsAdd, methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/tools/', 'subContributionTools',
                             subContribMod.RHSubContributionTools)
     event_mgmt.add_url_rule('/contribution/<contribId>/subcontribution/<subContId>/tools/delete',
