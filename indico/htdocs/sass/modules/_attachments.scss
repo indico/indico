@@ -269,10 +269,16 @@
             }
         }
     }
-    .folder .dropdown .attachment {
-        max-width: 250px;
-        &.is-protected {
-            color: $red;
+    .folder .dropdown {
+        & > li {
+            padding: 0.1em 0.2em !important;
+
+            .attachment {
+                max-width: 250px;
+                &.is-protected {
+                    color: $red;
+                }
+            }
         }
     }
 }
