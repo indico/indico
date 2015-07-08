@@ -42,9 +42,6 @@ def _convert_data(event, value):
 
 
 class EventLogImporter(Importer):
-    def __init__(self, **kwargs):
-        super(EventLogImporter, self).__init__(**kwargs)
-
     def has_data(self):
         return bool(EventLogEntry.query.count())
 

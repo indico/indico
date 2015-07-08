@@ -21,7 +21,6 @@ from operator import attrgetter
 import click
 
 from indico.core.db import db
-from indico.core.config import Config
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
@@ -33,6 +32,7 @@ from indico_zodbimport.util import get_archived_file
 class EventNoteImporter(Importer):
     def __init__(self, **kwargs):
         self.archive_dirs = kwargs.pop('archive_dir')
+        self.janitor_user_id = kwargs.pop('janitor_user_id')
         super(EventNoteImporter, self).__init__(**kwargs)
 
     @staticmethod
@@ -41,6 +41,7 @@ class EventNoteImporter(Importer):
                                help="The base path where materials are stored (ArchiveDir in indico.conf). "
                                     "When used multiple times, the dirs are checked in order until a file is "
                                     "found.")(command)
+        command = click.option('--janitor-user-id', type=int, required=True, help="The ID of the Janitor user")(command)
         return command
 
     def has_data(self):
@@ -52,7 +53,8 @@ class EventNoteImporter(Importer):
     def migrate_event_notes(self):
         self.print_step('migrating event notes')
 
-        janitor_user = User.get_one(Config.getInstance().getJanitorUserId())
+        janitor_user = User.get_one(self.janitor_user_id)
+        self.print_msg('Using janitor user {}'.format(janitor_user), always=True)
         for event, obj, minutes, special_prot in committing_iterator(self._iter_minutes()):
             if special_prot:
                 self.print_warning(

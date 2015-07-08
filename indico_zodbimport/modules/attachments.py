@@ -28,7 +28,6 @@ import click
 from werkzeug.utils import secure_filename
 
 from indico.core.db import db
-from indico.core.config import Config
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType, AttachmentFile
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -82,6 +81,7 @@ class ProtectionTarget(object):
 
 class AttachmentImporter(Importer):
     def __init__(self, **kwargs):
+        self.janitor_user_id = kwargs.pop('janitor_user_id')
         self.storage_backend = kwargs.pop('storage_backend')
         self.symlink_backend = kwargs.pop('symlink_backend')
         self.archive_dirs = kwargs.pop('archive_dir')
@@ -97,6 +97,7 @@ class AttachmentImporter(Importer):
 
     @staticmethod
     def decorate_command(command):
+        command = click.option('--janitor-user-id', type=int, required=True, help="The ID of the Janitor user")(command)
         command = click.option('--storage-backend', required=True,
                                help="The name of the storage backend used for attachments.")(command)
         command = click.option('--archive-dir', required=True, multiple=True,
@@ -125,7 +126,9 @@ class AttachmentImporter(Importer):
         # disable onupdate for attachment lastmod timestamp
         # see https://bitbucket.org/zzzeek/sqlalchemy/issue/3471/ why it's needed
         Attachment.__table__.columns.modified_dt.onupdate = None
-        self.janitor_user_id = User.get_one(Config.getInstance().getJanitorUserId()).id
+        janitor_user = User.get_one(self.janitor_user_id)
+        self.print_msg('Using janitor user {}'.format(janitor_user), always=True)
+        self.janitor_user_id = janitor_user.id
         self.todo = OrderedDict([
             (AttachmentFolder, []),
             (AttachmentFolderPrincipal, []),
