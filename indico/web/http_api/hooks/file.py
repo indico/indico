@@ -15,15 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 # indico imports
-from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
 
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.events.api import EventBaseHook
 from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-
-# legacy imports
-from MaKaC.conference import LocalFile
 
 
 @HTTPAPIHook.register
@@ -36,50 +33,29 @@ class FileHook(EventBaseHook):
     DEFAULT_DETAIL = 'bin'
     VALID_FORMATS = ('bin',)
     GUEST_ALLOWED = True
-    RE = r'(?P<event>[\w\s]+)(/session/(?P<session>[\w\s]+))?(/contrib/(?P<contrib>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?/material/(?P<material>[^/]+)/(?P<res>[\w\s]+)'
+    RE = (r'(?P<event>[\w\s]+)(/session/(?P<session>[\w\s]+))?'
+          r'(/contrib/(?P<contrib>[\w\s]+))?(/subcontrib/(?P<subcontrib>[\w\s]+))?'
+          r'/material/(?P<material>[^/]+)/(?P<res>\d+)')
     NO_CACHE = True
 
     def _getParams(self):
         super(FileHook, self)._getParams()
 
-        self._event = self._pathParams['event']
-        self._session = self._pathParams['session']
-        self._contrib = self._pathParams['contrib']
-        self._subcontrib = self._pathParams['subcontrib']
-        self._material = self._pathParams['material']
-        self._res = self._pathParams['res']
+        self._attachment = Attachment.get(int(self._pathParams['res']))
 
-        self._params = {
-            'confId': self._event,
-            'sessionId': self._session,
-            'contribId': self._contrib,
-            'subContId': self._subcontrib,
-            'materialId': self._material,
-            'resId': self._res
-        }
-
-        import MaKaC.webinterface.locators as locators
-        l = locators.WebLocator()
-        try:
-            l.setResource(self._params)
-            self._file = l.getObject()
-        except (KeyError, AttributeError):
+        if not self._attachment:
             raise HTTPAPIError("File not found", 404)
 
     def export_file(self, aw):
-        if not isinstance(self._file, LocalFile):
+        if self._attachment.type != AttachmentType.file:
             raise HTTPAPIError("Resource is not a file", 404)
 
-        return {
-            "fname": self._file.getFileName(),
-            "last_modified": self._file.getCreationDate(),
-            "size": self._file.getSize(),
-            "ftype": self._file.getFileType(),
-            "fpath": self._file.getFilePath()
-        }
+        return self._attachment.file.send()
 
     def _hasAccess(self, aw):
-        return self._file.canAccess(aw)
+        avatar = aw.getUser()
+        user = avatar.user if avatar else None
+        return self._attachment.can_access(user)
 
 
 class FileSerializer(Serializer):
@@ -88,7 +64,7 @@ class FileSerializer(Serializer):
     schemaless = False
 
     def _execute(self, fdata):
-        return send_file(fdata['fname'], fdata['fpath'], fdata['ftype'], fdata['last_modified'])
+        return fdata
 
     def set_headers(self, response):
         # Usually the serializer would set the mime type on the ResponseUtil. however, this would trigger
