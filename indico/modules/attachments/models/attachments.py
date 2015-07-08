@@ -193,7 +193,7 @@ class Attachment(ProtectionMixin, db.Model):
     @property
     def absolute_download_url(self):
         """The absolte download url for the attachment"""
-        return self.get_download_url(external=True)
+        return self.get_download_url(absolute=True)
 
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the attachment.

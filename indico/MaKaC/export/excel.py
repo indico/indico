@@ -407,11 +407,11 @@ class ContributionsListToExcel:
             resource_list = []
 
             for attachment in contrib.attached_items.get('files', []):
-                resource_list.append(attachment.get_download_url(_external=True))
+                resource_list.append(attachment.absolute_download_url)
 
             for folder in contrib.attached_items.get('folders', []):
                 for attachment in folder.attachments:
-                    resource_list.append(attachment.get_download_url(_external=True))
+                    resource_list.append(attachment.absolute_download_url)
 
             excelGen.addValue("\n".join(resource_list))
             excelGen.newLine()
