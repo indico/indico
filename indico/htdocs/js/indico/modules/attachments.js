@@ -14,10 +14,11 @@
         }
 
         editor
-            .on('click', '.tree .expandable > .actions > a', function(evt) {
-                evt.stopPropagation();
-            })
-            .on('click', '.tree .expandable', function() {
+            .on('click', '.tree .expandable', function(e) {
+                if ($(e.target).closest('.actions').length) {
+                    // ignore if it comes from inside the action panel
+                    return;
+                }
                 $(this)
                     .toggleClass('collapsed')
                     .next('.sub-tree')
