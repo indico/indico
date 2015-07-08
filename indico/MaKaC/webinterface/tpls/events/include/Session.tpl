@@ -58,7 +58,7 @@
     </table>
 
     % if item.note:
-        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes) }
+        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes, can_edit=item.canModify(user)) }
     % endif
 
     % if len(item.getSchedule().getEntries()) > 0:

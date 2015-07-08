@@ -1,4 +1,4 @@
-{% macro render_note(note, hidden=true, for_event=none, can_edit=false) %}
+{% macro render_note(note, hidden=true, can_edit=false, for_event=none) %}
     {% if for_event %}
         <div id="event-note-section">
             {{ _render_note_box(note=note, event=for_event, hidden=hidden, can_edit=can_edit) }}
@@ -6,7 +6,7 @@
     {% elif note %}
         <div class="note-area-wrapper">
             <div class="note-area {{ _togglable_classes(hidden) }}">
-                {{ _render_note_box(note=note) }}
+                {{ _render_note_box(note=note, can_edit=can_edit) }}
             </div>
         </div>
     {% endif %}
@@ -50,19 +50,17 @@
     {% if note %}
         <div class="note-actions {% if event %}{{ _togglable_classes(hidden) }}{% endif %}">
             {% if event %}
-                <a href="#" class="js-show-note-toggle">
-                    {% trans %}Hide{% endtrans %}
-                </a>
+                <a href="#" class="js-show-note-toggle">{% trans %}Hide{% endtrans %}</a>
             {% endif %}
             <a href="{{ url_for('event_notes.view', note) }}" target="_blank"
-                       class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
-            {% if event and can_edit %}
+               class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
+            {% if can_edit %}
                 <a href="#" class="icon-edit js-note-editor" title="{% trans %}Edit minutes{% endtrans %}"
                    data-href="{{ url_for('event_notes.edit', note) }}"></a>
                 <a href="#" class="icon-remove" title="{% trans %}Delete minutes{% endtrans %}"
                    data-href="{{ url_for('event_notes.delete', note) }}" data-method="POST"
                    data-title="{% trans %}Delete minutes?{% endtrans %}"
-                   data-confirm="{% trans %}Do you want to delete the minutes of this event{% endtrans %}"></a>
+                   data-confirm="{% trans %}Do you want to delete the attached minutes?{% endtrans %}"></a>
             {% endif %}
         </div>
     {% endif %}

@@ -61,7 +61,7 @@
             % endif
 
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if 'minutesLink' in info and getItemType(item) != 'Conference':
+            % if note_item.note is None and 'minutesLink' in info and getItemType(item) != 'Conference':
                 menuOptions['editMinutes'] = {
                     action: function(m) {
                         ajaxDialog({
@@ -77,27 +77,8 @@
                         m.close();
                         return false;
                     },
-                    display: ${ note_item.note is not None | n,j } ? $T('Edit minutes') : $T('Add minutes')
+                    display: $T('Add minutes')
                 };
-                % if note_item.note:
-                    menuOptions['deleteMinutes'] = {
-                        action: function(m) {
-                            confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {
-                                $.ajax({
-                                    url: ${ url_for('event_notes.delete', note_item) | n,j },
-                                    method: 'POST',
-                                    error: handleAjaxError,
-                                    success: function() {
-                                        location.reload();
-                                    }
-                                });
-                            });
-                            m.close();
-                            return false;
-                        },
-                        display: $T('Delete minutes')
-                    };
-                % endif
             % endif
 
             % if 'materialLink' in info:
