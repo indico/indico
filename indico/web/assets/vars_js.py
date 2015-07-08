@@ -83,7 +83,6 @@ def generate_global_file(config):
                 'contribution': urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router,
                 'session': urlHandlers.UHSessionModifAddMaterials.getURL(_ignore_static=True).js_router,
                 'conference': urlHandlers.UHConfModifAddMaterials.getURL(_ignore_static=True).js_router,
-                'category': urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router
             },
             'AttachmentManager': url_rule_to_js('attachments.management'),
 

@@ -389,7 +389,6 @@ class Category(CommonObjectBase):
         self.name = ""
         self.description = ""
         self.subcategories = {}
-        self.materials = {}
         self.conferences = OOTreeSet()
         self._numConferences = 0
         self.owner = None
@@ -402,9 +401,6 @@ class Category(CommonObjectBase):
         self._statistics = {"events": None, "contributions": None, "resources": None,
                             "updated": None}
         self._icon = None
-        self.materials = {}
-        #self._materials = {}
-        #self.material ={}
         self._tasksAllowed = False
         self._tasks = {}
         self._taskIdGenerator = 0
@@ -414,7 +410,6 @@ class Category(CommonObjectBase):
         self._tasksCommentators = []
         self._taskAccessList = []
         self._timezone = ""
-        self.__materialGenerator = Counter()
         self._notifyCreationList = ""
 
     def __cmp__(self, other):
@@ -566,83 +561,6 @@ class Category(CommonObjectBase):
         except AttributeError:
             self.poster = None
         return self.poster
-
-    def addMaterial(self, newMat):
-        try:
-            newMat.setId(str(self.__materialGenerator.newCount()))
-        except:
-            self.__materialGenerator = Counter()
-            newMat.setId(self.__materialGenerator.newCount())
-        newMat.setOwner(self)
-        self.materials[newMat.getId()] = newMat
-        self.notifyModification()
-
-    def removeMaterial(self, mat):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[mat.getId()]
-            self.notifyModification()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-            return "done: %s" % mat.getId()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-            return "done: %s" % mat.getId()
-        return "not done: %s" % mat.getId()
-
-    def recoverMaterial(self, recMat):
-    # Id must already be set in recMat.
-        recMat.setOwner(self)
-        self.materials[recMat.getId()] = recMat
-        recMat.recover()
-        self.notifyModification()
-
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import CategoryMFRegistry
-        return CategoryMFRegistry
-
-    def getMaterialById(self, matId):
-        if matId.lower() == 'paper':
-            return self.getPaper()
-        elif matId.lower() == 'slides':
-            return self.getSlides()
-        elif matId.lower() == 'video':
-            return self.getVideo()
-        elif matId.lower() == 'poster':
-            return self.getPoster()
-        elif self.materials.has_key(matId):
-            return self.materials[matId]
-        return None
-
-    def getMaterialList(self):
-        try:
-            return self.materials.values()
-        except:
-            self.materials = {}
-            return self.materials.values()
-
-    def getAllMaterialList(self):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append(self.getPaper())
-        if self.getSlides():
-            l.append(self.getSlides())
-        if self.getVideo():
-            l.append(self.getVideo())
-        if self.getPoster():
-            l.append(self.getPoster())
-        return l
 
     def getTaskList(self):
         try:

@@ -40,10 +40,6 @@ category_mgmt.add_url_rule('/events', 'categoryModification-actionConferences', 
                            methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/subcategories', 'categoryModification-actionSubCategs',
                            categoryMod.RHCategoryActionSubCategs, methods=('GET', 'POST'))
-# Files
-category_mgmt.add_url_rule('/files', 'categoryFiles', categoryMod.RHCategoryFiles)
-category_mgmt.add_url_rule('/files/add', 'categoryFiles-addMaterial', categoryMod.RHAddMaterial, methods=('POST',))
-
 # Protection
 category_mgmt.add_url_rule('/access', 'categoryAC', categoryMod.RHCategoryAC)
 category_mgmt.add_url_rule('/access/visibility', 'categoryAC-setVisibility', categoryMod.RHCategorySetVisibility,

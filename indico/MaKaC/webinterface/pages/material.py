@@ -145,8 +145,6 @@ class WMaterialDisplay(wcomponents.WTemplated):
             vars["uploadAction"] = 'Indico.Urls.UploadAction.session'
         elif self._material.getConference():
             vars["uploadAction"] = 'Indico.Urls.UploadAction.conference'
-        else:
-            vars["uploadAction"] = 'Indico.Urls.UploadAction.category'
 
         return vars
 

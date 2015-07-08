@@ -26,7 +26,6 @@ from MaKaC.common.utils import sortCategoryByTitle, validMail
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
-from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
@@ -175,25 +174,6 @@ class RHCategoryTasks( RHCategModifBase ):
     def _process( self ):
         p = category.WPCategModifTasks( self, self._target )
         return p.display()
-
-class RHCategoryFiles( RHCategModifBase ):
-    _uh = urlHandlers.UHCategModifFiles
-
-    def _process( self ):
-        p = category.WPCategoryModifExistingMaterials( self, self._target )
-        return p.display()
-
-
-class RHAddMaterial(RHSubmitMaterialBase, RHCategModifBase):
-    _uh = urlHandlers.UHCategoryAddMaterial
-
-    def __init__(self):
-        RHCategModifBase.__init__(self)
-        RHSubmitMaterialBase.__init__(self)
-
-    def _checkParams(self, params):
-        RHCategModifBase._checkParams(self, params)
-        RHSubmitMaterialBase._checkParams(self, params)
 
 
 class RHCategoryTasksAction( RHCategModifBase ):

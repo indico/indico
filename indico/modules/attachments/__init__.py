@@ -51,7 +51,7 @@ def _extend_event_management_menu(event, **kwargs):
 @signals.category.management_sidemenu.connect
 def _extend_category_management_menu(category, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'attachments', SideMenuItem(_('Attachments'), url_for('attachments.management', category))
+    return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', category))
 
 
 @signals.event_management.clone.connect

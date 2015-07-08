@@ -1143,9 +1143,7 @@ class UHMaterialModification(URLHandler):
 
         owner = material.getOwner()
         # return handler depending on parent type
-        if isinstance(owner, conference.Category):
-            handler = UHCategModifFiles
-        elif isinstance(owner, conference.Conference):
+        if isinstance(owner, conference.Conference):
             handler = UHConfModifShowMaterials
         elif isinstance(owner, conference.Session):
             handler = UHSessionModifMaterials
@@ -1173,10 +1171,6 @@ class UHCategoryModification(URLHandler):
     @classmethod
     def getActionURL(cls):
         return ''
-
-
-class UHCategoryAddMaterial(URLHandler):
-    _endpoint = 'category_mgmt.categoryFiles-addMaterial'
 
 
 class UHCategoryActionSubCategs(URLHandler):
@@ -1209,10 +1203,6 @@ class UHCategoryDeletion(URLHandler):
 
 class UHCategModifTasks(URLHandler):
     _endpoint = 'category_mgmt.categoryTasks'
-
-
-class UHCategModifFiles(URLHandler):
-    _endpoint = 'category_mgmt.categoryFiles'
 
 
 class UHCategModifTasksAction(URLHandler):

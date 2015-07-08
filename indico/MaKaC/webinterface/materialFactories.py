@@ -415,13 +415,6 @@ class MaterialFactoryRegistry:
 
 
 
-class CategoryMFRegistry(MaterialFactoryRegistry):
-
-    @classmethod
-    def getAllowed(cls, target):
-        return cls._allowedMaterials['category']
-
-
 class ConfMFRegistry(MaterialFactoryRegistry):
     pass
 

@@ -81,13 +81,6 @@ class WCategoryDisplay(WICalExportBase):
         self._wfReg = wfReg
         self._timezone = timezone(tz)
 
-    def _getMaterials(self):
-        l = []
-        for mat in sorted(self._target.getAllMaterialList()):
-            if mat.canView(self._aw):
-                l.append(mat)
-        return l
-
     def _getResourceName(self, resource):
         if isinstance(resource, conference.Link):
             return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() \
@@ -111,9 +104,6 @@ class WCategoryDisplay(WICalExportBase):
         vars["urlICSFile"] = urlHandlers.UHCategoryToiCal.getURL(self._target)
         vars["isRootCategory"] = isRootCategory
         vars["timezone"] = self._timezone
-        vars["materials"] = self._getMaterials()
-        vars["getMaterialURL"] = lambda mat: urlHandlers.UHMaterialDisplay.getURL(mat)
-        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         subcats = self._target.subcategories
 
         confs = self._target.conferences
@@ -170,9 +160,6 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         self._wfReg = wfReg
         tzUtil = DisplayTZ(self._getAW(), target)  # None,useServerTZ=1)
         self._locTZ = tzUtil.getDisplayTZ()
-
-    def getJSFiles(self):
-        return WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('MaterialEditor')
 
     def _getHeadContent(self):
         # add RSS feed
@@ -1202,10 +1189,6 @@ class WPCategoryModifBase( WPCategoryBase ):
             urlHandlers.UHCategoryModification.getURL( self._target ))
         mainSection.addItem( self._generalSettingsMenuItem)
 
-        self._filesMenuItem = wcomponents.SideMenuItem(_("Files"),
-            urlHandlers.UHCategModifFiles.getURL(self._target ))
-        mainSection.addItem( self._filesMenuItem)
-
         self._ACMenuItem = wcomponents.SideMenuItem(_("Protection"),
             urlHandlers.UHCategModifAC.getURL( self._target ))
         mainSection.addItem( self._ACMenuItem)
@@ -2006,20 +1989,4 @@ class WPCategModifTasks( WPCategoryModifBase ):
 "deleteCategoryURL": urlHandlers.UHCategoryDeletion.getURL(self._target) }
 
         return wc.getHTML( pars )
-
-class WPCategoryModifExistingMaterials( WPCategoryModifBase ):
-
-    _userData = ['favorite-user-list', 'favorite-user-ids']
-
-    def getJSFiles(self):
-        return WPCategoryModifBase.getJSFiles(self) + \
-               self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
-
-    def _getPageContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
-        return wc.getHTML( pars )
-
-    def _setActiveSideMenuItem( self ):
-        self._filesMenuItem.setActive()
 
