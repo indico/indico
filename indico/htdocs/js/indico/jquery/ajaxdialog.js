@@ -62,6 +62,7 @@
         }, options);
 
         var popup = null;
+        var customData = null;
 
         $.ajax({
             type: options.method,
@@ -97,6 +98,9 @@
             };
             popup.postDraw = function() {
                 ajaxifyForms();
+                popup.canvas.on('ajaxDialog:setData', function(e, data) {
+                    customData = data;
+                });
                 injectJS(dialogData.js);
                 _.defer(function() {
                     popup.canvas.data('ui-dialog')._focusTabbable();
@@ -108,7 +112,7 @@
         function closeDialog(callbackData, submitted) {
             var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
             confirmDeferred.then(function() {
-                var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData);
+                var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData, customData);
                 if (onCloseResult === false) {
                     return;
                 }

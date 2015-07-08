@@ -7,7 +7,13 @@
 
 
     global.setupAttachmentEditor = function setupAttachmentEditor() {
-        $('.attachment-editor')
+        var editor = $('.attachment-editor');
+
+        function flagChanged() {
+            editor.trigger('ajaxDialog:setData', [true]);
+        }
+
+        editor
             .on('click', '.tree .expandable > .actions > a', function(evt) {
                 evt.stopPropagation();
             })
@@ -27,6 +33,7 @@
                     onClose: function(data) {
                         if (data) {
                             $('#attachments-container').html(data.attachment_list);
+                            flagChanged();
                         }
                     }
                 });
@@ -43,6 +50,7 @@
                     success: function(data) {
                         $('#attachments-container').html(data.attachment_list);
                         handleFlashes(data);
+                        flagChanged();
                     }
                 });
             });
@@ -53,8 +61,10 @@
             url: build_url(Indico.Urls.AttachmentManager, itemLocator),
             title: $T.gettext("Manage material"),
             confirmCloseUnsaved: false,
-            onClose: function() {
-                location.reload();
+            onClose: function(callbackData, customData) {
+                if (customData) {
+                    location.reload();
+                }
             }
         });
     };
