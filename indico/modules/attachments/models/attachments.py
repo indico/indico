@@ -29,6 +29,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMixin
 from indico.core.storage import get_storage
 from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.util import can_manage_attachments
+from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii
@@ -172,8 +173,11 @@ class Attachment(ProtectionMixin, db.Model):
 
     @property
     def download_url(self):
-        filename = self.file.filename if self.type == AttachmentType.file else 'go'
-        return url_for('attachments.download', self, filename=filename)
+        if ContextManager.get('offlineMode'):
+            return _offline_download_url(self)
+        else:
+            filename = self.file.filename if self.type == AttachmentType.file else 'go'
+            return url_for('attachments.download', self, filename=filename, _external=False)
 
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the attachment.
@@ -337,3 +341,23 @@ def _add_file_to_relationship(target, value, *unused):
         raise ValueError('file cannot be set to None')
     with db.session.no_autoflush:
         target.all_files.append(value)
+
+
+def _offline_download_url(attachment):
+    # Legacy offline download link generation
+    from MaKaC import conference
+
+    if attachment.type == AttachmentType.file:
+        if isinstance(attachment.folder.linked_object, conference.Conference):
+            path = "events/conference"
+        elif isinstance(attachment.folder.linked_object, conference.Session):
+            path = "agenda/%s-session" % attachment.folder.linked_object.getId()
+        elif isinstance(attachment.folder.linked_object, conference.Contribution):
+            path = "agenda/%s-contribution" % attachment.folder.linked_object.getId()
+        elif isinstance(attachment.folder.linked_object, conference.SubContribution):
+            path = "agenda/%s-subcontribution" % attachment.folder.linked_object.getId()
+        else:
+            return ''
+        return posixpath.join("files", path, str(attachment.id) + "-" + attachment.file.filename)
+    else:
+        return attachment.link_url

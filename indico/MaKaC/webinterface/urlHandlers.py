@@ -1487,30 +1487,6 @@ class UHSubContributionModification(URLHandler):
 class UHFileAccess(URLHandler):
     _endpoint = 'files.getFile-access'
 
-    @staticmethod
-    def generateFileStaticLink(target):
-        from MaKaC import conference
-
-        params = target.getLocator()
-        owner = target.getOwner().getOwner()
-
-        if isinstance(owner, conference.Conference):
-            path = "events/conference"
-        elif isinstance(owner, conference.Session):
-            path = "agenda/%s-session" % owner.getId()
-        elif isinstance(owner, conference.Contribution):
-            path = "agenda/%s-contribution" % owner.getId()
-        elif isinstance(owner, conference.SubContribution):
-            path = "agenda/%s-subcontribution" % owner.getId()
-        else:
-            return None
-        url = os.path.join("files", path, params["materialId"], params["resId"] + "-" + target.getName())
-        return url
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return cls.generateFileStaticLink(target) or cls.getURL(target, _ignore_static=True, **params)
-
 
 class UHVideoWmvAccess(URLHandler):
     _endpoint = 'files.getFile-wmv'

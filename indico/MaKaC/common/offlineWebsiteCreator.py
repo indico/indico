@@ -17,13 +17,13 @@
 import itertools
 import errno
 import os
+import posixpath
 import re
 import requests
 import shutil
 from bs4 import BeautifulSoup
 from werkzeug.utils import secure_filename
 
-from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStaticConferenceProgram, \
@@ -33,12 +33,15 @@ from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStati
     WPStaticMaterialConfDisplayBase, WPStaticSubContributionDisplay, \
     WPStaticAuthorDisplay, WPTPLStaticConferenceDisplay, \
     WPStaticConferenceDisplay
-from indico.core.config import Config
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.common import timezoneUtils, HelperMaKaCInfo
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
     ContribsToPDF
+
+from indico.core.config import Config
+from indico.modules.attachments.models.attachments import AttachmentType
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.util.contextManager import ContextManager
 from indico.util.string import remove_tags
 from indico.web.assets import ie_compatibility
@@ -251,13 +254,13 @@ class OfflineEventCreator(object):
             self._addMaterialFrom(session, "agenda/%s-session" % session.getId())
 
     def _addMaterialFrom(self, target, categoryPath):
-        if target.getAllMaterialList():
-            for mat in target.getAllMaterialList():
-                for res in mat.getResourceList():
-                    if isinstance(res, conference.LocalFile):
-                        dstPath = os.path.join(
-                            self._mainPath, "files", categoryPath, mat.getId(), res.getId() + "-" + res.getName())
-                        self._addFileFromSrc(dstPath, res.getFilePath())
+        for folder in AttachmentFolder.get_for_linked_object(target, preload_event=True):
+            for attachment in folder.attachments:
+                if attachment.type == AttachmentType.file:
+                    dst_path = posixpath.join(self._mainPath, "files", categoryPath,
+                                              "{}-{}".format(attachment.id, attachment.file.filename))
+                    with attachment.file.get_local_path() as file_path:
+                        self._addFileFromSrc(dst_path, file_path)
 
     def _addFileFromSrc(self, dstPath, srcPath):
         if not os.path.isfile(dstPath) and os.path.isfile(srcPath):
