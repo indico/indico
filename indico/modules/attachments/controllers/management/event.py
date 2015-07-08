@@ -24,11 +24,13 @@ from indico.modules.attachments.controllers.management.base import (ManageAttach
                                                                     CreateFolderMixin, EditFolderMixin,
                                                                     DeleteFolderMixin, DeleteAttachmentMixin)
 from indico.modules.attachments.util import can_manage_attachments
+from indico.modules.attachments.controllers.event_package import MaterialsPackageMixin
 from indico.modules.attachments.views import (WPContributionAttachments, WPEventAttachments, WPSessionAttachments,
-                                              WPSubContributionAttachments)
+                                              WPSubContributionAttachments, WPMaterialsPackage)
 from indico.modules.events.util import get_object_from_args
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
@@ -97,3 +99,7 @@ class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagement
     def _checkParams(self, params):
         RHEventAttachmentManagementBase._checkParams(self, params)
         DeleteAttachmentMixin._checkParams(self)
+
+
+class RHMaterialsDownloadManagement(MaterialsPackageMixin, RHConferenceModifBase):
+    wp = WPMaterialsPackage

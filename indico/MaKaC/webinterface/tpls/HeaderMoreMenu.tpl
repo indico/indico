@@ -29,7 +29,7 @@ moreMenu.observeClick(function(e) {
     menuItems["exportPDF"] = {action: '${ pdfURL }', display: "${ _('Export to PDF') }"};
     % endif
     % if showDLMaterial:
-    menuItems["downloadMaterial"] = {action: '${ urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self_._rh._conf) }', display: "${ _('Download material') }"};
+    menuItems["downloadMaterial"] = {action: '${ url_for("attachments.package", self_._rh._conf) }', display: "${ _('Download material') }"};
     % endif
     % if showLayout:
     menuItems["layout"] = {action: new PopupMenu(layoutMenuItems, [moreMenu, menu], ${"'darkPopupList'" if dark else "null"}, null, null, null, '${ SelectedStyle }'), display: "${ _('Layout') }"};

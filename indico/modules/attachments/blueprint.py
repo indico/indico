@@ -20,7 +20,9 @@ import itertools
 
 from indico.modules.attachments.controllers.compat import compat_folder, compat_attachment
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
-from indico.modules.attachments.controllers.display.event import RHDownloadEventAttachment, RHListEventAttachmentFolder
+from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
+                                                                  RHListEventAttachmentFolder,
+                                                                  RHMaterialsDownloadDisplay)
 from indico.modules.attachments.controllers.management.category import (RHManageCategoryAttachments,
                                                                         RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
@@ -36,7 +38,8 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHCreateEventFolder,
                                                                      RHEditEventFolder,
                                                                      RHDeleteEventFolder,
-                                                                     RHDeleteEventAttachment)
+                                                                     RHDeleteEventAttachment,
+                                                                     RHMaterialsDownloadManagement)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
@@ -88,6 +91,11 @@ for object_type, prefixes in items:
                          _dispatch(RHDeleteEventAttachment, RHDeleteCategoryAttachment),
                          methods=('DELETE',), defaults={'object_type': object_type})
 
+_bp.add_url_rule('/event/<confId>/attachments/package', 'package',
+                 RHMaterialsDownloadDisplay, methods=('GET', 'POST'))
+
+_bp.add_url_rule('/event/<confId>/manage/tools/attachments-package', 'package_management',
+                 RHMaterialsDownloadManagement, methods=('GET', 'POST'))
 
 items = itertools.chain(event_object_url_prefixes.iteritems(), [('category', [''])])
 for object_type, prefixes in items:

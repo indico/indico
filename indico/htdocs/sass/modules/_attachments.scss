@@ -277,11 +277,10 @@
     }
 }
 
-.folder-main {
+.folder-main, div.main > .attachments-package {
     max-width: 1024px;
     margin: auto;
     margin-top: 2em;
     padding: 2em;
-
     background-color: $light-gray;
 }

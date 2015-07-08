@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryModifBase
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import (WPConferenceModifBase, WPConfModifToolsBase,
+                                                  WPConferenceDefaultDisplayBase)
 from MaKaC.webinterface.pages.sessions import WPSessionModifBase
 from MaKaC.webinterface.pages.contributions import WPContributionModifBase
 from MaKaC.webinterface.pages.subContributions import WPSubContributionModifBase
@@ -71,6 +72,30 @@ class WPSubContributionAttachments(EventObjectAttachmentsMixin, WPSubContributio
 
 
 class WPEventFolderDisplay(WPMeetingDisplay, WPJinjaMixin):
+    template_prefix = 'attachments/'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+
+class WPMaterialsPackage(WPConfModifToolsBase, WPJinjaMixin):
+    template_prefix = 'attachments/'
+
+    def _setActiveTab(self):
+        self._tabMatPackage.setActive()
+
+    def _getTabContent(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+
+class WPEventMaterialsDownloadDisplay(WPConferenceDefaultDisplayBase, WPJinjaMixin):
+    template_prefix = 'attachments/'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+
+class WPSimpleMaterialsDownloadDisplay(WPMeetingDisplay, WPJinjaMixin):
     template_prefix = 'attachments/'
 
     def _getBody(self, params):

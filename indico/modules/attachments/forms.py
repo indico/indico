@@ -17,17 +17,18 @@
 from __future__ import unicode_literals
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import PrincipalListField
+from indico.web.forms.fields import PrincipalListField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
@@ -96,3 +97,13 @@ class AttachmentFolderForm(IndicoForm):
     @generated_data
     def protection_mode(self):
         return ProtectionMode.protected if self.protected.data else ProtectionMode.inheriting
+
+
+class MaterialsPackageForm(IndicoForm):
+
+    added_since = DateField(_('Added Since'), [Optional()], parse_kwargs={'dayfirst': True},
+                            description=_('Include only attachments uploaded after this date'))
+    sessions = IndicoSelectMultipleCheckboxField(_('Sessions'),
+                                                 description=_('Include attachments from selected sessions'))
+    contributions = IndicoSelectMultipleCheckboxField(_('Contributions'),
+                                                      description=_('Include attachments from selected contributions'))

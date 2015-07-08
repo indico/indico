@@ -262,10 +262,9 @@ class WPDecorated(WPBase):
         wc = wcomponents.WFooter(isFrontPage=self._isFrontPage())
         return wc.getHTML({ "subArea": self._getSiteArea() })
 
-    def _applyDecoration( self, body ):
-        """
-        """
-        return "<div class=\"wrapper\"><div class=\"main\">%s%s</div></div>%s"%( self._getHeader(), body, self._getFooter() )
+    def _applyDecoration(self, body):
+        return '<div class="wrapper"><div class="main">{}{}</div></div>{}'.format(self._getHeader(), str(body),
+                                                                                  self._getFooter())
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
