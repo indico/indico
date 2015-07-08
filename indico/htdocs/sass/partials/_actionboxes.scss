@@ -33,6 +33,9 @@
         > .toolbar {
             margin: 0;
             padding 0;
+            &.right {
+                padding-left: 0.5em;
+            }
         }
 
         + .section:before {
