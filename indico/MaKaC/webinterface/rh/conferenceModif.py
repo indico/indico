@@ -2551,7 +2551,6 @@ class ContribFilterCrit(filters.FilterCriteria):
         contribFilters.TypeFilterField.getId():contribFilters.TypeFilterField, \
         contribFilters.StatusFilterField.getId():contribFilters.StatusFilterField, \
         contribFilters.TrackFilterField.getId():contribFilters.TrackFilterField, \
-        contribFilters.MaterialFilterField.getId():contribFilters.MaterialFilterField, \
         contribFilters.SessionFilterField.getId():contribFilters.SessionFilterField }
 
 

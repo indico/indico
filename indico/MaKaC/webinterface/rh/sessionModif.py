@@ -437,7 +437,6 @@ class ContribFilterCrit(filters.FilterCriteria):
         contribFilters.TypeFilterField.getId():contribFilters.TypeFilterField, \
         contribFilters.StatusFilterField.getId():contribFilters.StatusFilterField, \
         contribFilters.AuthorFilterField.getId():contribFilters.AuthorFilterField, \
-        contribFilters.MaterialFilterField.getId():contribFilters.MaterialFilterField, \
         contribFilters.TrackFilterField.getId():contribFilters.TrackFilterField }
 
 class ContribSortingCrit(filters.SortingCriteria):

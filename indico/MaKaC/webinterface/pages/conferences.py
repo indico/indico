@@ -4166,9 +4166,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             ('Tracks', {"title": _("Tracks"),
                         "options": self._getTrackItemsHTML()}),
             ('Status', {"title": _("Status"),
-                       "options": self._getStatusItemsHTML()}),
-            ('Materials', {"title": _("Materials"),
-                        "options": self._getMaterialItemsHTML()})
+                       "options": self._getStatusItemsHTML()})
         ]
 
         extraInfo = i18nformat("""<table align="center" cellspacing="10" width="100%%">
