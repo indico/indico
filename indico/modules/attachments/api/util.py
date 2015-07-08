@@ -47,7 +47,7 @@ def _build_folder_legacy_api_data(folder):
         '_type': folder.legacy_mapping.material_id.title() if folder.legacy_mapping is not None else 'Material',
         '_fossil': 'materialMetadata',
         'title': folder.title,
-        'id': folder.legacy_mapping.material_id if folder.legacy_mapping is not None else str(folder.id),
+        'id': str(folder.id),
         'resources': resources
     }
 
