@@ -1,7 +1,7 @@
-{% macro render_note(note, hidden=true, for_event=none) %}
+{% macro render_note(note, hidden=true, for_event=none, can_edit=false) %}
     {% if for_event %}
         <div id="event-note-section">
-            {{ _render_note_box(note=note, event=for_event, hidden=hidden) }}
+            {{ _render_note_box(note=note, event=for_event, hidden=hidden, can_edit=can_edit) }}
         </div>
     {% elif note %}
         <div class="note-area-wrapper">
@@ -23,11 +23,11 @@
 {% endmacro %}
 
 
-{% macro _render_note_box(note, event=none, hidden=false) %}
+{% macro _render_note_box(note, event=none, hidden=false, can_edit=false) %}
     <div class="padded-box">
         <div class="padded-box-pad icon-file"></div>
         <div class="padded-box-content">
-            {{ _render_note_actions(note=note, event=event, hidden=hidden) }}
+            {{ _render_note_actions(note=note, event=event, hidden=hidden, can_edit=can_edit) }}
             {% if note %}
                 <div class="note-text {% if event %}{{ _togglable_classes(hidden=hidden) }}{% endif %}">
                     {{ note.html|safe }}
@@ -38,7 +38,7 @@
                         <a href="#" class="js-show-note-toggle">{% trans %}Show them{% endtrans %}</a>.
                     </div>
                 {% endif %}
-            {% elif event %}
+            {% elif event and can_edit %}
                 {{ _render_event_note_placeholder(event) }}
             {% endif %}
         </div>
@@ -46,7 +46,7 @@
 {% endmacro %}
 
 
-{% macro _render_note_actions(note, event=none, hidden=true) %}
+{% macro _render_note_actions(note, event=none, hidden=true, can_edit=false) %}
     {% if note %}
         <div class="note-actions {% if event %}{{ _togglable_classes(hidden) }}{% endif %}">
             {% if event %}
@@ -56,7 +56,7 @@
             {% endif %}
             <a href="{{ url_for('event_notes.view', note) }}" target="_blank"
                        class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
-            {% if event %}
+            {% if event and can_edit %}
                 <a href="#" class="icon-edit js-note-editor" title="{% trans %}Edit minutes{% endtrans %}"
                    data-href="{{ url_for('event_notes.edit', note) }}"></a>
                 <a href="#" class="icon-remove" title="{% trans %}Delete minutes{% endtrans %}"

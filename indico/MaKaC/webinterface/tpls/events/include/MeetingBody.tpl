@@ -14,7 +14,7 @@ var videoServiceInfo = {};
 </div>
 
 % if conf.note or conf.canModify(user):
-    ${ render_template('events/notes/note_event.html', note=conf.note, hidden=not minutes, for_event=conf) }
+    ${ render_template('events/notes/note_event.html', note=conf.note, hidden=not minutes, for_event=conf, can_edit=conf.canModify(user)) }
 % endif
 
 <div class="meetingEventBody">
