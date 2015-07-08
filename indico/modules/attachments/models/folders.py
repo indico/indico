@@ -33,8 +33,6 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
 
-from MaKaC.conference import Category
-
 
 class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     __tablename__ = 'folders'
@@ -146,6 +144,8 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
                               This must not be used when ``linked_object``
                               is a category.
         """
+        from MaKaC.conference import Category
+
         try:
             return g.event_attachments.get(linked_object, [])
         except AttributeError:

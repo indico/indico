@@ -16,13 +16,15 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, has_request_context, request
 
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.modules.attachments.logging import connect_log_signals
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 
 
 logger = Logger.get('attachments')
@@ -56,3 +58,15 @@ def _extend_category_management_menu(category, **kwargs):
 def _get_attachment_cloner(event, **kwargs):
     from indico.modules.attachments.clone import AttachmentCloner
     return AttachmentCloner(event)
+
+
+@signals.acl.can_access.connect_via(Attachment)
+@signals.acl.can_access.connect_via(AttachmentFolder)
+def _can_access(cls, obj, user, **kwargs):
+    """Grant full access to attachments/folders to certain IPs"""
+    from MaKaC.common import HelperMaKaCInfo
+    if not has_request_context():
+        return
+    full_access_ips = HelperMaKaCInfo.getMaKaCInfoInstance().getIPBasedACLMgr().get_full_access_acl()
+    if request.remote_addr in full_access_ips:
+        return True
