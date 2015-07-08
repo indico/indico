@@ -70,7 +70,7 @@ div.eventInfoBox {
     padding: 10px;
 }
 
-h1 {
+.eventWrapper h1 {
     font-size: 18pt;
     color: white;
     font-weight: normal;
@@ -78,7 +78,7 @@ h1 {
     margin-bottom: 10px;
 }
 
-h2 {
+.eventWrapper h2 {
     font-size: 11pt;
     color: white;
     font-weight: normal;
