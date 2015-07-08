@@ -195,10 +195,9 @@ class _CelerySAWrapper(object):
     __slots__ = ('identity_key',)
 
     def __init__(self, obj):
-        state = inspect(obj)
-        if not state.persistent:
+        self.identity_key = inspect(obj).identity_key
+        if self.identity_key is None:
             raise ValueError('Cannot pass non-persistent object to Celery. Did you forget to flush?')
-        self.identity_key = state.identity_key
 
     @property
     def object(self):
