@@ -43,8 +43,11 @@ def _build_folder_legacy_api_data(folder):
     if not resources:  # Skipping empty folders for legacy API
         return None
 
+    type_ = (folder.legacy_mapping.material_id.title()
+             if folder.legacy_mapping is not None and not folder.legacy_mapping.material_id.isdigit()
+             else 'Material')
     return {
-        '_type': folder.legacy_mapping.material_id.title() if folder.legacy_mapping is not None else 'Material',
+        '_type': type_,
         '_fossil': 'materialMetadata',
         'title': folder.title,
         'id': str(folder.id),
