@@ -152,7 +152,7 @@
                         return;
                     }
 
-                    handleFlashes(data, options.clearFlashes);
+                    handleFlashes(data, options.clearFlashes, options.trigger ? $(options.trigger) : null);
 
                     if (data.close_dialog || data.success) {
                         closeDialog(data, true);

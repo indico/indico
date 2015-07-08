@@ -31,13 +31,24 @@
         return dfd.promise();
     };
 
-    global.handleFlashes = function handleFlashes(data, clear) {
+    global.handleFlashes = function handleFlashes(data, clear, element) {
+        var container;
+        if (!element || !element.length) {
+            container = $('#flashed-messages');
+        } else if (element.hasClass('flashed-messages')) {
+            container = element;
+        } else {
+            container = element.closest('.ui-dialog-content').find('.flashed-messages');
+        }
+        if (!container.length) {
+            container = $('#flashed-messages');
+        }
         if (clear === undefined || clear) {
-            $('#flashed-messages').empty();
+            container.empty();
         }
         if (data.flashed_messages) {
             var flashed = $(data.flashed_messages.trim()).children();
-            $('#flashed-messages').append(flashed);
+            container.append(flashed);
         }
     };
 })(window);
