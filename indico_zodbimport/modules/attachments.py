@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import mimetypes
 import os
 import sys
+from collections import OrderedDict
 from itertools import chain
 from operator import attrgetter
 from uuid import uuid4
@@ -28,6 +29,7 @@ from werkzeug.utils import secure_filename
 
 from indico.core.db import db
 from indico.core.config import Config
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType, AttachmentFile
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
@@ -35,9 +37,47 @@ from indico.modules.attachments.models.principals import AttachmentPrincipal, At
 from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import now_utc
-from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import protection_from_ac, patch_default_group_provider
+
+
+def _link_repr(folder):
+    _all_columns = {'category_id', 'event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
+    info = [('link_type', folder['link_type'].name if folder['link_type'] is not None else 'None')]
+    info.extend((key, folder[key]) for key in _all_columns if folder[key] is not None)
+    return ', '.join('{}={}'.format(key, value) for key, value in info)
+
+
+def _get_pg_id(col):
+    table = col.class_.__table__.fullname
+    return db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table, col.name))).one()[0]
+
+
+def _sa_to_dict(obj):
+    return {k: v for k, v in obj.__dict__.iteritems() if k[0] != '_'}
+
+
+class ProtectionTarget(object):
+    def __init__(self):
+        self.acl = set()
+        self.protection_mode = None
+
+    def _make_principal(self, principal, **data):
+        if principal.is_group:
+            if principal.is_local:
+                data['type'] = PrincipalType.local_group
+                data['local_group_id'] = principal.group.id
+            else:
+                data['type'] = PrincipalType.multipass_group
+                data['multipass_group_provider'] = principal.provider
+                data['multipass_group_name'] = principal.name
+        else:
+            data['type'] = PrincipalType.user
+            data['user_id'] = principal.id
+        return data
+
+    def make_principal_rows(self, **data):
+        return [self._make_principal(principal, **data) for principal in self.acl]
 
 
 class AttachmentImporter(Importer):
@@ -86,10 +126,46 @@ class AttachmentImporter(Importer):
         # see https://bitbucket.org/zzzeek/sqlalchemy/issue/3471/ why it's needed
         Attachment.__table__.columns.modified_dt.onupdate = None
         self.janitor_user_id = User.get_one(Config.getInstance().getJanitorUserId()).id
+        self.todo = OrderedDict([
+            (AttachmentFolder, []),
+            (AttachmentFolderPrincipal, []),
+            (Attachment, []),
+            (AttachmentPrincipal, []),
+            (AttachmentFile, []),
+            (LegacyAttachmentFolderMapping, []),
+            (LegacyAttachmentMapping, [])
+        ])
+        self.ids = {
+            AttachmentFolder: _get_pg_id(AttachmentFolder.id),
+            Attachment: _get_pg_id(Attachment.id),
+            AttachmentFile: _get_pg_id(AttachmentFile.id),
+        }
         with patch_default_group_provider(self.default_group_provider):
             self.migrate_category_attachments()
             self.migrate_event_attachments()
+        self.print_step('fixing id sequences')
+        self.fix_sequences('attachments')
         self.update_merged_ids()
+
+    def _get_id(self, mapper):
+        id_ = self.ids[mapper]
+        self.ids[mapper] += 1
+        return id_
+
+    def process_todo(self):
+        for mapper, mappings in self.todo.iteritems():
+            db.session.bulk_insert_mappings(mapper, mappings)
+            del mappings[:]
+        db.session.commit()
+
+    def _committing_iterator(self, iterable):
+        for i, data in enumerate(iterable, 1):
+            yield data
+            if i % 10000 == 0:
+                self.process_todo()
+                db.session.commit()
+        self.process_todo()
+        db.session.commit()
 
     def update_merged_ids(self):
         self.print_step('updating merged users in attachment acls')
@@ -109,51 +185,57 @@ class AttachmentImporter(Importer):
     def migrate_category_attachments(self):
         self.print_step('migrating category attachments')
 
-        for category, material, resources in committing_iterator(self._iter_category_materials(), n=1000):
+        for category, material, resources in self._committing_iterator(self._iter_category_materials()):
             folder = self._folder_from_material(material, category)
             if not self.quiet:
-                self.print_success(cformat('%{cyan}[{}]').format(folder.title),
-                                   event_id=category.id)
+                self.print_success(cformat('%{cyan}[{}]').format(folder['title']), event_id=category.id)
             for resource in resources:
                 attachment = self._attachment_from_resource(folder, material, resource, category)
                 if attachment is None:
                     continue
-                db.session.add(attachment)
                 if not self.quiet:
-                    if attachment.type == AttachmentType.link:
-                        self.print_success(cformat('- %{cyan}{}').format(attachment.title), event_id=category.id)
+                    if attachment['type'] == AttachmentType.link:
+                        self.print_success(cformat('- %{cyan}{}').format(attachment['title']), event_id=category.id)
                     else:
-                        self.print_success(cformat('- %{cyan!}{}').format(attachment.title), event_id=category.id)
+                        self.print_success(cformat('- %{cyan!}{}').format(attachment['title']), event_id=category.id)
 
     def migrate_event_attachments(self):
         self.print_step('migrating event attachments')
 
-        for event, obj, material, resources in committing_iterator(self._iter_event_materials(), n=1000):
+        for event, obj, material, resources in self._committing_iterator(self._iter_event_materials()):
             folder = self._folder_from_material(material, obj)
-            db.session.add(LegacyAttachmentFolderMapping(linked_object=obj, material_id=material.id, folder=folder))
+            lm = LegacyAttachmentFolderMapping(linked_object=obj, material_id=material.id, folder_id=folder['id'])
+            self.todo[LegacyAttachmentFolderMapping].append(_sa_to_dict(lm))
             if not self.quiet:
-                self.print_success(cformat('%{cyan}[{}]%{reset} %{blue!}({})').format(folder.title, folder.link_repr),
+                self.print_success(cformat('%{cyan}[{}]%{reset} %{blue!}({})').format(folder['title'],
+                                                                                      _link_repr(folder)),
                                    event_id=event.id)
             for resource in resources:
                 attachment = self._attachment_from_resource(folder, material, resource, event)
                 if attachment is None:
                     continue
-                db.session.add(LegacyAttachmentMapping(linked_object=obj, material_id=material.id,
-                                                       resource_id=resource.id, attachment=attachment))
+                lm = LegacyAttachmentMapping(linked_object=obj, material_id=material.id, resource_id=resource.id,
+                                             attachment_id=attachment['id'])
+                self.todo[LegacyAttachmentMapping].append(_sa_to_dict(lm))
                 if not self.quiet:
-                    if attachment.type == AttachmentType.link:
-                        self.print_success(cformat('- %{cyan}{}').format(attachment.title), event_id=event.id)
+                    if attachment['type'] == AttachmentType.link:
+                        self.print_success(cformat('- %{cyan}{}').format(attachment['title']), event_id=event.id)
                     else:
-                        self.print_success(cformat('- %{cyan!}{}').format(attachment.title), event_id=event.id)
+                        self.print_success(cformat('- %{cyan!}{}').format(attachment['title']), event_id=event.id)
 
     def _folder_from_material(self, material, linked_object):
-        folder = AttachmentFolder(title=convert_to_unicode(material.title).strip() or 'Material',
-                                  description=convert_to_unicode(material.description),
-                                  linked_object=linked_object,
-                                  is_always_visible=not getattr(material._Material__ac, '_hideFromUnauthorizedUsers',
-                                                                False))
-        protection_from_ac(folder, material._Material__ac)
-        db.session.add(folder)
+        folder_obj = AttachmentFolder(id=self._get_id(AttachmentFolder),
+                                      title=convert_to_unicode(material.title).strip() or 'Material',
+                                      description=convert_to_unicode(material.description),
+                                      linked_object=linked_object,
+                                      is_always_visible=not getattr(material._Material__ac,
+                                                                    '_hideFromUnauthorizedUsers', False))
+        folder = _sa_to_dict(folder_obj)
+        self.todo[AttachmentFolder].append(folder)
+        tmp = ProtectionTarget()
+        protection_from_ac(tmp, material._Material__ac)
+        self.todo[AttachmentFolderPrincipal] += tmp.make_principal_rows(folder_id=folder['id'])
+        folder['protection_mode'] = tmp.protection_mode
         return folder
 
     def _get_file_info(self, resource):
@@ -199,9 +281,10 @@ class AttachmentImporter(Importer):
     def _attachment_from_resource(self, folder, material, resource, base_object=None):
         modified_dt = (getattr(material, '_modificationDS', None) or getattr(base_object, 'startDate', None) or
                        getattr(base_object, '_modificationDS', None) or now_utc())
-        data = {'folder': folder,
+        data = {'id': self._get_id(Attachment),
+                'folder_id': folder['id'],
                 'user_id': self.janitor_user_id,
-                'title': convert_to_unicode(resource.name).strip() or folder.title,
+                'title': convert_to_unicode(resource.name).strip() or folder['title'],
                 'description': convert_to_unicode(resource.description),
                 'modified_dt': modified_dt}
         if resource.__class__.__name__ == 'Link':
@@ -219,13 +302,22 @@ class AttachmentImporter(Importer):
                                  event_id=base_object.id)
                 return None
             filename = secure_filename(convert_to_unicode(resource.fileName)) or 'attachment'
-            data['file'] = AttachmentFile(user_id=self.janitor_user_id, created_dt=modified_dt, filename=filename,
-                                          content_type=mimetypes.guess_type(filename)[0] or 'application/octet-stream',
-                                          size=size, storage_backend=storage_backend, storage_file_id=storage_path)
-        attachment = Attachment(**data)
-        protection_from_ac(attachment, resource._Resource__ac)
-        db.session.add(attachment)
-        return attachment
+            file_data = {'id': self._get_id(AttachmentFile),
+                         'attachment_id': data['id'],
+                         'user_id': self.janitor_user_id,
+                         'created_dt': modified_dt,
+                         'filename': filename,
+                         'content_type': mimetypes.guess_type(filename)[0] or 'application/octet-stream',
+                         'size': size,
+                         'storage_backend': storage_backend,
+                         'storage_file_id': storage_path}
+            self.todo[AttachmentFile].append(file_data)
+        tmp = ProtectionTarget()
+        protection_from_ac(tmp, resource._Resource__ac)
+        self.todo[AttachmentPrincipal] += tmp.make_principal_rows(attachment_id=data['id'])
+        data['protection_mode'] = tmp.protection_mode
+        self.todo[Attachment].append(data)
+        return data
 
     def _has_special_protection(self, material, resource):
         material_ac = material._Material__ac
