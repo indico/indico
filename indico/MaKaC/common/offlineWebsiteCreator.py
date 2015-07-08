@@ -332,15 +332,6 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         for session in self._conf.getSessionList():
             self._getSession(session)
 
-        # Getting material pages for conference
-        self._addConferenceMaterialDisplayPages()
-
-    def _addConferenceMaterialDisplayPages(self):
-        for mat in self._conf.getAllMaterialList():
-            if len(mat.getResourceList()) != 1:
-                html = WPStaticMaterialConfDisplayBase(self._rh, mat).display()
-                self._addPage(html, urlHandlers.UHMaterialDisplay, target=mat)
-
     def _initializeMenuItensComponents(self):
         self._menu_offline_items["programme"] = WPStaticConferenceProgram(self._rh, self._conf)
         self._menu_offline_items["timetable"] = WPStaticConferenceTimeTable(self._rh, self._conf)
