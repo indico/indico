@@ -406,10 +406,10 @@ class ContributionsListToExcel:
 
             resource_list = []
 
-            for attachment in contrib.attached_items['files']:
+            for attachment in contrib.attached_items.get('files', []):
                 resource_list.append(attachment.get_download_url(_external=True))
 
-            for folder in contrib.attached_items['folders']:
+            for folder in contrib.attached_items.get('folders', []):
                 for attachment in folder.attachments:
                     resource_list.append(attachment.get_download_url(_external=True))
 
