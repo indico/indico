@@ -93,7 +93,8 @@ class LegacyAttachmentMapping(LinkMixin, db.Model):
     )
     attachment = db.relationship(
         'Attachment',
-        lazy=False
+        lazy=False,
+        backref=db.backref('legacy_mapping', uselist=False, lazy=True)
     )
 
     @return_ascii
