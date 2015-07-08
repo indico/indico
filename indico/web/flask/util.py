@@ -256,8 +256,7 @@ def url_for(endpoint, *targets, **values):
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
-    if ContextManager.get('offlineMode'):
-        values['_external'] = True
+    values.setdefault('_external', bool(ContextManager.get('offlineMode')))
 
     for key, value in values.iteritems():
         # Avoid =True and =False in the URL
