@@ -17,7 +17,7 @@
     <div class="group i-selection note-visibility-toggle">
         {% set hash = uuid() %}
         <input type="checkbox" id="toggle-note-{{ note.id }}-{{ hash }}" {% if not note_is_hidden %}checked{% endif %}>
-        <label for="toggle-note-{{ note.id }}-{{ hash }}" class="i-button icon-file js-show-note-toggle"
+        <label for="toggle-note-{{ note.id }}-{{ hash }}" class="i-button icon-file-text js-show-note-toggle"
                title="">{% trans %}Minutes{% endtrans %}</label>
     </div>
 {% endmacro %}
@@ -25,7 +25,7 @@
 
 {% macro _render_note_box(note, event=none, hidden=false, can_edit=false) %}
     <div class="padded-box">
-        <div class="padded-box-pad icon-file"></div>
+        <div class="padded-box-pad icon-file-text"></div>
         <div class="padded-box-content">
             {{ _render_note_actions(note=note, event=event, hidden=hidden, can_edit=can_edit) }}
             {% if note %}
