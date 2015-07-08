@@ -1526,7 +1526,7 @@ class outputGenerator(object):
     def resourceToXMLMarc21(self, res, out=None):
         if not out:
             out = self._XMLGen
-        if res.type == AttachmentType.link:
+        if res.type == AttachmentType.file:
             self.resourceFileToXMLMarc21(res, out=out)
         else:
             self.resourceLinkToXMLMarc21(res, out=out)
@@ -1560,7 +1560,7 @@ class outputGenerator(object):
 
         out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
         out.writeTag("subfield", attachment.description, [["code", "a"]])
-        out.writeTag("subfield", attachment.get_download_url(_external=True), [["code", "u"]])
+        out.writeTag("subfield", attachment.absolute_download_url, [["code", "u"]])
         out.writeTag("subfield", self._attachment_unique_id(attachment), [["code", "3"]])
         out.writeTag("subfield", "resource", [["code", "x"]])
         out.writeTag("subfield", "external", [["code", "z"]])
@@ -1575,9 +1575,9 @@ class outputGenerator(object):
         out.writeTag("subfield", attachment.description, [["code", "a"]])
         out.writeTag("subfield", attachment.file.size, [["code", "s"]])
 
-        out.writeTag("subfield", attachment.download_url, [["code", "u"]])
+        out.writeTag("subfield", attachment.absolute_download_url, [["code", "u"]])
         out.writeTag("subfield", self._attachment_unique_id(attachment), [["code", "3"]])
-        out.writeTag("subfield", attachment.file.filename, [["code", "y"]])
+        out.writeTag("subfield", attachment.title, [["code", "y"]])
         out.writeTag("subfield", "stored", [["code", "z"]])
         out.writeTag("subfield", "resource", [["code", "x"]])
         out.closeTag("datafield")
