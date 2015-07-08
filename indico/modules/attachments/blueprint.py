@@ -22,7 +22,7 @@ from indico.modules.attachments.controllers.compat import compat_folder, compat_
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
 from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
                                                                   RHListEventAttachmentFolder,
-                                                                  RHMaterialsDownloadDisplay)
+                                                                  RHPackageEventAttachmentsDisplay)
 from indico.modules.attachments.controllers.management.category import (RHManageCategoryAttachments,
                                                                         RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
@@ -39,7 +39,7 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHEditEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment,
-                                                                     RHMaterialsDownloadManagement)
+                                                                     RHPackageEventAttachmentsManagement)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
@@ -59,6 +59,7 @@ def _dispatch(event_rh, category_rh):
     return view_func
 
 
+# Management
 items = itertools.chain(event_management_object_url_prefixes.iteritems(), [('category', ['/manage'])])
 for object_type, prefixes in items:
     for prefix in prefixes:
@@ -91,12 +92,7 @@ for object_type, prefixes in items:
                          _dispatch(RHDeleteEventAttachment, RHDeleteCategoryAttachment),
                          methods=('DELETE',), defaults={'object_type': object_type})
 
-_bp.add_url_rule('/event/<confId>/attachments/package', 'package',
-                 RHMaterialsDownloadDisplay, methods=('GET', 'POST'))
-
-_bp.add_url_rule('/event/<confId>/manage/tools/attachments-package', 'package_management',
-                 RHMaterialsDownloadManagement, methods=('GET', 'POST'))
-
+# Display/download
 items = itertools.chain(event_object_url_prefixes.iteritems(), [('category', [''])])
 for object_type, prefixes in items:
     for prefix in prefixes:
@@ -115,7 +111,14 @@ for object_type, prefixes in items:
                              defaults={'object_type': object_type})
 
 
-# Setup legacy redirects for the old URLs
+# Package
+_bp.add_url_rule('/event/<confId>/attachments/package', 'package',
+                 RHPackageEventAttachmentsDisplay, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/tools/attachments-package', 'package_management',
+                 RHPackageEventAttachmentsManagement, methods=('GET', 'POST'))
+
+
+# Legacy redirects for the old URLs
 _compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<event_id>')
 compat_folder_rules = [
     '/material/<material_id>/',

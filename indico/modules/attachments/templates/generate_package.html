@@ -3,7 +3,7 @@
 <div class="i-box-group vert fixed-width attachments-package">
     <div class="i-box titled no-padding">
         <div class="i-box-header">
-            <div class="i-box-title">{%- trans %}Materials Package{% endtrans -%}</div>
+            <div class="i-box-title">{%- trans %}Material Package{% endtrans -%}</div>
         </div>
         <div class="i-box-content">
             {{ form_header(form) }}
@@ -15,7 +15,7 @@
                 {{ form_row(form.contributions) }}
             {% endif %}
             {% call form_footer(form) %}
-                <input type="submit" class='i-button big highlight'>
+                <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
             {% endcall %}
         </div>
     </div>
@@ -23,5 +23,5 @@
 
 <script>
     $('#added_since').datepicker();
-    $('input[name=sessions], input[name=contributions').prop('checked', true);
+    $('input[name=sessions], input[name=contributions]').prop('checked', true);
 </script>

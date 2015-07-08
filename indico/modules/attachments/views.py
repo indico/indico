@@ -78,7 +78,7 @@ class WPEventFolderDisplay(WPMeetingDisplay, WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPMaterialsPackage(WPConfModifToolsBase, WPJinjaMixin):
+class WPPackageEventAttachmentsManagement(WPConfModifToolsBase, WPJinjaMixin):
     template_prefix = 'attachments/'
 
     def _setActiveTab(self):
@@ -88,14 +88,14 @@ class WPMaterialsPackage(WPConfModifToolsBase, WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPEventMaterialsDownloadDisplay(WPConferenceDefaultDisplayBase, WPJinjaMixin):
+class WPPackageEventAttachmentsDisplayConference(WPConferenceDefaultDisplayBase, WPJinjaMixin):
     template_prefix = 'attachments/'
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPSimpleMaterialsDownloadDisplay(WPMeetingDisplay, WPJinjaMixin):
+class WPPackageEventAttachmentsDisplay(WPMeetingDisplay, WPJinjaMixin):
     template_prefix = 'attachments/'
 
     def _getBody(self, params):

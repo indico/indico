@@ -22,11 +22,11 @@ from werkzeug.exceptions import Forbidden
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
-from indico.modules.attachments.controllers.event_package import MaterialsPackageMixin
+from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.controllers.util import SpecificFolderMixin
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
-from indico.modules.attachments.views import (WPEventFolderDisplay, WPEventMaterialsDownloadDisplay,
-                                              WPSimpleMaterialsDownloadDisplay)
+from indico.modules.attachments.views import (WPEventFolderDisplay, WPPackageEventAttachmentsDisplayConference,
+                                              WPPackageEventAttachmentsDisplay)
 
 
 class RHDownloadEventAttachment(DownloadAttachmentMixin, RHConferenceBase):
@@ -53,11 +53,10 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
                                                     folder=self.folder, event=self._target)
 
 
-class RHMaterialsDownloadDisplay(MaterialsPackageMixin, RHConferenceBaseDisplay):
-
+class RHPackageEventAttachmentsDisplay(AttachmentPackageMixin, RHConferenceBaseDisplay):
     @property
     def wp(self):
         if self._conf.getType() == 'conference':
-            return WPEventMaterialsDownloadDisplay
+            return WPPackageEventAttachmentsDisplayConference
         else:
-            return WPSimpleMaterialsDownloadDisplay
+            return WPPackageEventAttachmentsDisplay

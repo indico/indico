@@ -25,12 +25,13 @@ from sqlalchemy import cast, Date
 from werkzeug.utils import secure_filename
 
 from indico.web.flask.util import send_file
-from indico.modules.attachments.forms import MaterialsPackageForm
+from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 
 
-class MaterialsPackageMixin:
+class AttachmentPackageMixin:
+    wp = None
 
     def _process(self):
         form = self._prepare_form()
@@ -40,7 +41,7 @@ class MaterialsPackageMixin:
         return self.wp.render_template('generate_package.html', self._conf, form=form)
 
     def _prepare_form(self):
-        form = MaterialsPackageForm()
+        form = AttachmentPackageForm()
         form.sessions.choices = self._load_session_data()
         form.contributions.choices = self._load_contribution_data()
         return form
@@ -109,4 +110,4 @@ class MaterialsPackageMixin:
                 with attachment.file.storage.get_local_path(attachment.file.storage_file_id) as filepath:
                     zip_handler.write(filepath, name)
 
-        return send_file('attachments.zip', temp_file.name, 'application/zip', inline=False)
+        return send_file('material-{}.zip'.format(self._conf.id), temp_file.name, 'application/zip', inline=False)

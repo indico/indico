@@ -99,8 +99,7 @@ class AttachmentFolderForm(IndicoForm):
         return ProtectionMode.protected if self.protected.data else ProtectionMode.inheriting
 
 
-class MaterialsPackageForm(IndicoForm):
-
+class AttachmentPackageForm(IndicoForm):
     added_since = DateField(_('Added Since'), [Optional()], parse_kwargs={'dayfirst': True},
                             description=_('Include only attachments uploaded after this date'))
     sessions = IndicoSelectMultipleCheckboxField(_('Sessions'),
