@@ -34,11 +34,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class AttachmentFormBase(IndicoForm):
-    protected = BooleanField(_("Protected"), widget=SwitchWidget(),
-                             description=_("By default, the materials will inherit the protection of the parent. "
-                                           "Checking this field will restrict all access. The protection can be "
-                                           "modified later on from the material settings."))
-
+    protected = BooleanField(_("Protected"), widget=SwitchWidget())
     folder = QuerySelectField(_("Folder"), allow_blank=True, blank_text=_("No folder selected"), get_label='title',
                               description=_("Adding materials to folders allow grouping and easier permission "
                                             "management."))
@@ -87,10 +83,7 @@ class EditAttachmentLinkForm(AttachmentLinkFormMixin, EditAttachmentFormBase):
 class AttachmentFolderForm(IndicoForm):
     title = StringField(_("Name"), [DataRequired()], description=_("The name of the folder."))
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
-    protected = BooleanField(_("Protected"), widget=SwitchWidget(),
-                             description=_("By default, the folder will inherit the protection of the event. "
-                                           "Checking this field will restrict all access. The protection can be "
-                                           "modified later on from the folder settings."))
+    protected = BooleanField(_("Protected"), widget=SwitchWidget())
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
                              groups=True, serializable=False, allow_external=True,
                              description=_("The list of users and groups with access to the folder"))

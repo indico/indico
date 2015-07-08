@@ -1,57 +1,60 @@
 <div class="form-group" id="form-group-protected">
-    <div class="form-label form-block">
-    </div>
+    <div class="form-label form-block"></div>
     <div class="form-field form-block">
+
         <div class="action-box message-only for-form self-protection-message danger">
             <div class="section">
-                <div class="icon icon-lock-center"></div>
+                <div class="icon icon-lock"></div>
                 <div class="text">
                     <div class="label">
-                        {% trans %}Custom protection: Protected{% endtrans %}
+                        {% trans %}Protected{% endtrans %}
                     </div>
                     <div>
-                        {% trans %}The access to this object is restricted, regardless of the protection scheme of the
-                        parent.{% endtrans %}
+                        {% trans -%}
+                            This object is not publicly accessible since it is set as protected.
+                        {%- endtrans %}
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="action-box message-only for-form inherited-protection-message {%- if parent.is_protected %} warning{% else %} accept{% endif %}">
             <div class="section">
-                <div class="icon icon-arrow-up"></div>
+                <div class="icon {%- if parent.is_protected %} icon-lock{% else %} icon-unlocked{% endif %}"></div>
                 <div class="text">
                     {% if parent.is_protected %}
                         <div class="label">
-                            {% trans %}Inherited protection: Protected{% endtrans %}
+                            {% trans %}Protected{% endtrans %}
                         </div>
                         <div>
                             {% trans parent_type=parent.type, parent_title = parent.title -%}
-                                The access to this object is restricted, inheriting the protection scheme from
-                                <strong>{{ parent_title }}</strong> ({{ parent_type }})
+                                This object is not publicly accessible since <strong>{{ parent_title }}</strong> ({{ parent_type }}) is protected.
                             {%- endtrans %}
                         </div>
                     {% else %}
                         <div class="label">
-                            {% trans %}Inherited protection: Public{% endtrans %}
+                            {% trans %}Public{% endtrans %}
                         </div>
                         <div>
-                            {% trans %}The access to this material is public.{% endtrans %}
+                            {% trans parent_type=parent.type, parent_title=parent.title -%}
+                                This object is publicly accessible since <strong>{{ parent_title }}</strong> ({{ parent_type }}) is not protected.
+                            {%- endtrans %}
                         </div>
                     {% endif %}
                 </div>
             </div>
         </div>
+
         <div class="action-box message-only for-form folder-protection-message warning">
             <div class="section">
-                <div class="icon icon-folder"></div>
+                <div class="icon icon-lock"></div>
                 <div class="text">
                     <div class="label">
-                        {% trans %}Inherited protection: Protected{% endtrans %}
+                        {% trans %}Protected{% endtrans %}
                     </div>
                     <div>
                         {% trans -%}
-                            The access to this object is restricted, inheriting the protection scheme from
-                            <strong class="folder-name"></strong> (Folder)
+                            This object is not publicly accessible since <strong class="folder-name"></strong> (Folder) is protected.
                         {%- endtrans %}
                     </div>
                 </div>
