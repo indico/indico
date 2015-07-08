@@ -997,12 +997,13 @@ class WCategoryStatistics(wcomponents.WTemplated):
                     stats.append(wcsl.getHTML( self._aw ))
                 else:
                     stats.append( i18nformat("""<b> _("Number of contributions"): 0</b>"""))
-                stats.append( i18nformat("""<b> _("Number of resources"): %s</b>""")%self._stats["resources"])
+                stats.append("<strong>{}</strong>: {}".format(
+                    _("Number of attached files"), self._stats.get("files", _("Not available"))))
                 vars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
                 stats.append(i18nformat("""<b> _("No statistics for the events").</b>"""))
                 stats.append(i18nformat("""<b> _("No statistics for the contributions").</b>"""))
-                stats.append(i18nformat("""<b> _("No statistics for the resources").</b>"""))
+                stats.append(i18nformat("<strong>{}</strong>".format(_("No statistics for attached files"))))
                 vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
             vars["contents"] = "<br><br>".join( stats )
         else:
