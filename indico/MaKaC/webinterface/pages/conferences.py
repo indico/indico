@@ -7152,23 +7152,6 @@ class WPConfModifRelocate(WPConferenceModifBase):
                 "targetDay":quoteattr(str(self._targetDay))}
         return wc.getHTML(p)
 
-class WPConfModifExistingMaterials( WPConferenceModifBase ):
-
-    _userData = ['favorite-user-list', 'favorite-user-ids']
-
-    def __init__(self, rh, conf):
-        WPConferenceModifBase.__init__(self, rh, conf)
-
-    def _getPageContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._conf)
-        return wc.getHTML( pars )
-
-    def _setActiveTab( self ):
-        self._tabMaterials.setActive()
-
-    def _setActiveSideMenuItem( self ):
-        self._materialMenuItem.setActive()
-
 
 class WPDisplayFullMaterialPackage(WPConferenceDefaultDisplayBase):
 

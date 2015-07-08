@@ -37,7 +37,7 @@ import MaKaC.conference as conference
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
 from indico.core.config import Config
@@ -3730,28 +3730,6 @@ class RHRelocate(RHConferenceModifBase):
                         self._conf.getSchedule().addEntry(self._schEntry, check=self._check)
         self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
-class RHMaterialsAdd(RHSubmitMaterialBase, RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifAddMaterials
-
-    def __init__(self):
-        RHConferenceModifBase.__init__(self)
-        RHSubmitMaterialBase.__init__(self)
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        RHSubmitMaterialBase._checkParams(self, params)
-
-
-class RHMaterialsShow(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifShowMaterials
-
-    def _process( self ):
-        if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        p = conferences.WPConfModifExistingMaterials( self, self._target )
-        return p.display()
 
 # ============================================================================
 # === Badges related =========================================================
