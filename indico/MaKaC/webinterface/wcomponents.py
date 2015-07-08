@@ -521,8 +521,6 @@ class WMenuConferenceHeader( WConferenceHeader ):
         urlCustPDF.addParam("showSessions", vars.get("selectedSession", "all"))
         vars["pdfURL"] = quoteattr(str(urlCustPDF))
         vars["pdfIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
-        urlMatPack = urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self._conf)
-        vars["matPackURL"] = quoteattr(str(urlMatPack))
         vars["zipIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("smallzip")))
 
         return vars

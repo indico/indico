@@ -28,7 +28,7 @@
               ${ confModif }&nbsp;
                   &nbsp;<a href=${ printURL }><img src=${ printIMG } alt="${ _("printable view (w/o menus and icons)")}" title="${ _("printable view (w/o menus and icons)")}" style="border:0px;vertical-align:middle;padding-bottom:2px"></a>\
                   &nbsp;<a href=${ pdfURL }><img src=${ pdfIMG } alt="${ _("create PDF")}" title="${ _("create PDF")}" style="border:0px;vertical-align:middle;padding-bottom:2px"></a>
-                  &nbsp;<a href=${ matPackURL }><img src=${ zipIMG } alt="${ _("get material package")}" title="${ _("get material package")}" style="border:0px;vertical-align:middle;padding-bottom:2px"></a>
+                  &nbsp;<a href=${ url_for('attachments.package_management', conf) }><img src=${ zipIMG } alt="${ _("get material package")}" title="${ _("get material package")}" style="border:0px;vertical-align:middle;padding-bottom:2px"></a>
               ${"&nbsp;|&nbsp;" if evaluation.strip()!="" else ""}
               ${ evaluation }
               </small>
