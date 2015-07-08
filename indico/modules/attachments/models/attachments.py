@@ -171,22 +171,29 @@ class Attachment(ProtectionMixin, db.Model):
     def locator(self):
         return dict(self.folder.locator, attachment_id=self.id)
 
-    def get_download_url(self, **kwargs):
+    def get_download_url(self, absolute=False):
+        """Returns the download url for the attachment.
+
+        During static site generation this returns a local URL for the
+        file or the target URL for the link.
+
+        :param absolute: If the returned URL should be absolute.
+        """
         if ContextManager.get('offlineMode'):
             return _offline_download_url(self)
         else:
             filename = self.file.filename if self.type == AttachmentType.file else 'go'
-            kwargs.setdefault('_external', False)
-            return url_for('attachments.download', self, filename=filename, **kwargs)
+            return url_for('attachments.download', self, filename=filename, _external=absolute)
 
     @property
     def download_url(self):
+        """The download url for the attachment"""
         return self.get_download_url()
 
     @property
     def absolute_download_url(self):
-        filename = self.file.filename if self.type == AttachmentType.file else 'go'
-        return url_for('attachments.download', self, filename=filename, _external=True)
+        """The absolte download url for the attachment"""
+        return self.get_download_url(external=True)
 
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the attachment.
