@@ -26,7 +26,8 @@ from MaKaC.conference import ConferenceHolder
 @HTTPAPIHook.register
 class AttachmentsExportHook(HTTPAPIHook):
     TYPES = ('attachments',)
-    RE = r'(?P<event_id>\d+)(/(?P<session_id>\d+)(/(?P<contribution_id>\d+)(/(?P<subcontribution_id>\d+))?)?)?'
+    RE = (r'(?P<event_id>\d+)'
+          r'((/session/(?P<session_id>\d+)|(/contribution/(?P<contribution_id>\d+)(/(?P<subcontribution_id>\d+))?))?)?')
     MAX_RECORDS = {}
     GUEST_ALLOWED = True
     VALID_FORMATS = ('json', 'jsonp', 'xml')
@@ -43,7 +44,7 @@ class AttachmentsExportHook(HTTPAPIHook):
                 raise HTTPAPIError("No such session", 404)
         contribution_id = self._pathParams.get('contribution_id')
         if contribution_id:
-            contribution = self._obj = session.getContributionById(contribution_id)
+            contribution = self._obj = event.getContributionById(contribution_id)
             if contribution is None:
                 raise HTTPAPIError("No such contribution", 404)
         subcontribution_id = self._pathParams.get('subcontribution_id')
