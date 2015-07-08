@@ -29,6 +29,7 @@
                 e.preventDefault();
                 var $this = $(this);
                 ajaxDialog({
+                    trigger: this,
                     url: $this.data('href'),
                     title: $this.data('title'),
                     onClose: function(data) {
@@ -50,7 +51,7 @@
                     error: handleAjaxError,
                     success: function(data) {
                         $('#attachments-container').html(data.attachment_list);
-                        handleFlashes(data);
+                        handleFlashes(data, true, editor);
                         flagChanged();
                     }
                 });
