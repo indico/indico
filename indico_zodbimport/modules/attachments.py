@@ -314,6 +314,7 @@ class AttachmentImporter(Importer):
                          'size': size,
                          'storage_backend': storage_backend,
                          'storage_file_id': storage_path}
+            data['file_id'] = file_data['id']
             self.todo[AttachmentFile].append(file_data)
         tmp = ProtectionTarget()
         protection_from_ac(tmp, resource._Resource__ac)
