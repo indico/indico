@@ -126,7 +126,7 @@ ul.topLevelSCList {
     list-style-type: none;
 }
 
-ul.topLevelSCList li {
+ul.topLevelSCList > li {
     margin-top: 1em;
 }
 
