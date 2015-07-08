@@ -23,6 +23,7 @@ from indico.web.http_api.exceptions import LimitExceededException
 from indico.web.http_api.hooks.file import FileHook
 # The following imports are NOT unused - without them these modules would never
 # be imported and thus their api hooks wouldn't be registered at all
+import indico.modules.attachments.api.hooks
 import indico.modules.events.api
 import indico.modules.events.agreements.api
 import indico.modules.events.registration.api

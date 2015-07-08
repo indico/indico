@@ -68,3 +68,43 @@ def _build_file_legacy_api_data(file_):
         data['url'] = file_.link_url
 
     return data
+
+
+def build_folder_api_data(folder):
+    avatar = ContextManager.get("currentAW").getUser()
+    user = avatar.user if avatar else None
+    if not folder.can_view(user):
+        return None
+
+    return {
+        'id': folder.id,
+        'title': folder.title,
+        'description': folder.description,
+        'attachments': filter(None, (build_file_api_data(file_) for file_ in folder.attachments))
+    }
+
+
+def build_file_api_data(file_):
+    avatar = ContextManager.get("currentAW").getUser()
+    user = avatar.user if avatar else None
+    if not file_.can_access(user):
+        return None
+
+    data = {
+        'id': file_.id,
+        'download_url': file_.absolute_download_url,
+        'title': file_.title,
+        'description': file_.description,
+        'modified_dt': file_.modified_dt.isoformat(),
+        'type': file_.type.name,
+    }
+
+    if file_.type == AttachmentType.file:
+        data['filename'] = file_.file.filename
+        data['content_type'] = file_.file.content_type
+        data['size'] = file_.file.size
+
+    elif file_.type == AttachmentType.link:
+        data['link_url'] = file_.link_url
+
+    return data
