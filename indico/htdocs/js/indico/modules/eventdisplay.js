@@ -21,10 +21,12 @@ $(function() {
         });
     });
 
-    $('.js-show-note-toggle').on('click', function() {
-        $(this).toggleClass('note-is-hidden');
+    $('.js-show-note-toggle').on('click', function(e) {
+        if ($(this).is('a')) {
+            e.preventDefault();
+        }
         // Note for event
-        var note = $(this).closest('.toolbar').siblings('.note-area-wrapper');
+        var note = $(this).closest('#event-note-section');
         // Note for other elements
         if (note.length === 0) {
             note = $(this).closest('li').children('.note-area-wrapper');

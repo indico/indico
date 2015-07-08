@@ -64,13 +64,14 @@ li > table + .note-area-wrapper {
     margin-top: 0.7em;
 }
 
-.note-area-wrapper {
 
-    .padded-box-content {
-        .permalink {
+.padded-box-content {
+    .note-actions {
+        float: right;
+
+        a {
             @include transition;
             @include transition-property(opacity);
-            float: right;
             color: darken($pastel-blue, $color-variation);
 
             &:hover {
@@ -84,12 +85,18 @@ li > table + .note-area-wrapper {
             color: $black;
         }
 
-        > :first-child:not(.permalink) {
+        > :first-child {
             margin-top: 0;
         }
 
         > :last-child {
             margin-bottom: 0;
         }
+    }
+
+    .no-note-text {
+        color: $dark-gray;
+        font-style: italic;
+        font-size: 1.1em;
     }
 }

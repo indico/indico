@@ -1,53 +1,13 @@
 {% macro render_note(note, hidden=true, for_event=none) %}
     {% if for_event %}
-        <div class="toolbar thin" style="text-align: right">
-            {{ render_event_note_buttons(event=for_event, note=note, hidden=hidden) }}
+        <div id="event-note-section">
+            {{ _render_note_box(note=note, event=for_event, hidden=hidden) }}
         </div>
-    {% endif %}
-    {% if note %}
+    {% elif note %}
         <div class="note-area-wrapper">
             <div class="note-area {{ _togglable_classes(hidden) }}">
-                <div class="padded-box">
-                    <div class="padded-box-pad icon-file"></div>
-                    <div class="padded-box-content">
-                        <a href="{{ url_for('event_notes.view', note) }}" target="_blank"
-                           class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
-                        <div class="note-text">
-                            {{ note.html|safe }}
-                        </div>
-                    </div>
-                </div>
+                {{ _render_note_box(note=note) }}
             </div>
-        </div>
-    {% endif %}
-{% endmacro %}
-
-
-{% macro render_event_note_buttons(event, note=none, hidden=true) %}
-    {% if note %}
-        {{ render_toggle_button(note=note, note_is_hidden=hidden) }}
-        <div class="group">
-            <button class="i-button icon-edit js-note-editor" title="{% trans %}Edit{% endtrans %}"
-                    data-href="{{ url_for('event_notes.edit', event) }}"></button>
-        </div>
-        <div class="group">
-            <button class="i-button icon-remove js-confirm-warning" title="{% trans %}Delete{% endtrans %}"
-                    data-href="{{ url_for('event_notes.delete', event) }}" data-method="POST"
-                    data-title="{% trans %}Delete minutes?{% endtrans %}"
-                    data-confirm="{% trans %}Do you want to delete the minutes of this event{% endtrans %}"></button>
-        </div>
-    {% else %}
-        <div class="group">
-            <button class="i-button highlight icon-plus js-note-editor"
-                    data-href="{{ url_for('event_notes.edit', event) }}">
-                {% trans %}Add minutes{% endtrans %}
-            </button>
-        </div>
-        <div class="group">
-            <button class="i-button icon-stack js-note-editor"
-                    data-href="{{ url_for('event_notes.compile', event) }}">
-                {% trans %}Compile minutes{% endtrans %}
-            </button>
         </div>
     {% endif %}
 {% endmacro %}
@@ -59,6 +19,68 @@
         <input type="checkbox" id="toggle-note-{{ note.id }}-{{ hash }}" {% if not note_is_hidden %}checked{% endif %}>
         <label for="toggle-note-{{ note.id }}-{{ hash }}" class="i-button icon-file js-show-note-toggle"
                title="">{% trans %}Minutes{% endtrans %}</label>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_note_box(note, event=none, hidden=false) %}
+    <div class="padded-box">
+        <div class="padded-box-pad icon-file"></div>
+        <div class="padded-box-content">
+            {{ _render_note_actions(note=note, event=event, hidden=hidden) }}
+            {% if note %}
+                <div class="note-text {% if event %}{{ _togglable_classes(hidden=hidden) }}{% endif %}">
+                    {{ note.html|safe }}
+                </div>
+                {% if event %}
+                    <div class="no-note-text {{ _togglable_classes(hidden=not hidden) }}">
+                        {% trans %}There are minutes attached to this event.{% endtrans %}
+                        <a href="#" class="js-show-note-toggle">{% trans %}Show them{% endtrans %}</a>.
+                    </div>
+                {% endif %}
+            {% elif event %}
+                {{ _render_event_note_placeholder(event) }}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_note_actions(note, event=none, hidden=true) %}
+    {% if note %}
+        <div class="note-actions {% if event %}{{ _togglable_classes(hidden) }}{% endif %}">
+            {% if event %}
+                <a href="#" class="js-show-note-toggle">
+                    {% trans %}Hide{% endtrans %}
+                </a>
+            {% endif %}
+            <a href="{{ url_for('event_notes.view', note) }}" target="_blank"
+                       class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
+            {% if event %}
+                <a href="#" class="icon-edit js-note-editor" title="{% trans %}Edit minutes{% endtrans %}"
+                   data-href="{{ url_for('event_notes.edit', note) }}"></a>
+                <a href="#" class="icon-remove" title="{% trans %}Delete minutes{% endtrans %}"
+                   data-href="{{ url_for('event_notes.delete', note) }}" data-method="POST"
+                   data-title="{% trans %}Delete minutes?{% endtrans %}"
+                   data-confirm="{% trans %}Do you want to delete the minutes of this event{% endtrans %}"></a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro _render_event_note_placeholder(event) %}
+    <div class="no-note-text">
+        {% trans %}There are no minutes attached to this event.{% endtrans %}
+        <a href="#" class="js-note-editor"
+           data-href="{{ url_for('event_notes.edit', event) }}">
+            {% trans %}Write them{% endtrans %}
+        </a>
+        {% trans %}or{% endtrans %}
+        <a href="#" class="js-note-editor"
+           data-href="{{ url_for('event_notes.compile', event) }}">
+            {%- trans %}compile existing{% endtrans -%}
+        </a>.
     </div>
 {% endmacro %}
 
