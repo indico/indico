@@ -40,10 +40,6 @@ def uniqueId(obj):
     elif isinstance(obj, conference.SessionSlot):
         ret = "%s.s%s.%s" % (obj.getConference().getId(),
                              obj.getSession().getId(), ret)
-    elif isinstance(obj, conference.Material):
-        ret = "%sm%s" % (uniqueId(obj.getOwner()), ret)
-    elif isinstance(obj, conference.Resource):
-        ret = "%s.%s" % (uniqueId(obj.getOwner()), ret)
     elif isinstance(obj, EventNote):
         ret = '{}.n{}'.format(uniqueId(obj.linked_object), ret)
 

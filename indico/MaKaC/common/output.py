@@ -18,6 +18,7 @@ from datetime import datetime
 from flask import request
 from hashlib import md5
 from pytz import timezone
+from sqlalchemy.orm import joinedload
 
 import string
 from indico.util.json import dumps
@@ -39,6 +40,8 @@ from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from indico.core.config import Config
+from indico.modules.attachments.models.attachments import AttachmentType, Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
@@ -197,13 +200,13 @@ class outputGenerator(object):
                                       ["ind2", " "]])
 
         # define which part of the record the list concerns
-        if objId != None:
+        if objId is not None:
             out.writeTag("subfield", "INDICO.%s" % \
                          objId, [["code", "3"]])
 
         out.closeTag("datafield")
 
-    def _generateAccessList(self, obj, out, specifyId=True):
+    def _generateAccessList(self, obj=None, out=None, acl=None, objId=None):
         """
         Generate a comprehensive access list showing all users and e-groups who
         may access this object, taking into account the permissions and access
@@ -212,16 +215,15 @@ class outputGenerator(object):
         or SubContribution object.
         """
 
-        allowed_users = obj.getRecursiveAllowedToAccessList()
+        if acl is None:
+            acl = obj.getRecursiveAllowedToAccessList()
 
         # Populate two lists holding email/group strings instead of
         # Avatar/Group objects
         allowed_logins = set()
         allowed_groups = []
 
-        objId = uniqueId(obj) if specifyId else None
-
-        for user_obj in allowed_users:
+        for user_obj in acl:
             if isinstance(user_obj, AvatarUserWrapper):
                 # user names for all non-local accounts
                 for (provider, identifier) in user_obj.user.iter_identifiers():
@@ -1132,11 +1134,8 @@ class outputGenerator(object):
 
 
         #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        matList = conf.getAllMaterialList()
-        for mat in matList:
-            if mat.canView(self.__aw):
-                if includeMaterial:
-                    self.materialToXMLMarc21(mat, out=out)
+        if includeMaterial:
+            self.materialToXMLMarc21(conf, out=out)
         #out.closeTag("datafield")
 
         if conf.note:
@@ -1178,7 +1177,7 @@ class outputGenerator(object):
         self._generateLinkField(urlHandlers.UHConferenceDisplay, conf,
                                 "Event details", out)
 
-        self._generateAccessList(conf, out, specifyId=True)
+        self._generateAccessList(conf, out, objId=uniqueId(conf))
 
     def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
@@ -1325,11 +1324,8 @@ class outputGenerator(object):
             out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
             out.closeTag("datafield")
 
-        matList = cont.getAllMaterialList()
-        for mat in matList:
-            if mat.canView(self.__aw):
-                if includeMaterial:
-                    self.materialToXMLMarc21(mat, out=out)
+        if includeMaterial:
+            self.materialToXMLMarc21(cont, out=out)
 
         if cont.note:
             self.noteToXMLMarc21(cont.note, out=out)
@@ -1352,7 +1348,7 @@ class outputGenerator(object):
         self._generateLinkField(urlHandlers.UHConferenceDisplay,
                                 cont.getConference(), "Event details", out)
 
-        self._generateAccessList(cont, out, specifyId=True)
+        self._generateAccessList(cont, out, objId=uniqueId(cont))
     ####
     #fb
 
@@ -1489,11 +1485,8 @@ class outputGenerator(object):
             out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
             out.closeTag("datafield")
 
-        matList = subCont.getAllMaterialList()
-        for mat in matList:
-            if mat.canView(self.__aw):
-                if includeMaterial:
-                    self.materialToXMLMarc21(mat, out=out)
+        if includeMaterial:
+            self.materialToXMLMarc21(subCont, out=out)
 
         if subCont.note:
             self.noteToXMLMarc21(subCont.note, out=out)
@@ -1516,64 +1509,77 @@ class outputGenerator(object):
         self._generateLinkField(urlHandlers.UHConferenceDisplay,
                                 subCont.getConference(), "Event details", out)
 
-        self._generateAccessList(subCont, out, specifyId=True)
+        self._generateAccessList(subCont, out, objId=uniqueId(subCont))
 
-
-    def materialToXMLMarc21(self,mat, out=None):
-        if not out:
-            out = self._XMLGen
-        rList = mat.getResourceList()
-        self.resourcesToXMLMarc21(rList, out=out)
-
-    def resourcesToXMLMarc21(self, rList, out=None):
+    def materialToXMLMarc21(self, obj, out=None):
         if not out:
             out = self._XMLGen
 
-        for res in rList:
-            if res.canAccess(self.__aw):
-                self.resourceToXMLMarc21(res, out=out)
-                self._generateAccessList(res, out)
+        for attachment in (Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.linked_object == obj,
+                                           is_deleted=False, _join=AttachmentFolder)
+                                     .options(joinedload(Attachment.legacy_mapping))):
+            if attachment.can_access(self.__aw.getUser().user):
+                self.resourceToXMLMarc21(attachment, out)
+                self._generateAccessList(acl=self._attachment_access_list(attachment), out=out,
+                                         objId=self._attachment_unique_id(attachment))
 
-    def resourceToXMLMarc21(self,res, out=None):
+    def resourceToXMLMarc21(self, res, out=None):
         if not out:
             out = self._XMLGen
-        if type(res) == conference.LocalFile:
+        if res.type == AttachmentType.link:
             self.resourceFileToXMLMarc21(res, out=out)
         else:
             self.resourceLinkToXMLMarc21(res, out=out)
 
-    def resourceLinkToXMLMarc21(self,res, out=None):
+    @classmethod
+    def _attachment_unique_id(self, attachment):
+        unique_id = "INDICO." + uniqueId(attachment.folder.linked_object)
+        if attachment.legacy_mapping:
+            unique_id += "m{}.{}".format(attachment.legacy_mapping.material_id, attachment.legacy_mapping.resource_id)
+        else:
+            unique_id += "a{}".format(attachment.id)
+
+        return unique_id
+
+    @classmethod
+    def _attachment_access_list(self, attachment):
+
+        linked_object = attachment.folder.linked_object
+        manager_list = set(linked_object.getRecursiveManagerList())
+
+        if attachment.is_protected:
+            return {e.as_legacy for e in attachment.acl} | manager_list
+        if attachment.is_inheriting and attachment.folder.is_protected:
+            return {e.as_legacy for e in attachment.folder.acl} | manager_list
+        else:
+            return linked_object.getRecursiveAllowedToAccessList()
+
+    def resourceLinkToXMLMarc21(self, attachment, out=None):
         if not out:
             out = self._XMLGen
 
-        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        out.writeTag("subfield",res.getDescription(),[["code","a"]])
-        out.writeTag("subfield",res.getURL(),[["code","u"]])
-        out.writeTag("subfield", "INDICO.%s" % \
-                     uniqueId(res), [["code", "3"]])
-        out.writeTag("subfield", "resource", [["code","x"]])
-        out.writeTag("subfield", "external", [["code","z"]])
-        out.writeTag("subfield", res.getOwner().getTitle(), [["code","y"]])
+        out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
+        out.writeTag("subfield", attachment.description, [["code", "a"]])
+        out.writeTag("subfield", attachment.get_download_url(_external=True), [["code", "u"]])
+        out.writeTag("subfield", self._attachment_unique_id(attachment), [["code", "3"]])
+        out.writeTag("subfield", "resource", [["code", "x"]])
+        out.writeTag("subfield", "external", [["code", "z"]])
+        out.writeTag("subfield", attachment.title, [["code", "y"]])
         out.closeTag("datafield")
 
-    def resourceFileToXMLMarc21(self,res, out=None):
+    def resourceFileToXMLMarc21(self, attachment, out=None):
         if not out:
             out = self._XMLGen
 
-        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        out.writeTag("subfield",res.getDescription(),[["code","a"]])
-        try:
-            out.writeTag("subfield",res.getSize(),[["code","s"]])
-        except:
-            pass
+        out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
+        out.writeTag("subfield", attachment.description, [["code", "a"]])
+        out.writeTag("subfield", attachment.file.size, [["code", "s"]])
 
-        url = str(urlHandlers.UHFileAccess.getURL( res ))
-        out.writeTag("subfield",url,[["code","u"]])
-        out.writeTag("subfield", "INDICO.%s" % \
-                     uniqueId(res), [["code", "3"]])
-        out.writeTag("subfield", res.getFileName(), [["code","y"]])
-        out.writeTag("subfield", "stored", [["code","z"]])
-        out.writeTag("subfield", "resource", [["code","x"]])
+        out.writeTag("subfield", attachment.download_url, [["code", "u"]])
+        out.writeTag("subfield", self._attachment_unique_id(attachment), [["code", "3"]])
+        out.writeTag("subfield", attachment.file.filename, [["code", "y"]])
+        out.writeTag("subfield", "stored", [["code", "z"]])
+        out.writeTag("subfield", "resource", [["code", "x"]])
         out.closeTag("datafield")
 
     def noteToXMLMarc21(self, note, out=None):
