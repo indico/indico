@@ -269,6 +269,11 @@ class AttachmentFile(db.Model):
             raise RuntimeError('No storage backend set')
         return get_storage(self.storage_backend)
 
+    def get_local_path(self):
+        """Return context manager that will yield physical path.
+           This should be avoided in favour of using the actual file contents"""
+        return self.storage.get_local_path(self.storage_file_id)
+
     def save(self, data):
         """Saves a file in the file storage.
 
