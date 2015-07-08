@@ -233,11 +233,10 @@
 
         text-overflow: ellipsis;
         .title {
-            font-size: 0.9em;
-
-            text-overflow: ellipsis;
-
             color: $light-black;
+            font-size: 0.9em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
     .folder .i-button.attachment,
