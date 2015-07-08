@@ -317,9 +317,6 @@ class UHConfModifShowMaterials(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-materialsShow'
 
 
-class UHConfModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-materialsAdd'
-
 # ============================================================================
 # ROOM BOOKING ===============================================================
 # ============================================================================
@@ -1306,10 +1303,6 @@ class UHSubContributionDelete(URLHandler):
     _endpoint = 'event_mgmt.subContributionTools-delete'
 
 
-class UHSubContribModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification-materialsAdd'
-
-
 class UHSubContribModifTools(URLHandler):
     _endpoint = 'event_mgmt.subContributionTools'
 
@@ -1328,10 +1321,6 @@ class UHSessionDataModification(URLHandler):
 
 class UHSessionFitSlot(URLHandler):
     _endpoint = 'event_mgmt.sessionModifSchedule-fitSlot'
-
-
-class UHSessionModifAddMaterials(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-materialsAdd'
 
 
 class UHSessionModifSchedule(URLHandler):

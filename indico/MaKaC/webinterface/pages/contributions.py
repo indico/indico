@@ -338,21 +338,6 @@ class WPContributionModifTools(WPContributionModifBase):
         return wcomponents.WContribModifTool().getHTML({"deleteContributionURL": urlHandlers.UHContributionDelete.getURL(self._target)})
 
 
-class WPContributionModifMaterials(WPContributionModifBase):
-
-    _userData = ['favorite-user-list']
-
-    def __init__(self, rh, contribution):
-        WPContributionModifBase.__init__(self, rh, contribution)
-
-    def _setActiveTab(self):
-        self._tabMaterials.setActive()
-
-    def _getTabContent(self, pars):
-        wc = wcomponents.WShowExistingMaterial(self._target, mode='management', showTitle=True)
-        return wc.getHTML(pars)
-
-
 class WAuthorTable(wcomponents.WTemplated):
 
     def __init__(self, authList, contrib):

@@ -79,10 +79,7 @@ def generate_global_file(config):
             'FitSessionSlot': urlHandlers.UHSessionFitSlot.getURL(_ignore_static=True).js_router,
 
             'UploadAction': {
-                'subcontribution': urlHandlers.UHSubContribModifAddMaterials.getURL(_ignore_static=True).js_router,
                 'contribution': urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router,
-                'session': urlHandlers.UHSessionModifAddMaterials.getURL(_ignore_static=True).js_router,
-                'conference': urlHandlers.UHConfModifAddMaterials.getURL(_ignore_static=True).js_router,
             },
             'AttachmentManager': url_rule_to_js('attachments.management'),
 

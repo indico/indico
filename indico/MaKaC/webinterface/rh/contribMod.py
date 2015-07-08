@@ -632,35 +632,3 @@ class RHContributionToPDF(RHContributionModification):
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ContribToPDF(self._target)
         return send_file(filename, pdf.generate(), 'PDF')
-
-
-class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
-    _uh = urlHandlers.UHContribModifMaterials
-
-    def _checkProtection(self):
-        """ This disables people that are not conference managers or track coordinators to
-            delete files from a contribution.
-        """
-        RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkProtection(self)
-        for key in self._paramsForCheckProtection.keys():
-            if key.find("delete")!=-1:
-                RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordAndReviewingStaffRights._checkParams(self, params)
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-        # note from DavidMC: i wrote this long parameter name in order
-        # not to overwrite a possibly existing _params in a base class
-        # we need to store the params so that _checkProtection can know
-        # if the action is to upload a file, delete etc.
-        self._paramsForCheckProtection = params
-
-    def _process(self):
-        if self._target.getOwner().isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        p = contributions.WPContributionModifMaterials( self, self._target )
-        return p.display(**self._getRequestParams())

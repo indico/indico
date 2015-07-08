@@ -3464,40 +3464,6 @@ class WConfTickerTapeDrawer(WTemplated):
         return nowHappeningArray
 
 
-class WShowExistingMaterial(WTemplated):
-
-    def __init__(self,target, mode='display', showTitle=True):
-        """
-        mode should be 'display' or 'management'
-        """
-        self._target=target
-        self._mode = mode
-        self._showTitle = showTitle
-
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-
-        # yes, this may look a bit redundant, but materialRegistry isn't
-        # bound to a particular target
-        materialRegistry = self._target.getMaterialRegistry()
-        vars["materialList"] = materialRegistry.getMaterialList(self._target)
-
-
-        if self._showTitle:
-            vars["existingMaterialsTitle"] = """ <div class="groupTitle" id="title">%s</div>""" % _("Existing material")
-        else:
-            vars["existingMaterialsTitle"] = " "
-        vars["materialModifHandler"] = vars.get("materialModifHandler", None)
-        vars["materialProtectHandler"] = vars.get("materialProtectHandler", None)
-        vars["resourcesFileModifHandler"] = vars.get("resourcesFileModifHandler", None)
-        vars["resourcesFileProtectHandler"] = vars.get("resourcesFileProtectHandler", None)
-        vars["resourcesLinkModifHandler"] = vars.get("resourcesLinkModifHandler", None)
-        vars["resourcesLinkProtectHandler"] = vars.get("resourcesLinkProtectHandler", None)
-        vars['mode'] = self._mode
-
-        return vars
-
 class WShowExistingReviewingMaterial(WTemplated):
 
     def __init__(self, target):

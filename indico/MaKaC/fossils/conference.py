@@ -140,10 +140,7 @@ class IResourceBasicFossil(IFossil):
         """ Resource Description """
 
 class IResourceMinimalFossil(IResourceBasicFossil):
-
-    def getProtectionURL(self):
-        """ Resource protection URL """
-    getProtectionURL.produce = lambda s: str(urlHandlers.UHMaterialModification.getURL(s.getOwner()))
+    pass
 
 class ILinkMinimalFossil(IResourceMinimalFossil):
 
@@ -239,10 +236,6 @@ class IMaterialMinimalFossil(IFossil):
 
     def getType(self):
         """ The type of material"""
-
-    def getProtectionURL(self):
-        """ Material protection URL """
-    getProtectionURL.produce = lambda s: str(urlHandlers.UHMaterialModification.getURL(s))
 
 
 class IMaterialFossil(IMaterialMinimalFossil):

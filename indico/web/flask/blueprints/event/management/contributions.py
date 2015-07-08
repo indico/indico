@@ -55,9 +55,7 @@ with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     event_mgmt.add_url_rule('/contribution/<contribId>/withdraw', 'contributionModification-withdraw',
                             contribMod.RHWithdraw, methods=('POST',))
 
-    # Material
-    event_mgmt.add_url_rule('/contribution/<contribId>/material/', 'contributionModification-materials',
-                            contribMod.RHMaterials, methods=('GET', 'POST'))
+    # Material (also used to upload papers for reviewing!)
     event_mgmt.add_url_rule('/contribution/<contribId>/material/add', 'contributionModification-materialsAdd',
                             contribMod.RHMaterialsAdd, methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/material/browse/<materialId>',
