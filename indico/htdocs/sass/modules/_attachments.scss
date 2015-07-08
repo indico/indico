@@ -253,6 +253,10 @@
         &.is-protected {
             @extend %protected-colors;
         }
+        &.has-label {
+            margin: 0;
+            padding-left: 0.7em !important;
+        }
     }
     .folder.toolbar {
         display: inline-block;
