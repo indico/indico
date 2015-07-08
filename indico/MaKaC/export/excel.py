@@ -403,14 +403,17 @@ class ContributionsListToExcel:
                 excelGen.addValue("")
             status=contrib.getCurrentStatus()
             excelGen.addValue(ContribStatusList().getCaption(status.__class__))
-            listResource = []
-            for material in contrib.getAllMaterialList():
-                for resource in material.getResourceList():
-                    if isinstance(resource, Link):
-                        listResource.append(resource.getURL())
-                    else:
-                        listResource.append(str(urlHandlers.UHFileAccess.getURL( resource )))
-            excelGen.addValue("\n".join(listResource))
+
+            resource_list = []
+
+            for attachment in contrib.attached_items['files']:
+                resource_list.append(attachment.get_download_url(_external=True))
+
+            for folder in contrib.attached_items['folders']:
+                for attachment in folder.attachments:
+                    resource_list.append(attachment.get_download_url(_external=True))
+
+            excelGen.addValue("\n".join(resource_list))
             excelGen.newLine()
 
         return excelGen.getExcelContent()

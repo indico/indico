@@ -171,13 +171,17 @@ class Attachment(ProtectionMixin, db.Model):
     def locator(self):
         return dict(self.folder.locator, attachment_id=self.id)
 
-    @property
-    def download_url(self):
+    def get_download_url(self, **kwargs):
         if ContextManager.get('offlineMode'):
             return _offline_download_url(self)
         else:
             filename = self.file.filename if self.type == AttachmentType.file else 'go'
-            return url_for('attachments.download', self, filename=filename, _external=False)
+            kwargs.setdefault('_external', False)
+            return url_for('attachments.download', self, filename=filename, **kwargs)
+
+    @property
+    def download_url(self):
+        return self.get_download_url()
 
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the attachment.
