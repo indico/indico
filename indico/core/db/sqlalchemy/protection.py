@@ -76,16 +76,16 @@ class ProtectionMixin(object):
     def can_access(self, user, acl_attr='acl', legacy_method='canAccess', allow_admin=True):
         """Checks if the user can access the object.
 
-        When using a custom acl_attr on an object that supports
+        When using a custom `acl_attr` on an object that supports
         inherited proection, ALL possible `protection_parent` objects
-        need to have an ACL with the same name, too!
+        need to have an ACL with the same name too!
 
-        :param user: The :class:`.User` to check
+        :param user: The :class:`.User` to check. May be None if the
+                     user is not logged in.
         :param acl_attr: The name of the property that contains the
                          set of authorized principals.
-        :param legacy_ac_method: The AccessController method name to
-                                 use when inheriting the protection
-                                 from a legacy object
+        :param legacy_method: The method name to use when inheriting
+                              the protection from a legacy object.
         :param allow_admin: If admin users should always have access
         """
         if allow_admin and user and user.is_admin:
