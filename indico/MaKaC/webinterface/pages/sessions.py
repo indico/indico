@@ -203,8 +203,6 @@ class WPSessionModifBase( WPConferenceModifBase ):
                 urlHandlers.UHSessionModifSchedule.getURL(self._session) )
         self._tabComm = self._tabCtrl.newTab( "comment", _("Comment"), \
                 urlHandlers.UHSessionModifComm.getURL( self._session ) )
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-                urlHandlers.UHSessionModifMaterials.getURL( self._session ) )
         self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
                                                      url_for('attachments.management', self._session))
         self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \

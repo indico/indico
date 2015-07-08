@@ -135,9 +135,6 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
                 urlHandlers.UHSubContributionModification.getURL( self._target ) )
-        #self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Material"), \
-                urlHandlers.UHSubContribModifMaterials.getURL( self._target ) )
         self._tab_attachments = self._tabCtrl.newTab("attachments", _("Materials"),
                                                      url_for('attachments.management', self._subContrib))
         self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \

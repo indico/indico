@@ -1258,10 +1258,6 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifSchedule.getURL( self._conf ))
         self._generalSection.addItem( self._timetableMenuItem)
 
-        self._materialMenuItem = wcomponents.SideMenuItem(_("Material (old)"),
-            urlHandlers.UHConfModifShowMaterials.getURL( self._conf ))
-        self._generalSection.addItem( self._materialMenuItem)
-
         self._roomBookingMenuItem = wcomponents.SideMenuItem(_("Room booking"),
                                                              url_for('event_mgmt.rooms_booking_list', self._conf))
         self._generalSection.addItem( self._roomBookingMenuItem)
@@ -1341,14 +1337,12 @@ class WPConferenceModifBase(main.WPMainBase):
         if not canModify:
             self._generalSettingsMenuItem.setVisible(False)
             self._timetableMenuItem.setVisible(False)
-            self._materialMenuItem.setVisible(False)
             self._programMenuItem.setVisible(False)
             self._participantsMenuItem.setVisible(False)
             self._listingsMenuItem.setVisible(False)
             self._layoutMenuItem.setVisible(False)
             self._ACMenuItem.setVisible(False)
             self._toolsMenuItem.setVisible(False)
-            self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
