@@ -57,11 +57,6 @@ event_mgmt.add_url_rule('/session/<sessionId>/comment/', 'sessionModifComm', ses
 event_mgmt.add_url_rule('/session/<sessionId>/comment/edit', 'sessionModifComm-edit',
                         sessionModif.RHSessionModifCommEdit, methods=('GET', 'POST'))
 
-# Material
-event_mgmt.add_url_rule('/session/<sessionId>/material/', 'sessionModification-materials', sessionModif.RHMaterials)
-event_mgmt.add_url_rule('/session/<sessionId>/material/add', 'sessionModification-materialsAdd',
-                        sessionModif.RHMaterialsAdd, methods=('POST',))
-
 # Protection
 event_mgmt.add_url_rule('/session/<sessionId>/access/', 'sessionModifAC', sessionModif.RHSessionModifAC)
 event_mgmt.add_url_rule('/session/<sessionId>/access/visibility', 'sessionModifAC-setVisibility',

@@ -638,9 +638,6 @@ class WPMSessionModification( sessions.WPSessionModification ):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
 
-class WPMSessionModifMaterials( sessions.WPSessionModifMaterials ):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
 
 class WPMSessionModifAC(sessions.WPSessionModifAC):
     def _setupTabCtrl(self):

@@ -1246,26 +1246,6 @@ class WPSessionModifRelocate(WPSessionModifBase):
         return wc.getHTML(p)
 
 
-class WPSessionModifMaterials( WPSessionModifBase ):
-
-    _userData = ['favorite-user-list']
-
-    def __init__(self, rh, session):
-        self._target = session
-        WPSessionModifBase.__init__(self, rh, session)
-
-    def _setActiveTab( self ):
-        self._tabMaterials.setActive()
-
-    ## def _getContent( self, pars ):
-    ##     wc=wcomponents.WShowExistingMaterial(self._target)
-    ##     return wc.getHTML( pars )
-
-    def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
-        return wc.getHTML( pars )
-
-
 class WSessionICalExport(WICalExportBase):
 
     def __init__(self, session, user):

@@ -31,7 +31,7 @@ import MaKaC.schedule as schedule
 import MaKaC.domain as domain
 
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
-from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSessionSlotBase, RHSubmitMaterialBase
+from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSessionSlotBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 import MaKaC.webinterface.pages.errors as errors
@@ -213,36 +213,6 @@ class RHSessionOpen( RHSessionModifBase ):
     def _process( self ):
         self._target.setClosed(False)
         self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
-
-
-class RHMaterials(RHSessionModCoordinationBase):
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-
-    def _process(self):
-        if self._target.getOwner().isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        p = sessions.WPSessionModifMaterials( self, self._target )
-        return p.display(**self._getRequestParams())
-
-
-
-class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionModifMaterials
-
-    def __init__(self):
-        RHSessionModCoordinationBase.__init__(self)
-        RHSubmitMaterialBase.__init__(self)
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        RHSubmitMaterialBase._checkParams(self, params)
 
 
 class RHSessionModifSchedule(RHSessionModCoordinationBase):
