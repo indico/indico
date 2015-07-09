@@ -192,7 +192,7 @@ class SetShowPastEventsForCateg(CategoryDisplayBase):
         if self._showPastEvents:
             fpef.add(cid)
         else:
-            fpef.remove(cid)
+            fpef.discard(cid)
         session.modified = True
 
 class CategoryProtectionUserList(CategoryModifBase):
