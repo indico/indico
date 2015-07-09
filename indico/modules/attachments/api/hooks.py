@@ -16,8 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.attachments.util import get_attached_items
-from indico.modules.attachments.api.util import build_file_api_data, build_folder_api_data
+from indico.modules.attachments.api.util import build_folders_api_data
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
 from MaKaC.conference import ConferenceHolder
@@ -52,13 +51,9 @@ class AttachmentsExportHook(HTTPAPIHook):
             subcontribution = self._obj = contribution.getSubContributionById(subcontribution_id)
             if subcontribution is None:
                 raise HTTPAPIError("No such subcontribution", 404)
-        self._data = get_attached_items(self._obj)
 
     def _hasAccess(self, aw):
         return self._obj.canView(aw)
 
     def export_attachments(self, aw):
-        return {
-            'attachments': filter(None, (build_file_api_data(file_) for file_ in self._data.get('files', []))),
-            'folders': filter(None, (build_folder_api_data(folder) for folder in self._data.get('folders', [])))
-        }
+        return {'folders': build_folders_api_data(self._obj)}
