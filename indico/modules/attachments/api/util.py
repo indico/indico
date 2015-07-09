@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.orm import joinedload
 
+from indico.modules.attachments.util import get_attached_folders
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from MaKaC.common.contextManager import ContextManager
@@ -73,7 +74,16 @@ def _build_file_legacy_api_data(file_):
     return data
 
 
-def build_folder_api_data(folder):
+def build_folders_api_data(linked_object):
+    if not linked_object:
+        return []
+    folders = get_attached_folders(linked_object)
+    if not folders:
+        return []
+    return filter(None, (_build_folder_api_data(folder) for folder in folders))
+
+
+def _build_folder_api_data(folder):
     avatar = ContextManager.get("currentAW").getUser()
     user = avatar.user if avatar else None
     if not folder.can_view(user):
@@ -83,16 +93,12 @@ def build_folder_api_data(folder):
         'id': folder.id,
         'title': folder.title,
         'description': folder.description,
-        'attachments': filter(None, (build_file_api_data(file_) for file_ in folder.attachments))
+        'attachments': [_build_file_api_data(file_) for file_ in folder.attachments if file_.can_access(user)],
+        'default_folder': folder.is_default
     }
 
 
-def build_file_api_data(file_):
-    avatar = ContextManager.get("currentAW").getUser()
-    user = avatar.user if avatar else None
-    if not file_.can_access(user):
-        return None
-
+def _build_file_api_data(file_):
     data = {
         'id': file_.id,
         'download_url': file_.absolute_download_url,

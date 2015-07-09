@@ -19,10 +19,9 @@ from __future__ import unicode_literals
 from flask import session
 
 
-def get_attached_items(linked_object, include_empty=True, include_hidden=True, preload_event=False):
+def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
     """
-    Return a structured representation of all the attachments linked
-    to an object.
+    Return a list of all the folders linked to an object.
 
     :param linked_object: The object whose attachments are to be returned
     :param include_empty: Whether to return empty folders as well.
@@ -40,8 +39,25 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     if not include_empty:
         folders = [f for f in folders if f.attachments]
 
+    return folders
+
+
+def get_attached_items(linked_object, include_empty=True, include_hidden=True, preload_event=False):
+    """
+    Return a structured representation of all the attachments linked
+    to an object.
+
+    :param linked_object: The object whose attachments are to be returned
+    :param include_empty: Whether to return empty folders as well.
+    :param include_hidden: Include folders that the user can't see
+    :param preload_event: in the process, preload all objects tied to the
+                          corresponding event and keep them in cache
+    """
+    folders = get_attached_folders(linked_object, include_empty=include_empty,
+                                   include_hidden=include_hidden, preload_event=preload_event)
     if not folders:
         return {}
+
     # the default folder is never shown as a folder. instead, its
     # files are shown on the same level as other folders
     files = folders.pop(0).attachments if folders[0].is_default else []
