@@ -21,14 +21,8 @@ from wtforms.fields import TextAreaField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import CKEditorWidget
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 
 
 class NoteForm(IndicoForm):
     # TODO: use something switchable
     source = TextAreaField(_("Minutes"), widget=CKEditorWidget())
-
-    def __init__(self, *args, **kwargs):
-        linked_object = kwargs.pop('linked_object')
-        super(NoteForm, self).__init__(*args, **kwargs)
-        self.source.label.text = _("Minutes for {0}").format(to_unicode(linked_object.getTitle()))

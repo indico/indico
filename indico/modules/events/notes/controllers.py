@@ -77,7 +77,7 @@ class RHEditNote(RHManageNoteBase):
         note = None
         if not source:
             note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        return NoteForm(obj=self._get_defaults(note=note, source=source), linked_object=self.object)
+        return NoteForm(obj=self._get_defaults(note=note, source=source))
 
     def _process_form(self, form, **kwargs):
         if form.validate_on_submit():
