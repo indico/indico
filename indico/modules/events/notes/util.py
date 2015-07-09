@@ -18,6 +18,7 @@ import itertools
 
 from indico.web.flask.util import url_for
 from MaKaC.conference import Conference, Contribution, SessionSlot
+from MaKaC.schedule import BreakTimeSchEntry
 
 
 def build_note_api_data(note):
@@ -56,7 +57,7 @@ def get_all_notes(obj):
     notes = [obj.note] if obj.note else []
     nested_objects = []
     if isinstance(obj, Conference):
-        nested_objects = [e.getOwner() for e in obj.getSchedule().getEntries()]
+        nested_objects = [e.getOwner() for e in obj.getSchedule().getEntries() if not isinstance(e, BreakTimeSchEntry)]
     if isinstance(obj, SessionSlot):
         nested_objects = obj.getContributionList()
     elif isinstance(obj, Contribution):
