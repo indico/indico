@@ -22,8 +22,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
-from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, AttachmentFolderForm,
-                                              EditAttachmentFileForm)
+from indico.modules.attachments.forms import (AddAttachmentFilesForm, AddAttachmentLinkForm, AttachmentFolderForm,
+                                              EditAttachmentFileForm, EditAttachmentLinkForm)
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.util import get_attached_items
@@ -105,7 +105,7 @@ class AddAttachmentLinkMixin:
     """Add link attachment"""
 
     def _process(self):
-        form = AttachmentLinkForm(linked_object=self.object)
+        form = AddAttachmentLinkForm(linked_object=self.object)
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             link = Attachment(user=session.user, type=AttachmentType.link)
@@ -128,7 +128,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected)
-        form_cls = EditAttachmentFileForm if self.attachment.type == AttachmentType.file else AttachmentLinkForm
+        form_cls = EditAttachmentFileForm if self.attachment.type == AttachmentType.file else EditAttachmentLinkForm
         form = form_cls(linked_object=self.object, obj=defaults)
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)

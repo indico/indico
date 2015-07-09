@@ -56,7 +56,7 @@ class AttachmentFormBase(IndicoForm):
 
 
 class EditAttachmentFormBase(AttachmentFormBase):
-    title = StringField(_("Title"), [DataRequired()], description=_("The title of the file."))
+    title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"))
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
                              groups=True, serializable=False, allow_external=True,
@@ -71,12 +71,17 @@ class EditAttachmentFileForm(EditAttachmentFormBase):
     pass
 
 
-class AttachmentLinkForm(EditAttachmentFormBase):
+class AttachmentLinkFormMixin(object):
+    title = StringField(_("Title"), [DataRequired()])
     link_url = URLField(_("URL"), [DataRequired()])
 
-    def __init__(self, *args, **kwargs):
-        super(AttachmentLinkForm, self).__init__(*args, **kwargs)
-        self.title.description = _("The title of the link")
+
+class AddAttachmentLinkForm(AttachmentLinkFormMixin, AttachmentFormBase):
+    pass
+
+
+class EditAttachmentLinkForm(AttachmentLinkFormMixin, EditAttachmentFormBase):
+    pass
 
 
 class AttachmentFolderForm(IndicoForm):
