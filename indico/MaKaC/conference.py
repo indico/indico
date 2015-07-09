@@ -2069,6 +2069,12 @@ class Conference(CommonObjectBase, Locatable):
         from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self)
 
+    @property
+    @memoize_request
+    def nested_notes(self):
+        from indico.modules.events.notes.models.notes import EventNote
+        return EventNote.get_all_for_event(self) - {self.note}
+
     @unify_user_args
     def log(self, realm, kind, module, summary, user=None, type_=u'simple', data=None):
         """Creates a new log entry for the event
