@@ -5170,6 +5170,7 @@ class Session(CommonObjectBase, Locatable):
         self.notifyModification()
 
     def delete(self):
+        signals.event.session_deleted.send(self, parent=self.getConference())
         while len(self.getConvenerList()) > 0:
             self.removeConvener(self.getConvenerList()[0])
         while len(self.getMaterialList()) > 0:

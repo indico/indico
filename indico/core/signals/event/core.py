@@ -72,6 +72,10 @@ Called when an IP restriction is removed from an event. The `sender` is the even
 the `domain` is that domain that has been removed.
 """)
 
+session_deleted = _signals.signal('session-deleted', """
+Called when a session slot is deleted. The *sender* is the session.
+""")
+
 session_slot_deleted = _signals.signal('session-slot-deleted', """
 Called when a session slot is deleted. The *sender* is the session slot.
 """)
