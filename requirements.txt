@@ -75,3 +75,4 @@ PyYAML==3.11
 terminaltables==1.1.1
 contextlib2==0.4.0
 Flask-OAuthlib==0.9.1
+translitcodec
