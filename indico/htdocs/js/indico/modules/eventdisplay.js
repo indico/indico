@@ -1,4 +1,6 @@
-$(function() {
+$(document).ready(function() {
+    'use strict';
+
     $('.event-service-row > .trigger').click(function() {
         var toggler = $(this);
         toggler.siblings('.event-service-details').slideToggle({
@@ -21,19 +23,31 @@ $(function() {
         });
     });
 
-    $('.js-show-note-toggle').on('click', function(e) {
-        if ($(this).is('a')) {
-            e.preventDefault();
-        }
+    function toggleNote(element, visible, immediate) {
         // Note for event
-        var note = $(this).closest('#event-note-section');
+        var note = element.closest('#event-note-section');
         // Note for other elements
         if (note.length === 0) {
-            note = $(this).closest('li').children('.note-area-wrapper');
+            note = element.closest('li').children('.note-area-wrapper');
         }
-        content = note.hasClass('togglable') ? note : note.find('.togglable');
-        content.slideToggle();
+        var content = note.hasClass('togglable') ? note : note.find('.togglable');
+        if (immediate) {
+            content.toggle(visible);
+        } else {
+            content[visible === undefined ? 'slideToggle' : visible ? 'slideDown' : 'slideUp']();
+        }
+    }
+
+    $('a.js-show-note-toggle').on('click', function(e) {
+        e.preventDefault();
+        toggleNote($(this));
     });
+
+    $('input.js-toggle-note-cb').on('change', function(e, immediate) {
+        toggleNote($(this), this.checked, immediate);
+    });
+
+    $('input.js-toggle-note-cb').trigger('change', [true]);
 
     $('.js-note-editor').ajaxDialog({
         title: $T("Edit minutes"),

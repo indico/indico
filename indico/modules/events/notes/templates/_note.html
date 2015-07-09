@@ -16,7 +16,7 @@
 {% macro render_toggle_button(note, note_is_hidden) %}
     <div class="group i-selection note-visibility-toggle">
         {% set hash = uuid() %}
-        <input type="checkbox" id="toggle-note-{{ note.id }}-{{ hash }}" {% if not note_is_hidden %}checked{% endif %}>
+        <input type="checkbox" class="js-toggle-note-cb" id="toggle-note-{{ note.id }}-{{ hash }}" {% if not note_is_hidden %}checked{% endif %}>
         <label for="toggle-note-{{ note.id }}-{{ hash }}" class="i-button icon-file-text js-show-note-toggle"
                title="">{% trans %}Minutes{% endtrans %}</label>
     </div>
