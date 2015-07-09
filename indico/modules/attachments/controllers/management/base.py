@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, session, render_template
-from werkzeug.utils import secure_filename
 
 from indico.core import signals
 from indico.core.db import db
@@ -28,6 +27,7 @@ from indico.modules.attachments.forms import (AddAttachmentFilesForm, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.util import get_attached_items
+from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -84,7 +84,7 @@ class AddAttachmentFilesMixin:
             files = request.files.getlist('file')
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
-                filename = secure_filename(f.filename) or 'attachment'
+                filename = secure_filename(f.filename, 'attachment')
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
                                         protection_mode=form.protection_mode.data)
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
@@ -141,8 +141,8 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
             if self.attachment.type == AttachmentType.file:
                 file = request.files['file'] if request.files else None
                 if file:
-                    self.attachment.file = AttachmentFile(user=session.user, filename=secure_filename(file.filename),
-                                                          content_type=file.mimetype)
+                    self.attachment.file = AttachmentFile(user=session.user, content_type=file.mimetype,
+                                                          filename=secure_filename(file.filename, 'attachment'))
                     self.attachment.file.save(file.file)
 
             signals.attachments.attachment_updated.send(self.attachment, user=session.user)

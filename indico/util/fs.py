@@ -17,9 +17,26 @@
 import errno
 import os
 
+from indico.util.string import unicode_to_ascii, to_unicode
+from werkzeug.utils import secure_filename as _secure_filename
+
+
 def silentremove(filename):
     try:
         os.remove(filename)
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
+
+
+def secure_filename(filename, fallback):
+    """Returns a secure version of a filename.
+
+    This removes possibly dangerous characters and also converts the
+    filename to plain ASCII for maximum compatibility.
+
+    :param filename: A filename
+    :param fallback: The filename to use if there were no safe chars
+                     in the original filename.
+    """
+    return _secure_filename(unicode_to_ascii(to_unicode(filename))) or fallback

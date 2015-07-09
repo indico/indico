@@ -25,7 +25,6 @@ from operator import attrgetter
 from uuid import uuid4
 
 import click
-from werkzeug.utils import secure_filename
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -36,6 +35,7 @@ from indico.modules.attachments.models.principals import AttachmentPrincipal, At
 from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import protection_from_ac, patch_default_group_provider
 
@@ -304,7 +304,7 @@ class AttachmentImporter(Importer):
                 self.print_error(cformat('%{red!}File {} not found on disk').format(resource._LocalFile__archivedId),
                                  event_id=base_object.id)
                 return None
-            filename = secure_filename(convert_to_unicode(resource.fileName)) or 'attachment'
+            filename = secure_filename(convert_to_unicode(resource.fileName), 'attachment')
             file_data = {'id': self._get_id(AttachmentFile),
                          'attachment_id': data['id'],
                          'user_id': self.janitor_user_id,

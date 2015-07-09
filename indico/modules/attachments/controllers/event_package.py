@@ -22,8 +22,8 @@ from zipfile import ZipFile
 
 from flask import session
 from sqlalchemy import cast, Date
-from werkzeug.utils import secure_filename
 
+from indico.util.fs import secure_filename
 from indico.web.flask.util import send_file
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -103,7 +103,9 @@ class AttachmentPackageMixin:
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             for attachment in attachments:
                 if not attachment.folder.is_default:
-                    name = os.path.join(os.path.join(secure_filename(attachment.folder.title), attachment.file.filename))
+                    name = os.path.join(os.path.join(secure_filename(attachment.folder.title,
+                                                                     unicode(attachment.folder.id)),
+                                                     attachment.file.filename))
                 else:
                     name = attachment.file.filename
 

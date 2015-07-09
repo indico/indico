@@ -31,10 +31,10 @@ from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
 from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
 from werkzeug.urls import url_parse
-from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
 from indico.util.contextManager import ContextManager
+from indico.util.fs import secure_filename
 from indico.web.util import jsonify_data
 
 
@@ -349,7 +349,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     text/html mimetypes
     """
 
-    name = secure_filename(name)
+    name = secure_filename(name, 'file')
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
