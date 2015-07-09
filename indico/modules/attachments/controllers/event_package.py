@@ -24,12 +24,15 @@ from zipfile import ZipFile
 from flask import session
 from sqlalchemy import cast, Date
 
+from indico.util.fs import secure_filename
 from indico.util.date_time import format_date
 from indico.util.string import to_unicode
 from indico.web.flask.util import send_file
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+
+from MaKaC.conference import SubContribution
 
 
 class AttachmentPackageMixin:
@@ -56,7 +59,7 @@ class AttachmentPackageMixin:
         return [(contrib.getId(), to_unicode(contrib.getTitle())) for contrib in self._conf.getContributionList()]
 
     def _load_schedule_data(self):
-        dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList()}
+        dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList() if contrib.getStartDate()}
         return sorted([(unicode(d), format_date(d, 'short')) for d in dates], key=itemgetter(1))
 
     def _filter_attachments(self, form):
@@ -98,7 +101,7 @@ class AttachmentPackageMixin:
 
     def _get_contributions_by_schedule_date(self, dates):
         return [contribution.getId() for contribution in self._conf.getContributionList()
-                if str(contribution.getStartDate().date()) in dates]
+                if contribution.getStartDate() and str(contribution.getStartDate().date()) in dates]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
         query = self._build_base_query().filter(AttachmentFolder.contribution_id.in_(contribution_ids))
@@ -115,14 +118,27 @@ class AttachmentPackageMixin:
         temp_file = tempfile.NamedTemporaryFile('w')
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             for attachment in attachments:
-                if not attachment.folder.is_default:
-                    name = os.path.join(os.path.join(secure_filename(attachment.folder.title,
-                                                                     unicode(attachment.folder.id)),
-                                                     attachment.file.filename))
-                else:
-                    name = attachment.file.filename
-
+                name = self._prepare_folder_structure(attachment)
                 with attachment.file.storage.get_local_path(attachment.file.storage_file_id) as filepath:
                     zip_handler.write(filepath, name)
 
         return send_file('material-{}.zip'.format(self._conf.id), temp_file.name, 'application/zip', inline=False)
+
+    def _prepare_folder_structure(self, attachment):
+        linked_object = attachment.folder.linked_object
+        event_dir = secure_filename(self._conf.getTitle(), None)
+        path_paths = [event_dir] if event_dir else []
+
+        if isinstance(linked_object, SubContribution):
+            start_date = linked_object.parent.getAdjustedStartDate()
+            path_paths.extend([start_date.strftime('%Y%m%d_%A'),
+                               secure_filename(start_date.strftime('%H%M_{}').format(linked_object.parent.getTitle()), ''),
+                               secure_filename(linked_object.getTitle(), unicode(linked_object.getId()))])
+        elif linked_object != self._conf:
+            start_date = linked_object.getAdjustedStartDate()
+            path_paths.extend([start_date.strftime('%Y%m%d_%A'),
+                               start_date.strftime('%H%M_{}').format(linked_object.getTitle())])
+
+        path_paths.extend([secure_filename(attachment.folder.title, unicode(attachment.folder.id)),
+                           attachment.file.filename])
+        return os.path.join(*path_paths)
