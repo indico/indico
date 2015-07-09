@@ -55,11 +55,13 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
 
 def can_manage_attachments(obj, user):
     """Checks if a user can manage attachments for the object"""
-    from MaKaC.conference import Contribution, Session
+    from MaKaC.conference import Contribution, Session, SubContribution
     if not user:
         return False
     if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
         return True
     if isinstance(obj, Contribution) and obj.canUserSubmit(user.as_avatar):
         return True
+    if isinstance(obj, SubContribution):
+        return can_manage_attachments(obj.getContribution(), user)
     return obj.canModify(user.as_avatar)
