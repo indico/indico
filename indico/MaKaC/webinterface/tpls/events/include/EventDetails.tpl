@@ -37,7 +37,7 @@
     <td class="leftCol">${_("Material")}:</td>
     <td>
         <div class="material-list clearfix">
-            ${ render_template('attachments/mako_compat/attachments.html', files=files, folders=folders) }
+            ${ render_template('attachments/mako_compat/attachments_inline.html', files=files, folders=folders) }
         </div>
     </td>
 </tr>

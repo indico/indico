@@ -46,7 +46,7 @@
         <tr>
             <td class="leftCol">${ _("Material")}:</td>
             <td class="material-list">
-                ${ render_template('attachments/mako_compat/attachments.html', item=item.session) }
+                ${ render_template('attachments/mako_compat/attachments_inline.html', item=item.session) }
             </td>
         </tr>
         % endif
