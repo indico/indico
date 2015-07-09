@@ -112,7 +112,7 @@
             Material:
           </td>
           <td class="material-list">
-            ${ render_template('attachments/mako_compat/attachments.html', item=conf) }
+            ${ render_template('attachments/mako_compat/attachments_inline.html', item=conf) }
           </td>
         </tr>
         % endif

@@ -50,16 +50,10 @@
       </ul>
   </div>
   % endif
-
-  % if material or isSubmitter:
+  % if conf.attached_items or isSubmitter:
   <div class="infoline material material-list">
-      <span title="${_("Materials")}" class="icon icon-package-download" aria-hidden="true"></span>
-      % if attachments:
-          ${ render_template('attachments/mako_compat/attachments.html', item=conf) }
-      % else:
-          <span class="text" style="float: left; font-style: italic; padding: 10px 0px 0px">${_("No material yet")}</span>
-      % endif
-
+      <span title="${_("Materials")}" class="icon icon-package-download" aria-hidden="true"> ${_("Materials")}</span>
+      ${ render_template('attachments/mako_compat/attachments_tree.html', item=conf) }
   </div>
   % endif
 
