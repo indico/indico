@@ -16,8 +16,10 @@
     <div class="folder toolbar {% if folder.is_protected %}is-protected{% endif %}">
         <div class="attachments group">
             <span class="i-button label">{{ folder.title }}</span>
-            {% if folder.attachments|count == 1 %}
-                {{ render_attachment(folder.attachments[0], has_label=true) }}
+            {% if folder.attachments|count <= 2 %}
+                {%- for attachment in folder.attachments -%}
+                    {{ render_attachment(attachment, has_label=true) }}
+                {%- endfor -%}
             {% else %}
                 <a class="i-button arrow" data-toggle="dropdown"></a>
                 <ul class="dropdown">
