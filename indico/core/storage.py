@@ -254,7 +254,7 @@ class FileSystemStorage(Storage):
 
     def send_file(self, file_id, content_type, filename):
         try:
-            return send_file(filename, self._resolve_path(file_id), content_type)
+            return send_file(filename, self._resolve_path(file_id).encode('utf-8'), content_type)
         except Exception as e:
             raise StorageError('Could not send "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
