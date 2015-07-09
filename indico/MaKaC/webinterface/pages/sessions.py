@@ -713,9 +713,6 @@ class WSessionModContribList(wcomponents.WTemplated):
         if self._filterCrit.getField("status"):
             url.addParam("status",self._filterCrit.getField("status").getValues())
 
-        if self._filterCrit.getField("material"):
-            url.addParam("material",self._filterCrit.getField("material").getValues())
-
         if self._sortingCrit.getField():
             url.addParam("sortBy",self._sortingCrit.getField().getId())
             url.addParam("order","down")
@@ -847,18 +844,6 @@ class WSessionModContribList(wcomponents.WTemplated):
             res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
         return "<br>".join(res)
 
-    def _getMaterialItemsHTML(self):
-        res=[]
-        pf,sf=materialFactories.PaperFactory(),materialFactories.SlidesFactory()
-        for (id,caption) in [(pf.getId(),pf.getTitle()),\
-                        (sf.getId(),sf.getTitle()),\
-                        ("--other--", _("other")),("--none--", i18nformat("""--_("no material")--"""))]:
-            checked=""
-            if id in self._filterCrit.getField("material").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="material" value=%s%s> %s"""%(quoteattr(str(id)),checked,self.htmlText(caption)))
-        return "<br>".join(res)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["quickAccessURL"]=quoteattr(str(urlHandlers.UHSessionModContribQuickAccess.getURL(self._session)))
@@ -866,7 +851,6 @@ class WSessionModContribList(wcomponents.WTemplated):
         vars["types"]=self._getTypeItemsHTML()
         vars["tracks"]=self._getTrackItemsHTML()
         vars["status"]=self._getStatusItemsHTML()
-        vars["materials"]=self._getMaterialItemsHTML()
         vars["authSearch"]=""
         authField=self._filterCrit.getField("author")
         if authField is not None:

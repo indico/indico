@@ -1154,9 +1154,6 @@ class WTrackModContribList(wcomponents.WTemplated):
         if self._filterCrit.getField("status"):
             url.addParam("status",self._filterCrit.getField("status").getValues())
 
-#        if self._filterCrit.getField("material"):
-#            url.addParam("material",self._filterCrit.getField("material").getValues())
-
         if self._sortingCrit.getField():
             url.addParam("sortBy",self._sortingCrit.getField().getId())
             url.addParam("order","down")

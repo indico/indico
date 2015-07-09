@@ -3998,9 +3998,6 @@ class WConfModifContribList(wcomponents.WTemplated):
         if self._filterCrit.getField("status"):
             dict["status"] = self._filterCrit.getField("status").getValues()
 
-        if self._filterCrit.getField("material"):
-            dict["material"] = self._filterCrit.getField("material").getValues()
-
         if self._sortingCrit.getField():
             dict["sortBy"] = self._sortingCrit.getField().getId()
             dict["order"] = "down"
@@ -4138,17 +4135,6 @@ class WConfModifContribList(wcomponents.WTemplated):
             code=ContribStatusList().getCode(st)
             caption=ContribStatusList().getCaption(st)
             res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
-        return res
-
-    def _getMaterialItemsHTML(self):
-        res=[]
-        for (id,caption) in [(PaperFactory().getId(),PaperFactory().getTitle()),\
-                        (SlidesFactory().getId(),SlidesFactory().getTitle()),\
-                        ("--other--", _("other")),("--none--", i18nformat("""--_("no material")--"""))]:
-            checked=""
-            if id in self._filterCrit.getField("material").getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="material" value=%s%s> %s"""%(quoteattr(str(id)),checked,self.htmlText(caption)))
         return res
 
     def _getFilterMenu(self):
