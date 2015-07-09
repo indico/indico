@@ -440,10 +440,8 @@ class AccessController(Persistent):
         self._p_changed = 1
 
     def getNonInheritingChildren(self):
-        return self.nonInheritingChildren
-
-    def setNonInheritingChildren(self, nonInheritingChildren):
-        self.nonInheritingChildren = nonInheritingChildren
+        return [elem for elem in self.nonInheritingChildren
+                if elem.__class__.__name__ != 'Minutes']
 
     def updateNonInheritingChildren(self, elem, delete=False):
         if delete or elem.getAccessController().getAccessProtectionLevel() == 0:
