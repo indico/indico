@@ -37,6 +37,15 @@
     white-space: nowrap;
 }
 
+@mixin colored-icon($color) {
+    &:before {
+        color: $color;
+    }
+    &:hover:not(.disabled):not(disabled):before {
+        color: lighten($color, $light-color-variation) !important;
+    }
+}
+
 .attachment-editor {
     width: 800px;
 }
@@ -66,11 +75,35 @@
                 text-overflow: ellipsis;
                 &:before {
                     display: inline-block;
+
                 }
                 > .custom-protection:before {
                     @extend %attachment-icon;
 
                     color: $pastel-red;
+                }
+                > a.icon-file-pdf {
+                    @include colored-icon($red);
+                }
+
+                > a.icon-file-excel {
+                    @include colored-icon($green);
+                }
+
+                > a.icon-file-word {
+                    @include colored-icon($dark-blue);
+                }
+
+                > a.icon-file-image {
+                    @include colored-icon($blue);
+                }
+
+                > a.icon-calendar {
+                    @include colored-icon($dark-yellow);
+                }
+
+                > a.icon-file-presentation {
+                    @include colored-icon($yellow);
                 }
             }
             > * {
@@ -198,37 +231,28 @@
     }
 }
 
-@mixin download-button($color) {
-    &:before {
-        color: $color;
-    }
-    &:hover:not(.disabled):not(disabled) {
-        color: lighten($color, 5%) !important;
-    }
-}
-
 .attachment.icon-file-pdf {
-    @include download-button($red);
+    @include colored-icon($red);
 }
 
 .attachment.icon-file-excel {
-    @include download-button($green);
+    @include colored-icon($green);
 }
 
 .attachment.icon-file-word {
-    @include download-button($dark-blue);
+    @include colored-icon($dark-blue);
 }
 
 .attachment.icon-file-image {
-    @include download-button($blue);
+    @include colored-icon($blue);
 }
 
 .attachment.icon-calendar {
-    @include download-button($dark-yellow);
+    @include colored-icon($dark-yellow);
 }
 
 .attachment.icon-file-presentation {
-    @include download-button($yellow);
+    @include colored-icon($yellow);
 }
 
 .material-list {
