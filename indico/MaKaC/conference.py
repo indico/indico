@@ -7530,7 +7530,7 @@ class Contribution(CommonObjectBase, Locatable):
         if self._track is not None:
             data["track"] = self._track.getTitle()
         if self._type is not None:
-            data["type"] = self._type
+            data["type"] = self._type.getName()
         data["speaker text"] = self.speakerText
         if self.place is not None:
             data["place"] = self.place.getName()
