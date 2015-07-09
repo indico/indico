@@ -3215,6 +3215,7 @@ class Conference(CommonObjectBase, Locatable):
                 for contrib in session.getContributionList():
                     contrib.delete()
 
+            signals.event.session_deleted.send(session, parent=self.getConference())
             del self.sessions[session.getId()]
 
             session.delete()
@@ -5170,7 +5171,6 @@ class Session(CommonObjectBase, Locatable):
         self.notifyModification()
 
     def delete(self):
-        signals.event.session_deleted.send(self, parent=self.getConference())
         while len(self.getConvenerList()) > 0:
             self.removeConvener(self.getConvenerList()[0])
         while len(self.getMaterialList()) > 0:

@@ -63,3 +63,18 @@ class NoteCloner(EventCloner):
 @signals.event_management.clone.connect
 def _get_note_cloner(event, **kwargs):
     return NoteCloner(event)
+
+
+@signals.event.deleted.connect
+def _delete_event_notes(event, **kwargs):
+    from indico.modules.events.notes.models.notes import EventNote
+    EventNote.find(event_id=event.id).update({EventNote.is_deleted: True})
+    db.session.expire_all()
+
+
+@signals.event.session_deleted.connect
+@signals.event.contribution_deleted.connect
+@signals.event.subcontribution_deleted.connect
+def _delete_note(obj, **kwargs):
+    if obj.note:
+        obj.note.is_deleted = True
