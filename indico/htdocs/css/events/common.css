@@ -148,7 +148,7 @@ ul.subEventLevelSCList {
     margin-left: 40px;
 }
 
-ul.subEventLevelSCList li {
+ul.subEventLevelSCList > li {
     padding: 0;
     margin: 1em 0;
     list-style-type: none;
