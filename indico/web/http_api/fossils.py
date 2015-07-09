@@ -20,7 +20,7 @@ Basic fossils for data export
 
 from hashlib import md5
 
-from indico.modules.attachments.api.util import build_material_legacy_api_data
+from indico.modules.attachments.api.util import build_material_legacy_api_data, build_folders_api_data
 from indico.modules.events.notes.util import build_note_api_data
 from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
@@ -177,6 +177,11 @@ class _IncludeMaterialFossil(IFossil):
     getAllMaterialList.name = 'material'
     getAllMaterialList.produce = build_material_legacy_api_data
     getAllMaterialList.convert = Conversion.addLegacyMinutes
+
+    def getFolders(self):
+        pass
+    getFolders.produce = build_folders_api_data
+    getFolders.convert = Conversion.addLegacyMinutes
 
 
 class _IncludeACLFossil(IFossil):
