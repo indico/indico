@@ -86,3 +86,9 @@ though WTForms validation was successful.  In this case it is highly
 recommended to mark a field as erroneous or indicate the error in some
 other way.
 """)
+
+model_committed = _signals.signal('model-committed', """
+Triggered when an IndicoModel class was committed.  The *sender* is
+the model class, the model instance is passed as `obj` and the
+change type as a string (delete/insert/update) in the `change` kwarg.
+""")

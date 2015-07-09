@@ -25,6 +25,7 @@ from sqlalchemy.orm import joinedload, joinedload_all
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 
+from indico.core import signals
 from indico.util.decorators import strict_classproperty
 
 
@@ -119,10 +120,11 @@ class IndicoModel(Model):
 
         ALWAYS call super if you override this method!
 
-        :param change: The operation that has been committed (delete/change/update)
+        :param change: The operation that has been committed (delete/insert/update)
         """
         if hasattr(g, 'memoize_cache'):
             del g.memoize_cache
+        signals.model_committed.send(type(self), obj=self, change=change)
 
 
 def import_all_models(package_name=None):

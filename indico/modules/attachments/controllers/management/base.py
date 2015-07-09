@@ -21,7 +21,6 @@ from werkzeug.utils import secure_filename
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
 from indico.modules.attachments.forms import (AddAttachmentFilesForm, AttachmentLinkForm, AttachmentFolderForm,
