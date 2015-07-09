@@ -18,12 +18,14 @@ from __future__ import unicode_literals
 
 import os
 import tempfile
+from operator import itemgetter
 from zipfile import ZipFile
 
 from flask import session
 from sqlalchemy import cast, Date
 
-from indico.util.fs import secure_filename
+from indico.util.date_time import format_date
+from indico.util.string import to_unicode
 from indico.web.flask.util import send_file
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -44,14 +46,18 @@ class AttachmentPackageMixin:
         form = AttachmentPackageForm()
         form.sessions.choices = self._load_session_data()
         form.contributions.choices = self._load_contribution_data()
+        form.contributions_schedule_dates.choices = self._load_schedule_data()
         return form
 
     def _load_session_data(self):
-        sessions = self._conf.getSessionList()
-        return [(session.getId(), session.getTitle()) for session in sessions]
+        return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
 
     def _load_contribution_data(self):
-        return [(contrib.getId(), contrib.getTitle()) for contrib in self._conf.getContributionList()]
+        return [(contrib.getId(), to_unicode(contrib.getTitle())) for contrib in self._conf.getContributionList()]
+
+    def _load_schedule_data(self):
+        dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList()}
+        return sorted([(unicode(d), format_date(d, 'short')) for d in dates], key=itemgetter(1))
 
     def _filter_attachments(self, form):
         attachments = []
@@ -59,8 +65,11 @@ class AttachmentPackageMixin:
         attachments.extend(self._filter_protected(self._filter_top_level_attachments(added_since)))
         if form.sessions.data:
             attachments.extend(self._filter_protected(self._filter_by_sessions(form.sessions.data, added_since)))
-        if form.contributions.data:
-            attachments.extend(self._filter_protected(self._filter_by_contributions(form.contributions.data, added_since)))
+
+        contribution_ids = set(form.contributions.data +
+                               self._get_contributions_by_schedule_date(form.contributions_schedule_dates.data))
+        if contribution_ids:
+            attachments.extend(self._filter_protected(self._filter_by_contributions(contribution_ids, added_since)))
         return attachments
 
     def _filter_protected(self, attachments):
@@ -86,6 +95,10 @@ class AttachmentPackageMixin:
             query = self._filter_by_date(query, added_since)
 
         return query.all()
+
+    def _get_contributions_by_schedule_date(self, dates):
+        return [contribution.getId() for contribution in self._conf.getContributionList()
+                if str(contribution.getStartDate().date()) in dates]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
         query = self._build_base_query().filter(AttachmentFolder.contribution_id.in_(contribution_ids))

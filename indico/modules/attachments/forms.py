@@ -121,3 +121,7 @@ class AttachmentPackageForm(IndicoForm):
                                                  description=_('Include attachments from selected sessions'))
     contributions = IndicoSelectMultipleCheckboxField(_('Contributions'),
                                                       description=_('Include attachments from selected contributions'))
+    contributions_schedule_dates = IndicoSelectMultipleCheckboxField(_('Contributions scheduled on'),
+                                                                     description=_('Include attachments from '
+                                                                                   'contributions scheduled on '
+                                                                                   'selected dates'))

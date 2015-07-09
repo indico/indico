@@ -14,6 +14,9 @@
             {% if form.contributions.choices %}
                 {{ form_row(form.contributions) }}
             {% endif %}
+            {% if form.contributions_schedule_dates.choices %}
+                {{ form_row(form.contributions_schedule_dates) }}
+            {% endif %}
             {% call form_footer(form) %}
                 <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
             {% endcall %}
@@ -23,5 +26,5 @@
 
 <script>
     $('#added_since').datepicker();
-    $('input[name=sessions], input[name=contributions]').prop('checked', true);
+    $('input[name=sessions], input[name=contributions], input[name=contributions_schedule_dates]').prop('checked', true);
 </script>
