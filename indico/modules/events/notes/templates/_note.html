@@ -69,16 +69,29 @@
 
 {% macro _render_event_note_placeholder(event) %}
     <div class="no-note-text">
-        {% trans %}There are no minutes attached to this event.{% endtrans %}
-        <a href="#" class="js-note-editor"
-           data-href="{{ url_for('event_notes.edit', event) }}">
-            {% trans %}Write them{% endtrans %}
-        </a>
-        {% trans %}or{% endtrans %}
-        <a href="#" class="js-note-editor"
-           data-href="{{ url_for('event_notes.compile', event) }}">
-            {%- trans %}compile existing{% endtrans -%}
-        </a>.
+        {% trans -%}
+            There are no minutes attached to this event.
+        {%- endtrans %}
+
+        {# No other notes in the event #}
+        {% if not event.nested_notes %}
+            {% trans edit_url=url_for('event_notes.edit', event) -%}
+                You can
+                <a href="#" class="js-note-editor" data-href="{{ edit_url }}">
+                    write them</a>.
+            {%- endtrans %}
+
+        {# Other notes in the event #}
+        {% else %}
+            {% trans edit_url=url_for('event_notes.edit', event), compile_url=url_for('event_notes.compile', event) -%}
+                You can
+                <a href="#" class="js-note-editor" data-href="{{ edit_url }}">
+                    write them</a>
+                or
+                <a href="#" class="js-note-editor" data-href="{{ compile_url }}">
+                    compile existing</a>.
+            {%- endtrans %}
+        {% endif %}
     </div>
 {% endmacro %}
 
