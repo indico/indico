@@ -29,6 +29,8 @@ class SendErrorReport(ServiceBase):
     This service sends an error report to the indico support e-mail
     """
 
+    CHECK_HTML = False
+
     def _sendReport( self ):
         cfg = Config.getInstance()
 

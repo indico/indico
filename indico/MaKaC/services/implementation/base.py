@@ -160,6 +160,7 @@ class ServiceBase(RequestHandlerBase):
     """
 
     UNICODE_PARAMS = False
+    CHECK_HTML = True
 
     def __init__(self, params):
         if not self.UNICODE_PARAMS:
@@ -220,10 +221,11 @@ class ServiceBase(RequestHandlerBase):
         self._checkParams()
         self._checkProtection()
 
-        try:
-            security.Sanitization.sanitizationCheck(self._target, self._params, self._aw, ['requestInfo'])
-        except HtmlForbiddenTag as e:
-            raise HTMLSecurityError('ERR-X0','HTML Security problem. %s ' % str(e))
+        if self.CHECK_HTML:
+            try:
+                security.Sanitization.sanitizationCheck(self._target, self._params, self._aw, ['requestInfo'])
+            except HtmlForbiddenTag as e:
+                raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
 
         if self._doProcess:
             if Config.getInstance().getProfile():
