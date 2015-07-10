@@ -1491,10 +1491,6 @@ class UHConfModifContribList(URLHandler):
     _endpoint = 'event_mgmt.confModifContribList'
 
 
-class UHContribModifMaterialBrowse(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-browseMaterial'
-
-
 class UHContribModSetTrack(URLHandler):
     _endpoint = 'event_mgmt.contributionModification-setTrack'
 

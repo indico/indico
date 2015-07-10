@@ -58,8 +58,6 @@ with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     # Material (also used to upload papers for reviewing!)
     event_mgmt.add_url_rule('/contribution/<contribId>/material/add', 'contributionModification-materialsAdd',
                             contribMod.RHMaterialsAdd, methods=('POST',))
-    event_mgmt.add_url_rule('/contribution/<contribId>/material/browse/<materialId>',
-                            'contributionModification-browseMaterial', contribMod.RHContribModifMaterialBrowse)
 
     # Protection
     event_mgmt.add_url_rule('/contribution/<contribId>/access/', 'contributionAC', contribMod.RHContributionAC,

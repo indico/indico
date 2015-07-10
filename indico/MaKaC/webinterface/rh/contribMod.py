@@ -39,7 +39,6 @@ from MaKaC.errors import FormValuesError
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.web.flask.util import send_file
@@ -466,22 +465,6 @@ class RHSetSession(RHContribModifBase):
         self._target.setSession(self._session)
         url=urlHandlers.UHContributionModification.getURL(self._target)
         self._redirect(url)
-
-class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon ):
-    _uh = urlHandlers.UHContribModifMaterialBrowse
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        self._contrib = self._target
-        materialId = params["materialId"]
-
-        self._material = self._target = self._contrib.getMaterialById(materialId)
-
-    def _process(self):
-        return RHMaterialDisplayCommon._process(self)
-
-    def _processManyMaterials(self):
-        self._redirect(urlHandlers.UHContribModifMaterials.getURL(self._material.getOwner()))
 
 
 class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRights):

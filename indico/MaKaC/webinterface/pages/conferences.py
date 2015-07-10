@@ -57,8 +57,7 @@ from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 import MaKaC.common.info as info
-from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, _, ngettext
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
 from MaKaC.common.fossilize import fossilize
@@ -4006,30 +4005,14 @@ class WConfModifContribList(wcomponents.WTemplated):
 
         return url
 
-
     def _getMaterialsHTML(self, contrib):
-        materials=[]
-        if contrib.getPaper() is not None:
-            url= urlHandlers.UHContribModifMaterialBrowse.getURL(contrib.getPaper())
-            #url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'paper'})
-            materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(PaperFactory().getTitle().lower())))
-        if contrib.getSlides() is not None:
-            url= urlHandlers.UHContribModifMaterialBrowse.getURL(contrib.getSlides())
-            #url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'slides'})
-            materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(SlidesFactory().getTitle().lower())))
-        if contrib.getPoster() is not None:
-            url= urlHandlers.UHContribModifMaterialBrowse.getURL(contrib.getPoster())
-            #url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'poster'})
-            materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(PosterFactory().getTitle().lower())))
-        if contrib.getVideo() is not None:
-            materials.append("""<a href=%s>%s</a>"""%(
-                quoteattr(str(urlHandlers.UHContribModifMaterials.getURL(contrib))),
-                self.htmlText(materialFactories.VideoFactory.getTitle())))
-        for material in contrib.getMaterialList():
-            url=urlHandlers.UHContribModifMaterials.getURL(contrib)
-            materials.append("""<a href=%s>%s</a>"""%(
-                quoteattr(str(url)),self.htmlText(material.getTitle())))
-        return "<br>".join(materials)
+        attached_items = contrib.attached_items
+        if attached_items:
+            num_files = len(attached_items['files']) + sum(len(f.attachments) for f in attached_items['folders'])
+            return '<a href="{}">{}</a>'.format(
+                url_for('attachments.management', contrib),
+                ngettext('1 file', '{num} files', num_files).format(num=num_files)
+            )
 
     def _getContribHTML( self, contrib ):
         try:
