@@ -32,6 +32,7 @@
                     trigger: this,
                     url: $this.data('href'),
                     title: $this.data('title'),
+                    hidePageHeader: true,
                     onClose: function(data) {
                         if (data) {
                             $('#attachments-container').html(data.attachment_list);
@@ -63,6 +64,7 @@
             url: build_url(Indico.Urls.AttachmentManager, itemLocator),
             title: $T.gettext("Manage material"),
             confirmCloseUnsaved: false,
+            hidePageHeader: true,
             onClose: function(callbackData, customData) {
                 if (customData) {
                     location.reload();
