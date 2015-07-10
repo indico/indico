@@ -115,6 +115,7 @@ class AddAttachmentLinkMixin:
             form.populate_obj(link)
             link.folder = folder
 
+            db.session.flush()
             logger.info('Attachment {} added by {}'.format(link, session.user))
             signals.attachments.attachment_created.send(link, user=session.user)
             flash(_("The link has been added"), 'success')
