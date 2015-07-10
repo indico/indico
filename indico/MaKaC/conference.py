@@ -7778,13 +7778,17 @@ class Contribution(CommonObjectBase, Locatable):
             signals.event.contribution_deleted.send(self, parent=oldParent)
 
             self.setTrack(None)
-            for mat in self.getMaterialList():
-                self.removeMaterial(mat)
-            self.removePaper()
-            self.removeSlides()
-            self.removeVideo()
-            self.removePoster()
-            self.removeReviewing()
+
+            # sending deleted signal to attached items.
+            # TODO 2.0: do not delete them, only set is_deleted on parent
+            attachments = self.attached_items
+            if attachments:
+                for folder in attachments['folders']:
+                    signals.attachments.folder_deleted.send(folder, user=session.user)
+                for attachment in attachments['files']:
+                    signals.attachments.attachment_deleted.send(attachment, user=session.user)
+
+                self.removeReviewing()
 
             self.notify_protection_to_owner(self, delete=True)
 
