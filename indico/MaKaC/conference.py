@@ -2072,8 +2072,8 @@ class Conference(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def nested_notes(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_all_for_event(self) - {self.note}
+        from indico.modules.events.notes.util import get_all_notes
+        return set(get_all_notes(self)) - {self.note}
 
     @unify_user_args
     def log(self, realm, kind, module, summary, user=None, type_=u'simple', data=None):

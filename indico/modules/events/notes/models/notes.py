@@ -120,11 +120,6 @@ class EventNote(LinkMixin, db.Model):
             return g.event_notes.get(linked_object)
 
     @classmethod
-    def get_all_for_event(cls, event):
-        cls.get_for_linked_object(event)
-        return {note for obj, note in g.event_notes.iteritems() if obj.getConference() == event}
-
-    @classmethod
     def get_or_create(cls, linked_object):
         """Gets the note for the given object or creates a new one.
 
