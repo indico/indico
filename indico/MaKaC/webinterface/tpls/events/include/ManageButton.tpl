@@ -62,7 +62,7 @@
 
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
             % if 'minutesLink' in info:
-                % if note_item.note is None and getItemType(item) != 'Conference' or minutesEditActions:
+                % if note_item.note is None and getItemType(item) == 'Conference' or minutesEditActions:
                     menuOptions['editMinutes'] = {
                         action: function(m) {
                             ajaxDialog({
@@ -78,14 +78,14 @@
                             m.close();
                             return false;
                         },
-                        display: ${ note_item.note is not None | n,j } ? $T('Edit minutes') : $T('Add minutes')
+                        display: $T('Add minutes')
                     };
                 % endif
-                % if note_item.note is None and minutesEditActions and getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
+                % if note_item.note is None and getItemType(item) == 'Conference' and note_item.nested_notes and item.getVerboseType() != "Lecture":
                     menuOptions['compileMinutes'] = {
                         action: function(m) {
                             ajaxDialog({
-                                title: $T('Add minutes'),
+                                title: $T('Edit minutes'),
                                 url: ${ url_for('event_notes.compile', note_item) | n,j },
                                 confirmCloseUnsaved: true,
                                 onClose: function(data) {
@@ -98,6 +98,25 @@
                             return false;
                         },
                         display: $T('Compile minutes')
+                    };
+                % endif
+                % if note_item.note and minutesEditActions:
+                    menuOptions['editMinutes'] = {
+                        action: function(m) {
+                            ajaxDialog({
+                                title: $T('Edit minutes'),
+                                url: ${ url_for('event_notes.edit', note_item) | n,j },
+                                confirmCloseUnsaved: true,
+                                onClose: function(data) {
+                                    if (data) {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Edit minutes')
                     };
                 % endif
                 % if note_item.note and minutesEditActions:
