@@ -41,6 +41,11 @@
     width: 800px;
 }
 
+.dialog-window .attachments-container {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
 .tree {
     width: 100%;
 
