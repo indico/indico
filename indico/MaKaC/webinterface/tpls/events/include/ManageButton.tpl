@@ -81,7 +81,7 @@
                         display: $T('Add minutes')
                     };
                 % endif
-                % if note_item.note is None and getItemType(item) == 'Conference' and note_item.nested_notes and item.getVerboseType() != "Lecture":
+                % if note_item.note is None and getItemType(item) == 'Conference' and note_item.scheduled_notes and item.getVerboseType() != "Lecture":
                     menuOptions['compileMinutes'] = {
                         action: function(m) {
                             ajaxDialog({

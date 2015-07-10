@@ -26,7 +26,7 @@ from indico.core.errors import NoReportError
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
-from indico.modules.events.notes.util import get_all_notes
+from indico.modules.events.notes.util import get_nested_notes
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.util import get_object_from_args
 from indico.util.i18n import _
@@ -113,7 +113,7 @@ class RHCompileNotes(RHEditNote):
     def _process(self):
         if self.event.note:
             raise NoReportError(_("This event already has a note attached."))
-        source = render_template('events/notes/compiled_notes.html', notes=get_all_notes(self.event))
+        source = render_template('events/notes/compiled_notes.html', notes=self.event.scheduled_notes)
         form = self._make_form(source=source)
         return self._process_form(form, is_compilation=True)
 

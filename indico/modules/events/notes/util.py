@@ -48,11 +48,13 @@ def build_note_legacy_api_data(note):
             'title': 'Minutes'}
 
 
-def get_all_notes(obj):
+def get_nested_notes(obj):
     """Gets all notes linked to the object and its nested objects.
 
-    :param obj: A :class:`SessionSlot`, :class:`Contribution` or
-                :class:`SubContribution` object.
+    In case of :class:`Conference`, nested objects have to be scheduled.
+
+    :param obj: A :class:`Conference`, :class:`SessionSlot`,
+                :class:`Contribution` or :class:`SubContribution` object.
     """
     notes = [obj.note] if obj.note else []
     nested_objects = []
@@ -62,4 +64,4 @@ def get_all_notes(obj):
         nested_objects = obj.getContributionList()
     elif isinstance(obj, Contribution):
         nested_objects = obj.getSubContributionList()
-    return itertools.chain(notes, *map(get_all_notes, nested_objects))
+    return itertools.chain(notes, *map(get_nested_notes, nested_objects))
