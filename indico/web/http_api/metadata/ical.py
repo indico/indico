@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# python stdlib imports
-import icalendar as ical
 from lxml import html
 from lxml.etree import ParserError
 
-# indico imports
-from indico.web.http_api.metadata.serializer import Serializer
+import icalendar as ical
 
-# legacy indico imports
+from indico.util.string import to_unicode
+from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 
 
@@ -51,12 +49,12 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event.add('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
     event.add('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
     event.add('url', fossil['url'])
-    event.add('summary', fossil['title'].decode('utf-8'))
+    event.add('summary', to_unicode(fossil['title']))
     loc = fossil['location'] or ''
     if loc:
-        loc = loc.decode('utf-8')
+        loc = to_unicode(loc)
     if fossil['roomFullname']:
-        loc += ' ' + fossil['roomFullname'].decode('utf-8')
+        loc += ' ' + to_unicode(fossil['roomFullname'])
     event.add('location', loc)
     description = ""
     if fossil.get('speakers'):
@@ -68,7 +66,7 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         if not desc_text:
             desc_text = '<p/>'
         try:
-            description += '{}\n\n{}'.format(html.fromstring(desc_text.decode('utf-8')).text_content().encode('utf-8'),
+            description += '{}\n\n{}'.format(html.fromstring(to_unicode(desc_text)).text_content().encode('utf-8'),
                                              fossil['url'])
         except ParserError:
             # this happens e.g. if desc_text contains only a html comment
