@@ -74,24 +74,6 @@ class WPMaterialDisplayBase( WPConferenceDefaultDisplayBase ):
         return wc.getHTML( pars )
 
 
-class WPMaterialCatDisplayBase(WPCategoryDisplayBase, WPMaterialDisplayBase ):
-    def __init__(self, rh, material):
-        self._material = self._target =material
-
-
-        WPCategoryDisplayBase.__init__(self,rh,self._material.getCategory())
-        self._navigationTarget = self._material
-
-    def _applyDecoration( self, body ):
-
-        return WPCategoryDisplayBase._applyDecoration( self, body )
-
-    def _getBody( self, params ):
-
-        wc = WMaterialDisplay( self._getAW(), self._material )
-        return wc.getHTML( )
-
-
 class WPMaterialConfDisplayBase(WPMaterialDisplayBase, WPConferenceDefaultDisplayBase ):
 
     def __init__(self,rh,material):

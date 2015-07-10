@@ -78,10 +78,7 @@ class RHMaterialDisplay( RHMaterialDisplayBase, RHMaterialDisplayCommon ):
         return RHMaterialDisplayCommon._process(self)
 
     def _processManyMaterials( self ):
-        if self._material.getConference()!=None:
-            p = material.WPMaterialConfDisplayBase(self, self._material)
-        else:
-            p = material.WPMaterialCatDisplayBase(self, self._material)
+        p = material.WPMaterialConfDisplayBase(self, self._material)
         wf=self.getWebFactory()
 
         if wf is not None:

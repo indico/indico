@@ -29,11 +29,6 @@ files.add_url_rule('/event/<confId>/session/<sessionId>/contribution/<contribId>
 files.add_url_rule('/event/<confId>/material-old/<materialId>/accesskey', 'materialDisplay-accessKey',
                    materialDisplay.RHMaterialDisplayStoreAccessKey, methods=('POST',))
 
-# Material (category)
-files.add_url_rule('/category/<categId>/material-old/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
-files.add_url_rule('/category/<categId>/material-old/<materialId>/accesskey', 'materialDisplay-accessKey',
-                   materialDisplay.RHMaterialDisplayStoreAccessKey, methods=('POST',))
-
 # File access (event)
 files.add_url_rule(
     '/event/<confId>/session/<sessionId>/material-old/<materialId>/<resId>.<fileExt>', 'getFile-access',
