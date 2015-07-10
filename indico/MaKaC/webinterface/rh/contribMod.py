@@ -18,31 +18,24 @@ from cStringIO import StringIO
 
 from flask import session
 
+
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.string import to_unicode
+from indico.web.flask.util import send_file
 
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.conference as conference
-import MaKaC.user as user
-import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
-from indico.core.config import Config
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.errors import FormValuesError
-from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.web.flask.util import send_file
-from MaKaC.PDFinterface.base import LatexRunner
 
 
 class RHContribModifBase(RHModificationBaseProtected):
