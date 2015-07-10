@@ -24,7 +24,6 @@ from indico.modules.auth.util import url_for_login
 from indico.modules.rb.models.locations import Location
 from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
-from MaKaC.export import fileConverter
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 
@@ -120,11 +119,6 @@ def generate_global_file(config):
         'FileRestrictions': {
             'MaxUploadFilesTotalSize': config.getMaxUploadFilesTotalSize(),
             'MaxUploadFileSize': config.getMaxUploadFileSize()
-        },
-
-        'PDFConversion': {
-            'AvailablePDFConversions': fileConverter.CDSConvFileConverter.getAvailableConversions(),
-            'HasFileConverter': config.hasFileConverter()
         }
     }
 

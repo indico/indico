@@ -24,13 +24,11 @@ from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError, NotFoundError
 from indico.core.config import Config
 from MaKaC.conference import LocalFile, Link, Category
-from MaKaC.export import fileConverter
 from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
 
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
-from MaKaC.common.timezoneUtils import nowutc
 
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util import json
@@ -215,7 +213,6 @@ class RHSubmitMaterialBase(object):
 
         self._files = []
         self._links = []
-        self._topdf = "topdf" in params
 
         self._displayName = params.get("displayName", "").strip()
         self._uploadType = params.get("uploadType", "")
@@ -388,13 +385,6 @@ class RHSubmitMaterialBase(object):
             else:
                 mat.addResource(resource, forcedFileId=None)
 
-            #apply conversion
-            if self._topdf and not isinstance(resource, Link):
-                file_ext = os.path.splitext(resource.getFileName())[1].strip().lower()
-                if fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(file_ext):
-                    fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), 'pdf', mat)
-                    resource.setPDFConversionRequestDate(nowutc())
-
             # store the repo id, for files
             if isinstance(resource, LocalFile) and self._repositoryIds is None:
                 repoIDs.append(resource.getRepositoryId())
@@ -411,7 +401,6 @@ class RHSubmitMaterialBase(object):
             for principal in map(principal_from_fossil, self._userList):
                 protectedObject.grantAccess(principal)
 
-        self._topdf = False
         if self._repositoryIds is None:
             self._repositoryIds = repoIDs
 

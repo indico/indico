@@ -496,7 +496,6 @@ class Config:
         'SupportEmail'              : 'root@localhost',
         'PublicSupportEmail'        : 'root@localhost',
         'NoReplyEmail'              : 'noreply-root@localhost',
-        'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
         'ReportNumberSystems'       : {},
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
@@ -626,8 +625,6 @@ class Config:
             'TPLDir'                    : os.path.abspath(os.path.join(webinterface_dir, 'tpls')),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
-            'FileConverterServerURL'    : self.getFileConverter().get("conversion_server", ""),
-            'FileConverterResponseURL'  : self.getFileConverter().get("response_url", ""),
             'ImagesBaseURL'             : self.getImagesBaseURL(),
             'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
             'Version'                   : MaKaC.__version__,
@@ -900,9 +897,6 @@ class Config:
         if id not in self.__systemIcons:
             return id
         return self.__systemIcons[id]
-
-    def hasFileConverter(self):
-        return self.getFileConverter().get("conversion_server", "") != ""
 
     def getSharedTempDir(self):
         std = self.getUploadedFilesSharedTempDir()

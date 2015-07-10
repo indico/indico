@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, request
+from flask import session
 
 import MaKaC.webinterface.pages.material as material
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -23,7 +23,6 @@ from indico.core import signals
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHMaterialBase
-from MaKaC.export import fileConverter
 from MaKaC.i18n import _
 
 
@@ -107,19 +106,3 @@ class RHMaterialDisplayStoreAccessKey(RHMaterialDisplayBase):
         access_keys[self._target.getUniqueId()] = self._accesskey
         session.modified = True
         self._redirect(urlHandlers.UHMaterialDisplay.getURL(self._target))
-
-
-class RHMaterialAddConvertedFile(RHMaterialDisplayBase):
-
-    def _checkProtection(self):
-        pass
-
-    def _checkParams(self,params):
-        pass
-
-    def _process( self ):
-        params = self._getRequestParams()
-        tempFilePath = fileConverter.CDSConvFileConverter.storeConvertedFile(request.remote_addr, params)
-        self._tempFilesToDelete.append(tempFilePath)
-        #Normally, you do not have to response anything special.....but we can think about it.
-        return params.get("filename","")

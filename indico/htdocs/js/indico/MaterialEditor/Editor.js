@@ -96,9 +96,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         var MAX_MATERIAL_FIELDS = 5;
         var files = [Html.input('file', {name: 'file'})];
         var urlBoxes = [Html.edit({name: 'url'})];
-        var toPDFCheckbox = Html.checkbox({style: {verticalAlign: 'middle'}}, true);
         var currentResourceLocation;
-        toPDFCheckbox.dom.name = 'topdf';
 
         var self = this;
 
@@ -130,24 +128,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                         if(i == 0 && files.length < MAX_MATERIAL_FIELDS) {
                             args.push(addInputLink);
                         }
-                    }
-                    if (Indico.PDFConversion.HasFileConverter){
-                        var pdfDivLabel = Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
-                                $T("Convert to PDF"));
-                        var pdfDiv = Html.div({style:{marginTop: '5px'}},
-                                toPDFCheckbox,
-                                pdfDivLabel
-                                );
-                        $(pdfDivLabel.dom).qtip({
-                            content: {
-                                text: $T("The only available file formats are: ") + Indico.PDFConversion.AvailablePDFConversions.toString().replace(/\./g,' ')
-                            },
-                            position: {
-                                target: 'mouse',
-                                adjust: { mouse: true, x: 11, y: 13 }
-                            }
-                        });
-                        args.push(pdfDiv);
                     }
 
                     return Html.div.apply(null, args);

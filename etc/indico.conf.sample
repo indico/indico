@@ -189,19 +189,6 @@ MaxUploadFileSize = 0
 
 
 #------------------------------------------------------------------------------
-# FILE CONVERSION
-#------------------------------------------------------------------------------
-# Indico has an interface to interact with an external file conversion system
-# to convert from some formats to others but right now there is no publicly
-# available file conversion software.
-#
-# If you are interested in this feature please contact us at:
-#   indico-team@cern.ch
-#
-# FileConverter = {"conversion_server": "http://conversion.cern.ch/getSegFile.py",
-#                  "response_url": "http://localhost/conversion-finished"}
-
-#------------------------------------------------------------------------------
 # AUTOMATIC MAINTENANCE
 #------------------------------------------------------------------------------
 # Indico can automatically delete events older than a specified number of days.
