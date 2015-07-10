@@ -30,11 +30,14 @@ from indico.web.flask.util import url_for
 
 class WPRoomBookingHeadContentMixin:
     def _getHeadContent(self):
-        # This should be in sync with WPRoomBookingEventBase._getHeadContent!
+        try:
+            timestamp = os.stat(__file__).st_mtime
+        except OSError:
+            timestamp = 0
         return """
         <!-- Our libs -->
         <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
-        """ % (self._getBaseURL(), os.stat(__file__).st_mtime)
+        """ % (self._getBaseURL(), timestamp)
 
 
 class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):

@@ -358,7 +358,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     def _getHeadContent(self):
         dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         path = self._getBaseURL()
-        timestamp = os.stat(__file__).st_mtime
+        try:
+            timestamp = os.stat(__file__).st_mtime
+        except OSError:
+            timestamp = 0
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
             """ % (path, timestamp)
@@ -376,8 +379,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
                       for url in self._asset_env['mathjax_js'].urls())
         ])
-
-        return printCSS
 
     def _applyDecoration( self, body ):
         body = self._applyConfDisplayDecoration( body )
@@ -912,7 +913,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         htdocs = config.getHtdocsDir()
         baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
-        timestamp = os.stat(__file__).st_mtime
+        try:
+            timestamp = os.stat(__file__).st_mtime
+        except OSError:
+            timestamp = 0
         styleText = """<link rel="stylesheet" href="%s/css/%s?%d">\n""" % \
             (baseurl, Config.getInstance().getCssStylesheetName(), timestamp)
         # Then the common event display stylesheet
@@ -7634,7 +7638,10 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
 
     def _getHeadContent( self ):
         path = Config.getInstance().getCssBaseURL()
-        timestamp = os.stat(__file__).st_mtime
+        try:
+            timestamp = os.stat(__file__).st_mtime
+        except OSError:
+            timestamp = 0
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/Conf_Basic.css?%d" >
             """ % (path, timestamp)
