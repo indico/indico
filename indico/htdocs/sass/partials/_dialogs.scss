@@ -114,3 +114,11 @@
 .confirmation-dialog ul.categ-list span.event-title {
     font-style: italic;
 }
+
+.dialog-window {
+    &.no-page-header {
+        .page-content-header, .page-content-description {
+            display: none;
+        }
+    }
+}

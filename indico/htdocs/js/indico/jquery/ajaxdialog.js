@@ -58,7 +58,9 @@
                            // otherwise the JSON returned by the server. if it returns false, the dialog will remain
                            // open; if it returns a Deferred object, the dialog remain open until the object is resolved
             getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
-            confirmCloseUnsaved: false  // ask the user to confirm closing the dialog with unsaved changes
+            confirmCloseUnsaved: false,  // ask the user to confirm closing the dialog with unsaved changes
+            dialogClasses: '',  // extra classes to add to the dialog canvas
+            hidePageHeader: false  // if the default page header (title/subtitle/description) should be hidden
         }, options);
 
         var popup = null;
@@ -93,9 +95,11 @@
                 closeDialog(null);
                 return false;
             }, false, false);
+
             popup.draw = function() {
                 this.ExclusivePopup.prototype.draw.call(this, dialogData.html);
             };
+
             popup.postDraw = function() {
                 ajaxifyForms();
                 popup.canvas.on('ajaxDialog:setData', function(e, data) {
@@ -106,6 +110,12 @@
                     popup.canvas.data('ui-dialog')._focusTabbable();
                 });
             };
+
+            var dialogClasses = _.union(['dialog-window', options.dialogClasses]);
+            if (options.hidePageHeader) {
+                dialogClasses.push('no-page-header');
+            }
+            popup.canvas.addClass(dialogClasses.join(' '));
             popup.open();
         }
 
