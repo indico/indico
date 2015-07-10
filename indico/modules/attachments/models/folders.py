@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal
+from indico.modules.attachments.util import can_manage_attachments
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
 
@@ -123,6 +124,15 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     @property
     def locator(self):
         return dict(self.linked_object.getLocator(), folder_id=self.id)
+
+    def can_access(self, user, *args, **kwargs):
+        """Checks if the user is allowed to access the folder.
+
+        This is the case if the user has access the folder or if the
+        user can manage attachments for the linked object.
+        """
+        return (super(AttachmentFolder, self).can_access(user, *args, **kwargs) or
+                can_manage_attachments(self.linked_object, user))
 
     def can_view(self, user):
         """Checks if the user can see the folder.
