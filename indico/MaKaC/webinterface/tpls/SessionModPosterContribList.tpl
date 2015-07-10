@@ -28,13 +28,11 @@
                                     <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px"> ${ _("types")}</td>
                                     <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> ${ _("tracks")}</td>
                                     <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> ${ _("status")}</td>
-                                    <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> ${ _("material")}</td>
                                 </tr>
                                 <tr>
                                     <td valign="top" style="border-right:1px solid #777777;">${ types }</td>
                                     <td valign="top" style="border-right:1px solid #777777;">${ tracks }</td>
                                     <td valign="top" style="border-right:1px solid #777777;">${ status }</td>
-                                    <td valign="top" style="border-right:1px solid #777777;">${ materials }</td>
                                 </tr>
                             </table>
                         </td>

@@ -37,7 +37,7 @@ from MaKaC.common.utils import isStringHTML
 from MaKaC import user
 from MaKaC.i18n import _
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, ngettext
 
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ
@@ -719,50 +719,15 @@ class WSessionModContribList(wcomponents.WTemplated):
         url.addParam("OK","1")
         return url
 
-    def _getMaterialsHTML(self, contrib, matUrlHandler):
-        materials=[]
-        if contrib.getPaper() is not None:
-            url=matUrlHandler.getURL(contrib.getPaper())
-            iconHTML="""<img border="0" src=%s alt="paper">"""%quoteattr(str(materialFactories.PaperFactory.getIconURL()))
-            if len(contrib.getPaper().getResourceList())>0:
-                r=contrib.getPaper().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(materialFactories.PaperFactory.getTitle().lower())))
-        if contrib.getSlides() is not None:
-            url=matUrlHandler.getURL(contrib.getSlides())
-            iconHTML="""<img border="0" src=%s alt="slides">"""%quoteattr(str(materialFactories.SlidesFactory.getIconURL()))
-            if len(contrib.getSlides().getResourceList())>0:
-                r=contrib.getSlides().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(materialFactories.SlidesFactory.getTitle().lower())))
-        if contrib.getPoster() is not None:
-            url=matUrlHandler.getURL(contrib.getPoster())
-            iconHTML="""<img border="0" src=%s alt="slides">"""%quoteattr(str(materialFactories.PosterFactory.getIconURL()))
-            if len(contrib.getPoster().getResourceList())>0:
-                r=contrib.getPoster().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(materialFactories.PosterFactory.getTitle().lower())))
-        video=contrib.getVideo()
-        if video is not None:
-            materials.append("""<a href=%s><img src=%s border="0" alt="video"> %s</a>"""%(
-                quoteattr(str(matUrlHandler.getURL(video))),
-                quoteattr(str(materialFactories.VideoFactory.getIconURL())),
-                self.htmlText(materialFactories.VideoFactory.getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
-        for material in contrib.getMaterialList():
-            url=matUrlHandler.getURL(material)
-            materials.append("""<a href=%s><img src=%s border="0" alt=""> %s</a>"""%(
-                quoteattr(str(url)),iconURL,self.htmlText(material.getTitle())))
-        return "<br>".join(materials)
+    def _getMaterialsHTML(self, contrib, modify):
+        attached_items = contrib.attached_items
+        if not attached_items:
+            return ''
+        num_files = len(attached_items['files']) + sum(len(f.attachments) for f in attached_items['folders'])
+        return '<a href="{}">{}</a>'.format(
+            url_for('attachments.management' if modify else 'event.sessionDisplay', contrib),
+            ngettext('1 file', '{num} files', num_files).format(num=num_files)
+        )
 
     def _getContribHTML(self,contrib):
         sdate = ""
@@ -785,10 +750,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         if contrib.getType() is not None:
             cType=contrib.getType().getName()
         status=ContribStatusList().getCode(contrib.getCurrentStatus().__class__)
-        if self._session.canCoordinate(self._aw,"modifContribs") or self._session.canModify(self._aw):
-            matUrlHandler=urlHandlers.UHMaterialModification
-        else:
-            matUrlHandler=urlHandlers.UHMaterialDisplay
+        modify = self._session.canCoordinate(self._aw, "modifContribs") or self._session.canModify(self._aw)
         html = """
             <tr>
                 <td><input type="checkbox" name="contributions" value=%s></td>
@@ -805,7 +767,7 @@ class WSessionModContribList(wcomponents.WTemplated):
                 """%(quoteattr(str(contrib.getId())),\
                     self.htmlText(contrib.getId()),sdate or "&nbsp;",\
                     strdur or "&nbsp;",cType or "&nbsp;",title or "&nbsp;", speaker or "&nbsp;",\
-                    track or "&nbsp;",status or "&nbsp;", self._getMaterialsHTML(contrib,matUrlHandler) or "&nbsp;")
+                    track or "&nbsp;", status or "&nbsp;", self._getMaterialsHTML(contrib, modify) or "&nbsp;")
         return html
 
     def _getTypeItemsHTML(self):
@@ -999,17 +961,14 @@ class WSessionModPosterContribList(WSessionModContribList):
         if contrib.getType() is not None:
             cType=contrib.getType().getName()
         status=ContribStatusList().getCode(contrib.getCurrentStatus().__class__)
-        materials=""
-        if contrib.getPaper() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getPaper())
-            materials+="""<a href=%s><img border="0" src=%s alt="paper"></a>"""%(
-                    quoteattr(str(url)),
-                    quoteattr(str(materialFactories.PaperFactory().getIconURL())))
-        if contrib.getSlides() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getSlides())
-            materials+="""<a href=%s><img border="0" src=%s alt="slides"></a>"""%(
-                    quoteattr(str(url)),
-                    quoteattr(str(materialFactories.SlidesFactory().getIconURL())))
+        attached_items = contrib.attached_items
+        materials = None
+        if attached_items:
+            num_files = len(attached_items['files']) + sum(len(f.attachments) for f in attached_items['folders'])
+            materials = '<a href="{}">{}</a>'.format(
+                url_for('attachments.management', contrib),
+                ngettext('1 file', '{num} files', num_files).format(num=num_files)
+            )
         editURL=urlHandlers.UHSessionModContribListEditContrib.getURL(contrib)
         if self._currentSorting!="":
             editURL.addParam("sortBy",self._currentSorting)
