@@ -45,7 +45,7 @@
     </td>
     % if not print_mode:
     <td>
-        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
     </td>
     % endif
 </tr>

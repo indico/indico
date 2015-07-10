@@ -17,7 +17,7 @@
                 ${conf.getTitle()}
             </span>
             <div style="float: right; height: 15px;">
-                <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True, minutesToggle=False"/>
+                <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
             </div>
             % if conf.getReportNumberHolder().listReportNumbers():
                 <span style="font-size:x-small;">

@@ -45,7 +45,7 @@
         <br/>&nbsp;<br/>
 
         <div class="eventInfo">
-            <%include file="../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False"/>
+            <%include file="../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False, minutesEditActions=True"/>
             ${conf.getTitle()}<br/>
             <%block name="locationAndTime">
                 % if getLocationInfo(conf) != ('', '', ''):

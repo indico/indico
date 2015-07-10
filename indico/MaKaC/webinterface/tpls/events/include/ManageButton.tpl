@@ -1,4 +1,4 @@
-<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False, minutesHidden=True, minutesToggle=True"/>
+<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False, minutesHidden=True, minutesToggle=True, minutesEditActions=False"/>
 
 <%
     info = extractInfoForButton(item)
@@ -61,24 +61,64 @@
             % endif
 
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if note_item.note is None and 'minutesLink' in info and getItemType(item) != 'Conference':
-                menuOptions['editMinutes'] = {
-                    action: function(m) {
-                        ajaxDialog({
-                            title: $T('Edit minutes'),
-                            url: ${ url_for('event_notes.edit', note_item) | n,j },
-                            confirmCloseUnsaved: true,
-                            onClose: function(data) {
-                                if (data) {
-                                    location.reload();
+            % if 'minutesLink' in info:
+                % if note_item.note is None and getItemType(item) != 'Conference' or minutesEditActions:
+                    menuOptions['editMinutes'] = {
+                        action: function(m) {
+                            ajaxDialog({
+                                title: $T('Edit minutes'),
+                                url: ${ url_for('event_notes.edit', note_item) | n,j },
+                                confirmCloseUnsaved: true,
+                                onClose: function(data) {
+                                    if (data) {
+                                        location.reload();
+                                    }
                                 }
-                            }
-                        });
-                        m.close();
-                        return false;
-                    },
-                    display: $T('Add minutes')
-                };
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: ${ note_item.note is not None | n,j } ? $T('Edit minutes') : $T('Add minutes')
+                    };
+                % endif
+                % if note_item.note is None and minutesEditActions and getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
+                    menuOptions['compileMinutes'] = {
+                        action: function(m) {
+                            ajaxDialog({
+                                title: $T('Add minutes'),
+                                url: ${ url_for('event_notes.compile', note_item) | n,j },
+                                confirmCloseUnsaved: true,
+                                onClose: function(data) {
+                                    if (data) {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Compile minutes')
+                    };
+                % endif
+                % if note_item.note and minutesEditActions:
+                    menuOptions['deleteMinutes'] = {
+                        action: function(m) {
+                            confirmPrompt($T('Do you really want to delete these minutes?'), $T('Delete minutes')).then(function() {
+                                $.ajax({
+                                    url: ${ url_for('event_notes.delete', note_item) | n,j },
+                                    method: 'POST',
+                                    error: handleAjaxError,
+                                    success: function() {
+                                        location.reload();
+                                    }
+                                });
+                            });
+                            m.close();
+                            return false;
+                        },
+                        display: $T('Delete minutes')
+                    };
+                % endif
             % endif
 
             % if 'materialLink' in info:

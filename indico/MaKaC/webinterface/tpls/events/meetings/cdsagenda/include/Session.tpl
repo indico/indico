@@ -90,7 +90,7 @@
     % endif
   </td>
   <td style="padding-right:4px; width:23px">
-      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
+      <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
   </td>
 </tr>
 </table>

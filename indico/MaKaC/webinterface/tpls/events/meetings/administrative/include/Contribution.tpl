@@ -72,7 +72,7 @@
         </span>
     </td>
     <td class="itemTopAlign">
-        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
     </td>
 </tr>
 % if item.getSubContributionList():

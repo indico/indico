@@ -40,7 +40,7 @@
     </td>
     <td colspan="1" bgcolor="#90c0f0">
     <div style="float:right">
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False"/>
+        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True, minutesToggle=False, minutesEditActions=True"/>
         % if item.note:
             <div class="toolbar right thin">
                 <div class="group">
@@ -105,7 +105,7 @@
                           ${ render_template('attachments/mako_compat/attachments.html', item=item) }
                       </div>
                       <div style="float:right">
-                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False, minutesToggle=False"/>
+                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False, minutesToggle=False, minutesEditActions=True"/>
                         % if item.note:
                             <div class="toolbar right thin">
                                 <div class="group">
@@ -136,7 +136,7 @@
 <tr>
     <td>
     <span style="font-weight:bold;">
-    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False"/>
+    <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False, minutesToggle=False, minutesEditActions=True"/>
     % if conf.note:
         <div class="toolbar right thin">
             <div class="group">
