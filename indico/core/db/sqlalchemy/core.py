@@ -108,6 +108,10 @@ def _transaction_ended(session, transaction):
             del g.memoize_cache
         if 'settings_cache' in g:
             del g.settings_cache
+        if 'event_notes' in g:
+            del g.event_notes
+        if 'event_attachments' in g:
+            del g.event_attachments
     if has_request_context() and hasattr(flask_session, '_user'):
         delattr(flask_session, '_user')
 
