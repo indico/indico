@@ -989,12 +989,17 @@ type("ChildrenProtectionPopup", ["ExclusivePopup"], {
             var row = $("<tr/>").css("color","#444444");
             var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"));
 
-            // If it is a LocalFile, rename it to File.
-            var type = "LocalFile" == element._type?$T("File"):element._type;
-            type = element.resources?$T("Material"):type;
+            var type = {
+                "AttachmentWrapper": $T.gettext("Attachment"),
+                "FolderWrapper": $T.gettext("Folder")
+            }[element._type] || element._type;
 
             row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(type));
-            row.append($("<td/>").addClass(className).css("width","50%").html(_.contains(["Link", "File"], type)?element.name:element.title));
+            row.append($("<td/>").addClass(className).css({
+                'width': "50%",
+                'max-width': '200px',
+                'text-overflow': 'ellipsis',
+                'overflow': 'hidden'}).html(element.title));
             row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
             container.append(row);
         });
