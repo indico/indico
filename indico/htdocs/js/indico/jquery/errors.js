@@ -24,7 +24,16 @@
             try {
                 data = JSON.parse(data.responseText);
             } catch(e) {
-                // Can't do much here.. it's an error and we dno't have any details.
+                IndicoUI.Dialogs.Util.error({
+                    code: data.status,
+                    type: 'unknown',
+                    message: data.statusText.toLowerCase(),
+                    data: {},
+                    inner: null,
+                    requestInfo: {
+                        url: data._requestURL  // set in beforeSend callback
+                    }
+                });
                 return true;
             }
         }
