@@ -49,9 +49,8 @@ class RHAgreementForm(RHConferenceBaseDisplay):
 
     def _checkSessionUser(self):
         if session.user is None:
-            self._redirect(redirect_to_login(reason=_('You are trying to sign an agreement that requires '
-                                                      'you to be logged in')))
-            self._doProcess = False
+            raise Forbidden(response=redirect_to_login(reason=_('You are trying to sign an agreement that requires '
+                                                                'you to be logged in')))
         if self.agreement.user != session.user:
             raise Forbidden(_('Please log in as {name} to sign this agreement.')
                             .format(name=self.agreement.user.full_name))

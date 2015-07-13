@@ -14,24 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask import session
+from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.core.config import Config
-from indico.core.errors import AccessError
 from indico.modules.rb.util import rb_check_user_access
+from indico.util.i18n import _
 from MaKaC.webinterface.rh.base import RHProtected
 
 
 class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
         if not Config.getInstance().getIsRoomBookingActive():
-            raise AccessError()
-        if not session.user:
-            self._redirect(self._getLoginURL())
-            self._doProcess = False
-            return
+            raise NotFound(_('The room booking module is not enabled.'))
+        RHProtected._checkSessionUser(self)
         if not rb_check_user_access(session.user):
-            raise AccessError()
+            raise Forbidden(_('Your are not authorized to access the room booking system.'))
 
 
 class RHRoomBookingBase(RHRoomBookingProtected):

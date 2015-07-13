@@ -804,8 +804,7 @@ class RHProtected(RH):
             if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
-                self._redirect(self._getLoginURL())
-                self._doProcess = False
+                raise Forbidden
 
     def _checkProtection(self):
         self._checkSessionUser()
