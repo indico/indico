@@ -91,7 +91,7 @@ def serialize_user(user):
 
 
 def _build_match(column, value, exact):
-    value = to_unicode(value).replace('%', r'\%').replace('_', r'\%').lower()
+    value = to_unicode(value).replace('%', r'\%').replace('_', r'\_').lower()
     if not exact:
         value = '%{}%'.format(value)
     # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is
