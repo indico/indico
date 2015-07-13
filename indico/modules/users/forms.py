@@ -70,7 +70,7 @@ class UserEmailsForm(IndicoForm):
 class SearchForm(IndicoForm):
     last_name = StringField(_('Family name'))
     first_name = StringField(_('First name'))
-    email = EmailField(_('Email'), filters=[lambda x: x.lower() if x else x])
+    email = StringField(_('Email'), filters=[lambda x: x.lower() if x else x])
     affiliation = StringField(_('Affiliation'))
     exact = BooleanField(_('Exact match'))
     include_deleted = BooleanField(_('Include deleted'))
