@@ -253,6 +253,7 @@
         font-family: Roboto;
 
         display: inline-block;
+        white-space: nowrap;
 
         margin-top: 0.2em;
         &:not(first-child) {
