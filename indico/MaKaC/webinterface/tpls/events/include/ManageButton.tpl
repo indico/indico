@@ -62,7 +62,7 @@
 
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
             % if 'minutesLink' in info:
-                % if note_item.note is None and getItemType(item) == 'Conference' or minutesEditActions:
+                % if note_item.note is None:
                     menuOptions['editMinutes'] = {
                         action: function(m) {
                             ajaxDialog({
