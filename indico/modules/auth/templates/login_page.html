@@ -45,23 +45,26 @@
                                         {% endfor %}
                                     </div>
                                 {% endif %}
-                                <div class="seperator-line-center">
-                                    <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
-                                </div>
                             {% else %}
                                 <div class="login-container clearfix">
                                     <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
                                     {% include 'flashed_messages.html' %}
                                 </div>
                             {% endif %}
-                            <div class="login-providers external">
-                                {% for provider in providers|selectattr('is_external')|sort(attribute='title') %}
-                                    <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
-                                       class="i-button external-provider-{{ provider.name }}">
-                                       {{- provider.title -}}
-                                    </a>
-                                {% endfor %}
-                            </div>
+                            {% set external_providers = providers|selectattr('is_external')|sort(attribute='title') %}
+                            {% if external_providers %}
+                                <div class="seperator-line-center">
+                                    <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
+                                </div>
+                                <div class="login-providers external">
+                                    {% for provider in external_providers %}
+                                        <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
+                                           class="i-button external-provider-{{ provider.name }}">
+                                           {{- provider.title -}}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                             {% if indico_config.LocalIdentities %}
                                 <p class="register">
                                     {% trans url=url_for('.register', next=request.args.get('next')) -%}
