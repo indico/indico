@@ -29,6 +29,8 @@ from MaKaC.webinterface.rh.categoryMod import RHCategModifBase
 
 
 class RHCategoryAttachmentManagementBase(RHCategModifBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self, params):
         RHCategModifBase._checkParams(self, params)
         self.object_type = 'category'

@@ -34,6 +34,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
+    CSRF_ENABLED = True
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.object
@@ -103,3 +105,4 @@ class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagement
 
 class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHConferenceModifBase):
     wp = WPPackageEventAttachmentsManagement
+    CSRF_ENABLED = True

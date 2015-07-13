@@ -54,6 +54,8 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
 
 
 class RHPackageEventAttachmentsDisplay(AttachmentPackageMixin, RHConferenceBaseDisplay):
+    CSRF_ENABLED = True
+
     @property
     def wp(self):
         if self._conf.getType() == 'conference':
