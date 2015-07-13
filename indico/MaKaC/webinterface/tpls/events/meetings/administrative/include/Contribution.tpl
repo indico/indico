@@ -78,7 +78,7 @@
 % if item.getSubContributionList():
     <% suborder = 1 %>
     % for subcont in item.getSubContributionList():
-        <%include file="SubContribution.tpl" args="item=subcont, allMaterial=allMaterial, minutes=minutes, order = order, suborder=suborder"/>
+        <%include file="SubContribution.tpl" args="item=subcont, allMaterial=allMaterial, inlineMinutes=inlineMinutes, order = order, suborder=suborder"/>
         <% suborder += 1 %>
     % endfor
 % endif
