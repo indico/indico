@@ -35,6 +35,7 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 class RHRemindersBase(RHConferenceModifBase):
     ALLOW_LEGACY_IDS = False
+    CSRF_ENABLED = True
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -61,8 +62,6 @@ class RHListReminders(RHRemindersBase):
 
 class RHDeleteReminder(RHSpecificReminderBase):
     """Deletes a reminder"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         if self.reminder.is_sent:
