@@ -33,7 +33,7 @@ import transaction
 from flask import request, session, g, current_app, redirect
 from itsdangerous import BadData
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden
+from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden, HTTPException
 from werkzeug.wrappers import Response
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
@@ -60,8 +60,7 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.logger import Logger
-from indico.modules.auth.util import url_for_login
-from indico.util import json
+from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
@@ -420,8 +419,8 @@ class RH(RequestHandlerBase):
 
     @jsonify_error(status=403)
     def _processForbidden(self, e):
-        if session.user is None:
-            return redirect(url_for_login(next_url=request.relative_url))
+        if session.user is None and not request.is_xhr and not e.response:
+            return redirect_to_login(reason=_("Please log in to access this page."))
         message = _("Access Denied")
         if e.description == Forbidden.description:
             explanation = _("You are not allowed to access this page.")
@@ -695,6 +694,8 @@ class RH(RequestHandlerBase):
         except Exception as e:
             transaction.abort()
             res = self._getMethodByExceptionName(e)(e)
+            if isinstance(e, HTTPException) and e.response is not None:
+                res = e.response
             is_error_response = True
 
         totalTime = (datetime.now() - self._startTime)
