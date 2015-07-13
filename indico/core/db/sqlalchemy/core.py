@@ -103,6 +103,11 @@ def _transaction_ended(session, transaction):
     # transaction) e.g. when calling `transaction.abort()`.
     # in this case we need to clear the memoization cache to avoid
     # accessing memoized objects (which are now session-less)
+
+    if transaction._parent is not None:
+        # we don't care about sub-transactions
+        return
+
     if has_app_context():
         if 'memoize_cache' in g:
             del g.memoize_cache
