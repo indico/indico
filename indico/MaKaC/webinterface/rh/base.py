@@ -23,6 +23,7 @@ import pstats
 import sys
 import random
 import StringIO
+import warnings
 from datetime import datetime, timedelta
 from functools import wraps, partial
 from urlparse import urljoin
@@ -370,6 +371,13 @@ class RH(RequestHandlerBase):
             msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
                     u"button, reload the page and try again.")
             raise BadRequest(msg)
+        elif not self.CSRF_ENABLED and current_app.debug and request.method != 'GET':
+            # Warn if CSRF is not enabled for a RH in new code
+            module = self.__class__.__module__
+            if module.startswith('indico.modules.') or module.startswith('indico.core.'):
+                msg = (u'{} request sent to {} which has no CSRF checks. Set `CSRF_ENABLED = True` in the class to '
+                       u'enable them.').format(request.method, self.__class__.__name__)
+                warnings.warn(msg, RuntimeWarning)
         # legacy csrf check (referer-based):
         # Check referer for POST requests. We do it here so we can properly use indico's error handling
         if Config.getInstance().getCSRFLevel() < 3 or request.method != 'POST':
