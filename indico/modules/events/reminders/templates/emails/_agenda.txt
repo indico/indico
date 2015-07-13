@@ -2,7 +2,7 @@
     {%- filter underline -%}
         Agenda for {{ event.getTitle() }}
     {%- endfilter %}
-{% if not agenda or 1 -%}
+{% if not agenda -%}
     There are no events scheduled.
 {%- endif -%}
 
@@ -12,30 +12,30 @@
 {%- endmacro -%}
 
 {%- macro render_item(item) -%}
-    {%- if item.entryType == 'Session' -%}
+    {%- if item.ITEM_TYPE == 'session' -%}
         {{ render_session(item) }}
-    {%- elif item.entryType == 'Break' -%}
+    {%- elif item.ITEM_TYPE == 'break' -%}
         {{ render_break(item) }}
-    {%- elif item.entryType == 'Contribution' -%}
+    {%- elif item.ITEM_TYPE == 'contribution' -%}
         {{ render_contrib(item) }}
     {%- endif -%}
 {%- endmacro -%}
 
 {%- macro render_session(session) -%}
-    - {{ render_times(session) }} {{ session.title }}
-    {%- for item in session.entries %}
+    - {{ render_times(session) }} {{ session.getOwner().getSession().getTitle() }}
+    {%- for item in session.getOwner().getEntries() %}
     {{ render_item(item) }}
     {%- endfor -%}
 {%- endmacro -%}
 
 {%- macro render_contrib(contrib) -%}
-    - {{ render_times(contrib) }} {{ contrib.title }}
+    - {{ render_times(contrib) }} {{ contrib.getTitle() }}
 {%- endmacro -%}
 
 {%- macro render_break(break) -%}
-    - {{ render_times(break) }} {{ break.title }}
+    - {{ render_times(break) }} {{ break.getTitle() }}
 {%- endmacro -%}
 
 {%- macro render_times(item) -%}
-    [{{ item.startDate |  format_time }} - {{ item.endDate | format_time }}]
+    [{{ item.getStartDate() | format_time }} - {{ item.getEndDate() | format_time }}]
 {%- endmacro -%}

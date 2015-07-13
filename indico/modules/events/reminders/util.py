@@ -30,4 +30,4 @@ def make_reminder_email(event, with_agenda, note):
         with_agenda = False
     return get_template_module('events/reminders/emails/event_reminder.txt', event=event,
                                url=event.getURL(), note=note, with_agenda=with_agenda,
-                               agenda=[e.fossilize() for e in event.getSchedule().getEntries()])
+                               agenda=event.getSchedule().getEntries())

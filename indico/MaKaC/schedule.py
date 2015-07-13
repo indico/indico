@@ -935,6 +935,8 @@ class TimeSchEntry(SchEntry):
 
 class LinkedTimeSchEntry(TimeSchEntry):
 
+    ITEM_TYPE = 'session'
+
     fossilizes(ILinkedTimeSchEntryDisplayFossil,
                ILinkedTimeSchEntryMgmtFossil)
 
@@ -1095,6 +1097,8 @@ class IndTimeSchEntry(TimeSchEntry):
 
 
 class BreakTimeSchEntry(IndTimeSchEntry):
+
+    ITEM_TYPE = 'break'
 
     fossilizes(IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil)
 
@@ -1417,6 +1421,8 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
 
 class ContribSchEntry(LinkedTimeSchEntry):
+
+    ITEM_TYPE = 'contribution'
 
     fossilizes(IContribSchEntryDisplayFossil,
                IContribSchEntryMgmtFossil )
