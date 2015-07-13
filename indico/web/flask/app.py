@@ -88,6 +88,8 @@ def configure_app(app, set_path=False):
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
         raise ValueError('SecretKey must be set to a random secret of at least 16 characters. '
                          'You can generate one using os.urandom(32) in Python shell.')
+    if cfg.getMaxUploadFilesTotalSize() > 0:
+        app.config['MAX_CONTENT_LENGTH'] = cfg.getMaxUploadFilesTotalSize() * 1024 * 1024
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()

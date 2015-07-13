@@ -72,6 +72,7 @@
                 autoProcessQueue: false,
                 uploadMultiple: true,
                 parallelUploads: 999,
+                maxFilesize: Math.min({{ indico_config.MaxUploadFileSize or 10240 }}, {{ indico_config.MaxUploadFilesTotalSize or 10240 }}),
                 maxFiles: {% if existing_attachment %}1{% else %}10{% endif %},
                 addRemoveLinks: {% if existing_attachment %}false{% else %}true{% endif %},
 

@@ -177,13 +177,15 @@ NoReplyEmail	     = "noreply-root@localhost"
 # FILE UPLOAD
 #------------------------------------------------------------------------------
 # Here you can limit the maximum size of all the uploaded files (in MB) in a
-# request
+# request. This is a hard limit that is enforced on the server side.
 # default: 0 (unlimited)
 
 MaxUploadFilesTotalSize = 0
 
 # Here you can limit the maximum size of an uploaded file (in MB)
 # default: 0 (unlimited)
+# Please note that this limit is only enforced on the client side!
+# For a hard limit see MaxUploadFilesTotalSize
 
 MaxUploadFileSize = 0
 
