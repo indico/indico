@@ -22,14 +22,14 @@
                                 {{ favorite_users_list(user) }}
                             </ul>
                         {% else %}
-                            <p>{% trans %}You have not marked any user as favorite.{% endtrans %}</p>
+                            <span class="empty">{% trans %}You have not marked any user as favorite.{% endtrans %}</span>
                         {% endif %}
                     </div>
                 </div>
                 <button class="i-button highlight js-add-user" style="margin-top: 15px;">{% trans %}Add Indico user{% endtrans %}</button>
             </div>
             <div class="column col-50">
-                <div class="i-box titled no-padding">
+                <div class="i-box titled">
                     <div class="i-box-header">
                         <div class="i-box-title">
                             {%- trans %}Favorite Categories{% endtrans -%}
@@ -43,7 +43,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <p>{% trans %}You have not marked any category as favorite.{% endtrans %}</p>
+                            <span class="empty">{% trans %}You have not marked any category as favorite.{% endtrans %}</span>
                         {% endif %}
                     </div>
                 </div>
