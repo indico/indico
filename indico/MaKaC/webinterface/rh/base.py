@@ -420,6 +420,8 @@ class RH(RequestHandlerBase):
 
     @jsonify_error(status=403)
     def _processForbidden(self, e):
+        if session.user is None:
+            return redirect(url_for_login(next_url=request.relative_url))
         message = _("Access Denied")
         if e.description == Forbidden.description:
             explanation = _("You are not allowed to access this page.")
@@ -663,6 +665,7 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('[pid=%s] Request %s started' % (
             os.getpid(), request))
 
+        is_error_response = False
         try:
             for i, retry in enumerate(transaction.attempts(max_retries)):
                 with retry:
@@ -692,6 +695,7 @@ class RH(RequestHandlerBase):
         except Exception as e:
             transaction.abort()
             res = self._getMethodByExceptionName(e)(e)
+            is_error_response = True
 
         totalTime = (datetime.now() - self._startTime)
         textLog.append('{} : Request ended'.format(totalTime))
@@ -729,6 +733,11 @@ class RH(RequestHandlerBase):
         # specially with getVars breaking the JS files.
         if not self._doProcess or res is None:
             return self._responseUtil.make_empty()
+
+        if is_error_response and isinstance(res, (current_app.response_class, Response)):
+            # if we went through error handling code, responseUtil._status has been changed
+            # so make_response() would fail
+            return res
 
         return self._responseUtil.make_response(res)
 
