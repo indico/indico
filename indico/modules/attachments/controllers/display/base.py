@@ -16,12 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, session
+from flask import redirect, session, request
 from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
-from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
+from indico.modules.attachments.models.attachments import AttachmentType
+from indico.modules.attachments.preview import get_file_previewer
+from indico.web.util import jsonify_template
 
 
 class DownloadAttachmentMixin(SpecificAttachmentMixin):
@@ -33,7 +35,15 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
 
     def _process(self):
         signals.attachments.attachment_accessed.send(self.attachment, user=session.user)
-        if self.attachment.type == AttachmentType.link:
-            return redirect(self.attachment.link_url)
+        if request.values.get('preview') == '1':
+            previewer = get_file_previewer(self.attachment.file)
+            if previewer is None:
+                return
+            preview_content = previewer.generate_content(self.attachment)
+            return jsonify_template('attachments/preview.html', attachment=self.attachment,
+                                    preview_content=preview_content)
         else:
-            return self.attachment.file.send()
+            if self.attachment.type == AttachmentType.link:
+                return redirect(self.attachment.link_url)
+            else:
+                return self.attachment.file.send()

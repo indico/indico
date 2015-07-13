@@ -28,6 +28,7 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
 from indico.core.storage import get_storage
 from indico.modules.attachments.models.principals import AttachmentPrincipal
+from indico.modules.attachments.preview import get_file_previewer
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
@@ -288,6 +289,10 @@ class AttachmentFile(db.Model):
         if self.storage_backend is None:
             raise RuntimeError('No storage backend set')
         return get_storage(self.storage_backend)
+
+    @property
+    def is_previewable(self):
+        return get_file_previewer(self) is not None
 
     def get_local_path(self):
         """Return context manager that will yield physical path.

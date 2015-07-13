@@ -3,7 +3,42 @@
 
     $(document).ready(function() {
         $('.attachments > .dropdown').parent().dropdown();
+        setupAttachmentPreview();
     });
+
+    global.setupAttachmentPreview = function setupAttachmentPreview() {
+        var attachment = $('.js-preview-dialog');
+
+        attachment.on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            ajaxDialog({
+                trigger: this,
+                url: build_url($this.attr('href'), {preview: '1'}),
+                title: $this.data('title'),
+                dialogClasses: 'attachment-preview-dialog',
+                onOpen: function(popup) {
+                    popup.canvas.closest('.ui-dialog').prev('.ui-widget-overlay').addClass('attachment-preview-overlay');
+                    popup.canvas.find('.attachment-preview-content-wrapper, .attachment-download').on('click', function() {
+                        popup.close();
+                    });
+                    popup.canvas.find('.attachment-preview-content, .attachment-preview-top-bar').on('click', function(e) {
+                        e.stopPropagation();
+                    });
+                    popup.canvas.on('keydown', function(e) {
+                        if (e.which === $.ui.keyCode.ESCAPE) {
+                            popup.close();
+                        }
+                        e.stopPropagation();
+                    });
+                    $('html, body').addClass('prevent-scrolling');
+                },
+                onClose: function() {
+                    $('html, body').removeClass('prevent-scrolling');
+                }
+            });
+        });
+    };
 
 
     global.setupAttachmentEditor = function setupAttachmentEditor() {

@@ -1,0 +1,99 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+import re
+
+from flask import render_template
+
+from indico.core import signals
+from indico.util.signals import values_from_signal
+from indico.util.string import render_markdown
+
+
+class Previewer(object):
+    """Base class for file previewers
+
+    To create a new file prewiewer, subclass this class and register it using
+    the `get_file_previewers` signal.
+    """
+    ALLOWED_CONTENT_TYPE = None
+    TEMPLATES_DIR = 'attachments/previewers/'
+    TEMPATE = None
+
+    @classmethod
+    def can_preview(cls, attachment_file):
+        """Checks if the content type of the file matches the allowed content
+        type of files that the previewer can be used for.
+        """
+        return cls.ALLOWED_CONTENT_TYPE.search(attachment_file.content_type) is not None
+
+    @classmethod
+    def generate_content(cls, attachment):
+        """Generates the HTML output of the file preview"""
+        return render_template(cls.TEMPLATES_DIR + cls.TEMPLATE, attachment=attachment)
+
+
+class ImagePreviewer(Previewer):
+    ALLOWED_CONTENT_TYPE = re.compile(r'^image/')
+    TEMPLATE = 'image_preview.html'
+
+
+class PDFPreviewer(Previewer):
+    ALLOWED_CONTENT_TYPE = re.compile(r'^application/pdf$')
+    TEMPLATE = 'iframe_preview.html'
+
+
+class MarkdownPreviewer(Previewer):
+    ALLOWED_CONTENT_TYPE = re.compile(r'^text/markdown$')
+
+    @classmethod
+    def generate_content(cls, attachment):
+        with attachment.file.open() as f:
+            return render_template(cls.TEMPLATES_DIR + 'markdown_preview.html', attachment=attachment,
+                                   text=render_markdown(f.read()))
+
+
+class TextPreviewer(Previewer):
+    ALLOWED_CONTENT_TYPE = re.compile(r'^text/plain$')
+
+    @classmethod
+    def generate_content(cls, attachment):
+        with attachment.file.open() as f:
+            return render_template(cls.TEMPLATES_DIR + 'text_preview.html', attachment=attachment,
+                                   text=f.read())
+
+
+def get_file_previewer(attachment_file):
+    """Returns a file previewer for the given attachment file based on the
+    file's content type.
+    """
+    for previewer in get_file_previewers():
+        if previewer.can_preview(attachment_file):
+            return previewer()
+
+
+def get_file_previewers():
+    return values_from_signal(signals.attachments.get_file_previewers.send())
+
+
+@signals.attachments.get_file_previewers.connect
+def _get_file_previewers(sender, **kwargs):
+    yield ImagePreviewer
+    yield PDFPreviewer
+    yield MarkdownPreviewer
+    yield TextPreviewer

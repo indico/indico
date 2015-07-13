@@ -1,0 +1,20 @@
+{% from 'attachments/_attachments.html' import get_attachment_icon %}
+
+{% block content %}
+    <div class="attachment-preview-top-bar">
+        <div class="attachment-title">
+            <span class="{{ get_attachment_icon(attachment) }}">{{ attachment.title }}</span>
+        </div>
+        <div class="attachment-preview-close">
+            <a class="icon icon-close attachment-download" title="{% trans %}Close{% endtrans %}"></a>
+        </div>
+        <div class="attachment-actions">
+            <a href="{{ attachment.download_url }}" class="i-button icon icon-file-download" title="{% trans %}Download{% endtrans %}" download>Download</a>
+        </div>
+    </div>
+    <div class="attachment-preview-content-wrapper">
+        <div class="attachment-preview-content">
+            {{ preview_content | safe }}
+        </div>
+    </div>
+{% endblock %}

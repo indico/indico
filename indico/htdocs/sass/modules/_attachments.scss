@@ -301,6 +301,115 @@
     background-color: $light-gray;
 }
 
+.attachment-preview-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 30px;
+    width: 100%;
+    background-color: $black;
+    color: white;
+    padding: 10px 0 10px 0;
+    z-index: 10;
+
+    .attachment-title {
+        left: 20px;
+        position: absolute;
+        white-space: nowrap;
+
+        > span {
+            font-size: 1.1em;
+            line-height: 30px;
+
+            &:before {
+                margin-right: 0.5em;
+            }
+        }
+    }
+
+    .attachment-preview-close {
+        right: 20px;
+        position: absolute;
+
+        > a {
+            font-size: 1.5em;
+            line-height: 30px;
+            color: white;
+            vertical-align: middle;
+        }
+    }
+
+    .attachment-actions {
+        right: 50px;
+        position: absolute;
+
+        > a {
+            font-size: 1.3em;
+        }
+
+        > .attachment-download {
+            color: white;
+        }
+    }
+}
+
+.attachment-preview-dialog {
+    .exclusivePopup {
+        padding: 0;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background-color: transparent;
+
+        .attachment-preview-content-wrapper {
+            height: auto;
+            width: 100%;
+            position: absolute;
+            top: 50px;
+            bottom: 0;
+
+            .attachment-preview-content {
+                > img {
+                    position: absolute;
+                    margin: auto;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    max-width: 90%;
+                    max-height: 80%;
+                }
+
+                > iframe, .text-preview-content {
+                    position: absolute;
+                    margin: auto;
+                    left: 0;
+                    right: 0;
+                    height: 100%;
+                    width: 900px;
+                }
+
+                > .text-preview-content {
+                    padding: 2vw;
+                    background-color: white;
+                    overflow: auto;
+                }
+            }
+        }
+    }
+}
+
+.attachment-preview-overlay {
+    opacity: 0.9;
+}
+
+.prevent-scrolling {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 .attachments-tooltip-button {
     @include icon-before('icon-folder');
     cursor: pointer;

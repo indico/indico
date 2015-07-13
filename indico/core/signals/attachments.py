@@ -64,3 +64,7 @@ Called when an attachment is accessed.  The *sender* is the
 `Attachment` that was accessed.  The user who accessed the attachment
 is passed in the `user` kwarg.
 """)
+
+get_file_previewers = _signals.signal('get-file-previewers', """
+
+""")
