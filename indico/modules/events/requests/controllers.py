@@ -16,10 +16,9 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify, flash, redirect, session
-from werkzeug.exceptions import NotFound, BadRequest
+from flask import request, flash, redirect, session
+from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 
-from indico.core.errors import AccessError
 from indico.modules.events.requests import get_request_definitions
 from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.events.requests.util import is_request_manager
@@ -141,8 +140,8 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
     def _checkProtection(self):
         self._checkSessionUser()
-        if self._doProcess and not self.definition.can_be_managed(session.user):
-            raise AccessError()
+        if not self.definition.can_be_managed(session.user):
+            raise Forbidden
 
     def process_form(self):
         form = self.manager_form

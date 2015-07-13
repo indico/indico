@@ -23,10 +23,9 @@ import transaction
 from flask import request, session, redirect, flash, json, Response
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import lazyload
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import NotFound, BadRequest, Forbidden
 
 from indico.core.db import db
-from indico.core.errors import AccessError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.forms import VCRoomListFilterForm
@@ -355,8 +354,8 @@ class RHVCRoomList(RHProtected):
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
-        if self._doProcess and not get_managed_vc_plugins(session.user):
-            raise AccessError
+        if not get_managed_vc_plugins(session.user):
+            raise Forbidden
 
     def _process(self):
         form = VCRoomListFilterForm(request.args)

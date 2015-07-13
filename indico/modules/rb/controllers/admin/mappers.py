@@ -15,13 +15,13 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import session
+from werkzeug.exceptions import Forbidden
 
 from MaKaC import roomMapping
 from MaKaC.webinterface import locators, urlHandlers
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 from indico.util.i18n import _
-from indico.core.errors import AccessError
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb.views.admin import mappers as mapper_views
 
@@ -31,7 +31,7 @@ class RHRoomMapperProtected(RHAdminBase):
         if not session.user:
             self._checkSessionUser()
         elif not rb_is_admin(session.user):
-            raise AccessError(_('You are not authorized to take this action.'))
+            raise Forbidden(_('You are not authorized to take this action.'))
 
 
 class RHRoomMapperBase(RHRoomMapperProtected):

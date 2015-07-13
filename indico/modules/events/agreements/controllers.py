@@ -23,7 +23,7 @@ from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.core.db import db
-from indico.core.errors import AccessError, NoReportError
+from indico.core.errors import NoReportError
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementAnswerSubmissionForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
@@ -58,7 +58,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
         if self.agreement.uuid != request.view_args['uuid']:
-            raise AccessError()
+            raise Forbidden(_("The URL for this agreement is invalid."))
         if self.agreement.user:
             self._checkSessionUser()
 

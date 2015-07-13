@@ -15,8 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import session
-
-from MaKaC.errors import MaKaCError
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.util import rb_is_admin
@@ -33,4 +32,4 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
         if session.user is None:
             self._checkSessionUser()
         elif not rb_is_admin(session.user):
-            raise MaKaCError(_('You are not authorized to take this action.'))
+            raise Forbidden(_('You are not authorized to take this action.'))

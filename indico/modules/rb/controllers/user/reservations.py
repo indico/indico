@@ -21,9 +21,10 @@ import dateutil
 import transaction
 from flask import request, session, jsonify, flash
 from werkzeug.datastructures import MultiDict
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.core.errors import IndicoError, AccessError, NoReportError, NotFoundError
+from indico.core.errors import IndicoError, NoReportError, NotFoundError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
@@ -596,7 +597,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingBase):
     def _checkProtection(self):
         if not self._reservation.can_be_modified(session.user):
-            raise AccessError
+            raise Forbidden
 
     def _get_view(self, **kwargs):
         return WPRoomBookingModifyBooking(self, **kwargs)
