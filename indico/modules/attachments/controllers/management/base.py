@@ -146,7 +146,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                     self.attachment.file.save(file.file)
 
             signals.attachments.attachment_updated.send(self.attachment, user=session.user)
-            flash(_("The attachment has been updated"), 'success')
+            flash(_("The attachment \"{name}\" has been updated").format(name=self.attachment.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
         template = ('attachments/upload.html' if self.attachment.type == AttachmentType.file else
