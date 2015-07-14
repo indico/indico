@@ -1,5 +1,5 @@
 {% macro get_subject() -%}
-[Indico] {% block subject %}{% endblock %}
+{% block subject_prefix %}[Indico]{% endblock %} {% block subject %}{% endblock %}
 {%- endmacro %}
 
 {% macro get_body(footer) %}

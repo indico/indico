@@ -16,18 +16,21 @@
 
 """Some pages for dealing with generic application errors
 """
-from flask import session, request
-import traceback
+import json
 import sys
+import traceback
 from xml.sax.saxutils import quoteattr
 
+from flask import session, request
+
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from indico.core.config import Config
-from indico.util.i18n import i18nformat
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.i18n import _
+from indico.core.config import Config
+from indico.util.i18n import i18nformat
+from indico.web.util import get_request_info
 
 
 class WGenericError( WTemplated ):
@@ -126,18 +129,8 @@ class WGenericError( WTemplated ):
             """%("\n".join( tracebackList ), rh.__name__, url, "<br>".join(params), \
                     "\n".join( headers ), userHTML )
         vars["errorDetails"] = details
-        userStr = """-- "none" --"""
-        if av:
-            userStr = "[%s] %s <%s>"%(av.getId(), av.getFullName(), av.getEmail() )
-        report = ["exception message => %s"%str( ex ), \
-                    "exception type => %s" %str(ty), \
-                    "traceback => \n%s"%"\n".join(tracebackList), \
-                    "request handler => %s"%self._rh.__class__, \
-                    "url => %s" % request.url.encode('utf-8'),
-                    "parameters => \n%s"%"\n".join(params), \
-                    "headers => \n%s"%"\n".join(headers), \
-                    "user => %s"%userStr ]
-        vars["reportMsg"] = quoteattr( "\n".join( report ) )
+        vars["reportMsg"] = quoteattr(json.dumps({'request_info': get_request_info(),
+                                                  'traceback': traceback.format_exc()}))
         return vars
 
 class WUnexpectedError( WGenericError ):

@@ -14,15 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import json
 import os
+from pprint import pformat
 
-from werkzeug import secure_filename
-from flask import request
-from flask import send_from_directory
 
-import MaKaC.webinterface.pages.errors as errors
+from flask import request, send_from_directory
+from werkzeug.utils import secure_filename
+
+from indico.web.flask.templating import get_template_module
+from indico.core.notifications import make_email, send_email
+from MaKaC.webinterface.pages import errors
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.core.config import Config
 
@@ -42,19 +45,16 @@ class RHErrorReporting(RH):
         self._sendIt = "confirm" in params
         self._comments = ""
         if self._sendIt:
-            self._comments = params.get("comments", "")
+            self._comments = params.get("comments", "").strip()
         self._userMail = params.get("userEmail", "")
-        self._msg = params.get("reportMsg", "")
+        self._msg = params.get("reportMsg", "{}")
 
     def _sendReport(self):
         cfg = Config.getInstance()
-        fromAddr = self._userMail
-        toAddr = cfg.getSupportEmail()
-        subject = "[Indico@%s] Error report" % cfg.getBaseURL()
-        body = ["-"*20, "User Comments\n", "%s\n\n" % self._comments, "-"*20,
-                "Error details\n", self._msg, "-" * 20]
-        maildata = {"fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join(body)}
-        GenericMailer.send(GenericNotification(maildata), skipQueue=True)
+        data = json.loads(self._msg)
+        template = get_template_module('emails/error_report.txt', comment=self._comments, traceback=data['traceback'],
+                                       request_info=pformat(data['request_info']))
+        send_email(make_email(cfg.getSupportEmail(), reply_address=self._userMail, template=template), skip_queue=True)
 
     def process(self, params):
         self._checkParams(params)

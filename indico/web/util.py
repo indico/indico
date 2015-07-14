@@ -87,6 +87,7 @@ def get_request_info(hide_passwords=True):
         'url': request.url,
         'endpoint': request.url_rule.endpoint if request.url_rule else None,
         'method': request.method,
+        'rh': g.rh.__class__.__name__ if 'rh' in g else None,
         'user': repr(session.user),
         'ip': request.remote_addr,
         'user_agent': unicode(request.user_agent),
@@ -94,6 +95,7 @@ def get_request_info(hide_passwords=True):
         'data': {
             'url': _format_request_data(request.view_args, False),
             'get': _format_request_data(request.args, False),
-            'post': _format_request_data(request.form, hide_passwords)
+            'post': _format_request_data(request.form, hide_passwords),
+            'headers': _format_request_data(request.headers, False),
         }
     }
