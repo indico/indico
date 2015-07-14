@@ -3215,8 +3215,8 @@ class Conference(CommonObjectBase, Locatable):
                 for contrib in session.getContributionList():
                     contrib.delete()
 
-            signals.event.session_deleted.send(session, parent=self.getConference())
             del self.sessions[session.getId()]
+            self._p_changed = True
 
             session.delete()
             self.notifyModification()
