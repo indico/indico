@@ -43,6 +43,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
+from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.api import CategoryEventHook
@@ -121,15 +122,15 @@ class RHCategOverviewDisplay(RHCategDisplayBase):
         return p.display()
 
 
-class RHConferenceCreationBase( RHCategoryDisplay ):
-
-    def _checkProtection( self ):
+class RHConferenceCreationBase(RHCategoryDisplay):
+    def _checkProtection(self):
         self._checkSessionUser()
-        RHCategoryDisplay._checkProtection( self )
-        if not self._target.isConferenceCreationRestricted():
-            return
-        if not self._target.canCreateConference( self._getUser() ):
-            raise MaKaCError( _("You are not allowed to create conferences inside this category"))
+        if self._target is not None:
+            RHCategoryDisplay._checkProtection(self)
+            if not self._target.isConferenceCreationRestricted():
+                return
+            if not self._target.canCreateConference(self._getUser()):
+                raise MaKaCError(_("You are not allowed to create conferences inside this category"))
 
     def _checkParams( self, params, mustExist=1 ):
         RHCategoryDisplay._checkParams( self, params, mustExist )
@@ -149,10 +150,10 @@ class RHConferenceCreationBase( RHCategoryDisplay ):
 class RHConferenceCreation(RHConferenceCreationBase):
     _uh = urlHandlers.UHConferenceCreation
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         try:
-            RHConferenceCreationBase._checkProtection( self )
-        except Exception:
+            RHConferenceCreationBase._checkProtection(self)
+        except (MaKaCError, IndicoError):
             self._target = None
 
     def _checkParams( self, params ):

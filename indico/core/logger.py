@@ -59,7 +59,7 @@ class IndicoMailFormatter(logging.Formatter):
         return s + self._getRequestInfo()
 
     def _getRequestInfo(self):
-        return 'Additional information:\n\n{}'.format(pformat(get_request_info()))
+        return '\n\n\nRequest data:\n\n{}'.format(pformat(get_request_info()))
 
 
 class LoggerUtils:
