@@ -112,10 +112,8 @@ class AddAttachmentLinkMixin:
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             link = Attachment(user=session.user, type=AttachmentType.link)
-            form.populate_obj(link, skip={'acl'})
+            form.populate_obj(link)
             link.folder = folder
-            if link.is_protected:
-                link.acl = form.acl.data
 
             logger.info('Attachment {} added by {}'.format(link, session.user))
             signals.attachments.attachment_created.send(link, user=session.user)
