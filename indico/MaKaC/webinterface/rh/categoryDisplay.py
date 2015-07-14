@@ -441,6 +441,7 @@ class UtilsConference:
                     'room': room.name if room else ''}
 
         if newLocation.strip() == "":
+            l = None
             c.setLocation( None )
         else:
             l = c.getLocation()
