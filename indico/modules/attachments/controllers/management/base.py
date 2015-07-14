@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import mimetypes
+
 from flask import flash, request, session, render_template
 
 from indico.core import signals
@@ -87,7 +89,8 @@ class AddAttachmentFilesMixin:
                 filename = secure_filename(f.filename, 'attachment')
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
                                         protection_mode=form.protection_mode.data)
-                attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=f.mimetype)
+                content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+                attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
                 attachment.file.save(f.file)
                 db.session.add(attachment)
                 db.session.flush()
