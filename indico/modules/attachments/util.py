@@ -69,6 +69,32 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     }
 
 
+def get_nested_attached_items(obj):
+    """
+    Returns a structured representation of all attachments linked to an object
+    and all its nested objects.
+
+    :param obj: A :class:`Conference`, :class:`Session`, :class:`Contribution`
+                or :class:`Subcontribution` object.
+    """
+    from MaKaC.conference import Conference, Session, Contribution
+    attachments = get_attached_items(obj, include_empty=False, include_hidden=False)
+    nested_objects = []
+    if isinstance(obj, Conference):
+        nested_objects = obj.getSessionList() + obj.getContributionList()
+    elif isinstance(obj, Session):
+        nested_objects = obj.getContributionList()
+    elif isinstance(obj, Contribution):
+        nested_objects = obj.getSubContributionList()
+    if nested_objects:
+        children = filter(None, map(get_nested_attached_items, nested_objects))
+        if children:
+            attachments['children'] = children
+    if attachments:
+        attachments['object'] = obj
+    return attachments
+
+
 def can_manage_attachments(obj, user):
     """Checks if a user can manage attachments for the object"""
     from MaKaC.conference import Contribution, Session, SubContribution
