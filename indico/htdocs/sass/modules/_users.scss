@@ -210,7 +210,6 @@
 }
 
 .account-no-identities {
-    @extend .account-identity-provider;
     color: $dark-gray;
     font-style: italic;
 }
