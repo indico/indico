@@ -63,7 +63,7 @@
     </table>
 
     % if item.note:
-        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes, can_edit=item.canModify(user)) }
+        ${ render_template('events/notes/note_element.html', note=item.note, hidden=not minutes, can_edit=item.canUserSubmit(user)) }
     % endif
 
     % if item.getSubContributionList():

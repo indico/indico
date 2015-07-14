@@ -56,7 +56,7 @@ class RHManageNoteBase(RHNoteBase):
             return
         if self.object_type == 'session' and self.object.canCoordinate(session.avatar):
             return
-        if self.object_type == 'contribution' and self.object.canUserSubmit(session.avatar):
+        if self.object_type in {'contribution', 'subcontribution'} and self.object.canUserSubmit(session.avatar):
             return
         if not self.object.canModify(session.avatar):
             raise Forbidden
