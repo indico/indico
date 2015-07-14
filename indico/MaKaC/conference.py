@@ -988,6 +988,7 @@ class Category(CommonObjectBase):
         if sc in self.getSubCategoryList():
             self._decNumConfs(sc.getNumConferences())
             del self.subcategories[sc.getId()]
+            self._p_changed = True
             sc.setOwner(None)
 
     def newSubCategory(self, protection):
@@ -2408,6 +2409,7 @@ class Conference(CommonObjectBase, Locatable):
         if not ct in self._contribTypes.values():
             return
         del self._contribTypes[ct.getId()]
+        self._p_changed = True
         for cont in self.getContributionList():
             if cont.getType() == ct:
                 cont.setType(None)
@@ -3321,6 +3323,7 @@ class Conference(CommonObjectBase, Locatable):
         for spk in contrib.getSpeakerList()[:]:
             contrib.removeSpeaker(spk)
         del self.contributions[ contrib.getId() ]
+        self._p_changed = True
         if callDelete:
             contrib.delete()
         #else:
@@ -5223,6 +5226,7 @@ class Session(CommonObjectBase, Locatable):
 
     def _removeSlot(self,slot):
         del self.slots[slot.getId()]
+        self._p_changed = True
         self.getSchedule().removeEntry(slot.getSessionSchEntry())
         if self.getConference() is not None:
             self.getConference().getSchedule().removeEntry(slot.getConfSchEntry())
@@ -5854,6 +5858,7 @@ class Session(CommonObjectBase, Locatable):
             sch=contrib.getSchEntry().getSchedule()
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
+        self._p_changed = True
 
         self.updateNonInheritingChildren(contrib, delete=True, propagate=False)
         for child in contrib.getAccessController().getNonInheritingChildren():
@@ -6168,6 +6173,7 @@ class Session(CommonObjectBase, Locatable):
         if av is None or not self._coordinators.has_key(av.getId()):
             return
         del self._coordinators[av.getId()]
+        self._p_changed = True
         if isinstance(av, AvatarUserWrapper):
             av.unlinkTo(self, "coordinator")
         if self.getConference() is not None:
@@ -8104,6 +8110,7 @@ class Contribution(CommonObjectBase, Locatable):
         if not self._authors.has_key( part.getId() ):
             return
         del self._authors[ part.getId() ]
+        self._p_changed = True
         if not self.isSpeaker(part):
             part.delete()
 
@@ -11315,6 +11322,7 @@ class Track(CoreObject):
             k = self._abstracts.keys()[0]
             abstract = self._abstracts[k]
             del self._abstracts[k]
+            self._p_changed = True
             abstract.removeTrack( self )
 
         # we must notify each contribution in the track about the deletion of the
@@ -11323,6 +11331,7 @@ class Track(CoreObject):
             k = self._contributions.keys()[0]
             contrib = self._contributions[k]
             del self._contributions[k]
+            self._p_changed = True
             contrib.removeTrack( self )
 
         # we must delete and unindex all the possible track coordinators
@@ -11427,6 +11436,7 @@ class Track(CoreObject):
         """
         if subTrack in self.subTracks.values():
             del self.subTracks[ subTrack.getId() ]
+            self._p_changed = True
             subTrack.setTrack( None )
             subTrack.delete()
             self.notifyModification()
@@ -11494,6 +11504,7 @@ class Track(CoreObject):
         """
         if self.hasAbstract( abstract ):
             del self._abstracts[ abstract.getId() ]
+            self._p_changed = True
             #abstract.removeTrack( self )
 
     def addCoordinator( self, av ):
@@ -11607,6 +11618,7 @@ class Track(CoreObject):
         if not self._contributions.has_key( contrib.getId() ):
             return
         del self._contributions[ contrib.getId() ]
+        self._p_changed = True
         contrib.setTrack( None )
 
     def hasContribution( self, contrib ):
