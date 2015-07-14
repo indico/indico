@@ -17,13 +17,14 @@
 from __future__ import unicode_literals
 
 import os
-import tempfile
 from operator import itemgetter
+from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 from flask import session
 from sqlalchemy import cast, Date
 
+from indico.core.config import Config
 from indico.util.fs import secure_filename
 from indico.util.date_time import format_date
 from indico.util.string import to_unicode
@@ -115,7 +116,9 @@ class AttachmentPackageMixin:
         return query.filter(cast(AttachmentFile.created_dt, Date) >= added_since)
 
     def _generate_zip_file(self, attachments):
-        temp_file = tempfile.NamedTemporaryFile('w')
+        # XXX: could use a celery task to delay the temporary file after a day or so.
+        # right now this relies on an external cronjob to do so...
+        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir(), delete=False)
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             for attachment in attachments:
                 name = self._prepare_folder_structure(attachment)
