@@ -25,6 +25,7 @@ from flask import session
 from sqlalchemy import cast, Date
 
 from indico.core.config import Config
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.fs import secure_filename
 from indico.util.date_time import format_date
 from indico.util.string import to_unicode
@@ -105,7 +106,9 @@ class AttachmentPackageMixin:
                 if contribution.getStartDate() and str(contribution.getStartDate().date()) in dates]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.contribution_id.in_(contribution_ids))
+        query = self._build_base_query().filter(AttachmentFolder.link_type.in_(LinkType.contribution,
+                                                                               LinkType.subcontribution),
+                                                AttachmentFolder.contribution_id.in_(contribution_ids))
 
         if added_since:
             query = self._filter_by_date(query, added_since)
@@ -133,14 +136,15 @@ class AttachmentPackageMixin:
         path_paths = [event_dir] if event_dir else []
 
         if isinstance(linked_object, SubContribution):
-            start_date = linked_object.parent.getAdjustedStartDate()
+            contrib = linked_object.parent
+            start_date = contrib.getAdjustedStartDate()
             path_paths.extend([start_date.strftime('%Y%m%d_%A'),
-                               secure_filename(start_date.strftime('%H%M_{}').format(linked_object.parent.getTitle()), ''),
+                               secure_filename(start_date.strftime('%H%M_{}').format(contrib.getTitle()), ''),
                                secure_filename(linked_object.getTitle(), unicode(linked_object.getId()))])
         elif linked_object != self._conf:
             start_date = linked_object.getAdjustedStartDate()
             path_paths.extend([start_date.strftime('%Y%m%d_%A'),
-                               start_date.strftime('%H%M_{}').format(linked_object.getTitle())])
+                               secure_filename(start_date.strftime('%H%M_{}').format(linked_object.getTitle()), '')])
 
         path_paths.extend([secure_filename(attachment.folder.title, unicode(attachment.folder.id)),
                            attachment.file.filename])
