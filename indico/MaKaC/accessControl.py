@@ -25,6 +25,10 @@ from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from MaKaC.common.contextManager import ContextManager
 
+
+LEGACY_MATERIALS = {'Material', 'Resource', 'Minutes', 'Paper', 'Slides', 'Video', 'Poster', 'LocalFile', 'Link'}
+
+
 def isFullyAccess(level):
     def wrap(func):
         @wraps(func)
@@ -441,7 +445,7 @@ class AccessController(Persistent):
 
     def getNonInheritingChildren(self):
         return [elem for elem in self.nonInheritingChildren
-                if elem.__class__.__name__ != 'Minutes']
+                if elem.__class__.__name__ not in LEGACY_MATERIALS]
 
     def updateNonInheritingChildren(self, elem, delete=False):
         if delete or elem.getAccessController().getAccessProtectionLevel() == 0:
