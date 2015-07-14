@@ -119,6 +119,8 @@ def _folder_deleted(folder, **kwargs):
 
 def _attachment_changed(attachment, **kwargs):
     attachment.folder.linked_object.updateNonInheritingChildren(AttachmentWrapper(attachment))
+    # in case of folder change
+    attachment.folder.linked_object.updateNonInheritingChildren(FolderWrapper(attachment.folder))
 
 
 def _attachment_deleted(attachment, **kwargs):

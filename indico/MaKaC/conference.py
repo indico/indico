@@ -325,6 +325,22 @@ class CommonObjectBase(CoreObject, Fossilizable):
         else:
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 
+    def remove_attachments(self):
+        """
+        Send 'deleted' signal to all attachments/folders
+        """
+        # TODO 2.0: do not delete them, only set is_deleted on parent
+        attachments = self.attached_items
+        if attachments:
+            for folder in attachments['folders']:
+                folder.is_deleted = True
+                signals.attachments.folder_deleted.send(folder, user=session.user)
+                for attachment in folder.attachments:
+                    attachment.is_deleted = True
+            for attachment in attachments['files']:
+                attachment.is_deleted = True
+                signals.attachments.attachment_deleted.send(attachment, user=session.user)
+
 
 class CategoryManager(ObjectHolder):
     idxName = "categories"
@@ -3217,6 +3233,8 @@ class Conference(CommonObjectBase, Locatable):
                 for contrib in session.getContributionList():
                     contrib.delete()
 
+            session.remove_attachments()
+
             del self.sessions[session.getId()]
             self._p_changed = True
 
@@ -3755,25 +3773,6 @@ class Conference(CommonObjectBase, Locatable):
         newMat.setOwner( self )
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
-
-    def removeMaterial( self, mat ):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-            self.notifyModification()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-            self.notifyModification()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-            self.notifyModification()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-            self.notifyModification()
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
@@ -5135,8 +5134,7 @@ class Session(CommonObjectBase, Locatable):
     def delete(self):
         while len(self.getConvenerList()) > 0:
             self.removeConvener(self.getConvenerList()[0])
-        while len(self.getMaterialList()) > 0:
-            self.removeMaterial(self.getMaterialList()[0])
+
         for c in self.getCoordinatorList()[:]:
             self.removeCoordinator(c)
         while len(self.contributions.values())>0:
@@ -6021,15 +6019,6 @@ class Session(CommonObjectBase, Locatable):
         newMat.setOwner( self )
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
-
-    def removeMaterial( self, mat ):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-            return "done: %s"%mat.getId()
-        return "not done: %s"%mat.getId()
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
@@ -7785,16 +7774,8 @@ class Contribution(CommonObjectBase, Locatable):
 
             self.setTrack(None)
 
-            # sending deleted signal to attached items.
-            # TODO 2.0: do not delete them, only set is_deleted on parent
-            attachments = self.attached_items
-            if attachments:
-                for folder in attachments['folders']:
-                    signals.attachments.folder_deleted.send(folder, user=session.user)
-                for attachment in attachments['files']:
-                    signals.attachments.attachment_deleted.send(attachment, user=session.user)
-
-                self.removeReviewing()
+            self.remove_attachments()
+            self.removeReviewing()
 
             self.notify_protection_to_owner(self, delete=True)
 
@@ -8709,20 +8690,7 @@ class Contribution(CommonObjectBase, Locatable):
         self.notifyModification()
 
     def removeMaterial(self, mat):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-        elif mat.getId().lower() == 'reviewing':
+        if mat.getId().lower() == 'reviewing':
             self.removeReviewing()
 
     def recoverMaterial(self, recMat):
@@ -9992,25 +9960,6 @@ class SubContribution(CommonObjectBase, Locatable):
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
-    def removeMaterial( self, mat):
-        if mat.getId() in self.materials.keys():
-            mat.delete()
-            self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
-            self.notifyModification()
-        elif mat.getId().lower() == 'paper':
-            self.removePaper()
-            self.notifyModification()
-        elif mat.getId().lower() == 'slides':
-            self.removeSlides()
-            self.notifyModification()
-        elif mat.getId().lower() == 'video':
-            self.removeVideo()
-            self.notifyModification()
-        elif mat.getId().lower() == 'poster':
-            self.removePoster()
-            self.notifyModification()
-
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
         recMat.setOwner( self )
@@ -10161,12 +10110,7 @@ class SubContribution(CommonObjectBase, Locatable):
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
-        for mat in self.getMaterialList():
-            self.removeMaterial(mat)
-        self.removePaper()
-        self.removeSlides()
-        self.removeVideo()
-        self.removePoster()
+        self.remove_attachments()
         TrashCanManager().add(self)
 
         #self.unindex()
