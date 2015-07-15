@@ -255,6 +255,57 @@
     @include colored-icon($yellow);
 }
 
+.attachments-box {
+    padding: 5px;
+
+    background-color: $light-gray;
+    > .attachments-box-header {
+        > * {
+            color: $dark-gray;
+            display: inline-block;
+
+            vertical-align: middle;
+        }
+        > h2 {
+            margin: 0;
+        }
+        > .i-button.right {
+            margin-top: 0;
+        }
+    }
+    .tree tr.sub-tree > td > div > .tree {
+        background-color: white;
+    }
+}
+
+.category-sidebar > .attachments-box > .attachments-box-header {
+    margin-top: 20px;
+    padding-bottom: 0.2em;
+
+    border-bottom: 1px solid #ebebeb;
+    box-shadow: 0 1px 0 #fafafa;
+    > h2 {
+        padding-bottom: 0;
+
+        border-bottom: 0;
+        box-shadow: none;
+    }
+}
+
+.contribution-display .row.files .column .attachments-box > .attachments-box-header {
+    > h2 {
+        margin-top: 0;
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+    > .i-button.right {
+        margin: 0 !important;
+    }
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid darken($light-gray, 10%);
+}
+
+
 .material-list {
     .folder .attachment {
         display: inline-block;

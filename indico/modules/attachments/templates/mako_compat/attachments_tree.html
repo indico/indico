@@ -1,3 +1,16 @@
-{% from 'attachments/_attachments.html' import render_attachments_small %}
+{% from 'attachments/_attachments.html' import render_attachments %}
 
-{{ render_attachments_small(item=item, files=files, folders=folders) }}
+<div class="attachments-box {%- if can_edit %} highlighted-area{% endif %}">
+    <div class="attachments-box-header">
+        <h2 class="icon-package-download"> {% trans %}Materials{% endtrans %}</h2>
+        {% if can_edit %}
+            <a href="#" id="manageAttachments-{{ linked_object.id }}" class="right i-button icon-edit"></a>
+        {% endif %}
+    </div>
+    {{ render_attachments(linked_object.attached_items, short=true) }}
+</div>
+<script>
+    $('#manageAttachments-{{ linked_object.id }}').on('click', function openAtttachmentsPopup() {
+        openAttachmentManager({{ linked_object.getLocator()|tojson }});
+    });
+</script>

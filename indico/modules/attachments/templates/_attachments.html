@@ -112,10 +112,3 @@
         </div>
     {% endif %}
 {%- endmacro %}
-
-
-{% macro render_attachments_small(item=none, files=[], folders=[]) %}
-    {% set files = item.attached_items.files if item else files %}
-    {% set folders = item.attached_items.folders if item else folders %}
-    {{ render_attachments({'files': files, 'folders': folders}, short=true) }}
-{% endmacro %}
