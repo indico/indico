@@ -15,11 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/animation";
-@import 'base/palette';
-@import 'base/defaults';
-@import 'base/layout';
-@import 'base/reset';
-@import 'base/theme';
-@import 'base/typography';
-@import 'base/utilities';
+/* Animation utility constructs */
+/* To be removed whenever we support a more recent version of Compass */
+
+
+@mixin indico-animation($name, $duration, $timing-function, $count) {
+    animation-name: $name;
+    -webkit-animation-name: $name;
+    -moz-animation-name: $name;
+
+    animation-duration: $duration;
+    -webkit-animation-duration: $duration;
+    -moz-animation-duration: $duration;
+
+    animation-timing-function: $timing-function;
+    -webkit-animation-timing-function: $timing-function;
+    -moz-animation-timing-function: $timing-function;
+
+    animation-iteration-count: $count;
+    -webkit-animation-iteration-count: $count;
+    -moz-animation-iteration-count: $count;
+}
