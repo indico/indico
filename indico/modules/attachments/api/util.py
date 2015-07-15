@@ -38,9 +38,9 @@ def _build_folder_legacy_api_data(folder):
     if not folder.can_access(user):
         return None
 
-    resources = [_build_file_legacy_api_data(file_)
-                 for file_ in folder.attachments
-                 if file_.can_access(user)]
+    resources = [_build_attachment_legacy_api_data(attachment)
+                 for attachment in folder.attachments
+                 if attachment.can_access(user)]
     if not resources:  # Skipping empty folders for legacy API
         return None
 
@@ -56,20 +56,20 @@ def _build_folder_legacy_api_data(folder):
     }
 
 
-def _build_file_legacy_api_data(file_):
-    data = {'name': file_.title}
+def _build_attachment_legacy_api_data(attachment):
+    data = {'name': attachment.title}
 
-    if file_.type == AttachmentType.file:
+    if attachment.type == AttachmentType.file:
         data['_type'] = 'LocalFile'
         data['_fossil'] = 'localFileMetadata'
-        data['id'] = str(file_.id)
-        data['fileName'] = file_.file.filename
-        data['url'] = file_.absolute_download_url
+        data['id'] = str(attachment.id)
+        data['fileName'] = attachment.file.filename
+        data['url'] = attachment.absolute_download_url
 
-    elif file_.type == AttachmentType.link:
+    elif attachment.type == AttachmentType.link:
         data['_type'] = 'Link'
         data['_fossil'] = 'linkMetadata'
-        data['url'] = file_.link_url
+        data['url'] = attachment.link_url
 
     return data
 
@@ -93,27 +93,29 @@ def _build_folder_api_data(folder):
         'id': folder.id,
         'title': folder.title,
         'description': folder.description,
-        'attachments': [_build_file_api_data(file_) for file_ in folder.attachments if file_.can_access(user)],
+        'attachments': [_build_attachment_api_data(attachment)
+                        for attachment in folder.attachments
+                        if attachment.can_access(user)],
         'default_folder': folder.is_default
     }
 
 
-def _build_file_api_data(file_):
+def _build_attachment_api_data(attachment):
     data = {
-        'id': file_.id,
-        'download_url': file_.absolute_download_url,
-        'title': file_.title,
-        'description': file_.description,
-        'modified_dt': file_.modified_dt.isoformat(),
-        'type': file_.type.name,
+        'id': attachment.id,
+        'download_url': attachment.absolute_download_url,
+        'title': attachment.title,
+        'description': attachment.description,
+        'modified_dt': attachment.modified_dt.isoformat(),
+        'type': attachment.type.name,
     }
 
-    if file_.type == AttachmentType.file:
-        data['filename'] = file_.file.filename
-        data['content_type'] = file_.file.content_type
-        data['size'] = file_.file.size
+    if attachment.type == AttachmentType.file:
+        data['filename'] = attachment.file.filename
+        data['content_type'] = attachment.file.content_type
+        data['size'] = attachment.file.size
 
-    elif file_.type == AttachmentType.link:
-        data['link_url'] = file_.link_url
+    elif attachment.type == AttachmentType.link:
+        data['link_url'] = attachment.link_url
 
     return data
