@@ -200,7 +200,7 @@
 
 @mixin download-button($color) {
     &:before {
-        color: $color !important;
+        color: $color;
     }
     &:hover:not(.disabled):not(disabled) {
         color: lighten($color, 5%) !important;
