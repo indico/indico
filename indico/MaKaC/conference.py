@@ -3844,47 +3844,6 @@ class Conference(CommonObjectBase, Locatable):
                           'url': furl})
         return files
 
-    def getAllMaterialDict(self, child=None):
-        """
-        This method iterates through the children of the conference, creating
-        a dictionary which maps type to material link URLs.
-        """
-
-        child = self if child is None else child
-
-        node = {}
-        node['title'] = child.getTitle()
-
-        try:
-            node['type'] = child.getType()
-        except:
-            # If we land here, it's a session which doesn't have 'getType'
-            node['type'] = 'session'
-
-        node['children'] = []
-        node['material'] = []
-
-        if node['type'] in ['conference', 'meeting']:
-            for session in child.getSessionList():
-                node['children'].append(self.getAllMaterialDict(session))
-
-            for contrib in child.getContributionList():
-                node['children'].append(self.getAllMaterialDict(contrib))
-
-        for material in child.getAllMaterialList():
-            files = self._getMaterialFiles(material)
-
-            for f in files:
-                materialNode = {}
-                materialNode['type'] = 'material'
-                materialNode['title'] = material.getTitle()
-                materialNode['materialType'] = f['type']
-                materialNode['url'] = str(f['url'])
-
-                node['material'].append(materialNode)
-
-        return node
-
     def setPaper( self, newPaper ):
         if self.getPaper() != None:
             raise MaKaCError( _("The paper for this conference has already been set"), _("Conference"))
