@@ -359,7 +359,7 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFo
     getNote.produce = lambda x: build_note_api_data(x.note)
 
 
-class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
+class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil, _IncludeMaterialFossil):
 
     def getId(self):
         pass
