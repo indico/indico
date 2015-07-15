@@ -22,7 +22,7 @@ from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 from flask import session
-from sqlalchemy import cast, Date, or_
+from sqlalchemy import cast, Date
 
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.links import LinkType
@@ -58,8 +58,9 @@ class AttachmentPackageMixin:
         return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
 
     def _load_contribution_data(self):
-        return [(contrib.getId(), to_unicode(contrib.getTitle())) for contrib in self._conf.getContributionList()
-                if contrib.getStartDate()]
+        return [(contrib.getId(), to_unicode(contrib.getTitle()))
+                for contrib in self._conf.getContributionList() if contrib.getOwner() == self._conf
+                and contrib.getStartDate()]
 
     def _load_schedule_data(self):
         dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList() if contrib.getStartDate()}
@@ -93,11 +94,9 @@ class AttachmentPackageMixin:
                                _join=AttachmentFolder)
 
     def _filter_by_sessions(self, session_ids, added_since):
-        query = self._build_base_query()
+        query = self._build_base_query().filter(AttachmentFolder.link_type == LinkType.session)
         if session_ids:
             query = query.filter(AttachmentFolder.session_id.in_(session_ids))
-        else:
-            query = query.filter(AttachmentFolder.session_id != None)
 
         if added_since:
             query = self._filter_by_date(query, added_since)
@@ -114,8 +113,7 @@ class AttachmentPackageMixin:
         if contribution_ids:
             query = query.filter(AttachmentFolder.contribution_id.in_(contribution_ids))
         else:
-            query = query.filter(or_(AttachmentFolder.contribution_id is not None,
-                                 AttachmentFolder.subcontribution_id is not None))
+            query = query.filter(AttachmentFolder.contribution_id is not None)
 
         if added_since:
             query = self._filter_by_date(query, added_since)
@@ -138,21 +136,32 @@ class AttachmentPackageMixin:
         return send_file('material-{}.zip'.format(self._conf.id), temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, attachment):
-        linked_object = attachment.folder.linked_object
         event_dir = secure_filename(self._conf.getTitle(), None)
-        path_paths = [event_dir] if event_dir else []
+        segments = [event_dir] if event_dir else []
+        segments.extend(self._get_base_path(attachment))
+        segments.extend([secure_filename(attachment.folder.title, unicode(attachment.folder.id)),
+                        attachment.file.filename])
+        return os.path.join(*segments)
+
+    def _get_base_path(self, attachment):
+        obj = linked_object = attachment.folder.linked_object
+        paths = []
+        while obj != self._conf:
+            owner = obj.getOwner()
+            if isinstance(obj, SubContribution):
+                start_date = owner.getAdjustedStartDate()
+            else:
+                start_date = obj.getAdjustedStartDate()
+
+            paths.append(secure_filename(start_date.strftime('%H%M_{}').format(obj.getTitle()), ''))
+            obj = owner
 
         if isinstance(linked_object, SubContribution):
-            contrib = linked_object.parent
-            start_date = contrib.getAdjustedStartDate()
-            path_paths.extend([start_date.strftime('%Y%m%d_%A'),
-                               secure_filename(start_date.strftime('%H%M_{}').format(contrib.getTitle()), ''),
-                               secure_filename(linked_object.getTitle(), unicode(linked_object.getId()))])
-        elif linked_object != self._conf:
-            start_date = linked_object.getAdjustedStartDate()
-            path_paths.extend([start_date.strftime('%Y%m%d_%A'),
-                               secure_filename(start_date.strftime('%H%M_{}').format(linked_object.getTitle()), '')])
+            linked_obj_start_date = linked_object.getOwner().getAdjustedStartDate()
+        else:
+            linked_obj_start_date = linked_object.getAdjustedStartDate()
 
-        path_paths.extend([secure_filename(attachment.folder.title, unicode(attachment.folder.id)),
-                           attachment.file.filename])
-        return os.path.join(*path_paths)
+        if attachment.folder.linked_object != self._conf:
+            paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
+
+        return reversed(paths)
