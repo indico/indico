@@ -128,9 +128,10 @@ ${ actions }
 
 
 <script type="text/javascript">
-      $('.chair_list .nomail').qtip({
-             content: {
-                 text: $T("Login to see email address"),
-             },
-         });
+    $('.chair_list .nomail').qtip({
+        content: {
+            text: $T("Login to see email address"),
+        },
+    });
+    setupAttachmentTreeView();
 </script>

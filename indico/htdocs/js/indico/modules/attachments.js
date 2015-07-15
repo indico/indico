@@ -3,6 +3,18 @@
 
     var HISTORY_API_SUPPORTED = !!history.pushState;
 
+    function toggleFolder(evt) {
+        if ($(evt.target).closest('.actions').length) {
+            // ignore if it comes from inside the action panel
+            return;
+        }
+        $(this)
+            .toggleClass('collapsed')
+            .next('.sub-tree')
+            .find('td > div')
+                .slideToggle(150);
+    }
+
     $(document).ready(function() {
         $('.attachments > .dropdown').parent().dropdown();
         setupAttachmentPreview();
@@ -111,6 +123,10 @@
         }
     };
 
+    global.setupAttachmentTreeView = function setupAttachmentTreeView() {
+        $('.attachments-box').on('click', '.tree .expandable', toggleFolder);
+    };
+
 
     global.setupAttachmentEditor = function setupAttachmentEditor() {
         var editor = $('.attachment-editor');
@@ -120,17 +136,7 @@
         }
 
         editor
-            .on('click', '.tree .expandable', function(e) {
-                if ($(e.target).closest('.actions').length) {
-                    // ignore if it comes from inside the action panel
-                    return;
-                }
-                $(this)
-                    .toggleClass('collapsed')
-                    .next('.sub-tree')
-                    .find('td > div')
-                        .slideToggle(150);
-            })
+            .on('click', '.tree .expandable', toggleFolder)
             .on('click', '.js-dialog-action', function(e) {
                 e.preventDefault();
                 var $this = $(this);
