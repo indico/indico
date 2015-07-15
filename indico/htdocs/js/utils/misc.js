@@ -31,6 +31,14 @@
         return dfd.promise();
     };
 
+    global.alertPopup = function alertPopup(message, title) {
+        var dfd = $.Deferred();
+        new AlertPopup(title, message, function(){
+            dfd.resolve();
+        }).open();
+        return dfd;
+    };
+
     global.handleFlashes = function handleFlashes(data, clear, element) {
         var container;
         if (!element || !element.length) {
