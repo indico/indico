@@ -60,6 +60,7 @@ def _build_folder_legacy_api_data(folder):
     return {
         '_type': type_,
         '_fossil': 'materialMetadata',
+        '_deprecated': True,
         'title': folder.title,
         'id': str(folder.id),
         'resources': resources
@@ -67,7 +68,7 @@ def _build_folder_legacy_api_data(folder):
 
 
 def _build_attachment_legacy_api_data(attachment):
-    data = {'name': attachment.title}
+    data = {'name': attachment.title, '_deprecated': True}
 
     if attachment.type == AttachmentType.file:
         data['_type'] = 'LocalFile'
