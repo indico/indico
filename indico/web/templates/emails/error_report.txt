@@ -2,7 +2,7 @@
 
 {% block header %}{% endblock %}
 {% block footer_title %}Error Report{% endblock %}
-{% block subject_prefix %}[Indico@{{ config.SERVER_NAME }}]{% endblock %}
+{% block subject_prefix %}[Indico@{{ server_name }}]{% endblock %}
 {% block subject %}Error report{% endblock %}
 
 

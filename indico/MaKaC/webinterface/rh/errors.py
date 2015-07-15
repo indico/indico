@@ -20,6 +20,7 @@ from pprint import pformat
 
 
 from flask import request, send_from_directory
+from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 from indico.web.flask.templating import get_template_module
@@ -53,7 +54,8 @@ class RHErrorReporting(RH):
         cfg = Config.getInstance()
         data = json.loads(self._msg)
         template = get_template_module('emails/error_report.txt', comment=self._comments, traceback=data['traceback'],
-                                       request_info=pformat(data['request_info']))
+                                       request_info=pformat(data['request_info']),
+                                       server_name=url_parse(cfg.getBaseURL()).netloc)
         send_email(make_email(cfg.getSupportEmail(), reply_address=self._userMail, template=template), skip_queue=True)
 
     def process(self, params):
