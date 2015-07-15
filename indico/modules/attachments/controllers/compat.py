@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import current_app, redirect
+from werkzeug.exceptions import NotFound
 
 from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
 from indico.web.flask.util import url_for
@@ -38,12 +39,16 @@ def _clean_args(kwargs):
 @RHSimple.wrap_function
 def compat_folder(**kwargs):
     _clean_args(kwargs)
-    mapping = LegacyAttachmentFolderMapping.find(**kwargs).first_or_404()
-    return redirect(url_for('attachments.list_folder', mapping.folder), 302 if current_app.debug else 301)
+    folder = LegacyAttachmentFolderMapping.find(**kwargs).first_or_404().folder
+    if folder.is_deleted or folder.linked_object is None:
+        raise NotFound
+    return redirect(url_for('attachments.list_folder', folder), 302 if current_app.debug else 301)
 
 
 @RHSimple.wrap_function
 def compat_attachment(**kwargs):
     _clean_args(kwargs)
-    mapping = LegacyAttachmentMapping.find(**kwargs).first_or_404()
-    return redirect(mapping.attachment.download_url, 302 if current_app.debug else 301)
+    attachment = LegacyAttachmentMapping.find(**kwargs).first_or_404().attachment
+    if attachment.is_deleted or attachment.folder.is_deleted or attachment.folder.linked_object is None:
+        raise NotFound
+    return redirect(attachment.download_url, 302 if current_app.debug else 301)
