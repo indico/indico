@@ -35,7 +35,7 @@ def connect_log_signals():
     signals.attachments.attachment_updated.connect(_log_attachment_updated)
 
 
-def _ignore_category(f):
+def _ignore_non_loggable(f):
     """
     Only calls the decorated function the attachment/folder is not
     linked to a category.
@@ -43,7 +43,7 @@ def _ignore_category(f):
     @wraps(f)
     def wrapper(sender, **kwargs):
         folder = getattr(sender, 'folder', sender)  # sender may be a folder or attachment here
-        if folder.link_type != LinkType.category:
+        if folder.link_type != LinkType.category or kwargs.get('internal'):
             f(sender, **kwargs)
 
     return wrapper
@@ -73,52 +73,40 @@ def _log(event, kind, msg, user, data):
     event.log(EventLogRealm.management, kind, 'Materials', msg, user, data=data)
 
 
-@_ignore_category
+@_ignore_non_loggable
 def _log_folder_created(folder, user, **kwargs):
-    if folder.link_type == LinkType.category:
-        return
     event = folder.linked_object.getConference()
     _log(event, EventLogKind.positive, 'Created folder "{}"'.format(folder.title), user, _get_folder_data(folder))
 
 
-@_ignore_category
+@_ignore_non_loggable
 def _log_folder_deleted(folder, user, **kwargs):
-    if folder.link_type == LinkType.category:
-        return
     event = folder.linked_object.getConference()
     _log(event, EventLogKind.negative, 'Deleted folder "{}"'.format(folder.title), user, _get_folder_data(folder))
 
 
-@_ignore_category
+@_ignore_non_loggable
 def _log_folder_updated(folder, user, **kwargs):
-    if folder.link_type == LinkType.category:
-        return
     event = folder.linked_object.getConference()
     _log(event, EventLogKind.change, 'Updated folder "{}"'.format(folder.title), user, _get_folder_data(folder))
 
 
-@_ignore_category
+@_ignore_non_loggable
 def _log_attachment_created(attachment, user, **kwargs):
-    if attachment.folder.link_type == LinkType.category:
-        return
     event = attachment.folder.linked_object.getConference()
     _log(event, EventLogKind.positive, 'Added material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
 
 
-@_ignore_category
+@_ignore_non_loggable
 def _log_attachment_deleted(attachment, user, **kwargs):
-    if attachment.folder.link_type == LinkType.category:
-        return
     event = attachment.folder.linked_object.getConference()
     _log(event, EventLogKind.negative, 'Deleted material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
 
 
-@_ignore_category
+@_ignore_non_loggable
 def _log_attachment_updated(attachment, user, **kwargs):
-    if attachment.folder.link_type == LinkType.category:
-        return
     event = attachment.folder.linked_object.getConference()
     _log(event, EventLogKind.change, 'Updated material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))

@@ -334,12 +334,12 @@ class CommonObjectBase(CoreObject, Fossilizable):
         if attachments:
             for folder in attachments['folders']:
                 folder.is_deleted = True
-                signals.attachments.folder_deleted.send(folder, user=session.user)
+                signals.attachments.folder_deleted.send(folder, user=session.user, internal=True)
                 for attachment in folder.attachments:
                     attachment.is_deleted = True
             for attachment in attachments['files']:
                 attachment.is_deleted = True
-                signals.attachments.attachment_deleted.send(attachment, user=session.user)
+                signals.attachments.attachment_deleted.send(attachment, user=session.user, internal=True)
 
 
 class CategoryManager(ObjectHolder):
