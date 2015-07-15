@@ -206,6 +206,7 @@ $(document).ready(function(){
             $this.children(".material-title-icon").removeClass('icon-expand').addClass('icon-next');
         }
     });
+    setupAttachmentTreeView();
 });
 </script>
 

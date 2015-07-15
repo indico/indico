@@ -130,6 +130,9 @@
         </div>
     </div>
 </div>
+<script>
+    setupAttachmentTreeView();
+</script>
 <%block name="scripts">
 
 </%block>
