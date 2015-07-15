@@ -22,7 +22,7 @@ from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 from flask import session
-from sqlalchemy import cast, Date
+from sqlalchemy import cast, Date, or_
 
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.links import LinkType
@@ -58,7 +58,8 @@ class AttachmentPackageMixin:
         return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
 
     def _load_contribution_data(self):
-        return [(contrib.getId(), to_unicode(contrib.getTitle())) for contrib in self._conf.getContributionList()]
+        return [(contrib.getId(), to_unicode(contrib.getTitle())) for contrib in self._conf.getContributionList()
+                if contrib.getStartDate()]
 
     def _load_schedule_data(self):
         dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList() if contrib.getStartDate()}
@@ -68,13 +69,11 @@ class AttachmentPackageMixin:
         attachments = []
         added_since = form.added_since.data
         attachments.extend(self._filter_protected(self._filter_top_level_attachments(added_since)))
-        if form.sessions.data:
-            attachments.extend(self._filter_protected(self._filter_by_sessions(form.sessions.data, added_since)))
+        attachments.extend(self._filter_protected(self._filter_by_sessions(form.sessions.data, added_since)))
 
         contribution_ids = set(form.contributions.data +
                                self._get_contributions_by_schedule_date(form.contributions_schedule_dates.data))
-        if contribution_ids:
-            attachments.extend(self._filter_protected(self._filter_by_contributions(contribution_ids, added_since)))
+        attachments.extend(self._filter_protected(self._filter_by_contributions(contribution_ids, added_since)))
         return attachments
 
     def _filter_protected(self, attachments):
@@ -94,7 +93,11 @@ class AttachmentPackageMixin:
                                _join=AttachmentFolder)
 
     def _filter_by_sessions(self, session_ids, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.session_id.in_(session_ids))
+        query = self._build_base_query()
+        if session_ids:
+            query = query.filter(AttachmentFolder.session_id.in_(session_ids))
+        else:
+            query = query.filter(AttachmentFolder.session_id != None)
 
         if added_since:
             query = self._filter_by_date(query, added_since)
@@ -106,9 +109,13 @@ class AttachmentPackageMixin:
                 if contribution.getStartDate() and str(contribution.getStartDate().date()) in dates]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.link_type.in_(LinkType.contribution,
-                                                                               LinkType.subcontribution),
-                                                AttachmentFolder.contribution_id.in_(contribution_ids))
+        query = self._build_base_query().filter(AttachmentFolder.link_type.in_([LinkType.contribution,
+                                                                               LinkType.subcontribution]))
+        if contribution_ids:
+            query = query.filter(AttachmentFolder.contribution_id.in_(contribution_ids))
+        else:
+            query = query.filter(or_(AttachmentFolder.contribution_id is not None,
+                                 AttachmentFolder.subcontribution_id is not None))
 
         if added_since:
             query = self._filter_by_date(query, added_since)
