@@ -96,6 +96,7 @@ def get_request_info(hide_passwords=True):
             'url': _format_request_data(request.view_args, False),
             'get': _format_request_data(request.args, False),
             'post': _format_request_data(request.form, hide_passwords),
+            'json': request.get_json(silent=True),
             'headers': _format_request_data(request.headers, False),
         }
     }
