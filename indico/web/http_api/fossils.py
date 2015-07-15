@@ -181,7 +181,6 @@ class _IncludeMaterialFossil(IFossil):
     def getFolders(self):
         pass
     getFolders.produce = build_folders_api_data
-    getFolders.convert = Conversion.addLegacyMinutes
 
 
 class _IncludeACLFossil(IFossil):
