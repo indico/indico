@@ -114,15 +114,7 @@ from MaKaC.webinterface.general import strfFileSize
                 % endfor
                 </ul>
             % endif
-            <div>
-                % if allowUserModif:
-                    <div class="right">
-                        <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                    </div>
-                % endif
-                <h2 class="icon-package-download">${ _("Files") }</h2>
-            </div>
-            ${ render_template('attachments/mako_compat/attachments_tree.html', item=categ) }
+            ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=categ, can_edit=allowUserModif) }
         % endif
     </div>
     % endif
@@ -220,11 +212,6 @@ $(document).ready(function(){
 % if isLoggedIn:
     <script type="text/javascript">
         $(document).ready(function(){
-            $("#manageMaterial").click(function(e){
-                e.preventDefault();
-                openAttachmentManager(${categ.getLocator() | n,j});
-            });
-
             $('.toolbar .i-button').qtip({
                 position: {
                     my: 'bottom center',

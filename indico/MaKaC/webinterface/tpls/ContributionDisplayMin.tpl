@@ -93,14 +93,8 @@
                             <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
 
                             % if Contribution.attached_items or canEditFiles:
-                                <div class="column ${'highlighted-area' if canEditFiles else ''}">
-                                    % if canEditFiles:
-                                        <div class="right">
-                                            <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                                        </div>
-                                    % endif
-                                    <h2>${_("Files")}</h2>
-                                    ${ render_template('attachments/mako_compat/attachments_tree.html', item=Contribution) }
+                                <div class="column">
+                                    ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=Contribution, can_edit=canEditFiles) }
                                 </div>
                                 % endif
                             </div>
@@ -136,12 +130,6 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    $("#manageMaterial").click(function(e){
-        e.preventDefault();
-        openAttachmentManager(${Contribution.getLocator() | n,j});
-    });
-</script>
 <%block name="scripts">
 
 </%block>

@@ -52,8 +52,7 @@
   % endif
   % if conf.attached_items or isSubmitter:
   <div class="infoline material material-list">
-      <span title="${_("Materials")}" class="icon icon-package-download" aria-hidden="true"> ${_("Materials")}</span>
-      ${ render_template('attachments/mako_compat/attachments_tree.html', item=conf) }
+      ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=conf, can_edit=isSubmitter) }
   </div>
   % endif
 
@@ -134,18 +133,4 @@ ${ actions }
                  text: $T("Login to see email address"),
              },
          });
-
-% if isSubmitter:
-    $('.infoline.material').addClass('highlighted-area');
-    $('.infoline.material').css('background-color', '#f2f2f2');
-    $('.infoline.material').append('<span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" style="float: right" id="manageMaterials" aria-hidden="true" ></span>');
-
-
-    $("#manageMaterials").click(function(e){
-        e.preventDefault();
-        openAttachmentManager(${conf.getLocator() | n,j});
-    });
-
-% endif
-
 </script>
