@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import g
+from flask import g, session
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
@@ -33,6 +33,7 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
+from MaKaC.accessControl import AccessWrapper
 
 
 class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
@@ -140,6 +141,8 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
         """
+        if not self.linked_object.canView(AccessWrapper(session.user.as_avatar if session.user else None)):
+            return False
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
 
     @classmethod
