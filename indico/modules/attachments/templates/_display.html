@@ -20,6 +20,7 @@
             {% if folder.attachments|count <= 2 %}
                 {%- for attachment in folder.attachments -%}
                     {{ render_attachment(attachment, has_label=true) }}
+                    {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=true) }}
                 {%- endfor -%}
             {% else %}
                 <a class="i-button arrow" data-toggle="dropdown"></a>
@@ -32,7 +33,7 @@
                                 {{- attachment.title -}}
                             </a>
                         </li>
-                        {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=false) }}
+                        {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=false, has_label=false) }}
                     {%- endfor -%}
                 </ul>
             {% endif %}
@@ -44,14 +45,16 @@
     {% set files = item.attached_items.files if item else files %}
     {% set folders = item.attached_items.folders if item else folders %}
 
-    <span class="folder folder-root toolbar">
-        {% for attachment in files %}
-            {{ render_attachment(attachment) }}
-            {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true) }}
-        {% endfor %}
-    </span>
+    <div class="attachments-display-container">
+        <span class="folder folder-root toolbar">
+            {% for attachment in files %}
+                {{ render_attachment(attachment) }}
+                {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=false) }}
+            {% endfor %}
+        </span>
 
-    {%- for folder in folders -%}
-        {{ render_folder(folder) }}
-    {%- endfor %}
+        {%- for folder in folders -%}
+            {{ render_folder(folder) }}
+        {%- endfor %}
+    </div>
 {% endmacro %}
