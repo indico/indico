@@ -95,17 +95,6 @@ class outputGenerator(object):
         from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
         self.webFactory = WebFactoryRegistry()
 
-    def _generateMaterialList(self, obj):
-        """
-        Generates a list containing all the materials, with the
-        corresponding Ids for those that already exist
-        """
-
-        # yes, this may look a bit redundant, but materialRegistry isn't
-        # bound to a particular target
-        materialRegistry = obj.getMaterialRegistry()
-        return materialRegistry.getMaterialList(obj.getConference())
-
     def _getRecordCollection(self, obj):
         if obj.hasAnyProtection():
             return "INDICOSEARCH.PRIVATE"
@@ -270,6 +259,7 @@ class outputGenerator(object):
             modificons = 1
 
         out.writeTag("ID", conf.getId())
+        out.writeTag("_deprecated", 'True')
 
         if conf.getOwnerList():
             out.writeTag("category", conf.getOwnerList()[0].getName())
@@ -277,12 +267,9 @@ class outputGenerator(object):
             out.writeTag("category", "")
 
         out.writeTag("parentProtection", dumps(conf.getAccessController().isProtected()))
-        out.writeTag("materialList", dumps(self._generateMaterialList(conf)))
 
         if conf.canModify(self.__aw) and vars and modificons:
             out.writeTag("modifyLink", vars["modifyURL"])
-        if conf.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("materialLink", True)
         if conf.canModify( self.__aw ) and vars and vars.has_key("cloneURL") and modificons:
             out.writeTag("cloneLink", vars["cloneURL"])
         if  vars and vars.has_key("iCalURL"):
@@ -468,11 +455,6 @@ class outputGenerator(object):
                 out.writeTag("toDate", "%d%s%s" % (adjusted_endDate.year, string.zfill(adjusted_endDate.month, 2), string.zfill(adjusted_endDate.day, 2)))
                 out.closeTag("line")
 
-        mList = conf.getAllMaterialList()
-        for mat in mList:
-            if mat.canView(self.__aw) and mat.getTitle() != "Internal Page Files":
-                if includeMaterial:
-                    self._materialToXML(mat, vars, out=out)
 
     def _sessionToXML(self,
                       session,
@@ -502,8 +484,6 @@ class outputGenerator(object):
             out.writeTag("code",session.getId())
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
             out.writeTag("modifyLink",vars["sessionModifyURLGen"](session))
-        if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
-            out.writeTag("materialLink", True)
         out.writeTag("title",session.title)
         out.writeTag("description",session.description)
         cList = session.getConvenerList()
@@ -561,10 +541,6 @@ class outputGenerator(object):
                         if showWithdrawed or not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn):
                             self._contribToXML(contrib, vars, includeSubContribution,includeMaterial, session.getConference(),out=out, recordingManagerTags=recordingManagerTags) # needs to be re-done
 
-        mList = session.getAllMaterialList()
-        for mat in mList:
-            self._materialToXML(mat, vars, out=out)
-
         out.closeTag("session")
 
     def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None, recordingManagerTags=None):
@@ -580,7 +556,6 @@ class outputGenerator(object):
         out.writeTag("ID", session.getId())
 
         out.writeTag("parentProtection", dumps(session.getAccessController().isProtected()))
-        out.writeTag("materialList", dumps(self._generateMaterialList(session)))
 
 
         slotId = session.getSortedSlotList().index(slot)
@@ -594,8 +569,6 @@ class outputGenerator(object):
             url = urlHandlers.UHSessionModifSchedule.getURL(session)
             ttLink = "%s#%s.s%sl%s" % (url, session.getStartDate().strftime('%Y%m%d'), session.getId(), slotId)
             out.writeTag("sessionTimetableLink",ttLink)
-        if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
-            out.writeTag("materialLink", True)
         title = session.title
         if slot.getTitle() != "" and slot.getTitle() != title:
             title += ": %s" %  slot.getTitle()
@@ -645,10 +618,6 @@ class outputGenerator(object):
                         if owner.canView(self.__aw):
                             if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
                                 self._contribToXML(owner,vars,1,includeMaterial, conf,out=out)
-        mList = session.getAllMaterialList()
-        for mat in mList:
-            self._materialToXML(mat, vars, out=out)
-        out.closeTag("session")
 
     def _contribToXML(self,
                       contribution,
@@ -669,7 +638,6 @@ class outputGenerator(object):
         out.writeTag("ID",contribution.getId())
 
         out.writeTag("parentProtection", dumps(contribution.getAccessController().isProtected()))
-        out.writeTag("materialList", dumps(self._generateMaterialList(contribution)))
 
         if contribution.getBoardNumber() != "":
             out.writeTag("board",contribution.getBoardNumber())
@@ -682,8 +650,6 @@ class outputGenerator(object):
             out.closeTag("type")
         if contribution.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["contribModifyURLGen"](contribution))
-        if (contribution.canModify( self.__aw ) or contribution.canUserSubmit(self.__aw.getUser())) and vars and modificons:
-            out.writeTag("materialLink", True)
         keywords = contribution.getKeywords()
         keywords = keywords.replace("\r\n", "\n")
         keywordsList = filter (lambda a: a != '', keywords.split("\n"))
@@ -750,13 +716,6 @@ class outputGenerator(object):
         if contribution.duration:
             out.writeTag("duration","%s:%s" %(string.zfill((datetime(1900,1,1)+contribution.duration).hour,2), string.zfill((datetime(1900,1,1)+contribution.duration).minute,2)))
         out.writeTag("abstract",contribution.getDescription())
-        matList = contribution.getAllMaterialList()
-        for mat in matList:
-            if mat.canView(self.__aw):
-                if includeMaterial:
-                    self._materialToXML(mat, vars, out=out)
-                else:
-                    out.writeTag("material",out.writeTag("id",mat.id))
         for subC in contribution.getSubContributionList():
             if includeSubContribution:
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
@@ -782,12 +741,9 @@ class outputGenerator(object):
         out.writeTag("ID",subCont.getId())
 
         out.writeTag("parentProtection", dumps(subCont.getContribution().getAccessController().isProtected()))
-        out.writeTag("materialList", dumps(self._generateMaterialList(subCont)))
 
         if subCont.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["subContribModifyURLGen"](subCont))
-        if (subCont.canModify( self.__aw ) or subCont.canUserSubmit( self.__aw.getUser())) and vars and modificons:
-            out.writeTag("materialLink", True)
         rnh = subCont.getReportNumberHolder()
         rns = rnh.listReportNumbers()
         if len(rns) != 0:
@@ -808,130 +764,7 @@ class outputGenerator(object):
             out.closeTag("speakers")
         out.writeTag("duration","%s:%s"%((string.zfill((datetime(1900,1,1)+subCont.getDuration()).hour,2), string.zfill((datetime(1900,1,1)+subCont.getDuration()).minute,2))))
         out.writeTag("abstract",subCont.getDescription())
-        matList = subCont.getAllMaterialList()
-        for mat in matList:
-            if mat.canView(self.__aw):
-                if includeMaterial:
-                    self._materialToXML(mat, vars, out=out)
-
         out.closeTag("subcontribution")
-
-    def _materialToXML(self,mat, vars, out=None):
-        if not out:
-            out = self._XMLGen
-        out.openTag("material")
-        out.writeTag("ID",mat.getId())
-        out.writeTag("title",mat.title)
-        out.writeTag("description",mat.description)
-        out.writeTag("type",mat.type)
-        if vars:
-            out.writeTag("displayURL",vars["materialURLGen"](mat))
-        types = {"pdf"   :{"mapsTo" : "pdf",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "pdf_small.png"),  "imgAlt" : "pdf file"},
-                 "doc"   :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},
-                 "docx"  :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},
-                 "ppt"   :{"mapsTo" : "ppt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "powerpoint.png"), "imgAlt" : "powerpoint file"},
-                 "pptx"  :{"mapsTo" : "ppt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "powerpoint.png"), "imgAlt" : "powerpoint file"},
-                 "xls"   :{"mapsTo" : "xls",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "excel.png"),      "imgAlt" : "excel file"},
-                 "xlsx"  :{"mapsTo" : "xls",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "excel.png"),      "imgAlt" : "excel file"},
-                 "sxi"   :{"mapsTo" : "odp",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "impress.png"),    "imgAlt" : "presentation file"},
-                 "odp"   :{"mapsTo" : "odp",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "impress.png"),    "imgAlt" : "presentation file"},
-                 "sxw"   :{"mapsTo" : "odt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "writer.png"),     "imgAlt" : "writer file"},
-                 "odt"   :{"mapsTo" : "odt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "writer.png"),     "imgAlt" : "writer file"},
-                 "sxc"   :{"mapsTo" : "ods",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "calc.png"),       "imgAlt" : "spreadsheet file"},
-                 "ods"   :{"mapsTo" : "ods",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "calc.png"),       "imgAlt" : "spreadsheet file"},
-                 "other" :{"mapsTo" : "other", "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "file_small.png"), "imgAlt" : "unknown type file"},
-                 "link"  :{"mapsTo" : "link",  "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "link.png"),       "imgAlt" : "link"}}
-
-        if len(mat.getResourceList()) > 0:
-            out.openTag("files")
-            processedFiles = []
-            for res in mat.getResourceList():
-                try:
-                    type = res.getFileType().lower()
-
-                    try:
-                        fileType = types[type]["mapsTo"]
-                    except KeyError:
-                        fileType = "other"
-
-                    if vars:
-                        filename = res.getFileName()
-                        if filename in processedFiles:
-                            filename = "%s-%s"%(processedFiles.count(filename)+1, filename)
-                        out.openTag("file")
-                        out.writeTag("name",filename)
-                        out.writeTag("type", fileType)
-                        out.writeTag("url",vars["resourceURLGen"](res))
-                        out.closeTag("file")
-                        processedFiles.append(res.getFileName())
-                except:
-                    out.openTag("file")
-                    out.writeTag("name", str(res.getURL()))
-                    out.writeTag("type", "link")
-                    out.writeTag("url", str(res.getURL()))
-                    out.closeTag("file")
-            out.closeTag("files")
-
-            # Used to enumerate types in the stylesheet. The order of the icons
-            # showed for the materials will be the one specified here
-            # TODO: find a way to avoid this hard coded list and get it from types
-            # typeList = set([ type["mapsTo"] for type in types.values()])
-
-            typeList = ["doc", "ppt", "pdf", "odt", "odp", "ods", "other", "link"]
-
-            out.openTag("types")
-            for type in typeList:
-                out.openTag("type")
-                out.writeTag("name", types[type]["mapsTo"])
-                out.writeTag("imgURL", types[type]["imgURL"])
-                out.writeTag("imgAlt", types[type]["imgAlt"])
-                out.closeTag("type")
-            out.closeTag("types")
-
-        if mat.isItselfProtected():
-            out.writeTag("locked","yes")
-        out.closeTag("material")
-
-    def _resourcesToXML(self, rList, out=None):
-        if not out:
-            out = self._XMLGen
-        out.openTag("resources")
-        for res in rList:
-            if res.canView(self.__aw):
-                self._resourceToXML(res, out=out)
-        out.closeTag("resources")
-
-    def _resourceToXML(self,res, out=None):
-        if not out:
-            out = self._XMLGen
-        if type(res) == conference.LocalFile:
-            self._resourceFileToXML(res, out=out)
-        else:
-            self._resourceLinkToXML(res, out=out)
-
-    def _resourceLinkToXML(self,res, out=None):
-        if not out:
-            out = self._XMLGen
-        out.openTag("resourceLink")
-        out.writeTag("name",res.getName())
-        out.writeTag("description",res.getDescription())
-        out.writeTag("url",res.getURL())
-        out.closeTag("resourceLink")
-
-    def _resourceFileToXML(self,res, out=None):
-        if not out:
-            out = self._XMLGen
-        out.openTag("resourceFile")
-        out.writeTag("name",res.getName())
-        out.writeTag("description",res.getDescription())
-        out.writeTag("type",res.fileType)
-        out.writeTag("url",res.getURL())
-        out.writeTag("fileName",res.getFileName())
-        out.writeTag("duration","1")#TODO:DURATION ISN'T ESTABLISHED
-        cDate = res.getCreationDate()
-        creationDateStr = "%d-%s-%sT%s:%s:00Z" %(cDate.year, string.zfill(cDate.month,2), string.zfill(cDate.day,2), string.zfill(cDate.hour,2), string.zfill(cDate.minute,2))
-        out.writeTag("creationDate",creationDateStr)
-        out.closeTag("resourceFile")
 
     def _breakToXML(self,br, out=None):
         if not out:
@@ -1531,7 +1364,6 @@ class outputGenerator(object):
         else:
             self.resourceLinkToXMLMarc21(res, out=out)
 
-    @classmethod
     def _attachment_unique_id(self, attachment):
         unique_id = "INDICO." + uniqueId(attachment.folder.linked_object)
         if attachment.legacy_mapping:
@@ -1541,9 +1373,7 @@ class outputGenerator(object):
 
         return unique_id
 
-    @classmethod
     def _attachment_access_list(self, attachment):
-
         linked_object = attachment.folder.linked_object
         manager_list = set(linked_object.getRecursiveManagerList())
 
