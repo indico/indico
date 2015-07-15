@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
+from flask import g
 from sqlalchemy.orm import joinedload
 
 from indico.modules.attachments.util import get_attached_folders
@@ -26,10 +29,17 @@ from MaKaC.common.contextManager import ContextManager
 
 def build_material_legacy_api_data(linked_object):
     # Skipping root folder and files in legacy API
-    folder_query = (AttachmentFolder
-                    .find(linked_object=linked_object, is_deleted=False, is_default=False)
-                    .options(joinedload(AttachmentFolder.legacy_mapping), joinedload(AttachmentFolder.attachments)))
-    return filter(None, (_build_folder_legacy_api_data(folder) for folder in folder_query))
+    try:
+        cache = g.legacy_api_event_attachments
+    except AttributeError:
+        g.legacy_api_event_attachments = cache = defaultdict(list)
+        query = (AttachmentFolder
+                 .find(event_id=int(linked_object.getConference().id), is_deleted=False, is_default=False)
+                 .options(joinedload(AttachmentFolder.legacy_mapping), joinedload(AttachmentFolder.attachments)))
+        for folder in query:
+            g.legacy_api_event_attachments[folder.linked_object].append(folder)
+
+    return filter(None, map(_build_folder_legacy_api_data, cache.get(linked_object, [])))
 
 
 def _build_folder_legacy_api_data(folder):
@@ -77,10 +87,10 @@ def _build_attachment_legacy_api_data(attachment):
 def build_folders_api_data(linked_object):
     if not linked_object:
         return []
-    folders = get_attached_folders(linked_object)
+    folders = get_attached_folders(linked_object, preload_event=True)
     if not folders:
         return []
-    return filter(None, (_build_folder_api_data(folder) for folder in folders))
+    return filter(None, map(_build_folder_api_data, folders))
 
 
 def _build_folder_api_data(folder):
