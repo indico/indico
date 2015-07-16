@@ -57,6 +57,7 @@
             onClose: null, // callback to invoke after closing the dialog. first argument is null if closed manually,
                            // otherwise the JSON returned by the server. if it returns false, the dialog will remain
                            // open; if it returns a Deferred object, the dialog remain open until the object is resolved
+            onOpen: null,  // callback to invoke after opening the dialog.
             getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
             confirmCloseUnsaved: false,  // ask the user to confirm closing the dialog with unsaved changes
             dialogClasses: '',  // extra classes to add to the dialog canvas
@@ -111,6 +112,11 @@
                     customData = data;
                 });
                 injectJS(dialogData.js);
+
+                if (options.onOpen) {
+                    options.onOpen(popup);
+                }
+
                 _.defer(function() {
                     popup.canvas.data('ui-dialog')._focusTabbable();
                 });
