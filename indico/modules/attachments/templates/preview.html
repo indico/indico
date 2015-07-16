@@ -9,7 +9,10 @@
             <a class="icon icon-close attachment-download" title="{% trans %}Close{% endtrans %}"></a>
         </div>
         <div class="attachment-actions">
-            <a href="{{ attachment.download_url }}" class="i-button icon icon-file-download" title="{% trans %}Download{% endtrans %}" download>Download</a>
+            <a href="{{ attachment.download_url }}" target="_blank" title="{% trans %}Download{% endtrans %}"
+               class="i-button icon icon-file-download" download>
+                {%- trans %}Download{% endtrans -%}
+            </a>
         </div>
     </div>
     <div class="attachment-preview-content-wrapper">
