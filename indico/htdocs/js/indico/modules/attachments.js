@@ -41,6 +41,7 @@
                 title: attachment.data('title'),
                 dialogClasses: 'attachment-preview-dialog',
                 onClose: function(data) {
+                    $('body').off('keydown.attachmentPreview');
                     $('html, body').removeClass('prevent-scrolling');
                     if (!data) {
                         if (history.pushState) {
@@ -59,11 +60,10 @@
                     popup.canvas.find('.attachment-preview-content, .attachment-preview-top-bar').on('click', function(e) {
                         e.stopPropagation();
                     });
-                    popup.canvas.on('keydown', function(e) {
+                    $('body').add(popup.canvas.closest('.ui-dialog')).on('keydown.attachmentPreview', function(e) {
                         if (e.which === $.ui.keyCode.ESCAPE) {
                             popup.canvas.trigger('ajaxDialog:close');
                         }
-                        e.stopPropagation();
                     });
                     $('html, body').addClass('prevent-scrolling');
                 }
