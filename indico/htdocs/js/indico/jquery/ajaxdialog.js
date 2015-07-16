@@ -63,8 +63,10 @@
             hidePageHeader: false  // if the default page header (title/subtitle/description) should be hidden
         }, options);
 
+        var confirmCloseMessage = $T('You have unsaved changes. Do you really want to close the dialog without saving?');
         var popup = null;
         var customData = null;
+        var oldOnBeforeUnload = null;
 
         $.ajax({
             type: options.method,
@@ -81,13 +83,15 @@
             }
         });
 
-        function confirmClose() {
+        function hasChangedFields() {
             var forms = popup.contentContainer.find('form');
-            var hasChanges = forms.length && forms.filter(function() {
+            return forms.length && !!forms.filter(function() {
                 return $(this).data('fieldsChanged');
             }).length;
-            var message = $T('You have unsaved changes. Do you really want to close the dialog without saving?');
-            return hasChanges ? confirmPrompt(message, $T('Unsaved changes')) : $.Deferred().resolve();
+        }
+
+        function confirmClose() {
+            return hasChangedFields() ? confirmPrompt(confirmCloseMessage, $T('Unsaved changes')) : $.Deferred().resolve();
         }
 
         function showDialog(dialogData) {
@@ -116,6 +120,16 @@
                 dialogClasses.push('no-page-header');
             }
             popup.canvas.addClass(dialogClasses.join(' '));
+
+            if (options.confirmCloseUnsaved) {
+                oldOnBeforeUnload = window.onbeforeunload;
+                window.onbeforeunload = function() {
+                    if (popup.isopen && hasChangedFields()) {
+                        return confirmCloseMessage;
+                    }
+                };
+            }
+
             popup.open();
         }
 
@@ -131,6 +145,9 @@
                 }
                 onCloseResult.then(function() {
                     popup.close();
+                    if (options.confirmCloseUnsaved) {
+                        window.onbeforeunload = oldOnBeforeUnload;
+                    }
                 });
             });
         }
