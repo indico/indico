@@ -1176,6 +1176,8 @@ class TextIndex(IntStringMappedIndex):
 class CategoryTitleIndex(object):
 
     def index(self, obj):
+        if not obj.getId():  # newly created root category has id=''
+            return
         self.unindex(obj)
         category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
         db.session.add(category)
@@ -1183,6 +1185,8 @@ class CategoryTitleIndex(object):
             db.session.flush()
 
     def unindex(self, obj):
+        if not obj.getId():  # newly created root category has id=''
+            return
         IndexedCategory.find(id=obj.getId()).delete()
         db.session.flush()
 
