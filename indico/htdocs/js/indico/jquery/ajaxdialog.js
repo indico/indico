@@ -111,6 +111,9 @@
                 popup.canvas.on('ajaxDialog:setData', function(e, data) {
                     customData = data;
                 });
+                popup.canvas.on('ajaxDialog:close', function(e, data, submitted) {
+                    closeDialog(data, submitted);
+                });
                 injectJS(dialogData.js);
 
                 if (options.onOpen) {
