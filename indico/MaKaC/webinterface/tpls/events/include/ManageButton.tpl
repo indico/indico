@@ -63,14 +63,14 @@
             <% note_item = item.getSession() if getItemType(item) == 'Session' else item %>
             % if 'minutesLink' in info:
                 % if note_item.note is None:
-                    menuOptions['editMinutes'] = {
+                    menuOptions['addMinutes'] = {
                         action: function(m) {
                             ajaxDialog({
-                                title: $T('Edit minutes'),
+                                title: $T('Add minutes'),
                                 url: ${ url_for('event_notes.edit', note_item) | n,j },
                                 confirmCloseUnsaved: true,
-                                onClose: function(data) {
-                                    if (data) {
+                                onClose: function(data, customData) {
+                                    if (data || customData) {
                                         location.reload();
                                     }
                                 }
@@ -88,8 +88,8 @@
                                 title: $T('Edit minutes'),
                                 url: ${ url_for('event_notes.compile', note_item) | n,j },
                                 confirmCloseUnsaved: true,
-                                onClose: function(data) {
-                                    if (data) {
+                                onClose: function(data, customData) {
+                                    if (data || customData) {
                                         location.reload();
                                     }
                                 }
@@ -107,8 +107,8 @@
                                 title: $T('Edit minutes'),
                                 url: ${ url_for('event_notes.edit', note_item) | n,j },
                                 confirmCloseUnsaved: true,
-                                onClose: function(data) {
-                                    if (data) {
+                                onClose: function(data, customData) {
+                                    if (data || customData) {
                                         location.reload();
                                     }
                                 }

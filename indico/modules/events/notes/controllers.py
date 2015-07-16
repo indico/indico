@@ -31,7 +31,7 @@ from indico.modules.events.util import get_object_from_args
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template, jsonify_data
+from indico.web.util import jsonify_template
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.accessControl import AccessWrapper
 
@@ -63,7 +63,7 @@ class RHManageNoteBase(RHNoteBase):
 
 
 class RHEditNote(RHManageNoteBase):
-    """Create/edit/delete a note attached to an object inside an event"""
+    """Create/edit a note attached to an object inside an event"""
 
     def _get_defaults(self, note=None, source=None):
         if source:
@@ -81,6 +81,7 @@ class RHEditNote(RHManageNoteBase):
         return NoteForm(obj=self._get_defaults(note=note, source=source))
 
     def _process_form(self, form, **kwargs):
+        saved = False
         if form.validate_on_submit():
             note = EventNote.get_or_create(self.object)
             is_new = note.id is None or note.is_deleted
@@ -99,9 +100,9 @@ class RHEditNote(RHManageNoteBase):
                 logger.info('Note {} modified by {}'.format(note, session.user))
                 self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
                                session.user, data=note.link_event_log_data)
-            return jsonify_data(flash=False)
+            saved = is_new or is_changed
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
-                                object=self.object, **kwargs)
+                                object=self.object, saved=saved, **kwargs)
 
     def _process(self):
         form = self._make_form()

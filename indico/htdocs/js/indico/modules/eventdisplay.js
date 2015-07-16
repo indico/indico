@@ -52,8 +52,8 @@ $(document).ready(function() {
     $('.js-note-editor').ajaxDialog({
         title: $T("Edit minutes"),
         confirmCloseUnsaved: true,
-        onClose: function(data) {
-            if (data) {
+        onClose: function(data, customData) {
+            if (data || customData) {
                 location.reload();
             }
         }
