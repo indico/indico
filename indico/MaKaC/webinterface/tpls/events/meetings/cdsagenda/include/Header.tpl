@@ -108,9 +108,7 @@
         % endif
         % if conf.attached_items:
          <tr>
-          <td valign="top" align="right" class="headerTitle">
-            Material:
-          </td>
+          <td valign="top" align="right" class="headerTitle icon-attachment inline-attachments-icon"></td>
           <td class="material-list">
             ${ render_template('attachments/mako_compat/attachments_inline.html', item=conf) }
           </td>

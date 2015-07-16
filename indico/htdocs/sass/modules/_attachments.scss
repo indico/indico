@@ -305,6 +305,16 @@
     border-bottom: 1px solid darken($light-gray, 10%);
 }
 
+.inline-attachments-icon{
+    vertical-align: middle !important;
+    line-height: 1.7em;
+    &:before {
+        display: inline-block;
+        margin-top: 0.3em;
+        font-size: 1.4em;
+        color: $light-black;
+    }
+}
 
 .material-list {
     .folder .attachment {
