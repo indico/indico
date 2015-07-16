@@ -67,6 +67,7 @@
         var popup = null;
         var customData = null;
         var oldOnBeforeUnload = null;
+        var closingSubmitted = false;
 
         $.ajax({
             type: options.method,
@@ -124,7 +125,7 @@
             if (options.confirmCloseUnsaved) {
                 oldOnBeforeUnload = window.onbeforeunload;
                 window.onbeforeunload = function() {
-                    if (popup.isopen && hasChangedFields()) {
+                    if (popup.isopen && !closingSubmitted && hasChangedFields()) {
                         return confirmCloseMessage;
                     }
                 };
@@ -134,6 +135,7 @@
         }
 
         function closeDialog(callbackData, submitted) {
+            closingSubmitted = submitted;
             var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
             confirmDeferred.then(function() {
                 var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData, customData);
