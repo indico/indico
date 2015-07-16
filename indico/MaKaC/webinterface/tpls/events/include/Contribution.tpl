@@ -54,7 +54,7 @@
 
         % if item.attached_items:
         <tr>
-            <td class="leftCol">${ _("Material")}:</td>
+            <td class="leftCol icon-attachment inline-attachments-icon"></td>
             <td class="material-list">
                 ${ render_template('attachments/mako_compat/attachments_inline.html', item=item) }
             </td>
