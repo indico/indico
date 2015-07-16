@@ -67,7 +67,7 @@
         var popup = null;
         var customData = null;
         var oldOnBeforeUnload = null;
-        var closingSubmitted = false;
+        var ignoreOnBeforeUnload = false;
 
         $.ajax({
             type: options.method,
@@ -125,7 +125,7 @@
             if (options.confirmCloseUnsaved) {
                 oldOnBeforeUnload = window.onbeforeunload;
                 window.onbeforeunload = function() {
-                    if (popup.isopen && !closingSubmitted && hasChangedFields()) {
+                    if (popup.isopen && !ignoreOnBeforeUnload && hasChangedFields()) {
                         return confirmCloseMessage;
                     }
                 };
@@ -135,11 +135,12 @@
         }
 
         function closeDialog(callbackData, submitted) {
-            closingSubmitted = submitted;
             var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
             confirmDeferred.then(function() {
+                ignoreOnBeforeUnload = true;
                 var onCloseResult = !options.onClose ? $.Deferred().resolve() : options.onClose(callbackData, customData);
                 if (onCloseResult === false) {
+                    ignoreOnBeforeUnload = false;
                     return;
                 }
                 else if (!onCloseResult || onCloseResult === true) {
@@ -150,6 +151,8 @@
                     if (options.confirmCloseUnsaved) {
                         window.onbeforeunload = oldOnBeforeUnload;
                     }
+                }, function() {
+                    ignoreOnBeforeUnload = false;
                 });
             });
         }
