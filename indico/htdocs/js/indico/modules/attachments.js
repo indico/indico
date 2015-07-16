@@ -8,36 +8,67 @@
 
     global.setupAttachmentPreview = function setupAttachmentPreview() {
         var attachment = $('.js-preview-dialog');
+        var pageURL = location.href.replace(/#.*$/, '');
+
+        $(window).on('hashchange', function() {
+            if (location.hash.indexOf('#preview:') != 0) {
+                $('.attachment-preview-dialog').trigger('ajaxDialog:close', [true]);
+            } else {
+                var id = location.hash.split('#preview:')[1];
+                previewAttachment(id);
+            }
+        }).triggerHandler('hashchange');
 
         attachment.on('click', function(e) {
+            if (e.which != 1 || e.shiftKey) {
+                // ignore middle clicks and shift-clicks - people should be able to open an attachment in a new tab/window
+                return;
+            }
             e.preventDefault();
-            var $this = $(this);
+            location.hash = '#preview:{0}'.format($(this).data('attachmentId'));
+        });
+
+        function previewAttachment(id) {
+            var attachment = $('.attachment[data-previewable][data-attachment-id="{0}"]'.format(id));
+            if (!attachment.length) {
+                if (history.replaceState) {
+                    history.replaceState({}, attachment.data('title'), pageURL);
+                }
+                return;
+            }
             ajaxDialog({
-                trigger: this,
-                url: build_url($this.attr('href'), {preview: '1'}),
-                title: $this.data('title'),
+                url: build_url(attachment.attr('href'), {preview: '1'}),
+                title: attachment.data('title'),
                 dialogClasses: 'attachment-preview-dialog',
+                onClose: function(data) {
+                    $('html, body').removeClass('prevent-scrolling');
+                    if (!data) {
+                        if (history.pushState) {
+                            // push the normal url if we closed the dialog manually (i.e. not using the back button)
+                            history.pushState({}, attachment.data('title'), pageURL);
+                        } else {
+                            location.hash = '';
+                        }
+                    }
+                },
                 onOpen: function(popup) {
                     popup.canvas.closest('.ui-dialog').prev('.ui-widget-overlay').addClass('attachment-preview-overlay');
                     popup.canvas.find('.attachment-preview-content-wrapper, .attachment-download').on('click', function() {
-                        popup.close();
+                        popup.canvas.trigger('ajaxDialog:close');
                     });
                     popup.canvas.find('.attachment-preview-content, .attachment-preview-top-bar').on('click', function(e) {
                         e.stopPropagation();
                     });
                     popup.canvas.on('keydown', function(e) {
                         if (e.which === $.ui.keyCode.ESCAPE) {
-                            popup.close();
+                            popup.canvas.trigger('ajaxDialog:close');
                         }
                         e.stopPropagation();
                     });
                     $('html, body').addClass('prevent-scrolling');
-                },
-                onClose: function() {
-                    $('html, body').removeClass('prevent-scrolling');
                 }
             });
-        });
+        }
     };
 
 
@@ -110,11 +141,11 @@
 
     global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo, selfProtection, inheritedProtection, folderProtection) {
         folderField.on('change', function() {
-            var selectedFolder = $(this)
+            var selectedFolder = $(this);
             if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
                 selfProtection.hide();
                 inheritedProtection.hide();
-                folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text())
+                folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text());
                 folderProtection.show();
             }
             else {
