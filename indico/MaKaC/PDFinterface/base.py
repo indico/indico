@@ -20,6 +20,7 @@ import cgi
 import shutil
 import xml.sax.saxutils as saxutils
 import uuid
+import re
 
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
@@ -47,9 +48,11 @@ from mako.template import Template
 
 from indico.core.config import Config
 from indico.util import mdx_latex
+from indico.util.string import render_markdown
 import markdown
 from PIL import Image as PILImage
-from indico.util.string import sanitize_for_platypus
+from indico.util.string import sanitize_for_platypus, to_unicode
+
 
 ratio = math.sqrt(math.sqrt(2.0))
 
@@ -708,8 +711,11 @@ class PDFLaTeXBase(object):
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
+        def _convert_markdown(text):
+            return render_markdown(text, md=md.convert)
+
         self._args = {
-            'md_convert': md.convert
+            'md_convert': _convert_markdown
         }
 
     def generate(self):

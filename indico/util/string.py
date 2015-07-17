@@ -190,18 +190,25 @@ def remove_tags(text):
     return remove_extra_spaces(pattern.sub(' ', text))
 
 
-def render_markdown(text, **kwargs):
+def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
     """ Mako markdown to html filter """
-    math_segments = []
-    placeholder = u"\uE000"
+    if escape_latex_math:
+        math_segments = []
+        placeholder = u"\uE000"
 
-    def math_replace(m):
-        math_segments.append(m.group(0))
-        return placeholder
+        def _math_replace(m):
+            math_segments.append(m.group(0))
+            return placeholder
 
-    text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
+        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
+
+    if md is not None:
+        return re.sub(placeholder, lambda _: math_segments.pop(0), md(text))
     res = markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs)
-    return re.sub(placeholder, lambda _: math_segments.pop(0), res).encode('utf-8')
+
+    if escape_latex_math:
+        res = re.sub(placeholder, lambda _: math_segments.pop(0), res)
+    return res.encode('utf-8')
 
 
 def sanitize_for_platypus(text):
