@@ -62,7 +62,11 @@ is passed in the `user` kwarg.
 attachment_accessed = _signals.signal('attachment-accessed', """
 Called when an attachment is accessed.  The *sender* is the
 `Attachment` that was accessed.  The user who accessed the attachment
-is passed in the `user` kwarg.
+is passed in the `user` kwarg.  The `from_preview` kwarg will be set
+to ``True`` if the download link on the preview page was used to access
+the attachment or if the attachment was loaded to be displayed on the
+preview page (opening the preview itself already sends this signal
+with `from_preview=False`).
 """)
 
 get_file_previewers = _signals.signal('get-file-previewers', """

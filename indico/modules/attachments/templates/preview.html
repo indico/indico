@@ -6,11 +6,11 @@
             <span class="{{ get_attachment_icon(attachment) }}">{{ attachment.title }}</span>
         </div>
         <div class="attachment-preview-close">
-            <a class="icon icon-close attachment-download" title="{% trans %}Close{% endtrans %}"></a>
+            <a class="icon icon-close js-close-preview" title="{% trans %}Close{% endtrans %}"></a>
         </div>
         <div class="attachment-actions">
             <a href="{{ attachment.download_url }}" target="_blank" title="{% trans %}Download{% endtrans %}"
-               class="i-button icon icon-file-download" download>
+               class="i-button icon icon-file-download attachment-download" download>
                 {%- trans %}Download{% endtrans -%}
             </a>
         </div>

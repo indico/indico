@@ -60,8 +60,16 @@
                 },
                 onOpen: function(popup) {
                     popup.canvas.closest('.ui-dialog').prev('.ui-widget-overlay').addClass('attachment-preview-overlay');
-                    popup.canvas.find('.attachment-preview-content-wrapper, .attachment-download').on('click', function() {
+                    popup.canvas.find('.attachment-preview-content-wrapper, .js-close-preview').on('click', function() {
                         popup.canvas.trigger('ajaxDialog:close');
+                    });
+                    popup.canvas.find('.attachment-download').on('click', function() {
+                        var $this = $(this);
+                        var href = $this.attr('href');
+                        $this.attr('href', build_url(href, {from_preview: '1'}));
+                        _.defer(function() {
+                            $this.attr('href', href);
+                        });
                     });
                     popup.canvas.find('.attachment-preview-content, .attachment-preview-top-bar').on('click', function(e) {
                         e.stopPropagation();

@@ -34,7 +34,8 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
             raise Forbidden
 
     def _process(self):
-        signals.attachments.attachment_accessed.send(self.attachment, user=session.user)
+        from_preview = request.args.get('from_preview') == '1'
+        signals.attachments.attachment_accessed.send(self.attachment, user=session.user, from_preview=from_preview)
         if request.values.get('preview') == '1':
             if self.attachment.type != AttachmentType.file:
                 raise BadRequest
