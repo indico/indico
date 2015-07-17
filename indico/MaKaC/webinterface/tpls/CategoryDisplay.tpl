@@ -114,35 +114,7 @@ from MaKaC.webinterface.general import strfFileSize
                 % endfor
                 </ul>
             % endif
-            % if categ.attached_items or allowUserModif:
-                <div>
-                    % if allowUserModif:
-                        <div class="right">
-                            <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                        </div>
-                    % endif
-                    <h2 class="icon-package-download">${ _("Files") }</h2>
-                </div>
-                <ul class="resource-list">
-                    ${render_attachments(categ.attached_items.get('files', []))}
-                </ul>
-                <ul>
-                % for folder in categ.attached_items.get('folders', []):
-                    <li>
-                        <a class="material-show" data-hidden="true" title="${folder.title}">
-                           <div class="left material-title-icon icon-next" ></div>
-                           <h3>${folder.title}</h3>
-                           % if folder.is_protected:
-                               <i class="icon-lock"></i>
-                           % endif
-                        </a>
-                        <ul class="resource-list" style="display: none">
-                            ${render_attachments(folder.attachments)}
-                        </ul>
-                     </li>
-                % endfor
-                </ul>
-            % endif
+            ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=categ, can_edit=allowUserModif) }
         % endif
     </div>
     % endif
@@ -234,15 +206,13 @@ $(document).ready(function(){
             $this.children(".material-title-icon").removeClass('icon-expand').addClass('icon-next');
         }
     });
+    setupAttachmentTreeView();
 });
 </script>
 
 % if isLoggedIn:
     <script type="text/javascript">
         $(document).ready(function(){
-            $("#manageMaterial").click(function(){
-                openAttachmentManager(${categ.getLocator() | n,j});
-            });
 
             $('.toolbar .i-button').qtip({
                 position: {

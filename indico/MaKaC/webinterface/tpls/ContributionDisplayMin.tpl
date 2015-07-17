@@ -93,38 +93,8 @@
                             <% canEditFiles = (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn %>
 
                             % if Contribution.attached_items or canEditFiles:
-                                <div class="column ${'highlighted-area' if canEditFiles else ''}">
-                                    % if canEditFiles:
-                                        <div class="right">
-                                            <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                                        </div>
-                                    % endif
-                                    <h2>${_("Files")}</h2>
-                                    <ul>
-                                    % for attachment in Contribution.attached_items.get('files', []):
-                                        <li class="icon-file">
-                                            <a href="${attachment.download_url}" target="_blank" title="${attachment.title}">
-                                                ${attachment.title}
-                                            </a>
-                                        </li>
-                                    % endfor
-                                    </ul>
-                                    <ul>
-                                    % for folder in Contribution.attached_items.get('folders', []):
-                                        <li>
-                                            <h3>${folder.title}</h3>
-                                            <ul>
-                                            % for attachment in folder.attachments:
-                                                <li class="icon-file">
-                                                    <a href="${attachment.download_url}" target="_blank" title="${attachment.title}">
-                                                        ${attachment.title}
-                                                    </a>
-                                                </li>
-                                            % endfor
-                                            </ul>
-                                         </li>
-                                    % endfor
-                                    </ul>
+                                <div class="column">
+                                    ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=Contribution, can_edit=canEditFiles) }
                                 </div>
                                 % endif
                             </div>
@@ -160,10 +130,8 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    $("#manageMaterial").click(function(){
-        openAttachmentManager(${Contribution.getLocator() | n,j});
-    });
+<script>
+    setupAttachmentTreeView();
 </script>
 <%block name="scripts">
 

@@ -64,7 +64,7 @@
         (${getLocationInfo(item)[1]})
     % endif
     <div style="float:right">
-        ${ render_template('attachments/mako_compat/attachments.html', item=session) }
+        ${ render_template('attachments/mako_compat/attachments_inline.html', item=session) }
     </div>
     </td>
     </tr>
@@ -102,7 +102,7 @@
                   &nbsp;
                   <div style="float:right">
                       <div style="float:left">
-                          ${ render_template('attachments/mako_compat/attachments.html', item=item) }
+                          ${ render_template('attachments/mako_compat/attachments_inline.html', item=item) }
                       </div>
                       <div style="float:right">
                         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False, minutesToggle=False, minutesEditActions=True"/>

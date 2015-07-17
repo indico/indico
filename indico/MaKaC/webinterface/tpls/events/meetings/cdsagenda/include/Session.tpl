@@ -66,13 +66,11 @@
     % endif
     % if item.note or session.attached_items:
     <tr>
-      <td valign="top" class="headerTitle">
-        Material:
-      </td>
+      <td valign="top" class="headerTitle icon-attachment inline-attachments-icon"></td>
       <td class="headerInfo" >
         % if session.attached_items:
           <span class="material-list">
-            ${ render_template('attachments/mako_compat/attachments.html', item=session) }
+            ${ render_template('attachments/mako_compat/attachments_inline.html', item=session) }
           </span>
         % endif
 
