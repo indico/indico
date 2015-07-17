@@ -287,11 +287,6 @@ class ISessionBasicFossil(IFossil):
 
 class ISessionFossil(ISessionBasicFossil):
 
-    def getAllMaterialList(self):
-        """ Session List of all material """
-    getAllMaterialList.result = IMaterialFossil
-    getAllMaterialList.name = "material"
-
     def getNumSlots(self):
         """ Number of slots present in the session """
     getNumSlots.produce = lambda s : len(s.getSlotList())
