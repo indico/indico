@@ -30,7 +30,7 @@
     <td class="itemRightAlign" >
         <span class="materialDisplayName">
         % if allMaterial:
-            ${base.render_materials(conf)}
+            ${base.render_materials(session)}
         % elif materialSession:
             % for material in session.attached_items.get('files', []):
                 % if material.title != 'document' or not conf.getReportNumberHolder().listReportNumbers():
