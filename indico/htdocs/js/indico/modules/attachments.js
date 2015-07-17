@@ -1,6 +1,8 @@
 (function(global) {
     'use strict';
 
+    var HISTORY_API_SUPPORTED = !!history.pushState;
+
     $(document).ready(function() {
         $('.attachments > .dropdown').parent().dropdown();
         setupAttachmentPreview();
@@ -10,14 +12,20 @@
         var attachment = $('.js-preview-dialog');
         var pageURL = location.href.replace(/#.*$/, '');
 
-        $(window).on('hashchange', function() {
+        $(window).on('hashchange', function(e, initial) {
             if (location.hash.indexOf('#preview:') != 0) {
                 $('.attachment-preview-dialog').trigger('ajaxDialog:close', [true]);
             } else {
+                if (initial && HISTORY_API_SUPPORTED) {
+                    var hash = location.hash;
+                    // start with a clean state, i.e. [..., page, page+preview]
+                    history.replaceState({}, document.title, pageURL);
+                    history.pushState({}, document.title, location.href + hash);
+                }
                 var id = location.hash.split('#preview:')[1];
                 previewAttachment(id);
             }
-        }).triggerHandler('hashchange');
+        }).triggerHandler('hashchange', [true]);
 
         attachment.on('click', function(e) {
             if (e.which != 1 || e.shiftKey) {
@@ -29,10 +37,14 @@
         });
 
         function clearHash() {
-            if (history.pushState) {
-                history.pushState({}, attachment.data('title'), pageURL);
+            if (HISTORY_API_SUPPORTED) {
+                // if we have the history api, we can assume that the previous state is the same page without
+                // a preview hash (since we ensure this in the initial/fake hashchange event on page load)
+                history.back();
             } else {
-                // old browsers with no pushState support: the # wil stay which is a bit ugly
+                // old browsers with no pushState support: the # wil stay which is a bit ugly,
+                // but let's not break history (we WILL "spam" history though, but that's what you
+                // get when using ancient browsers)
                 location.hash = '';
             }
         }
@@ -40,9 +52,7 @@
         function previewAttachment(id) {
             var attachment = $('.attachment[data-previewable][data-attachment-id="{0}"]'.format(id));
             if (!attachment.length) {
-                if (history.replaceState) {
-                    history.replaceState({}, attachment.data('title'), pageURL);
-                }
+                clearHash();
                 return;
             }
             ajaxDialog({
