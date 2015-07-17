@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
+import mimetypes
 import re
 
 
@@ -82,3 +83,13 @@ def icon_from_mimetype(mimetype, default_icon='icon-file-filled'):
             if pattern.search(mimetype):
                 return icon
         return default_icon
+
+
+def register_custom_mimetypes():
+    """Registers additional extension/mimetype mappings.
+
+    This is used for mimetypes/extensions that are not in the official
+    mapping but useful, e.g. because indico has special handling for
+    files with that type.
+    """
+    mimetypes.add_type(b'text/markdown', b'.md')
