@@ -154,7 +154,7 @@
             url += (~url.indexOf('?') ? '&' : '?') + qs;
         }
         if (fragment) {
-            url += '#' + fragment;
+            url += '#' + fragment.replace(/^#/, '');
         }
         return url;
     }
