@@ -20,7 +20,7 @@ Module containing the Indico exception class hierarchy
 
 import traceback
 
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.util.i18n import _
 from indico.util.translations import ensure_str
@@ -40,6 +40,8 @@ def get_error_description(exception):
         return _(u"You are not allowed to access this page.")
     elif isinstance(exception, NotFound) and description == NotFound.description:
         return _(u"The page you are looking for doesn't exist.")
+    elif isinstance(exception, BadRequest) and description == BadRequest.description:
+        return _(u"The request was invalid or contained invalid arguments.")
     else:
         return unicode(description)
 
