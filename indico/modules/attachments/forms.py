@@ -40,6 +40,9 @@ class AttachmentFormBase(IndicoForm):
     folder = QuerySelectField(_("Folder"), allow_blank=True, blank_text=_("No folder selected"), get_label='title',
                               description=_("Adding materials to folders allow grouping and easier permission "
                                             "management."))
+    acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
+                             groups=True, serializable=False, allow_external=True,
+                             description=_("The list of users and groups with access to the material"))
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
@@ -56,9 +59,6 @@ class AttachmentFormBase(IndicoForm):
 class EditAttachmentFormBase(AttachmentFormBase):
     title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
-                             groups=True, serializable=False, allow_external=True,
-                             description=_("The list of users and groups with access to the material"))
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):

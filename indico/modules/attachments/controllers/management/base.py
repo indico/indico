@@ -89,6 +89,8 @@ class AddAttachmentFilesMixin:
                 filename = secure_filename(f.filename, 'attachment')
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
                                         protection_mode=form.protection_mode.data)
+                if attachment.is_protected:
+                    attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
                 attachment.file.save(f.file)
@@ -112,7 +114,9 @@ class AddAttachmentLinkMixin:
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             link = Attachment(user=session.user, type=AttachmentType.link)
-            form.populate_obj(link)
+            form.populate_obj(link, skip={'acl'})
+            if link.is_protected:
+                link.acl = form.acl.data
             link.folder = folder
 
             db.session.flush()
