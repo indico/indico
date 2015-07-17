@@ -22,7 +22,6 @@ from flask import render_template
 
 from indico.core import signals
 from indico.util.signals import values_from_signal
-from indico.util.string import render_markdown
 
 
 class Previewer(object):
@@ -65,7 +64,7 @@ class MarkdownPreviewer(Previewer):
     def generate_content(cls, attachment):
         with attachment.file.open() as f:
             return render_template(cls.TEMPLATES_DIR + 'markdown_preview.html', attachment=attachment,
-                                   text=render_markdown(f.read()))
+                                   text=f.read())
 
 
 class TextPreviewer(Previewer):
