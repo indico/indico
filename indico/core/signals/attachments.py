@@ -66,5 +66,5 @@ is passed in the `user` kwarg.
 """)
 
 get_file_previewers = _signals.signal('get-file-previewers', """
-
+Expected to return one or more `Previewer` subclasses.
 """)
