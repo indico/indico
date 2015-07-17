@@ -20,8 +20,28 @@ Module containing the Indico exception class hierarchy
 
 import traceback
 
+from werkzeug.exceptions import Forbidden, NotFound
+
 from indico.util.i18n import _
 from indico.util.translations import ensure_str
+
+
+def get_error_description(exception):
+    """Gets a user-friendy description for an exception
+
+    This overrides some HTTPException messages to be more suitable
+    for end-users.
+    """
+    try:
+        description = exception.description
+    except AttributeError:
+        return unicode(exception.message)
+    if isinstance(exception, Forbidden) and description == Forbidden.description:
+        return _(u"You are not allowed to access this page.")
+    elif isinstance(exception, NotFound) and description == NotFound.description:
+        return _(u"The page you are looking for doesn't exist.")
+    else:
+        return unicode(description)
 
 
 class IndicoError(Exception):

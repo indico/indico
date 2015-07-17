@@ -19,9 +19,10 @@ from __future__ import absolute_import
 import traceback
 from datetime import datetime, date
 
-from flask import current_app
+from flask import current_app, session
 from persistent.dict import PersistentDict
 from speaklater import _LazyString
+from werkzeug.exceptions import Forbidden
 
 from indico.web.util import get_request_info
 
@@ -73,7 +74,7 @@ def loads(string):
 
 def create_json_error_answer(exception, status=200):
     from indico.core.config import Config
-    from indico.core.errors import IndicoError
+    from indico.core.errors import IndicoError, get_error_description
     if isinstance(exception, IndicoError):
         details = exception.toDict()
     else:
@@ -84,9 +85,8 @@ def create_json_error_answer(exception, status=200):
             exception_data = {}
         details = {
             'code': type(exception).__name__,
-            'type': 'unknown',
-            # werkzeug HTTPExceptions have a description instead of a message.
-            'message': unicode(getattr(exception, 'description', exception.message)),
+            'type': 'noReport' if not session.user and isinstance(exception, Forbidden) else 'unknown',
+            'message': unicode(get_error_description(exception)),
             'data': exception_data,
             'requestInfo': get_request_info(),
             'inner': traceback.format_exc()

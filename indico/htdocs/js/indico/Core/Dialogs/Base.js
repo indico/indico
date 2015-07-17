@@ -191,7 +191,7 @@ type("NoReportErrorDialog", ["AlertPopup"], {
         content.append(Html.div({}, this.error.message));
         content.append(Html.unescaped.div("warningExplanation", this.error.explanation));
 
-        if (this.error.code == 'ERR-P4') {
+        if (this.error.code == 'ERR-P4' || this.error.code == 'Forbidden') {
             content.append(Html.div({style:{marginTop:pixels(10)}},
                     Html.a({href: build_url(Indico.Urls.Login, {next: document.URL})}, $T("Go to login page"))));
         }

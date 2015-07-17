@@ -59,6 +59,7 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
+from indico.core.errors import get_error_description
 from indico.core.logger import Logger
 from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.core.db.util import flush_after_commit_queue
@@ -422,10 +423,7 @@ class RH(RequestHandlerBase):
         if session.user is None and not request.is_xhr and not e.response:
             return redirect_to_login(reason=_("Please log in to access this page."))
         message = _("Access Denied")
-        if e.description == Forbidden.description:
-            explanation = _("You are not allowed to access this page.")
-        else:
-            explanation = e.description
+        explanation = get_error_description(e)
         return WErrorWSGI((message, explanation)).getHTML()
 
     @jsonify_error(status=400)
@@ -492,10 +490,7 @@ class RH(RequestHandlerBase):
     def _processNotFoundError(self, e):
         if isinstance(e, NotFound):
             message = _("Page not found")  # that's a bit nicer than "404: Not Found"
-            if e.description == NotFound.description:
-                explanation = _("The page you are looking for doesn't exist.")
-            else:
-                explanation = e.description
+            explanation = get_error_description(e)
         else:
             message = e.getMessage()
             explanation = e.getExplanation()
@@ -730,15 +725,15 @@ class RH(RequestHandlerBase):
         if self._responseUtil.call:
             return self._responseUtil.make_call()
 
-        # In case of no process needed, we should return empty string to avoid erroneous output
-        # specially with getVars breaking the JS files.
-        if not self._doProcess or res is None:
-            return self._responseUtil.make_empty()
-
         if is_error_response and isinstance(res, (current_app.response_class, Response)):
             # if we went through error handling code, responseUtil._status has been changed
             # so make_response() would fail
             return res
+
+        # In case of no process needed, we should return empty string to avoid erroneous output
+        # specially with getVars breaking the JS files.
+        if not self._doProcess or res is None:
+            return self._responseUtil.make_empty()
 
         return self._responseUtil.make_response(res)
 
