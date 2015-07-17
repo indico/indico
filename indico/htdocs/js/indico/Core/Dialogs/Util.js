@@ -52,15 +52,5 @@ IndicoUI.Dialogs.Util = {
         return function() {
             progress.hide();
         };
-    },
-
-    alert: function(title, message) {
-        var popup = new AlertPopup(title, message);
-        popup.open();
-    },
-
-    confirm: function(title, message, handler) {
-        var popup = new ConfirmPopup(title, message, handler);
-        popup.open();
     }
 };
