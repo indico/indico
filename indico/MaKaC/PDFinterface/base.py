@@ -712,7 +712,7 @@ class PDFLaTeXBase(object):
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         def _convert_markdown(text):
-            return render_markdown(text, md=md.convert)
+            return render_markdown(text, md=md.convert).encode('utf-8')
 
         self._args = {
             'md_convert': _convert_markdown

@@ -245,7 +245,7 @@ def _render_revision(attr, target, value, *unused):
     if render_mode == RenderMode.html:
         target.html = source
     elif render_mode == RenderMode.markdown:
-        target.html = to_unicode(render_markdown(source, extensions=('nl2br',)))
+        target.html = render_markdown(source, extensions=('nl2br',))
     else:  # pragma: no cover
         raise ValueError('Invalid render mode: {}'.format(render_mode))
 
