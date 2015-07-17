@@ -705,8 +705,9 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            align: 'center',
                            width: 50,
                            editable: true,
-                           edittype: "text",
+                           edittype: 'text',
                            editoptions: {size: "7", maxlength: "20"},
+                           pattern: '/^(\\d+(\\.\\d{1,2})?)?$/'
                         },
                         {
                            name:'placesLimit',
