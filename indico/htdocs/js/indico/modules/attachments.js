@@ -28,6 +28,15 @@
             location.hash = '#preview:{0}'.format($(this).data('attachmentId'));
         });
 
+        function clearHash() {
+            if (history.pushState) {
+                history.pushState({}, attachment.data('title'), pageURL);
+            } else {
+                // old browsers with no pushState support: the # wil stay which is a bit ugly
+                location.hash = '';
+            }
+        }
+
         function previewAttachment(id) {
             var attachment = $('.attachment[data-previewable][data-attachment-id="{0}"]'.format(id));
             if (!attachment.length) {
@@ -44,12 +53,9 @@
                     $('body').off('keydown.attachmentPreview');
                     $('html, body').removeClass('prevent-scrolling');
                     if (!data) {
-                        if (history.pushState) {
-                            // push the normal url if we closed the dialog manually (i.e. not using the back button)
-                            history.pushState({}, attachment.data('title'), pageURL);
-                        } else {
-                            location.hash = '';
-                        }
+                        // get rid of the hash if we closed the dialog manually (i.e. not using the back button,
+                        // in which case the hash should already be gone)
+                        clearHash();
                     }
                 },
                 onOpen: function(popup) {
@@ -66,6 +72,22 @@
                         }
                     });
                     $('html, body').addClass('prevent-scrolling');
+                },
+                onLoadError: function(xhr) {
+                    var hash = location.hash;
+                    clearHash();
+                    if (xhr.status != 403) {
+                        return;
+                    }
+                    if (Indico.User && Indico.User.id !== undefined) {
+                        alertPopup($T('You are not authorized to access this file.'), $T('Access Denied'));
+                    } else {
+                        var msg = $T('This file is protected. You will be redirected to the login page.');
+                        confirmPrompt(msg, $T('Access Denied')).then(function() {
+                            location.href = build_url(Indico.Urls.Login, {next: location.href + hash});
+                        });
+                    }
+                    return false;
                 }
             });
         }
