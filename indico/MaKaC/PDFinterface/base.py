@@ -178,8 +178,8 @@ class Paragraph(platypus.Paragraph):
     """
     add a part attribute for drawing the name of the current part on the laterPages function
     """
-    def __init__(self, test, style, part="", bulletText=None, frags=None, caseSensitive=1):
-        platypus.Paragraph.__init__(self, test, style, bulletText, frags, caseSensitive)
+    def __init__(self, text, style, part="", bulletText=None, frags=None, caseSensitive=1):
+        platypus.Paragraph.__init__(self, to_unicode(text), style, bulletText, frags, caseSensitive)
         self._part = part
 
     def setPart(self, part):
@@ -215,8 +215,8 @@ class TableOfContentsEntry(Paragraph):
         Class used to create table of contents entry with its number.
         Much faster than table of table of contents from platypus lib
     """
-    def __init__(self, test, pageNumber,style, part="", bulletText=None, frags=None, caseSensitive=1):
-        Paragraph.__init__(self, test, style, part, bulletText, frags, caseSensitive)
+    def __init__(self, text, pageNumber, style, part="", bulletText=None, frags=None, caseSensitive=1):
+        Paragraph.__init__(self, to_unicode(text), style, part, bulletText, frags, caseSensitive)
         self._part = part
         self._pageNumber = pageNumber
 
