@@ -138,13 +138,14 @@ class SyncedInputWidget(JinjaWidget):
 class SelectizeWidget(JinjaWidget):
     """Renders a selectizer-based widget"""
 
-    def __init__(self):
+    def __init__(self, selectize_options=None):
         super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
+        self.selectize_options = selectize_options or {}
 
     def __call__(self, field, **kwargs):
         choices = []
         if field.data is not None:
-            choices.append({'name': field.data.name, 'id': field.data.id})
+            choices.append(field.selectize_data)
 
         options = {
             'valueField': 'id',
@@ -158,4 +159,5 @@ class SelectizeWidget(JinjaWidget):
         }
 
         options.update(kwargs.pop('options', {}))
-        return super(SelectizeWidget, self).__call__(field, options=options)
+        options.update(self.selectize_options)
+        return super(SelectizeWidget, self).__call__(field, options=options, choices=getattr(field, 'choices', []))

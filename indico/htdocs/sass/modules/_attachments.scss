@@ -419,3 +419,7 @@
         @include icon-before('icon-folder-open');
     }
 }
+
+.selectize-dropdown.folder-name-dropdown {
+    z-index: 200 !important;
+}

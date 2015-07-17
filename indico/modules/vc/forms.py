@@ -42,6 +42,7 @@ ROOM_NAME_RE = re.compile(r'[\w\-]+')
 
 class VCRoomField(HiddenField):
     widget = SelectizeWidget()
+    min_trigger_length = 3
 
     def process_formdata(self, valuelist):
         if valuelist and valuelist[0].isdigit():
@@ -49,6 +50,10 @@ class VCRoomField(HiddenField):
 
     def _value(self):
         return self.data.id if self.data is not None else None
+
+    @property
+    def selectize_data(self):
+        return {'id': self.data.id, 'name': self.data.name}
 
 
 class LinkingWidget(JinjaWidget):

@@ -137,6 +137,13 @@ class WPConferenceBase(base.WPDecorated):
     def getLogoutURL(self):
         return url_for_logout(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
+    def getJSFiles(self):
+        return (base.WPDecorated.getJSFiles(self) + self._includeJSPackage('selectize_js', prefix=''))
+
+    def getCSSFiles(self):
+        return (base.WPDecorated.getCSSFiles(self) +
+                self._asset_env['selectize_css'].urls())
+
 
 class WPConferenceDisplayBase(WPConferenceBase):
     pass
@@ -1227,10 +1234,15 @@ class WPConferenceModifBase(main.WPMainBase):
         main.WPMainBase.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = conference
 
+    def getCSSFiles(self):
+        return (main.WPMainBase.getCSSFiles(self) +
+                self._asset_env['selectize_css'].urls())
+
     def getJSFiles(self):
         return main.WPMainBase.getJSFiles(self) + \
                self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
+               self._includeJSPackage('MaterialEditor') + \
+               self._includeJSPackage('selectize_js', prefix='')
 
     def _getSiteArea(self):
         return "ModificationArea"

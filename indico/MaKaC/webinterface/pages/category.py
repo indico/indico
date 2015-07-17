@@ -64,7 +64,11 @@ class WPCategoryBase (main.WPMainBase):
         self._conf = None
 
     def getCSSFiles(self):
-        return main.WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
+        return (main.WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
+                + self._asset_env['selectize_css'].urls())
+
+    def getJSFiles(self):
+        return main.WPMainBase.getJSFiles(self) + self._asset_env['selectize_js'].urls()
 
     def _currentCategory(self):
         return self._target
