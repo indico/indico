@@ -58,6 +58,8 @@
                            // otherwise the JSON returned by the server. if it returns false, the dialog will remain
                            // open; if it returns a Deferred object, the dialog remain open until the object is resolved
             onOpen: null,  // callback to invoke after opening the dialog.
+            onLoadError: null,  // callback to invoke when loading the dialog fails.  receives the jqxhr object as an
+                                // argument.  if the function returns false, the default error handler is not invoked.
             getExtraData: function() {},  // callback to add data to the form. receives the <form> element as `this`
             confirmCloseUnsaved: false,  // ask the user to confirm closing the dialog with unsaved changes
             dialogClasses: '',  // extra classes to add to the dialog canvas
@@ -76,7 +78,11 @@
             data: $.isFunction(options.data) ? options.data() : options.data,
             cache: false, // IE caches GET AJAX requests. WTF.
             complete: IndicoUI.Dialogs.Util.progress(),
-            error: handleAjaxError,
+            error: function(xhr) {
+                if (!options.onLoadError || options.onLoadError(xhr) !== false) {
+                    handleAjaxError(xhr);
+                }
+            },
             success: function(data) {
                 if (handleAjaxError(data)) {
                     return;
