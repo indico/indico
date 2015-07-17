@@ -101,6 +101,7 @@ def _build_folder_api_data(folder):
         return None
 
     return {
+        '_type': 'folder',
         'id': folder.id,
         'title': folder.title,
         'description': folder.description,
@@ -113,6 +114,7 @@ def _build_folder_api_data(folder):
 
 def _build_attachment_api_data(attachment):
     data = {
+        '_type': 'attachment',
         'id': attachment.id,
         'download_url': attachment.absolute_download_url,
         'title': attachment.title,
