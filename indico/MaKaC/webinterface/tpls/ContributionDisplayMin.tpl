@@ -161,7 +161,8 @@
     </div>
 </div>
 <script type="text/javascript">
-    $("#manageMaterial").click(function(){
+    $("#manageMaterial").click(function(e){
+        e.preventDefault();
         openAttachmentManager(${Contribution.getLocator() | n,j});
     });
 </script>

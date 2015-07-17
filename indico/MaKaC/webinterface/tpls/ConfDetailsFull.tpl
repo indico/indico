@@ -147,7 +147,8 @@ ${ actions }
     $('.infoline.material').append('<span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" style="float: right" id="manageMaterials" aria-hidden="true" ></span>');
 
 
-    $("#manageMaterials").click(function(){
+    $("#manageMaterials").click(function(e){
+        e.preventDefault();
         openAttachmentManager(${conf.getLocator() | n,j});
     });
 

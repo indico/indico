@@ -10,7 +10,7 @@
 <h1 class="materialTitle">
     ${material.getTitle()}
     <div class="materialDescription">${material.getDescription()}</div>
-</h2>
+</h1>
 <div>
     <div class="materialMainContent">
         <div class="materialDetail">
@@ -56,7 +56,8 @@
 </div>
 
 <script type="text/javascript">
-    $("#manageMaterial").click(function(){
+    $("#manageMaterial").click(function(e){
+        e.preventDefault();
         IndicoUI.Dialogs.Material.editor('${material.getConference().getOwner().getId() if material.getConference() else ""}',
             '${material.getConference().getId() if material.getConference() else ""}', '${material.getSession().getId() if material.getSession() else ""}',
                 '${material.getContribution().getId() if material.getContribution() else ""}','${material.getSubContribution().getId() if material.getSubContribution() else ""}',

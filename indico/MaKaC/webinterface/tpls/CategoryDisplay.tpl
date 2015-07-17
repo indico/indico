@@ -240,7 +240,8 @@ $(document).ready(function(){
 % if isLoggedIn:
     <script type="text/javascript">
         $(document).ready(function(){
-            $("#manageMaterial").click(function(){
+            $("#manageMaterial").click(function(e){
+                e.preventDefault();
                 openAttachmentManager(${categ.getLocator() | n,j});
             });
 

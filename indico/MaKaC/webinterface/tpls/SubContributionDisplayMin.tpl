@@ -89,7 +89,8 @@
     </div>
 </div>
 <script type="text/javascript">
-    $("#manageMaterial").click(function(){
+    $("#manageMaterial").click(function(e){
+        e.preventDefault();
         openAttachmentManager(${SubContrib.getLocator() | n,j});
     });
 </script>

@@ -159,7 +159,8 @@
         $('#timeTableDiv').hide();
     });
 
-    $("#manageMaterial").click(function(){
+    $("#manageMaterial").click(function(e){
+        e.preventDefault();
         openAttachmentManager(${session.getLocator() | n,j});
     });
     $('.sessionRightPanel').css('height', $('.sessionMainContent').css('height'));
