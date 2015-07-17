@@ -19,6 +19,7 @@ from lxml import etree
 from datetime import datetime
 
 # module imports
+from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.core.logger import Logger
 
@@ -36,12 +37,12 @@ class XMLSerializer(Serializer):
         super(XMLSerializer, self).__init__(query_params, pretty, **kwargs)
 
     def _convert(self, value):
-        if type(value) == datetime:
+        if isinstance(value, datetime):
             return value.isoformat()
-        elif type(value) in (int, float, bool):
+        elif isinstance(value, (int, long, float, bool)):
             return str(value)
         else:
-            value = value.decode('utf-8') if type(value) == str else value
+            value = to_unicode(value) if isinstance(value, str) else value
             if isinstance(value, basestring):
                 # Get rid of vertical tabs, the most common control char breaking XML conversion
                 value = value.replace('\x0b', '')
