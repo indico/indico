@@ -1196,7 +1196,7 @@ class CategoryTitleIndex(object):
                      func.to_tsquery('simple', preprocess_ts_string(search_string))))
                  .limit(limit)
                  .offset(offset))
-        return map(itemgetter(0), query)
+        return [x[0] for x in query]
 
     def initialize(self, items):
         for i, categ in enumerate(items, 1):
