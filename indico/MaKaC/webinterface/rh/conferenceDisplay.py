@@ -37,7 +37,6 @@ import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
 from MaKaC.PDFinterface.conference import TimeTablePlain, AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
-from MaKaC.common.contribPacker import ConferencePacker, ZIPFileHandler
 import zipfile
 from cStringIO import StringIO
 from MaKaC.i18n import _

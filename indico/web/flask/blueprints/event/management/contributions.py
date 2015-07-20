@@ -27,8 +27,6 @@ event_mgmt.add_url_rule('/contributions/perform-action', 'confModifContribList-c
                         conferenceModif.RHContribsActions, methods=('POST',))
 event_mgmt.add_url_rule('/contributions/pdf', 'confModifContribList-contribsToPDFMenu',
                         conferenceModif.RHContribsToPDFMenu, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/contributions/material-package', 'confModifContribList-matPkg',
-                        conferenceModif.RHMaterialPackage, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/contributions/moveToSession', 'confModifContribList-moveToSession',
                         conferenceModif.RHMoveContribsToSession, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/contributions/participants', 'confModifContribList-participantList',
