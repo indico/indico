@@ -13,12 +13,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
-from MaKaC.webinterface import wcomponents, navigation, urlHandlers
-from MaKaC.errors import MaKaCError, NotFoundError
-from MaKaC.common.fossilize import fossilize
+from MaKaC.webinterface import wcomponents, navigation
+from MaKaC.errors import NotFoundError
 from MaKaC.i18n import _
-from MaKaC.conference import Link
 
 
 class WAuthorDisplay( wcomponents.WTemplated ):
@@ -28,18 +27,6 @@ class WAuthorDisplay( wcomponents.WTemplated ):
         self._conf = contrib.getConference()
         self._contrib = contrib
         self._authorId = authId
-
-    def _getMaterial(self, contrib):
-        materials = []
-        for material in contrib.getAllMaterialList():
-            resources = []
-            for resource in material.getResourceList():
-                resources.append({
-                        'name': resource.getName(),
-                        'url': str(urlHandlers.UHMaterialDisplay.getURL(resource)) if isinstance(resource, Link) \
-                            else str(urlHandlers.UHFileAccess.getURL(resource))})
-            materials.append({'title': material.getTitle(), 'resources': resources})
-        return materials
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)

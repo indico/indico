@@ -300,3 +300,17 @@
     padding: 2em;
     background-color: $light-gray;
 }
+
+.attachments-tooltip-button {
+    @include icon-before('icon-folder');
+    cursor: pointer;
+    color: $gray;
+
+    &:hover, &.open {
+        color: $dark-gray;
+    }
+
+    &.open {
+        @include icon-before('icon-folder-open');
+    }
+}

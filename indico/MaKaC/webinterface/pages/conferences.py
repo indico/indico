@@ -4764,7 +4764,7 @@ class WConfAuthorIndex(WConfDisplayBodyBase):
                     contribs.append({
                         'title': contrib.getTitle(),
                         'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
-                        'materials': fossilize(contrib.getAllMaterialList())
+                        'attached_items': contrib.attached_items
                     })
         return res
 
@@ -4814,8 +4814,9 @@ class WConfSpeakerIndex(WConfDisplayBodyBase):
                         continue
                     url = urlHandlers.UHContributionDisplay.getURL(participation)
                 if participation.getConference() is not None:
-                    res[index].append({'title': participation.getTitle(), 'url': str(url),
-                                       'materials': fossilize(participation.getAllMaterialList())})
+                    res[index].append({'title': participation.getTitle(),
+                                       'url': str(url),
+                                       'attached_items': participation.getContribution().attached_items})
         wvars["body_title"] = self._getTitle()
         wvars["items"] = res
         return wvars

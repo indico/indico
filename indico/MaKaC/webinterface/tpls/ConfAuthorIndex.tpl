@@ -31,14 +31,15 @@
                 % for i, contrib in enumerate(item['contributions']):
                     <div class="contribItem">
                         <a href="${contrib['url']}">${contrib['title']}</a>
-
-                        % if contrib['materials']:
-                            <img class="material_icon" title="${_('materials')}" src="${Config.getInstance().getImagesBaseURL()}/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
-                            <%include file="MaterialListPopup.tpl" args="materials=contrib['materials']"/>
+                        % if contrib['attached_items']:
+                            ${ render_template('attachments/mako_compat/attachments_button.html', attached_items=contrib['attached_items']) }
                         % endif
                     </div>
                 % endfor
             </div>
         % endfor
     </div>
+    <script>
+        setupAttachmentTooltipButtons();
+    </script>
 </%block>

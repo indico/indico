@@ -28,13 +28,15 @@
                 % for i in range(1, len(item)):
                     <div class="contribItem">
                         <a href="${item[i]['url']}">${item[i]['title']}</a>
-                        % if item[i]['materials']:
-                            <img class="material_icon" title="${_('materials')}" src="${Config.getInstance().getBaseURL()}/images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
-                            <%include file="MaterialListPopup.tpl" args="materials=item[i]['materials']"/>
+                        % if item[i]['attached_items']:
+                            ${ render_template('attachments/mako_compat/attachments_button.html', attached_items=item[i]['attached_items']) }
                         % endif
                     </div>
                 % endfor
             </div>
         % endfor
     </div>
+    <script>
+        setupAttachmentTooltipButtons();
+    </script>
 </%block>

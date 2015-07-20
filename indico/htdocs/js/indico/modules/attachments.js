@@ -92,4 +92,36 @@
             folderField.triggerHandler('change');
         });
     };
+
+    global.setupAttachmentTooltipButtons = function setupAttachmentTooltipButtons() {
+        $('.attachments-tooltip-button').each(function() {
+            var button = $(this);
+            button.qtip({
+                content: {
+                    text: button.next('.material_list')
+                },
+                show: {
+                    event: 'click'
+                },
+                hide: {
+                    event: 'unfocus'
+                },
+                position: {
+                    my: 'top right',
+                    at: 'bottom left'
+                },
+                events: {
+                    show: function() {
+                        button.addClass('open');
+                    },
+                    hide: function() {
+                        button.removeClass('open');
+                    }
+                },
+                style: {
+                    classes: 'material_tip'
+                }
+            });
+        });
+    };
 })(window);
