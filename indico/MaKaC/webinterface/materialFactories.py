@@ -63,12 +63,6 @@ class MaterialFactory:
         return False
     canDelete = staticmethod( canDelete )
 
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return cls._modificationURL
-    getModificationURL = classmethod(getModificationURL)
-
     def getCreationWC( cls, owner ):
         if not cls._creationWC:
             return None
@@ -118,12 +112,6 @@ class PaperFactory(MaterialFactory):
         return target.getPaper() != None
     canDelete = staticmethod( canDelete )
 
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-    getModificationURL = classmethod(getModificationURL)
-
     def create(cls, target ):
         m = conference.Paper()
         m.setTitle(cls.getTitle())
@@ -160,12 +148,6 @@ class SlidesFactory(MaterialFactory):
         return target.getSlides() != None
     canDelete = staticmethod( canDelete )
 
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-    getModificationURL = classmethod(getModificationURL)
-
     def create(cls, target ):
         m = conference.Slides()
         m.setTitle(cls.getTitle())
@@ -201,12 +183,6 @@ class VideoFactory(MaterialFactory):
         return target.getVideo() != None
     canDelete = staticmethod( canDelete )
 
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-    getModificationURL = classmethod(getModificationURL)
-
     def create(cls, target ):
         m = conference.Video()
         m.setTitle(cls.getTitle())
@@ -241,12 +217,6 @@ class PosterFactory(MaterialFactory):
         #only a poster which is already set in a contribution can be deleted
         return target.getPoster() != None
     canDelete = staticmethod( canDelete )
-
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-    getModificationURL = classmethod(getModificationURL)
 
     def create(cls, target ):
         m = conference.Poster()
@@ -288,12 +258,6 @@ class ReviewingFactory(MaterialFactory):
         return target.getReviewing() != None
     canDelete = staticmethod( canDelete )
 
-    def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-    getModificationURL = classmethod(getModificationURL)
-
     def create(cls, target ):
         m = conference.Reviewing()
         m.setTitle(cls.getTitle())
@@ -327,17 +291,11 @@ class DefaultMaterialFactory(MaterialFactory):
     def canDelete( self, target ):
         return len(target.getMaterialList) > 0
 
-    def getModificationURL( self, mat ):
-        """returns the URL for accessing to the modification view of the
-            material"""
-        return urlHandlers.UHMaterialModification.getURL( mat )
-
     def create(self, target):
         m = conference.Material()
         m.setTitle(self.name)
         target.addMaterial( m )
         return m
-
 
     @classmethod
     def getInstance(cls, name):

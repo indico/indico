@@ -313,9 +313,6 @@ class UHConferenceModification(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification'
 
 
-class UHConfModifShowMaterials(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-materialsShow'
-
 
 # ============================================================================
 # ROOM BOOKING ===============================================================
@@ -769,10 +766,6 @@ class UHContributionSetVisibility(URLHandler):
     _endpoint = 'event_mgmt.contributionAC-setVisibility'
 
 
-class UHContribModifMaterialMgmt(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-materials'
-
-
 class UHContribModifAddMaterials(URLHandler):
     _endpoint = 'event_mgmt.contributionModification-materialsAdd'
 
@@ -1133,27 +1126,6 @@ class UHAdminsProtection(URLHandler):
     _endpoint = 'admin.adminProtection'
 
 
-class UHMaterialModification(URLHandler):
-    @classmethod
-    def getURL(cls, material, returnURL=""):
-        from MaKaC import conference
-
-        owner = material.getOwner()
-        # return handler depending on parent type
-        if isinstance(owner, conference.Conference):
-            handler = UHConfModifShowMaterials
-        elif isinstance(owner, conference.Session):
-            handler = UHSessionModifMaterials
-        elif isinstance(owner, conference.Contribution):
-            handler = UHContribModifMaterials
-        elif isinstance(owner, conference.SubContribution):
-            handler = UHSubContribModifMaterials
-        else:
-            raise Exception('Unknown material owner type: %s' % owner)
-
-        return handler.getURL(owner, returnURL=returnURL)
-
-
 class UHMaterialEnterAccessKey(URLHandler):
     _endpoint = 'files.materialDisplay-accessKey'
 
@@ -1311,10 +1283,6 @@ class UHSessionModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification'
 
 
-class UHSessionModifMaterials(URLHandler):
-    _endpoint = 'event_mgmt.sessionModification-materials'
-
-
 class UHSessionDataModification(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-modify'
 
@@ -1359,16 +1327,8 @@ class UHContributionModification(URLHandler):
     _endpoint = 'event_mgmt.contributionModification'
 
 
-class UHContribModifMaterials(URLHandler):
-    _endpoint = 'event_mgmt.contributionModification-materials'
-
-
 class UHSubContribModification(URLHandler):
     _endpoint = 'event_mgmt.subContributionModification'
-
-
-class UHSubContribModifMaterials(URLHandler):
-    _endpoint = 'event_mgmt.subContributionModification-materials'
 
 
 class UHMaterialDisplay(URLHandler):
