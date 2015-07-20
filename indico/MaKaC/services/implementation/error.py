@@ -69,7 +69,7 @@ class SendErrorReport(ServiceBase):
         self._message = pManager.extract("message", pType=str, allowEmpty=True)
         inner = self._params.get('inner', '')
         self._inner = '\n'.join(inner) if isinstance(inner, list) else inner
-        self._requestInfo = pManager.extract("requestInfo", pType=dict)
+        self._requestInfo = pManager.extract("requestInfo", pType=dict, allowEmpty=True)
 
     def _getAnswer(self):
 
