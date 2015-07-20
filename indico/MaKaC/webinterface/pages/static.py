@@ -45,7 +45,8 @@ class WPStaticEventBase:
                 link.setVisible(False)
 
     def getJSFiles(self):
-        return self._asset_env['base_js'].urls() + self._asset_env['modules_event_display_js'].urls()
+        return (self._asset_env['base_js'].urls() + self._asset_env['modules_event_display_js'].urls() +
+                self._asset_env['modules_attachments_js'].urls())
 
 
 class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):

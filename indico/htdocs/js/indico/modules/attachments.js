@@ -17,7 +17,9 @@
 
     $(document).ready(function() {
         $('.attachments > .dropdown').parent().dropdown();
-        setupAttachmentPreview();
+        if (!window.indicoOfflineSite) {
+            setupAttachmentPreview();
+        }
     });
 
     global.setupAttachmentPreview = function setupAttachmentPreview() {
