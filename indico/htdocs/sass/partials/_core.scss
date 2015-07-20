@@ -67,12 +67,12 @@
     display: none;
 }
 
-.icon-medium{
-    font-size:3em;
+.icon-medium {
+    font-size: 3em;
 }
 
-.icon-large{
-    font-size:5em;
+.icon-large {
+    font-size: 5em;
 }
 
 .icon-background {
@@ -98,4 +98,9 @@
 .highlighted-area:hover .i-button {
     -webkit-transition: box-shadow .5s;
     box-shadow: 0 0 1px 1px rgba(100, 100, 100, 0.2);
+}
+
+.prevent-scrolling {
+    overflow-x: hidden;
+    overflow-y: auto;
 }

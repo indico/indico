@@ -406,11 +406,6 @@
     opacity: 0.9;
 }
 
-.prevent-scrolling {
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
 .attachments-tooltip-button {
     @include icon-before('icon-folder');
     cursor: pointer;
