@@ -63,7 +63,7 @@ class SendErrorReport(ServiceBase):
         GenericMailer.send(GenericNotification(maildata))
 
     def _checkParams(self):
-        pManager = ParameterManager(self._params)
+        pManager = ParameterManager(self._params or {})  # if params is not specified it's an empty list
         self._userMail = pManager.extract("userMail", pType=str, allowEmpty=True)
         self._code = pManager.extract("code", pType=str, allowEmpty=True)
         self._message = pManager.extract("message", pType=str, allowEmpty=True)
