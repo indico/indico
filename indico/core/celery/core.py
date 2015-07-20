@@ -128,7 +128,7 @@ class IndicoCelery(Celery):
                 stack.enter_context(self.flask_app.app_context())
                 stack.enter_context(DBMgr.getInstance().global_connection())
                 if getattr(s, 'request_context', False):
-                    stack.enter_context(self.flask_app.test_request_context())
+                    stack.enter_context(self.flask_app.test_request_context(base_url=Config.getInstance().getBaseURL()))
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
                 plugin = getattr(s, 'plugin', kwargs.pop('__current_plugin__', None))
