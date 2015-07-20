@@ -129,41 +129,6 @@ class NEMeetingSessionDisplay(NavigationEntry):
     _url = urlHandlers.UHSessionDisplay
     _title = "Session details"
 
-class NEMeetingMaterialDisplay(NavigationEntry):
-    _url = urlHandlers.UHMaterialDisplay
-    _parent = {"session": NEMeetingSessionDisplay, \
-                           "contrib": NEContributionDisplay}
-    _title = "Material details"
-
-    def getParent(cls, target):
-        nextPage = None
-        if target is not None:
-            parent = target.getOwner()
-            if isinstance(parent, conference.Session):
-                nextPage = cls._parent["session"]()
-            elif isinstance(parent, conference.Contribution):
-                nextPage = cls._parent["contrib"]()
-        return nextPage
-    getParent = classmethod( getParent)
-
-
-
-class NEMaterialDisplay( NavigationEntry ):
-    _url = urlHandlers.UHMaterialDisplay
-    _parent = { "contrib": NEContributionDisplay, \
-                "session": NESessionDisplay }
-    _title = "Material details"
-
-    def getParent(cls, target):
-        nextPage = None
-        if target is not None:
-            parent = target.getOwner()
-            if isinstance(parent, conference.Contribution):
-                nextPage = cls._parent["contrib"]()
-            elif isinstance(parent, conference.Session):
-                nextPage = cls._parent["session"]()
-        return nextPage
-    getParent = classmethod( getParent)
 
 class NEAbstractSubmissionConfirmation( NavigationEntry ):
     _url = urlHandlers.UHAbstractSubmissionConfirmation

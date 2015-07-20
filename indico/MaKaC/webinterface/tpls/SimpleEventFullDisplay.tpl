@@ -34,7 +34,6 @@
                 ${ room }
                 ${ contact }
                 ${ moreInfo }
-                ${ material }
             </table>
         </td>
     </tr>

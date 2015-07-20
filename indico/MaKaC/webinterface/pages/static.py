@@ -21,7 +21,6 @@ from MaKaC.webinterface.pages.conferences import (WPTPLConferenceDisplay, WPConf
 from MaKaC.webinterface.pages.sessions import WPSessionDisplay
 from MaKaC.webinterface.pages.contributions import WPContributionDisplay
 from MaKaC.webinterface.pages.registrants import WPConfRegistrantsList, WConfRegistrantsList
-from MaKaC.webinterface.pages.material import WPMaterialConfDisplayBase
 from MaKaC.webinterface.pages.subContributions import WPSubContributionDisplay
 from MaKaC.webinterface.pages.authors import WPAuthorDisplay
 from MaKaC.webinterface.displayMgr import SystemLink
@@ -162,13 +161,6 @@ class WPStaticConfRegistrantsList(WPStaticEventBase, WPConfRegistrantsList):
         filterCrit = RHRegistrantsList.create_filter(self._conf, params)
         wc = WConfRegistrantsList(self._conf, filterCrit, sortingCrit, None, "session")
         return wc.getHTML()
-
-
-class WPStaticMaterialConfDisplayBase(WPStaticEventBase, WPMaterialConfDisplayBase):
-
-    def _defineSectionMenu(self):
-        WPMaterialConfDisplayBase._defineSectionMenu(self)
-        self._getMenu()
 
 
 class WPStaticSubContributionDisplay(WPStaticEventBase, WPSubContributionDisplay):

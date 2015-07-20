@@ -16,13 +16,11 @@
 
 import os
 import re
-import string
 import urlparse
 
 from flask import request, session, has_request_context
 
 from MaKaC.common.url import URL, EndpointURL
-from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
@@ -1126,14 +1124,6 @@ class UHAdminsProtection(URLHandler):
     _endpoint = 'admin.adminProtection'
 
 
-class UHMaterialEnterAccessKey(URLHandler):
-    _endpoint = 'files.materialDisplay-accessKey'
-
-
-class UHFileEnterAccessKey(URLHandler):
-    _endpoint = 'files.getFile-accessKey'
-
-
 class UHCategoryModification(URLHandler):
     _endpoint = 'category_mgmt.categoryModification'
 
@@ -1331,20 +1321,6 @@ class UHSubContribModification(URLHandler):
     _endpoint = 'event_mgmt.subContributionModification'
 
 
-class UHMaterialDisplay(URLHandler):
-    _endpoint = 'files.materialDisplay'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        if target is not None:
-            params = target.getLocator()
-            resources = target.getOwner().getMaterialById(params["materialId"]).getResourceList()
-            if len(resources) == 1:
-                return UHFileAccess.getStaticURL(resources[0])
-            return "materialDisplay-%s.html" % params["materialId"]
-        return cls._getURL()
-
-
 class UHConferenceProgram(URLHandler):
     _endpoint = 'event.conferenceProgram'
 
@@ -1425,14 +1401,6 @@ class UHSubContributionModification(URLHandler):
 
 class UHFileAccess(URLHandler):
     _endpoint = 'files.getFile-access'
-
-
-class UHVideoWmvAccess(URLHandler):
-    _endpoint = 'files.getFile-wmv'
-
-
-class UHVideoFlashAccess(URLHandler):
-    _endpoint = 'files.getFile-flash'
 
 
 class UHErrorReporting(URLHandler):
@@ -1744,10 +1712,6 @@ class UHConfModScheduleDataEdit(URLHandler):
     _endpoint = 'event_mgmt.confModifSchedule-edit'
 
 
-class UHConfModMaterialPackage(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-matPkg'
-
-
 class UHConfModProceedings(URLHandler):
     _endpoint = 'event_mgmt.confModifContribList-proceedings'
 
@@ -1823,259 +1787,6 @@ class UHAnnouncementSave(URLHandler):
 class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
 
-
-# ------- Static webpages ------
-
-class UHStaticConferenceDisplay(URLHandler):
-    _relativeURL = "./index.html"
-
-
-class UHStaticMaterialDisplay(URLHandler):
-    _relativeURL = "none-page-material.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Conference, Link, Video, Session
-
-        if target is not None:
-            if len(target.getResourceList()) == 1:
-                res = target.getResourceList()[0]
-                # TODO: Remove the "isinstance", it's just for CHEP04
-                if isinstance(res, Link):# and not isinstance(target, Video):
-                    return res.getURL()
-                else:
-                    return UHStaticResourceDisplay.getRelativeURL(res)
-            else:
-                contrib = target.getOwner()
-                relativeURL = None
-                if isinstance(contrib, Contribution):
-                    spk = ""
-                    if len(contrib.getSpeakerList()) > 0:
-                        spk = contrib.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName = "%s-%s" % (contrib.getId(), spk)
-                    relativeURL = "./%s-material-%s.html" % (contribDirName, cls._normalisePathItem(target.getId()))
-                elif isinstance(contrib, Conference):
-                    relativeURL = "./material-%s.html" % cls._normalisePathItem(target.getId())
-                elif isinstance(contrib, Session):
-                    relativeURL = "./material-s%s-%s.html" % (contrib.getId(), cls._normalisePathItem(target.getId()))
-
-                if escape:
-                    relativeURL = utf8rep(relativeURL)
-
-                return relativeURL
-        return cls._relativeURL
-
-
-class UHStaticConfAbstractBook(URLHandler):
-    _relativeURL = "./abstractBook.pdf"
-
-
-class UHStaticConferenceProgram(URLHandler):
-    _relativeURL = "./programme.html"
-
-
-class UHStaticConferenceTimeTable(URLHandler):
-    _relativeURL = "./timetable.html"
-
-
-class UHStaticContributionList(URLHandler):
-    _relativeURL = "./contributionList.html"
-
-
-class UHStaticConfAuthorIndex(URLHandler):
-    _relativeURL = "./authorIndex.html"
-
-
-class UHStaticContributionDisplay(URLHandler):
-    _relativeURL = ""
-
-    @classmethod
-    def getRelativeURL(cls, target=None, prevPath=".", escape=True):
-        url = cls._relativeURL
-        if target is not None:
-            spk = ""
-            if len(target.getSpeakerList()) > 0:
-                spk = target.getSpeakerList()[0].getFamilyName().lower()
-            contribDirName = "%s-%s" % (target.getId(), spk)
-            track = target.getTrack()
-            if track is not None:
-                url = "./%s/%s/%s.html" % (prevPath, track.getTitle().replace(" ", "_"), contribDirName)
-            else:
-                url = "./%s/other_contributions/%s.html" % (prevPath, contribDirName)
-
-        if escape:
-            url = utf8rep(url)
-
-        return url
-
-
-class UHStaticSessionDisplay(URLHandler):
-    _relativeURL = ""
-
-    @classmethod
-    def getRelativeURL(cls, target=None):
-        return "./sessions/s%s.html" % target.getId()
-
-
-class UHStaticResourceDisplay(URLHandler):
-    _relativeURL = "none-page-resource.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Conference, Video, Link, Session
-
-        relativeURL = cls._relativeURL
-        if target is not None:
-            mat = target.getOwner()
-            contrib = mat.getOwner()
-            # TODO: Remove the first if...cos it's just for CHEP.
-            # Remove as well in pages.conferences.WMaterialStaticDisplay
-            #if isinstance(mat, Video) and isinstance(target, Link):
-            #    relativeURL = "./%s.rm"%os.path.splitext(os.path.basename(target.getURL()))[0]
-            #    return relativeURL
-            if isinstance(contrib, Contribution):
-                relativeURL = "./%s-%s-%s-%s" % (cls._normalisePathItem(contrib.getId()), target.getOwner().getId(),
-                                                 target.getId(), cls._normalisePathItem(target.getFileName()))
-            elif isinstance(contrib, Conference):
-                relativeURL = "./resource-%s-%s-%s" % (target.getOwner().getId(), target.getId(),
-                                                       cls._normalisePathItem(target.getFileName()))
-            elif isinstance(contrib, Session):
-                relativeURL = "./resource-s%s-%s-%s" % (contrib.getId(), target.getId(),
-                                                        cls._normalisePathItem(target.getFileName()))
-
-            if escape:
-                relativeURL = utf8rep(relativeURL)
-
-            return relativeURL
-
-
-class UHStaticTrackContribList(URLHandler):
-    _relativeURL = ""
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        url = cls._relativeURL
-        if target is not None:
-            url = "%s.html" % (target.getTitle().replace(" ", "_"))
-
-        if escape:
-            url = utf8rep(url)
-        return url
-
-
-class UHMStaticMaterialDisplay(URLHandler):
-    _relativeURL = "none-page.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Link, Session, SubContribution
-
-        if target is not None:
-            if len(target.getResourceList()) == 1:
-                res = target.getResourceList()[0]
-                if isinstance(res, Link):
-                    return res.getURL()
-                else:
-                    return UHMStaticResourceDisplay.getRelativeURL(res)
-            else:
-                owner = target.getOwner()
-                parents = "./material"
-                if isinstance(owner, Session):
-                    parents = "%s/session-%s-%s" % (parents, owner.getId(), cls._normalisePathItem(owner.getTitle()))
-                elif isinstance(owner, Contribution):
-                    if isinstance(owner.getOwner(), Session):
-                        parents = "%s/session-%s-%s" % (parents, owner.getOwner().getId(),
-                                                        cls._normalisePathItem(owner.getOwner().getTitle()))
-                    spk = ""
-                    if len(owner.getSpeakerList()) > 0:
-                        spk = owner.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName = "%s-%s" % (owner.getId(), spk)
-                    parents = "%s/contrib-%s" % (parents, contribDirName)
-                elif isinstance(owner, SubContribution):
-                    contrib = owner.getContribution()
-                    if isinstance(contrib.getOwner(), Session):
-                        parents = "%s/session-%s-%s" % (parents, contrib.getOwner().getId(),
-                                                        cls._normalisePathItem(contrib.getOwner().getTitle()))
-                    contribspk = ""
-                    if len(contrib.getSpeakerList()) > 0:
-                        contribspk = contrib.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName = "%s-%s" % (contrib.getId(), contribspk)
-                    subcontspk = ""
-                    if len(owner.getSpeakerList()) > 0:
-                        subcontspk = owner.getSpeakerList()[0].getFamilyName().lower()
-                    subcontribDirName = "%s-%s" % (owner.getId(), subcontspk)
-                    parents = "%s/contrib-%s/subcontrib-%s" % (parents, contribDirName, subcontribDirName)
-                relativeURL = "%s/material-%s.html" % (parents, cls._normalisePathItem(target.getId()))
-
-                if escape:
-                    relativeURL = utf8rep(relativeURL)
-                return relativeURL
-        return cls._relativeURL
-
-
-class UHMStaticResourceDisplay(URLHandler):
-    _relativeURL = "none-page.html"
-
-    @classmethod
-    def _normalisePathItem(cls, name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
-
-    @classmethod
-    def getRelativeURL(cls, target=None, escape=True):
-        from MaKaC.conference import Contribution, Session, SubContribution
-
-        if target is not None:
-
-            mat = target.getOwner()
-            owner = mat.getOwner()
-            parents = "./material"
-            if isinstance(owner, Session):
-                parents = "%s/session-%s-%s" % (parents, owner.getId(), cls._normalisePathItem(owner.getTitle()))
-            elif isinstance(owner, Contribution):
-                if isinstance(owner.getOwner(), Session):
-                    parents = "%s/session-%s-%s" % (parents, owner.getOwner().getId(),
-                                                    cls._normalisePathItem(owner.getOwner().getTitle()))
-                spk = ""
-                if len(owner.getSpeakerList()) > 0:
-                    spk = owner.getSpeakerList()[0].getFamilyName().lower()
-                contribDirName = "%s-%s" % (owner.getId(), spk)
-                parents = "%s/contrib-%s" % (parents, contribDirName)
-            elif isinstance(owner, SubContribution):
-                contrib = owner.getContribution()
-                if isinstance(contrib.getOwner(), Session):
-                    parents = "%s/session-%s-%s" % (parents, contrib.getOwner().getId(),
-                                                    cls._normalisePathItem(contrib.getOwner().getTitle()))
-                contribspk = ""
-                if len(contrib.getSpeakerList()) > 0:
-                    contribspk = contrib.getSpeakerList()[0].getFamilyName().lower()
-                contribDirName = "%s-%s" % (contrib.getId(), contribspk)
-                subcontspk = ""
-                if len(owner.getSpeakerList()) > 0:
-                    subcontspk = owner.getSpeakerList()[0].getFamilyName().lower()
-                subcontribDirName = "%s-%s" % (owner.getId(), subcontspk)
-                parents = "%s/contrib-%s/subcontrib-%s" % (parents, contribDirName, subcontribDirName)
-
-            relativeURL = "%s/resource-%s-%s-%s" % (parents, cls._normalisePathItem(target.getOwner().getTitle()),
-                                                    target.getId(), cls._normalisePathItem(target.getFileName()))
-            if escape:
-                relativeURL = utf8rep(relativeURL)
-            return relativeURL
-        return cls._relativeURL
-
-
-# ------- END: Static webpages ------
 
 class UHContribAuthorDisplay(URLHandler):
     _endpoint = 'event.contribAuthorDisplay'

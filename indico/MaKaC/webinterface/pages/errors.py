@@ -188,12 +188,6 @@ class WAccessKeyError( WTemplated ):
         if isinstance(self._rh._target,Conference):
             vars["type"] = "event"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target) ) )
-        elif isinstance(self._rh._target,Material):
-            vars["type"] = "file"
-            vars["url"] = quoteattr( str( urlHandlers.UHMaterialEnterAccessKey.getURL(self._rh._target) ) )
-        elif isinstance(self._rh._target,Resource):
-            vars["type"] = "file"
-            vars["url"] = quoteattr( str( urlHandlers.UHFileEnterAccessKey.getURL(self._rh._target) ) )
         else:
             vars["type"] = "presentation"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target.getConference()) ) )

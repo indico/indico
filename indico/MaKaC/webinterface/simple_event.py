@@ -21,8 +21,6 @@ import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.pages.category as category
 import MaKaC.common.Configuration as Configuration
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.pages.material as material
-import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.displayMgr as displayMgr
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
@@ -87,13 +85,6 @@ class WebFactory(WebFactory):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)
 
-    def getMaterialDisplay( rh, material):
-        return WPMMaterialDisplay(rh, material)
-    getMaterialDisplay = staticmethod(getMaterialDisplay)
-
-    @staticmethod
-    def getDisplayFullMaterialPackage(rh, conf):
-        return WPSEDisplayFullMaterialPackage(rh,conf)
 
 #################### Participants #####################################
 
@@ -133,64 +124,7 @@ class WebFactory(WebFactory):
 
 
 SimpleEventWebFactory = WebFactory
-################ Material Display ###################################
-class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
-    def __init__(self, rh, material):
-        self._material = material
-        conferences.WPConferenceDefaultDisplayBase.__init__( self, rh, self._material.getConference())
-        self._navigationTarget = self._material
-        self._extraCSS.append(" body { background: #424242; } ")
 
-    def _getNavigationBarHTML(self):
-        item = self.navigationEntry
-        itemList = []
-        while item is not None:
-            if itemList == []:
-                itemList.insert(0, wcomponents.WTemplated.htmlText(item.getTitle()) )
-            else:
-                itemList.insert(0, """<a href=%s>%s</a>"""%( quoteattr(str(item.getURL(self._navigationTarget))), wcomponents.WTemplated.htmlText(item.getTitle())  ) )
-            item = item.getParent(self._navigationTarget)
-
-        itemList.insert(0, """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHConferenceDisplay.getURL(self._conf))), self._conf.getTitle() ))
-        return " &gt; ".join(itemList)
-
-    def _applyConfDisplayDecoration( self, body ):
-        frame = WMConfDisplayFrame( self._getAW(), self._conf )
-        frameParams = {\
-              "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
-                      }
-        if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
-
-        colspan=""
-        imgOpen=""
-        padding=""
-        padding=""" style="padding:0px" """
-
-        body =  i18nformat("""
-                <td class="confBodyBox" %s %s>
-                    %s
-                    <table border="0" cellpadding="0" cellspacing="0" valign="top" width="720px">
-                        <tr>
-                            <td><div class="groupTitle">_("Added Material")</div></td>
-                        </tr>
-                        <tr>
-                            <td align="left" valign="middle" width="100%%">
-                                <b>%s</b>
-                            </td>
-                       </tr>
-                    </table>
-                     <!--Main body-->
-                    %s
-                </td>""")%(colspan,padding,imgOpen,
-                        self._getNavigationBarHTML(),
-                        body)
-        return frame.getHTML( body, frameParams)
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"dark":True}
-        return wc.getHTML(p)
 
 class WMConfDisplayFrame(conferences.WConfDisplayFrame):
     def getVars(self):
@@ -230,15 +164,6 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         self._body = body
         return wcomponents.WTemplated.getHTML( self, params )
 
-class WMMaterialDisplay(material.WMaterialDisplay):
-    pass
-
-class WPMMaterialDisplay( WPMMaterialDisplayBase):
-    navigationEntry = navigation.NEMaterialDisplay
-
-    def _getBody( self, params ):
-        wc = WMMaterialDisplay( self._getAW(), self._material )
-        return wc.getHTML()
 
 #################Conference Modification#############################
 
@@ -327,8 +252,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
     "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
     "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
     "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \
-    "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
-    "materialURLGen": urlHandlers.UHMaterialDisplay.getURL }
+    "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL}
         return wc.getHTML( pars )
 
 
@@ -394,12 +318,6 @@ class WSimpleEventBaseDisplay(wcomponents.WTemplated):
             roomLink = linking.RoomLinker().getHTMLLink( room, location )
             vars["room"] = self.__getHTMLRow( _("Room"), roomLink )
         vars["moreInfo"] = self.__getHTMLRow(  _("Additional Info"), self._conf.getContactInfo(), 0 )
-        ml = []
-        for mat in self._conf.getAllMaterialList():
-            ml.append( wcomponents.WMaterialDisplayItem().getHTML(\
-                                                self._aw, mat, \
-                                                vars["materialURLGen"](mat) ) )
-        vars["material"] =  self.__getHTMLRow( _("Material"), "<br>".join(ml), 0)
         al = []
         if self._conf.getChairmanText() != "":
             al.append( self._conf.getChairmanText() )

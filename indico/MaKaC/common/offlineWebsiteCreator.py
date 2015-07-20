@@ -30,7 +30,7 @@ from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStati
     WPStaticContributionList, WPStaticInternalPageDisplay, \
     WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, \
     WPStaticContributionDisplay, WPStaticConfRegistrantsList, \
-    WPStaticMaterialConfDisplayBase, WPStaticSubContributionDisplay, \
+    WPStaticSubContributionDisplay, \
     WPStaticAuthorDisplay, WPTPLStaticConferenceDisplay, \
     WPStaticConferenceDisplay
 from MaKaC.common.contribPacker import ZIPFileHandler

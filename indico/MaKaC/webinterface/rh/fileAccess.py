@@ -13,29 +13,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import session
 
-import os
 from copy import copy
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
-from MaKaC.webinterface.rh.base import RH, RHDisplayBaseProtected
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.webinterface.pages import files
+
+from werkzeug.exceptions import NotFound
+
+from MaKaC.webinterface.rh.conferenceBase import RHFileBase
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.errors import NotFoundError, AccessError
 from MaKaC.registration import Registrant
-from MaKaC.conference import Reviewing, Link
+from MaKaC.conference import Reviewing, LocalFile
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from MaKaC.i18n import _
 
-from indico.core import signals
 from indico.web.flask.util import send_file
-from indico.modules import ModuleHolder
 
 
 class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
-    _uh  = urlHandlers.UHFileAccess
-
     def _checkParams( self, params ):
         try:
             RHFileBase._checkParams( self, params )
@@ -55,65 +49,10 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
             raise AccessError(_("Access to this resource is forbidden."))
 
         else:
-            RHDisplayBaseProtected._checkProtection( self )
-
-    def _process( self ):
-        signals.event.material_downloaded.send(self._conf, resource=self._file)
-        if isinstance(self._file, Link):
-            self._redirect(self._file.getURL())
-        else:
-            return send_file(self._file.getFileName(), self._file.getFilePath(), self._file.getFileType(),
-                             self._file.getCreationDate())
-
-
-class RHFileAccessStoreAccessKey(RHFileBase):
-    _uh = urlHandlers.UHFileEnterAccessKey
-
-    def _checkParams(self, params):
-        RHFileBase._checkParams(self, params)
-        self._accesskey = params.get("accessKey", "").strip()
-        self._doNotSanitizeFields.append("accessKey")
-
-    def _checkProtection(self):
-        pass
+            # superseded by attachments
+            raise NotFound
 
     def _process(self):
-        access_keys = session.setdefault('accessKeys', {})
-        access_keys[self._target.getOwner().getUniqueId()] = self._accesskey
-        session.modified = True
-        self._redirect(urlHandlers.UHFileAccess.getURL(self._target))
-
-
-class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
-    _uh  = urlHandlers.UHVideoWmvAccess
-
-    def _checkParams( self, params ):
-        try:
-            RHLinkBase._checkParams( self, params )
-        except:
-            raise NotFoundError("The file you tried to access does not exist.")
-
-    def _checkProtection( self ):
-        """targets for this RH are exclusively URLs so no protection apply"""
-        return
-
-    def _process( self ):
-        p = files.WPVideoWmv(self, self._link )
-        return p.display()
-
-class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
-    _uh  = urlHandlers.UHVideoFlashAccess
-
-    def _checkParams( self, params ):
-        try:
-            RHLinkBase._checkParams( self, params )
-        except:
-            raise NotFoundError("The file you tried to access does not exist.")
-
-    def _checkProtection( self ):
-        """targets for this RH are exclusively URLs so no protection apply"""
-        return
-
-    def _process( self ):
-        p = files.WPVideoFlash(self, self._link )
-        return p.display()
+        assert isinstance(self._file, LocalFile)
+        return send_file(self._file.getFileName(), self._file.getFilePath(), self._file.getFileType(),
+                         self._file.getCreationDate())

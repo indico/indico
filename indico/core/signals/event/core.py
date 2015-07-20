@@ -80,11 +80,6 @@ session_slot_deleted = _signals.signal('session-slot-deleted', """
 Called when a session slot is deleted. The *sender* is the session slot.
 """)
 
-material_downloaded = _signals.signal('material-downloaded', """
-Notifies a file being downloaded. The *sender* is the event and the downloaded
-file is passed in the *resource* kwarg.
-""")
-
 timetable_buttons = _signals.signal('timetable-buttons', """
 Expected to return a list of tuples ('button_name', 'js-call-class').
 Called when building the timetable view.

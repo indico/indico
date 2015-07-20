@@ -59,17 +59,6 @@ class WPTrackDefaultDisplayBase( WPTrackDisplayBase, WPConferenceDefaultDisplayB
         return WPConferenceDefaultDisplayBase._display(self,params)
 
 
-class WPTrackDisplay( WPTrackDefaultDisplayBase ):
-
-    def _getBody( self, params ):
-        wc = wcomponents.WTrackDisplay( self._getAW(), self._track )
-        pars = { \
-"trackModifURL": urlHandlers.UHTrackModification.getURL( self._track ), \
-"materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
-"contribURLGen": urlHandlers.UHContributionDisplay.getURL }
-        return wc.getHTML( pars )
-
-
 class WPTrackModifBase( WPConferenceModifBase ):
 
     def __init__( self, rh, track, subTrack=None):
