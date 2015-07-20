@@ -624,7 +624,7 @@ table.sessionDetails td {
     padding-left: 0;
 }
 
-table.sessionDetails td.leftCol {
+table.sessionDetails > td.leftCol {
     padding-right: 10px;
     font-weight: normal;
     text-align: left;

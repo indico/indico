@@ -10,7 +10,7 @@
     <tr>
         <td>
             <a href="{{ attachment.download_url }}" target="_blank"
-               class="{{ get_attachment_icon(attachment) }}"> {{ attachment.title }}</a> {# Spaces needed for :before icon #}
+               class="{{ get_attachment_icon(attachment) }}">{{ attachment.title }}</a>
             {%- if attachment.is_protected %}
                 <i class="icon-lock-center custom-protection"
                    title="{% trans %}The access to this material is restricted, regardless of the protection scheme of
@@ -40,7 +40,7 @@
 {% macro _folder_row(folder, short=false) -%}
     <tr class="expandable {%- if not folder.attachments %} collapsed{% endif %}">
         <td>
-            <span> {{ folder.title }}</span> {# Spaces needed for :before icon #}
+            <span>{{ folder.title }}</span>
             {%- if folder.is_protected %}
                 <i class="icon-lock-center custom-protection"
                    title="{% trans %}The access to this folder is restricted, regardless of the protection scheme of
