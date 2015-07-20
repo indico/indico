@@ -7,7 +7,7 @@
             <a href="#" id="manageAttachments-{{ linked_object.id }}" class="right i-button icon-edit"></a>
         {% endif %}
     </div>
-    {{ render_attachments(linked_object.attached_items, short=true) }}
+    {{ render_attachments(linked_object.attached_items, management=false) }}
 </div>
 <script>
     $('#manageAttachments-{{ linked_object.id }}').on('click', function openAtttachmentsPopup() {

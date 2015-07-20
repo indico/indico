@@ -6,7 +6,7 @@
     {%- endif -%}
 {%- endmacro %}
 
-{% macro _attachment_row(attachment, short=false) %}
+{% macro _attachment_row(attachment, management=true) %}
     <tr>
         <td>
             <a href="{{ attachment.download_url }}" target="_blank"
@@ -17,7 +17,7 @@
                           the parent.{% endtrans %}"></i>
             {% endif %}
         </td>
-        {% if not short -%}
+        {% if management -%}
             <td class="actions">
                 <a class="icon-edit js-dialog-action"
                    data-href="{{ url_for('.modify_attachment', attachment) }}"
@@ -37,7 +37,7 @@
     </tr>
 {% endmacro %}
 
-{% macro _folder_row(folder, short=false) -%}
+{% macro _folder_row(folder, management=true) -%}
     <tr class="expandable {%- if not folder.attachments %} collapsed{% endif %}">
         <td>
             <span>{{ folder.title }}</span>
@@ -47,7 +47,7 @@
                           the parent.{% endtrans %}"></i>
             {% endif %}
         </td>
-        {% if not short -%}
+        {% if management -%}
             <td class="actions">
                 <a class="icon-edit js-dialog-action"
                            data-href="{{ url_for('.edit_folder', folder) }}"
@@ -66,45 +66,45 @@
         {%- endif %}
     </tr>
     <tr class="sub-tree">
-        <td {%- if not short %} colspan="3"{% endif %}>
+        <td {%- if management %} colspan="3"{% endif %}>
             {# Div to have a smooth slide up and down of the sub-tree #}
             <div {%- if not folder.attachments %} style="display: none;"{% endif %}>
                 <table class="tree">
-                {{- _render_tree(folder.attachments, false, short=short) -}}
+                {{- _render_tree(folder.attachments, false, management=management) -}}
                 </table>
             </div>
         </td>
     </tr>
 {%- endmacro %}
 
-{% macro _render_tree(nodes, is_folder, short=false) -%}
+{% macro _render_tree(nodes, is_folder, management=true) -%}
     {%- for sub_node in nodes -%}
         {% if is_folder %}
-            {{ _folder_row(sub_node, short=short) }}
+            {{ _folder_row(sub_node, management=management) }}
         {% else %}
-            {{ _attachment_row(sub_node, short=short) }}
+            {{ _attachment_row(sub_node, management=management) }}
         {% endif %}
     {%- else -%}
         <tr class="empty">
-            <td {%- if not short %} colspan="3"{% endif %}> {% trans %}empty folder{% endtrans %}</td>
+            <td {%- if management %} colspan="3"{% endif %}> {% trans %}empty folder{% endtrans %}</td>
         </tr>
     {%- endfor -%}
 {%- endmacro %}
 
-{% macro render_attachments(attachments, linked_object=None, short=false) -%}
+{% macro render_attachments(attachments, linked_object=None, management=true) -%}
     {%- if attachments -%}
         <table class="tree">
             {%- if attachments.files -%}
-                {{ _render_tree(attachments.files, false, short=short) }}
+                {{ _render_tree(attachments.files, false, management=management) }}
             {%- endif -%}
             {%- if attachments.folders -%}
-                {{ _render_tree(attachments.folders, true, short=short) }}
+                {{ _render_tree(attachments.folders, true, management=management) }}
             {%- endif -%}
         </table>
     {%- else -%}
         <span class="empty">{% trans %}There are no materials yet.{% endtrans %}</span>
     {%- endif -%}
-    {% if not short %}
+    {% if management %}
         <div class="i-box-footer text-right js-attachment-actions">
             <a href="#" class="i-button icon-folder-plus js-dialog-action"
                data-href="{{ url_for('.create_folder', linked_object) }}"
