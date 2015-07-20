@@ -1,17 +1,4 @@
-{% from 'attachments/_attachments.html' import get_attachment_icon %}
-
-{% macro render_attachment(attachment, has_label=false) %}
-    <a class="i-button attachment {{ get_attachment_icon(attachment) }} {% if attachment.is_protected %}is-protected{% endif %} {% if has_label %}has-label{% endif %} {%- if attachment.file.is_previewable %} js-preview-dialog{% endif %}"
-       data-previewable="{% if attachment.file %}{{ attachment.file.is_previewable | tojson }}{% else %}false{% endif %}"
-       data-attachment-id="{{ attachment.id }}"
-       href="{{ attachment.download_url }}" target="_blank"
-       title="{{ attachment.description or attachment.title }}
-              {%- if attachment.is_protected %} ({% trans %}Protected{% endtrans %}){% endif %}">
-        {%- if not has_label -%}
-            <span class="title">{{ attachment.title }}</span>
-        {%- endif -%}
-    </a>
-{% endmacro %}
+{% from 'attachments/_attachments.html' import get_attachment_icon, render_attachment %}
 
 {% macro render_folder(folder) -%}
     <div class="folder toolbar {% if folder.is_protected %}is-protected{% endif %}">
@@ -19,7 +6,7 @@
             <span class="i-button label" title="{{ folder.description }}">{{ folder.title }}</span>
             {% if folder.attachments|count <= 2 %}
                 {%- for attachment in folder.attachments -%}
-                    {{ render_attachment(attachment, has_label=true) }}
+                    {{ render_attachment(attachment, has_label=true, classes='i-button') }}
                     {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=true) }}
                 {%- endfor -%}
             {% else %}
@@ -51,7 +38,7 @@
     <div class="attachments-display-container">
         <span class="folder folder-root toolbar">
             {% for attachment in files %}
-                {{ render_attachment(attachment) }}
+                {{ render_attachment(attachment, classes='i-button') }}
                 {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=false) }}
             {% endfor %}
         </span>

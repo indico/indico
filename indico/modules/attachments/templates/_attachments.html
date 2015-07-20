@@ -6,11 +6,23 @@
     {%- endif -%}
 {%- endmacro %}
 
+{% macro render_attachment(attachment, has_label=false, classes='') %}
+    <a class="attachment {{ get_attachment_icon(attachment) }} {% if attachment.is_protected %}is-protected{% endif %} {% if has_label %}has-label{% endif %} {%- if attachment.file.is_previewable %} js-preview-dialog{% endif %} {{ classes }}"
+       data-previewable="{% if attachment.file %}{{ attachment.file.is_previewable | tojson }}{% else %}false{% endif %}"
+       data-attachment-id="{{ attachment.id }}"
+       href="{{ attachment.download_url }}" target="_blank"
+       title="{{ attachment.description or attachment.title }}
+              {%- if attachment.is_protected %} ({% trans %}Protected{% endtrans %}){% endif %}">
+        {%- if not has_label -%}
+            <span class="title">{{ attachment.title }}</span>
+        {%- endif -%}
+    </a>
+{% endmacro %}
+
 {% macro _attachment_row(attachment, management=true) %}
     <tr>
         <td>
-            <a href="{{ attachment.download_url }}" target="_blank"
-               class="{{ get_attachment_icon(attachment) }}">{{ attachment.title }}</a>
+            {{ render_attachment(attachment) }}
             {%- if attachment.is_protected %}
                 <i class="icon-lock-center custom-protection"
                    title="{% trans %}The access to this material is restricted, regardless of the protection scheme of
