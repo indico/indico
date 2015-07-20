@@ -15,7 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
-from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable, WPConferenceProgram, WPContributionList, WPInternalPageDisplay, WPAuthorIndex, WPSpeakerIndex
+from MaKaC.webinterface.pages.conferences import (WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable,
+                                                  WPConferenceProgram, WPContributionList, WPInternalPageDisplay,
+                                                  WPAuthorIndex, WPSpeakerIndex)
 from MaKaC.webinterface.pages.sessions import WPSessionDisplay
 from MaKaC.webinterface.pages.contributions import WPContributionDisplay
 from MaKaC.webinterface.pages.registrants import WPConfRegistrantsList, WConfRegistrantsList
@@ -41,6 +43,9 @@ class WPStaticEventBase:
         for link in self._sectionMenu.getLinkList():
             if isinstance(link, SystemLink) and link.getName() not in ContextManager.get("_menu_offline_items"):
                 link.setVisible(False)
+
+    def getJSFiles(self):
+        return self._asset_env['base_js'].urls() + self._asset_env['modules_event_display_js'].urls()
 
 
 class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
@@ -170,6 +175,7 @@ class WPStaticSubContributionDisplay(WPStaticEventBase, WPSubContributionDisplay
     def _defineSectionMenu(self):
         WPSubContributionDisplay._defineSectionMenu(self)
         self._getMenu()
+
 
 class WPStaticAuthorDisplay(WPStaticEventBase, WPAuthorDisplay):
 
