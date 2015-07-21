@@ -10332,37 +10332,6 @@ class Resource(CommonObjectBase):
             return 'converting'
         return None
 
-class Link(Resource):
-    """Specialises Resource class in order to represent web links. Objects of
-        this class will contain necessary information to include in a conference
-        object links to internet resources through a URL.
-       Params:
-        url -- (string) Contains the URL to the internet target resource.
-    """
-
-    fossilizes(ILinkMinimalFossil, ILinkFossil)
-
-    def __init__( self, resData = None ):
-        Resource.__init__( self, resData )
-        self.url = ""
-
-    def clone( self, conf ):
-        link = Resource.clone(self, conf)
-        link.setURL(self.getURL())
-        return link
-
-    @Updates ('MaKaC.conference.Link', 'url')
-    def setURL( self, newURL ):
-        self.url = newURL.strip()
-        self.notifyModification()
-
-    def getURL( self ):
-        return self.url
-
-    def getLocator(self):
-        locator = Resource.getLocator(self)
-        locator['fileExt'] = 'link'
-        return locator
 
 class LocalFile(Resource):
     """Specialises Resource class in order to represent files which can be
