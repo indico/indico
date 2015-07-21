@@ -122,6 +122,22 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             folder = cls(is_default=True, linked_object=linked_object)
         return folder
 
+    @classmethod
+    def get_or_create(cls, linked_object, title=None):
+        """Gets a folder for the given object or creates it.
+
+        If no folder title is specified, the default folder will be
+        used.  It is the caller's responsibility to add the folder
+        or an object (such as an attachment) associated wit with
+        to the SQLAlchemy session using ``db.session.add(...)``.
+        """
+        if title is None:
+            return AttachmentFolder.get_or_create_default(linked_object)
+        else:
+            folder = AttachmentFolder.find_first(linked_object=linked_object, is_default=False, is_deleted=False,
+                                                 title=title)
+            return folder or AttachmentFolder(linked_object=linked_object, title=title)
+
     @property
     def locator(self):
         return dict(self.linked_object.getLocator(), folder_id=self.id)

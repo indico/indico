@@ -245,22 +245,12 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
         self._contribution.setDuration(self._duration/60, self._duration%60)
         self._addReportNumbers()
 
-
         if self._needsToBeScheduled:
             checkFlag = self._getCheckFlag()
             adjDate = setAdjustedDate(self._dateTime, self._conf)
             self._contribution.setStartDate(adjDate, check = checkFlag)
 
-        if self._materials:
-            for material in self._materials.keys():
-                newMaterial = Material()
-                newMaterial.setTitle(material)
-                for resource in self._materials[material]:
-                    newLink = Link()
-                    newLink.setURL(resource)
-                    newLink.setName(resource)
-                    newMaterial.addResource(newLink)
-                self._contribution.addMaterial(newMaterial)
+        self._contribution.attach_links(self._materials)
 
         self._schedule(self._contribution)
 

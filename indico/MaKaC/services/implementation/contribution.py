@@ -123,16 +123,7 @@ class ContributionAddSubContribution(ContributionModifBase):
             subcontrib.newSpeaker(presenter)
 
     def __addMaterials(self, subcontrib):
-        if self._materials:
-            for material in self._materials.keys():
-                newMaterial = conference.Material()
-                newMaterial.setTitle(material)
-                for resource in self._materials[material]:
-                    newLink = conference.Link()
-                    newLink.setURL(resource)
-                    newLink.setName(resource)
-                    newMaterial.addResource(newLink)
-                subcontrib.addMaterial(newMaterial)
+        subcontrib.attach_links(self._materials)
 
     def __addReportNumbers(self, subcontrib):
         if self._reportNumbers:

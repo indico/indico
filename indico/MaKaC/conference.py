@@ -17,6 +17,7 @@
 from itertools import ifilter
 from flask_pluginengine import plugin_context
 from sqlalchemy.orm import lazyload
+from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
@@ -107,6 +108,8 @@ from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
 from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
+from indico.modules.attachments.models.attachments import AttachmentType, Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_attached_items
 from indico.util.date_time import utc_timestamp
 from indico.util.signals import values_from_signal
@@ -324,6 +327,34 @@ class CommonObjectBase(CoreObject, Fossilizable):
             return get_attached_items(self, include_empty=False, include_hidden=False, preload_event=True)
         else:
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
+
+    def attach_links(self, links, user=None):
+        """
+        Adds links from a mapping which is usually passed to the various
+        JSON-RPC endpoints when importing contributions from outside,
+        usually using the importer plugin.
+
+        :param links: A dict mapping folder names (empty for the
+                      default folder) to lists of URLs.
+        :param user: The user who initiated the action.  Defaults to
+                     the current session user.
+        """
+        if not isinstance(self, (Contribution, Session, SubContribution, Conference)):
+            raise ValueError("Object of type '{}' does not support attach_links".format(type(self)))
+        if not links:
+            return
+        for folder_title, urls in links.iteritems():
+            if not urls:
+                continue
+            folder = AttachmentFolder.get_or_create(self, folder_title or None)
+            db.session.add(folder)
+            for url in urls:
+                link = Attachment(user=session.user, type=AttachmentType.link, link_url=url,
+                                  title=url_parse(url).netloc, description=url)
+                folder.all_attachments.append(link)
+                db.session.flush()
+                signals.attachments.attachment_created.send(link, user=link.user, internal=True)
+
 
     def remove_attachments(self):
         """
