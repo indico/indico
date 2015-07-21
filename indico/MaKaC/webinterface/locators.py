@@ -279,10 +279,8 @@ class WebLocator:
             if not conference.CategoryManager().hasKey(self.__categId):
                 raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
             obj = conference.CategoryManager().getById(self.__categId)
-            if self.__materialId:
-                obj=obj.getMaterialById(self.__materialId)
-            if self.__resId:
-                obj=obj.getResourceById( self.__resId )
+            if self.__materialId is not None or self.__resId is not None:
+                return None  # obsolete - attachments don't use WebLocator
             return obj
         if not self.__confId:
             return None
@@ -336,8 +334,6 @@ class WebLocator:
             return obj
         assert self.__materialId == 'reviewing'
         mat = reviewing_factory_get(obj)
-        if not mat:
-            mat = obj.getMaterialById(self.__materialId)
-        if not self.__resId:
+        if mat is None or self.__resId is None:
             return mat
         return mat.getResourceById(self.__resId)
