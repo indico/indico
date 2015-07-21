@@ -108,10 +108,8 @@ from MaKaC import conference as cmod
     </td>
 </tr>
 <script type="text/javascript">
-
-% if not isinstance(target, cmod.Category) and (not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
-    or not target.getAccessController().isFullyPrivate() and (privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED'))):
-    $(".see_children").click(function(){
+% if target.getAccessController().getNonInheritingChildren():
+    $(".see_children").click(function(e){
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching..."));
         jsonRpc(Indico.Urls.JsonRpcService, $(self).data("url") ,
@@ -129,6 +127,7 @@ from MaKaC import conference as cmod
                         new ChildrenProtectionPopup($(self).data("type") + $T(" elements"), result).open();
                     }
                 });
+            e.preventDefault();
         });
 % endif
 
