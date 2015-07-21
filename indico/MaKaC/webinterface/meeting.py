@@ -15,34 +15,26 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import urllib
-from datetime import datetime, timedelta
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.schedule as schedule
-import MaKaC.conference as conference
 import MaKaC.webinterface.pages.category as category
 import MaKaC.common.Configuration as Configuration
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.pages.subContributions as subContributions
-import MaKaC.webinterface.timetable as timetable
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.navigation as navigation
 from MaKaC.conference import EventCloner
 from indico.core.config import Config
-from xml.sax.saxutils import quoteattr, escape
+from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
-from MaKaC.webinterface.materialFactories import ConfMFRegistry, ContribMFRegistry
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
-from indico.util.string import safe_upper
-import MaKaC.common.timezoneUtils as timezoneUtils
 
 
 class WebFactory(WebFactory):
@@ -430,7 +422,7 @@ class WPMContributionModification(contributions.WPContributionModification):
 
     def _getTabContent( self, params ):
         from MaKaC.webinterface.pages.contributions import WContribModifMain
-        wc = WContribModifMain( self._contrib, ContribMFRegistry(), eventType = "meeting" )
+        wc = WContribModifMain(self._contrib, eventType="meeting")
         return wc.getHTML()
 
 class WPMContribEditData(contributions.WPEditData):
@@ -501,7 +493,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
 ##Main##
 class WPMConfModif(conferences.WPConferenceModification):
     def _getPageContent( self, params ):
-        wc = WMConfModifMainData( self._conf, ConfMFRegistry, self._ct, self._rh )
+        wc = WMConfModifMainData(self._conf, self._ct, self._rh)
         pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
         return wc.getHTML( pars )
 

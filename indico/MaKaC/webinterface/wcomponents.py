@@ -2741,7 +2741,6 @@ class WSelectionBoxCloneLecture :
         p={
             "description":  _("Please check the boxes indicating which elements of the lecture you want to clone"),\
             "options":  i18nformat("""<input type="checkbox" name="cloneDetails" id="cloneDetails" checked="1" disabled="1" value="1">  _("Event details")
-                          <input type="checkbox" name="cloneMaterials" id="cloneMaterials" value="1" >  _("Attached materials")
                           <input type="checkbox" name="cloneAccess" id="cloneAccess" value="1" >  _("Access and management privileges")
                         """)
           }

@@ -15,14 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.conference import IMaterialMinimalFossil,\
-        IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
-from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
-    IContributionParticipationTTMgmtFossil, IContributionParticipationFossil
-from MaKaC.common.contextManager import ContextManager
+from MaKaC.fossils.conference import IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
+from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil, IContributionParticipationFossil
+
 
 class ISchEntryFossil(IFossil):
 
@@ -202,11 +199,6 @@ class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
     getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
     getPDF.name = "pdf"
 
-    def getMaterial(self):
-        """ Entry Material """
-    getMaterial.produce = lambda s: s.getOwner().getAllViewableMaterialList()
-    getMaterial.result = IMaterialMinimalFossil
-
     def getAttachments(self):
         """ Entry Material """
     getAttachments.produce = lambda s: s.getOwner().attached_items
@@ -381,11 +373,6 @@ class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
     getEntries.produce = lambda s: s.getOwner().getSchedule().getEntries()
     getEntries.result = {"MaKaC.schedule.ContribSchEntry": IContribSchEntryDisplayFossil,
                          "MaKaC.schedule.BreakTimeSchEntry": IBreakTimeSchEntryFossil}
-
-    def getMaterial(self):
-        """ Entry Material """
-    getMaterial.produce = lambda s: s.getOwner().getSession().getAllMaterialList()
-    getMaterial.result = IMaterialMinimalFossil
 
     def getConveners(self):
         """ Entry Conveners """

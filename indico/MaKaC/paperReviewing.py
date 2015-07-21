@@ -1229,3 +1229,16 @@ class Status(Persistent, Fossilizable):
         self._editable = value
 
 
+def reviewing_factory_get(owner):
+    if isinstance(owner, conference.Contribution):
+        return owner.getReviewing()
+    else:
+        # we supposed that it is a Review object
+        return owner.getMaterialById(0)
+
+
+def reviewing_factory_create(target):
+    m = conference.Reviewing()
+    m.setTitle('Reviewing')
+    target.setReviewing(m)
+    return m

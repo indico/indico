@@ -3812,13 +3812,6 @@ class Conference(CommonObjectBase, Locatable):
         recMat.recover()
         self.notifyModification()
 
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import ConfMFRegistry
-        return ConfMFRegistry
-
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -3831,23 +3824,6 @@ class Conference(CommonObjectBase, Locatable):
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append( self.getPaper() )
-        if self.getSlides():
-            l.append( self.getSlides() )
-        if self.getVideo():
-            l.append( self.getVideo() )
-        if self.getPoster():
-            l.append( self.getPoster() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
 
     def _getMaterialFiles(self, material):
         """
@@ -4086,18 +4062,6 @@ class Conference(CommonObjectBase, Locatable):
                 newSes = s.clone(timeDelta, conf, options, session_id=s.getId())
                 ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
                 conf.addSession(newSes)
-        # Materials' cloning
-        if options.get("materials",False) :
-            for m in self.getMaterialList() :
-                conf.addMaterial(m.clone(conf))
-            if self.getPaper() is not None:
-                conf.setPaper(self.getPaper().clone(conf))
-            if self.getSlides() is not None:
-                conf.setSlides(self.getSlides().clone(conf))
-            if self.getVideo() is not None:
-                conf.setVideo(self.getVideo().clone(conf))
-            if self.getPoster() is not None:
-                conf.setPoster(self.getPoster().clone(conf))
         # access and modification keys
         if options.get("keys", False) :
             conf.setAccessKey(self.getAccessKey())
@@ -6058,26 +6022,10 @@ class Session(CommonObjectBase, Locatable):
         recMat.recover()
         self.notifyModification()
 
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import SessionMFRegistry
-        return SessionMFRegistry
-
     def getMaterialById( self, matId ):
         if self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
 
     def _setSchedule(self):
         self.__schedule=SessionSchedule(self)
@@ -6928,9 +6876,6 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
             res=self.getSession().getTextColor()
         return res
 
-    def getAllMaterialList(self, sort=True):
-        return self.getSession().getAllMaterialList(sort=sort)
-
     def getRecursiveAllowedToAccessList(self):
         return self.getSession().getRecursiveAllowedToAccessList()
 
@@ -7717,20 +7662,6 @@ class Contribution(CommonObjectBase, Locatable):
             for sp in self.getSpeakerList():
                 cont.newSpeaker(sp.clone())
             cont.setSpeakerText(self.getSpeakerText())
-
-        if options.get("materials", False) :
-            for m in self.getMaterialList() :
-                cont.addMaterial(m.clone(cont))
-            if self.getPaper() is not None:
-                cont.setPaper(self.getPaper().clone(cont))
-            if self.getSlides() is not None:
-                cont.setSlides(self.getSlides().clone(cont))
-            if self.getVideo() is not None:
-                cont.setVideo(self.getVideo().clone(cont))
-            if self.getPoster() is not None:
-                cont.setPoster(self.getPoster().clone(cont))
-            if self.getReviewing() is not None:
-                cont.setReviewing(self.getReviewing().clone(cont))
 
         if options.get("subcontribs", False) :
             for sc in self.getSubContributionList() :
@@ -8731,13 +8662,6 @@ class Contribution(CommonObjectBase, Locatable):
         recMat.recover()
         self.notifyModification()
 
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import ContribMFRegistry
-        return ContribMFRegistry
-
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -8750,29 +8674,6 @@ class Contribution(CommonObjectBase, Locatable):
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append( self.getPaper() )
-        if self.getSlides():
-            l.append( self.getSlides() )
-        if self.getVideo():
-            l.append( self.getVideo() )
-        if self.getPoster():
-            l.append( self.getPoster() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
-
-    def getAllViewableMaterialList( self, aw=None ):
-        if not aw:
-            aw = ContextManager.get("currentAW", ContextManager.get("currentRH").getAW())
-        return [mat for mat in self.getAllMaterialList() if mat.canView(aw)]
-
 
     def newSubContribution(self):
         newSub = SubContribution()
@@ -9735,19 +9636,6 @@ class SubContribution(CommonObjectBase, Locatable):
                 sCont.newSpeaker(s.clone())
             sCont.setSpeakerText(self.getSpeakerText())
 
-        if options.get("materials", False) :
-            for m in self.getMaterialList() :
-                sCont.addMaterial(m.clone(sCont))
-            if self.getPaper() is not None:
-                sCont.setPaper(self.getPaper().clone(sCont))
-            if self.getSlides() is not None:
-                sCont.setSlides(self.getSlides().clone(sCont))
-            if self.getVideo() is not None:
-                sCont.setVideo(self.getVideo().clone(sCont))
-            if self.getPoster() is not None:
-                sCont.setPoster(self.getPoster().clone(sCont))
-
-
         sCont.notifyModification()
         return sCont
 
@@ -9998,13 +9886,6 @@ class SubContribution(CommonObjectBase, Locatable):
         recMat.recover()
         self.notifyModification()
 
-    def getMaterialRegistry(self):
-        """
-        Return the correct material registry for this type
-        """
-        from MaKaC.webinterface.materialFactories import SubContributionMFRegistry
-        return SubContributionMFRegistry
-
     def getMaterialById( self, matId ):
         if matId.lower() == 'paper':
             return self.getPaper()
@@ -10017,23 +9898,6 @@ class SubContribution(CommonObjectBase, Locatable):
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
-
-    def getMaterialList( self ):
-        return self.materials.values()
-
-    def getAllMaterialList(self, sort=True):
-        l = self.getMaterialList()
-        if self.getPaper():
-            l.append( self.getPaper() )
-        if self.getSlides():
-            l.append( self.getSlides() )
-        if self.getVideo():
-            l.append( self.getVideo() )
-        if self.getPoster():
-            l.append( self.getPoster() )
-        if sort:
-            l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
-        return l
 
     def setPaper( self, newPaper ):
         if self.getPaper() != None:

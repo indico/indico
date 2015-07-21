@@ -25,7 +25,6 @@ from indico.modules.rb.models.locations import Location
 from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 
 
 def generate_global_file(config):
@@ -36,10 +35,8 @@ def generate_global_file(config):
         'name': auth.name,
         'title': auth.title,
         'supports_groups': auth.supports_groups
-        } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
+    } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
     file_type_icons = dict((k.lower(), v[2]) for k, v in config.getFileTypes().iteritems())
-    material_types = dict((evt_type, [(m, m.title()) for m in MaterialFactoryRegistry._allowedMaterials[evt_type]])
-                          for evt_type in ['meeting', 'simple_event', 'conference', 'category'])
 
     indico_vars = {
         'FileTypeIcons': file_type_icons,
@@ -96,7 +93,6 @@ def generate_global_file(config):
         },
 
         'Data': {
-            'MaterialTypes': material_types,
             'WeekDays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             'DefaultLocation': default_location,
             'Locations': location_names

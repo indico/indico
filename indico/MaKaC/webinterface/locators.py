@@ -17,9 +17,10 @@
 import MaKaC.conference as conference
 import MaKaC.errors as errors
 import MaKaC.domain as domain
+from MaKaC.paperReviewing import reviewing_factory_get
 import MaKaC.roomMapping as roomMapping
-import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
+
 
 class CategoryWebLocator:
 
@@ -288,7 +289,6 @@ class WebLocator:
         obj = conference.ConferenceHolder().getById( self.__confId )
         if obj is None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
-        fr = materialFactories.ConfMFRegistry
         if self.__notifTplId:
             obj = obj.getAbstractMgr().getNotificationTplById(self.__notifTplId)
             return obj
@@ -315,14 +315,12 @@ class WebLocator:
                 return obj.getAttachmentById( self.__resId )
         if self.__sessionId:
             obj = obj.getSessionById( self.__sessionId )
-            fr = materialFactories.SessionMFRegistry
             if obj == None:
                 raise errors.NoReportError("The session you are trying to access does not exist or has been deleted")
         if self.__slotId:
             obj = obj.getSlotById( self.__slotId )
         if self.__contribId:
             obj = obj.getContributionById( self.__contribId )
-            fr = materialFactories.ContribMFRegistry
             if obj == None:
                 raise errors.NoReportError(_("The contribution you are trying to access does not exist or has been deleted"))
         if self.__reviewId:
@@ -332,18 +330,14 @@ class WebLocator:
                 raise errors.NoReportError("The review you are tring to access does not exist or has been deleted")
         if self.__subContribId and self.__contribId:
             obj = obj.getSubContributionById( self.__subContribId )
-            fr = materialFactories.ContribMFRegistry
             if obj == None:
                 raise errors.NoReportError("The subcontribution you are trying to access does not exist or has been deleted")
         if not self.__materialId:
             return obj
-        #first we check if it refers to a special type of material
-        mat = None
-        f = fr.getById( self.__materialId )
-        if f:
-            mat = f.get( obj )
+        assert self.__materialId == 'reviewing'
+        mat = reviewing_factory_get(obj)
         if not mat:
-            mat = obj.getMaterialById( self.__materialId )
+            mat = obj.getMaterialById(self.__materialId)
         if not self.__resId:
             return mat
-        return mat.getResourceById( self.__resId )
+        return mat.getResourceById(self.__resId)

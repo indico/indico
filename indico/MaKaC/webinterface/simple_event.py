@@ -27,7 +27,6 @@ from xml.sax.saxutils import quoteattr
 from MaKaC.conference import EventCloner
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
-from MaKaC.webinterface.materialFactories import ConfMFRegistry
 from MaKaC.webinterface import meeting
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
@@ -170,7 +169,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
 ##Main##
 class WPSEConfModif(conferences.WPConferenceModification):
     def _getPageContent( self, params ):
-        wc = WSEConfModifMainData( self._conf, ConfMFRegistry, self._ct, self._rh )
+        wc = WSEConfModifMainData(self._conf, self._ct, self._rh)
         pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
         return wc.getHTML( pars )
 

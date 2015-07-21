@@ -20,6 +20,7 @@ import tempfile
 import os
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
+from MaKaC.paperReviewing import reviewing_factory_get, reviewing_factory_create
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError, NotFoundError
 from indico.core.config import Config
@@ -217,6 +218,7 @@ class RHSubmitMaterialBase(object):
         self._displayName = params.get("displayName", "").strip()
         self._uploadType = params.get("uploadType", "")
         self._materialId = params.get("materialId", "")
+        assert self._materialId == 'reviewing'
         self._description = params.get("description", "")
         self._statusSelection = int(params.get("statusSelection", 1))
         self._visibility = int(params.get("visibility", 0))
@@ -287,35 +289,19 @@ class RHSubmitMaterialBase(object):
         if self._materialId=="":
             self._errorList.append(_("""A material ID must be selected."""))
 
-    def _getMaterial(self, forceCreate = True):
+    def _getMaterial(self, forceCreate=True):
         """
         Returns the Material object to which the resource is being added
         """
-
-        registry = self._target.getMaterialRegistry()
-        material = self._target.getMaterialById(self._materialId)
-
-        if material:
-            return material, False
-        # there's a defined id (not new type)
-        elif self._materialId:
-            # get a material factory for it
-            mf = registry.getById(self._materialId)
-            # get a material from the material factory
-            material = mf.get(self._target)
-
-            # if the factory returns an empty material (doesn't exist)
-            if material == None and forceCreate:
-                # create one
-                material = mf.create(self._target)
-                newlyCreated = True
-            else:
-                newlyCreated = False
-
-            return material, newlyCreated
+        assert self._materialId == 'reviewing'  # only reviewing still uses this...
+        material = reviewing_factory_get(self._target)
+        if material is None and forceCreate:
+            material = reviewing_factory_create(self._target)
+            newlyCreated = True
         else:
-            # else, something has gone wrong
-            raise Exception("""A material ID must be specified.""")
+            newlyCreated = False
+
+        return material, newlyCreated
 
     def _addMaterialType(self, text, user):
 

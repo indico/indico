@@ -20,18 +20,17 @@ Schedule-related services
 
 from indico.util.user import principal_from_fossil
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError,NoReportError
-from MaKaC.services.implementation.base import \
-     ParameterManager, ProtectedModificationService, ProtectedDisplayService
+from MaKaC.services.implementation.base import ProtectedModificationService, ProtectedDisplayService
 
 import MaKaC.webinterface.locators as locators
 from MaKaC.errors import ModificationError
 
 import MaKaC.conference as conference
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IMaterialFossil,\
-        ILinkFossil, ILocalFileFossil, ILocalFileExtendedFossil
+from MaKaC.fossils.conference import IMaterialFossil, ILinkFossil, ILocalFileExtendedFossil
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
+from indico.util.i18n import _
 
 
 class UserListChange(object):
@@ -190,44 +189,26 @@ class ResourceDisplayBase(ProtectedDisplayService, ResourceBase):
         ResourceBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
+
 class ResourceModifBase(ResourceBase, MaterialModifBase):
 
     def _checkParams(self):
         ResourceBase._checkParams(self)
 
 
-class GetMaterialClassesBase(MaterialDisplayBase):
-    """
-    Base class for obtaining a listing of material classes
-    """
-
-    def _checkParams( self ):
-        l = locators.WebLocator()
-
-        l.setMaterial( self._params, 0 )
-        self._target = l.getObject()
-
-
-    def _getAnswer(self):
-        """
-        Provides the list of material classes, based on the target
-        resource (conference, session, contribution, etc...)
-        """
-        matList = {}
-
-        for mat in self._target.getAllMaterialList():
-            matList[mat.getId()] = mat.fossilize(IMaterialFossil)
-
-        return matList
-
-class GetReviewingMaterial(GetMaterialClassesBase):
+class GetReviewingMaterial(MaterialDisplayBase):
     """
     Base class for obtaining a listing of reviewing material classes
     """
 
+    def _checkParams(self):
+        l = locators.WebLocator()
+        l.setMaterial(self._params, 0)
+        self._target = l.getObject()
+
     def _checkProtection(self):
         if not RCContributionPaperReviewingStaff.hasRights(self):
-            GetMaterialClassesBase._checkProtection(self)
+            MaterialDisplayBase._checkProtection(self)
 
     def _getAnswer(self):
         """
@@ -256,122 +237,6 @@ class GetMaterial(MaterialDisplayBase):
         """
         return self._material.fossilize(IMaterialFossil)
 
-class GetMaterialAllowedUsers(MaterialModifBase):
-    """
-    Lists the users that allowed to access the material
-    """
-
-    def _checkParams(self):
-        MaterialModifBase._checkParams(self)
-        self._user = self._getUser() #will be None if user is not authenticated
-
-    def _getAnswer(self):
-        return fossilize(self._material.getAllowedToAccessList())
-
-
-class GetMaterialProtection(MaterialModifBase):
-
-    def _getAnswer(self):
-        """
-        Returns the material's protection
-        """
-        try:
-            materialId = self._target.getMaterialById(self._params['matId'])
-        except:
-            # it's not in the material list, we return the parent's level of protection
-            # WATCH OUT! This is the default value to inherit from parent in Editor.js.
-            # if that value is changed for any reason this function may not
-            # work properly
-            return 0
-        else:
-            return materialId.getAccessProtectionLevel()
-
-
-class SetMainResource(MaterialModifBase):
-
-    def _getAnswer(self):
-        self._target.setMainResource(self._target.getResourceById(self._params['resourceId']))
-
-
-class RemoveMainResource(MaterialModifBase):
-
-    def _getAnswer(self):
-        self._target.setMainResource(None)
-
-
-class EditMaterialClassBase(MaterialModifBase, UserListChange):
-    """
-    Base class for material class edition
-    """
-
-    def _checkParams(self):
-        """
-        Gets a reference to the material, using the
-        id as the key, and gets the properties to change
-        """
-        MaterialModifBase._checkParams(self)
-
-        matId = self._params.get("materialId",None)
-        self._newProperties = self._params.get("materialInfo",None)
-        self._newUserList = self._newProperties['userList']
-
-        materialPM = ParameterManager(self._newProperties)
-
-        self._title = materialPM.extract('title', pType=str, allowEmpty=True, defaultValue="NO TITLE ASSIGNED")
-        self._description = materialPM.extract('description', pType=str, allowEmpty=True)
-        self._protection = materialPM.extract('protection', pType=int)
-        self._hidden = materialPM.extract('hidden', pType=int)
-        self._accessKey = materialPM.extract('accessKey', pType=str, allowEmpty=True)
-
-    def _getAnswer(self):
-        """
-        Updates the material with the new properties
-        """
-
-        if self._material.isBuiltin() and self._material.getTitle() != self._title:
-            raise ServiceError("", "You can't change the name of a built-in material.")
-
-        self.changeUserList(self._material, self._newUserList)
-
-        self._material.setTitle(self._title);
-        self._material.setDescription(self._description);
-        self._material.setProtection(self._protection);
-        self._material.setHidden(self._hidden);
-        self._material.setAccessKey(self._accessKey);
-
-        event = self._material.getOwner()
-        materialRegistry = event.getMaterialRegistry()
-
-        return {
-            'material': self._material.fossilize(IMaterialFossil),
-            'newMaterialTypes': materialRegistry.getMaterialList(event)
-            }
-
-class DeleteMaterialClassBase(MaterialModifBase):
-
-    def _getAnswer(self):
-        materialId = self._material.getId()
-        event = self._material.getOwner()
-
-        # actually delete it
-        self._target.getOwner().removeMaterial(self._material)
-
-        materialRegistry = event.getMaterialRegistry()
-
-        return {
-            'deletedMaterialId': materialId,
-            'newMaterialTypes': materialRegistry.getMaterialList(event)
-            }
-
-class GetResourcesBase(ResourceDisplayBase):
-
-    def _getAnswer(self):
-        resList = {}
-
-        for resource in self._material.getResourceList():
-            resList[resource.getId()] = resource.fossilize({"MaKaC.conference.Link": ILinkFossil,
-                                                           "MaKaC.conference.LocalFile": ILocalFileFossil})
-        return resList
 
 class EditResourceBase(ResourceModifBase, UserListChange):
 
@@ -416,15 +281,6 @@ class DeleteResourceBase(ResourceModifBase):
             self._event.removeMaterial(self._material)
 
 
-class DeleteResource(DeleteResourceBase):
-
-    def _getAnswer(self):
-        self._deleteResource()
-        return {
-            'deletedResourceId': self._resource.getId(),
-            'newMaterialTypes': self._event.getMaterialRegistry().getMaterialList(self._event)
-            }
-
 class DeleteResourceReviewing(DeleteResourceBase):
 
     def _getAnswer(self):
@@ -434,25 +290,13 @@ class DeleteResourceReviewing(DeleteResourceBase):
             'newMaterialTypes': [["reviewing", "Reviewing"]]
             }
 
+
 methodMap = {
-
-    "list": GetMaterialClassesBase,
-    "reviewing.list": GetReviewingMaterial,
-    "listAllowedUsers": GetMaterialAllowedUsers,
+    # everything here is still needed for reviewing!
+    # TODO: remove this whole file when migrating reviewing
     "get": GetMaterial,
-    "edit": EditMaterialClassBase,
-    "delete": DeleteMaterialClassBase,
-    "getProtection": GetMaterialProtection,
-    "setMainResource": SetMainResource,
-    "removeMainResource": RemoveMainResource,
-
-    # Resource add is quite hacky, and uses a normal RH, because of file upload
-    # So, you won't find it here...
-
+    "reviewing.list": GetReviewingMaterial,
+    "reviewing.resources.delete": DeleteResourceReviewing,
     "resources.listAllowedUsers": GetResourceAllowedUsers,
-    "resources.list": GetResourcesBase,
     "resources.edit": EditResourceBase,
-    "resources.delete": DeleteResource,
-    "reviewing.resources.delete": DeleteResourceReviewing
-    }
-
+}

@@ -13,24 +13,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-import urllib
+
 from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.common.TemplateExec import render
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.navigation as navigation
-import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceBase, WPConferenceModifBase
 from indico.core.config import Config
 from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 
@@ -181,7 +176,7 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
 
 class WPSubContributionModification( WPSubContribModifMain ):
     def _getTabContent( self, params ):
-        wc = WSubContribModifMain( self._target, materialFactories.ContribMFRegistry() )
+        wc = WSubContribModifMain(self._target)
         place = ""
         if self._target.getLocation() is not None:
             place = self._target.getLocation().getName()
@@ -274,9 +269,8 @@ class WPSubContributionModificationClosed( WPSubContribModifMain ):
 
 class WSubContribModifMain(wcomponents.WTemplated):
 
-    def __init__( self, subContribution, mfRegistry ):
+    def __init__(self, subContribution):
         self._subContrib = subContribution
-        self._mfRegistry = mfRegistry
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )

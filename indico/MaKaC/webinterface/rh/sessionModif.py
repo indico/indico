@@ -14,39 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import re
-from cStringIO import StringIO
 from datetime import timedelta
 
-from pytz import timezone
-
 import MaKaC.webinterface.pages.sessions as sessions
-import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
-import MaKaC.webinterface.materialFactories as materialFactories
-import MaKaC.user as user
-import MaKaC.conference as conference
-import MaKaC.schedule as schedule
-import MaKaC.domain as domain
 
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
-from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSessionSlotBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
-import MaKaC.webinterface.pages.errors as errors
+from MaKaC.errors import MaKaCError, NoReportError
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.webinterface.common.slotDataWrapper import Slot
 from MaKaC.PDFinterface.conference import ContribsToPDF
-from indico.core.config import Config
 from BTrees.OOBTree import OOBTree
-from BTrees.IOBTree import IOBTree
-from MaKaC.errors import FormValuesError
-from MaKaC.conference import SessionChair
 
-from indico.core.config import Config
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 
@@ -451,13 +433,6 @@ class RHContribList(RHSessionModCoordinationBase):
             for status in ContribStatusList().getList():
                 lstatus.append(ContribStatusList().getId(status))
         filter["status"]=self._normaliseListParam(params.get("status",lstatus))
-        lmaterial=[]
-        if not filterUsed:
-            paperId=materialFactories.PaperFactory().getId()
-            slidesId=materialFactories.SlidesFactory().getId()
-            for matId in ["--other--","--none--",paperId,slidesId]:
-                lmaterial.append(matId)
-        filter["material"]=self._normaliseListParam(params.get("material",lmaterial))
         self._filterCrit=ContribFilterCrit(self._conf,filter)
         typeShowNoValue,trackShowNoValue=True,True
         if filterUsed:

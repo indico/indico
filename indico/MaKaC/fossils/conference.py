@@ -217,7 +217,6 @@ class ILocalFileAbstractMaterialFossil(IResourceBasicFossil, ILocalFileInfoFossi
     getURL.name = "url"
 
 
-
 class IMaterialMinimalFossil(IFossil):
 
     def getId(self):

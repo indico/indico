@@ -14,36 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from xml.sax.saxutils import quoteattr, escape
+from xml.sax.saxutils import quoteattr
 from datetime import datetime,timedelta
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
-import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, \
     WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
-from MaKaC.common import info
 import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.common.utils import isStringHTML
-from MaKaC import user
 from MaKaC.i18n import _
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat, ngettext
 
-from pytz import timezone
-from MaKaC.common.timezoneUtils import DisplayTZ
 from indico.util import json
-from indico.util.date_time import format_date, format_datetime
-import pytz
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
@@ -288,9 +279,8 @@ class WSessionModifMainColors(wcomponents.WTemplated):
 
 class WSessionModifMain(wcomponents.WTemplated):
 
-    def __init__( self, session, mfRegistry ):
+    def __init__(self, session):
         self._session = session
-        self._mfr = mfRegistry
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -324,8 +314,8 @@ class WSessionModifMain(wcomponents.WTemplated):
 
 class WPSessionModification( WPSessionModifBase ):
 
-    def _getTabContent( self, params ):
-        comp=WSessionModifMain(self._session,materialFactories.SessionMFRegistry())
+    def _getTabContent(self, params):
+        comp = WSessionModifMain(self._session)
         return comp.getHTML()
 
 class WPSessionModificationClosed( WPSessionModifBase ):

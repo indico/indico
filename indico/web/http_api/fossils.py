@@ -128,48 +128,6 @@ class IContributionParticipationMetadataFossil(IFossil):
         pass
 
 
-class IResourceMetadataFossil(IFossil):
-
-    def getName(self):
-        pass
-
-
-class ILocalFileMetadataFossil(IResourceMetadataFossil):
-
-    def getId(self):
-        pass
-
-    def getURL(self):
-        pass
-    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
-    getURL.name = 'url'
-
-    def getFileName(self):
-        pass
-
-
-class ILinkMetadataFossil(IResourceMetadataFossil):
-
-    def getURL(self):
-        pass
-    getURL.name = 'url'
-
-
-class IMaterialMetadataFossil(IFossil):
-
-    def getId(self):
-        pass
-
-    def getTitle( self ):
-        pass
-
-    def getResourceList(self):
-        pass
-    getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
-    getResourceList.name = 'resources'
-    getResourceList.filterBy = 'access'
-
-
 class _IncludeMaterialFossil(IFossil):
 
     def getAllMaterialList(self):

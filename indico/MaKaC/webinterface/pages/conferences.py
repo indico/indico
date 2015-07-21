@@ -37,7 +37,6 @@ import MaKaC.review as review
 from MaKaC.review import AbstractTextField
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
-from MaKaC.webinterface.materialFactories import ConfMFRegistry
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.output import outputGenerator
@@ -818,16 +817,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             # return Conference, Contribution or SubContribution
             return itemClass
 
-    def _generateMaterialList(self, obj):
-        """
-        Generates a list containing all the materials, with the
-        corresponding Ids for those that already exist
-        """
-        # yes, this may look a bit redundant, but materialRegistry isn't
-        # bound to a particular target
-        materialRegistry = obj.getMaterialRegistry()
-        return materialRegistry.getMaterialList(obj.getConference())
-
     def _extractInfoForButton(self, item):
         info = {}
         for key in ['sessId', 'slotId', 'contId', 'subContId']:
@@ -836,11 +825,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         itemType = self._getItemType(item)
         info['uploadURL'] = 'Indico.Urls.UploadAction.%s' % itemType.lower()
-
-        if itemType != 'Session':
-            info['materialList'] = self._generateMaterialList(item)
-        else:
-            info['materialList'] = self._generateMaterialList(item.getSession())
 
         if itemType == 'Conference':
             info['parentProtection'] = item.getAccessController().isProtected()
@@ -1448,10 +1432,9 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
 
 class WConfModifMainData(wcomponents.WTemplated):
 
-    def __init__(self,conference,mfRegistry,ct,rh):
-        self._conf=conference
-        self.__mfr=mfRegistry
-        self._ct=ct
+    def __init__(self, conference, ct, rh):
+        self._conf = conference
+        self._ct = ct
         self._rh = rh
 
     def _getChairPersonsList(self):
@@ -1578,7 +1561,7 @@ class WPConferenceModification( WPConferenceModifBase ):
         self._generalSettingsMenuItem.setActive()
 
     def _getPageContent( self, params ):
-        wc = WConfModifMainData( self._conf, ConfMFRegistry(), self._ct, self._rh )
+        wc = WConfModifMainData(self._conf, self._ct, self._rh)
         pars = { "type": params.get("type","") , "conferenceId": self._conf.getId()}
         return wc.getHTML( pars )
 

@@ -22,7 +22,6 @@ import MaKaC.conference as conference
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
-import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
@@ -380,9 +379,8 @@ class WAuthorTable(wcomponents.WTemplated):
 
 class WContribModifMain(wcomponents.WTemplated):
 
-    def __init__(self, contribution, mfRegistry, eventType="conference"):
+    def __init__(self, contribution, eventType="conference"):
         self._contrib = contribution
-        self._mfRegistry = mfRegistry
         self._eventType = eventType
 
     def _getAbstractHTML(self):
@@ -553,7 +551,7 @@ class WContribModifMain(wcomponents.WTemplated):
 class WPContributionModification(WPContribModifMain):
 
     def _getTabContent(self, params):
-        wc = WContribModifMain(self._contrib, materialFactories.ContribMFRegistry())
+        wc = WContribModifMain(self._contrib)
         return wc.getHTML()
 
 

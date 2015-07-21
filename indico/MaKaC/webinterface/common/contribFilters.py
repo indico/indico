@@ -142,34 +142,6 @@ class AuthorFilterField( filters.FilterField ):
         return False
 
 
-class MaterialFilterField(filters.FilterField):
-    """
-    """
-    _id = "material"
-
-    def satisfies(self,contribution):
-        """
-        """
-        #all options selected
-        if len(self._values) == 4:
-            return True
-        from MaKaC.webinterface.materialFactories import PaperFactory
-        paper=contribution.getPaper()
-        if (PaperFactory().getId() in self._values) and paper is not None:
-            return True
-        from MaKaC.webinterface.materialFactories import SlidesFactory
-        slides=contribution.getSlides()
-        if (SlidesFactory().getId() in self._values) and slides is not None:
-            return True
-        if ("--other--" in self._values) and \
-                len(contribution.getAllMaterialList())>0:
-            return True
-        if ("--none--" in self._values) and \
-                len(contribution.getAllMaterialList())==0:
-            return True
-        return False
-
-
 class RefereeFilterField( filters.FilterField ):
     """ Contains the filtering criteria for the Referee of a contribution.
         Attributes:

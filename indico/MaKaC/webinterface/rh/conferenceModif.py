@@ -23,12 +23,10 @@ from persistent.list import PersistentList
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
-import MaKaC.common.timezoneUtils as timezoneUtils
 from BTrees.OOBTree import OOBTree
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.webinterface.pages.conferences as conferences
@@ -796,8 +794,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
     def _process( self ):
         params = self._getRequestParams()
         paramNames = params.keys()
-        options = { "materials"     : "cloneMaterials"    in paramNames,
-                    "access"        : "cloneAccess"       in paramNames,
+        options = { "access"        : "cloneAccess"       in paramNames,
                     "keys"          : "cloneAccess"       in paramNames,
                     "authors"       : "cloneTimetable"    in paramNames,
                     "contributions" : "cloneTimetable"    in paramNames,
@@ -2594,12 +2591,6 @@ class RHContributionList(RHContributionListBase):
         sessionData["track"] = map(lambda track: track.getId(), self._conf.getTrackList())
         sessionData["session"] = map(lambda ses: ses.getId(), self._conf.getSessionList())
         sessionData["status"] = map(lambda status: ContribStatusList.getId(status), ContribStatusList.getList())
-        lmaterial = []
-        paperId = materialFactories.PaperFactory().getId()
-        slidesId = materialFactories.SlidesFactory().getId()
-        for matId in ["--other--","--none--",paperId,slidesId]: # wtf? doesn't that simply re-create the list?
-            lmaterial.append(matId)
-        sessionData["material"] = lmaterial
         sessionData["typeShowNoValue"] = True
         sessionData["trackShowNoValue"] = True
         sessionData["sessionShowNoValue"] = True
@@ -2613,7 +2604,6 @@ class RHContributionList(RHContributionListBase):
         """
 
         sessionData["status"] = []
-        sessionData["material"] = []
         sessionData.update(params)
         sessionData["type"] = utils.normalizeToList(params.get('types', []))
         sessionData["track"] = utils.normalizeToList(params.get('tracks', []))
