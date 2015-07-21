@@ -2586,7 +2586,7 @@ class WCategoryStatisticsList(WTemplated):
         years = stats.keys()
         years.sort()
         year, last_year = years[0], years[-1]
-        while year < last_year:
+        while year <= last_year:
             nb = stats[year]
             # We hide holes >=10 years
             if not nb and not any(stats[y] for y in xrange(year, min(last_year, year + 10))):
