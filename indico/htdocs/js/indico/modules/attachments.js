@@ -108,7 +108,10 @@
                 onLoadError: function(xhr) {
                     var hash = location.hash;
                     clearHash();
-                    if (xhr.status != 403) {
+                    if (xhr.status == 404) {
+                        alertPopup($T.gettext('This file no longer exists. Please reload the page.'));
+                        return false;
+                    } else if (xhr.status != 403) {
                         return;
                     }
                     if (Indico.User && Indico.User.id !== undefined) {
