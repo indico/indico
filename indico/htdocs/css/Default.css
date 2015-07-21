@@ -3855,20 +3855,6 @@ div.exclusivePopupTopBg {
     -webkit-border-radius: 10px;
 }
 
-div.exclusivePopup .title {
-    font-size: 17px;
-    padding-left: 10px;
-    padding-right: 50px;
-    padding-bottom: 10px;
-    background-color:  #F8F8F8;
-    border-bottom: 1px solid #CCC;
-}
-
-div.exclusivePopup .titleWrapper {
-    position: relative;
-    top: -10px;
-}
-
 div.exclusivePopup .printLink {
     font-size: 13px;
     position: absolute;
