@@ -107,12 +107,6 @@ class WSessionDisplayBase(WICalExportBase):
         self._session = session
         self._tz = timezoneUtils.DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
 
-    def _getResourceName(self, resource):
-        if isinstance(resource, conference.Link):
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
-        else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
-
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
 
@@ -131,7 +125,6 @@ class WSessionDisplayBase(WICalExportBase):
         vars["ttdata"]= schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False)
         vars["eventInfo"]= eventInfo
 
-        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["session"] = vars["target"] = self._session
         vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \

@@ -1,6 +1,4 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
-<% from MaKaC.conference import LocalFile %>
-<% from MaKaC.conference import Link %>
 
 % for review in Versioning:
     % if review.getMaterials() and (( (ConferenceChoice == 2 or ConferenceChoice == 4) and review.getRefereeJudgement().isSubmitted() ) or ( ConferenceChoice == 3 and review.getEditorJudgement().isSubmitted())):
@@ -11,7 +9,7 @@
             % for m in review.getMaterials():
                % for res in m.getResourceList():
                     <li><span style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <a href="${ urlHandlers.UHFileAccess.getURL(res) if isinstance(res, LocalFile) else res.getURL()}" target="_blank">
+                        <a href="${ urlHandlers.UHFileAccess.getURL(res) }" target="_blank">
                             ${ res.getName() }
                         </a>
                         (<span style="font-style:italic;">${_("Uploaded on")} ${res.getCreationDate().strftime("%d %b %Y %H:%M")}</span>)

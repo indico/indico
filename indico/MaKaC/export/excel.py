@@ -16,15 +16,14 @@
 
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.common import utils
 from datetime import datetime
-from MaKaC.conference import Link
-from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import LocalFile
 from MaKaC.review import AbstractStatusAccepted, AbstractStatusProposedToAccept
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from indico.util.date_time import format_date
-import csv, codecs
+import csv
+import codecs
+
 
 class ExcelGenerator:
     """It helps to create an Excel CSV file. The way to work with this class

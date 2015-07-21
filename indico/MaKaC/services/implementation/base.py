@@ -284,12 +284,9 @@ class ProtectedDisplayService(ProtectedService):
         the user is authorized to view the target resource
         """
         if not self._target.canAccess( self.getAW() ):
-
-            from MaKaC.conference import Link, LocalFile
-
+            from MaKaC.conference import Resource
             # in some cases, the target does not directly have an owner
-            if (isinstance(self._target, Link) or
-                isinstance(self._target, LocalFile)):
+            if isinstance(self._target, Resource):
                 target = self._target.getOwner()
             else:
                 target = self._target

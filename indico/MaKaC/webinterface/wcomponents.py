@@ -21,7 +21,7 @@ import exceptions
 import urllib
 import pkg_resources
 import binascii
-from flask import request, session
+from flask import session
 from lxml import etree
 from pytz import timezone
 from speaklater import _LazyString
@@ -37,13 +37,10 @@ from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.url import URL
 from indico.core.config import Config
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.conference import Conference, Category
-from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
 from MaKaC.webinterface.common import contribFilters
 from MaKaC.common import filters, utils
-from MaKaC.common.TemplateExec import escapeHTMLForJS
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import displayMgr
 from MaKaC.common.ContextHelp import ContextHelp
@@ -1141,35 +1138,6 @@ class WContribModifSC(WTemplated):
 ##ness##############################################################################
 
 
-class WMaterialModifHeader(WTemplated):
-
-    def __init__( self, material, aw ):
-        self._mat = material
-        self._aw = aw
-
-    def getHTML( self, params ):
-        owner = self._mat.getOwner()
-        if isinstance( owner, conference.Contribution ):
-            HTML = WContribModifHeader( owner, self._aw ).getHTML( params )
-        elif isinstance( owner, conference.SubContribution ):
-            HTML = WSubContribModifHeader( owner, self._aw ).getHTML( params )
-        elif isinstance( owner, conference.Session ):
-            HTML = WSessionModifHeader( owner, self._aw ).getHTML( params )
-        elif isinstance( owner, conference.Conference ):
-            HTML = WConfModifHeader( owner, self._aw ).getHTML( params )
-        elif isinstance( owner, conference.Category):
-            HTML = WCategoryModificationHeader( owner ).getHTML( params )
-        return "%s%s"%(HTML, WTemplated.getHTML( self, params ))
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
-        vars["title"] = escape(self._mat.getTitle())
-        vars["materialDisplayURL"] = vars["materialDisplayURLGen"](self._mat)
-        vars["materialModificationURL"] = vars["materialModifURLGen"](self._mat)
-        vars["titleTabPixels"] = WMaterialModifFrame(self._mat, self._aw).getTitleTabPixels()
-        return vars
-
 
 class WConferenceModifFrame(WTemplated):
 
@@ -1308,140 +1276,6 @@ class WContributionModifFrame(WTemplated):
         vars = WTemplated.getVars( self )
         vars["target"] = self._contrib
         return vars
-
-
-class WMaterialModifFrame(WTemplated):
-
-    def __init__( self, material, aw):
-        self._material = material
-        self._aw = aw
-
-    def getHTML( self, body, **params ):
-        params["body"] = body
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        closeHeaderTags = "</table></td></tr>"
-        vars = WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL("gestionGrey")
-        owner = self._material.getOwner()
-        if isinstance(owner, conference.Contribution):
-            wc = WContribModifHeader( owner, self._aw )
-        elif isinstance(owner, conference.Session):
-            wc = WSessionModifHeader( owner, self._aw )
-        elif isinstance(owner, conference.SubContribution):
-            wc = WSubContribModifHeader( owner, self._aw )
-        elif isinstance(owner, conference.Category) :
-            wc = WCategoryModificationHeader(owner)
-        else:
-            wc = WConfModifHeader( owner, self._aw )
-        vars["context"] = wc.getHTML( vars )
-        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-        vars["titleTabPixels"] = self.getTitleTabPixels()
-        vars["title"] = escape(self._material.getTitle())
-        vars["materialDisplayURL"] = vars["materialDisplayURLGen"]( self._material )
-        return vars
-
-    def getOwnerComponent( self ):
-        owner = self._material.getOwner()
-        if isinstance(owner, conference.Contribution):
-            wc = WContributionModifFrame(owner, self._aw)
-        elif isinstance(owner, conference.Session):
-            wc = WSessionModifFrame(owner, self._aw)
-        elif isinstance(owner, conference.SubContribution):
-            wc = WSubContributionModifFrame(owner, self._aw)
-
-        else:
-            wc = WConferenceModifFrame(owner, self._aw)
-        return wc
-
-    def getIntermediateVTabPixels( self ):
-        wc = self.getOwnerComponent()
-        return 7 + wc.getIntermediateVTabPixels()
-
-    def getTitleTabPixels( self ):
-        wc = self.getOwnerComponent()
-        return wc.getTitleTabPixels() - 7
-
-    def getCloseHeaderTags( self ):
-        wc = self.getOwnerComponent()
-        return "</table></td></tr>" + wc.getCloseHeaderTags()
-
-
-class WResourceModifFrame(WTemplated):
-
-    def __init__( self, resource, aw):
-        self._resource = resource
-        self._aw = aw
-
-    def getHTML( self, body, **params ):
-        params["body"] = body
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        wc = WMaterialModifHeader( self._resource.getOwner(), self._aw )
-        vars["context"] = wc.getHTML( vars )
-        vars["name"] = self._resource.getName()
-        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-        vars["titleTabPixels"] = self.getTitleTabPixels()
-        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-        return vars
-
-    def getOwnerComponent( self ):
-        owner = self._resource.getOwner()
-        wc = WMaterialModifFrame(owner, self._aw)
-        return wc
-
-    def getIntermediateVTabPixels( self ):
-        wc = self.getOwnerComponent()
-        return 7 + wc.getIntermediateVTabPixels()
-
-    def getTitleTabPixels( self ):
-        wc = self.getOwnerComponent()
-        return wc.getTitleTabPixels() - 7
-
-    def getCloseHeaderTags( self ):
-        wc = self.getOwnerComponent()
-        return "</table></td></tr>" + wc.getCloseHeaderTags()
-
-
-class WFileModifFrame( WResourceModifFrame ):
-    pass
-
-
-class WLinkModifFrame( WResourceModifFrame ):
-    pass
-
-
-
-class ModifFrameFactory:
-
-    def getFrameClass( cls, target ):
-        if isinstance(target, conference.Conference):
-            return WConferenceModifFrame
-        if isinstance( target, conference.Session ):
-            return WSessionModifFrame
-        if isinstance( target, conference.Contribution ):
-            return WContributionModifFrame
-        if isinstance( target, conference.SubContribution ):
-            return WSubContributionModifFrame
-        if isinstance(target, conference.Material):
-            return WMaterialModifFrame
-        if isinstance(target, conference.LocalFile):
-            return WFileModifFrame
-        if isinstance( target, conference.Link ):
-            return WLinkModifFrame
-        return None
-    getFrameClass = classmethod( getFrameClass )
-
-    def getModifFrame( target ):
-        f = ModifFrameFactory.getFrameClass( target )
-        if f:
-            return f( target )
-        return None
-    getModifFrame = staticmethod( getModifFrame )
 
 
 class WAccessControlFrameBase(WTemplated):
@@ -1613,56 +1447,6 @@ class WInlineContextHelp(WTemplated):
         vars = WTemplated.getVars( self )
         vars["helpContent"] = self._content
         vars["imgSrc"] = Config.getInstance().getSystemIconURL("help")
-        return vars
-
-class WResourceModification(WTemplated):
-
-    def __init__( self, resource ):
-        self._resource = resource
-        self._conf = resource.getConference()
-        self._session = resource.getSession()
-        self._contrib = resource.getContribution()
-        self._material = resource.getOwner()
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["confTitle"] = self._conf.getTitle()
-        vars["sessionTitle"] = ""
-        if self._session != None:
-            vars["sessionTitle"] = self._session.getTitle()
-        vars["contributionTitle"] = ""
-        if self._contrib != None:
-            vars["contributionTitle"] = self._contrib.getTitle()
-        vars["materialTitle"] = self._material.getTitle()
-        vars["title"] = self._resource.getName()
-        vars["description"] = self._resource.getDescription()
-        vars["accessControlFrame"] = WAccessControlFrame().getHTML(\
-                                                    self._resource,\
-                                                    vars["setVisibilityURL"],\
-                                                    vars["addAllowedURL"],\
-                                                    vars["removeAllowedURL"],\
-                                                    vars["setAccessKeyURL"], \
-                                                    vars["setModifKeyURL"] )
-        return vars
-
-
-class WResourceDataModification(WResourceModification):
-
-    def getHTML(self, params):
-        str = """
-            <form action="%s" method="POST" enctype="multipart/form-data">
-                %s
-                %s
-            </form>
-              """%(params["postURL"],\
-                   self._resource.getLocator().getWebForm(),\
-                   WTemplated.getHTML( self, params ) )
-        return str
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["title"] = self._resource.getName()
-        vars["description"] = self._resource.getDescription()
         return vars
 
 

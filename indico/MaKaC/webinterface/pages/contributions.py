@@ -82,12 +82,6 @@ class WContributionDisplayBase(WICalExportBase):
     def _getAuthorURL(self, author):
         return urlHandlers.UHContribAuthorDisplay.getURL(self._contrib, authorId=author.getId())
 
-    def _getResourceName(self, resource):
-        if isinstance(resource, conference.Link):
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
-        else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
-
     def _getStatusReviewing(self):
         from MaKaC.paperReviewing import ConferencePaperReview as CPR
         versioning = self._contrib.getReviewManager().getVersioning()
@@ -156,7 +150,6 @@ class WContributionDisplayBase(WICalExportBase):
             vars["statusText"] = _("Paper not yet submitted")
             vars["statusClass"] = "contributionReviewingStatusNotSubmitted"
         vars["prefixUpload"] = "Re-" if statusReviewing not in ["Accept", "Reject", None] else ""
-        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return vars
 

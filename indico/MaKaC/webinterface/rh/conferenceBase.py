@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, session
+from flask import request
 
 import tempfile
 import os
@@ -24,17 +24,16 @@ from MaKaC.paperReviewing import reviewing_factory_get, reviewing_factory_create
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError, NotFoundError
 from indico.core.config import Config
-from MaKaC.conference import LocalFile, Link, Category
+from MaKaC.conference import LocalFile, Category
 from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
 
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 
-from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util import json
 from indico.util.contextManager import ContextManager
-from indico.util.string import is_legacy_id, to_unicode
+from indico.util.string import is_legacy_id
 from indico.util.user import principal_from_fossil
 
 BYTES_1MB = 1024 * 1024
@@ -319,48 +318,19 @@ class RHSubmitMaterialBase(object):
             protectedAtResourceLevel = True
 
         resources = []
-        if self._uploadType in ['file','link']:
-            if self._uploadType == "file":
-                for fileEntry in self._files:
-                    resource = LocalFile()
-                    resource.setFileName(fileEntry["fileName"])
-                    resource.setFilePath(fileEntry["filePath"])
-                    resource.setDescription(self._description)
-                    if self._displayName == "":
-                        resource.setName(resource.getFileName())
-                    else:
-                        resource.setName(self._displayName)
-
-                    if not isinstance(self._target, Category):
-                        log_msg = u'Added file {}{}'.format(to_unicode(fileEntry['fileName']), to_unicode(text))
-                        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Material',
-                                                         log_msg, session.user)
-                    resources.append(resource)
-                    # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
-
-            elif self._uploadType == "link":
-
-                for link in self._links:
-                    resource = Link()
-                    resource.setURL(link["url"])
-                    resource.setDescription(self._description)
-                    if self._displayName == "":
-                        resource.setName(resource.getURL())
-                    else:
-                        resource.setName(self._displayName)
-
-                    if not isinstance(self._target, Category):
-                        log_msg = u'Added link {}{}'.format(to_unicode(resource.getURL()), to_unicode(text))
-                        self._target.getConference().log(EventLogRealm.management, EventLogKind.positive, u'Material',
-                                                         log_msg, session.user)
-                    resources.append(resource)
-
-            status = "OK"
-            info = resources
-        else:
-            status = "ERROR"
-            info = "Unknown upload type"
-            return mat, status, info
+        assert self._uploadType == "file"
+        for fileEntry in self._files:
+            resource = LocalFile()
+            resource.setFileName(fileEntry["fileName"])
+            resource.setFilePath(fileEntry["filePath"])
+            resource.setDescription(self._description)
+            if self._displayName == "":
+                resource.setName(resource.getFileName())
+            else:
+                resource.setName(self._displayName)
+            resources.append(resource)
+        status = "OK"
+        info = resources
 
         # forcedFileId - in case there is a conflict, use the file that is
         # already stored

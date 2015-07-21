@@ -81,14 +81,6 @@ class WCategoryDisplay(WICalExportBase):
         self._wfReg = wfReg
         self._timezone = timezone(tz)
 
-    def _getResourceName(self, resource):
-        if isinstance(resource, conference.Link):
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() \
-                else resource.getURL()
-        else:
-            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() \
-                else resource.getFileName()
-
     def getHTML(self, aw, params):
         self._aw = aw
         return wcomponents.WTemplated.getHTML(self, params)

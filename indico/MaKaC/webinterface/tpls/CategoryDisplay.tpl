@@ -9,8 +9,6 @@ urlMeeting = urlHandlers.UHConferenceCreation.getURL(categ)
 urlMeeting.addParam("event_type","meeting")
 
 containsCategories = len(categ.getSubCategoryList()) > 0
-from MaKaC.conference import Link
-from MaKaC.webinterface.general import strfFileSize
 %>
 
 <%def name="render_attachments(attachments)">

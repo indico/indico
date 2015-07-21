@@ -47,7 +47,7 @@ from MaKaC.fossils.conference import IConferenceParticipationFossil,\
     ISessionFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.schedule import BreakTimeSchEntry
-from MaKaC.conference import SessionSlot, Material, Link
+from MaKaC.conference import SessionSlot
 from MaKaC.webinterface.pages.sessions import WSessionICalExport
 from MaKaC.webinterface.pages.contributions import WContributionICalExport
 from indico.web.http_api.util import generate_public_auth_request
