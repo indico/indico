@@ -130,11 +130,10 @@ class IContributionParticipationMetadataFossil(IFossil):
 
 class _IncludeMaterialFossil(IFossil):
 
-    def getAllMaterialList(self):
+    def getMaterial(self):
         pass
-    getAllMaterialList.name = 'material'
-    getAllMaterialList.produce = build_material_legacy_api_data
-    getAllMaterialList.convert = Conversion.addLegacyMinutes
+    getMaterial.produce = build_material_legacy_api_data
+    getMaterial.convert = Conversion.addLegacyMinutes
 
     def getFolders(self):
         pass
