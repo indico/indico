@@ -131,9 +131,6 @@ else:
                             <input type="submit" class="btn" name="PKG" value="${ _("Material package")}">
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="PROC" value="${ _("Proceedings")}">
-                        </td>
-                        <td valign="bottom" align="left">
                           ${ _("Export to:") }
                         </td>
                         <td valign="bottom" align="left">
@@ -195,9 +192,6 @@ else:
                                 </td>
                                 <td valign="bottom" align="left">
                                     <input type="submit" class="btn" name="PKG" value="${ _("Material package")}">
-                                </td>
-                                <td valign="bottom" align="left">
-                                    <input type="submit" class="btn" name="PROC" value="${ _("Proceedings")}">
                                 </td>
                                 <td valign="bottom" align="left">
                                    ${ _("Export to:") }

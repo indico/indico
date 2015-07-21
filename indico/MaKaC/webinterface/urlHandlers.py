@@ -1712,10 +1712,6 @@ class UHConfModScheduleDataEdit(URLHandler):
     _endpoint = 'event_mgmt.confModifSchedule-edit'
 
 
-class UHConfModProceedings(URLHandler):
-    _endpoint = 'event_mgmt.confModifContribList-proceedings'
-
-
 class UHUpdateNews(URLHandler):
     _endpoint = 'admin.updateNews'
 

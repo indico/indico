@@ -50,13 +50,13 @@ import MaKaC.webinterface.common.registrantNotificator as registrantNotificator
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker, ContribPacker, ProceedingsPacker
+from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker, ContribPacker
 from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
 from indico.modules.events.requests.util import is_request_manager
-from indico.util.i18n import i18nformat, set_best_lang
+from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
@@ -2864,8 +2864,6 @@ class RHContribsActions:
             return RHMoveContribsToSession().process(params)
         elif params.has_key("PKG"):
             return RHMaterialPackage().process(params)
-        elif params.has_key("PROC"):
-            return RHProceedings().process(params)
         return "no action to do"
 
 
@@ -3114,15 +3112,6 @@ class RHMaterialPackage(RHConferenceModifBase):
         if not p.getItems():
             raise NoReportError(_("The selected package does not contain any items"))
         return send_file('material.zip', path, 'ZIP', inline=False)
-
-
-class RHProceedings(RHConferenceModifBase):
-
-    def _process( self ):
-        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
-        p=ProceedingsPacker(self._conf)
-        path=p.pack(ZIPFileHandler())
-        return send_file('proceedings.zip', path, 'ZIP', inline=False)
 
 
 class RHAbstractBook( RHConfModifCFABase ):

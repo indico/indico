@@ -15,11 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 import types
 from copy import deepcopy
-from textwrap import wrap, fill
 from PIL import Image
 from qrcode import QRCode, constants
 
-from MaKaC.PDFinterface.base import escape, Int2Romans
+from MaKaC.PDFinterface.base import escape
 from datetime import timedelta,datetime
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch, cm
@@ -27,7 +26,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.rl_config import defaultPageSize
-from reportlab.platypus import Table,TableStyle,KeepTogether, XPreformatted
+from reportlab.platypus import Table, TableStyle
 from reportlab.pdfgen import canvas
 from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -37,14 +36,14 @@ import MaKaC.schedule as schedule
 from MaKaC.badge import BadgeTemplateItem
 from MaKaC.poster import PosterTemplateItem
 from MaKaC.registration import Registrant
-from MaKaC.PDFinterface.base import PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, Preformatted, FileDummy, setTTFonts, PDFSizes, modifiedFontSize, SimpleParagraph
+from MaKaC.PDFinterface.base import (PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, FileDummy,
+                                     setTTFonts, PDFSizes, modifiedFontSize)
 from MaKaC.webinterface.pages.tracks import (
     AbstractStatusTrackViewFactory,
     _ASTrackViewPFOT,
     _ASTrackViewPA,
     _ASTrackViewDuplicated,
     _ASTrackViewMerged,
-    _ASTrackViewAccepted,
     _ASTrackViewIC,
     _ASTrackViewAcceptedForOther
 )
@@ -64,7 +63,7 @@ from MaKaC.common import utils
 
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
-from indico.util.string import safe_upper, safe_slice, html_color_to_rgb
+from indico.util.string import safe_upper, html_color_to_rgb
 from indico.util import json
 from MaKaC.common.Configuration import Config
 
@@ -1413,203 +1412,6 @@ class FilterCriteria(filters.FilterCriteria):
         contribFilters.StatusFilterField.getId():contribFilters.StatusFilterField
                 }
 
-class ProceedingsTOC(PDFBase):
-
-    def __init__(self, conf, trackDict=None, trackOrder=None, contribList=None, npages=None, doc=None, story=None, tz=None):
-        self._conf = conf
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        self._trackDict = trackDict
-        self._trackOrder = trackOrder
-        self._contribDictNPages = npages
-        self._contribList=contribList
-        if not story:
-            story = [Spacer(inch, 5*cm)]
-        PDFBase.__init__(self, doc, story)
-        self._title = _("Proceedings")
-        self._PAGE_HEIGHT = defaultPageSize[1]
-        self._PAGE_WIDTH = defaultPageSize[0]
-
-    def firstPage(self,c,doc):
-        c.saveState()
-        self._drawLogo(c, False)
-        height=self._drawWrappedString(c, self._conf.getTitle())
-        c.setFont('Times-Bold',15)
-        height-=2*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
-                self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
-        if self._conf.getLocation():
-            height-=1*cm
-            c.drawCentredString(self._PAGE_WIDTH/2.0,height,escape(self._conf.getLocation().getName()))
-        c.setFont('Times-Bold', 30)
-        height-=6*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0,height,self._title)
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        c.restoreState()
-
-    def laterPages(self,c,doc):
-        c.saveState()
-        location = ""
-        if self._conf.getLocation() is not None and self._conf.getLocation().getName().strip() != "":
-            location = " - %s"%(escape(self._conf.getLocation().getName()))
-        self._drawWrappedString(c, "%s%s"%(escape(self._conf.getTitle()), location), width=0.5*inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-inch, measurement=inch, lineSpacing=0.15)
-        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"%s "%Int2Romans.int_to_roman(doc.page-1))
-        c.restoreState()
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-        self._story.append(PageBreak())
-        style = ParagraphStyle({})
-        style.fontName = "Times-Bold"
-        style.fontSize = 20
-        style.spaceBefore=0
-        style.spaceAfter=8
-        style.leading=14
-        style.alignment=TA_LEFT
-        text = _("Table of Contents")
-        p = Paragraph(text, style)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.5*cm))
-
-        styleAuthor = ParagraphStyle({})
-        styleAuthor.leading = 10
-        styleAuthor.fontName = "Times-Roman"
-        styleAuthor.fontSize = 8
-        styleAuthor.spaceBefore=0
-        styleAuthor.spaceAfter=0
-        styleAuthor.alignment=TA_LEFT
-        styleAuthor.leftIndent=10
-        styleAuthor.firstLineIndent=0
-
-        styleContrib = ParagraphStyle({})
-        styleContrib.leading = 12
-        styleContrib.fontName = "Times-Roman"
-        styleContrib.fontSize = 10
-        styleContrib.spaceBefore=0
-        styleContrib.spaceAfter=0
-        styleContrib.alignment=TA_LEFT
-        styleContrib.leftIndent=0
-        styleContrib.firstLineIndent=0
-        styleContrib.leftIndent=0
-
-        styleTrack = ParagraphStyle({})
-        styleTrack.fontName = "Times-Bold"
-        styleTrack.fontSize = 12
-        styleTrack.spaceBefore=40
-        styleTrack.spaceAfter=30
-        styleTrack.alignment=TA_LEFT
-
-        tsContribs=TableStyle([('VALIGN',(0,0),(-1,0),"BOTTOM"),
-                        ('VALIGN',(0,0),(-1,-1),"BOTTOM"),
-                        ('ALIGN',(0,1),(-1,1),"RIGHT"),
-                        ('BOTTOMPADDING',(0,0),(-1,-1),0),
-                        ('TOPPADDING',(0,0),(-1,-1),0)])
-        i = 1
-        if self._trackOrder is not None and self._trackOrder!=[]:
-            for track in self._trackOrder:
-                l=[]
-                p=Paragraph("",styleTrack)
-                p2=Paragraph("",styleTrack)
-                l.append([p, p2])
-                p=Paragraph(escape(track.getTitle()),styleTrack)
-                p2=Paragraph("<b>%s</b>"%escape("%s"%i),styleTrack)
-                i += 2
-                l.append([p, p2])
-                p=Paragraph("",styleTrack)
-                p2=Paragraph("",styleTrack)
-                l.append([p, p2])
-                l.append(["", ""])
-                for contrib in self._trackDict[track.getId()]:
-                    i=self._addContrib(contrib, l, i, styleContrib, styleAuthor )
-                l.append(["", ""])
-                t=Table(l,colWidths=(None,1.2*cm),style=tsContribs)
-                self._story.append(t)
-        else:
-            l=[]
-            for contrib in self._contribList:
-                i=self._addContrib(contrib, l, i, styleContrib, styleAuthor)
-            if l!=[]:
-                t=Table(l,colWidths=(None,1.2*cm),style=tsContribs)
-                self._story.append(t)
-        self._story.append(Spacer(inch, 2*cm))
-
-        return story
-
-    def _addContrib(self, contrib, l, i, styleContrib, styleAuthor):
-        authorList = []
-        for author in contrib.getPrimaryAuthorList():
-            authorList.append(self._getAbrName(author))
-        for author in contrib.getCoAuthorList():
-            authorList.append(self._getAbrName(author))
-        if authorList == []:
-            for author in contrib.getSpeakerList():
-                authorList.append(self._getAbrName(author))
-        p=Paragraph(escape(contrib.getTitle()), styleContrib)
-        p2=Paragraph("""<i>%s</i>"""%(escape(", ".join(authorList))), styleAuthor)
-        p3=Paragraph("""<font size="10">%s</font>"""%escape("%s"%i),styleAuthor)
-        i += self._contribDictNPages[contrib.getId()]
-        l.append([p, ""])
-        l.append([p2, p3])
-        l.append(["", ""])
-        return i
-
-    def _getAbrName(self, author):
-        res = author.getFamilyName()
-        if res.strip() and len(res) > 1:
-            uniname = res.decode('utf-8')
-            res = (uniname[0].upper() + uniname[1:].lower()).encode('utf-8')
-        if author.getFirstName():
-            if not res:
-                res = author.getFirstName()
-            else:
-                res = "%s. %s" % (safe_upper(safe_slice(author.getFirstName(), 0, 1)), res)
-        return res
-
-class ProceedingsChapterSeparator(PDFBase):
-
-    def __init__(self, track, doc=None, story=None):
-        self._track = track
-        self._conf = track.getConference()
-        if not story:
-            story = [Spacer(inch, 5*cm)]
-        PDFBase.__init__(self, doc, story)
-        self._title = _("Proceedings")
-        self._PAGE_HEIGHT = defaultPageSize[1]
-        self._PAGE_WIDTH = defaultPageSize[0]
-
-    def firstPage(self,c,doc):
-        c.saveState()
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        #c.drawString(1*cm,self._PAGE_HEIGHT-1*cm,
-        #    "%s / %s"%(escape(self._conf.getTitle()),self._title))
-        #c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"Page %d "%doc.page)
-        self._drawWrappedString(c, self._track.getTitle())
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        c.restoreState()
-
-    def laterPages(self,c,doc):
-        c.saveState()
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        #c.drawString(1*cm,self._PAGE_HEIGHT-1*cm,
-        #    "%s / %s"%(escape(self._conf.getTitle()),self._title))
-        #c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"Page %d "%doc.page)
-        c.restoreState()
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-        self._story.append(PageBreak())
-        self._story.append(PageBreak())
-        return story
 
 class RegistrantToPDF(PDFBase):
 

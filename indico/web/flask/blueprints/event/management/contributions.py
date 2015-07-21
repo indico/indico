@@ -31,8 +31,6 @@ event_mgmt.add_url_rule('/contributions/moveToSession', 'confModifContribList-mo
                         conferenceModif.RHMoveContribsToSession, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/contributions/participants', 'confModifContribList-participantList',
                         conferenceModif.RHContribsParticipantList, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/contributions/proceedings', 'confModifContribList-proceedings', conferenceModif.RHProceedings,
-                        methods=('GET', 'POST'))
 
 with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     # Main

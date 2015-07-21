@@ -14,24 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-#import sys
-#sys.path.append("c:/development/indico/code/code")
-
 import zipfile
 import tempfile
 import string
 import os
-from datetime import timedelta, datetime
 
-from indico.util.date_time import format_date
 
 from MaKaC.common.utils import utf8rep
 from MaKaC.errors import MaKaCError
 from MaKaC import conference
-from MaKaC import schedule
 from indico.core.config import Config
-from MaKaC.PDFinterface.conference import ProceedingsTOC, ProceedingsChapterSeparator
-from MaKaC.i18n import _
+from indico.util.i18n import _
 
 
 class ZIPFileHandler:
@@ -128,140 +121,6 @@ class ContribPacker:
                                                             self._normalisePathItem(res.getId()),
                                                             self._normalisePathItem(res.getFileName())),
                                         res.getFilePath())
-        fileHandler.close()
-        return fileHandler.getPath()
-
-
-
-class PDFPagesCounter:
-
-    def countPages(filepath):
-        data = ''
-        for line in file(filepath, 'rb'):
-            if data:
-                data.append(line)
-            if '/Type/Pages' in line or '/Type /Pages' in line:
-                data = [line]
-            if 'endobj' in line and data:
-                data = ''.join(data)
-                #if '/Parent' in data:
-                #    print "dat:---------------\n%s"%line
-                #    data = ''
-                #    continue
-                pos = data.find('/Count')+7
-                result = "%s"%data[pos:].split()[0].split('/')[0].replace('>>','')
-                if result.strip() == "":
-                    result = "0"
-                return result
-        return "0"
-    countPages = staticmethod(countPages)
-
-class ProceedingsPacker:
-    """
-    """
-
-    def __init__(self,conf):
-        self._conf=conf
-        self._items=0
-
-    def getItems(self):
-        return self._items
-
-    def _normalisePathItem(self,name):
-        return str(name).translate(string.maketrans("",""),"\\/")
-
-    def pack(self, fileHandler=None):
-        if self._conf.getTrackList() != []:
-            # Get every contribution order by track and by scheduled
-            trackOrder=[]
-            trackDict={}
-            for track in self._conf.getTrackList():
-                trackDict[track.getId()]=[]
-                trackOrder.append(track)
-            # Get contribs with papers
-            for entry in self._conf.getSchedule().getEntries():
-                if isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                        isinstance(entry.getOwner(),conference.SessionSlot):
-                    slot=entry.getOwner()
-                    for slotEntry in slot.getSchedule().getEntries():
-                        if isinstance(slotEntry,schedule.LinkedTimeSchEntry) and isinstance(slotEntry.getOwner(),conference.Contribution):
-                            contrib = slotEntry.getOwner()
-                            if contrib.getPaper() is not None:
-                                mr= contrib.getPaper().getMainResource()
-                                if mr is not None and isinstance(mr,conference.LocalFile):
-                                    track = contrib.getTrack()
-                                    if track is not None:
-                                        trackDict[track.getId()].append(contrib)
-                elif isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                        isinstance(entry.getOwner(),conference.Contribution):
-                    contrib = entry.getOwner()
-                    if contrib.getPaper() is not None:
-                        mr= contrib.getPaper().getMainResource()
-                        if mr is not None and isinstance(mr,conference.LocalFile):
-                            track = contrib.getTrack()
-                            if track is not None:
-                                trackDict[track.getId()].append(contrib)
-            contribDictNPages = {}
-            i = 0
-            i += 1
-            # Get papers
-            for track in trackOrder:
-                # Get Chapter Separator
-                pdf = ProceedingsChapterSeparator(track)
-                fileHandler.addNewFile("%04d-CHAPTER_SEPARATOR.pdf"%i, pdf.getPDFBin())
-                self._items += 1
-                i += 1
-                for contrib in trackDict[track.getId()]:
-                    paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
-                    mr= contrib.getPaper().getMainResource()
-                    fileHandler.add(paperName, mr.getFilePath())
-                    self._items += 1
-                    contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
-                    i += 1
-            # Get TOC
-            pdf = ProceedingsTOC(self._conf, trackDict=trackDict, trackOrder=trackOrder, npages=contribDictNPages)
-        else:
-            contribDictNPages = {}
-            contribList=[]
-            i = 0
-            i += 1
-            for entry in self._conf.getSchedule().getEntries():
-                if isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                        isinstance(entry.getOwner(),conference.SessionSlot):
-                    slot=entry.getOwner()
-                    for slotEntry in slot.getSchedule().getEntries():
-                        if isinstance(slotEntry,schedule.LinkedTimeSchEntry) and isinstance(slotEntry.getOwner(),conference.Contribution):
-                            contrib = slotEntry.getOwner()
-                            if contrib.getPaper() is not None:
-                                mr= contrib.getPaper().getMainResource()
-                                if mr is not None and isinstance(mr,conference.LocalFile):
-                                    contribList.append(contrib)
-                                    paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
-                                    mr= contrib.getPaper().getMainResource()
-                                    fileHandler.add(paperName, mr.getFilePath())
-                                    self._items += 1
-                                    contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
-                                    i += 1
-                elif isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                        isinstance(entry.getOwner(),conference.Contribution):
-                    contrib = entry.getOwner()
-                    if contrib.getPaper() is not None:
-                        mr= contrib.getPaper().getMainResource()
-                        if mr is not None and isinstance(mr,conference.LocalFile):
-                            contribList.append(contrib)
-                            paperName="%04d-%s.pdf"%(i,self._normalisePathItem(contrib.getTitle()))
-                            mr= contrib.getPaper().getMainResource()
-                            fileHandler.add(paperName, mr.getFilePath())
-                            self._items += 1
-                            contribDictNPages[contrib.getId()] = int(PDFPagesCounter.countPages(mr.getFilePath()))
-                            i += 1
-            # Get TOC
-            pdf = ProceedingsTOC(self._conf, contribList=contribList, npages=contribDictNPages)
-
-        i = 0
-        fileHandler.addNewFile("%04d-TOC.pdf"%i, pdf.getPDFBin())
-        self._items += 1
-
         fileHandler.close()
         return fileHandler.getPath()
 
