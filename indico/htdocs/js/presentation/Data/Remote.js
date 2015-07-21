@@ -196,6 +196,7 @@ function jsonRpcCommit(url, method, params, value, handler) {
  * @return {XMLHttpRequest} request
  */
 function jsonRpc(url, method, params, handler) {
+        url = build_url(url, {_method: method});  // add method to query string to get better logs
         return jsonRequest(url, {
                 version: "1.1",
                 origin: location.href,
