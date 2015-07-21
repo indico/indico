@@ -277,12 +277,6 @@ class MaterialLocalRepository(Persistent):
                 raise
             return ''
 
-    def replaceContent( self, id, newContent ):
-        filePath = self.__getFilePath( id )
-        f = open(filePath, "w")
-        f.write( newContent )
-        f.close()
-
     def retireFile( self, file ):
         if not self.__files.has_key( file.getRepositoryId() ):
             return

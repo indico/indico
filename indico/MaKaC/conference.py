@@ -10454,11 +10454,6 @@ class LocalFile(Resource):
             raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
         return self.__repository.readFile( self.__archivedId  )
 
-    def replaceContent( self, newContent ):
-        if not self.isArchived():
-            raise MaKaCError( _("File not available until it has been archived") , _("File Archiving"))
-        self.__repository.replaceContent( self.__archivedId, newContent )
-
     def archive( self, repository=None, forcedFileId = None ):
         if self.isArchived():
             raise Exception( _("File is already archived"))
@@ -10469,11 +10464,6 @@ class LocalFile(Resource):
         repository.storeFile( self, forcedFileId = forcedFileId)
         self.filePath = ""
         self.notifyModification()
-
-    def unArchive(self):
-    # Not used.
-        self.__repository = None
-        self.__archivedId = ""
 
     def recover(self):
         if not self.isArchived():
