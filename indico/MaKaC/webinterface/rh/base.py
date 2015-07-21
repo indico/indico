@@ -316,6 +316,8 @@ class RH(RequestHandlerBase):
         # Retrieve the expected values from locators
         for getter in spec['locators']:
             value = getter(self)
+            if value is None:
+                raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
             try:
                 expected = value.locator
             except AttributeError:
