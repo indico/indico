@@ -50,3 +50,6 @@
 [submodule "ext_modules/jquery-typeahead"]
 	path = ext_modules/jquery-typeahead
 	url = https://github.com/running-coder/jquery-typeahead.git
+[submodule "ext_modules/selectize.js"]
+	path = ext_modules/selectize.js
+	url = https://github.com/brianreavis/selectize.js.git

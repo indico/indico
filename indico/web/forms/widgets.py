@@ -135,8 +135,39 @@ class SyncedInputWidget(JinjaWidget):
             return self.default_widget(field, **kwargs)
 
 
+class SelectizeWidget(JinjaWidget):
+    """Renders a selectize-based widget
+
+    :param search_url: The URL used to retrieve items.
+    :param min_trigger_length: Number of characters needed to start
+                               searching for suggestions.
+    """
+
+    def __init__(self, search_url=None, min_trigger_length=3):
+        self.min_trigger_length = min_trigger_length
+        self.search_url = search_url
+        super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
+
+    def __call__(self, field, **kwargs):
+        choices = [{'name': field.data.name, 'id': field.data.id}] if field.data is not None else []
+        options = {
+            'valueField': 'id',
+            'labelField': 'name',
+            'searchField': 'name',
+            'persist': False,
+            'options': choices,
+            'create': False,
+            'maxItems': 1,
+            'closeAfterSelect': True
+        }
+
+        options.update(kwargs.pop('options', {}))
+        return super(SelectizeWidget, self).__call__(field, options=options, search_url=self.search_url,
+                                                     min_trigger_length=self.min_trigger_length)
+
+
 class TypeaheadWidget(JinjaWidget):
-    """Renders a selectizer-based widget
+    """Renders a text field enhanced with jquery-typeahead
 
     :param search_url: The URL used to retrieve AJAX-based suggestions.
     :param min_trigger_length: Number of characters needed to start

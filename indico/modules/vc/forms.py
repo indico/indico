@@ -35,13 +35,13 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import PrincipalListField, IndicoRadioField, EmailListField
 from indico.web.forms.validators import UsedIf, Exclusive
-from indico.web.forms.widgets import JinjaWidget, SwitchWidget, TypeaheadWidget
+from indico.web.forms.widgets import JinjaWidget, SwitchWidget, SelectizeWidget
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
 
 
 class VCRoomField(HiddenField):
-    widget = TypeaheadWidget(min_trigger_length=3)
+    widget = SelectizeWidget(min_trigger_length=3)
 
     def process_formdata(self, valuelist):
         if valuelist and valuelist[0].isdigit():

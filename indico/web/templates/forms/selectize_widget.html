@@ -1,0 +1,39 @@
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    <div class="form-row" data-tooltip-anchor>
+        <input id="{{ field.id }}" class="typeahead" type="text" name="{{ field.name }}"
+               {%- if field.data is not none -%}value="{{ field._value() | tojson }}"{%- endif -%}>
+        <span></span>
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var params = {
+                load: function(query, callback) {
+                    if (query.length < {{ min_trigger_length }}) {
+                        return callback();
+                    }
+                    $.ajax({{ search_url | tojson }}, {
+                        data: {q: query},
+                        cache: false
+                    }).fail(function() {
+                        callback();
+                    }).done(function(res) {
+                        callback(res);
+                    });
+                }
+            };
+
+            _.extend(params, {{ options | tojson }});
+
+            $('#{{ field.id }}').selectize(params);
+        })();
+    </script>
+{% endblock %}

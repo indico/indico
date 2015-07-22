@@ -296,6 +296,8 @@ class RHVCEventPage(RHConferenceBaseDisplay):
 class RHVCManageAttach(RHVCManageEventCreateBase):
     """Attaches a room to the event"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         defaults = FormDefaults(self.plugin.get_vc_room_attach_form_defaults(self.event))
         form = self.plugin.vc_room_attach_form(prefix='vc-', obj=defaults, event=self.event,
