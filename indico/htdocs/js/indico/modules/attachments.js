@@ -42,8 +42,10 @@
         }).triggerHandler('hashchange', [true]);
 
         attachment.on('click', function(e) {
-            if (e.which != 1 || e.shiftKey) {
-                // ignore middle clicks and shift-clicks - people should be able to open an attachment in a new tab/window
+            if (e.which != 1 || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) {
+                // ignore middle clicks and modifier-clicks - people should be able to open
+                // an attachment in a new tab/window skipping the previewer, even if they use
+                // a weird mouse with less than three buttons.
                 return;
             }
             e.preventDefault();
