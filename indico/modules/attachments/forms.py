@@ -96,8 +96,18 @@ class AttachmentFolderForm(IndicoForm):
                                                    "for anyone who does not have permission to access it."))
 
     def __init__(self, *args, **kwargs):
+        self.linked_object = kwargs.pop('linked_object')
         super(AttachmentFolderForm, self).__init__(*args, **kwargs)
-        self.title.choices = [{'name': value} for value in get_default_folder_names()]
+        self.title.choices = self._get_title_suggestions()
+
+    def _get_title_suggestions(self):
+        query = db.session.query(AttachmentFolder.title).filter_by(is_deleted=False, is_default=False,
+                                                                   linked_object=self.linked_object)
+        existing = set(x[0] for x in query)
+        suggestions = set(get_default_folder_names()) - existing
+        if self.title.data:
+            suggestions.add(self.title.data)
+        return sorted(suggestions)
 
     @generated_data
     def protection_mode(self):

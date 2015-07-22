@@ -163,7 +163,7 @@ class CreateFolderMixin:
     """Create a new empty folder"""
 
     def _process(self):
-        form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True))
+        form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True), linked_object=self.object)
         if form.validate_on_submit():
             folder = AttachmentFolder(linked_object=self.object)
             form.populate_obj(folder, skip={'acl'})
@@ -183,7 +183,7 @@ class EditFolderMixin(SpecificFolderMixin):
 
     def _process(self):
         defaults = FormDefaults(self.folder, protected=self.folder.is_protected)
-        form = AttachmentFolderForm(obj=defaults)
+        form = AttachmentFolderForm(obj=defaults, linked_object=self.object)
         if form.validate_on_submit():
             form.populate_obj(self.folder, skip={'acl'})
             if self.folder.is_protected:
