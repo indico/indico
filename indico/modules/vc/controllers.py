@@ -358,7 +358,7 @@ class RHVCRoomList(RHProtected):
             raise Forbidden
 
     def _process(self):
-        form = VCRoomListFilterForm(request.args)
+        form = VCRoomListFilterForm(request.args, csrf_enabled=False)
         results = None
         if request.args and form.validate():
             reverse = form.direction.data == 'desc'
