@@ -8,7 +8,9 @@
 
 {% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=False, i_form=true) -%}
     <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="{% if i_form %}i-form {% endif %}{{ orientation }} {{ classes }}"{% if id %} id="{{ id }}"{% endif %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
-        {{ form.csrf_token() }}
+        {% if form.csrf_enabled -%}
+            {{ form.csrf_token() }}
+        {% endif %}
 {%- endmacro %}
 
 {% macro form_row_static(label='', content=none, single_row=true) -%}
