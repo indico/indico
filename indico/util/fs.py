@@ -39,4 +39,6 @@ def secure_filename(filename, fallback):
     :param fallback: The filename to use if there were no safe chars
                      in the original filename.
     """
+    if not filename:
+        return fallback
     return _secure_filename(unicode_to_ascii(to_unicode(filename))) or fallback

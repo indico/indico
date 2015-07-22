@@ -20,6 +20,8 @@ from indico.util.fs import secure_filename
 
 
 @pytest.mark.parametrize(('filename', 'expected'), (
+    ('', 'fallback'),
+    (None, 'fallback'),
     ('foo.txt', 'foo.txt'),
     ('', 'fallback'),
     ('../../../etc/passwd', 'etc_passwd'),
