@@ -83,7 +83,8 @@ class EditAttachmentLinkForm(AttachmentLinkFormMixin, EditAttachmentFormBase):
 
 
 class AttachmentFolderForm(IndicoForm):
-    title = HiddenField(_("Name"), [DataRequired()], description=_("The name of the folder."), widget=TypeaheadWidget())
+    title = HiddenField(_("Name"), [DataRequired()], widget=TypeaheadWidget(),
+                        description=_("The name of the folder."))
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget())
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],

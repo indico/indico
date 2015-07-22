@@ -3,8 +3,9 @@
 {% block html %}
     <div class="form-row typeahead-container" data-tooltip-anchor>
         <div class="typeahead-field">
-            <input id="{{ field.id }}-typeahead" autocomplete="off" class="typeahead" type="text"
-                   {%- if field.data is not none -%}value="{{ field._value() }}"{%- endif -%} name="{{ field.name }}">
+            <input id="{{ field.id }}" autocomplete="off" class="typeahead" type="text"
+                   {% if not search_url %}name="{{ field.name }}"{% endif %}
+                   {%- if field.data is not none -%}value="{{ field._value() }}"{%- endif -%}>
         </div>
     </div>
 {% endblock %}
@@ -14,46 +15,52 @@
         (function() {
             'use strict';
 
+            var field = $('#{{ field.id }}');
+            var params = {
+                hint: true,
+                display: 'name',
+                mustSelectItem: true,
+                minLength: {{ min_trigger_length }},
+                source: {
+                    data: {{ choices | tojson }}
+                }
+            };
 
-            {% if field.widget.search_url %}
-                $('#{{ field.id }}-typeahead').removeAttr('name');
-
-                var params = {
-                    minLength: {{ field.widget.min_trigger_length or 0 }},
+            {% if search_url %}
+                // TODO: we should have a separate option to determine if ONLY searched results are allowed
+                $.extend(true, params, {
                     dynamic: true,
                     source: {
                         url: [{
-                            url: {{ field.widget.search_url | tojson }},
+                            url: {{ search_url | tojson }},
                             data: {
-                                q: {% raw %} '{{query}}' {% endraw %}
+                                q: {% raw %}'{{query}}'{% endraw %}
                             }
-                        }],
-                        data: {{ options.source.data | tojson }}
+                        }]
                     },
                     callback: {
-                        onClickAfter: function(node, a, item, event) {
+                        onClickAfter: function(node, a, item) {
                             if (!item) {
                                 return;
                             }
 
-                            var field = $('{{ field.id }}-typeahead');
-                            if (!field.length) {
-                                field = $('<input>', {
+                            var dataField = $('#{{ field.id }}-data');
+                            if (!dataField.length) {
+                                dataField = $('<input>', {
                                     type: 'hidden',
+                                    id: '{{ field.id }}-data',
                                     name: {{ field.name | tojson }}
                                 });
+                                dataField.insertAfter(field);
                             }
-
-                            field.val(item['id']);
-                            field.insertAfter($('#{{ field.id }}-typeahead'));
+                            dataField.val(item['id']).triggerHandler('change');
+                            field.trigger('typeaheadSelected', [item]);
                         }
                     }
-                };
-            {% else %}
-                var params = {};
+                });
             {% endif %}
 
-            $('#{{ field.id }}-typeahead').typeahead(_.extend({}, {{ options | tojson }}, params));
+            field.typeahead($.extend(true, params, {{ options | tojson }}));
         })();
     </script>
 {% endblock %}

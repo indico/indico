@@ -136,29 +136,25 @@ class SyncedInputWidget(JinjaWidget):
 
 
 class TypeaheadWidget(JinjaWidget):
-    """Renders a selectizer-based widget"""
+    """Renders a selectizer-based widget
 
-    def __init__(self, typeahead_options=None, min_trigger_length=0):
+    :param search_url: The URL used to retrieve AJAX-based suggestions.
+    :param min_trigger_length: Number of characters needed to start
+                               searching for suggestions.
+    :param typeahead_options: Params passed to the typeahead js
+                              initialization.
+    """
+
+    def __init__(self, search_url=None, min_trigger_length=1, typeahead_options=None):
         super(TypeaheadWidget, self).__init__('forms/typeahead_widget.html')
-        self.typeahead_options = typeahead_options or {}
+        self.search_url = search_url
         self.min_trigger_length = min_trigger_length
+        self.typeahead_options = typeahead_options
 
     def __call__(self, field, **kwargs):
-        choices = []
-
-        if hasattr(field, 'choices'):
-            choices.extend(field.choices)
-
-        options = {
-            'hint': True,
-            'searchOnFocus': True,
-            'display': 'name',
-            'mustSelectItem': True,
-            'source': {
-                'data': choices
-            }
-        }
-
+        options = {}
+        if self.typeahead_options:
+            options.update(self.typeahead_options)
         options.update(kwargs.pop('options', {}))
-        options.update(self.typeahead_options)
-        return super(TypeaheadWidget, self).__call__(field, options=options)
+        return super(TypeaheadWidget, self).__call__(field, options=options, min_trigger_length=self.min_trigger_length,
+                                                     search_url=self.search_url, choices=getattr(field, 'choices', []))
