@@ -3697,34 +3697,6 @@ class Conference(CommonObjectBase, Locatable):
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
-    def _getMaterialFiles(self, material):
-        """
-        Adaption of _getMaterialFiles in WPTPLConferenceDisplay for desired format, objects
-        seemed mutually exclusive hence use of similar logic here specific to Conference.
-        """
-        files = []
-        processed = []
-
-        for res in material.getResourceList():
-            try:
-                ftype = res.getFileType()
-                fname = res.getFileName()
-                furl = urlHandlers.UHFileAccess.getURL(res)
-
-                if fname in processed:
-                    fname = "%s - %s" % (fname, processed.count(fname))
-
-                processed.append(res.getFileName())
-            except:
-                # If we are here then the resource is a Link object.
-                fname, ftype, furl = str(res.getURL()), "link", str(res.getURL())
-            fdesc = res.getDescription()
-            files.append({'title': fname,
-                          'description': fdesc,
-                          'type': ftype,
-                          'url': furl})
-        return files
-
     def _setSchedule( self, sch=None ):
         self.__schedule=ConferenceSchedule(self)
         for session in self.getSessionList():

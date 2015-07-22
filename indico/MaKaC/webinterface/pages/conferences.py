@@ -59,7 +59,7 @@ from MaKaC.common.Conversion import Conversion
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
-from MaKaC.conference import Session, Contribution, LocalFile
+from MaKaC.conference import Session, Contribution
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.user import AvatarHolder
@@ -771,27 +771,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         wvars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return wvars
 
-    def _getMaterialFiles(self, material):
-        files = []
-        for res in material.getResourceList():
-            if isinstance(res, LocalFile):
-                fileType = res.getFileType().lower()
-                try:
-                    fileType = self._types[fileType]["mapsTo"]
-                except KeyError:
-                    fileType = "other"
-                filename = res.getName() or res.getFileName()
-                fileURL = str(urlHandlers.UHFileAccess.getURL(res))
-            else:
-                filename, fileType, fileURL = str(res.getName() or res.getURL()), "link", str(res.getURL())
-            files.append({'id': res.getId(),
-                          'name': filename,
-                          'description': res.getDescription(),
-                          'type': fileType,
-                          'url': fileURL,
-                          'pdfConversionStatus': res.getPDFConversionStatus()})
-        return files
-
     def _getItemType(self, item):
         itemClass = item.__class__.__name__
         if itemClass == 'BreakTimeSchEntry':
@@ -998,7 +977,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             vars['prettyDuration'] = MaKaC.common.utils.prettyDuration
             vars['parseDate'] = MaKaC.common.utils.parseDate
             vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
-            vars['getMaterialFiles'] = lambda material : self._getMaterialFiles(material)
             vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
             vars['getItemType'] = lambda item : self._getItemType(item)
             vars['getLocationInfo'] = WPTPLConferenceDisplay.getLocationInfo
