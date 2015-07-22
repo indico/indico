@@ -233,13 +233,6 @@ dropzone_css = Bundle('css/lib/dropzone.js/dropzone.css',
                       'sass/custom/_dropzone.scss',
                       filters=('pyscss', 'cssmin'), output='css/dropzone_css_%(version)s.min.css')
 
-selectize_js = rjs_bundle('selectize_js',
-                          'js/lib/selectize.js/selectize.js')
-
-selectize_css = Bundle('css/lib/selectize.js/selectize.css',
-                       'css/lib/selectize.js/selectize.default.css',
-                       filters='cssmin', output='css/selectize_css_%(version)s.min.css')
-
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
@@ -247,6 +240,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
     'js/jquery/jquery-ui.js',
     'js/lib/jquery.multiselect.js',
     'js/lib/jquery.multiselect.filter.js',
+    'js/lib/jquery.typeahead.js',
     'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
     namespace('js/jquery',
 
@@ -433,7 +427,6 @@ def register_all_js(env):
     env.register('jqplot_js', jqplot_js)
     env.register('zero_clipboard_js', zero_clipboard_js)
     env.register('dropzone_js', dropzone_js)
-    env.register('selectize_js', selectize_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
@@ -450,6 +443,7 @@ def register_all_css(env, main_css_file):
                    'lib/jquery.qtip.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
+                   'lib/jquery.typeahead.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
                    'jquery.qtip-custom.css',
@@ -460,7 +454,6 @@ def register_all_css(env, main_css_file):
     env.register('base_css', base_css)
     env.register('indico_badges_css', indico_badges_css)
     env.register('jqplot_css', jqplot_css)
-    env.register('selectize_css', selectize_css)
     env.register('dropzone_css', dropzone_css)
 
     # SASS/SCSS

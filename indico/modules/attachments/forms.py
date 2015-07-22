@@ -16,21 +16,23 @@
 
 from __future__ import unicode_literals
 
+
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
-from wtforms.fields.simple import StringField
+from wtforms.fields.simple import StringField, HiddenField
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.attachments.util import get_default_folder_names
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import PrincipalListField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import UsedIf
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
 
 class AttachmentFormBase(IndicoForm):
@@ -81,7 +83,7 @@ class EditAttachmentLinkForm(AttachmentLinkFormMixin, EditAttachmentFormBase):
 
 
 class AttachmentFolderForm(IndicoForm):
-    title = StringField(_("Name"), [DataRequired()], description=_("The name of the folder."))
+    title = HiddenField(_("Name"), [DataRequired()], description=_("The name of the folder."), widget=TypeaheadWidget())
     description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
     protected = BooleanField(_("Protected"), widget=SwitchWidget())
     acl = PrincipalListField(_("Grant Access To"), [UsedIf(lambda form, field: form.protected.data)],
@@ -91,6 +93,10 @@ class AttachmentFolderForm(IndicoForm):
                                      description=_("By default, folders are always visible, even if a user cannot "
                                                    "access them. You can disable this behavior here, hiding the folder "
                                                    "for anyone who does not have permission to access it."))
+
+    def __init__(self, *args, **kwargs):
+        super(AttachmentFolderForm, self).__init__(*args, **kwargs)
+        self.title.choices = [{'name': value} for value in get_default_folder_names()]
 
     @generated_data
     def protection_mode(self):

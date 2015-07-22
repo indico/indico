@@ -29,13 +29,11 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
 
     def getCSSFiles(self):
         return (WPConferenceModifBase.getCSSFiles(self) +
-                self._asset_env['vc_sass'].urls() +
-                self._asset_env['selectize_css'].urls())
+                self._asset_env['vc_sass'].urls())
 
     def getJSFiles(self):
         return (WPConferenceModifBase.getJSFiles(self) +
                 self._asset_env['modules_vc_js'].urls() +
-                self._asset_env['selectize_js'].urls() +
                 self._asset_env['zero_clipboard_js'].urls())
 
     def _setActiveSideMenuItem(self):

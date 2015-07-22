@@ -1,0 +1,59 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="form-row typeahead-container" data-tooltip-anchor>
+        <div class="typeahead-field">
+            <input id="{{ field.id }}-typeahead" autocomplete="off" class="typeahead" type="text"
+                   {%- if field.data is not none -%}value="{{ field._value() }}"{%- endif -%} name="{{ field.name }}">
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+
+            {% if field.widget.search_url %}
+                $('#{{ field.id }}-typeahead').removeAttr('name');
+
+                var params = {
+                    minLength: {{ field.widget.min_trigger_length or 0 }},
+                    dynamic: true,
+                    source: {
+                        url: [{
+                            url: {{ field.widget.search_url | tojson }},
+                            data: {
+                                q: {% raw %} '{{query}}' {% endraw %}
+                            }
+                        }],
+                        data: {{ options.source.data | tojson }}
+                    },
+                    callback: {
+                        onClickAfter: function(node, a, item, event) {
+                            if (!item) {
+                                return;
+                            }
+
+                            var field = $('{{ field.id }}-typeahead');
+                            if (!field.length) {
+                                field = $('<input>', {
+                                    type: 'hidden',
+                                    name: {{ field.name | tojson }}
+                                });
+                            }
+
+                            field.val(item['id']);
+                            field.insertAfter($('#{{ field.id }}-typeahead'));
+                        }
+                    }
+                };
+            {% else %}
+                var params = {};
+            {% endif %}
+
+            $('#{{ field.id }}-typeahead').typeahead(_.extend({}, {{ options | tojson }}, params));
+        })();
+    </script>
+{% endblock %}

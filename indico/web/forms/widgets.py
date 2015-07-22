@@ -135,27 +135,30 @@ class SyncedInputWidget(JinjaWidget):
             return self.default_widget(field, **kwargs)
 
 
-class SelectizeWidget(JinjaWidget):
+class TypeaheadWidget(JinjaWidget):
     """Renders a selectizer-based widget"""
 
-    def __init__(self):
-        super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
+    def __init__(self, typeahead_options=None, min_trigger_length=0):
+        super(TypeaheadWidget, self).__init__('forms/typeahead_widget.html')
+        self.typeahead_options = typeahead_options or {}
+        self.min_trigger_length = min_trigger_length
 
     def __call__(self, field, **kwargs):
         choices = []
-        if field.data is not None:
-            choices.append({'name': field.data.name, 'id': field.data.id})
+
+        if hasattr(field, 'choices'):
+            choices.extend(field.choices)
 
         options = {
-            'valueField': 'id',
-            'labelField': 'name',
-            'searchField': 'name',
-            'persist': False,
-            'options': choices,
-            'create': False,
-            'maxItems': 1,
-            'closeAfterSelect': True
+            'hint': True,
+            'searchOnFocus': True,
+            'display': 'name',
+            'mustSelectItem': True,
+            'source': {
+                'data': choices
+            }
         }
 
         options.update(kwargs.pop('options', {}))
-        return super(SelectizeWidget, self).__call__(field, options=options)
+        options.update(self.typeahead_options)
+        return super(TypeaheadWidget, self).__call__(field, options=options)

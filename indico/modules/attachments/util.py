@@ -107,3 +107,24 @@ def can_manage_attachments(obj, user):
     if isinstance(obj, SubContribution):
         return can_manage_attachments(obj.getContribution(), user)
     return obj.canModify(user.as_avatar) or obj.getAccessController().canUserSubmit(user.as_avatar)
+
+
+def get_default_folder_names():
+    return [
+        'Agenda',
+        'Document',
+        'Drawings',
+        'List of Actions',
+        'Minutes',
+        'Notes',
+        'Paper',
+        'Pictures',
+        'Poster',
+        'Proceedings',
+        'Recording',
+        'Slides',
+        'Summary',
+        'Text',
+        'Video',
+        'Webcast',
+    ]

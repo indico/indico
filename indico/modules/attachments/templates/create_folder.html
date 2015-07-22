@@ -6,7 +6,7 @@
     {{ form_rows(form, fields=('protected', 'acl')) }}
     {{ protection_message | safe }}
     {% call form_footer(attach_form) %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
+        <input class="i-button big highlight" data-disabled-until-change type="submit" value="{% trans %}Submit{% endtrans %}">
         <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     {% endcall %}
     <script>
