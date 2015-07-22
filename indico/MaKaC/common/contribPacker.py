@@ -92,39 +92,6 @@ class AbstractPacker:
         return fileHandler.getPath()
 
 
-class ContribPacker:
-    """
-    """
-
-    def __init__(self,conf):
-        self._conf=conf
-        self._items=0
-
-    def getItems(self):
-        return self._items
-
-    def _normalisePathItem(self,name):
-        return str(name).translate(string.maketrans("",""),"\\/")
-
-    def pack(self, contribList=[], fileHandler=None):
-        if len(contribList) <= 0:
-            raise MaKaCError(_("no contribution to pack"))
-        for contrib in contribList:
-            contribDirName = "%s_%s" % (contrib.getId(), contrib.getTitle())
-            for material in contrib.getAllMaterialList():
-                for res in material.getResourceList():
-                    if isinstance(res, conference.LocalFile):
-                        self._items += 1
-                        fileHandler.add("%s/%s/%s-%s-%s" % (self._normalisePathItem(contribDirName),
-                                                            self._normalisePathItem(material.getTitle()),
-                                                            self._normalisePathItem(contrib.getId()),
-                                                            self._normalisePathItem(res.getId()),
-                                                            self._normalisePathItem(res.getFileName())),
-                                        res.getFilePath())
-        fileHandler.close()
-        return fileHandler.getPath()
-
-
 class ReviewingPacker:
 
     """

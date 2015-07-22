@@ -37,43 +37,18 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from MaKaC.conference import SubContribution
 
 
-class AttachmentPackageMixin:
-    wp = None
+class AttachmentPackageGeneratorMixin:
 
-    def _process(self):
-        form = self._prepare_form()
-        if form.validate_on_submit():
-            return self._generate_zip_file(self._filter_attachments(form))
-
-        return self.wp.render_template('generate_package.html', self._conf, form=form)
-
-    def _prepare_form(self):
-        form = AttachmentPackageForm()
-        form.sessions.choices = self._load_session_data()
-        form.contributions.choices = self._load_contribution_data()
-        form.contributions_schedule_dates.choices = self._load_schedule_data()
-        return form
-
-    def _load_session_data(self):
-        return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
-
-    def _load_contribution_data(self):
-        return [(contrib.getId(), to_unicode(contrib.getTitle()))
-                for contrib in self._conf.getContributionList() if contrib.getOwner() == self._conf
-                and contrib.getStartDate()]
-
-    def _load_schedule_data(self):
-        dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList() if contrib.getStartDate()}
-        return sorted([(unicode(d), format_date(d, 'short')) for d in dates], key=itemgetter(1))
-
-    def _filter_attachments(self, form):
+    def _filter_attachments(self, filter_data):
         attachments = []
-        added_since = form.added_since.data
+        added_since = filter_data.get('added_since', None)
         attachments.extend(self._filter_protected(self._filter_top_level_attachments(added_since)))
-        attachments.extend(self._filter_protected(self._filter_by_sessions(form.sessions.data, added_since)))
+        attachments.extend(self._filter_protected(self._filter_by_sessions(filter_data.get('sessions', []),
+                                                                           added_since)))
 
-        contribution_ids = set(form.contributions.data +
-                               self._get_contributions_by_schedule_date(form.contributions_schedule_dates.data))
+        contribution_ids = set(filter_data.get('contributions', []) +
+                               self._get_contributions_by_schedule_date(filter_data.get('contributions_schedule_dates',
+                                                                                        [])))
         attachments.extend(self._filter_protected(self._filter_by_contributions(contribution_ids, added_since)))
         return attachments
 
@@ -165,3 +140,33 @@ class AttachmentPackageMixin:
             paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
 
         return reversed(paths)
+
+
+class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
+    wp = None
+
+    def _process(self):
+        form = self._prepare_form()
+        if form.validate_on_submit():
+            return self._generate_zip_file(self._filter_attachments(form.data))
+
+        return self.wp.render_template('generate_package.html', self._conf, form=form)
+
+    def _prepare_form(self):
+        form = AttachmentPackageForm()
+        form.sessions.choices = self._load_session_data()
+        form.contributions.choices = self._load_contribution_data()
+        form.contributions_schedule_dates.choices = self._load_schedule_data()
+        return form
+
+    def _load_session_data(self):
+        return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
+
+    def _load_contribution_data(self):
+        return [(contrib.getId(), to_unicode(contrib.getTitle()))
+                for contrib in self._conf.getContributionList() if contrib.getOwner() == self._conf
+                and contrib.getStartDate()]
+
+    def _load_schedule_data(self):
+        dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList() if contrib.getStartDate()}
+        return sorted([(unicode(d), format_date(d, 'short')) for d in dates], key=itemgetter(1))

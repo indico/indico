@@ -50,7 +50,7 @@ import MaKaC.webinterface.common.registrantNotificator as registrantNotificator
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker, ContribPacker
+from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker
 from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
@@ -66,6 +66,7 @@ from MaKaC.fossils.conference import ISessionBasicFossil
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file, url_for
+from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 
 
 class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
@@ -3086,7 +3087,7 @@ class RHMaterialPackageAbstract(RHConferenceModifBase):
         return send_file('abstractFiles.zip', path, 'ZIP', inline=False)
 
 
-class RHMaterialPackage(RHConferenceModifBase):
+class RHMaterialPackage(RHConferenceModifBase, AttachmentPackageGeneratorMixin):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -3098,11 +3099,7 @@ class RHMaterialPackage(RHConferenceModifBase):
     def _process(self):
         if not self._contribs:
             return "No contribution selected"
-        p=ContribPacker(self._conf)
-        path=p.pack(self._contribs, ZIPFileHandler())
-        if not p.getItems():
-            raise NoReportError(_("The selected package does not contain any items"))
-        return send_file('material.zip', path, 'ZIP', inline=False)
+        return self._generate_zip_file(self._filter_protected(self._filter_by_contributions(self._contribIds, None)))
 
 
 class RHAbstractBook( RHConfModifCFABase ):
