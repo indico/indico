@@ -286,13 +286,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 link = self._sectionMenu.getLinkByName(item.name)
                 link.setVisible(item.visible(self._conf))
 
-    def _defineToolBar(self):
-        pass
-
     def _display( self, params ):
         self._defineSectionMenu()
-        self._toolBar=wcomponents.WebToolBar()
-        self._defineToolBar()
         return WPConferenceBase._display(self,params)
 
     def _getNavigationBarHTML(self):
@@ -308,10 +303,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             item = item.getParent(self._navigationTarget)
         itemList.insert(0, i18nformat("""<a href=%s> _("Home")</a>""")%quoteattr(str(urlHandlers.UHConferenceDisplay.getURL(self._conf))) )
         return " &gt; ".join(itemList)
-
-    def _getToolBarHTML(self):
-        drawer=wcomponents.WConfTBDrawer(self._toolBar)
-        return drawer.getHTML()
 
     def _applyConfDisplayDecoration( self, body ):
         drawer = wcomponents.WConfTickerTapeDrawer(self._conf, self._tz)
@@ -333,7 +324,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                                     <div>
                                         <div></div>
                                         <div class="breadcrumps">%s</div>
-                                        <div style="float:right;">%s</div>
                                     </div>
                 <!--Main body-->
                                     <div class="mainContent">
@@ -341,10 +331,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                                         %s
                                         </div>
                                   </div>
-            </div>""" % (
-                    self._getNavigationBarHTML(),
-                    self._getToolBarHTML().strip(),
-                    body)
+            </div>""" % (self._getNavigationBarHTML(), body)
         return frame.getHTML( self._sectionMenu, body, frameParams)
 
     def _getHeadContent(self):
@@ -6028,9 +6015,7 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         ###############################
         p = WPConferenceDisplay( self._rh, self._conf )
         p._defineSectionMenu()
-        p._toolBar=wcomponents.WebToolBar()
-        p._defineToolBar()
-        params["bodyConf"] = p._applyConfDisplayDecoration( p._getBody( params ) )
+        params["bodyConf"] = p._applyConfDisplayDecoration(p._getBody(params))
         ###############################
         ###############################
 
