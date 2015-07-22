@@ -5,7 +5,7 @@
     <input type="hidden" name=${fid} value="">
 % else:
     <tr>
-        <td align="right" valign="top"  style="white-space:nowrap">
+        <td style="text-align: right; vertical-align: top; max-width: 200px">
             <span class="dataCaptionFormat">
                 ${field.getCaption()}
             </span>
