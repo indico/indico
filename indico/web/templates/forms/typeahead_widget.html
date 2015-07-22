@@ -3,8 +3,7 @@
 {% block html %}
     <div class="form-row typeahead-container" data-tooltip-anchor>
         <div class="typeahead-field">
-            <input id="{{ field.id }}" autocomplete="off" class="typeahead" type="text"
-                   {% if not search_url %}name="{{ field.name }}"{% endif %}
+            <input id="{{ field.id }}" autocomplete="off" class="typeahead" type="text" name="{{ field.name }}"
                    {%- if field.data is not none -%}value="{{ field._value() }}"{%- endif -%}>
         </div>
     </div>
@@ -27,7 +26,6 @@
             };
 
             {% if search_url %}
-                // TODO: we should have a separate option to determine if ONLY searched results are allowed
                 $.extend(true, params, {
                     dynamic: true,
                     source: {
@@ -37,25 +35,6 @@
                                 q: {% raw %}'{{query}}'{% endraw %}
                             }
                         }]
-                    },
-                    callback: {
-                        onClickAfter: function(node, a, item) {
-                            if (!item) {
-                                return;
-                            }
-
-                            var dataField = $('#{{ field.id }}-data');
-                            if (!dataField.length) {
-                                dataField = $('<input>', {
-                                    type: 'hidden',
-                                    id: '{{ field.id }}-data',
-                                    name: {{ field.name | tojson }}
-                                });
-                                dataField.insertAfter(field);
-                            }
-                            dataField.val(item['id']).triggerHandler('change');
-                            field.trigger('typeaheadSelected', [item]);
-                        }
                     }
                 });
             {% endif %}
