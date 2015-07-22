@@ -129,15 +129,3 @@ class RHContributionToMarcXML(RHContributionDisplay):
         outgen.contribToXMLMarc21(self._target, xmlgen)
         xmlgen.closeTag("marc:record")
         return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
-
-
-class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):
-
-    def _checkProtection(self):
-        if not self._target.canModify( self.getAW() )  and not self._target.canUserSubmit(self.getAW().getUser()):
-            if self._target.getModifKey() != "":
-                raise ModificationError()
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                raise ModificationError()
