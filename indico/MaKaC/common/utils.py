@@ -14,26 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# stdlib imports
-import time, re, os
+import os
+import re
+import time
+from datetime import datetime
 from random import randint
-from datetime import datetime, date, timedelta
 
-# 3rd party imports
-from BTrees.OOBTree import OOBTree
+from indico.core.config import Config
 from indico.util.date_time import format_datetime, format_date, format_time
 
-# indico legacy imports
-from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
-    isTomorrow
-from MaKaC.common import info
 from MaKaC import errors
+from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate, isTomorrow
 
-# indico imports
-from indico.core.config import Config
-from indico.core.db import DBMgr
-# backward compatibility
-from indico.util.string import truncate
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -42,13 +34,6 @@ if os.name == 'posix':
 _KEY_DEFAULT_LENGTH = 20
 _FAKENAME_SIZEMIN = 5
 _FAKENAME_SIZEMAX = 10
-
-
-def isWeekend(d):
-    """
-    Accepts date or datetime object.
-    """
-    return d.weekday() in [5, 6]
 
 
 def stringToDate( str ):
@@ -77,53 +62,10 @@ def getTextColorFromBackgroundColor(bgcolor):
             pass
     return "#202020"
 
-charRplace = [
-[u'\u2019', u"'"],
-[u'\u0153', u"oe"],
-[u'\u2026', u"..."],
-[u'\u2013', u"-"],
-[u'\u2018', u"'"]
-]
-
-def utf8Tolatin1(text):
-    t = text.decode("utf8")
-    for i in charRplace:
-        t = t.replace(i[0], i[1])
-    return t.encode("latin1",'replace')
 
 def utf8rep(text):
     # \x -> _x keeps windows systems satisfied
     return text.decode('utf-8').encode('unicode_escape').replace('\\x','_x')
-
-def sortUsersByName(x,y):
-    return cmp(x.getFamilyName().lower(),y.getFamilyName().lower())
-
-def sortUsersByFirstName(x,y):
-    return cmp(x.getFirstName().lower(),y.getFirstName().lower())
-
-def sortUsersByAffiliation(x,y):
-    return cmp(x.getAffiliation().lower(),y.getAffiliation().lower())
-
-def sortUsersByEmail(x,y):
-    return cmp(x.getEmail().lower(),y.getEmail().lower())
-
-def sortGroupsByName(x,y):
-    return cmp(x.getName().lower(),y.getName().lower())
-
-def sortDomainsByName(x,y):
-    return cmp(x.getName().lower(),y.getName().lower())
-
-def sortFilesByName(x,y):
-    return cmp(x.getName().lower(),y.getName().lower())
-
-def sortContributionByDate(x, y):
-    return cmp(x.getStartDate(), y.getStartDate())
-
-def sortSlotByDate(x,y):
-    return cmp(x.getStartDate(),y.getStartDate())
-
-def sortCategoryByTitle(x,y):
-    return cmp(x.getTitle().lower(),y.getTitle().lower())
 
 
 def validMail(emailstr, allowMultiple=True):
@@ -215,10 +157,6 @@ def dictionaryToString(dico):
             attrString += """%s="%s" """%(attrName,attrVal)
     return attrString
 
-def dictionaryToTupleList(dic):
-    return [(k,v) for (k,v) in dic.iteritems()]
-
-
 def removeQuotes(myString):
     """encode/replace problematics quotes."""
     # XXX: why are we handling this one in a special way? there are more non-ascii quotes!
@@ -231,53 +169,6 @@ def putbackQuotes(myString):
     """cancel (almost all) effects of function removeQuotes()."""
     return str(myString).strip().replace("&quot;", '"').replace("&rsquo;", "'")
 
-def newFakeName(minSize=_FAKENAME_SIZEMIN, maxSize=_FAKENAME_SIZEMAX):
-    """Give randomly a fake name. Useful when we want to make people anonymous..."""
-    #check
-    try:
-        minSize = int(minSize)
-    except:
-        minSize = _FAKENAME_SIZEMIN
-    try:
-        maxSize = int(maxSize)
-    except:
-        maxSize = _FAKENAME_SIZEMAX
-    #next
-    length = randint(minSize,maxSize)
-    uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    vowels = "aeiouy"
-    consonants = "bcdfghjklmnpqrstvwxz"
-    upperIndexMax = len(uppers)-1
-    vowelIndexMax = len(vowels)-1
-    consonantIndexMax = len(consonants)-1
-    #first capital letter
-    fakename = uppers[ randint(0,upperIndexMax) ]
-    #following lowercase letters
-    isVowel = fakename.lower() in vowels
-    for i in range(1, length):
-        if isVowel:
-            fakename += consonants[ randint(0,consonantIndexMax) ]
-            isVowel = False
-        else:
-            fakename += vowels[ randint(0,vowelIndexMax) ]
-            isVowel = True
-    return fakename
-
-
-def newKey(length=_KEY_DEFAULT_LENGTH):
-    """returns a new crypted key of given length."""
-    #check
-    try:
-        length = int(length)
-    except:
-        length = _KEY_DEFAULT_LENGTH
-    #next
-    table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    key = ""
-    indexMax = len(table)-1
-    for i in range(length):
-        key += table[ randint(0,indexMax) ]
-    return key
 
 def nodeValue(node):
     """given a leaf node, returns its value."""
@@ -309,14 +200,6 @@ def _positiveInt(val):
     else:
         return val
 
-def _negativeInt(val):
-    """same as _int(), but returns 0 when you give a positive int."""
-    val = _int(val)
-    if val>0:
-        return 0
-    else:
-        return val
-
 def encodeUnicode(text, sourceEncoding = "utf-8"):
     try:
         tmp = str(text).decode( sourceEncoding )
@@ -326,11 +209,6 @@ def encodeUnicode(text, sourceEncoding = "utf-8"):
         except:
             return ""
     return tmp.encode('utf-8')
-
-
-def unicodeLength(s, encoding='utf-8'):
-    """Returns the length of the string s as an unicode object."""
-    return len(s.decode(encoding, 'replace'))
 
 
 def unicodeSlice(s, start, end, encoding='utf-8'):
@@ -415,71 +293,6 @@ def formatDuration(duration, units = 'minutes', truncate = True):
     else:
         return result
 
-
-def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = False, dayFormat = None, capitalize = True, showWeek = False):
-    """ Formats two dates, such as an event start and end date, taking into account if they happen the same day
-        (given a timezone).
-        -date1 and date2 have to be timezone-aware.
-        -If no tz argument is provided, tz will be the timezone of date1.
-         tz can be a string or a timezone "object"
-        -dayFormat and showWeek are passed to formatDate function, so they behave the same way as in that function
-        -capitalize: capitalize week days AND first letter of sentence if there is one
-
-        Examples: 17/07/2009 from 08:00 to 18:00 (default args, 2 dates in same day)
-                  from 17/07/2009 at 08:00 to 19/07/2009 at 14:00 (default args, 2 dates in different day)
-                  Fri 17/07/2009 from 08:00 to 18:00 (showWeek = True, default args, 2 dates in same day)
-                  today from 10:00 to 11:00 (useToday = True, default args, 2 dates in same day and it happens to be today)
-    """
-
-    if not tz:
-        tz = date1.tzinfo
-
-    date1 = getAdjustedDate(date1, tz = tz)
-    date2 = getAdjustedDate(date2, tz = tz)
-
-    sameDay = isSameDay(date1, date2, tz)
-
-    date1text = ''
-    date2text = ''
-    if useToday:
-        if isToday(date1, tz):
-            date1text = "today"
-        if isToday(date2, tz):
-            date2text = "today"
-    if useTomorrow:
-        if isTomorrow(date1, tz):
-            date1text = "isTomorrow"
-        if isTomorrow(date2, tz):
-            date2text = "isTomorrow"
-
-
-    if not date1text:
-        date1text = formatDate(date1.date(), showWeek, dayFormat)
-        if capitalize:
-            date1text = date1text.capitalize()
-    if not date2text:
-        date2text = formatDate(date2.date(), showWeek, dayFormat)
-        if capitalize:
-            date2text = date2text.capitalize()
-
-    time1text = formatTime(date1.time())
-    time2text = formatTime(date2.time())
-
-    if sameDay:
-        result = date1text + ' from ' + time1text + ' to ' + time2text
-    else:
-        if capitalize:
-            fromText = 'From '
-        else:
-            fromText = 'from '
-        result = fromText + date1text + ' at ' + time1text + ' to ' + date2text + ' at ' + time2text
-
-    return result
-
-
-def parseTime(timeStr, format='%H:%M'):
-    t=time.strptime(timeStr, format)
-    return datetime(t.tm_year,t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min).time()
 
 def parseDateTime(dateTimeStr):
     t=time.strptime(dateTimeStr, '%d/%m/%Y %H:%M')

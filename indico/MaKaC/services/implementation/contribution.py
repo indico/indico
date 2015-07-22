@@ -87,14 +87,6 @@ class ContributionModifBase(ProtectedModificationService, ContributionBase):
                 return
         ProtectedModificationService._checkProtection(self)
 
-class ContributionTextModificationBase(TextModificationBase, ContributionBase):
-    pass
-
-class ContributionHTMLModificationBase(HTMLModificationBase, ContributionBase):
-    pass
-
-class ContributionDateTimeModificationBase (DateTimeModificationBase, ContributionBase):
-    pass
 
 class ContributionAddSubContribution(ContributionModifBase):
     def _checkParams(self):

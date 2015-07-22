@@ -22,36 +22,15 @@ import stat
 import datetime
 import random
 import sys
-from MaKaC.i18n import _
 
-import ZODB
 from persistent import Persistent
-
 from BTrees import OOBTree
-from MaKaC.common.Counter import Counter
 
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.util.i18n import _
 from MaKaC.review import Abstract
 from MaKaC.registration import Registrant
-
-class Repository:
-    """Generic class for file repositories. A file repository knows where to
-        store files (binary, text, ...) and provides services for archiving
-        (by uniquely identifyng them inside the repository) and accessing
-        them.
-       This is a base class that provides a common interface. Any implentation
-        should inherit from this one.
-    """
-    def getInstance( cls ):
-        return None
-    getInstance = classmethod(getInstance)
-
-    def storeFile( self, newFile ):
-        raise Exception( _("not implemented for class %s")%self.__class__.__name__)
-
-    def retireFile( self, file ):
-        raise Exception( _("not implemented for class %s")%self.__class__.__name__)
 
 
 class MaterialLocalRepository(Persistent):

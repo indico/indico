@@ -418,6 +418,7 @@ class DateTimeModificationBase( TextModificationBase ):
         except TimingError,e:
             raise ServiceError("ERR-E2", e.getMessage())
 
+
 class ListModificationBase:
     """ Base class for a list modification.
         The class that inherits from this must have:
@@ -429,33 +430,6 @@ class ListModificationBase:
         if self._params.has_key('value'):
             pm = ParameterManager(self._params)
             self._value = pm.extract("value", pType=list, allowEmpty=True)
-        else:
-            self._value = None
-
-        if self._value == None:
-            return self._handleGet()
-        else:
-            self._handleSet()
-
-        return self._value
-
-class TwoListModificationBase:
-    """ Base class for two lists modification.
-        The class that inherits from this must have:
-        -a _handleGet() method that returns a list, given self._destination
-        -a _handleSet() method which can use self._value and self._destination to process the input.
-        self._value will be a list. self._destination will be 'left' or 'right'
-    """
-
-    def _getAnswer(self):
-        self._destination = self._params.get('destination', None)
-        if self._destination == None or (self._destination != 'right' and self._destination != 'left'):
-            #TODO: add this error to the wiki
-            raise ServiceError("ERR-E4", 'Destination list not set to "right" or "left"')
-
-        if self._params.has_key('value'):
-            pm = ParameterManager(self._params)
-            self._value = pm.extract("value", pType=list, allowEmpty=False)
         else:
             self._value = None
 

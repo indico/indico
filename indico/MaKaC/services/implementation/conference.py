@@ -132,11 +132,6 @@ class ConferenceHTMLModificationBase(HTMLModificationBase, ConferenceModifBase):
     pass
 
 
-class ConferenceDateTimeModificationBase (DateTimeModificationBase, ConferenceModifBase):
-    #Note: don't change the order of the inheritance here!
-    pass
-
-
 class ConferenceListModificationBase (ListModificationBase, ConferenceModifBase):
     #Note: don't change the order of the inheritance here!
     pass
@@ -259,29 +254,6 @@ class ConferenceBookingModification(ConferenceTextModificationBase):
         return {'location': loc.getName() if loc else "",
                 'room': room.name if room else "",
                 'address': loc.getAddress() if loc else ""}
-
-
-class ConferenceBookingDisplay(ConferenceDisplayBase):
-    """
-        Conference location
-    """
-    def _getAnswer(self):
-        loc = self._target.getLocation()
-        room = self._target.getRoom()
-        if loc:
-            locName = loc.getName()
-            locAddress = loc.getAddress()
-        else:
-            locName = ''
-            locAddress = ''
-        if room:
-            roomName = room.name
-        else:
-            roomName = ''
-
-        return {'location': locName,
-                'room': roomName,
-                'address': locAddress}
 
 
 class ConferenceShortURLModification(ConferenceTextModificationBase):
@@ -477,44 +449,6 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
 
         else:
             return self._params.get('value')
-
-
-class ConferenceDateTimeEndModification(ConferenceDateTimeModificationBase):
-    """ Conference end date/time modification
-        When changing the end date / time, the _setParam method will be called by DateTimeModificationBase's _handleSet method.
-        The _setParam method will return None (if there are no problems),
-        or a FieldModificationWarning object if the event start date change was OK but there were side problems,
-        such as an object observing the event start date change could not perform its task
-        (Ex: a videoconference booking could not be moved in time according with the conference's time change)
-    """
-    def _setParam(self):
-
-        ContextManager.set('dateChangeNotificationProblems', {})
-
-        if (self._pTime < self._target.getStartDate()):
-            raise ServiceError("ERR-E3",
-                               "Date/time of end cannot " +
-                               "be lower than data/time of start")
-        self._target.setDates(self._target.getStartDate(),
-                              self._pTime.astimezone(timezone("UTC")),
-                              moveEntries=0)
-
-        dateChangeNotificationProblems = ContextManager.get('dateChangeNotificationProblems')
-
-        if dateChangeNotificationProblems:
-            warningContent = []
-            for problemGroup in dateChangeNotificationProblems.itervalues():
-                warningContent.extend(problemGroup)
-
-            return Warning(_('Warning'), [_('The end date of your event was changed correctly.'),
-                                          _('However, there were the following problems:'),
-                                          warningContent])
-        else:
-            return None
-
-    def _handleGet(self):
-        return datetime.datetime.strftime(self._target.getAdjustedEndDate(),
-                                          '%d/%m/%Y %H:%M')
 
 
 class ConferenceListSessions (ConferenceListModificationBase):
@@ -1491,42 +1425,6 @@ class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase )
     def _handleGet(self):
         return self._target.getProgramDescription()
 
-class ConferenceAddParticipantBase(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        self._pm = ParameterManager(self._params)
-
-
-    def _isEmailAlreadyUsed(self, email):
-        for part in self._conf.getParticipation().getParticipantList():
-            if email == part.getEmail():
-                return True
-        return False
-
-
-class ConferenceParticipantAddExisting(ConferenceAddParticipantBase):
-
-    def _checkParams(self):
-        ConferenceAddParticipantBase._checkParams(self)
-        self._action = self._pm.extract("action", pType=str, allowEmpty=False)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
-        # Check if there is already a participant with the same email
-        for part in self._userList:
-            if self._isEmailAlreadyUsed(part["email"]):
-                raise ServiceAccessError(_("The email address (%s) of a participant you are trying to add is already used by another participant. Participant(s) not added.") % part["email"])
-
-    def _getAnswer(self):
-        eventManager = self._getUser()
-        for part in self._userList:
-            ah = AvatarHolder()
-            av = ah.getById(part["id"])
-            participant = Participant(self._conf, av)
-            if self._action == "add":
-                self._conf.getParticipation().addParticipant(participant, eventManager)
-            elif self._action == "invite":
-                self._conf.getParticipation().inviteParticipant(participant, eventManager)
-        return fossilize(self._conf.getParticipation().getParticipantList())
 
 class ConferenceManagerListBase(ConferenceModifBase):
 

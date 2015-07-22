@@ -1000,53 +1000,6 @@ class ConferenceGetAllConveners(conferenceServices.ConferenceDisplayBase):
                 d[elem['name']] = elem
         return d.values()
 
-### Breaks
-
-class BreakBase(object):
-
-    def _checkParams( self ):
-
-        try:
-            self._target = self._conf = conference.ConferenceHolder().getById(self._params["conference"]);
-            if self._conf == None:
-                raise Exception("Conference id not specified.")
-        except:
-            raise ServiceError("ERR-E4", "Invalid conference id.")
-
-        slotId = self._params.get("slot", None)
-
-        try:
-            if slotId != None:
-                self._slot = self._session.getSlotById(slotId)
-        except Exception, e:
-            raise ServiceError("ERR-S3", "Invalid slot id.",inner=str(e))
-
-        except:
-            raise ServiceError("ERR-C0", "Invalid break id.")
-
-        try:
-            entry = self._params["break"]
-
-            if slotId != None:
-                self._break = self._slot.getSchedule().getEntryById(entry)
-            else:
-                self._break = self._conf.getSchedule().getEntryById(entry)
-
-            if self._break == None:
-                raise Exception("Break id not specified.")
-        except:
-            raise ServiceError("ERR-C0", "Invalid break id.")
-
-
-        # create a parameter manager that checks the consistency of passed parameters
-        self._pm = ParameterManager(self._params)
-
-class BreakDisplayBase(base.ProtectedDisplayService, BreakBase):
-
-    def _checkParams(self):
-        BreakBase._checkParams(self)
-        base.ProtectedDisplayService._checkParams(self)
-
 
 class GetUnscheduledContributions(ScheduleOperation):
 

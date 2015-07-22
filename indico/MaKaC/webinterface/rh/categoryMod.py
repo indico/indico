@@ -22,7 +22,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 from MaKaC.webinterface.user import UserListModificationBase
 from indico.core.config import Config
-from MaKaC.common.utils import sortCategoryByTitle, validMail
+from MaKaC.common.utils import validMail
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
@@ -352,7 +352,7 @@ class _ActionSortCategories:
 
     def perform(self):
         cl = self._rh._target.getSubCategoryList()
-        cl.sort(sortCategoryByTitle)
+        cl.sort(key=lambda c: c.getTitle().lower())
         for categ in cl:
             categ.setOrder(cl.index(categ))
 

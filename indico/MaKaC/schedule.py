@@ -592,8 +592,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
     """
     """
 
-#    fossilizes(IConferenceScheduleDisplayFossil, IConferenceScheduleMgmtFossil)
-
     def __init__(self,conf):
         TimeSchedule.__init__(self,conf)
 

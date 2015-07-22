@@ -77,11 +77,6 @@ class XMLGen:
         self.writeText(value, True)
         self.closeTag(name, True)
 
-    def writeComment(self, commentText):
-        self.xml.append("<!-- ")
-        self.writeText(commentText, True)
-        self.xml.append(" -->\r\n")
-
     def writeXML(self,text):
         #add already well-formated text
         self.xml.append( text )

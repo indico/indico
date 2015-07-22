@@ -439,10 +439,6 @@ class WPMContributionModifTools(contributions.WPContributionModifTools):
 #    def _getBody( self, params ):
 #        return ContribModifTabsFrame._getBody(self, params)
 
-class WMContribModifMain(contributions.WContribModifMain):
-    pass
-
-
 class WPMContribAddSC(contributions.WPContribAddSC):
     pass
 
@@ -506,20 +502,6 @@ class WMConfModifMainData(conferences.WConfModifMainData):
 class WPMConfModifAC(conferences.WPConfModifAC):
     pass
 
-class WMConfModifAC(conferences.WConfModifAC):
-    pass  #Depends which frames we need inside of AC
-
-
-##Tools ##
-class WPMConfModifTools (conferences.WPConfModifToolsBase):
-
-    def _getTabContent( self, params ):
-        wc = WMConfModifTools( self._conf, self._rh._getUser() )
-        p = {
-            "deleteConferenceURL": urlHandlers.UHConfDeletion.getURL( self._conf ), \
-            "cloneConferenceURL": urlHandlers.UHConfClone.getURL( self._conf ), \
-            }
-        return wc.getHTML( p )
 
 class WPMConfModifListings (conferences.WPConfModifListings):
 

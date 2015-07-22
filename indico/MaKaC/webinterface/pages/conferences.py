@@ -1036,12 +1036,6 @@ class WPrintPageFrame (wcomponents.WTemplated):
     pass
 
 
-class WText(wcomponents.WTemplated):
-
-    def __init__(self):
-        wcomponents.WTemplated("events/Text")
-
-
 class WConfDisplayBodyBase(wcomponents.WTemplated):
 
     def _getTitle(self):
@@ -2619,11 +2613,6 @@ class WEmailToConveners(wcomponents.WTemplated):
         vars["body"]=""
         return vars
 
-class WPConfAllParticipants( WPConfModifListings ):
-
-    def _getTabContent( self, params ):
-        p = wcomponents.WConferenceAllParticipants( self._conf )
-        return p.getHTML()
 
 #---------------------------------------------------------------------------------------
 
@@ -5467,28 +5456,6 @@ class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase
                 "reminder": _("reminder")
                 })
 
-class WAbstractBookCustomise(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        url=urlHandlers.UHConfAbstractBookPerform.getURL(self._conf)
-        vars["getPDFURL"]=quoteattr(str(url))
-        return vars
-
-class WPAbstractBookCustomise( WPConferenceDefaultDisplayBase ):
-    navigationEntry = navigation.NEAbstractBookCustomise
-
-    def _getBody( self, params ):
-        wc = WAbstractBookCustomise( self._conf )
-        return wc.getHTML(params)
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._abstractsBookOpt)
-
 
 class WConfModifReschedule(wcomponents.WTemplated):
 
@@ -5509,19 +5476,6 @@ class WPConfModifReschedule(WPConferenceModifBase):
     def _getPageContent( self, params):
         wc=WConfModifReschedule(self._targetDay)
         p={"postURL":quoteattr(str(urlHandlers.UHConfModifReschedule.getURL(self._conf)))}
-        return wc.getHTML(p)
-
-class WPConfModifRelocate(WPConferenceModifBase):
-
-    def __init__(self, rh, conf, entry, targetDay):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._targetDay=targetDay
-        self._entry=entry
-
-    def _getPageContent( self, params):
-        wc=wcomponents.WSchRelocate(self._entry)
-        p={"postURL":quoteattr(str(urlHandlers.UHConfModifScheduleRelocate.getURL(self._entry))), \
-                "targetDay":quoteattr(str(self._targetDay))}
         return wc.getHTML(p)
 
 

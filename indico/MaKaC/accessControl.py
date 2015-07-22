@@ -471,12 +471,6 @@ class AccessController(Persistent):
         pass
 
 
-class CategoryAC(AccessController):
-
-    def __init__( self ):
-        pass
-
-
 class AccessWrapper:
     """This class encapsulates the information about an access to the system. It
             must be initialised by clients if they want to perform access

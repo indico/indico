@@ -4402,104 +4402,6 @@ class ConferenceHolder( ObjectHolder ):
         return event
 
 
-class Observer(object):
-    """ Base class for Observer objects.
-        Inheriting classes should overload the following boolean class attributes:
-            _shouldBeTitleNotified
-            _shouldBeDateChangeNotified
-            _shouldBeLocationChangeNotified
-            _shouldBeDeletionNotified
-        And set them to True if they want to be notified of the corresponding event.
-        In that case, they also have to implement the corresponding methods:
-            _notifyTitleChange (for title notification)
-            _notifyEventDateChanges and _notifyTimezoneChange (for date / timezone notification)
-            _shouldBeLocationChangeNotified (for location notification)
-            _notifyDeletion (for deletion notification).
-        The interface for those methods is also specified in this class. If the corresponding
-        class attribute is set to False but the method is not implemented, an exception will be thrown.
-    """
-    _shouldBeTitleNotified = False
-    _shouldBeDateChangeNotified = False
-    _shouldBeLocationChangeNotified = False
-    _shouldBeDeletionNotified = False
-
-    def getObserverName(self):
-        name = "'Observer of class" + self.__class__.__name__
-        try:
-            conf = self.getOwner()
-            name = name + " of event " + conf.getId() + "'"
-        except AttributeError:
-            pass
-        return name
-
-    def notifyTitleChange(self, oldTitle, newTitle):
-        if self._shouldBeTitleNotified:
-            self._notifyTitleChange(oldTitle, newTitle)
-
-    def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
-        if self._shouldBeDateChangeNotified:
-            self._notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
-
-    def notifyTimezoneChange(self, oldTimezone, newTimezone):
-        if self._shouldBeDateChangeNotified:
-            self._notifyTimezoneChange(oldTimezone, newTimezone)
-
-    def notifyLocationChange(self, newLocation):
-        if self._shouldBeLocationChangeNotified:
-            self._notifyLocationChange(newLocation)
-
-    def notifyDeletion(self):
-        if self._shouldBeDeletionNotified:
-            self._notifyDeletion()
-
-    def _notifyTitleChange(self, oldTitle, newTitle):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object's title has changed
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method _notifyTitleChange")
-
-    def _notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the start and / or end dates of the object it is attached to has changed.
-            If the observer finds any problems during whatever he needs to do as a consequence of
-            the event dates changing, he should write strings describing the problems
-            in the 'dateChangeNotificationProblems' context variable (which is a list of strings).
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
-
-    def _notifyTimezoneChange(self, oldTimezone, newTimezone):
-        """ To be implemented by inheriting classes.
-            Notifies the observer that the end date of the object it is attached to has changed.
-            This method has to return a list of strings describing problems encountered during
-            whatever the DateChangeObserver object does as a consequence of the notification.
-            If there are no problems, the DateChangeObserver should return an empty list.
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
-
-    def _notifyLocationChange(self):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the location of the object it is attached to has changed.
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyLocationChange")
-
-    def _notifyDeletion(self):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object it is attached to has been deleted
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyDeletion")
-
-class TitleChangeObserver(Observer):
-    """ Base class for objects who want to be notified of a Conference object being deleted.
-        Inheriting classes have to implement the notifyTitleChange method, and probably the __init__ method too.
-    """
-
-    def notifyTitleChange(self, oldTitle, newTitle):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object's title has changed
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTitleChange")
-
-
 class SessionChair(ConferenceParticipation):
 
     def __init__(self):
@@ -5012,7 +4914,7 @@ class Session(CommonObjectBase, Locatable):
 
     def getSortedSlotList(self):
         sl = self.getSlotList()
-        sl.sort(utils.sortSlotByDate)
+        sl.sort(key=lambda s: s.getStartDate())
         return sl
 
     def getMinSlotStartTime(self):
@@ -9795,7 +9697,7 @@ class Material(CommonObjectBase):
     def getResourceList(self, sort=True):
         list = self.__resources.values()
         if sort:
-            list.sort(utils.sortFilesByName)
+            list.sort(key=lambda f: f.getName().lower())
         return list
 
     def getNbResources(self ):

@@ -117,13 +117,7 @@ class ConferenceReviewingAssignStaffBasePRMReferee(ConferenceReviewingAssignStaf
             ProtectedModificationService._checkProtection(self)
 
 
-
 class ConferenceReviewingSetupTextModificationBase(TextModificationBase, ConferenceReviewingPRMBase):
-    #Note: don't change the order of the inheritance here!
-    pass
-
-
-class ConferenceReviewingDateTimeModificationBase (DateTimeModificationBase, ConferenceReviewingPRMBase):
     #Note: don't change the order of the inheritance here!
     pass
 

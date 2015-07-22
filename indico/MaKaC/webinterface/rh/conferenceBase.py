@@ -81,15 +81,6 @@ class RHSessionBase( RHConferenceSite ):
         self._session = self._target = l.getObject()
         self._conf = self._session.getConference()
 
-class RHSessionSlotBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setSlot( params )
-        self._slot = self._target = l.getObject()
-        self._session = self._slot.getSession()
-        self._conf = self._session.getConference()
-
 
 class RHContributionBase( RHConferenceSite ):
 
@@ -109,22 +100,6 @@ class RHSubContributionBase( RHConferenceSite ):
         self._conf = self._contrib.getConference()
 
 
-class RHMaterialBase(RHConferenceSite):
-
-    def _checkParams(self, params):
-        l = locators.WebLocator()
-        l.setMaterial(params)
-        self._material = self._target = l.getObject()
-        if self._material is None:
-            raise NotFoundError(_("The material you are trying to access does not exist or was removed").format(
-                                params['confId']),
-                                title=_("Resource not found"))
-
-        self._conf = self._material.getConference()
-        if self._conf is None:
-            self._categ = self._material.getCategory()
-
-
 class RHFileBase(RHConferenceSite):
 
     def _checkParams(self, params):
@@ -136,17 +111,6 @@ class RHFileBase(RHConferenceSite):
         self._conf = self._file.getConference()
         if self._conf is None:
             self._categ = self._file.getCategory()
-
-
-class RHLinkBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setResource( params )
-        self._link = self._target = l.getObject()
-        self._conf = self._link.getConference()
-        if self._conf == None:
-            self._categ=self._link.getCategory()
 
 
 class RHTrackBase( RHConferenceSite ):

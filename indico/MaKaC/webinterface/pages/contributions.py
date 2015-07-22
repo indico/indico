@@ -331,45 +331,6 @@ class WPContributionModifTools(WPContributionModifBase):
         return wcomponents.WContribModifTool().getHTML({"deleteContributionURL": urlHandlers.UHContributionDelete.getURL(self._target)})
 
 
-class WAuthorTable(wcomponents.WTemplated):
-
-    def __init__(self, authList, contrib):
-        self._list = authList
-        self._conf = contrib.getConference()
-        self._contrib = contrib
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        urlGen = vars.get("modAuthorURLGen", None)
-        l = []
-        for author in self._list:
-            authCaption = author.getFullName()
-            if author.getAffiliation() != "":
-                authCaption = "%s (%s)" % (authCaption, author.getAffiliation())
-            if urlGen:
-                authCaption = """<a href=%s>%s</a>""" % (urlGen(author), self.htmlText(authCaption))
-            href = "\"\""
-            if author.getEmail() != "":
-                mailtoSubject = """[%s] _("Contribution") %s: %s""" % (self._conf.getTitle(), self._contrib.getId(), self._contrib.getTitle())
-                mailtoURL = "mailto:%s?subject=%s" % (author.getEmail(), urllib.quote(mailtoSubject))
-                href = quoteattr(mailtoURL)
-            emailHtml = """ <a href=%s><img src="%s" style="border:0px" alt="email"></a> """ % (href, Config.getInstance().getSystemIconURL("smallEmail"))
-            upURLGen = vars.get("upAuthorURLGen", None)
-            up = ""
-            if upURLGen is not None:
-                up = """<a href=%s><img src=%s border="0" alt="up"></a>""" % (quoteattr(str(upURLGen(author))), quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))))
-            downURLGen = vars.get("downAuthorURLGen", None)
-            down = ""
-            if downURLGen is not None:
-                down = """<a href=%s><img src=%s border="0" alt="down"></a>""" % (quoteattr(str(downURLGen(author))), quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))))
-            l.append("""<input type="checkbox" name="selAuthor" value=%s>%s%s%s %s""" % (quoteattr(author.getId()), up, down, emailHtml, authCaption))
-        vars["authors"] = "<br>".join(l)
-        vars["remAuthorsURL"] = vars.get("remAuthorsURL", "")
-        vars["addAuthorsURL"] = vars.get("addAuthorsURL", "")
-        vars["searchAuthorURL"] = vars.get("searchAuthorURL", "")
-        return vars
-
-
 class WContribModifMain(wcomponents.WTemplated):
 
     def __init__(self, contribution, eventType="conference"):
@@ -895,17 +856,6 @@ class WPContributionDeletion( WPContributionModifTools ):
                 'contribList': [self._target],
                 'postURL': urlHandlers.UHContributionDelete.getURL(self._target)
                 })
-
-
-class WPContributionReportNumberEdit(WPContributionModifBase):
-
-    def __init__(self, rh, contribution, reportNumberSystem):
-        WPContributionModifBase.__init__(self, rh, contribution)
-        self._reportNumberSystem=reportNumberSystem
-
-    def _getTabContent( self, params):
-        wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "contribution")
-        return wc.getHTML()
 
 
 class WContributionICalExport(WICalExportBase):

@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.schedule as schedule
-import MaKaC.conference as conference
-from datetime import timedelta,datetime
-import pytz
+from datetime import timedelta
+
 from pytz import timezone
 from pytz import all_timezones
-from MaKaC.errors import MaKaCError
+
+from MaKaC import conference, schedule
+
 
 class TimeTable(object):
 
@@ -33,10 +33,6 @@ class TimeTable(object):
         #self.listEntries = schedule.getEntries()
         self._tz = tz
         self.mapEntryList(self._sch.getEntries())
-
-
-
-
 
     def setStartDate( self, date):
         self.__startDate = date
@@ -857,91 +853,6 @@ class Container(object):
         return False
 
 
-class PlainTimeTable(object):
-
-    def __init__( self, schedule=None, tz = 'UTC' ):
-        self._tz = tz
-        sd, ed = schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz)
-        self.setStartDate( sd )
-        self.setEndDate( ed )
-
-    def getTZ(self):
-        return self._tz
-
-    def setStartDate( self, date):
-        self._startDate = date
-
-    def getStartDate( self ):
-        return self._startDate
-
-    def setEndDate( self, date):
-        self._endDate = date
-
-    def getEndDate( self ):
-        return self._endDate
-
-    def _initialise( self ):
-        self._days = []
-        iDate = self.getStartDate()
-        while iDate.date()<=self.getEndDate().date():
-            self._days.append( PlainDay( iDate ) )
-            iDate = iDate+timedelta(days=1)
-
-    def reGenerate( self ):
-        self._initialise()
-
-    def getDayList( self ):
-        return self._days
-
-    def mapEntryList( self, entryList, aw, hd ):
-        self._initialise()
-        #to be optimised
-        lastIndex = 0
-        for day in self.getDayList():
-            entryList = entryList[lastIndex:]
-            lastIndex = day.mapEntryList( entryList, aw, hd )
-
-
-class PlainDay(object):
-
-    def __init__( self, date ):
-        self._date = date
-        self._initialise()
-        self._tz = date.tzinfo
-
-    def getTZ( self ):
-        return self._tz
-
-    def getDate( self ):
-        return self._date
-
-    def _initialise( self ):
-        self._events = []
-
-    def getEventList( self ):
-        return self._events
-
-    def mapEntryList(self,l,aw,highDetail):
-        # to be MUCH optimised
-        addedSessions = []
-        lastIndex=-1
-        tz = self.getTZ()
-        for entry in l:
-            if self.getDate().date()==entry.getStartDate().astimezone(tz).date():
-                if isinstance(entry,conference.SessionSlot):
-                    session=entry.getSession()
-                    s=SessionSlot(entry,self)
-                    s.mapEntries(aw)
-                    self._events.append(s)
-                else:
-                    s = ConfEntry(entry)
-                    self._events.append(s)
-                lastIndex=l.index(entry)
-        return lastIndex+1
-
-    def getDate(self):
-        return self._date
-
 class SessionSlot(object):
 
     def __init__(self,sesSlot,day):
@@ -1005,44 +916,6 @@ class SessionSlot(object):
 
     def hasEntries(self):
         return len(self._entries)!=0
-
-    def getAdjustedStartDate(self,tz=None):
-        if not tz:
-            tz = self.getTimezone()
-        if tz not in all_timezones:
-           tz = 'UTC'
-        return self.getStartDate().astimezone(timezone(tz))
-
-    def getAdjustedEndDate(self,tz=None):
-        if not tz:
-            tz = self.getTimezone()
-        if tz not in all_timezones:
-           tz = 'UTC'
-        return self.getStartDate().astimezone(timezone(tz))
-
-
-class ConfEntry(object):
-
-    def __init__(self, entry):
-        self._entry = entry
-
-    def getTitle(self):
-        return self._entry.getTitle()
-
-    def isBreak(self):
-        return not isinstance(self._entry, schedule.LinkedTimeSchEntry)
-
-    def getOwner(self):
-        return self._entry.getOwner()
-
-    def getStartDate(self):
-        return self._entry.getStartDate()
-
-    def getEndDate(self):
-        return self._entry.getEndDate()
-
-    def getDuration(self):
-        return self._entry.getDuration()
 
     def getAdjustedStartDate(self,tz=None):
         if not tz:

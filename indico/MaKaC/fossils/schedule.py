@@ -413,12 +413,3 @@ class IConferenceScheduleDisplayFossil(IFossil):
     getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
                          "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
                          "ContribSchEntry": IContribSchEntryDisplayFossil}
-
-
-class IConferenceScheduleMgmtFossil(IFossil):
-
-    def getEntries(self):
-        """ Schedule Entries """
-    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
-                         "BreakTimeSchEntry": IBreakTimeSchEntryMgmtFossil,
-                         "ContribSchEntry": IContribSchEntryMgmtFossil}

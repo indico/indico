@@ -18,7 +18,6 @@ from xml.sax.saxutils import quoteattr, escape
 from urllib import quote
 from datetime import datetime,timedelta
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.conferences import WContribParticipantList
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import wcomponents
@@ -28,35 +27,10 @@ from MaKaC.common import filters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-import MaKaC.user as user
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstractManagmentReject
 from MaKaC.common.TemplateExec import render
-
-
-class WPTrackBase(WPConferenceBase):
-
-    def __init__( self, rh, track, subTrack=None):
-        WPConferenceBase.__init__( self, rh, track.getConference() )
-        self._track = track
-        self._subTrack = subTrack
-
-
-class WPTrackDisplayBase( WPTrackBase ):
-    pass
-
-
-class WPTrackDefaultDisplayBase( WPTrackDisplayBase, WPConferenceDefaultDisplayBase ):
-
-    def __init__( self, rh, track ):
-        WPTrackDisplayBase.__init__( self, rh, track )
-
-    def _applyDecoration( self, body ):
-        return WPConferenceDefaultDisplayBase._applyDecoration( self, body )
-
-    def _display(self,params):
-        return WPConferenceDefaultDisplayBase._display(self,params)
 
 
 class WPTrackModifBase( WPConferenceModifBase ):

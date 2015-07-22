@@ -135,18 +135,6 @@ class EntryTimingError(TimingError):
     pass
 
 
-class UserError(MaKaCError):
-    """
-    """
-
-    @ensure_str
-    def __str__(self):
-        if self._msg:
-            return self._msg
-        else:
-            return _("Error creating user")
-
-
 class NotLoggedError(MaKaCError):
     """
     """

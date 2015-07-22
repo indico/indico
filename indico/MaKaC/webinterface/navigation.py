@@ -39,9 +39,6 @@ class NavigationEntry:
             return cls._parent()
         return None
 
-class NEConferenceProgramme( NavigationEntry ):
-    _url = urlHandlers.UHConferenceProgram
-    _title = "Scientific Programme"
 
 class NEConferenceCFA( NavigationEntry ):
     _url = urlHandlers.UHConferenceCFA
@@ -173,11 +170,3 @@ class NETimeTableCustomizePDF( NavigationEntry ):
     _url = urlHandlers.UHConfTimeTableCustomizePDF
     _parent = NEConferenceTimeTable
     _title = "Customize PDF"
-
-class NEAbstractBookCustomise( NavigationEntry ):
-    _url = urlHandlers.UHConfTimeTableCustomizePDF
-    _title = "Customize Book of Abstracts"
-
-class NESubContributionDisplay(NavigationEntry):
-    _url = urlHandlers.UHSubContributionDisplay
-    _title = "SubContribution details"

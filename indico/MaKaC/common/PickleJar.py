@@ -26,32 +26,12 @@ globals()['_PickleJar__mappings_unpickle'] = {}
 globalPickleMap = globals()['_PickleJar__mappings_pickle']
 globalUnpickleMap = globals()['_PickleJar__mappings_unpickle']
 
-def if_else(cond, resT, resF):
-    if cond:
-        return resT
-    else:
-        return resF
-
-class PicklerException(Exception):
-    def __init__(self, message, inner=None):
-        self.message = message
-        self.inner = inner
-
-    def __str__(self):
-        return str(self.message) + "\r\n" + str(self.inner)
 
 def functional_append(list, element):
     newlist = copy.deepcopy(list)
     newlist.append(element)
     return newlist
 
-def stringToBool(s):
-    if (s.lower() == 'false'):
-        return False
-    elif (s.lower() == 'true'):
-        return True
-    else:
-        raise ValueError('Impossible to convert \'%s\' to bool' % s)
 
 def classPath(clazz):
     return "%s.%s" % (clazz.__module__, clazz.__name__)

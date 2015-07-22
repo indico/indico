@@ -191,8 +191,6 @@ class WAdminFrame(wcomponents.WTemplated):
     def getTitleTabPixels( self ):
         return 260
 
-class WRBAdminFrame(WAdminFrame):
-    pass
 
 class WPAdmins( WPAdminsBase ):
 
@@ -495,11 +493,6 @@ class WAdminsAddStyle(wcomponents.WTemplated):
         vars["cssContextHelpText"] = "Lists all CSS files in %s" % baseCSSPath
         return vars
 
-class WAdminTemplates(wcomponents.WTemplated):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        return vars
 
 class WPBadgeTemplates(WPBadgeTemplatesBase):
     pageURL = "badgeTemplates.py"
@@ -687,13 +680,12 @@ class WBrowseDomains( wcomponents.WTemplated ):
             else:
                 vars["browseIndex"] += """\n<span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='%s';document.browseForm.submit();return false;">%s</a></span> """ % (escape(letter,True),letter)
         vars["browseResult"] = ""
-        res = []
         if self._letter not in [ None, "" ]:
             if self._letter != "all":
                 res = dh.matchFirstLetter(self._letter)
             else:
                 res = dh.getValuesToList()
-            res.sort(utils.sortDomainsByName)
+            res.sort(key=lambda x: x.getName().lower())
             vars["browseResult"] = WHTMLDomainList(vars,res).getHTML()
         return vars
 

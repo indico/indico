@@ -19,17 +19,8 @@ from indico.core.db import DBMgr
 
 
 class AnnoucementMgr(Persistent):
-
     def __init__(self):
-        self.speed = "2"
         self.text = ""
-
-    # TODO: Speed should be removed since no longer used.
-    def setSpeed(self, speed):
-        self.speed = speed
-
-    def getSpeed(self):
-        return self.speed
 
     def setText(self, text):
         self.text = text

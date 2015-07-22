@@ -63,14 +63,3 @@ class IResultWithWarningFossil(IFossil):
 
     def hasWarning(self):
         """ Whether the result has a Warning or not """
-
-class IResultWithHighlightFossil(IFossil):
-
-    def getResult(self):
-        """ Result """
-
-    def getHighlight(self):
-        """ Highlight """
-
-    def hasHighlight(self):
-        """ Whether the result has a highlight or not """

@@ -61,45 +61,6 @@ class WPSessionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSessionDispl
         WPSessionDisplayBase.__init__(self, rh, session)
 
 
-class WContributionListDisplayTab(wcomponents.WTemplated):
-
-    def __init__(self, aw, session, tab=None):
-        self._aw = aw
-        self._session = session
-        self._activeTab = tab
-
-    def _getURL(self, sortByField):
-        url = urlHandlers.UHSessionDisplay.getURL(self._session)
-
-        if self._activeTab:
-            url.addParam("tab", self._activeTab)
-
-        return url
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['contributions'] = self._session.getContributionList()
-        vars['accessWrapper'] = self._aw
-        vars['posterSession'] = (self._session.getScheduleType() == "poster")
-        return vars
-
-
-class _NoWitdhdrawFF(filters.FilterField):
-    _id = "no_withdrawn"
-
-    def __init__(self):
-        pass
-
-    def satisfies(self, contrib):
-        return not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn)
-
-
-class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
-
-    def __init__(self, conf):
-        self._fields = {"no_withdrawn": _NoWitdhdrawFF()}
-
-
 class WSessionDisplayBase(WICalExportBase):
 
     def __init__(self,aw,session):
@@ -134,13 +95,7 @@ class WSessionDisplayBase(WICalExportBase):
         return vars
 
 
-# TODO: These classes are actually the same, no?  (Pedro)
-
 class WSessionDisplayFull(WSessionDisplayBase):
-    pass
-
-
-class WSessionDisplayMin(WSessionDisplayBase):
     pass
 
 
@@ -417,120 +372,6 @@ class WSessionModifSchedule(wcomponents.WTemplated):
         vars['eventInfo'] = json.dumps(eventInfo)
 
         return vars
-
-class ContainerIndexItem:
-
-    def __init__(self, container, day):
-        self._overlap = container.getMaxOverlap(day)
-        self._startPosition = -1
-        self._entryList = []
-        for i in range(0,self._overlap):
-            self._entryList.append(None)
-
-    def setStartPosition(self, counter):
-        self._startPosition = counter
-
-    def getStartPosition(self):
-        return self._startPosition
-
-    def setEntryList(self, newEntryList):
-        # -- Remove the ones which are not in the new entry list
-        i = 0
-        for entry in self._entryList:
-            if entry not in newEntryList:
-                self._entryList[i] = None
-            i += 1
-        # -- Add the new ones to the new entry list
-        for newEntry in newEntryList:
-            if newEntry not in self._entryList:
-                i = 0
-                for entry in self._entryList:
-                    if entry == None:
-                        self._entryList[i] = newEntry
-                        break
-                    i += 1
-
-    def getEntryIndex(self, i):
-        return self._startPosition + i
-
-    def getEntryByPosition(self, i):
-        if i >= 0 and i < len(self._entryList):
-            return self._entryList[i]
-        return 0
-
-    def getOverlap(self):
-        return self._overlap
-
-class ContainerIndex:
-
-    def __init__(self, containerIndex = {}, day = None, hasOverlap = False):
-        self._containerIndex = containerIndex
-        self._day = day
-        self._rowsCounter = 0
-        self._hasOverlap = hasOverlap
-
-    def initialization(self, day, hasOverlap = False):
-        self._containerIndex={}
-        self._day = day
-        self._rowsCounter = 0
-        self._hasOverlap = hasOverlap
-
-    def hasOverlap(self):
-        return self._hasOverlap
-
-    def setHasOverlap(self, hasOverlap):
-        self._hasOverlap = hasOverlap
-
-    def addContainer(self, container):
-        if not self._containerIndex.has_key(container):
-            item = ContainerIndexItem(container, self._day)
-            item.setStartPosition(self._rowsCounter)
-            if self.hasOverlap():
-                self._rowsCounter += item.getOverlap()
-            self._containerIndex[container] = item
-
-    def setContainerEntries(self, container, entryList):
-        if self._containerIndex.has_key(container):
-            self._containerIndex[container].setEntryList(entryList)
-
-    def getEntryIndex(self, container, i):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getEntryIndex(i)
-        return 0
-
-    def getEntryByPosition(self, container, i):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getEntryByPosition(i)
-        return 0
-
-    def getMaxOverlap(self, container):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getOverlap()
-        return 0
-
-    def getStartPosition(self, container):
-        if self._containerIndex.has_key(container):
-            contItem = self._containerIndex[container]
-            return contItem.getStartPosition()
-        return 0
-
-
-class WPModSchEditContrib(WPSessionModifSchedule):
-
-    def __init__(self,rh,contrib):
-        WPSessionModifSchedule.__init__(self,rh,contrib.getSession())
-        self._contrib=contrib
-
-    def _getTabContent(self,params):
-        if self._contrib.getSession().getScheduleType() == "poster":
-            wc=WSessionModContribListEditContrib(self._contrib)
-        else:
-            wc=wcomponents.WSchEditContrib(self._contrib)
-        pars={"postURL":urlHandlers.UHSessionModSchEditContrib.getURL(self._contrib)}
-        return wc.getHTML(pars)
 
 
 class WSessionModifAC(wcomponents.WTemplated):
@@ -1156,20 +997,6 @@ class WPModParticipantList( WPSessionModifBase ):
         wc = WContribParticipantList(self._conf, self._emailList, self._displayedGroups, self._contribs)
         params = {"urlDisplayGroup":urlHandlers.UHSessionModParticipantList.getURL(self._session)}
         return wc.getHTML(params)
-
-
-class WPSessionModifRelocate(WPSessionModifBase):
-
-    def __init__(self, rh, session, entry, targetDay):
-        WPSessionModifBase.__init__(self, rh, session)
-        self._targetDay=targetDay
-        self._entry=entry
-
-    def _getPageContent( self, params):
-        wc=wcomponents.WSchRelocate(self._entry)
-        p={"postURL":quoteattr(str(urlHandlers.UHSessionModifScheduleRelocate.getURL(self._entry))), \
-                "targetDay":quoteattr(str(self._targetDay))}
-        return wc.getHTML(p)
 
 
 class WSessionICalExport(WICalExportBase):

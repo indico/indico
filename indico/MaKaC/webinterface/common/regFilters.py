@@ -326,13 +326,6 @@ class ReasonParticipationSF( RegistrantSortingField ):
         rp2=r2.getReasonParticipation() or ""
         return cmp( rp1.lower(), rp2.lower() )
 
-class AddressSF( RegistrantSortingField ):
-    _id = "Address"
-
-    def compare( self, r1, r2 ):
-        a1=r1.getAddress() or ""
-        a2=r2.getAddress() or ""
-        return cmp( a.lower().strip(), a.lower().strip() )
 
 class RegistrationDateSF( RegistrantSortingField ):
     _id = "RegistrationDate"

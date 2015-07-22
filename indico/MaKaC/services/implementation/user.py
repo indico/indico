@@ -69,24 +69,6 @@ class UserHidePastEvents(UserModifyBase):
         return True
 
 
-class UserPersonalDataBase(UserModifyBase):
-
-    _dataTypes = ["title", "surName", "name", "fullName", "straightFullName", "organisation",
-                  "email", "secondaryEmails", "address", "telephone", "fax"]
-
-    def _checkParams(self):
-        self._pm = ParameterManager(self._params)
-        userId = self._pm.extract("userId", None)
-        if userId is not None:
-            ah = AvatarHolder()
-            self._user = self._avatar = self._target = ah.getById(userId)
-        else:
-            raise ServiceError("ERR-U5", _("User id not specified"))
-        self._dataType = self._pm.extract("dataType", pType=str, allowEmpty=False)
-        if self._dataType not in self._dataTypes:
-            raise ServiceError("ERR-U7", _("Data argument is not valid"))
-
-
 class UserRefreshRedisLinks(AdminService):
     def _checkParams(self):
         AdminService._checkParams(self)

@@ -180,16 +180,6 @@ class ResourceBase:
                 raise ServiceError("ERR-M0", str(e))
 
 
-class ResourceDisplayBase(ProtectedDisplayService, ResourceBase):
-
-    def _checkProtection(self):
-        ProtectedDisplayService._checkParams(self)
-
-    def _checkParams(self):
-        ResourceBase._checkParams(self)
-        ProtectedDisplayService._checkParams(self)
-
-
 class ResourceModifBase(ResourceBase, MaterialModifBase):
 
     def _checkParams(self):

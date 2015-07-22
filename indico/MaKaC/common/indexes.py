@@ -919,24 +919,6 @@ class CategoryDateIndex(Persistent):
             return []
 
 
-class CategoryDateIndexLtd(CategoryDateIndex):
-    """ Version of CategoryDateIndex whiself.ch indexing events
-        on the base of their visibility
-    """
-    def indexConf(self, conf):
-        level = 0
-        for categ in conf.getOwnerPath():
-            if conf.getFullVisibility() > level:
-                self._indexConf(categ.getId(),conf)
-            level+=1
-        if conf.getFullVisibility() > level:
-            self._indexConf("0",conf)
-
-    def buildIndex(self, dbi=None):
-        self._idxCategItem = OOBTree()
-        from MaKaC.conference import CategoryManager
-        self.indexCateg(CategoryManager().getById('0'), dbi=dbi)
-
 class CategoryDayIndex(CategoryDateIndex):
 
     def __init__(self, visibility=True):
@@ -1067,18 +1049,6 @@ class PendingManagersIndex( PendingQueuesUsersIndex ):
 
 class PendingManagersTasksIndex( PendinQueuesTasksIndex ):
     _name = "pendingManagersTasks"
-    pass
-
-class PendingCoordinatorsIndex( PendingQueuesUsersIndex ):
-    _name = "pendingCoordinators"
-    pass
-
-class PendingCoordinatorsTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingCoordinatorsTasks"
-    pass
-
-
-class IndexException(Exception):
     pass
 
 

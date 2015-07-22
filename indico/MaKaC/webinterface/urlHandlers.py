@@ -144,28 +144,6 @@ class URLHandler(object):
         return cls._getURL(**cls._getParams(target, params))
 
 
-class SecureURLHandler(URLHandler):
-    @classmethod
-    def getURL(cls, target=None, **params):
-        return cls._getURL(_force_secure=True, **cls._getParams(target, params))
-
-
-class OptionallySecureURLHandler(URLHandler):
-    @classmethod
-    def getURL(cls, target=None, secure=False, **params):
-        return cls._getURL(_force_secure=secure, **cls._getParams(target, params))
-
-
-class UserURLHandler(URLHandler):
-    """Strips the userId param if it's the current user"""
-
-    @classmethod
-    def _translateParams(cls, params):
-        if 'userId' in params and session.get('_avatarId') == params['userId']:
-            del params['userId']
-        return params
-
-
 # Hack to allow secure Indico on non-80 ports
 def setSSLPort(url):
     """
@@ -343,42 +321,8 @@ class UHRoomBookingRoomStats(URLHandler):
     _endpoint = 'rooms.roomBooking-roomStats'
 
 
-class UHRoomBookingBookingDetails(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookingDetails'
-
-    @classmethod
-    def _translateParams(cls, params):
-        # confId is apparently unused and thus just ugly
-        params.pop('confId', None)
-        return params
-
-
-class UHRoomBookingModifyBookingForm(URLHandler):
-    _endpoint = 'rooms.roomBooking-modifyBookingForm'
-
-
 class UHRoomBookingDeleteBooking(URLHandler):
     _endpoint = 'rooms.roomBooking-deleteBooking'
-
-
-class UHRoomBookingCloneBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-cloneBooking'
-
-
-class UHRoomBookingCancelBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-cancelBooking'
-
-
-class UHRoomBookingAcceptBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-acceptBooking'
-
-
-class UHRoomBookingRejectBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-rejectBooking'
-
-
-class UHRoomBookingCancelBookingOccurrence(URLHandler):
-    _endpoint = 'rooms.roomBooking-cancelBookingOccurrence'
 
 
 # RB Administration
@@ -715,14 +659,6 @@ class UHSessionOpen(URLHandler):
     _endpoint = 'event_mgmt.sessionModification-open'
 
 
-class UHSessionCreation(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule'
-
-
-class UHContribCreation(URLHandler):
-    _endpoint = 'event_mgmt.confModifSchedule'
-
-
 class UHContribToXMLConfManager(URLHandler):
     _endpoint = 'event_mgmt.contributionModification-xml'
 
@@ -1032,12 +968,6 @@ class UHConfEnterModifKey(UHConfUser):
 
 class UHConfCloseModifKey(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
-
-
-class UHUserDetails(UserURLHandler):
-    # XXX: This UH is deprecated. It's just kept around to have a
-    # quick reference to find code that needs to be rewritten/removed.
-    _endpoint = None
 
 
 class UHDomains(URLHandler):
@@ -1684,10 +1614,6 @@ class UHConfAbstractBook(URLHandler):
         return "files/generatedPdf/BookOfAbstracts.pdf"
 
 
-class UHConfAbstractBookLatex(URLHandler):
-    _endpoint = 'event.conferenceDisplay-abstractBookLatex'
-
-
 class UHConferenceToiCal(URLHandler):
     _endpoint = 'event.conferenceDisplay-ical'
 
@@ -1814,10 +1740,6 @@ class UHConfRegistrationFormCreation(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-creation'
 
 
-class UHConfRegistrationFormConditions(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-conditions'
-
-
 class UHConfRegistrationFormCreationDone(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-creationDone'
 
@@ -1829,21 +1751,6 @@ class UHConfRegistrationFormCreationDone(URLHandler):
             url.addParam('authkey', registrant.getRandomId())
         else:
             url.setParams(registrant.getConference().getLocator())
-        return url
-
-
-class UHConferenceTicketPDF(URLHandler):
-    _endpoint = 'event.e-ticket-pdf'
-
-    @classmethod
-    def getURL(cls, conf):
-        url = cls._getURL()
-        user = ContextManager.get("currentUser")
-        if user:
-            registrant = user.getRegistrantById(conf.getId())
-            if registrant:
-                url.setParams(registrant.getLocator())
-                url.addParam('authkey', registrant.getRandomId())
         return url
 
 
@@ -1887,10 +1794,6 @@ class UHConfModifRegistrationModification(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrationModification'
 
 
-class UHConfModifRegistrationModificationSectionQuery(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationModificationSection-query'
-
-
 class UHConfModifRegistrantList(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants'
 
@@ -1921,10 +1824,6 @@ class UHCategoryStatistics(URLHandler):
 
 class UHCategoryToiCal(URLHandler):
     _endpoint = 'category.categoryDisplay-ical'
-
-
-class UHCategoryToRSS(URLHandler):
-    _endpoint = 'category.categoryDisplay-rss'
 
 
 class UHCategoryToAtom(URLHandler):
@@ -2013,10 +1912,6 @@ class UHConfModifRegistrantStatusesModify(URLHandler):
 
 class UHConfModifRegistrantStatusesPerformModify(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-performModifyStatuses'
-
-
-class UHGetCalendarOverview(URLHandler):
-    _endpoint = 'category.categOverview'
 
 
 class UHCategoryCalendarOverview(URLHandler):

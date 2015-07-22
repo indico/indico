@@ -31,17 +31,6 @@ class UserModificationBase ( object ):
         else:
             self._targetUser = None
 
-## TODO: this class is never used....
-class UserEditBase ( object ):
-
-    def _checkParams(self):
-        if 'userData' in self._params:
-            pm = ParameterManager(self._params)
-            self._userData = pm.extract("userData", pType=dict, allowEmpty = True)
-        else:
-            raise ServiceError("ERR-E6", '"userData" parameter missing')
-
-
 
 class UserListModificationBase ( object):
     """ Base class to retrieve a list of users from a 'userList' parameter.

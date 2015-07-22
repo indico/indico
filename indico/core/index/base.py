@@ -263,15 +263,6 @@ class DIndex(SIndex):
         self._rev_index = self._rev_class()
 
 
-class SIOIndex(DIndex):
-    """
-    Maps integer keys to objects
-    int -> set(obj)
-    """
-    _fwd_class = IOBTree
-    _fwd_set_class = OOTreeSet
-
-
 class IOIndex(DIndex):
     """
     Maps integer keys to objects
@@ -282,47 +273,3 @@ class IOIndex(DIndex):
     _rev_class = OOBTree
     _fwd_set_class = OOTreeSet
     _rev_set_class = IOTreeSet
-
-
-class OOIndex(DIndex):
-    """
-    Maps object keys to objects
-    obj -> set(obj)
-    uid(obj) -> set(obj)
-    """
-    _fwd_class = OOBTree
-    _rev_class = OOBTree
-    _fwd_set_class = OOSet
-    _rev_set_class = OOSet
-
-
-class IIIndex(FieldIndex):
-
-    """
-    Maps integers to sets of integers
-
-    Since we're dealing with ids, no adaptation is done.
-    We take advantage of multiunion, which is quite fast.
-    """
-
-    def clear(self):
-        """
-        Initialize forward and reverse mappings.
-        """
-
-        # The forward index maps indexed values to a sequence of docids
-        self._fwd_index = self.family.IO.BTree()
-
-        # The reverse index maps a docid to its index value
-        self._rev_index = self.family.II.BTree()
-        self._num_docs = Length(0)
-
-    def has_doc(self, docid):
-        if type(docid) == int:
-            return docid in self._rev_index
-        else:
-            return False
-
-    def all(self):
-        return self.family.IF.multiunion(
-            self._fwd_index.values())

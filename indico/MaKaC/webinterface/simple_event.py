@@ -182,9 +182,6 @@ class WSEConfModifMainData(meeting.WMConfModifMainData):
 class WPSEConfModifAC(conferences.WPConfModifAC):
     pass
 
-class WSEConfModifAC(conferences.WConfModifAC):
-    pass  #Depends which frames we need inside of AC
-
 
 #####Tools # Stays the same as conference for now
 class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):

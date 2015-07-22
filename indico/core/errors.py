@@ -113,12 +113,6 @@ class KeyAccessError(AccessControlError):
     pass
 
 
-class HostnameResolveError(IndicoError):
-    """
-    Hostname resolution failed
-    """
-
-
 class ModificationError(AccessControlError):
     @ensure_str
     def __str__(self):
@@ -145,15 +139,6 @@ class EntryTimingError(TimingError):
     pass
 
 
-class UserError(IndicoError):
-    @ensure_str
-    def __str__(self):
-        if self._message:
-            return self._message
-        else:
-            return _('Error creating user')
-
-
 class NotLoggedError(IndicoError):
     pass
 
@@ -167,10 +152,6 @@ class NoReportError(IndicoError):
 
 
 class NotFoundError(IndicoError):
-    pass
-
-
-class HtmlScriptError(IndicoError):
     pass
 
 

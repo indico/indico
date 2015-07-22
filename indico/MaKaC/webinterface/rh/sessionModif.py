@@ -470,10 +470,6 @@ class RHContribListEditContrib(RHSessionModCoordinationBase):
             url.addParam("sortBy",self._sortBy)
         if self._action=="GO":
             params = self._getRequestParams()
-            #if params["locationAction"] == "inherit":
-            #    params["locationName"] = ""
-            #if params["roomAction"] == "inherit":
-            #    params["roomName"] = ""
             self._contrib.setValues(params)
             self._redirect(url)
         elif self._action=="CANCEL":
@@ -481,36 +477,6 @@ class RHContribListEditContrib(RHSessionModCoordinationBase):
         else:
             p=sessions.WPModContribListEditContrib(self,self._contrib)
             return p.display(sortBy=self._sortBy)
-
-
-class RHSchEditContrib(RHSessionModCoordinationBase):
-
-    def _checkParams(self,params):
-        #RHSessionModifBase._checkParams(self,params)
-        self._check = int(params.get("check",1))
-        self._moveEntries = int(params.get("moveEntries",0))
-        l = locators.WebLocator()
-        l.setContribution( params )
-        self._contrib=l.getObject()
-        self._conf=self._contrib.getConference()
-        self._target=self._session=self._contrib.getSession()
-        self._action=""
-        if params.has_key("OK"):
-            self._action="GO"
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
-
-    def _process(self):
-        url=urlHandlers.UHSessionModifSchedule.getURL(self._session)
-        if self._action=="GO":
-            params = self._getRequestParams()
-            self._contrib.setValues(params,self._check, self._moveEntries)
-            self._redirect(url)
-        elif self._action=="CANCEL":
-            self._redirect(url)
-        else:
-            p=sessions.WPModSchEditContrib(self,self._contrib)
-            return p.display()
 
 
 class RHAddContribs(RHSessionModUnrestrictedContribMngCoordBase):
@@ -700,43 +666,6 @@ class RHContribsParticipantList(RHSessionModUnrestrictedContribMngCoordBase):
         emailList["coAuthors"]["emails"] = coAuthorEmails
         p = sessions.WPModParticipantList(self, self._target, emailList, self._displayedGroups, self._contribIds )
         return p.display()
-
-
-class RHRelocate(RHSessionModUnrestrictedContribMngCoordBase):
-
-    def _checkParams(self, params):
-        RHSessionModUnrestrictedContribMngCoordBase._checkParams(self, params)
-        self._entry=None
-        if params.has_key("contribId"):
-            self._entry=self._conf.getContributionById(params.get("contribId",""))
-        else:
-            raise MaKaCError( _("No contribution to relocate"))
-        self._contribPlace=params.get("targetId","")
-        self._cancel=params.has_key("CANCEL")
-        self._ok=params.has_key("OK")
-        self._targetDay=params.get("targetDay","")
-        self._check=int(params.get("check","1"))
-
-    def _process(self):
-        if not self._cancel:
-            if not self._ok:
-                p=sessions.WPSessionModifRelocate(self,self._session, self._entry, self._targetDay)
-                return p.display()
-            else:
-                if self._contribPlace!="conf":
-                    s,ss=self._contribPlace.split(":")
-                    session=self._conf.getSessionById(s)
-                    if session is not None:
-                        slot=session.getSlotById(ss)
-                        if slot is not None:
-                            self._entry.getSchEntry().getSchedule().removeEntry(self._entry.getSchEntry())
-                            self._entry.setSession(session)
-                            slot.getSchedule().addEntry(self._entry.getSchEntry(), check=self._check)
-                else:
-                    self._entry.getSchEntry().getSchedule().removeEntry(self._entry.getSchEntry())
-                    self._entry.setSession(None)
-                    self._conf.getSchedule().addEntry(self._entry.getSchEntry(), check=self._check)
-        self._redirect("%s#%s"%(urlHandlers.UHSessionModifSchedule.getURL(self._session), self._targetDay))
 
 
 

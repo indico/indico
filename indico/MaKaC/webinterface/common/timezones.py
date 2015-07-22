@@ -18,18 +18,9 @@
 # Fermi timezone awareness #
 ############################
 
-from datetime import datetime
-from pytz import timezone
 from xml.sax.saxutils import quoteattr, escape
 from indico.core.config import Config
 
-
-def convertTime(d,tz):
-    if str(d.tzinfo) == 'None':
-       return_d = datetime(d.year,d.month,d.day,d.hour,d.minute,tzinfo=timezone('UTC'))
-    else:
-       return_d = d.astimezone(timezone(tz))
-    return (return_d)
 
 class TimezoneRegistry:
     _items = Config.getInstance().getTimezoneList()
@@ -38,9 +29,10 @@ class TimezoneRegistry:
     def getList( self ):
         return self._items
 
-    def getShortSelectItemsHTML( self, selTitle="", localTZ="" ):
+    @classmethod
+    def getShortSelectItemsHTML(cls, selTitle=""):
         l=[]
-        for title in self._items:
+        for title in cls._items:
             selected=""
             if title==selTitle:
                 selected=" selected"
@@ -48,24 +40,4 @@ class TimezoneRegistry:
             l.append("""<option value=%s%s>%s</option>"""%(quoteattr(title),
                                         selected, escape(screenTitle)))
         return "".join(l)
-    getShortSelectItemsHTML=classmethod(getShortSelectItemsHTML)
 
-
-class DisplayTimezoneRegistry:
-    _items = ['MyTimezone','Event Timezone']
-
-    def getList( self ):
-        return self._items
-
-    getList=classmethod(getList)
-
-    def getSelectItemsHTML( self, selTitle="" ):
-        l=[]
-        for title in self._items:
-            selected=""
-            if title==selTitle:
-                selected=" selected"
-            l.append("""<option value=%s%s>%s</option>"""%(quoteattr(title),
-                                        selected, escape(title)))
-        return "".join(l)
-    getSelectItemsHTML=classmethod(getSelectItemsHTML)

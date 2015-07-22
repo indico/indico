@@ -18,14 +18,12 @@ from copy import copy
 from pytz import timezone
 from indico.util.string import safe_upper, safe_slice
 from indico.util.i18n import i18nformat
-import ZODB
 from persistent import Persistent
 from persistent.list import PersistentList
 from BTrees.OOBTree import OOBTree, intersection, union
 from BTrees.IOBTree import IOBTree
 import BTrees.OIBTree as OIBTree
-from datetime import datetime, timedelta
-import MaKaC
+from datetime import datetime
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.trashCan import TrashCanManager
@@ -41,14 +39,6 @@ from indico.util.i18n import N_
 from indico.util.text import wordsCounter
 
 import tempfile
-
-
-class AbstractSorter:
-    pass
-
-
-class AbstractFilter:
-    pass
 
 
 class _AbstractParticipationIndex(Persistent):

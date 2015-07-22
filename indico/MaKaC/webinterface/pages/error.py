@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 
 
@@ -29,23 +28,3 @@ class WErrorWSGI(WTemplated):
         vars["errorTitle"] = str(self._ex[0])
         vars["errorText"] = str(self._ex[1])
         return vars
-
-
-class WPReportSended(WPDecorated):
-
-
-    def __init__( self, rh):
-        WPDecorated.__init__(self, rh)
-
-    def _getBody(self, params):
-        wc = WReportSended()
-        return wc.getHTML(params)
-
-
-class WReportSended(WTemplated):
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-
-        return vars
-

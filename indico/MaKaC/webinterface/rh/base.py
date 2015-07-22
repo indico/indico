@@ -42,7 +42,6 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.common.utils import truncate
 from MaKaC.errors import (
     AccessError,
     BadRefererError,
@@ -66,6 +65,7 @@ from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.redis import RedisError
+from indico.util.string import truncate
 from indico.web.flask.util import ResponseUtil, url_for
 
 
@@ -414,12 +414,6 @@ class RH(RequestHandlerBase):
             raise
         return errors.WPUnexpectedError(self).display()
 
-    @jsonify_error
-    def _processHostnameResolveError(self, e):
-        """Unexpected errors"""
-
-        return errors.WPHostnameResolveError(self).display()
-
     @jsonify_error(status=403)
     def _processForbidden(self, e):
         if session.user is None and not request.is_xhr and not e.response:
@@ -524,18 +518,10 @@ class RH(RequestHandlerBase):
 
     @jsonify_error
     def _processRestrictedHTML(self, e):
-
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
     @jsonify_error
-    def _processHtmlScriptError(self, e):
-        """ TODO """
-        return errors.WPHtmlScriptError(self, escape(str(e))).display()
-
-    @jsonify_error
     def _processHtmlForbiddenTag(self, e):
-        """ TODO """
-
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
     def _process_retry_setup(self):

@@ -84,10 +84,3 @@ class IAvatarAllDetailsFossil(IAvatarFossil):
 
     def getTelephone( self ):
         """ Avatar telephone """
-
-
-
-class IPersonalInfoFossil(IFossil):
-
-    def getShowPastEvents(self):
-        """ Show Past Events """

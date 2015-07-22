@@ -583,15 +583,6 @@ class RHConfModifParticipantsStatistics(RHConferenceModifBase):
         else:
             return conferences.WPConfModifParticipantsStatistics( self, self._target ).display()
 
-#######################################################################################
-
-class RHConfAllParticipants( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfAllSessionsConveners
-
-    def _process(self):
-        p = conferences.WPConfAllParticipants( self, self._conf )
-        return p.display()
-
 
 #######################################################################################
 
@@ -3546,40 +3537,6 @@ class RHConfMoveAbsFieldDown( RHConfModifCFABase ):
         self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
 
-class RHScheduleMoveEntryUp(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._entry=self._conf.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        date=None
-        if self._entry is not None:
-            self._conf.getSchedule().moveUpEntry(self._entry)
-            date=self._entry.getStartDate()
-        if date is None:
-            self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._conf))
-        else:
-            self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
-
-
-class RHScheduleMoveEntryDown(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._entry=self._conf.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        date=None
-        if self._entry is not None:
-            self._conf.getSchedule().moveDownEntry(self._entry)
-            date=self._entry.getStartDate()
-        if date is None:
-            self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._conf))
-        else:
-            self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
-
-
 class RHReschedule(RHConferenceModifBase):
 
     def _checkParams(self, params):
@@ -3621,53 +3578,6 @@ class RHReschedule(RHConferenceModifBase):
             self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
             self._redirect("%s#%s" % (urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
-
-class RHRelocate(RHConferenceModifBase):
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._entry=None
-        if params.has_key("contribId"):
-            self._entry = self._conf.getContributionById(params.get("contribId",""))
-            self._schEntry = self._entry.getSchEntry()
-        elif params.has_key("schEntryId"):
-            if params.has_key("sessionId") and params.has_key("slotId"):
-                self._oldSch = self._conf.getSessionById(params.get("sessionId","")).getSlotById(params.get("slotId","")).getSchedule()
-            else:
-                self._oldSch = self._conf.getSchedule()
-            try:
-                self._schEntry = self._entry = self._oldSch.getEntryById(params.get("schEntryId",""))
-            except:
-                raise MaKaCError( _("Cannot find target item"))
-        else:
-            raise MaKaCError( _("No contribution to relocate"))
-        self._contribPlace=params.get("targetId","")
-        self._cancel=params.has_key("CANCEL")
-        self._ok=params.has_key("OK")
-        self._targetDay=params.get("targetDay","")
-        self._check=int(params.get("check","1"))
-
-    def _process(self):
-        if not self._cancel:
-            if not self._ok:
-                p=conferences.WPConfModifRelocate(self,self._conf, self._entry, self._targetDay)
-                return p.display()
-            else:
-                if self._contribPlace.strip() != "":
-                    if self._contribPlace!="conf":
-                        s,ss=self._contribPlace.split(":")
-                        session=self._conf.getSessionById(s)
-                        if session is not None:
-                            slot=session.getSlotById(ss)
-                            if slot is not None:
-                                self._schEntry.getSchedule().removeEntry(self._schEntry)
-                                if isinstance(self._entry, conference.Contribution):
-                                    self._entry.setSession(session)
-                                slot.getSchedule().addEntry(self._schEntry, check=self._check)
-                    else:
-                        self._schEntry.getSchedule().removeEntry(self._schEntry)
-                        self._conf.getSchedule().addEntry(self._schEntry, check=self._check)
-        self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
 
 # ============================================================================

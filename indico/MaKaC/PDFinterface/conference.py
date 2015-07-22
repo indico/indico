@@ -68,13 +68,6 @@ from indico.util import json
 from MaKaC.common.Configuration import Config
 
 styles = getSampleStyleSheet()
-charRplace = [
-[u'\u2019', u"'"],
-[u'\u0153', u"oe"],
-[u'\u2026', u"..."],
-[u'\u2013', u"-"],
-[u'\u2018', u"'"]
-]
 
 
 def extract_affiliations(contrib):

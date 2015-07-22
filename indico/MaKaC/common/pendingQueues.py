@@ -475,32 +475,6 @@ class _PendingCoordinatorNotification(_PendingNotification):
 
 #---END COORDINATORS
 
-#--GENERAL---
-class PendingQueuesHolder(object):
-
-    _pendingQueues=[PendingConfManagersHolder, \
-                    PendingConfSubmittersHolder, \
-                    PendingSubmittersHolder, \
-                    PendingManagersHolder, \
-                    PendingCoordinatorsHolder]
-
-    def _getAllPendingQueues(cls):
-        return cls._pendingQueues
-    _getAllPendingQueues=classmethod(_getAllPendingQueues)
-
-    def grantRights(cls, av):
-        for pq in cls._getAllPendingQueues():
-            pq().grantRights(av)
-    grantRights=classmethod(grantRights)
-
-    def getFirstPending(cls, email):
-        for pq in cls._getAllPendingQueues():
-            l=pq().getPendingByEmail(email)
-            if len(l)>0:
-                return l[0]
-        return None
-    getFirstPending=classmethod(getFirstPending)
-
 ###---------------------------- Conference Pending Queues ---------------------------------
 
 class ConfPendingQueuesMgr(Persistent):

@@ -19,9 +19,5 @@ class ArgumentParseError(Exception):
     pass
 
 
-class ArgumentValueError(Exception):
-    pass
-
-
 class LimitExceededException(Exception):
     pass

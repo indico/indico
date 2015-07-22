@@ -23,27 +23,3 @@ class IIndexableByStartDateTime(Interface):
         """
         Returns a tz-aware datetime
         """
-
-
-class IIndexableByEndDateTime(Interface):
-
-    def getAdjustedEndDate(self):
-        """
-        Returns a tz-aware datetime
-        """
-
-
-class IIndexableByArbitraryDateTime(Interface):
-
-    def getIndexingDateTime():
-        """
-        Return an arbitrary tz-aware datetime (class will decide what)
-        """
-
-
-class IIndexableById(Interface):
-
-    def getId():
-        """
-        Return the id of the object
-        """

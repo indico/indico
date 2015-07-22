@@ -103,14 +103,6 @@ class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
         SessionModifBase._checkProtection( self )
 
 
-class SessionModifUnrestrictedContribMngCoordBase(SessionModifBase):
-
-    def _checkProtection(self):
-        if not self._session.isClosed() and self._session.canCoordinate(self.getAW(), "modifContribs"):
-            return
-        SessionModifBase._checkProtection( self )
-
-
 class SessionSlotBase(SessionBase):
 
     def _checkParams( self ):
@@ -162,15 +154,6 @@ class SessionSlotModifCoordinationBase(SessionSlotModifBase, SessionModifCoordin
     def _checkProtection(self):
         SessionModifCoordinationBase._checkProtection( self )
 
-class SessionSlotModifUnrestrictedTTCoordinationBase(SessionSlotModifBase, SessionModifUnrestrictedTTCoordinationBase):
-
-    def _checkProtection(self):
-        SessionModifUnrestrictedTTCoordinationBase._checkProtection( self )
-
-class SessionSlotModifUnrestrictedContribMngCoordBase(SessionSlotModifBase, SessionModifUnrestrictedContribMngCoordBase):
-
-    def _checkProtection(self):
-        SessionModifUnrestrictedContribMngCoordBase._checkProtection( self )
 
 class SessionProtectionUserList(SessionModifBase):
     def _getAnswer(self):

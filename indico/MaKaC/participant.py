@@ -201,7 +201,7 @@ class Participation(Persistent):
 
     def getParticipantList(self):
         participants = self._participantList.values()
-        participants.sort(utils.sortUsersByName)
+        participants.sort(key=lambda p: p.getFamilyName().lower())
         return participants
 
     def getPresentParticipantListText(self):
