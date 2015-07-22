@@ -103,8 +103,10 @@ class AttachmentPackageGeneratorMixin:
         # right now this relies on an external cronjob to do so...
         temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir(), delete=False)
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
+            self.used = set()
             for attachment in attachments:
                 name = self._prepare_folder_structure(attachment)
+                self.used.add(name)
                 with attachment.file.storage.get_local_path(attachment.file.storage_file_id) as filepath:
                     zip_handler.write(filepath, name)
 
@@ -114,9 +116,15 @@ class AttachmentPackageGeneratorMixin:
         event_dir = secure_filename(self._conf.getTitle(), None)
         segments = [event_dir] if event_dir else []
         segments.extend(self._get_base_path(attachment))
-        segments.extend([secure_filename(attachment.folder.title, unicode(attachment.folder.id)),
-                        attachment.file.filename])
-        return os.path.join(*segments)
+        if not attachment.folder.is_default:
+            segments.append(secure_filename(attachment.folder.title, unicode(attachment.folder.id)))
+        segments.append(attachment.file.filename)
+        path = os.path.join(*filter(None, segments))
+        while path in self.used:
+            # prepend the id if there's a path collision
+            segments[-1] = '{}-{}'.format(attachment.id, segments[-1])
+            path = os.path.join(*filter(None, segments))
+        return path
 
     def _get_base_path(self, attachment):
         obj = linked_object = attachment.folder.linked_object
@@ -128,7 +136,10 @@ class AttachmentPackageGeneratorMixin:
             else:
                 start_date = obj.getAdjustedStartDate()
 
-            paths.append(secure_filename(start_date.strftime('%H%M_{}').format(obj.getTitle()), ''))
+            if start_date is not None:
+                paths.append(secure_filename(start_date.strftime('%H%M_{}').format(obj.getTitle()), ''))
+            else:
+                paths.append(secure_filename(obj.getTitle(), unicode(obj.getId())))
             obj = owner
 
         if isinstance(linked_object, SubContribution):
@@ -136,7 +147,7 @@ class AttachmentPackageGeneratorMixin:
         else:
             linked_obj_start_date = linked_object.getAdjustedStartDate()
 
-        if attachment.folder.linked_object != self._conf:
+        if attachment.folder.linked_object != self._conf and linked_obj_start_date is not None:
             paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
 
         return reversed(paths)

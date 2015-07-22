@@ -3092,9 +3092,7 @@ class RHMaterialPackage(RHConferenceModifBase, AttachmentPackageGeneratorMixin):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self._contribIds = self._normaliseListParam(params.get("contributions", []))
-        self._contribs = []
-        for id in self._contribIds:
-            self._contribs.append(self._conf.getContributionById(id))
+        self._contribs = map(self._conf.getContributionById, self._contribIds)
 
     def _process(self):
         if not self._contribs:
