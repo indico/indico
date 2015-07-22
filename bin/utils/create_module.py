@@ -35,8 +35,6 @@ def _validate_indico_dir(ctx, param, value):
 
 def _process_name(ctx, param, value):
     path = _get_module_dir(ctx.params['indico_dir'], ctx.params.get('event'), value)
-    if os.path.exists(path):
-        raise click.BadParameter('module already exists')
     ctx.params['module_dir'] = path
     return value
 
@@ -139,14 +137,19 @@ def write_model(f, class_name, event):
 @click.option('-c', '--controllers', is_flag=True, help='Add controllers module (only makes sense with a blueprint)')
 @click.option('-v', '--views', is_flag=True, help='Add views module (only makes sense with a blueprint)')
 def main(indico_dir, name, module_dir, event, models, blueprint, templates, controllers, views, model_classes):
-    os.mkdir(module_dir)
-    touch(os.path.join(module_dir, '__init__.py'))
+    if not os.path.exists(module_dir):
+        os.mkdir(module_dir)
+        touch(os.path.join(module_dir, '__init__.py'))
     if models or model_classes:
         models_dir = os.path.join(module_dir, 'models')
-        os.mkdir(models_dir)
-        touch(os.path.join(models_dir, '__init__.py'))
+        if not os.path.exists(models_dir):
+            os.mkdir(models_dir)
+            touch(os.path.join(models_dir, '__init__.py'))
         for module_name, class_names in model_classes.iteritems():
-            with open(os.path.join(models_dir, '{}.py'.format(module_name)), 'w') as f:
+            model_path = os.path.join(models_dir, '{}.py'.format(module_name))
+            if os.path.exists(model_path):
+                raise click.exceptions.UsageError('Cannot create model in {} (file already exists)'.format(module_name))
+            with open(model_path, 'w') as f:
                 write_header(f)
                 write(f, 'from indico.core.db import db')
                 write(f, 'from indico.util.string import return_ascii')
@@ -154,7 +157,10 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
                     write_model(f, class_name, event)
     if blueprint:
         blueprint_name = 'event_{}'.format(name) if event else name
-        with open(os.path.join(module_dir, 'blueprint.py'), 'w') as f:
+        blueprint_path = os.path.join(module_dir, 'blueprint.py')
+        if os.path.exists(blueprint_path):
+            raise click.exceptions.UsageError('Cannot create blueprint (file already exists)')
+        with open(blueprint_path, 'w') as f:
             write_header(f)
             write(f, 'from indico.web.flask.wrappers import IndicoBlueprint')
             write(f)
@@ -167,13 +173,18 @@ def main(indico_dir, name, module_dir, event, models, blueprint, templates, cont
             write(f)
     if templates:
         templates_dir = os.path.join(module_dir, 'templates')
-        os.mkdir(templates_dir)
+        if not os.path.exists(templates_dir):
+            os.mkdir(templates_dir)
     if controllers:
-        with open(os.path.join(module_dir, 'controllers.py'), 'w') as f:
-            write_header(f)
+        controllers_path = os.path.join(module_dir, 'controllers.py')
+        if not os.path.exists(controllers_path):
+            with open(controllers_path, 'w') as f:
+                write_header(f)
     if views:
-        with open(os.path.join(module_dir, 'views.py'), 'w') as f:
-            write_header(f)
+        views_path = os.path.join(module_dir, 'views.py')
+        if not os.path.exists(views_path):
+            with open(views_path, 'w') as f:
+                write_header(f)
 
 
 if __name__ == '__main__':
