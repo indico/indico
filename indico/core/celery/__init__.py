@@ -37,6 +37,7 @@ def _load_default_modules(app, **kwargs):
 
 @import_modules.connect
 def _import_modules(*args, **kwargs):
+    import indico.util.tasks
     signals.import_tasks.send()
 
 
