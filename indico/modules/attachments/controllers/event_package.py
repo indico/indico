@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
+import datetime
 import os
-from operator import itemgetter
+from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
@@ -26,43 +27,54 @@ from sqlalchemy import cast, Date
 
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.links import LinkType
-from indico.util.fs import secure_filename
 from indico.util.date_time import format_date
+from indico.util.i18n import _
+from indico.util.fs import secure_filename
 from indico.util.string import to_unicode
 from indico.util.tasks import delete_file
 from indico.web.flask.util import send_file
+from indico.web.forms.base import FormDefaults
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
-
 from MaKaC.conference import SubContribution
+
+
+def _get_start_date(obj):
+    if isinstance(obj, SubContribution):
+        return obj.getContribution().getAdjustedStartDate()
+    else:
+        return obj.getAdjustedStartDate()
 
 
 class AttachmentPackageGeneratorMixin:
 
     def _filter_attachments(self, filter_data):
-        attachments = []
         added_since = filter_data.get('added_since', None)
-        attachments.extend(self._filter_protected(self._filter_top_level_attachments(added_since)))
-        attachments.extend(self._filter_protected(self._filter_by_sessions(filter_data.get('sessions', []),
-                                                                           added_since)))
+        filter_type = filter_data['filter_type']
+        attachments = []
 
-        contribution_ids = set(filter_data.get('contributions', []) +
-                               self._get_contributions_by_schedule_date(filter_data.get('contributions_schedule_dates',
-                                                                                        [])))
-        attachments.extend(self._filter_protected(self._filter_by_contributions(contribution_ids, added_since)))
-        return attachments
+        if filter_type == 'all':
+            attachments = self._get_all_attachments(added_since)
+        elif filter_type == 'sessions':
+            attachments = self._filter_by_sessions(filter_data.get('sessions', []), added_since)
+        elif filter_type == 'contributions':
+            attachments = self._filter_by_contributions(filter_data.get('contributions', []), added_since)
+        elif filter_type == 'dates':
+            attachments = self._filter_by_dates(filter_data.get('dates'))
+
+        return self._filter_protected(attachments)
 
     def _filter_protected(self, attachments):
         return [attachment for attachment in attachments if attachment.can_access(session.user)]
 
-    def _filter_top_level_attachments(self, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.linked_object == self._conf)
+    def _get_all_attachments(self, added_since):
+        query = self._build_base_query()
 
         if added_since:
             query = self._filter_by_date(query, added_since)
 
-        return query.all()
+        return [att for att in query if att.folder.linked_object and _get_start_date(att.folder.linked_object)]
 
     def _build_base_query(self):
         return Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
@@ -70,31 +82,28 @@ class AttachmentPackageGeneratorMixin:
                                _join=AttachmentFolder)
 
     def _filter_by_sessions(self, session_ids, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.link_type == LinkType.session)
-        if session_ids:
-            query = query.filter(AttachmentFolder.session_id.in_(session_ids))
+        query = self._build_base_query().filter(AttachmentFolder.link_type.in_([LinkType.session, LinkType.contribution,
+                                                                                LinkType.subcontribution]))
 
         if added_since:
             query = self._filter_by_date(query, added_since)
 
-        return query.all()
-
-    def _get_contributions_by_schedule_date(self, dates):
-        return [contribution.getId() for contribution in self._conf.getContributionList()
-                if contribution.getStartDate() and str(contribution.getStartDate().date()) in dates]
+        return [att for att in query if att.folder.linked_object.getSession()
+                and att.folder.linked_object.getSession().getId() in session_ids]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.link_type.in_([LinkType.contribution,
-                                                                               LinkType.subcontribution]))
-        if contribution_ids:
-            query = query.filter(AttachmentFolder.contribution_id.in_(contribution_ids))
-        else:
-            query = query.filter(AttachmentFolder.contribution_id is not None)
+        query = self._build_base_query().filter(AttachmentFolder.contribution_id.in_(contribution_ids),
+                                                AttachmentFolder.link_type.in_([LinkType.contribution,
+                                                                                LinkType.subcontribution]))
 
         if added_since:
             query = self._filter_by_date(query, added_since)
 
-        return query.all()
+        return [att for att in query if att.folder.linked_object and _get_start_date(att.folder.linked_object)]
+
+    def _filter_by_dates(self, dates):
+        return [att for att in self._build_base_query() if att.folder.linked_object and
+                unicode(_get_start_date(att.folder.linked_object)) in dates]
 
     def _filter_by_date(self, query, added_since):
         return query.filter(cast(AttachmentFile.created_dt, Date) >= added_since)
@@ -163,18 +172,32 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     wp = None
 
     def _process(self):
-        form = self._prepare_form()
+        form, skipped_fields = self._prepare_form()
         if form.validate_on_submit():
             return self._generate_zip_file(self._filter_attachments(form.data))
 
-        return self.wp.render_template('generate_package.html', self._conf, form=form)
+        return self.wp.render_template('generate_package.html', self._conf, form=form, skipped_fields=skipped_fields)
 
     def _prepare_form(self):
-        form = AttachmentPackageForm()
-        form.sessions.choices = self._load_session_data()
-        form.contributions.choices = self._load_contribution_data()
-        form.contributions_schedule_dates.choices = self._load_schedule_data()
-        return form
+        form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
+        filter_types = OrderedDict(all=_('Everything'))
+        sessions = self._load_session_data()
+        contributions = self._load_contribution_data()
+        dates = self._load_dates()
+
+        if sessions:
+            filter_types['sessions'] = _('Specific sessions')
+        if contributions:
+            filter_types['contributions'] = _('Specific contributions')
+        if dates:
+            filter_types['dates'] = _('Specific days')
+
+        skipped_fields = {'sessions', 'contributions', 'dates'} - filter_types.viewkeys()
+        form.filter_type.choices = filter_types.items()
+        form.sessions.choices = sessions
+        form.contributions.choices = contributions
+        form.dates.choices = dates
+        return form, skipped_fields
 
     def _load_session_data(self):
         return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
@@ -184,6 +207,8 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
                 for contrib in self._conf.getContributionList() if contrib.getOwner() == self._conf
                 and contrib.getStartDate()]
 
-    def _load_schedule_data(self):
-        dates = {contrib.getStartDate().date() for contrib in self._conf.getContributionList() if contrib.getStartDate()}
-        return sorted([(unicode(d), format_date(d, 'short')) for d in dates], key=itemgetter(1))
+    def _load_dates(self):
+        offset = self._conf.getAdjustedEndDate() - self._conf.getAdjustedStartDate()
+        return [(unicode(self._conf.getAdjustedStartDate() + datetime.timedelta(days=day_number)),
+                 format_date(self._conf.getAdjustedStartDate() + datetime.timedelta(days=day_number), 'short'))
+                for day_number in xrange(offset.days + 1)]

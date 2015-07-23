@@ -30,8 +30,8 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_default_folder_names
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import PrincipalListField, IndicoSelectMultipleCheckboxField
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.fields import PrincipalListField, IndicoSelectMultipleCheckboxField, IndicoRadioField
+from indico.web.forms.validators import UsedIf, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
 
@@ -117,11 +117,16 @@ class AttachmentFolderForm(IndicoForm):
 class AttachmentPackageForm(IndicoForm):
     added_since = DateField(_('Added Since'), [Optional()], parse_kwargs={'dayfirst': True},
                             description=_('Include only attachments uploaded after this date'))
-    sessions = IndicoSelectMultipleCheckboxField(_('Sessions'),
-                                                 description=_('Include attachments from selected sessions'))
+
+    filter_type = IndicoRadioField(_('Include'), [DataRequired()])
+
+    sessions = IndicoSelectMultipleCheckboxField(_('Sessions'), [HiddenUnless('filter_type', 'sessions'),
+                                                                 DataRequired()],
+                                                 description=_('Include materials from selected sessions'))
     contributions = IndicoSelectMultipleCheckboxField(_('Contributions'),
-                                                      description=_('Include attachments from selected contributions'))
-    contributions_schedule_dates = IndicoSelectMultipleCheckboxField(_('Contributions scheduled on'),
-                                                                     description=_('Include attachments from '
-                                                                                   'contributions scheduled on '
-                                                                                   'selected dates'))
+                                                      [HiddenUnless('filter_type', 'contributions'), DataRequired()],
+                                                      description=_('Include materials from selected contributions'))
+    dates = IndicoSelectMultipleCheckboxField(_('Events scheduled on'), [HiddenUnless('filter_type', 'dates'),
+                                                                         DataRequired()],
+                                              description=_('Include materials from events scheduled on selected '
+                                                            'dates'))

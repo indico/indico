@@ -20,6 +20,7 @@ from wtforms.fields import RadioField, BooleanField
 from wtforms.widgets.core import Input, Select, HiddenInput
 from wtforms.validators import Length, Regexp, NumberRange
 
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import ConfirmPassword, HiddenUnless
 
 
@@ -61,7 +62,8 @@ def _attrs_for_validators(field, validators):
 def render_field(field, widget_attrs):
     """Renders a WTForms field, taking into account validators"""
     args = _attrs_for_validators(field, field.validators)
-    args['required'] = field.flags.required and not field.flags.conditional
+    args['required'] = (field.flags.required and not field.flags.conditional
+                        and not isinstance(field, IndicoSelectMultipleCheckboxField))
     args.update(widget_attrs)
     return field(**args)
 

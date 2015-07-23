@@ -1,4 +1,4 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_row %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 <div class="i-box-group vert fixed-width attachments-package">
     <div class="i-box titled no-padding">
@@ -7,16 +7,7 @@
         </div>
         <div class="i-box-content">
             {{ form_header(form) }}
-            {{ form_row(form.added_since) }}
-            {% if form.sessions.choices %}
-                {{ form_row(form.sessions) }}
-            {% endif %}
-            {% if form.contributions.choices %}
-                {{ form_row(form.contributions) }}
-            {% endif %}
-            {% if form.contributions_schedule_dates.choices %}
-                {{ form_row(form.contributions_schedule_dates) }}
-            {% endif %}
+            {{ form_rows(form, skip=skipped_fields) }}
             {% call form_footer(form) %}
                 <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
             {% endcall %}
