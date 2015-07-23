@@ -18,4 +18,5 @@ from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
-_bp = IndicoBlueprint('evaluation', __name__, template_folder='templates', virtual_template_folder='events/evaluation')
+_bp = IndicoBlueprint('evaluation_old', __name__, template_folder='templates',
+                      virtual_template_folder='events/evaluation_old')

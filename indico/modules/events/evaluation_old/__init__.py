@@ -20,11 +20,11 @@ from indico.core import signals
 from indico.modules.events.settings import EventSettingsProxy
 
 
-event_settings = EventSettingsProxy('evaluation', {
+event_settings = EventSettingsProxy('evaluation_old', {
     'send_notification': False
 })
 
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico.modules.events.evaluation.tasks
+    import indico.modules.events.evaluation_old.tasks

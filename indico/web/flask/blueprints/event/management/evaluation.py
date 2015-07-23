@@ -20,30 +20,30 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Setup
-event_mgmt.add_url_rule('/evaluation/', 'confModifEvaluation', redirect_view('.confModifEvaluation-setup'))
-event_mgmt.add_url_rule('/evaluation/setup/', 'confModifEvaluation-setup', evaluationModif.RHEvaluationSetup)
-event_mgmt.add_url_rule('/evaluation/setup/change-status', 'confModifEvaluation-changeStatus',
+event_mgmt.add_url_rule('/evaluation-old/', 'confModifEvaluation', redirect_view('.confModifEvaluation-setup'))
+event_mgmt.add_url_rule('/evaluation-old/setup/', 'confModifEvaluation-setup', evaluationModif.RHEvaluationSetup)
+event_mgmt.add_url_rule('/evaluation-old/setup/change-status', 'confModifEvaluation-changeStatus',
                         evaluationModif.RHEvaluationSetupChangeStatus, methods=('POST',))
-event_mgmt.add_url_rule('/evaluation/setup/modify', 'confModifEvaluation-dataModif',
+event_mgmt.add_url_rule('/evaluation-old/setup/modify', 'confModifEvaluation-dataModif',
                         evaluationModif.RHEvaluationSetupDataModif, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/evaluation/setup/modify/save', 'confModifEvaluation-performDataModif',
+event_mgmt.add_url_rule('/evaluation-old/setup/modify/save', 'confModifEvaluation-performDataModif',
                         evaluationModif.RHEvaluationSetupPerformDataModif, methods=('POST',))
-event_mgmt.add_url_rule('/evaluation/setup/special-action', 'confModifEvaluation-specialAction',
+event_mgmt.add_url_rule('/evaluation-old/setup/special-action', 'confModifEvaluation-specialAction',
                         evaluationModif.RHEvaluationSetupSpecialAction, methods=('POST',))
 
 # Edit questions
-event_mgmt.add_url_rule('/evaluation/edit', 'confModifEvaluation-edit', evaluationModif.RHEvaluationEdit)
-event_mgmt.add_url_rule('/evaluation/edit', 'confModifEvaluation-editPerformChanges',
+event_mgmt.add_url_rule('/evaluation-old/edit', 'confModifEvaluation-edit', evaluationModif.RHEvaluationEdit)
+event_mgmt.add_url_rule('/evaluation-old/edit', 'confModifEvaluation-editPerformChanges',
                         evaluationModif.RHEvaluationEditPerformChanges, methods=('POST',))
 
 # Preview
-event_mgmt.add_url_rule('/evaluation/preview', 'confModifEvaluation-preview', evaluationModif.RHEvaluationPreview,
+event_mgmt.add_url_rule('/evaluation-old/preview', 'confModifEvaluation-preview', evaluationModif.RHEvaluationPreview,
                         methods=('GET', 'POST'))
 
 # Results
-event_mgmt.add_url_rule('/evaluation/results/', 'confModifEvaluation-results', evaluationModif.RHEvaluationResults,
+event_mgmt.add_url_rule('/evaluation-old/results/', 'confModifEvaluation-results', evaluationModif.RHEvaluationResults,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/evaluation/results/options', 'confModifEvaluation-resultsOptions',
+event_mgmt.add_url_rule('/evaluation-old/results/options', 'confModifEvaluation-resultsOptions',
                         evaluationModif.RHEvaluationResultsOptions, methods=('POST',))
-event_mgmt.add_url_rule('/evaluation/results/perform-action', 'confModifEvaluation-resultsSubmittersActions',
+event_mgmt.add_url_rule('/evaluation-old/results/perform-action', 'confModifEvaluation-resultsSubmittersActions',
                         evaluationModif.RHEvaluationResultsSubmittersActions, methods=('POST',))

@@ -27,7 +27,7 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.core.config import Config
-from indico.modules.events.evaluation import event_settings as evaluation_settings
+from indico.modules.events.evaluation_old import event_settings as evaluation_settings
 from indico.modules.users.legacy import AvatarUserWrapper
 
 
