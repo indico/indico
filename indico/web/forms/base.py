@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import weakref
+
 from flask import request, session, flash, g
 from flask_wtf import Form
 from wtforms import ValidationError
@@ -83,7 +85,9 @@ class IndicoForm(Form):
             no_filter_fields = (QuerySelectField, FieldList)
             filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
-            return unbound_field.bind(form=form, filters=filters, **options)
+            bound = unbound_field.bind(form=form, filters=filters, **options)
+            bound.get_form = weakref.ref(form)  # GC won't collect the form if we don't use a weakref
+            return bound
 
     def generate_csrf_token(self, csrf_context=None):
         if not self.csrf_enabled:

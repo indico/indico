@@ -58,7 +58,7 @@ class LinkingWidget(JinjaWidget):
         super(LinkingWidget, self).__init__('forms/linking_widget.html', **context)
 
     def __call__(self, field, **kwargs):
-        form = field._form
+        form = field.get_form()
         has_error = {subfield.data: (subfield.data in form.conditional_fields and form[subfield.data].errors)
                      for subfield in field}
         return super(LinkingWidget, self).__call__(field, form=form, has_error=has_error, **kwargs)
@@ -100,7 +100,6 @@ class VCRoomLinkFormBase(IndicoForm):
                          sorted(self.event.getSessionSlotList(), key=methodcaller('getFullTitle'))]
         self.contribution.choices = [('', _("Please select a contribution"))] + contrib_choices
         self.block.choices = [('', _("Please select a session block"))] + block_choices
-        self.linking._form = self
 
 
 class VCRoomAttachFormBase(VCRoomLinkFormBase):

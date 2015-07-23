@@ -46,12 +46,7 @@ def _attrs_for_validators(field, validators):
             if validator.max is not None:
                 attrs['max'] = validator.max
         elif isinstance(validator, ConfirmPassword):
-            # We don't have access to the form so we need to get the
-            # form's prefix from this field's name...
-            prefix = ''
-            if field.name != field.short_name:
-                prefix = re.sub(re.escape(field.short_name) + '$', '', field.name, 1)
-            attrs['data-confirm-password'] = prefix + validator.fieldname
+            attrs['data-confirm-password'] = field.get_form()[validator.fieldname].name
     return attrs
 
 
