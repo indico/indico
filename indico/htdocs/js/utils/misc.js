@@ -47,6 +47,9 @@
             container = element;
         } else {
             container = element.closest('.ui-dialog-content').find('.flashed-messages');
+            if (!container.length) {
+                container = element.closest('.page-content').find('.flashed-messages');
+            }
         }
         if (!container.length) {
             container = $('#flashed-messages');
