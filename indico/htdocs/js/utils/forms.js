@@ -34,7 +34,12 @@
         conditionField.on('change', function() {
             var value = checkedOnly ? conditionField.filter(':checked').val() : conditionField.val();
             var active = !!((requiredValue === null && value) || (requiredValue !== null && requiredValue === value));
-            field.prop('disabled', !active).closest('.form-group').toggle(active);
+            field.closest('.form-group').toggle(active);
+            if (!field.is(':input')) {
+                field.find(':input').prop('disabled', !active);
+            } else {
+                field.prop('disabled', !active);
+            }
         });
     }
 

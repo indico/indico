@@ -4,7 +4,7 @@
 {% block html %}
     {% for subfield in field %}
         <div class="i-checkbox">
-            {{ subfield() }}
+            {{ subfield(**input_args) }}
             {{ subfield.label }}
         </div>
     {% endfor %}

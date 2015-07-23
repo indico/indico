@@ -56,7 +56,7 @@ class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
 
 
 class IndicoSelectMultipleCheckboxField(SelectMultipleField):
-    widget = JinjaWidget('forms/checkbox_group_widget.html')
+    widget = JinjaWidget('forms/checkbox_group_widget.html', single_kwargs=True)
     option_widget = CheckboxInput()
 
 
