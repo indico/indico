@@ -101,7 +101,10 @@ class ReminderForm(IndicoForm):
     def validate_schedule_type(self, field):
         # Be graceful and allow a reminder that's in the past but on the same day.
         # It will be sent immediately but that way we are a little bit more user-friendly
-        if field.data != 'now' and self.scheduled_dt.data.date() < now_utc().date():
+        if field.data == 'now':
+            return
+        scheduled_dt = self.scheduled_dt.data
+        if scheduled_dt is not None and scheduled_dt.date() < now_utc().date():
             raise ValidationError(_('The specified date is in the past'))
 
     def validate_absolute_date(self, field):
@@ -115,9 +118,13 @@ class ReminderForm(IndicoForm):
     @generated_data
     def scheduled_dt(self):
         if self.schedule_type.data == 'absolute':
+            if self.absolute_date.data is None or self.absolute_time.data is None:
+                return None
             dt = datetime.combine(self.absolute_date.data, self.absolute_time.data)
             return get_timezone(self.timezone).localize(dt).astimezone(pytz.utc)
         elif self.schedule_type.data == 'relative':
+            if self.relative_delta.data is None:
+                return None
             return self.event.getStartDate() - self.relative_delta.data
         elif self.schedule_type.data == 'now':
             return now_utc()
