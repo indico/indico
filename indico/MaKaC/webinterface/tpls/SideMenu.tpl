@@ -34,8 +34,14 @@
                             % else:
                                 <% liClass = "sideMenu_disabled " + item.getErrorMessage() %>
                             % endif
+                            % if menu.event and item.event_feature:
+                                <% liClass = '{} js-event-feature-{}'.format(liClass, item.event_feature) %>
+                                % if not menu.event.has_feature(item.event_feature):
+                                    <% liClass += ' weak-hidden' %>
+                                % endif
+                            % endif
 
-                            <li id="sideMenu_${ re.sub(r'[^a-zA-Z]', '', item.getTitle())} " class="${ liClass }">
+                            <li id="sideMenu_${ re.sub(r'[^a-zA-Z]', '', item.getTitle())}" class="${ liClass } ${ 'js-event-feature-{}'.format(item.event_feature) if menu.event and item.event_feature else '' }">
                                 % if item.isEnabled():
                                     <a href="${ item.getURL() }">
                                         ${ item.getTitle() }

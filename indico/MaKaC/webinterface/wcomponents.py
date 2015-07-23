@@ -1159,12 +1159,13 @@ class WClosed(WTemplated):
 
 
 class SideMenu(object):
-    def __init__(self, userStatus=False):
+    def __init__(self, userStatus=False, event=None):
         """ Constructor
             userStatus: a boolean that is True if the user is logged in, False otherwise
         """
         self._sections = []
         self._userStatus = userStatus
+        self.event = event
 
     def addSection(self, section, top=False):
         if top:
@@ -1249,7 +1250,8 @@ class SideMenuSection:
 
 class SideMenuItem:
 
-    def __init__(self, title, url, active=False, enabled=True, errorMessage = "msgNoPermissions", visible=True):
+    def __init__(self, title, url, active=False, enabled=True, errorMessage="msgNoPermissions", visible=True,
+                 event_feature=None):
         """ errorMessage: one of the error messages in SideMenu.wohl
         """
         self._title = title
@@ -1258,6 +1260,7 @@ class SideMenuItem:
         self._enabled = enabled
         self._errorMessage = errorMessage
         self._visible = visible
+        self.event_feature = event_feature
 
     def getTitle(self):
         return self._title;

@@ -35,6 +35,8 @@
                         feature: this.name
                     });
                 }
+            }).on('ajaxCheckbox:changed', function(e, state) {
+                $('.js-event-feature-{0}'.format(this.name)).toggle(state);
             });
         })();
     </script>

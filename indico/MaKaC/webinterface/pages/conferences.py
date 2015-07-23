@@ -1181,7 +1181,7 @@ class WPConferenceModifBase(main.WPMainBase):
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
 
     def _createSideMenu(self):
-        self._sideMenu = wcomponents.ManagementSideMenu()
+        self._sideMenu = wcomponents.ManagementSideMenu(event=self._conf)
 
         # The main section containing most menu items
         self._generalSection = wcomponents.SideMenuSection()
