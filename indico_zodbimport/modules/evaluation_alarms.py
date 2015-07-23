@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import itertools
 from datetime import date
 
-from indico.modules.events.evaluation import event_settings as evaluation_settings
+from indico.modules.events.evaluation_old import event_settings as evaluation_settings
 from indico.util.console import cformat
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer
