@@ -21,13 +21,13 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.evaluation import event_settings as evaluation_settings
+from indico.modules.events.evaluation_old import event_settings as evaluation_settings
 from indico.util.date_time import now_utc
 from indico.web.flask.templating import get_template_module
 from MaKaC.evaluation import Evaluation
 
 
-@celery.periodic_task(name='evaluation_start_notifications', run_every=crontab(minute='0', hour='0'))
+@celery.periodic_task(name='evaluation_old_start_notifications', run_every=crontab(minute='0', hour='0'))
 def notify_evaluation_start():
     for setting in evaluation_settings.query.filter_by(name='send_notification'):
         if not setting.value:
@@ -69,7 +69,7 @@ def _process_evaluation(event):
         # Notifications disabled
         return True
 
-    tpl = get_template_module('events/evaluation/emails/evaluation_started.txt', event=event, evaluation=evaluation)
+    tpl = get_template_module('events/evaluation_old/emails/evaluation_started.txt', event=event, evaluation=evaluation)
     # XXX: This is terrible, putting possibly all the participants in `To`. We should really use BCC for this!
     email = make_email(notification.getToList(), notification.getCCList(), template=tpl)
     send_email(email, event, 'Evaluation')
