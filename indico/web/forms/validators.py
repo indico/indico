@@ -40,6 +40,27 @@ class UsedIf(object):
             raise StopValidation()
 
 
+class HiddenUnless(object):
+    """Hides and disables a field unless another field has a certain value.
+
+    :param field: The name of the other field to check
+    :param value: The value to check for.  If unspecified, any truthy
+                  value is accepted.
+    """
+    field_flags = ('initially_hidden',)
+
+    def __init__(self, field, value=None):
+        self.field = field
+        self.value = value
+
+    def __call__(self, form, field):
+        value = form[self.field].data
+        active = (value and self.value is None) or (value == self.value and self.value is not None)
+        if not active:
+            field.errors[:] = []
+            raise StopValidation()
+
+
 class Exclusive(object):
     """Makes a WTF field mutually exclusive with other fields.
 

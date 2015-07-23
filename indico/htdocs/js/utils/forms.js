@@ -30,13 +30,32 @@
         }
     }
 
+    function hideFieldUnless(field, conditionField, requiredValue, checkedOnly) {
+        conditionField.on('change', function() {
+            var value = checkedOnly ? conditionField.filter(':checked').val() : conditionField.val();
+            var active = !!((requiredValue === null && value) || (requiredValue !== null && requiredValue === value));
+            field.prop('disabled', !active).closest('.form-group').toggle(active);
+        });
+    }
+
     global.initForms = function initForms(forms) {
+        // ConfirmPassword validator
         forms.find('input[data-confirm-password]').each(function() {
             var confirmField = $(this);
             var passwordField = $(this.form).find('input[name="' + confirmField.data('confirmPassword') + '"]');
             validatePasswordConfirmation(passwordField, confirmField);
         });
 
+        // HiddenUnless validator
+        forms.find(':input[data-hidden-unless]').each(function() {
+            var field = $(this);
+            var data = field.data('hidden-unless');
+            var conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
+            hideFieldUnless(field, conditionField, data.value, data.checked_only);
+            (data.checked_only ? conditionField.filter(':checked') : conditionField).triggerHandler('change');
+        });
+
+        // track modifications
         forms.find('[data-disabled-until-change]').prop('disabled', true);
         forms.each(function() {
             var $this = $(this);
@@ -76,11 +95,11 @@
 
     global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo, selfProtection, inheritedProtection, folderProtection) {
         folderField.on('change', function() {
-            var selectedFolder = $(this)
+            var selectedFolder = $(this);
             if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
                 selfProtection.hide();
                 inheritedProtection.hide();
-                folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text())
+                folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text());
                 folderProtection.show();
             }
             else {

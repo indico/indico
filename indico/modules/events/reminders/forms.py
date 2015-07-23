@@ -31,7 +31,7 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, IndicoRadioField, TimeDeltaField
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.validators import HiddenUnless
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
@@ -46,12 +46,10 @@ class ReminderForm(IndicoForm):
                                      choices=[('relative', _("Relative to the event start time")),
                                               ('absolute', _("Fixed date/time")),
                                               ('now', _('Send immediately'))])
-    relative_delta = TimeDeltaField(_('Offset'), [UsedIf(lambda form, field: form.schedule_type.data == 'relative'),
-                                                  DataRequired()])
-    absolute_date = DateField(_('Date'), [UsedIf(lambda form, field: form.schedule_type.data == 'absolute'),
-                                          DataRequired()], parse_kwargs={'dayfirst': True})
-    absolute_time = TimeField(_('Time'), [UsedIf(lambda form, field: form.schedule_type.data == 'absolute'),
-                                          InputRequired()])
+    relative_delta = TimeDeltaField(_('Offset'), [HiddenUnless('schedule_type', 'relative'), DataRequired()])
+    absolute_date = DateField(_('Date'), [HiddenUnless('schedule_type', 'absolute'), DataRequired()],
+                              parse_kwargs={'dayfirst': True})
+    absolute_time = TimeField(_('Time'), [HiddenUnless('schedule_type', 'absolute'), InputRequired()])
     # Recipients
     recipients = EmailListField(_('Email addresses'), description=_('One email address per line.'))
     send_to_participants = BooleanField(_('Participants'),

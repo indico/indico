@@ -14,12 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import re
+import json
 
+from wtforms.fields import RadioField, BooleanField
 from wtforms.widgets.core import Input, Select, HiddenInput
 from wtforms.validators import Length, Regexp, NumberRange
 
-from indico.web.forms.validators import ConfirmPassword
+from indico.web.forms.validators import ConfirmPassword, HiddenUnless
 
 
 def is_single_line_field(field):
@@ -47,6 +48,13 @@ def _attrs_for_validators(field, validators):
                 attrs['max'] = validator.max
         elif isinstance(validator, ConfirmPassword):
             attrs['data-confirm-password'] = field.get_form()[validator.fieldname].name
+        elif isinstance(validator, HiddenUnless):
+            condition_field = field.get_form()[validator.field]
+            checked_only = (isinstance(condition_field, (RadioField, BooleanField)) or
+                            isinstance(condition_field.widget, Select))
+            attrs['data-hidden-unless'] = json.dumps({'field': condition_field.name,
+                                                      'value': validator.value,
+                                                      'checked_only': checked_only})
     return attrs
 
 
