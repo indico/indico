@@ -1,0 +1,41 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_rows %}
+
+{% block title %}
+    {%- trans %}Features{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {% trans -%}
+        You can enable/disable various features for your event.
+        Disabling a feature will hide it from both managers and users.
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="flashed-messages"></div>
+
+    <div class="i-form horizontal" id="features-container">
+        {{ form_rows(form) }}
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            var urlTemplate = {{ url_rule_to_js('event_features.switch') | tojson }};
+            $('#features-container input:checkbox').ajaxCheckbox({
+                sendData: false,
+                method: function() {
+                    return this.checked ? 'PUT' : 'DELETE';
+                },
+                href: function() {
+                    return build_url(urlTemplate, {
+                        confId: {{ event.id }},
+                        feature: this.name
+                    });
+                }
+            });
+        })();
+    </script>
+{% endblock %}

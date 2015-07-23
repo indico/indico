@@ -179,6 +179,7 @@ class RH(RequestHandlerBase):
     _doNotSanitizeFields = []
     _isMobile = True  # this value means that the generated web page can be mobile
     CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
+    EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
 
     #: A dict specifying how the url should be normalized.
     #: `args` is a dictionary mapping view args keys to callables
@@ -396,6 +397,12 @@ class RH(RequestHandlerBase):
         if base_secure and referer.startswith(base_secure):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
+
+    def _check_event_feature(self):
+        from indico.modules.events.features.util import require_feature
+        event_id = request.view_args.get('confId') or request.view_args.get('event_id')
+        if event_id is not None:
+            require_feature(event_id, self.EVENT_FEATURE)
 
     @jsonify_error
     def _processGeneralError(self, e):
@@ -641,6 +648,9 @@ class RH(RequestHandlerBase):
         #redirect to https if necessary
         if self._checkHttpsRedirect():
             return self._responseUtil.make_redirect()
+
+        if self.EVENT_FEATURE is not None:
+            self._check_event_feature()
 
         DBMgr.getInstance().startRequest()
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))

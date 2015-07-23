@@ -19,13 +19,14 @@ from __future__ import absolute_import
 import os
 from contextlib import contextmanager
 
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
+from werkzeug.exceptions import NotFound
 from werkzeug.utils import cached_property
 
 from indico.core.config import Config
@@ -100,13 +101,28 @@ class IndicoBlueprint(Blueprint):
     ignore the url_prefix of the blueprint.
 
     It also supports automatically creating rules in two versions - with and
-    without a prefix."""
+    without a prefix.
+
+    :param event_feature: If set, this blueprint will raise `NotFound`
+                          for all its endpoints unless the event referenced
+                          by the `confId` or `event_id` URL argument has
+                          the specified feature.
+    """
 
     def __init__(self, *args, **kwargs):
         self.__prefix = None
         self.__default_prefix = ''
         self.__virtual_template_folder = kwargs.pop('virtual_template_folder', None)
+        event_feature = kwargs.pop('event_feature', None)
         super(IndicoBlueprint, self).__init__(*args, **kwargs)
+
+        if event_feature:
+            @self.before_request
+            def _check_event_feature():
+                from indico.modules.events.features.util import require_feature
+                event_id = request.view_args.get('confId') or request.view_args.get('event_id')
+                if event_id is not None:
+                    require_feature(event_id, event_feature)
 
     @locked_cached_property
     def jinja_loader(self):
