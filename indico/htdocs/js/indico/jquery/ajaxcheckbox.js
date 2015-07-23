@@ -72,7 +72,7 @@
                         $this.prop('checked', !checked);
                     },
                     success: function(data) {
-                        $this.prop('checked', data.enabled);
+                        $this.prop('checked', data.enabled).trigger('ajaxCheckbox:changed', [data.enabled]);
                         handleFlashes(data, true, $this);
                     }
                 });
