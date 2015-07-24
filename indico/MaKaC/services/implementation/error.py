@@ -16,6 +16,8 @@
 
 from pprint import pformat
 
+from werkzeug.urls import url_parse
+
 from MaKaC.services.implementation.base import ParameterManager, ServiceBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.errors import MaKaCError
@@ -43,7 +45,7 @@ class SendErrorReport(ServiceBase):
 
         toAddr = Config.getInstance().getSupportEmail()
         Logger.get('errorReport').debug('mailing %s' % toAddr)
-        subject = "[Indico@%s] Error report"%cfg.getBaseURL()
+        subject = "[Indico@{}] Error report".format(url_parse(cfg.getBaseURL()).netloc)
 
         request_info = self._requestInfo or ''
         if isinstance(request_info, (dict, list)):
