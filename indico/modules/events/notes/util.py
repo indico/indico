@@ -65,3 +65,18 @@ def get_nested_notes(obj):
     elif isinstance(obj, Contribution):
         nested_objects = obj.getSubContributionList()
     return itertools.chain(notes, *map(get_nested_notes, nested_objects))
+
+
+def can_edit_note(obj, user):
+    """Checks if a user can edit the object's note"""
+    from MaKaC.conference import Contribution, Session, SubContribution
+    if not user:
+        return False
+    elif isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
+        return True
+    elif isinstance(obj, Contribution) and obj.canUserSubmit(user.as_avatar):
+        return True
+    elif isinstance(obj, SubContribution):
+        return can_edit_note(obj.getContribution(), user)
+    else:
+        return obj.canModify(user.as_avatar) or obj.getAccessController().canUserSubmit(user.as_avatar)

@@ -27,6 +27,7 @@ from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
+from indico.modules.events.notes.util import can_edit_note
 from indico.modules.events.util import get_object_from_args
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -52,13 +53,7 @@ class RHManageNoteBase(RHNoteBase):
 
     def _checkProtection(self):
         RHNoteBase._checkProtection(self)
-        if not self._doProcess:
-            return
-        if self.object_type == 'session' and self.object.canCoordinate(session.avatar):
-            return
-        if self.object_type in {'contribution', 'subcontribution'} and self.object.canUserSubmit(session.avatar):
-            return
-        if not self.object.canModify(session.avatar):
+        if not can_edit_note(self.object, session.user):
             raise Forbidden
 
 
