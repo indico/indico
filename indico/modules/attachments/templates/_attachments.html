@@ -33,7 +33,12 @@
             <td class="actions">
                 <a class="icon-edit js-dialog-action"
                    data-href="{{ url_for('.modify_attachment', attachment) }}"
-                   data-title="{% trans name=attachment.title %}Edit attachment {{ name }}{% endtrans %}"></a>
+                   data-title="
+                    {%- if attachment.type.name == 'file' -%}
+                        {% trans name=attachment.title %}Edit file &quot;{{ name }}&quot;{% endtrans %}
+                    {% else %}
+                        {% trans name=attachment.title %}Edit link &quot;{{ name }}&quot;{% endtrans %}
+                    {% endif -%}"></a>
                 <a href="#" class="icon-remove js-delete"
                    data-method="DELETE"
                    data-href="{{ url_for('.delete_attachment', attachment) }}"
