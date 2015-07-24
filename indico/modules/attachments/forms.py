@@ -128,5 +128,5 @@ class AttachmentPackageForm(IndicoForm):
                                                       description=_('Include materials from selected contributions'))
     dates = IndicoSelectMultipleCheckboxField(_('Events scheduled on'), [HiddenUnless('filter_type', 'dates'),
                                                                          DataRequired()],
-                                              description=_('Include materials from events scheduled on selected '
-                                                            'dates'))
+                                              description=_('Include materials from sessions/contributions scheduled '
+                                                            'on the selected dates'))

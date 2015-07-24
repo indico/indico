@@ -184,7 +184,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     wp = None
 
     def _process(self):
-        form, skipped_fields = self._prepare_form()
+        form = self._prepare_form()
         if form.validate_on_submit():
             attachments = self._filter_attachments(form.data)
             if attachments:
@@ -192,28 +192,29 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             else:
                 flash(_('There are no materials matching your criteria.'), 'warning')
 
-        return self.wp.render_template('generate_package.html', self._conf, form=form, skipped_fields=skipped_fields)
+        return self.wp.render_template('generate_package.html', self._conf, form=form)
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
-        filter_types = OrderedDict(all=_('Everything'))
-        sessions = self._load_session_data()
-        contributions = self._load_contribution_data()
-        dates = list(self._iter_event_days())
+        form.dates.choices = list(self._iter_event_days())
+        filter_types = OrderedDict()
+        filter_types['all'] = _('Everything')
+        filter_types['sessions'] = _('Specific sessions')
+        filter_types['contributions'] = _('Specific contributions')
+        filter_types['dates'] = _('Specific days')
 
-        if sessions:
-            filter_types['sessions'] = _('Specific sessions')
-        if contributions:
-            filter_types['contributions'] = _('Specific contributions')
-        if dates:
-            filter_types['dates'] = _('Specific days')
+        form.sessions.choices = self._load_session_data()
+        if not form.sessions.choices:
+            del filter_types['sessions']
+            del form.sessions
 
-        skipped_fields = {'sessions', 'contributions', 'dates'} - filter_types.viewkeys()
+        form.contributions.choices = self._load_contribution_data()
+        if not form.contributions.choices:
+            del filter_types['contributions']
+            del form.contributions
+
         form.filter_type.choices = filter_types.items()
-        form.sessions.choices = sessions
-        form.contributions.choices = contributions
-        form.dates.choices = dates
-        return form, skipped_fields
+        return form
 
     def _load_session_data(self):
         return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
