@@ -69,10 +69,7 @@ class AttachmentPackageGeneratorMixin:
         return [attachment for attachment in attachments if attachment.can_access(session.user)]
 
     def _get_all_attachments(self, added_since):
-        query = self._build_base_query()
-
-        if added_since:
-            query = self._filter_by_date(query, added_since)
+        query = self._build_base_query(added_since)
 
         def _check_scheduled(attachment):
             obj = attachment.folder.linked_object
@@ -80,18 +77,19 @@ class AttachmentPackageGeneratorMixin:
 
         return filter(_check_scheduled, query)
 
-    def _build_base_query(self):
-        return Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
-                               ~Attachment.is_deleted, AttachmentFolder.event_id == int(self._conf.getId()),
-                               _join=AttachmentFolder)
+    def _build_base_query(self, added_since=None):
+        query = Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
+                                ~Attachment.is_deleted, AttachmentFolder.event_id == int(self._conf.getId()),
+                                _join=AttachmentFolder)
+        if added_since is not None:
+            query = query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
+        return query
 
     def _filter_by_sessions(self, session_ids, added_since):
         session_ids = set(session_ids)
-        query = self._build_base_query().filter(AttachmentFolder.link_type.in_([LinkType.session, LinkType.contribution,
-                                                                                LinkType.subcontribution]))
-
-        if added_since:
-            query = self._filter_by_date(query, added_since)
+        query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.session,
+                                                                                           LinkType.contribution,
+                                                                                           LinkType.subcontribution]))
 
         def _check_session(attachment):
             obj = attachment.folder.linked_object
@@ -100,12 +98,9 @@ class AttachmentPackageGeneratorMixin:
         return filter(_check_session, query)
 
     def _filter_by_contributions(self, contribution_ids, added_since):
-        query = self._build_base_query().filter(AttachmentFolder.contribution_id.in_(contribution_ids),
-                                                AttachmentFolder.link_type.in_([LinkType.contribution,
-                                                                                LinkType.subcontribution]))
-
-        if added_since:
-            query = self._filter_by_date(query, added_since)
+        query = self._build_base_query(added_since).filter(AttachmentFolder.contribution_id.in_(contribution_ids),
+                                                           AttachmentFolder.link_type.in_([LinkType.contribution,
+                                                                                           LinkType.subcontribution]))
 
         def _check_scheduled(attachment):
             obj = attachment.folder.linked_object
@@ -126,9 +121,6 @@ class AttachmentPackageGeneratorMixin:
             return unicode(start_dt.date()) in dates
 
         return filter(_check_date, self._build_base_query())
-
-    def _filter_by_date(self, query, added_since):
-        return query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
 
     def _generate_zip_file(self, attachments):
         temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
