@@ -18,7 +18,7 @@ import os
 from cStringIO import StringIO
 import tempfile
 import types
-from flask import session, request
+from flask import session, request, flash, redirect
 from persistent.list import PersistentList
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
@@ -3092,12 +3092,16 @@ class RHMaterialPackage(RHConferenceModifBase, AttachmentPackageGeneratorMixin):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self._contribIds = self._normaliseListParam(params.get("contributions", []))
-        self._contribs = map(self._conf.getContributionById, self._contribIds)
 
     def _process(self):
-        if not self._contribs:
-            return "No contribution selected"
-        return self._generate_zip_file(self._filter_protected(self._filter_by_contributions(self._contribIds, None)))
+        if not self._contribIds:
+            flash(_('You did not select any contributions.'), 'warning')
+            return redirect(url_for('event_mgmt.confModifContribList', self._conf))
+        attachments = self._filter_by_contributions(self._contribIds, None)
+        if not attachments:
+            flash(_('The selected contributions do not have any materials.'), 'warning')
+            return redirect(url_for('event_mgmt.confModifContribList', self._conf))
+        return self._generate_zip_file(attachments)
 
 
 class RHAbstractBook( RHConfModifCFABase ):

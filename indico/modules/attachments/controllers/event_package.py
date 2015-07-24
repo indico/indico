@@ -22,7 +22,7 @@ from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
-from flask import session
+from flask import session, flash
 from sqlalchemy import cast, Date
 
 from indico.core.config import Config
@@ -109,8 +109,6 @@ class AttachmentPackageGeneratorMixin:
         return query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
 
     def _generate_zip_file(self, attachments):
-        # XXX: could use a celery task to delay the temporary file after a day or so.
-        # right now this relies on an external cronjob to do so...
         temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used = set()
@@ -174,7 +172,11 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     def _process(self):
         form, skipped_fields = self._prepare_form()
         if form.validate_on_submit():
-            return self._generate_zip_file(self._filter_attachments(form.data))
+            attachments = self._filter_attachments(form.data)
+            if attachments:
+                return self._generate_zip_file(attachments)
+            else:
+                flash(_('There are no materials matching your criteria.'), 'warning')
 
         return self.wp.render_template('generate_package.html', self._conf, form=form, skipped_fields=skipped_fields)
 
