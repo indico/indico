@@ -30,7 +30,7 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.fs import secure_filename
-from indico.util.string import to_unicode
+from indico.util.string import to_unicode, natural_sort_key
 from indico.util.tasks import delete_file
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -220,9 +220,18 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
 
     def _load_contribution_data(self):
-        return [(contrib.getId(), to_unicode(contrib.getTitle()))
-                for contrib in self._conf.getContributionList() if contrib.getOwner() == self._conf
-                and contrib.getStartDate()]
+        def _format_contrib(contrib):
+            if contrib.getSession() is None:
+                return to_unicode(contrib.getTitle())
+            else:
+                return _('{contrib} (in session "{session}")').format(
+                    session=to_unicode(contrib.getSession().getTitle()),
+                    contrib=to_unicode(contrib.getTitle())
+                )
+
+        contribs = sorted([contrib for contrib in self._conf.getContributionList() if contrib.getStartDate()],
+                          key=lambda c: natural_sort_key(c.getTitle()))
+        return [(contrib.getId(), _format_contrib(contrib)) for contrib in contribs]
 
     def _iter_event_days(self):
         duration = (self._conf.getAdjustedEndDate() - self._conf.getAdjustedStartDate()).days
