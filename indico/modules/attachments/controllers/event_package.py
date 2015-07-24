@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-import datetime
 import os
 from collections import OrderedDict
+from datetime import timedelta
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
@@ -40,7 +40,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from MaKaC.conference import SubContribution
 
 
-def _get_start_date(obj):
+def _get_start_dt(obj):
     if isinstance(obj, SubContribution):
         return obj.getContribution().getAdjustedStartDate()
     else:
@@ -61,7 +61,7 @@ class AttachmentPackageGeneratorMixin:
         elif filter_type == 'contributions':
             attachments = self._filter_by_contributions(filter_data.get('contributions', []), added_since)
         elif filter_type == 'dates':
-            attachments = self._filter_by_dates(filter_data.get('dates'))
+            attachments = self._filter_by_dates(filter_data.get('dates', []))
 
         return self._filter_protected(attachments)
 
@@ -74,7 +74,11 @@ class AttachmentPackageGeneratorMixin:
         if added_since:
             query = self._filter_by_date(query, added_since)
 
-        return [att for att in query if att.folder.linked_object and _get_start_date(att.folder.linked_object)]
+        def _check_scheduled(attachment):
+            obj = attachment.folder.linked_object
+            return obj is not None and _get_start_dt(obj) is not None
+
+        return filter(_check_scheduled, query)
 
     def _build_base_query(self):
         return Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
@@ -82,14 +86,18 @@ class AttachmentPackageGeneratorMixin:
                                _join=AttachmentFolder)
 
     def _filter_by_sessions(self, session_ids, added_since):
+        session_ids = set(session_ids)
         query = self._build_base_query().filter(AttachmentFolder.link_type.in_([LinkType.session, LinkType.contribution,
                                                                                 LinkType.subcontribution]))
 
         if added_since:
             query = self._filter_by_date(query, added_since)
 
-        return [att for att in query if att.folder.linked_object.getSession()
-                and att.folder.linked_object.getSession().getId() in session_ids]
+        def _check_session(attachment):
+            obj = attachment.folder.linked_object
+            return obj is not None and obj.getSession() and obj.getSession().getId() in session_ids
+
+        return filter(_check_session, query)
 
     def _filter_by_contributions(self, contribution_ids, added_since):
         query = self._build_base_query().filter(AttachmentFolder.contribution_id.in_(contribution_ids),
@@ -99,11 +107,25 @@ class AttachmentPackageGeneratorMixin:
         if added_since:
             query = self._filter_by_date(query, added_since)
 
-        return [att for att in query if att.folder.linked_object and _get_start_date(att.folder.linked_object)]
+        def _check_scheduled(attachment):
+            obj = attachment.folder.linked_object
+            return obj is not None and _get_start_dt(obj) is not None
+
+        return filter(_check_scheduled, query)
 
     def _filter_by_dates(self, dates):
-        return [att for att in self._build_base_query() if att.folder.linked_object and
-                unicode(_get_start_date(att.folder.linked_object)) in dates]
+        dates = set(dates)
+
+        def _check_date(attachment):
+            obj = attachment.folder.linked_object
+            if obj is None:
+                return False
+            start_dt = _get_start_dt(obj)
+            if start_dt is None:
+                return None
+            return unicode(start_dt.date()) in dates
+
+        return filter(_check_date, self._build_base_query())
 
     def _filter_by_date(self, query, added_since):
         return query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
@@ -185,7 +207,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         filter_types = OrderedDict(all=_('Everything'))
         sessions = self._load_session_data()
         contributions = self._load_contribution_data()
-        dates = self._load_dates()
+        dates = list(self._iter_event_days())
 
         if sessions:
             filter_types['sessions'] = _('Specific sessions')
@@ -209,8 +231,8 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
                 for contrib in self._conf.getContributionList() if contrib.getOwner() == self._conf
                 and contrib.getStartDate()]
 
-    def _load_dates(self):
-        offset = self._conf.getAdjustedEndDate() - self._conf.getAdjustedStartDate()
-        return [(unicode(self._conf.getAdjustedStartDate() + datetime.timedelta(days=day_number)),
-                 format_date(self._conf.getAdjustedStartDate() + datetime.timedelta(days=day_number), 'short'))
-                for day_number in xrange(offset.days + 1)]
+    def _iter_event_days(self):
+        duration = (self._conf.getAdjustedEndDate() - self._conf.getAdjustedStartDate()).days
+        for offset in xrange(duration + 1):
+            day = (self._conf.getAdjustedStartDate() + timedelta(days=offset)).date()
+            yield day.isoformat(), format_date(day, 'short')
