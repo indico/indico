@@ -23,6 +23,7 @@ from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
 from flask import session, flash
+from markupsafe import escape
 from sqlalchemy import cast, Date
 
 from indico.core.config import Config
@@ -217,7 +218,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         return form
 
     def _load_session_data(self):
-        return [(session.getId(), to_unicode(session.getTitle())) for session in self._conf.getSessionList()]
+        return [(session.getId(), escape(to_unicode(session.getTitle()))) for session in self._conf.getSessionList()]
 
     def _load_contribution_data(self):
         def _format_contrib(contrib):
@@ -231,7 +232,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
 
         contribs = sorted([contrib for contrib in self._conf.getContributionList() if contrib.getStartDate()],
                           key=lambda c: natural_sort_key(c.getTitle()))
-        return [(contrib.getId(), _format_contrib(contrib)) for contrib in contribs]
+        return [(contrib.getId(), escape(_format_contrib(contrib))) for contrib in contribs]
 
     def _iter_event_days(self):
         duration = (self._conf.getAdjustedEndDate() - self._conf.getAdjustedStartDate()).days
