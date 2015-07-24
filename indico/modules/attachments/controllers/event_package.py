@@ -106,7 +106,7 @@ class AttachmentPackageGeneratorMixin:
                 unicode(_get_start_date(att.folder.linked_object)) in dates]
 
     def _filter_by_date(self, query, added_since):
-        return query.filter(cast(AttachmentFile.created_dt, Date) >= added_since)
+        return query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
 
     def _generate_zip_file(self, attachments):
         # XXX: could use a celery task to delay the temporary file after a day or so.
