@@ -88,6 +88,9 @@ class EvaluationQuestion(db.Model):
         default={}
     )
 
+    # relationship backrefs:
+    # - answers (EvaluationAnswer.question)
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder

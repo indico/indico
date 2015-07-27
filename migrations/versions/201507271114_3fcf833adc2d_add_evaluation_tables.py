@@ -9,6 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
+from indico.core.db.sqlalchemy import UTCDateTime
+
 
 # revision identifiers, used by Alembic.
 revision = '3fcf833adc2d'
@@ -30,7 +32,30 @@ def upgrade():
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
+    op.create_table(
+        'evaluation_submissions',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('is_anonymous', sa.Boolean(), nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('submitted_dt', UTCDateTime, nullable=False),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='events'
+    )
+    op.create_table(
+        'evaluation_answers',
+        sa.Column('submission_id', sa.Integer(), nullable=False),
+        sa.Column('question_id', sa.Integer(), nullable=False),
+        sa.Column('data', postgresql.JSON(), nullable=False),
+        sa.ForeignKeyConstraint(['question_id'], ['events.evaluation_questions.id']),
+        sa.ForeignKeyConstraint(['submission_id'], ['events.evaluation_submissions.id']),
+        sa.PrimaryKeyConstraint('submission_id', 'question_id'),
+        schema='events'
+    )
 
 
 def downgrade():
+    op.drop_table('evaluation_answers', schema='events')
+    op.drop_table('evaluation_submissions', schema='events')
     op.drop_table('evaluation_questions', schema='events')
