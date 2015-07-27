@@ -19,6 +19,7 @@ import itertools
 import re
 from heapq import heappush
 
+import bleach
 from flask import current_app as app
 from jinja2 import environmentfilter
 from jinja2.ext import Extension
@@ -80,6 +81,11 @@ def groupby(environment, value, attribute, reverse=False):
     """Like Jinja's builtin `groupby` filter, but allows reversed order."""
     expr = make_attrgetter(environment, attribute)
     return sorted(map(_GroupTuple, itertools.groupby(sorted(value, key=expr), expr)), reverse=reverse)
+
+
+def strip_tags(value):
+    """Strips provided text of html tags"""
+    return bleach.clean(value, tags=[], strip=True).strip()
 
 
 def instanceof(value, type_):
