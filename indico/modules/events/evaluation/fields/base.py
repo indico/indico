@@ -65,7 +65,7 @@ class EvaluationField(object):
         self.question.field_type = self.name
         self.question.field_data = {name: field.data
                                     for name, field in form._fields.iteritems()
-                                    if name not in form._common_fields}
+                                    if name not in form._common_fields and name != 'csrf_token'}
 
     def get_wtforms_field(self):
         """Returns a WTForms field for this field"""

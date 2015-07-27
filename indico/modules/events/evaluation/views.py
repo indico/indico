@@ -20,7 +20,7 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
-class WPEvaluation(WPJinjaMixin, WPConferenceModifBase):
+class WPManageEvaluation(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/evaluation/'
 
     def _setActiveSideMenuItem(self):
