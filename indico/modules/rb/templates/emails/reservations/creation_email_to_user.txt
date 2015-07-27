@@ -5,9 +5,9 @@
 The conference room {{ reservation.room.full_name }}
 has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.booked_for_name }}
 {% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
-    on {{ reservation.start_dt | format_date }} from {{ reservation.start_dt | format_time }} to {{ reservation.end_dt | format_time }}.
+    on {{ reservation.start_dt | format_date(locale='en_GB') }} from {{ reservation.start_dt | format_time(locale='en_GB') }} to {{ reservation.end_dt | format_time(locale='en_GB') }}.
 {%- else -%}
-    {{ RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date }} to {{ reservation.end_dt | format_date }} between {{ reservation.start_dt | format_time }} and {{ reservation.end_dt | format_time }}.
+    {{ RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date(locale='en_GB') }} to {{ reservation.end_dt | format_date(locale='en_GB') }} between {{ reservation.start_dt | format_time(locale='en_GB') }} and {{ reservation.end_dt | format_time(locale='en_GB') }}.
 {%- endif %}
 Reason: {{ reservation.booking_reason }}
 {%- block confirmed_booking -%}

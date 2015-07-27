@@ -5,12 +5,12 @@
 This is a reminder digest about a weekly booking under your name:
 
 Room: {{ reservation.room.name }}
-Time: {{ reservation.start_dt | format_time }} - {{ reservation.end_dt | format_time }}
+Time: {{ reservation.start_dt | format_time(locale='en_GB') }} - {{ reservation.end_dt | format_time(locale='en_GB') }}
 Reason: {{ reservation.booking_reason }}
 
 Days:
 {%- for occ in occurrences %}
-  * {{ occ.start_dt | format_date }}
+  * {{ occ.start_dt | format_date(locale='en_GB') }}
 {%- endfor %}
 
 If you don't need to use the room some of these days, please cancel them on this page:
