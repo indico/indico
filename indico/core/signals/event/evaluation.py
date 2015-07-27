@@ -18,7 +18,7 @@ from blinker import Namespace
 
 _signals = Namespace()
 
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.evaluation import *
-from indico.core.signals.event.notes import *
+
+get_evaluation_fields = _signals.signal('get-evaluation-fields', """
+Expected to return `FieldType` subclasses.
+""")
