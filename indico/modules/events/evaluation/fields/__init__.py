@@ -14,11 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from blinker import Namespace
+from __future__ import unicode_literals
 
-_signals = Namespace()
+from indico.core import signals
+from indico.util.signals import named_objects_from_signal
 
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.evaluation import *
-from indico.core.signals.event.notes import *
+
+def get_field_types():
+    """Gets a dict containing all field types"""
+    return named_objects_from_signal(signals.event.get_evaluation_fields.send(), plugin_attr='plugin')
+
+
+@signals.event.get_evaluation_fields.connect
+def _get_fields(sender, **kwargs):
+    from .simple import TextField, NumberField, BoolField
+    yield TextField
+    yield NumberField
+    yield BoolField
+
+
+@signals.app_created.connect
+def _check_field_definitions(app, **kwargs):
+    # This will raise RuntimeError if the field names are not unique
+    get_field_types()
