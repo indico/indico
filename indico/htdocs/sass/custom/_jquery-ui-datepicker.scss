@@ -57,9 +57,9 @@
             }
         }
 
-        &:hover:not(.ui-state-disabled) {
-            .ui-datepicker-prev,
-            .ui-datepicker-next {
+        &:not(.ui-state-disabled) {
+            .ui-datepicker-prev:hover,
+            .ui-datepicker-next:hover {
                 color: white;
                 background: $blue;
             }
