@@ -57,7 +57,7 @@
             var data = field.data('hidden-unless');
             var conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
             hideFieldUnless(field, conditionField, data.value, data.checked_only);
-            (data.checked_only ? conditionField.filter(':checked') : conditionField).triggerHandler('change');
+            conditionField.triggerHandler('change');
         });
 
         // track modifications
