@@ -19,6 +19,20 @@ down_revision = '3778dc365e54'
 
 def upgrade():
     op.create_table(
+        'evaluations',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('title', sa.String(), nullable=False),
+        sa.Column('description', sa.Text(), nullable=False),
+        sa.Column('anonymous', sa.Boolean(), nullable=False),
+        sa.Column('require_user', sa.Boolean(), nullable=False),
+        sa.Column('start_dt', UTCDateTime, nullable=False),
+        sa.Column('end_dt', UTCDateTime, nullable=False),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        schema='events'
+    )
+    op.create_table(
         'evaluation_questions',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
@@ -36,9 +50,11 @@ def upgrade():
         'evaluation_submissions',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('evaluation_id', sa.Integer(), nullable=False),
         sa.Column('is_anonymous', sa.Boolean(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
+        sa.ForeignKeyConstraint(['evaluation_id'], ['events.evaluations.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
@@ -56,6 +72,8 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_constraint('fk_evaluation_submissions_evaluation_id_evaluations', 'evaluation_submissions', schema='events')
+    op.drop_table('evaluations', schema='events')
     op.drop_table('evaluation_answers', schema='events')
     op.drop_table('evaluation_submissions', schema='events')
     op.drop_table('evaluation_questions', schema='events')
