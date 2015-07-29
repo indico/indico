@@ -39,6 +39,13 @@ class EvaluationSubmission(db.Model):
         index=True,
         nullable=False
     )
+    #: The ID of the evaluation
+    evaluation_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.evaluations.id'),
+        index=True,
+        nullable=False
+    )
     #: If the submission is anonymous
     is_anonymous = db.Column(
         db.Boolean,
