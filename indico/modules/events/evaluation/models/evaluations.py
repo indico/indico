@@ -99,6 +99,11 @@ class Evaluation(db.Model):
     def event(self, event):
         self.event_id = int(event.getId())
 
+    @property
+    def locator(self):
+        return {'confId': self.event.id,
+                'evaluation_id': self.id}
+
     @return_ascii
     def __repr__(self):
         return '<Evaluation({}, {})>'.format(self.id, self.event_id)
