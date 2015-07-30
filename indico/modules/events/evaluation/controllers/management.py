@@ -44,6 +44,15 @@ class RHManageEvaluations(RHManageEvaluationsBase):
                                                   evaluations=evaluations)
 
 
+class RHManageEvaluation(RHManageEvaluationsBase):
+    def _checkParams(self, params):
+        RHManageEvaluationsBase._checkParams(self, params)
+        self.evaluation = Evaluation.get(request.view_args['evaluation_id'])
+
+    def _process(self):
+        return WPManageEvaluation.render_template('manage_evaluation.html', self.event, evaluation=self.evaluation)
+
+
 class RHCreateEvaluation(RHManageEvaluationsBase):
     def _process(self):
         form = EvaluationForm()
