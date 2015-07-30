@@ -71,8 +71,11 @@ class RHEditEvaluation(RHManageEvaluation):
 class RHCreateEvaluation(RHManageEvaluationsBase):
     back_button_endpoint = 'evaluation.management'
 
+    def _get_form_defaults(self):
+        return FormDefaults(require_user=True)
+
     def _process(self):
-        form = EvaluationForm(event=self.event)
+        form = EvaluationForm(obj=self._get_form_defaults(), event=self.event)
         if form.validate_on_submit():
             evaluation = Evaluation(event=self.event)
             form.populate_obj(evaluation)
