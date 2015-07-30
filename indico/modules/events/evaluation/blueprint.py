@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.evaluation.controllers.management import (RHManageEvaluation, RHManageEvaluationQuestions,
-                                                                     RHAddEvaluationQuestion, RHEditEvaluationQuestion)
+                                                                     RHAddEvaluationQuestion, RHEditEvaluationQuestion,
+                                                                     RHCreateEvaluation)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -26,6 +27,7 @@ _bp = IndicoBlueprint('evaluation', __name__, template_folder='templates', virtu
 
 # Management
 _bp.add_url_rule('/manage/evaluation/', 'management', RHManageEvaluation)
+_bp.add_url_rule('/manage/evaluation/create', 'create', RHCreateEvaluation, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/evaluation/questions/', 'manage_questions', RHManageEvaluationQuestions)
 _bp.add_url_rule('/manage/evaluation/questions/add/<type>', 'add_question', RHAddEvaluationQuestion,
                  methods=('GET', 'POST'))

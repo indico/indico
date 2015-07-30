@@ -1,0 +1,15 @@
+{% extends 'events/evaluation/management_base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+
+{% block subtitle %}
+    {%- trans %}Create evaluation{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form) }}
+    {{ form_rows(form) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Create{% endtrans %}">
+        <a href="{{ back_url }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}
