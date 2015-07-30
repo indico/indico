@@ -28,6 +28,7 @@ from indico.modules.events.evaluation.views import WPManageEvaluation
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -88,12 +89,14 @@ class RHCreateEvaluation(RHManageEvaluationsBase):
                                                   back_url=url_for(self.back_button_endpoint, self.event))
 
 
-class RHManageEvaluationQuestions(RHManageEvaluationsBase):
+class RHManageEvaluationQuestionnaire(RHManageEvaluation):
     def _process(self):
-        return 'TODO'
+        field_types = get_field_types()
+        return WPManageEvaluation.render_template('manage_questionnaire.html', self.event,
+                                                  evaluation=self.evaluation, field_types=field_types)
 
 
-class RHAddEvaluationQuestion(RHManageEvaluationsBase):
+class RHAddEvaluationQuestion(RHManageEvaluation):
     def _process(self):
         try:
             field_cls = get_field_types()[request.view_args['type']]
@@ -102,13 +105,13 @@ class RHAddEvaluationQuestion(RHManageEvaluationsBase):
 
         form = field_cls.config_form()
         if form.validate_on_submit():
-            question = EvaluationQuestion(event=self.event)
+            question = EvaluationQuestion(evaluation_id=self.evaluation.id)
             field_cls(question).save_config(form)
             db.session.add(question)
             db.session.flush()
             flash(_('Question "{title}" added').format(title=question.title), 'success')
-            return redirect(url_for('.manage_questions', self.event))
-        return WPManageEvaluation.render_template('edit_question.html', self.event, form=form)
+            return jsonify_data(flash=False)
+        return jsonify_template('events/evaluation/edit_question.html', form=form)
 
 
 class RHEditEvaluationQuestion(RHManageEvaluationsBase):

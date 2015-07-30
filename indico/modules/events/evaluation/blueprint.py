@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.evaluation.controllers.management import (RHManageEvaluations, RHManageEvaluation,
                                                                      RHEditEvaluation,
-                                                                     RHManageEvaluationQuestions,
+                                                                     RHManageEvaluationQuestionnaire,
                                                                      RHAddEvaluationQuestion, RHEditEvaluationQuestion,
                                                                      RHCreateEvaluation)
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -37,8 +37,9 @@ _bp.add_url_rule('/manage/evaluation/<evaluation_id>/edit',
                  'edit_evaluation', RHEditEvaluation, methods=('GET', 'POST'))
 
 # Evaluation question management
-_bp.add_url_rule('/manage/evaluation/questions/', 'manage_questions', RHManageEvaluationQuestions)
-_bp.add_url_rule('/manage/evaluation/questions/add/<type>', 'add_question', RHAddEvaluationQuestion,
+_bp.add_url_rule('/manage/evaluation/<evaluation_id>/questionnaire/',
+                 'manage_questionnaire', RHManageEvaluationQuestionnaire)
+_bp.add_url_rule('/manage/evaluation/<evaluation_id>/questionnaire/add/<type>', 'add_question', RHAddEvaluationQuestion,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/evaluation/questions/<question_id>', 'edit_question', RHEditEvaluationQuestion,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/evaluation/<evaluation_id>/questionnaire/<question_id>',
+                 'edit_question', RHEditEvaluationQuestion, methods=('GET', 'POST'))
