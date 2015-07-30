@@ -17,6 +17,11 @@
             <a class="i-button">Results</a>
         </div>
         <div class="group">
+            <a href="{{ url_for('.manage_questionnaire', evaluation) }}" class="i-button">
+                {% trans %}Questionnaire{% endtrans %}
+            </a>
+        </div>
+        <div class="group">
             <a href="{{ url_for('.edit_evaluation', evaluation) }}" class="i-button">
                 {% trans %}Edit{% endtrans %}
             </a>
