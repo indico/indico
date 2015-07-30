@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired
 
+from indico.modules.events.evaluation.models.evaluations import Evaluation
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.forms.validators import HiddenUnless, ValidationError
@@ -34,6 +35,17 @@ class EvaluationForm(IndicoForm):
     require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')],
                                 description=_('Still require users to be logged in for submitting the evaluation'),
                                 widget=SwitchWidget())
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event', None)
+        super(IndicoForm, self).__init__(*args, **kwargs)
+
+    def validate_title(self, field):
+        query = Evaluation.find(Evaluation.event_id == self.event.id,
+                                Evaluation.title == field.data,
+                                Evaluation.title != field.object_data)
+        if query.count():
+            raise ValidationError(_("There is already an evaluation named {} on this event".format(field.data)))
 
     def validate_require_user(self, field):
         if not field.data and not self.anonymous.data:
