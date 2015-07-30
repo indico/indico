@@ -101,6 +101,10 @@ class EvaluationQuestion(db.Model):
             return None
         return impl(self)
 
+    @property
+    def locator(self):
+        return dict(self.evaluation.locator, question_id=self.id)
+
     @return_ascii
     def __repr__(self):
         return '<EvaluationQuestion({}, {}, {}, {})>'.format(self.id, self.evaluation_id, self.field_type, self.title)
