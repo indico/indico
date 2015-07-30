@@ -25,8 +25,8 @@ from indico.util.string import return_ascii
 
 def _get_next_position(context):
     """Get the next question position for the event."""
-    event_id = context.current_parameters['event_id']
-    res = db.session.query(db.func.max(EvaluationQuestion.position)).filter_by(event_id=event_id).one()
+    evaluation_id = context.current_parameters['evaluation_id']
+    res = db.session.query(db.func.max(EvaluationQuestion.position)).filter_by(evaluation_id=evaluation_id).one()
     return (res[0] or 0) + 1
 
 
@@ -40,10 +40,11 @@ class EvaluationQuestion(db.Model):
         primary_key=True
     )
     #: The ID of the event
-    event_id = db.Column(
+    evaluation_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.evaluations.id'),
         index=True,
-        nullable=False
+        nullable=False,
     )
     #: The position of the question in the evaluation form
     position = db.Column(
@@ -90,15 +91,7 @@ class EvaluationQuestion(db.Model):
 
     # relationship backrefs:
     # - answers (EvaluationAnswer.question)
-
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id), True)
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
+    # - evaluation (Evaluation.questions)
 
     @property
     def field(self):
@@ -110,4 +103,4 @@ class EvaluationQuestion(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<EvaluationQuestion({}, {}, {}, {})>'.format(self.id, self.event_id, self.field_type, self.title)
+        return '<EvaluationQuestion({}, {}, {}, {})>'.format(self.id, self.evaluation_id, self.field_type, self.title)

@@ -35,7 +35,7 @@ def upgrade():
     op.create_table(
         'evaluation_questions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('evaluation_id', sa.Integer(), nullable=False, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
@@ -43,6 +43,7 @@ def upgrade():
         sa.Column('is_required', sa.Boolean(), nullable=False),
         sa.Column('field_type', sa.String(), nullable=False),
         sa.Column('field_data', postgresql.JSON(), nullable=False),
+        sa.ForeignKeyConstraint(['evaluation_id'], ['events.evaluations.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
