@@ -25,3 +25,6 @@ class WPManageEvaluation(WPJinjaMixin, WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items['evaluation'].setActive()
+
+    def getJSFiles(self):
+        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_evaluations_js'].urls())
