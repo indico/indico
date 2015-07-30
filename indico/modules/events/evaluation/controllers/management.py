@@ -60,8 +60,9 @@ class RHCreateEvaluation(RHManageEvaluationsBase):
             evaluation = Evaluation(event=self.event)
             form.populate_obj(evaluation)
             db.session.add(evaluation)
+            db.session.flush()
             flash(_('Evaluation created'), 'success')
-            return redirect(url_for('.management', self.event))
+            return redirect(url_for('.manage_evaluation', evaluation))
         return WPManageEvaluation.render_template('create_evaluation.html', self.event, form=form)
 
 
