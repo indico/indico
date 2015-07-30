@@ -31,18 +31,20 @@ from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHManageEvaluationBase(RHConferenceModifBase):
+class RHManageEvaluationsBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf
 
 
-class RHManageEvaluation(RHManageEvaluationBase):
+class RHManageEvaluations(RHManageEvaluationsBase):
     def _process(self):
-        return WPManageEvaluation.render_template('management.html', self.event)
+        evaluations = Evaluation.find_all(event_id=self.event.id)
+        return WPManageEvaluation.render_template('management.html', self.event, event=self.event,
+                                                  evaluations=evaluations)
 
 
-class RHCreateEvaluation(RHManageEvaluationBase):
+class RHCreateEvaluation(RHManageEvaluationsBase):
     def _process(self):
         form = EvaluationForm()
         if form.validate_on_submit():
@@ -54,12 +56,12 @@ class RHCreateEvaluation(RHManageEvaluationBase):
         return WPManageEvaluation.render_template('create_evaluation.html', self.event, form=form)
 
 
-class RHManageEvaluationQuestions(RHManageEvaluationBase):
+class RHManageEvaluationQuestions(RHManageEvaluationsBase):
     def _process(self):
         return 'TODO'
 
 
-class RHAddEvaluationQuestion(RHManageEvaluationBase):
+class RHAddEvaluationQuestion(RHManageEvaluationsBase):
     def _process(self):
         try:
             field_cls = get_field_types()[request.view_args['type']]
@@ -77,7 +79,7 @@ class RHAddEvaluationQuestion(RHManageEvaluationBase):
         return WPManageEvaluation.render_template('edit_question.html', self.event, form=form)
 
 
-class RHEditEvaluationQuestion(RHManageEvaluationBase):
+class RHEditEvaluationQuestion(RHManageEvaluationsBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.question.event
@@ -86,7 +88,7 @@ class RHEditEvaluationQuestion(RHManageEvaluationBase):
     }
 
     def _checkParams(self, params):
-        RHManageEvaluationBase._checkParams(self, params)
+        RHManageEvaluationsBase._checkParams(self, params)
         self.question = EvaluationQuestion.get_one(request.view_args['question_id'])
 
     def _process(self):
