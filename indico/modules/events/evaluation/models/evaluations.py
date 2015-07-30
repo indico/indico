@@ -90,6 +90,17 @@ class Evaluation(db.Model):
         )
     )
 
+    #: The list of questions
+    questions = db.relationship(
+        'EvaluationQuestion',
+        cascade='all, delete-orphan',
+        lazy=True,
+        backref=db.backref(
+            'evaluation',
+            lazy=True
+        )
+    )
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
