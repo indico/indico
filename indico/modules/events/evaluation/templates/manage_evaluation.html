@@ -1,0 +1,28 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}
+        Evaluation
+    {% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {{ evaluation.title }}
+{% endblock %}
+
+{% block content %}
+    <div class="toolbar">
+        <div class="group">
+            <a class="i-button">Publish</a>
+        </div>
+        <div class="group">
+            <a class="i-button">Results</a>
+        </div>
+        <div class="group">
+            <a href="{#{{ url_for('evaluation.settings', evaluation) }}#}" class="i-button">Edit</a>
+        </div>
+    </div>
+    <div>
+        Summary
+    </div>
+{% endblock %}
