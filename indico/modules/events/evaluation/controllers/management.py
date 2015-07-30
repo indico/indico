@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import redirect, request, flash
-from indico.web.forms.base import FormDefaults
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -28,6 +27,7 @@ from indico.modules.events.evaluation.models.questions import EvaluationQuestion
 from indico.modules.events.evaluation.views import WPManageEvaluation
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -53,9 +53,20 @@ class RHManageEvaluation(RHManageEvaluationsBase):
         return WPManageEvaluation.render_template('manage_evaluation.html', self.event, evaluation=self.evaluation)
 
 
+class RHEditEvaluation(RHManageEvaluation):
+    def _process(self):
+        form = EvaluationForm(event=self.event, obj=FormDefaults(self.evaluation))
+        if form.validate_on_submit():
+            form.populate_obj(self.evaluation)
+            flash(_('Evaluation modified'), 'success')
+            return redirect(url_for('.manage_evaluation', self.evaluation))
+        return WPManageEvaluation.render_template('edit_evaluation.html', self.event,
+                                                  evaluation=self.evaluation, form=form)
+
+
 class RHCreateEvaluation(RHManageEvaluationsBase):
     def _process(self):
-        form = EvaluationForm()
+        form = EvaluationForm(event=self.event)
         if form.validate_on_submit():
             evaluation = Evaluation(event=self.event)
             form.populate_obj(evaluation)
