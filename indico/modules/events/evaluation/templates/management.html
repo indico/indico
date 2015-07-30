@@ -2,9 +2,39 @@
 {% from 'forms/_form.html' import form_rows %}
 
 {% block title %}
-    {%- trans %}Evaluation{% endtrans -%}
+    {%- trans %}Evaluations{% endtrans -%}
 {% endblock %}
 
 {% block content %}
-    TODO...
+    <div class="toolbar">
+        <div class="group">
+            <a href="{{ url_for('evaluation.create', event) }}" class="i-button">Create</a>
+        </div>
+    </div>
+    <hr>
+    {% for evaluation in evaluations %}
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-agreement"></div>
+                <div class="text">
+                    <div class="label">
+                        {{ evaluation.title }}
+                    </div>
+                    <div>
+                        {{ evaluation.description }}
+                        {% if not evaluation.description %}
+                            {% trans %}
+                                TODO
+                            {% endtrans %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    <a href="" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
