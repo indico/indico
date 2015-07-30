@@ -54,17 +54,23 @@ class RHManageEvaluation(RHManageEvaluationsBase):
 
 
 class RHEditEvaluation(RHManageEvaluation):
+    back_button_endpoint = 'evaluation.manage_evaluation'
+
     def _process(self):
         form = EvaluationForm(event=self.event, obj=FormDefaults(self.evaluation))
         if form.validate_on_submit():
             form.populate_obj(self.evaluation)
             flash(_('Evaluation modified'), 'success')
             return redirect(url_for('.manage_evaluation', self.evaluation))
+
         return WPManageEvaluation.render_template('edit_evaluation.html', self.event,
-                                                  evaluation=self.evaluation, form=form)
+                                                  evaluation=self.evaluation, form=form,
+                                                  back_url=url_for(self.back_button_endpoint, self.evaluation))
 
 
 class RHCreateEvaluation(RHManageEvaluationsBase):
+    back_button_endpoint = 'evaluation.management'
+
     def _process(self):
         form = EvaluationForm(event=self.event)
         if form.validate_on_submit():
@@ -74,7 +80,9 @@ class RHCreateEvaluation(RHManageEvaluationsBase):
             db.session.flush()
             flash(_('Evaluation created'), 'success')
             return redirect(url_for('.manage_evaluation', evaluation))
-        return WPManageEvaluation.render_template('create_evaluation.html', self.event, form=form)
+
+        return WPManageEvaluation.render_template('create_evaluation.html', self.event, form=form,
+                                                  back_url=url_for(self.back_button_endpoint, self.event))
 
 
 class RHManageEvaluationQuestions(RHManageEvaluationsBase):
