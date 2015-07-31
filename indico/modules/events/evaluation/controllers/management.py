@@ -22,7 +22,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.db import db
 from indico.modules.events.evaluation.fields import get_field_types
 from indico.modules.events.evaluation.forms import EvaluationForm
-from indico.modules.events.evaluation.models.evaluations import Evaluation
+from indico.modules.events.evaluation.models.evaluations import Evaluation, EvaluationState
 from indico.modules.events.evaluation.models.questions import EvaluationQuestion
 from indico.modules.events.evaluation.views import WPManageEvaluation
 from indico.util.i18n import _
@@ -51,7 +51,8 @@ class RHManageEvaluation(RHManageEvaluationsBase):
         self.evaluation = Evaluation.get(request.view_args['evaluation_id'])
 
     def _process(self):
-        return WPManageEvaluation.render_template('manage_evaluation.html', self.event, evaluation=self.evaluation)
+        return WPManageEvaluation.render_template('manage_evaluation.html', self.event,
+                                                  evaluation=self.evaluation, states=EvaluationState)
 
 
 class RHEditEvaluation(RHManageEvaluation):
