@@ -20,6 +20,13 @@
                     {{ text }}
                 </div>
             </div>
+            <div class="toolbar right">
+                <a href="#" class="i-button highlight icon-time js-evaluation-schedule-dialog"
+                   data-href="{{ url_for('.schedule_evaluation', evaluation) }}"
+                   data-title="{% trans %}Schedule evaluation{% endtrans %}">
+                    {% trans %}Schedule{% endtrans %}
+                </a>
+            </div>
         </div>
     </div>
 {% endmacro %}

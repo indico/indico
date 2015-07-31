@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
+from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import StringField, TextAreaField, BooleanField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.evaluation.models.evaluations import Evaluation
 from indico.web.forms.base import IndicoForm
@@ -50,3 +51,18 @@ class EvaluationForm(IndicoForm):
     def validate_require_user(self, field):
         if not field.data and not self.anonymous.data:
             raise ValidationError(_("Guests can't submit evaluations if submissions are not anonymous"))
+
+
+class ScheduleEvaluationForm(IndicoForm):
+    start_dt = DateField(_('Start'), [Optional()], parse_kwargs={'dayfirst': True},
+                         description=_('Include only attachments uploaded after this date'))
+    end_dt = DateField(_('End'), [Optional()], parse_kwargs={'dayfirst': True},
+                       description=_('Include only attachments uploaded after this date'))
+
+    def __init__(self, *args, **kwargs):
+        self.evaluation = kwargs.pop('evaluation', None)
+        super(IndicoForm, self).__init__(*args, **kwargs)
+
+    def validate_end_dt(self, field):
+        if field.data < self.start_dt.data:
+            raise ValidationError(_("End date of the evaluation can't be before the start time"))
