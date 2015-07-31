@@ -72,14 +72,12 @@ class Evaluation(db.Model):
     #: Datetime when the evaluation is open
     start_dt = db.Column(
         UTCDateTime,
-        nullable=False,
-        default=now_utc,
+        nullable=True
     )
     #: Datetime when the evaluation is closed
     end_dt = db.Column(
         UTCDateTime,
-        nullable=False,
-        default=now_utc,
+        nullable=True
     )
     #: Whether the evaluation has been marked as deleted
     is_deleted = db.Column(
