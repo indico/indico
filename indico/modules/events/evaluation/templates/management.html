@@ -30,9 +30,16 @@
                     </div>
                 </div>
                 <div class="toolbar right">
-                    <a href="{{ url_for('.manage_evaluation', evaluation) }}" class="i-button icon-settings">
-                        {% trans %}Manage{% endtrans %}
-                    </a>
+                    <div class="group">
+                        <a href="{{ url_for('.edit_evaluation', evaluation) }}" class="i-button icon-edit">
+                            {% trans %}Edit{% endtrans %}
+                        </a>
+                    </div>
+                    <div class="group">
+                        <a href="{{ url_for('.manage_evaluation', evaluation) }}" class="i-button highlight icon-settings">
+                            {% trans %}Manage{% endtrans %}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
