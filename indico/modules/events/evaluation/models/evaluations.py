@@ -20,6 +20,15 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
+from indico.util.struct.enum import IndicoEnum
+
+
+class EvaluationState(IndicoEnum):
+    not_ready = 1
+    ready_to_open = 2
+    active_and_clean = 3
+    active_and_answered = 4
+    finished = 5
 
 
 class Evaluation(db.Model):
@@ -111,9 +120,29 @@ class Evaluation(db.Model):
         self.event_id = int(event.getId())
 
     @property
+    def has_ended(self):
+        return self.end_dt < now_utc()
+
+    @property
+    def has_started(self):
+        return self.start_dt < now_utc()
+
+    @property
     def locator(self):
         return {'confId': self.event.id,
                 'evaluation_id': self.id}
+
+    @property
+    def state(self):
+        if not self.questions:
+            return EvaluationState.not_ready
+        if not self.has_started:
+            return EvaluationState.ready_to_open
+        if not self.submissions:
+            return EvaluationState.active_and_clean
+        if not self.has_ended:
+            return EvaluationState.active_and_answered
+        return EvaluationState.finished
 
     @return_ascii
     def __repr__(self):
