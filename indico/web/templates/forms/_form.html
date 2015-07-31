@@ -34,6 +34,9 @@
         {% if field.widget.input_type == 'checkbox' %}
             <div class="checkbox-label">{{ field.label() }}</div>
         {% endif %}
+        {%- if caller -%}
+            {{ caller() }}
+        {%- endif -%}
         {% if field.description %}
             <p class="form-field-description"><em>{{ field.description | safe }}</em></p>
         {% endif %}
@@ -55,7 +58,15 @@
                     {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
                 </div>
             {% endif %}
-            {{ form_field(field, "form-field form-block", dict(widget_attrs, placeholder=(field.label.text if placeholder else ''))) }}
+            {% set widget_attrs = dict(widget_attrs, placeholder=(field.label.text if placeholder else '')) %}
+            {%- if caller -%}
+                {% set caller_ = caller %}
+                {% call form_field(field, "form-field form-block", widget_attrs) -%}
+                    {{ caller_() }}
+                {%- endcall %}
+            {%- else -%}
+                {{ form_field(field, "form-field form-block", widget_attrs) }}
+            {%- endif -%}
         </div>
     {% endif %}
 {%- endmacro %}
