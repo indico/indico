@@ -8,21 +8,92 @@
     {{ evaluation.title }}
 {% endblock %}
 
-{% block content %}
-    <div class="toolbar">
-        <div class="group">
-            <a class="i-button">Publish</a>
-        </div>
-        <div class="group">
-            <a class="i-button">Results</a>
-        </div>
-        <div class="group">
-            <a href="{{ url_for('.manage_questionnaire', evaluation) }}" class="i-button">
-                {% trans %}Questionnaire{% endtrans %}
-            </a>
+{% macro evaluation_state_box(label, text, toolbar) %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-file-check"></div>
+            <div class="text">
+                <div class="label">
+                    {{ label }}
+                </div>
+                <div>
+                    {{ text }}
+                </div>
+            </div>
         </div>
     </div>
-    <div>
-        Summary
+{% endmacro %}
+
+{% macro evaluation_not_ready(evaluation) %}
+    {{ evaluation_state_box(_("Evaluation not ready"), _("The questionnaire is not set up")) }}
+{% endmacro %}
+
+{% macro evaluation_ready_to_open(evaluation) %}
+    {{ evaluation_state_box(_("Evaluation ready to go live"), _("Choose when to open the evaluation")) }}
+{% endmacro %}
+
+{% macro evaluation_active_and_clean(evaluation) %}
+    {{ evaluation_state_box(_("Waiting for submissions"), _("The evaluation is active but nobody answered yet")) }}
+{% endmacro %}
+
+{% macro evaluation_active_and_answered(evaluation) %}
+    {{ evaluation_state_box(_("Submissions received"), _("The evaluation is active")) }}
+{% endmacro %}
+
+{% macro evaluation_finished(evaluation) %}
+    {{ evaluation_state_box(_("Evaluation finished"), _("The evaluation finished")) }}
+{% endmacro %}
+
+{% block content %}
+    {% if evaluation.state == states.not_ready %}
+        {{ evaluation_not_ready(evaluation) }}
+    {% elif evaluation.state == states.ready_to_open %}
+        {{ evaluation_ready_to_open(evaluation) }}
+    {% elif evaluation.state == states.active_and_clean %}
+        {{ evaluation_active_and_clean(evaluation) }}
+    {% elif evaluation.state == states.active_and_answered %}
+        {{ evaluation_active_and_answered(evaluation) }}
+    {% elif evaluation.state == states.finished %}
+       {{ evaluation_finished(evaluation) }}
+    {% endif %}
+
+    {% if evaluation.state != states.not_ready  %}
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-clipboard"></div>
+                <div class="text">
+                    <div class="label">
+                        Questionnaire
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    <a href="{{ url_for('.manage_questionnaire', evaluation) }}" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}Submissions{% endtrans %}
+            </div>
+            <div class="i-box-buttons">
+                <a href="#" class="i-button">
+                    {% trans %}Show results{% endtrans %}
+                </a>
+            </div>
+        </div>
+        <div class="i-box-content">
+            {% for submission in evaluation.submissions %}
+                <div>
+                    {{ submission }}
+                </div>
+            {% else %}
+                {% trans %}There are no submissions.{% endtrans %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
