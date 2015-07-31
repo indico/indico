@@ -1249,7 +1249,7 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifTools.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._toolsMenuItem)
 
-        self._layoutMenuItem = wcomponents.SideMenuItem(_("Layout"),
+        self._layoutMenuItem = wcomponents.SideMenuItem(_("Layout (Old)"),
             urlHandlers.UHConfModifDisplay.getURL(self._conf))
         self._advancedOptionsSection.addItem( self._layoutMenuItem)
 
