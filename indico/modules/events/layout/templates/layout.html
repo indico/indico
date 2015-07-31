@@ -1,0 +1,30 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_field %}
+
+{% block title %}
+    {%- trans %}Layout{% endtrans -%}
+{% endblock %}
+
+{%- block content %}
+    {{ form_header(form) }}
+    {{ form_rows(form, fields=('timezone', 'is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
+    <h3>{% trans %}Header Style{% endtrans %}</h3>
+    {{ form_row(form.logo) }}
+    {% call form_row(form.header_text_color) -%}
+        <span class="enable-input">
+            <span>{{ form.enable_header_text_color.label() }}</span>
+            <span>{{ form_field(form.enable_header_text_color) }}</span>
+        </span>
+    {%- endcall %}
+    {% call form_row(form.header_background_color) -%}
+        <span class="enable-input">
+            <span>{{ form.enable_header_background_color.label() }}</span>
+            <span>{{ form_field(form.enable_header_background_color) }}</span>
+        </span>
+    {%- endcall %}
+    <h3>{% trans %}Announcement{% endtrans %}</h3>
+    {{ form_rows(form, fields=('announcement', 'show_annoucement')) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+    {% endcall %}
+{%- endblock %}

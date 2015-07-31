@@ -457,6 +457,17 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 }
             }
 
+            > .enable-input {
+                &, > span {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                > span:first-child {
+                    margin-right: 1em;
+                }
+                margin-left: 2em;
+            }
+
             input[type="checkbox"],
             input[type="radio"] {
                 margin: 0;
