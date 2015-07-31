@@ -84,7 +84,7 @@ class WPAdminsBase(WPMainBase):
             urlHandlers.UHDomains.getURL())
         mainSection.addItem( self._domainsMenuItem)
 
-        self._templatesMenuItem = wcomponents.SideMenuItem(_("Layout"),
+        self._templatesMenuItem = wcomponents.SideMenuItem(_("Layout (old)"),
             urlHandlers.UHAdminLayoutGeneral.getURL())
         mainSection.addItem( self._templatesMenuItem)
 

@@ -47,33 +47,33 @@ event_mgmt.add_url_rule('/layout/header/search', 'confModifDisplay-toggleSearch'
                         conferenceModif.RHConfModifToggleSearch, methods=('POST',))
 
 # Layout: Menu
-event_mgmt.add_url_rule('/layout/menu/', 'confModifDisplay-menu', conferenceModif.RHConfModifDisplayMenu)
-event_mgmt.add_url_rule('/layout/menu/<linkId>/', 'confModifDisplay-menu', conferenceModif.RHConfModifDisplayMenu)
-event_mgmt.add_url_rule('/layout/menu/<linkId>/up', 'confModifDisplay-upLink', conferenceModif.RHConfModifDisplayUpLink)
-event_mgmt.add_url_rule('/layout/menu/<linkId>/down', 'confModifDisplay-downLink',
-                        conferenceModif.RHConfModifDisplayDownLink)
-event_mgmt.add_url_rule('/layout/menu/<linkId>/toggle', 'confModifDisplay-toggleLinkStatus',
-                        conferenceModif.RHConfModifDisplayToggleLinkStatus, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/remove', 'confModifDisplay-removeLink',
-                        conferenceModif.RHConfModifDisplayRemoveLink, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/modify', 'confModifDisplay-modifyData',
-                        conferenceModif.RHConfModifDisplayModifyData, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/modify-sys', 'confModifDisplay-modifySystemData',
-                        conferenceModif.RHConfModifDisplayModifySystemData, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/homepage', 'confModifDisplay-toggleHomePage',
-                        conferenceModif.RHConfModifDisplayToggleHomePage, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/add/link/<linkId>', 'confModifDisplay-addLink',
-                        conferenceModif.RHConfModifDisplayAddLink, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/add/link', 'confModifDisplay-addLink', conferenceModif.RHConfModifDisplayAddLink,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/add/spacer', 'confModifDisplay-addSpacer',
-                        conferenceModif.RHConfModifDisplayAddSpacer, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/add/page', 'confModifDisplay-addPage', conferenceModif.RHConfModifDisplayAddPage,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable-view', 'confModifDisplay-toggleTimetableView',
-                        conferenceModif.RHConfModifDisplayToggleTimetableView, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable-layout', 'confModifDisplay-toggleTTDefaultLayout',
-                        conferenceModif.RHConfModifDisplayToggleTTDefaultLayout, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/', 'confModifDisplay-menu', conferenceModif.RHConfModifDisplayMenu)
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/', 'confModifDisplay-menu', conferenceModif.RHConfModifDisplayMenu)
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/up', 'confModifDisplay-upLink', conferenceModif.RHConfModifDisplayUpLink)
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/down', 'confModifDisplay-downLink',
+#                         conferenceModif.RHConfModifDisplayDownLink)
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/toggle', 'confModifDisplay-toggleLinkStatus',
+#                         conferenceModif.RHConfModifDisplayToggleLinkStatus, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/remove', 'confModifDisplay-removeLink',
+#                         conferenceModif.RHConfModifDisplayRemoveLink, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/modify', 'confModifDisplay-modifyData',
+#                         conferenceModif.RHConfModifDisplayModifyData, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/modify-sys', 'confModifDisplay-modifySystemData',
+#                         conferenceModif.RHConfModifDisplayModifySystemData, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/homepage', 'confModifDisplay-toggleHomePage',
+#                         conferenceModif.RHConfModifDisplayToggleHomePage, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/add/link/<linkId>', 'confModifDisplay-addLink',
+#                         conferenceModif.RHConfModifDisplayAddLink, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/add/link', 'confModifDisplay-addLink', conferenceModif.RHConfModifDisplayAddLink,
+#                         methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/add/spacer', 'confModifDisplay-addSpacer',
+#                         conferenceModif.RHConfModifDisplayAddSpacer, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/add/page', 'confModifDisplay-addPage', conferenceModif.RHConfModifDisplayAddPage,
+#                         methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable-view', 'confModifDisplay-toggleTimetableView',
+#                         conferenceModif.RHConfModifDisplayToggleTimetableView, methods=('POST',))
+# event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable-layout', 'confModifDisplay-toggleTTDefaultLayout',
+#                         conferenceModif.RHConfModifDisplayToggleTTDefaultLayout, methods=('POST',))
 
 # Layout: Images
 event_mgmt.add_url_rule('/layout/images/', 'confModifDisplay-resources', conferenceModif.RHConfModifDisplayResources)
