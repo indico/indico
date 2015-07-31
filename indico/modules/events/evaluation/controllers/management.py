@@ -115,13 +115,6 @@ class RHAddEvaluationQuestion(RHManageEvaluation):
 
 
 class RHEditEvaluationQuestion(RHManageEvaluationsBase):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.question.event
-        },
-        'preserved_args': {'question_id'}
-    }
-
     def _checkParams(self, params):
         RHManageEvaluationsBase._checkParams(self, params)
         self.question = EvaluationQuestion.get_one(request.view_args['question_id'])
@@ -132,5 +125,5 @@ class RHEditEvaluationQuestion(RHManageEvaluationsBase):
             self.question.field.save_config(form)
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=self.question.title), 'success')
-            return redirect(url_for('.manage_questions', self.event))
-        return WPManageEvaluation.render_template('edit_question.html', self.event, form=form, question=self.question)
+            return jsonify_data(flash=False)
+        return jsonify_template('events/evaluation/edit_question.html', form=form, question=self.question)
