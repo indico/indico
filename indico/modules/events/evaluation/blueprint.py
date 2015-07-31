@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.evaluation.controllers.management import (RHManageEvaluations, RHManageEvaluation,
-                                                                     RHEditEvaluation,
+                                                                     RHEditEvaluation, RHScheduleEvaluation,
                                                                      RHManageEvaluationQuestionnaire,
                                                                      RHAddEvaluationQuestion, RHEditEvaluationQuestion,
                                                                      RHCreateEvaluation)
@@ -35,6 +35,8 @@ _bp.add_url_rule('/manage/evaluations/create', 'create', RHCreateEvaluation, met
 _bp.add_url_rule('/manage/evaluation/<evaluation_id>/', 'manage_evaluation', RHManageEvaluation)
 _bp.add_url_rule('/manage/evaluation/<evaluation_id>/edit',
                  'edit_evaluation', RHEditEvaluation, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/evaluation/<evaluation_id>/schedule',
+                 'schedule_evaluation', RHScheduleEvaluation, methods=('GET', 'POST'))
 
 # Evaluation question management
 _bp.add_url_rule('/manage/evaluation/<evaluation_id>/questionnaire/',
