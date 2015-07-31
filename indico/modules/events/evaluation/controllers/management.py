@@ -21,7 +21,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.events.evaluation.fields import get_field_types
-from indico.modules.events.evaluation.forms import EvaluationForm
+from indico.modules.events.evaluation.forms import EvaluationForm, ScheduleEvaluationForm
 from indico.modules.events.evaluation.models.evaluations import Evaluation, EvaluationState
 from indico.modules.events.evaluation.models.questions import EvaluationQuestion
 from indico.modules.events.evaluation.views import WPManageEvaluation
@@ -85,9 +85,20 @@ class RHCreateEvaluation(RHManageEvaluationsBase):
             db.session.flush()
             flash(_('Evaluation created'), 'success')
             return redirect(url_for('.manage_evaluation', evaluation))
-
         return WPManageEvaluation.render_template('create_evaluation.html', self.event, form=form,
                                                   back_url=url_for(self.back_button_endpoint, self.event))
+
+
+class RHScheduleEvaluation(RHManageEvaluation):
+    def _process(self):
+        form = ScheduleEvaluationForm()
+        if form.validate_on_submit():
+            self.evaluation.start_dt = form.start_dt.data
+            self.evaluation.end_dt = form.end_dt.data
+            # TODO: open/close/schedule
+            flash(_('Evaluation is now open'), 'success')
+            return jsonify_data(flash=False)
+        return jsonify_template('events/evaluation/schedule_evaluation.html', form=form)
 
 
 class RHManageEvaluationQuestionnaire(RHManageEvaluation):
