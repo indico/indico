@@ -16,24 +16,15 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.util.signals import named_objects_from_signal
+from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
-def get_field_types():
-    """Gets a dict containing all field types"""
-    return named_objects_from_signal(signals.event.get_evaluation_fields.send(), plugin_attr='plugin')
+class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
+    template_prefix = 'events/surveys/'
 
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['surveys'].setActive()
 
-@signals.event.get_evaluation_fields.connect
-def _get_fields(sender, **kwargs):
-    from .simple import TextField, NumberField, BoolField
-    yield TextField
-    yield NumberField
-    yield BoolField
-
-
-@signals.app_created.connect
-def _check_field_definitions(app, **kwargs):
-    # This will raise RuntimeError if the field names are not unique
-    get_field_types()
+    def getJSFiles(self):
+        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls())

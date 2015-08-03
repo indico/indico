@@ -35,13 +35,13 @@ class FieldConfigForm(IndicoForm):
                                description=_("If the user has to answer the question."))
 
 
-class EvaluationField(object):
-    """Base class for an evaluation form field definition.
+class SurveyField(object):
+    """Base class for an survey form field definition.
 
     To create a new field, subclass this class and register
-    it using the `event.get_evaluation_fields` signal.
+    it using the `event.get_survey_fields` signal.
 
-    :param question: An `EvaluationQuestion` instance
+    :param question: A `SurveyQuestion` instance
     """
 
     #: unique name of the field type

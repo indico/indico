@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields import IntegerField, BooleanField, StringField
 from wtforms.validators import NumberRange, Optional, ValidationError, Length
 
-from indico.modules.events.evaluation.fields.base import EvaluationField, FieldConfigForm
+from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
 from indico.web.forms.widgets import SwitchWidget
 
@@ -28,7 +28,7 @@ class TextConfigForm(FieldConfigForm):
     max_length = IntegerField(_('Max length'), [Optional(), NumberRange(min=1)])
 
 
-class TextField(EvaluationField):
+class TextField(SurveyField):
     name = 'text'
     friendly_name = _('Text')
     config_form = TextConfigForm
@@ -51,7 +51,7 @@ class NumberConfigForm(FieldConfigForm):
     validate_max_value = _validate_min_max_value
 
 
-class NumberField(EvaluationField):
+class NumberField(SurveyField):
     name = 'number'
     friendly_name = _('Number')
     config_form = NumberConfigForm
@@ -65,7 +65,7 @@ class NumberField(EvaluationField):
         return self._make_wtforms_field(IntegerField, validators)
 
 
-class BoolField(EvaluationField):
+class BoolField(SurveyField):
     name = 'bool'
     friendly_name = _('Yes/No')
 

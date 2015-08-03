@@ -19,17 +19,17 @@ from __future__ import unicode_literals
 from indico.web.forms.base import IndicoForm
 
 
-def make_evaluation_form(questions):
-    """Creates a WTForm from evaluation questions.
+def make_survey_form(questions):
+    """Creates a WTForm from survey questions.
 
     Each question will use a field named ``question_ID``.
 
-    :param questions: An iterable containing `EvaluationQuestion`
+    :param questions: An iterable containing `SurveyQuestion`
                       objects.  The questions are expected to be
                       sorted according to their `position` attribute.
     :return: An `IndicoForm` subclass.
     """
-    form_class = type(b'EvaluationForm', (IndicoForm,), {})
+    form_class = type(b'SurveyForm', (IndicoForm,), {})
     for question in questions:
         name = 'question_{}'.format(question.id)
         field_impl = question.field

@@ -24,8 +24,8 @@ from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 
 
-class EvaluationSubmission(db.Model):
-    __tablename__ = 'evaluation_submissions'
+class SurveySubmission(db.Model):
+    __tablename__ = 'survey_submissions'
     __table_args__ = {'schema': 'events'}
 
     #: The ID of the submission
@@ -39,10 +39,10 @@ class EvaluationSubmission(db.Model):
         index=True,
         nullable=False
     )
-    #: The ID of the evaluation
-    evaluation_id = db.Column(
+    #: The ID of the survey
+    survey_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.evaluations.id'),
+        db.ForeignKey('events.surveys.id'),
         index=True,
         nullable=False
     )
@@ -52,32 +52,32 @@ class EvaluationSubmission(db.Model):
         nullable=False,
         default=False
     )
-    #: The ID of the user who submitted the evaluation
+    #: The ID of the user who submitted the survey
     user_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
         index=True,
         nullable=True
     )
-    #: The date/time when the evaluation was submitted
+    #: The date/time when the survey was submitted
     submitted_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc,
     )
 
-    #: The user who submitted the evaluation
+    #: The user who submitted the survey
     user = db.relationship(
         'User',
         lazy=True,
         backref=db.backref(
-            'evaluations',
+            'surveys',
             lazy='dynamic'
         )
     )
     #: The list of answers
     answers = db.relationship(
-        'EvaluationAnswer',
+        'SurveyAnswer',
         cascade='all, delete-orphan',
         lazy=True,
         backref=db.backref(
@@ -97,23 +97,23 @@ class EvaluationSubmission(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<EvaluationSubmission({}, {}, {})>'.format(self.id, self.event_id, self.user_id)
+        return '<SurveySubmission({}, {}, {})>'.format(self.id, self.event_id, self.user_id)
 
 
-class EvaluationAnswer(db.Model):
-    __tablename__ = 'evaluation_answers'
+class SurveyAnswer(db.Model):
+    __tablename__ = 'survey_answers'
     __table_args__ = {'schema': 'events'}
 
     #: The ID of the submission
     submission_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.evaluation_submissions.id'),
+        db.ForeignKey('events.survey_submissions.id'),
         primary_key=True
     )
     #: The ID of the question
     question_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.evaluation_questions.id'),
+        db.ForeignKey('events.survey_questions.id'),
         primary_key=True
     )
     #: The user's answer (no, not 42!) to the question
@@ -124,7 +124,7 @@ class EvaluationAnswer(db.Model):
 
     #: The list of answers
     question = db.relationship(
-        'EvaluationQuestion',
+        'SurveyQuestion',
         lazy=True,
         backref=db.backref(
             'answers',
@@ -134,8 +134,8 @@ class EvaluationAnswer(db.Model):
     )
 
     # relationship backrefs:
-    # - submission (EvaluationSubmission.answers)
+    # - submission (SurveySubmission.answers)
 
     @return_ascii
     def __repr__(self):
-        return '<EvaluationAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)
+        return '<SurveyAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)

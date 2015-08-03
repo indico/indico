@@ -1,4 +1,4 @@
-"""Add evaluation tables
+"""Add survey tables
 
 Revision ID: 3fcf833adc2d
 Revises: 3778dc365e54
@@ -19,7 +19,7 @@ down_revision = '3778dc365e54'
 
 def upgrade():
     op.create_table(
-        'evaluations',
+        'surveys',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
@@ -33,9 +33,9 @@ def upgrade():
         schema='events'
     )
     op.create_table(
-        'evaluation_questions',
+        'survey_questions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('evaluation_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('survey_id', sa.Integer(), nullable=False, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
@@ -43,39 +43,39 @@ def upgrade():
         sa.Column('is_required', sa.Boolean(), nullable=False),
         sa.Column('field_type', sa.String(), nullable=False),
         sa.Column('field_data', postgresql.JSON(), nullable=False),
-        sa.ForeignKeyConstraint(['evaluation_id'], ['events.evaluations.id']),
+        sa.ForeignKeyConstraint(['survey_id'], ['events.surveys.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
     op.create_table(
-        'evaluation_submissions',
+        'survey_submissions',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('evaluation_id', sa.Integer(), nullable=False),
+        sa.Column('survey_id', sa.Integer(), nullable=False),
         sa.Column('is_anonymous', sa.Boolean(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
-        sa.ForeignKeyConstraint(['evaluation_id'], ['events.evaluations.id']),
+        sa.ForeignKeyConstraint(['survey_id'], ['events.surveys.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
     op.create_table(
-        'evaluation_answers',
+        'survey_answers',
         sa.Column('submission_id', sa.Integer(), nullable=False),
         sa.Column('question_id', sa.Integer(), nullable=False),
         sa.Column('data', postgresql.JSON(), nullable=False),
-        sa.ForeignKeyConstraint(['question_id'], ['events.evaluation_questions.id']),
-        sa.ForeignKeyConstraint(['submission_id'], ['events.evaluation_submissions.id']),
+        sa.ForeignKeyConstraint(['question_id'], ['events.survey_questions.id']),
+        sa.ForeignKeyConstraint(['submission_id'], ['events.survey_submissions.id']),
         sa.PrimaryKeyConstraint('submission_id', 'question_id'),
         schema='events'
     )
 
 
 def downgrade():
-    op.drop_constraint('fk_evaluation_submissions_evaluation_id_evaluations', 'evaluation_submissions', schema='events')
-    op.drop_constraint('fk_evaluation_questions_evaluation_id_evaluations', 'evaluation_questions', schema='events')
-    op.drop_table('evaluations', schema='events')
-    op.drop_table('evaluation_answers', schema='events')
-    op.drop_table('evaluation_submissions', schema='events')
-    op.drop_table('evaluation_questions', schema='events')
+    op.drop_constraint('fk_survey_submissions_survey_id_surveys', 'survey_submissions', schema='events')
+    op.drop_constraint('fk_survey_questions_survey_id_surveys', 'survey_questions', schema='events')
+    op.drop_table('surveys', schema='events')
+    op.drop_table('survey_answers', schema='events')
+    op.drop_table('survey_submissions', schema='events')
+    op.drop_table('survey_questions', schema='events')
