@@ -24,21 +24,32 @@ from indico.util.struct.enum import TitledIntEnum
 
 
 class MenuEntryType(TitledIntEnum):
-    __titles__ = [None, _('Separator'), _('Link'), _('Page')]
+    __titles__ = [None, _('Separator'), _('Internal Link'), _('External Link'), _('Plugin Link'), _('Page')]
     separator = 1
-    link = 2
-    page = 3
+    internal_link = 2
+    external_link = 3
+    plugin_link = 4
+    page = 5
 
 
 class MenuEntry(db.Model):
     __tablename__ = 'menu_entries'
     __table_args__ = (
         db.CheckConstraint(
-            '(type == {type.separator.value} AND link IS NULL AND page is NULL) OR'
-            '(type == {type.link.value} AND link IS NOT NULL AND page is NULL) OR'
-            '(type == {type.page.value} AND link IS NULL AND page is NOT NULL)'.format(type=MenuEntryType),
+            '(type = {type.separator.value} AND link IS NULL AND page_id is NULL) OR'
+            ' (type in ({type.internal_link.value}, {type.external_link.value}, {type.plugin_link.value})'
+            ' AND link IS NOT NULL AND page_id is NULL) OR'
+            ' (type = {type.page.value} AND link IS NULL AND page_id is NOT NULL)'.format(type=MenuEntryType),
             'valid_type'),
-        {'schema': 'menu_entries'}
+        db.CheckConstraint(
+            '((type = {type.internal_link.value} OR type = {type.plugin_link.value}) AND endpoint IS NOT NULL) OR'
+            ' (type in ({type.separator.value}, {type.external_link.value}, {type.page.value}) AND endpoint is NULL)'
+            .format(type=MenuEntryType),
+            'valid_endpoint'),
+        db.CheckConstraint(
+            '(type = {type.plugin_link.value} AND plugin IS NOT NULL) OR plugin is NULL'.format(type=MenuEntryType),
+            'valid_plugin'),
+        {'schema': 'events'}
     )
 
     #: The ID of the attachment
@@ -49,7 +60,7 @@ class MenuEntry(db.Model):
     #: The ID of the parent menu entry (NULL if root menu entry)
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('menu_entries.id'),
+        db.ForeignKey('events.menu_entries.id'),
         index=True,
         nullable=True,
     )
@@ -59,17 +70,16 @@ class MenuEntry(db.Model):
         index=True,
         nullable=False
     )
-    #: Whether the entry is enabled and visible in the event's menu
-    enabled = db.Column(
+    #: Whether the entry is visible in the event's menu
+    visible = db.Column(
         db.Boolean,
         nullable=False,
-        default=False
+        default=True
     )
     #: The name of the menu entry
     title = db.Column(
         db.String,
         nullable=False,
-        default=''
     )
     #: The position of the entry relative to the start in the menu
     position = db.Column(
@@ -77,58 +87,65 @@ class MenuEntry(db.Model):
         nullable=False,
         default=0
     )
+    #: Whether the menu entry should be opened in a new tab or window
+    new_tab = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: The
     #: The link data if the entry is a link
-    link_id = db.Column(
-        db.Integer,
-        db.ForeignKey('menu_links.id'),
-        nullable=False
+    link = db.Column(
+        db.String,
+        nullable=True,
+        default=None
+    )
+    #: The name of the plugin from which the entry comes from (NULL if the entry does not come from a plugin)
+    plugin = db.Column(
+        db.String,
+        nullable=True
     )
     #: The page data if the entry is a page
     page_id = db.Column(
         db.Integer,
-        db.ForeignKey('menu_pages.id'),
-        nullable=False
+        db.ForeignKey('events.menu_pages.id'),
+        nullable=True,
+        default=None
     )
     #: The type of the attachment (file or link)
     type = db.Column(
         PyIntEnum(MenuEntryType),
         nullable=False
     )
-    #: The link of the menu entry
-    link = db.relationship(
-        'MenuEntryLink',
-        primaryjoin=lambda: MenuEntry.link_id == MenuEntryLink.id,
-        foreign_keys=link_id,
-        lazy=False,
-        post_update=True
-    )
     #: The page of the menu entry
     page = db.relationship(
-        'MenuEntryPage',
-        primaryjoin=lambda: MenuEntry.page_id == MenuEntryPage.id,
+        'MenuPage',
+        primaryjoin=lambda: MenuEntry.page_id == MenuPage.id,
         foreign_keys=page_id,
         lazy=False,
         post_update=True
     )
-    #: The parent menu entry
-    parent = db.relationship(
-        'MenuEntry',
-        primaryjoin=lambda: MenuEntry.parent_id == MenuEntry.id,
-        foreign_keys=parent_id,
-        lazy=False,
-        post_update=True
-    )
+    # #: The parent menu entry
+    # parent = db.relationship(
+    #     'MenuEntry',
+    #     remote_side=[id]
+    #     # primaryjoin=lambda: MenuEntry.parent_id == MenuEntry.id,
+    #     # foreign_keys=parent_id,
+    #     # lazy=False,
+    #     # post_update=True
+    # )
 
     #: The parent menu entry
     children = db.relationship(
         'MenuEntry',
-        primaryjoin=lambda: MenuEntry.id == MenuEntry.parent_id,
-        foreign_keys=lambda: MenuEntry.id,
+        cascade="all, delete-orphan",
+        # primaryjoin=lambda: MenuEntry.id == MenuEntry.parent_id,
+        # foreign_keys=lambda: MenuEntry.id,
         order_by='MenuEntry.position',
         backref=db.backref(
-            'menu_entries',
-            remote_side=parent_id
-        )
+            'parent',
+            remote_side=[id]
+        ),
     )
 
     @property
@@ -149,64 +166,19 @@ class MenuEntry(db.Model):
         )
 
 
-class MenuEntryLink(db.Model):
-    __tablename__ = 'entry_links'
-    __table_args__ = {'schema': 'entry_links'}
-
-    #: The ID of the link entry
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    #: The ID of the associated attachment
-    menu_entry_id = db.Column(
-        db.Integer,
-        db.ForeignKey('attachments.attachments.id'),
-        nullable=False,
-        index=True
-    )
-    #: The target URL for a link menu entry
-    url = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: Whether the link points to a page within Indico
-    is_internal = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    #: Whether the link is injected from a plugin
-    from_plugin = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    #: Whether the link should be opened in a new tab or window
-    in_new_tab = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=True
-    )
-
-    @return_ascii
-    def __repr__(self):
-        return '<MenuEntryLink({}, {})>'.format(self.id, self.url)
-
-
-class MenuEntryPage(db.Model):
-    __tablename__ = 'entry_pages'
-    __table_args__ = {'schema': 'entry_pages'}
+class MenuPage(db.Model):
+    __tablename__ = 'menu_pages'
+    __table_args__ = {'schema': 'events'}
 
     #: The ID of the file
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    #: The ID of the associated attachment
+    #: The ID of the associated menu entry
     menu_entry_id = db.Column(
         db.Integer,
-        db.ForeignKey('attachments.attachments.id'),
+        db.ForeignKey('events.menu_entries.id'),
         nullable=False,
         index=True
     )
@@ -218,4 +190,4 @@ class MenuEntryPage(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<MenuEntryPage({}, {})>'.format(self.id, self.html)
+        return '<MenuPage({}, {})>'.format(self.id, self.html)
