@@ -30,5 +30,11 @@ class WPLayoutEdit(WPJinjaMixin, WPConferenceModifBase):
 class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
 
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
+
     def _setActiveSideMenuItem(self):
         self.extra_menu_items_advanced['menu'].setActive()

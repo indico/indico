@@ -109,3 +109,28 @@
         }
     }
 }
+
+
+.menu-entries {
+    list-style: none;
+    width: 300px;
+    > li {
+        margin-top: 0.4em;
+        &:first-child {
+            margin-top: 0;
+        }
+        > .menu-entry > .i-label {
+            width: 100%;
+            text-align: left;
+            > .actions {
+                margin-right: -0.6em;
+                > * {
+                    padding: 0 0.2em;
+                }
+                > .drag-handle {
+                    cursor: move;
+                }
+            }
+        }
+    }
+}

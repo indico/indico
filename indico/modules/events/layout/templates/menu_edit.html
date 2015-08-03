@@ -1,18 +1,34 @@
 {% extends 'layout/base.html' %}
 
+
+{% macro menu_entry(entry) -%}
+    <div class="menu-entry">
+        <div class="i-label disabled">
+            <span class="icon-link">&nbsp;{{  _(entry.title)  }}</span>
+            <span class="right actions">
+                <i class="icon-edit"></i>
+                <i class="drag-handle icon-menu-arrows"></i>
+            </span>
+        </div>
+        {% if entry.children %}
+            {{ menu_entries(entry.children) }}
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{% macro menu_entries(entries) -%}
+    <ul class="menu-entries">
+        {% for entry in entries -%}
+            <li>{{ menu_entry(entry) }}</li>
+        {%- endfor %}
+    </ul>
+{%- endmacro %}
+
+
 {% block title %}
     {%- trans %}Menu{% endtrans -%}
 {% endblock %}
 
 {%- block content %}
-    <ul>
-    {% for entry in menu %}
-        <li>
-            <div class="i-label">
-                <span>{{  entry.title  }}</span>
-                <i class="icon-edit"></i>
-            </div>
-        </li>
-    {% endfor %}
-    </ul>
+    {{ menu_entries(menu) }}
 {% endblock %}
