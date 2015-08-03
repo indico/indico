@@ -14,17 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from blinker import Namespace
 
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+_signals = Namespace()
 
 
-class WPManageEvaluation(WPJinjaMixin, WPConferenceModifBase):
-    template_prefix = 'events/evaluation/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['evaluation'].setActive()
-
-    def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_evaluations_js'].urls())
+get_survey_fields = _signals.signal('get-survey-fields', """
+Expected to return `FieldType` subclasses.
+""")

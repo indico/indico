@@ -20,5 +20,5 @@ _signals = Namespace()
 
 from indico.core.signals.event.contributions import *
 from indico.core.signals.event.core import *
-from indico.core.signals.event.evaluation import *
 from indico.core.signals.event.notes import *
+from indico.core.signals.event.surveys import *

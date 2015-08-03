@@ -23,7 +23,7 @@ from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
-class EvaluationState(IndicoEnum):
+class SurveyState(IndicoEnum):
     not_ready = 1
     ready_to_open = 2
     active_and_clean = 3
@@ -31,8 +31,8 @@ class EvaluationState(IndicoEnum):
     finished = 5
 
 
-class Evaluation(db.Model):
-    __tablename__ = 'evaluations'
+class Survey(db.Model):
+    __tablename__ = 'surveys'
     __table_args__ = {'schema': 'events'}
 
     #: The ID of the submission
@@ -46,12 +46,12 @@ class Evaluation(db.Model):
         index=True,
         nullable=False
     )
-    #: The title of the evaluation
+    #: The title of the survey
     title = db.Column(
         db.String,
         nullable=False
     )
-    #: The description of the evaluation
+    #: The description of the survey
     description = db.Column(
         db.Text,
         nullable=False,
@@ -69,17 +69,17 @@ class Evaluation(db.Model):
         nullable=False,
         default=True
     )
-    #: Datetime when the evaluation is open
+    #: Datetime when the survey is open
     start_dt = db.Column(
         UTCDateTime,
         nullable=True
     )
-    #: Datetime when the evaluation is closed
+    #: Datetime when the survey is closed
     end_dt = db.Column(
         UTCDateTime,
         nullable=True
     )
-    #: Whether the evaluation has been marked as deleted
+    #: Whether the survey has been marked as deleted
     is_deleted = db.Column(
         db.Boolean,
         nullable=False,
@@ -88,22 +88,22 @@ class Evaluation(db.Model):
 
     #: The list of submissions
     submissions = db.relationship(
-        'EvaluationSubmission',
+        'SurveySubmission',
         cascade='all, delete-orphan',
         lazy=True,
         backref=db.backref(
-            'evaluation',
+            'survey',
             lazy=True
         )
     )
 
     #: The list of questions
     questions = db.relationship(
-        'EvaluationQuestion',
+        'SurveyQuestion',
         cascade='all, delete-orphan',
         lazy=True,
         backref=db.backref(
-            'evaluation',
+            'survey',
             lazy=True
         )
     )
@@ -128,20 +128,20 @@ class Evaluation(db.Model):
     @property
     def locator(self):
         return {'confId': self.event.id,
-                'evaluation_id': self.id}
+                'survey_id': self.id}
 
     @property
     def state(self):
         if not self.questions:
-            return EvaluationState.not_ready
+            return SurveyState.not_ready
         if not self.has_started:
-            return EvaluationState.ready_to_open
+            return SurveyState.ready_to_open
         if not self.submissions:
-            return EvaluationState.active_and_clean
+            return SurveyState.active_and_clean
         if not self.has_ended:
-            return EvaluationState.active_and_answered
-        return EvaluationState.finished
+            return SurveyState.active_and_answered
+        return SurveyState.finished
 
     @return_ascii
     def __repr__(self):
-        return '<Evaluation({}, {})>'.format(self.id, self.event_id)
+        return '<Survey({}, {})>'.format(self.id, self.event_id)

@@ -25,31 +25,31 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
-logger = Logger.get('events.evaluation')
+logger = Logger.get('events.survey')
 
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    from indico.modules.events.evaluation.models.submissions import EvaluationSubmission
-    EvaluationSubmission.find(user_id=source.id).update({EvaluationSubmission.user_id: target.id})
+    from indico.modules.events.surveys.models.submissions import SurveySubmission
+    SurveySubmission.find(user_id=source.id).update({SurveySubmission.user_id: target.id})
 
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'evaluation', SideMenuItem(_('Evaluation'), url_for('evaluation.management', event),
-                                      visible=event.canModify(session.user), event_feature='evaluation')
+    return 'surveys', SideMenuItem(_('Surveys'), url_for('survey.management', event),
+                                   visible=event.canModify(session.user), event_feature='surveys')
 
 
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
-    return EvaluationFeature
+    return SurveysFeature
 
 
-class EvaluationFeature(EventFeature):
-    name = 'evaluation'
-    friendly_name = _('Evaluation')
-    description = _('Gives event managers the opportunity to ask participants for feedback.')
+class SurveysFeature(EventFeature):
+    name = 'surveys'
+    friendly_name = _('Surveys')
+    description = _('Gives event managers the opportunity to create surveys.')
 
     @classmethod
     def is_default_for_event(cls, event):
