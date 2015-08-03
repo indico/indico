@@ -119,6 +119,18 @@ class MenuEntry(db.Model):
         post_update=True
     )
 
+    #: The parent menu entry
+    children = db.relationship(
+        'MenuEntry',
+        primaryjoin=lambda: MenuEntry.id == MenuEntry.parent_id,
+        foreign_keys=lambda: MenuEntry.id,
+        order_by='MenuEntry.position',
+        backref=db.backref(
+            'menu_entries',
+            remote_side=parent_id
+        )
+    )
+
     @property
     def is_root(self):
         return self.parent_id is None
