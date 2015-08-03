@@ -382,7 +382,7 @@ module_js = {
     'event_display': rjs_bundle('modules_event_display', 'js/indico/modules/eventdisplay.js'),
     'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/eventlayout.js'),
     'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
-    'evaluations': rjs_bundle('modules_evaluations', 'js/indico/modules/evaluations.js')
+    'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js')
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",

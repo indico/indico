@@ -1,0 +1,106 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}Survey{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {{ survey.title }}
+{% endblock %}
+
+{% macro survey_state_box(label, text, toolbar) %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-file-check"></div>
+            <div class="text">
+                <div class="label">
+                    {{ label }}
+                </div>
+                <div>
+                    {{ text }}
+                </div>
+            </div>
+            <div class="toolbar right">
+                <a href="#" class="i-button highlight icon-time js-survey-schedule-dialog"
+                   data-href="{{ url_for('.schedule_survey', survey) }}"
+                   data-title="{% trans %}Schedule survey{% endtrans %}">
+                    {% trans %}Schedule{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro survey_not_ready(survey) %}
+    {{ survey_state_box(_("Survey not ready"), _("The questionnaire is not set up")) }}
+{% endmacro %}
+
+{% macro survey_ready_to_open(survey) %}
+    {{ survey_state_box(_("Survey ready to go live"), _("Choose when to open the survey")) }}
+{% endmacro %}
+
+{% macro survey_active_and_clean(survey) %}
+    {{ survey_state_box(_("Waiting for submissions"), _("The survey is active but nobody answered yet")) }}
+{% endmacro %}
+
+{% macro survey_active_and_answered(survey) %}
+    {{ survey_state_box(_("Submissions received"), _("The survey is active")) }}
+{% endmacro %}
+
+{% macro survey_finished(survey) %}
+    {{ survey_state_box(_("Survey finished"), _("The survey finished")) }}
+{% endmacro %}
+
+{% block content %}
+    {% if survey.state == states.not_ready %}
+        {{ survey_not_ready(survey) }}
+    {% elif survey.state == states.ready_to_open %}
+        {{ survey_ready_to_open(survey) }}
+    {% elif survey.state == states.active_and_clean %}
+        {{ survey_active_and_clean(survey) }}
+    {% elif survey.state == states.active_and_answered %}
+        {{ survey_active_and_answered(survey) }}
+    {% elif survey.state == states.finished %}
+       {{ survey_finished(survey) }}
+    {% endif %}
+
+    {% if survey.state != states.not_ready  %}
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-clipboard"></div>
+                <div class="text">
+                    <div class="label">
+                        Questionnaire
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    <a href="{{ url_for('.manage_questionnaire', survey) }}" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}Submissions{% endtrans %}
+            </div>
+            <div class="i-box-buttons">
+                <a href="#" class="i-button">
+                    {% trans %}Show results{% endtrans %}
+                </a>
+            </div>
+        </div>
+        <div class="i-box-content">
+            {% for submission in survey.submissions %}
+                <div>
+                    {{ submission }}
+                </div>
+            {% else %}
+                {% trans %}There are no submissions.{% endtrans %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

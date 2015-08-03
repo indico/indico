@@ -19,19 +19,19 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
-from indico.modules.events.evaluation.fields import get_field_types
+from indico.modules.events.surveys.fields import get_field_types
 from indico.util.string import return_ascii
 
 
 def _get_next_position(context):
     """Get the next question position for the event."""
-    evaluation_id = context.current_parameters['evaluation_id']
-    res = db.session.query(db.func.max(EvaluationQuestion.position)).filter_by(evaluation_id=evaluation_id).one()
+    survey_id = context.current_parameters['survey_id']
+    res = db.session.query(db.func.max(SurveyQuestion.position)).filter_by(survey_id=survey_id).one()
     return (res[0] or 0) + 1
 
 
-class EvaluationQuestion(db.Model):
-    __tablename__ = 'evaluation_questions'
+class SurveyQuestion(db.Model):
+    __tablename__ = 'survey_questions'
     __table_args__ = {'schema': 'events'}
 
     #: The ID of the question
@@ -39,14 +39,14 @@ class EvaluationQuestion(db.Model):
         db.Integer,
         primary_key=True
     )
-    #: The ID of the event
-    evaluation_id = db.Column(
+    #: The ID of the survey
+    survey_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.evaluations.id'),
+        db.ForeignKey('events.surveys.id'),
         index=True,
         nullable=False,
     )
-    #: The position of the question in the evaluation form
+    #: The position of the question in the survey form
     position = db.Column(
         db.Integer,
         nullable=False,
@@ -90,8 +90,8 @@ class EvaluationQuestion(db.Model):
     )
 
     # relationship backrefs:
-    # - answers (EvaluationAnswer.question)
-    # - evaluation (Evaluation.questions)
+    # - answers (SurveyAnswer.question)
+    # - survey (Survey.questions)
 
     @property
     def field(self):
@@ -103,8 +103,8 @@ class EvaluationQuestion(db.Model):
 
     @property
     def locator(self):
-        return dict(self.evaluation.locator, question_id=self.id)
+        return dict(self.survey.locator, question_id=self.id)
 
     @return_ascii
     def __repr__(self):
-        return '<EvaluationQuestion({}, {}, {}, {})>'.format(self.id, self.evaluation_id, self.field_type, self.title)
+        return '<SurveyQuestion({}, {}, {}, {})>'.format(self.id, self.survey_id, self.field_type, self.title)

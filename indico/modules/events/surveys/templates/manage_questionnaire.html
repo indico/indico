@@ -1,10 +1,10 @@
-{% extends 'events/evaluation/manage_evaluation.html' %}
+{% extends 'events/surveys/manage_survey.html' %}
 
 {% block content %}
     <div class="toolbar">
         <div class="group">
             {% for field_type in field_types %}
-                <a href="#" data-href="{{ url_for('.add_question', evaluation, type=field_type) }}"
+                <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type) }}"
                    data-title="{% trans %}Add {{ field_type }} question{% endtrans %}"
                    class="i-button js-question-dialog">{% trans %}Add {{ field_type }}{% endtrans %}</a>
             {% endfor %}
@@ -18,7 +18,7 @@
         </div>
         <div class="i-box-content">
             <ul class="group-list with-buttons no-content-before">
-            {% for question in evaluation.questions %}
+            {% for question in survey.questions %}
                 <li>
                     <a href="#" data-href="{{ url_for('.edit_question', question) }}"
                                 data-title="{% trans %}Edit question{% endtrans %}"

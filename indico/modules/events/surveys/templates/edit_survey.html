@@ -1,9 +1,9 @@
-{% extends 'events/evaluation/manage_evaluation.html' %}
+{% extends 'events/surveys/manage_survey.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 {% block subtitle %}
-    {% trans evaluation_title=evaluation.title -%}
-        Edit {{ evaluation_title }}
+    {% trans survey_title=survey.title -%}
+        Edit {{ survey_title }}
     {%- endtrans %}
 {% endblock %}
 

@@ -2,12 +2,12 @@
     'use strict';
 
     $(document).ready(function() {
-        setupEvaluationScheduleWindows();
+        setupSurveyScheduleWindows();
         setupQuestionWindows();
     });
 
-    global.setupEvaluationScheduleWindows = function setupEvaluationScheduleWindows() {
-        $('a.js-evaluation-schedule-dialog').on('click', function(evt) {
+    global.setupSurveyScheduleWindows = function setupSurveyScheduleWindows() {
+        $('a.js-survey-schedule-dialog').on('click', function(evt) {
             evt.preventDefault();
             ajaxDialog({
                 url: build_url($(this).data('href')),

@@ -20,21 +20,21 @@ from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Optional
 
-from indico.modules.events.evaluation.models.evaluations import Evaluation
+from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.forms.validators import HiddenUnless, ValidationError
 from indico.util.i18n import _
 
 
-class EvaluationForm(IndicoForm):
-    title = StringField(_('Title'), [DataRequired()], description=_('The title of the evaluation'))
+class SurveyForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the survey'))
     description = TextAreaField(_('Description'), description=_('The description of the room'))
     anonymous = BooleanField(_("Anonymous submissions"),
                              description=_('User information will not be attached to submissions'),
                              widget=SwitchWidget())
     require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')],
-                                description=_('Still require users to be logged in for submitting the evaluation'),
+                                description=_('Still require users to be logged in for submitting the survey'),
                                 widget=SwitchWidget())
 
     def __init__(self, *args, **kwargs):
@@ -42,27 +42,27 @@ class EvaluationForm(IndicoForm):
         super(IndicoForm, self).__init__(*args, **kwargs)
 
     def validate_title(self, field):
-        query = Evaluation.find(Evaluation.event_id == self.event.id,
-                                Evaluation.title == field.data,
-                                Evaluation.title != field.object_data)
+        query = Survey.find(Survey.event_id == self.event.id,
+                            Survey.title == field.data,
+                            Survey.title != field.object_data)
         if query.count():
-            raise ValidationError(_("There is already an evaluation named {} on this event".format(field.data)))
+            raise ValidationError(_("There is already an survey named {} on this event".format(field.data)))
 
     def validate_require_user(self, field):
         if not field.data and not self.anonymous.data:
-            raise ValidationError(_("Guests can't submit evaluations if submissions are not anonymous"))
+            raise ValidationError(_("Guests can't submit surveys if submissions are not anonymous"))
 
 
-class ScheduleEvaluationForm(IndicoForm):
+class ScheduleSurveyForm(IndicoForm):
     start_dt = DateField(_('Start'), [Optional()], parse_kwargs={'dayfirst': True},
                          description=_('Include only attachments uploaded after this date'))
     end_dt = DateField(_('End'), [Optional()], parse_kwargs={'dayfirst': True},
                        description=_('Include only attachments uploaded after this date'))
 
     def __init__(self, *args, **kwargs):
-        self.evaluation = kwargs.pop('evaluation', None)
+        self.survey = kwargs.pop('survey', None)
         super(IndicoForm, self).__init__(*args, **kwargs)
 
     def validate_end_dt(self, field):
         if field.data < self.start_dt.data:
-            raise ValidationError(_("End date of the evaluation can't be before the start time"))
+            raise ValidationError(_("End date of the survey can't be before the start time"))
