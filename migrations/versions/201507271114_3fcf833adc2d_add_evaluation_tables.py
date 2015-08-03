@@ -26,8 +26,8 @@ def upgrade():
         sa.Column('description', sa.Text(), nullable=False),
         sa.Column('anonymous', sa.Boolean(), nullable=False),
         sa.Column('require_user', sa.Boolean(), nullable=False),
-        sa.Column('start_dt', UTCDateTime, nullable=False),
-        sa.Column('end_dt', UTCDateTime, nullable=False),
+        sa.Column('start_dt', UTCDateTime, nullable=True),
+        sa.Column('end_dt', UTCDateTime, nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
@@ -74,6 +74,7 @@ def upgrade():
 
 def downgrade():
     op.drop_constraint('fk_evaluation_submissions_evaluation_id_evaluations', 'evaluation_submissions', schema='events')
+    op.drop_constraint('fk_evaluation_questions_evaluation_id_evaluations', 'evaluation_questions', schema='events')
     op.drop_table('evaluations', schema='events')
     op.drop_table('evaluation_answers', schema='events')
     op.drop_table('evaluation_submissions', schema='events')
