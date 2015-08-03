@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.forms import LayoutForm
-
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
 from indico.web.forms.base import FormDefaults

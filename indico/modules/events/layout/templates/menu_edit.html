@@ -1,3 +1,18 @@
-<ul>
+{% extends 'layout/base.html' %}
 
-</ul>
+{% block title %}
+    {%- trans %}Menu{% endtrans -%}
+{% endblock %}
+
+{%- block content %}
+    <ul>
+    {% for entry in menu %}
+        <li>
+            <div class="i-label">
+                <span>{{  entry.title  }}</span>
+                <i class="icon-edit"></i>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
