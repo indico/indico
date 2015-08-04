@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
+from indico.core.errors import IndicoError
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
@@ -136,12 +137,22 @@ class Survey(db.Model):
             return SurveyState.not_ready
         if not self.has_started:
             return SurveyState.ready_to_open
-        if not self.submissions:
-            return SurveyState.active_and_clean
         if not self.has_ended:
+            if not self.submissions:
+                return SurveyState.active_and_clean
             return SurveyState.active_and_answered
         return SurveyState.finished
 
     @return_ascii
     def __repr__(self):
         return '<Survey({}, {})>'.format(self.id, self.event_id)
+
+    def start(self):
+        if self.state != SurveyState.ready_to_open:
+            raise IndicoError("Survey can't start")
+        self.start_dt = now_utc()
+
+    def end(self):
+        if self.state not in (SurveyState.active_and_clean, SurveyState.active_and_answered):
+            raise IndicoError("Survey can't end")
+        self.end_dt = now_utc()
