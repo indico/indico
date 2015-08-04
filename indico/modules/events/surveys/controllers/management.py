@@ -24,10 +24,12 @@ from indico.modules.events.surveys.fields import get_field_types
 from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.models.questions import SurveyQuestion
+from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.widgets import SwitchWidget
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -114,8 +116,10 @@ class RHEndSurvey(RHManageSurvey):
 class RHManageSurveyQuestionnaire(RHManageSurvey):
     def _process(self):
         field_types = get_field_types()
-        return WPManageSurvey.render_template('manage_questionnaire.html', self.event,
-                                              survey=self.survey, field_types=field_types)
+        preview_form = make_survey_form(self.survey.questions)()
+
+        return WPManageSurvey.render_template('manage_questionnaire.html', self.event, survey=self.survey,
+                                              field_types=field_types, preview_form=preview_form)
 
 
 class RHAddSurveyQuestion(RHManageSurvey):

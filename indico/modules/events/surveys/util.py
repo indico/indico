@@ -36,5 +36,5 @@ def make_survey_form(questions):
         if field_impl is None:
             # field definition is not available anymore
             continue
-        setattr(form_class, name, field_impl.get_wtforms_field())
+        setattr(form_class, name, field_impl.create_wtf_field())
     return form_class

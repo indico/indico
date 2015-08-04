@@ -50,6 +50,8 @@ class SurveyField(object):
     plugin = None
     #: displayed name of the field type
     friendly_name = None
+    #: wtform field class for this field
+    wtf_field_class = None
     #: the WTForm used to configure the field
     config_form = FieldConfigForm
 
@@ -67,9 +69,14 @@ class SurveyField(object):
                                     for name, field in form._fields.iteritems()
                                     if name not in form._common_fields and name != 'csrf_token'}
 
-    def get_wtforms_field(self):
+    def create_wtf_field(self):
         """Returns a WTForms field for this field"""
-        raise NotImplementedError
+        return self._make_wtforms_field(self.wtf_field_class, self.validators)
+
+    @property
+    def validators(self):
+        """Returns a list of validators for this field"""
+        return None
 
     def _make_wtforms_field(self, field_cls, validators=None, **kwargs):
         """Util to instantiate a WTForms field.

@@ -32,11 +32,12 @@ class TextField(SurveyField):
     name = 'text'
     friendly_name = _('Text')
     config_form = TextConfigForm
+    wtf_field_class = StringField
 
-    def get_wtforms_field(self):
+    @property
+    def validators(self):
         max_length = self.question.field_data.get('max_length')
-        validators = [Length(max=max_length)] if max_length else None
-        return self._make_wtforms_field(StringField, validators)
+        return [Length(max=max_length)] if max_length else None
 
 
 class NumberConfigForm(FieldConfigForm):
@@ -56,19 +57,84 @@ class NumberField(SurveyField):
     name = 'number'
     friendly_name = _('Number')
     config_form = NumberConfigForm
+    wtf_field_class = IntegerField
 
-    def get_wtforms_field(self):
+    @property
+    def validators(self):
         min_value = self.question.field_data.get('min_value')
         max_value = self.question.field_data.get('max_value')
-        validators = [NumberRange(min=min_value, max=max_value)]
-        # XXX: do we need to support floats? in that case add another config option
-        # to determine whether to use IntegerField or FloatField
-        return self._make_wtforms_field(IntegerField, validators)
+        return [NumberRange(min=min_value, max=max_value)]
 
 
 class BoolField(SurveyField):
     name = 'bool'
     friendly_name = _('Yes/No')
+    wtf_field_class = BooleanField
 
-    def get_wtforms_field(self):
-        return self._make_wtforms_field(BooleanField, widget=SwitchWidget())
+    def create_wtf_field(self):
+        return self._make_wtforms_field(self.wtf_field_class, widget=SwitchWidget())
+
+
+class SingleChoiceConfigForm(FieldConfigForm):
+    display_type = IndicoRadioField(_('Display type'), [DataRequired()],
+                                    description=_('Show the question either as radio button or select'),
+                                    choices=[('radio', _('Show as radio button')),
+                                             ('select', _('Show as select field'))],
+                                    default='radio')
+    radio_display_type = IndicoRadioField(_('Arrangment of available options'),
+                                          [HiddenUnless('display_type', 'radio')],
+                                          choices=[('vertical', _('Vertical alignment')),
+                                                   ('horizontal', _('Horizontal alignment'))])
+    options = MultipleItemsField(_('Options'), [DataRequired()],
+                                 fields=[('option', _('Option'))], unique_field='option',
+                                 description=_('Specify options available for selection by user'))
+
+
+class SingleChoiceField(SurveyField):
+    name = 'single_choice'
+    friendly_name = _('Single Choice')
+    config_form = SingleChoiceConfigForm
+    wtf_field_class = None
+
+    def create_wtf_field(self):
+        field_options = {}
+        if self.question.field_data['display_type'] == 'select':
+            self.wtf_field_class = SelectField
+        else:
+            self.wtf_field_class = IndicoRadioField
+            field_options['arrangement'] = self.question.field_data['radio_display_type']
+        choices = [(iter['option'], iter['option']) for iter in self.question.field_data['options']]
+        return self._make_wtforms_field(self.wtf_field_class, choices=choices, **field_options)
+
+
+class TextParagraphConfigForm(IndicoForm):
+    _common_fields = {'title'}
+
+    title = StringField(_('Title'), [DataRequired()], description=_("The title of the field"))
+    content = TextAreaField(_('Content'), description=_('Text content displayed in the field'))
+
+
+class TextParagraphField(SurveyField):
+    name = 'text_paragraph'
+    friendly_name = _('Text Paragraph')
+    config_form = TextParagraphConfigForm
+    wtf_field_class = TextAreaField
+
+    def create_wtf_field(self):
+        return self._make_wtforms_field(self.wtf_field_class, default=self.question.field_data['content'])
+
+
+class MultiSelectConfigForm(FieldConfigForm):
+    choices = MultipleItemsField(_('choices'), [DataRequired()], fields=[('choice', _('Choice'))], unique_field='choice',
+                                 description=_('Specify choices available for selection by user'))
+
+
+class MultiSelectField(SurveyField):
+    name = 'multiselect'
+    friendly_name = _('Select multiple')
+    config_form = MultiSelectConfigForm
+    wtf_field_class = IndicoSelectMultipleCheckboxField
+
+    def create_wtf_field(self):
+        choices = [(choice['choice'], choice['choice']) for choice in self.question.field_data['choices']]
+        return self._make_wtforms_field(self.wtf_field_class, choices=choices)
