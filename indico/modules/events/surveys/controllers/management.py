@@ -99,6 +99,18 @@ class RHScheduleSurvey(RHManageSurvey):
         return jsonify_template('events/surveys/schedule_survey.html', form=form)
 
 
+class RHStartSurvey(RHManageSurvey):
+    def _process(self):
+        self.survey.start()
+        return redirect(url_for('.manage_survey', self.survey))
+
+
+class RHEndSurvey(RHManageSurvey):
+    def _process(self):
+        self.survey.end()
+        return redirect(url_for('.manage_survey', self.survey))
+
+
 class RHManageSurveyQuestionnaire(RHManageSurvey):
     def _process(self):
         field_types = get_field_types()
