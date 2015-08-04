@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import IntegerField, BooleanField, StringField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length
+from wtforms.fields import IntegerField, BooleanField, StringField, SelectField
+from wtforms.validators import NumberRange, Optional, ValidationError, Length, DataRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
+from indico.web.forms.fields import IndicoRadioField, MultipleItemsField
 from indico.web.forms.widgets import SwitchWidget
 
 
