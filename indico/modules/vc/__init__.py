@@ -21,6 +21,7 @@ from flask import render_template, has_request_context, session
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.users import User
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType, VCRoom
 from indico.modules.vc.forms import VCPluginSettingsFormBase
@@ -31,7 +32,6 @@ from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 from indico.util.i18n import _
 from MaKaC.conference import EventCloner
-from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
@@ -68,7 +68,11 @@ def _extend_event_menu(sender, **kwargs):
         if event.has_legacy_id:
             return False
         return bool(get_vc_plugins()) and bool(VCRoomEventAssociation.find_for_event(event).count())
-    return EventMenuEntry('vc.event_videoconference', 'Videoconference Rooms', name='vc-event-page', visible=_visible)
+    return MenuEntryData(endpoint='vc.event_videoconference',
+                         title='Videoconference Rooms',
+                         visible=_visible,
+                         children=None,
+                         plugin=None)
 
 
 @signals.event.session_slot_deleted.connect
