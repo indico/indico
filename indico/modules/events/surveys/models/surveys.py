@@ -119,11 +119,11 @@ class Survey(db.Model):
 
     @property
     def has_ended(self):
-        return self.end_dt and self.end_dt < now_utc()
+        return bool(self.end_dt) and self.end_dt <= now_utc()
 
     @property
     def has_started(self):
-        return self.end_dt and self.start_dt < now_utc()
+        return bool(self.start_dt) and self.start_dt <= now_utc()
 
     @property
     def locator(self):
