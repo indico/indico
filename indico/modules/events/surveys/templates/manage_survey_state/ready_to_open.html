@@ -9,9 +9,17 @@
 {% endblock %}
 
 {% block buttons %}
-    <a href="#" class="i-button highlight icon-time js-survey-schedule-dialog"
-       data-href="{{ url_for('.schedule_survey', survey) }}"
-       data-title="{% trans %}Schedule survey{% endtrans %}">
-        {% trans %}Open{% endtrans %}
-    </a>
+    <div class="group">
+        <a href="#" class="i-button icon-time js-survey-schedule-dialog"
+           data-href="{{ url_for('.schedule_survey', survey) }}"
+           data-title="{% trans %}Schedule survey{% endtrans %}">
+            {% trans %}Schedule{% endtrans %}
+        </a>
+    </div>
+    <div class="group">
+        <a href="#" data-href="{{ url_for('.start_survey', survey) }}" data-method="POST"
+           class="i-button highlight">
+            {% trans %}Start{% endtrans %}
+        </a>
+    </div>
 {% endblock %}
