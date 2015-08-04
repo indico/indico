@@ -10,26 +10,30 @@
             {% endfor %}
         </div>
     </div>
-    <div class="i-box titled no-padding">
-        <div class="i-box-header">
-            <div class="i-box-title">
-            {% trans %}List of questions{% endtrans %}
+    <div class="i-box-group vert">
+        <div class="i-box titled no-padding">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                {% trans %}List of questions{% endtrans %}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <ul class="group-list with-buttons no-content-before">
+                {% for question in survey.questions %}
+                    <li>
+                        <a href="#" data-href="{{ url_for('.edit_question', question) }}"
+                                    data-title="{% trans %}Edit question{% endtrans %}"
+                                    class="js-question-dialog">
+                            <strong>{{ question.title }}</strong>
+                        </a>
+                    </li>
+                {% else %}
+                    <li>{% trans %}No questions defined{% endtrans %}</li>
+                {% endfor %}
+                </ul>
             </div>
         </div>
-        <div class="i-box-content">
-            <ul class="group-list with-buttons no-content-before">
-            {% for question in survey.questions %}
-                <li>
-                    <a href="#" data-href="{{ url_for('.edit_question', question) }}"
-                                data-title="{% trans %}Edit question{% endtrans %}"
-                                class="js-question-dialog">
-                        <strong>{{ question.title }}</strong>
-                    </a>
-                </li>
-            {% else %}
-                <li>{% trans %}No questions defined{% endtrans %}</li>
-            {% endfor %}
-            </ul>
-        </div>
+
+        {% include 'events/surveys/questionnaire_preview.html' %}
     </div>
 {% endblock %}
