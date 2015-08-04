@@ -93,7 +93,12 @@ class MenuEntry(db.Model):
         nullable=False,
         default=False
     )
-    #: The
+    #: The endpoint of the link for internal and plugin links
+    endpoint = db.Column(
+        db.String,
+        nullable=True,
+        default=None
+    )
     #: The link data if the entry is a link
     link = db.Column(
         db.String,
