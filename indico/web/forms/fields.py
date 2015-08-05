@@ -68,6 +68,10 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
 class IndicoRadioField(RadioField):
     widget = JinjaWidget('forms/radio_buttons_widget.html', single_kwargs=True)
 
+    def __init__(self, *args, **kwargs):
+        self.option_orientation = kwargs.pop('orientation', 'vertical')
+        super(IndicoRadioField, self).__init__(*args, **kwargs)
+
 
 class JSONField(HiddenField):
     def process_formdata(self, valuelist):
