@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.controllers import RHLayoutEdit, RHMenuEdit
+from indico.modules.events.layout.controllers import RHLayoutEdit, RHMenuEdit, RHMenuEntryEdit
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
@@ -25,3 +25,4 @@ _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
 
 _bp.add_url_rule('/', 'index', RHLayoutEdit)
 _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
+_bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu-entry-edit', RHMenuEntryEdit)

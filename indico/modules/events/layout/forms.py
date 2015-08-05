@@ -17,16 +17,17 @@
 from __future__ import unicode_literals
 
 from pytz import all_timezones
-from wtforms.fields import BooleanField, FileField
+from wtforms.fields import BooleanField, FileField, TextAreaField
 from wtforms.fields.core import SelectField
+from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, InputRequired
 from wtforms_components import ColorField
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import UsedIf
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 class LayoutForm(IndicoForm):
@@ -58,3 +59,20 @@ class LayoutForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(LayoutForm, self).__init__(*args, **kwargs)
         self.timezone.choices = zip(all_timezones, all_timezones)
+
+
+class MenuEntryForm(IndicoForm):
+    title = StringField(_("Title"), [InputRequired()])
+    visible = BooleanField(_("Show"), widget=SwitchWidget())
+
+
+class MenuUserEntry(MenuEntryForm):
+    new_tab = BooleanField(_("Open in a new tab"), widget=SwitchWidget())
+
+
+class MenuLinkForm(MenuUserEntry):
+    endpoint = URLField(_("URL"))
+
+
+class MenuPageForm(MenuUserEntry):
+    source = TextAreaField(_("Content"), widget=CKEditorWidget())

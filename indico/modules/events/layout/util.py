@@ -237,7 +237,7 @@ def menu_entries_for_event(event):
         transaction.commit()
 
     # Filter out entries from disabled plugins
-    plugins = plugin_engine.get_active_plugins().viewvalues()
+    plugins = plugin_engine.get_active_plugins().viewkeys()
     return (entry for entry in entries if entry.type != MenuEntryType.plugin_link or entry.plugin in plugins)
 
 

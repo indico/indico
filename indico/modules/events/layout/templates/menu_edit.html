@@ -2,12 +2,13 @@
 
 
 {% macro menu_entry(entry) -%}
-    <div class="menu-entry">
-        <div class="i-label disabled">
-            <span class="icon-link">&nbsp;{{  _(entry.title)  }}</span>
+    <div class="menu-entry {%- if entry.children %} with-children{% endif %}">
+        <div class="i-label disabled {% if not entry.visible %}stripped{% endif %} entry-{{ entry.type.name }}">
+            <span>{{  _(entry.title)  }} ({{ entry.position }})</span>
             <span class="right actions">
-                <i class="icon-edit"></i>
-                <i class="drag-handle icon-menu-arrows"></i>
+                <i class="{% if entry.visible %}icon-eye{% else %}icon-eye-blocked{% endif %}"></i>
+                <a href="{{ url_for('.menu-entry-edit', entry) }}" class="edit-entry"></a>
+                <i class="drag-handle"></i>
             </span>
         </div>
         {% if entry.children %}
@@ -31,4 +32,9 @@
 
 {%- block content %}
     {{ menu_entries(menu) }}
+    <script>
+    $('.edit-entry').ajaxDialog({
+        title: '{% trans %}Menu Entry Settings{% endtrans %}'
+    });
+    </script>
 {% endblock %}
