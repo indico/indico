@@ -335,6 +335,18 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                         padding $dropdown-transition);
 }
 
+%form-field {
+    @include border-radius();
+    height: 2.5em;
+    padding: 0.5em 1em;
+    line-height: 1.5;
+    color: $black;
+    border: 1px solid $gray;
+    @include transition-property(border-color, box-shadow);
+    @include transition-duration(0.12s, 0.12s);
+    @include transition-timing-function(ease-in-out, ease-in-out);
+}
+
 .i-form {
     @extend %font-family-form;
     @include box-sizing(border-box);
@@ -424,15 +436,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
             }
 
             textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
-                @include border-radius();
-                height: 2.5em;
-                padding: 0.5em 1em;
-                line-height: 1.5;
-                color: $black;
-                border: 1px solid $gray;
-                @include transition-property(border-color, box-shadow);
-                @include transition-duration(0.12s, 0.12s);
-                @include transition-timing-function(ease-in-out, ease-in-out);
+                @extend %form-field;
             }
 
             .i-has-action > input {
