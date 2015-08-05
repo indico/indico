@@ -51,6 +51,16 @@ def as_utc(dt):
     return pytz.utc.localize(dt)
 
 
+def event_to_utc(dt, event):
+    """Converts a datetime of an event to UTC.
+
+    :param dt: A naive :class:`datetime.datetime` object in UTC
+    :param event: An :class:`.Conference` object from which to take the timezone
+    """
+    timezone = DisplayTZ(conf=event).getDisplayTZ()
+    return get_timezone(timezone).localize(dt).astimezone(pytz.utc)
+
+
 def server_to_utc(dt):
     """Converts the given datetime in the server's TZ to UTC.
 
