@@ -1,0 +1,95 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="dropzone-area">
+        <div class="dropzone-area-inner">
+            <div class="dropzone-previews"></div>
+            <div class="select-files-btn">
+                <div class="dz-message">
+                    {% trans %}Drag file here{% endtrans %}
+                    <span class="message-seperator">- or -</span>
+                </div>
+                <button type="button" class="i-button">
+                    {%- trans %}Choose from your computer{% endtrans -%}
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            'use strict';
+
+            Dropzone.autoDiscover = false;
+
+            $('#dropzone').dropzone({
+                // TODO: Check if we can move here the url from the form action
+                // url: '',
+                clickable: '.dropzone-area',
+                previewsContainer: '.dropzone-previews',
+                autoProcessQueue: false,
+                uploadMultiple: false,
+                maxFilesize: Math.min({{ indico_config.MaxUploadFileSize or 10240 }}, {{ indico_config.MaxUploadFilesTotalSize or 10240 }}),
+                maxFiles: 1,
+                addRemoveLinks: true,
+                {% if accepted_files %}acceptedFiles: '{{ accepted_files }}',{% endif %}
+                paramName: function() { return 'file'; },
+                init: function() {
+                    var form = $('#dropzone');
+                    var saveButton = form.find(':submit');
+                    var self = this;
+                    var file = JSON.parse({{ field._value() | tojson | safe }});
+
+                    if (file) {
+                        var existingFile = {
+                            name: file['file_name'],
+                            size: file['size'],
+                            accepted: true
+                        };
+
+                        self.emit('addedfile', existingFile);
+                        $('.dz-progress').hide();
+                        self.files[0] = existingFile;
+
+                        /* Disable opening the upload dialog when clicking on the file's preview element */
+                        $('.dz-preview').on('click', function(e) {
+                            e.stopPropagation();
+                        });
+
+                        // Check if the existing file is an image and add the image preview.
+                        if (file['content']) {
+                            $('.dz-image > img').attr('src', 'data:' + file['content_type'] + ';base64,' + file['content']);
+                            $('.dz-image > img').attr('width', '120px');
+                            $('.dz-preview').removeClass('dz-file-preview').addClass('dz-image-preview');
+                        }
+                    }
+
+                    saveButton.on('click', function(e) {
+                        if (self.getQueuedFiles().length) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        $('.dz-progress').show();
+                        self.processQueue();
+                    });
+
+                    self.on('addedfile', function(file) {
+                        if (self.files.length > 1) {
+                            self.removeFile(self.files[0]);
+                        }
+                        $('.dz-message').hide();
+                        $('.dz-progress').hide();
+                        $(file.previewElement).on('click', function(e) {
+                            e.stopPropagation();
+                        });
+                    });
+
+                    self.on('removedfile', function(file) {
+                        if (self.files.length == 0) {
+                            $('.dz-message').show();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
