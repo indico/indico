@@ -4,7 +4,7 @@
 {% block html %}
     {% for subfield in field %}
         <div class="i-radio">
-            {{ subfield(required=field.flags.required, disabled=disabled|default(false)) }}
+            {{ subfield(**input_args) }}
             {{ subfield.label }}
         </div>
     {% endfor %}

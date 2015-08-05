@@ -65,7 +65,7 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
 
 
 class IndicoRadioField(RadioField):
-    widget = JinjaWidget('forms/radio_buttons_widget.html')
+    widget = JinjaWidget('forms/radio_buttons_widget.html', single_kwargs=True)
 
 
 class JSONField(HiddenField):
