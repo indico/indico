@@ -748,6 +748,19 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 }
 
+%tilted-strips-bg {
+    background-color: lighten($pastel-gray, $light-color-variation);
+    background: repeating-linear-gradient(
+        -40deg,
+        lighten($pastel-gray, 0.5*$color-variation),
+        lighten($pastel-gray, 0.5*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 10px,
+        lighten($pastel-gray, 0.7*$color-variation) 20px
+    );
+    font-style: italic;
+    color: $dark-gray !important;
+}
+
 .i-has-action {
     @extend %toolbar-group;
     position: relative;
@@ -802,16 +815,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
     > input[type=text], textarea {
         &[readonly] {
-            background-color: lighten($pastel-gray, $light-color-variation);
-            background: repeating-linear-gradient(
-                -40deg,
-                lighten($pastel-gray, 0.5*$color-variation),
-                lighten($pastel-gray, 0.5*$color-variation) 10px,
-                lighten($pastel-gray, 0.7*$color-variation) 10px,
-                lighten($pastel-gray, 0.7*$color-variation) 20px
-            );
-            font-style: italic;
-            color: $dark-gray !important;
+            @extend %tilted-strips-bg;
         }
     }
 }
