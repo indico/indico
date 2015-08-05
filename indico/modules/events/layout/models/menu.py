@@ -25,10 +25,10 @@ from MaKaC.conference import ConferenceHolder
 
 
 class MenuEntryType(TitledIntEnum):
-    __titles__ = [None, _('Separator'), _('Internal Link'), _('External Link'), _('Plugin Link'), _('Page')]
+    __titles__ = [None, _('Separator'), _('Internal Link'), _('User Link'), _('Plugin Link'), _('Page')]
     separator = 1
     internal_link = 2
-    external_link = 3
+    user_link = 3
     plugin_link = 4
     page = 5
 
@@ -38,13 +38,13 @@ class MenuEntry(db.Model):
     __table_args__ = (
         db.CheckConstraint(
             '(type = {type.separator.value} AND link IS NULL AND page_id is NULL) OR'
-            ' (type in ({type.internal_link.value}, {type.external_link.value}, {type.plugin_link.value})'
+            ' (type in ({type.internal_link.value}, {type.user_link.value}, {type.plugin_link.value})'
             ' AND link IS NOT NULL AND page_id is NULL) OR'
             ' (type = {type.page.value} AND link IS NULL AND page_id is NOT NULL)'.format(type=MenuEntryType),
             'valid_type'),
         db.CheckConstraint(
             '((type = {type.internal_link.value} OR type = {type.plugin_link.value}) AND endpoint IS NOT NULL) OR'
-            ' (type in ({type.separator.value}, {type.external_link.value}, {type.page.value}) AND endpoint is NULL)'
+            ' (type in ({type.separator.value}, {type.user_link.value}, {type.page.value}) AND endpoint is NULL)'
             .format(type=MenuEntryType),
             'valid_endpoint'),
         db.CheckConstraint(
@@ -157,6 +157,22 @@ class MenuEntry(db.Model):
     @property
     def is_root(self):
         return self.parent_id is None
+
+    @property
+    def is_link(self):
+        return self.type in {MenuEntryType.internal_link, MenuEntryType.plugin_link, MenuEntryType.user_link}
+
+    @property
+    def is_user_link(self):
+        return self.type == MenuEntryType.user_link
+
+    @property
+    def is_page(self):
+        return self.type == MenuEntryType.page
+
+    @property
+    def is_separator(self):
+        return self.type == MenuEntryType.separator
 
     @property
     def event(self):
