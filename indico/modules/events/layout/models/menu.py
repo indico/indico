@@ -21,6 +21,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
+from MaKaC.conference import ConferenceHolder
 
 
 class MenuEntryType(TitledIntEnum):
@@ -156,6 +157,14 @@ class MenuEntry(db.Model):
     @property
     def is_root(self):
         return self.parent_id is None
+
+    @property
+    def event(self):
+        return ConferenceHolder().getById(str(self.event_id), True)
+
+    @property
+    def locator(self):
+        return dict(self.event.getLocator(), menu_entry_id=self.id)
 
     @return_ascii
     def __repr__(self):
