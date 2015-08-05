@@ -3,10 +3,15 @@
 {% block content %}
     <div class="toolbar">
         <div class="group">
-            {% for field_type in field_types %}
+            {% for field_type in field_types.iterkeys() %}
+                {% set friendly_name = field_types[field_type].friendly_name %}
                 <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type) }}"
-                   data-title="{% trans %}Add {{ field_type }} question{% endtrans %}"
-                   class="i-button js-question-dialog">{% trans %}Add {{ field_type }}{% endtrans %}</a>
+                   data-title="{% trans %}Add {{ friendly_name }} question{% endtrans %}"
+                   class="i-button js-question-dialog">
+                        {% trans friendly_name=friendly_name %}
+                            Add {{ friendly_name }}
+                        {% endtrans %}
+                </a>
             {% endfor %}
         </div>
     </div>
