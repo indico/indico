@@ -16,11 +16,15 @@
 
 from __future__ import unicode_literals
 
+from flask import request
+
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.forms import LayoutForm
+from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm
+from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_template
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -36,3 +40,16 @@ class RHLayoutEdit(RHConferenceModifBase):
 class RHMenuEdit(RHConferenceModifBase):
     def _process(self):
         return WPMenuEdit.render_template('menu_edit.html', self._conf, menu=menu_entries_for_event(self._conf))
+
+
+class RHMenuEntryEdit(RHConferenceModifBase):
+    def _process(self):
+        entry = MenuEntry.get(request.view_args['menu_entry_id'])
+        defaults = FormDefaults(entry)
+        form_cls = MenuEntryForm
+        if entry.is_user_link:
+            form_cls = MenuLinkForm
+        elif entry.is_page:
+            form_cls = MenuPageForm
+        form = form_cls(linked_object=entry, obj=defaults)
+        return jsonify_template('events/layout/menu_entry_edit.html', form=form, event=self._conf)
