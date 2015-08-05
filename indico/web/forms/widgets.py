@@ -189,3 +189,15 @@ class TypeaheadWidget(JinjaWidget):
         options.update(kwargs.pop('options', {}))
         return super(TypeaheadWidget, self).__call__(field, options=options, min_trigger_length=self.min_trigger_length,
                                                      search_url=self.search_url, choices=getattr(field, 'choices', []))
+
+
+class ColorPickerWidget(JinjaWidget):
+    """Renders a colorpicker input field"""
+
+    single_line = True
+
+    def __init__(self):
+        super(ColorPickerWidget, self).__init__('forms/colorpicker_widget.html')
+
+    def __call__(self, field, **kwargs):
+        return super(ColorPickerWidget, self).__call__(field, input_args=kwargs)
