@@ -44,11 +44,10 @@ def utc_timestamp(datetimeVal):
 
 
 def as_utc(dt):
-    """Returns the given datetime with tzinfo=UTC.
-
-    The given datetime object **MUST** be naive but already contain UTC!
-    """
-    return pytz.utc.localize(dt)
+    """Returns the given naive datetime with tzinfo=UTC."""
+    if dt.tzinfo and dt.tzinfo != pytz.utc:
+        raise ValueError("{} already contains non-UTC tzinfo data".format(dt))
+    return pytz.utc.localize(dt) if dt.tzinfo is None else dt
 
 
 def event_to_utc(dt, event):
