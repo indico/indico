@@ -1,11 +1,14 @@
 {% extends 'forms/base_widget.html' %}
 
+{% set vertical_alignment = field.option_orientation == 'vertical' %}
 
 {% block html %}
-    {% for subfield in field %}
-        <div class="i-radio">
-            {{ subfield(**input_args) }}
-            {{ subfield.label }}
-        </div>
-    {% endfor %}
+    <div class="{{ 'i-group' if vertical_alignment else 'group i-selection' }}">
+        {% for subfield in field %}
+            <div class="{{ 'i-radio' if vertical_alignment else 'inline-vcentered'}}">
+                {{ subfield(**input_args) }}
+                {{ subfield.label(class_=('i-button' if not vertical_alignment)) }}
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
