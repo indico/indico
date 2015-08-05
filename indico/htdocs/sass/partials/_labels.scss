@@ -33,6 +33,17 @@
     @extend %label;
     margin: 0 5px;
 
+    &.stripped {
+        background-color: lighten($pastel-gray, $light-color-variation);
+        background: repeating-linear-gradient(
+            -40deg,
+            lighten($pastel-gray, 0.5*$color-variation),
+            lighten($pastel-gray, 0.5*$color-variation) 10px,
+            lighten($pastel-gray, 0.7*$color-variation) 10px,
+            lighten($pastel-gray, 0.7*$color-variation) 20px
+        );
+    }
+
     // same as in _buttons.scss
     &.accept {
         @include border-all(darken($green, $light-color-variation));
@@ -50,6 +61,16 @@
         @include border-all(darken($blue, $light-color-variation));
         background: $blue;
         color: #FDFDFD !important;
+        &.stripped {
+            background-color: lighten($blue, $light-color-variation);
+            background: repeating-linear-gradient(
+                -40deg,
+                $blue,
+                $blue 10px,
+                lighten($blue, 0.3*$color-variation) 10px,
+                lighten($blue, 0.3*$color-variation) 20px
+            );
+        }
     }
 
     &.warning {
@@ -61,5 +82,15 @@
         @include border-all(darken($pastel-gray, $light-color-variation));
         background: $pastel-gray;
         color: $light-black;
+        &.stripped {
+            background-color: lighten($pastel-gray, $light-color-variation);
+            background: repeating-linear-gradient(
+                -40deg,
+                $pastel-gray,
+                $pastel-gray 10px,
+                darken($pastel-gray, 0.3*$color-variation) 10px,
+                darken($pastel-gray, 0.3*$color-variation) 20px
+            );
+        }
     }
 }
