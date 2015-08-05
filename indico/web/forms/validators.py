@@ -14,8 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from wtforms.validators import StopValidation, ValidationError, EqualTo
 
+from indico.util.date_time import as_utc, format_datetime, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 
@@ -99,6 +102,76 @@ class IndicoEmail(object):
         if field.data and not is_valid_mail(field.data, self.multi):
             msg = _(u'Invalid email address list') if self.multi else _(u'Invalid email address')
             raise ValidationError(msg)
+
+
+class DateTimeRange(object):
+    def __init__(self, earliest=None, latest=None):
+        self.earliest = earliest
+        self.latest = latest
+
+    def __call__(self, form, field):
+        field_dt = as_utc(field.data)
+        earliest_dt = self.get_earliest(form, field)
+        latest_dt = self.get_latest(form, field)
+        if field.data and field.data != field.object_data:
+            if earliest_dt and field_dt < earliest_dt:
+                raise ValidationError(_("Moment can't be before {}").format(format_datetime(earliest_dt)))
+            if latest_dt and field_dt > latest_dt:
+                raise ValidationError(_("Moment can't be after {}").format(format_datetime(latest_dt)))
+
+    def get_earliest(self, form, field):
+        earliest = self.earliest(form, field) if hasattr(self.earliest, '__call__') else self.earliest
+        return as_utc(earliest) if earliest else earliest
+
+    def get_latest(self, form, field, default_now=False):
+        latest = self.latest(form, field) if hasattr(self.latest, '__call__') else self.latest
+        return as_utc(latest) if latest else latest
+
+
+class EarliestDateTime(DateTimeRange):
+    """Validates the introduced datetime is after a given datetime or now"""
+
+    def __init__(self, earliest=None):
+        self.earliest_now = False
+        super(EarliestDateTime, self).__init__(earliest=earliest)
+
+    def __call__(self, form, field):
+        earliest_dt = self.get_earliest(form, field)
+        field_dt = as_utc(field.data)
+        if field.data and field.data != field.object_data and field_dt < earliest_dt:
+            if self.earliest_now:
+                msg = _("Moment can't be in the past")
+            else:
+                msg = _("Moment can't be before {}").format(format_datetime(earliest_dt))
+            raise ValidationError(msg)
+
+    def get_earliest(self, form, field):
+        earliest = super(EarliestDateTime, self).get_earliest(form, field)
+        self.earliest_now = earliest is None
+        return earliest or now_utc()
+
+
+class LatestDateTime(DateTimeRange):
+    """Validates the introduced datetime is before a given datetime or now"""
+
+    def __init__(self, latest=None):
+        self.latest_now = False
+        super(LatestDateTime, self).__init__(latest=latest)
+
+    def __call__(self, form, field):
+        latest_dt = self.get_latest(form, field)
+        field_dt = as_utc(field.data)
+        if field.data and field.data != field.object_data and field_dt > latest_dt:
+            if self.latest_now:
+                msg = _("Moment can't be in the future")
+            else:
+                msg = _("Moment can't be after {}").format(format_datetime(latest_dt))
+            raise ValidationError(msg)
+
+    def get_latest(self, form, field):
+        latest = super(LatestDateTime, self).get_latest(form, field)
+        self.latest_now = latest is None
+        return latest or now_utc()
 
 
 def used_if_not_synced(form, field):
