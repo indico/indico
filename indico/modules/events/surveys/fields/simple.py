@@ -22,6 +22,7 @@ from wtforms.validators import NumberRange, Optional, ValidationError, Length, D
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
 from indico.web.forms.fields import IndicoRadioField, MultipleItemsField
+from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -103,7 +104,7 @@ class SingleChoiceField(SurveyField):
             self.wtf_field_class = SelectField
         else:
             self.wtf_field_class = IndicoRadioField
-            field_options['arrangement'] = self.question.field_data['radio_display_type']
+            field_options['orientation'] = self.question.field_data['radio_display_type']
         choices = [(iter['option'], iter['option']) for iter in self.question.field_data['options']]
         return self._make_wtforms_field(self.wtf_field_class, choices=choices, **field_options)
 
