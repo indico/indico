@@ -16,5 +16,8 @@
  */
 
  $(function initEventLayout() {
-    $('.menu-entries').sortable({ handle: '.drag-handle' });
+    $('.menu-entries').sortable({
+        handle: '.drag-handle',
+        placeholder: 'menu-entry-placeholder'
+    });
  });
