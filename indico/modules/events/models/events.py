@@ -18,9 +18,9 @@ from indico.core.db.sqlalchemy import db
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
-class IndexedEvent(db.Model):
+class Event(db.Model):
 
-    __tablename__ = 'event_index'
+    __tablename__ = 'event'
     __table_args__ = (db.Index(None, 'title_vector', postgresql_using='gin'),
                       {'schema': 'events'})
 
@@ -50,4 +50,7 @@ class IndexedEvent(db.Model):
         db.DateTime,
         nullable=False,
         index=True
+    )
+    logo = db.Column(
+        db.LargeBinary
     )

@@ -34,7 +34,7 @@ from indico.core.logger import Logger
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.util.string import remove_accents
-from indico.modules.fulltextindexes.models.events import IndexedEvent
+from indico.modules.events.models.events import Event
 from indico.modules.fulltextindexes.models.categories import IndexedCategory
 
 from MaKaC.common.ObjectHolders import ObjectHolder
@@ -1184,32 +1184,32 @@ class ConferenceIndex(object):
 
     def index(self, obj):
         self.unindex(obj)
-        event = IndexedEvent(id=obj.getId(), title=obj.getTitle(),
+        event = Event(id=obj.getId(), title=obj.getTitle(),
                              start_date=obj.getStartDate(), end_date=obj.getEndDate())
         db.session.add(event)
         with retry_request_on_conflict():
             db.session.flush()
 
     def unindex(self, obj):
-        IndexedEvent.find(id=obj.getId()).delete()
+        Event.find(id=obj.getId()).delete()
         db.session.flush()
 
     def search(self, search_string, order_by='start'):
         if order_by == 'start':
-            order = IndexedEvent.start_date.desc()
+            order = Event.start_date.desc()
         elif order_by == 'id':
-            order = IndexedEvent.id
+            order = Event.id
         else:
             order = None
 
-        return (db.session.query(IndexedEvent.id)
-                  .filter(IndexedEvent.title_vector.op('@@')(
+        return (db.session.query(Event.id)
+                  .filter(Event.title_vector.op('@@')(
                       func.to_tsquery('simple', preprocess_ts_string(search_string))))
                   .order_by(order))
 
     def initialize(self, items):
         for i, conf in enumerate(items, 1):
-            event = IndexedEvent(id=conf.getId(), title=conf.getTitle(),
+            event = Event(id=conf.getId(), title=conf.getTitle(),
                                  start_date=conf.getStartDate(), end_date=conf.getEndDate())
             db.session.add(event)
             if i % 20000 == 0:
@@ -1217,7 +1217,7 @@ class ConferenceIndex(object):
         db.session.commit()
 
     def clear(self):
-        IndexedEvent.query.delete()
+        Event.query.delete()
 
 
 class IndexesHolder(ObjectHolder):
