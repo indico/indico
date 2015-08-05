@@ -15,7 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
+@import "base";
+@import "compass";
 @import "partials/icons";
 
 .static-sites {
@@ -112,25 +113,75 @@
 
 
 .menu-entries {
+    width: 340px;
+    padding: 5px 10px 5px 5px;
+
     list-style: none;
-    width: 300px;
     > li {
-        margin-top: 0.4em;
+        margin-top: 5px;
         &:first-child {
             margin-top: 0;
         }
-        > .menu-entry > .i-label {
-            width: 100%;
-            text-align: left;
-            > .actions {
-                margin-right: -0.6em;
-                > * {
-                    padding: 0 0.2em;
+        > .menu-entry {
+            &.with-children > .i-label {
+                @include border-bottom-radius(0);
+            }
+            > .i-label {
+                width: 100%;
+
+                text-align: left;
+                > .actions {
+                    margin-right: -10px;
+                    > * {
+                        padding: 0 5px;
+                        &:hover {
+                            color: $blue
+                        }
+                    }
+                    > .drag-handle {
+                        @include icon-before('icon-menu-arrows');
+                        cursor: move;
+                    }
+                    > .edit-entry {
+                        @include icon-before('icon-edit');
+                    }
                 }
-                > .drag-handle {
-                    cursor: move;
+                &.highlight > .actions > *:hover {
+                    color: $pastel-gray;
+                }
+                &.entry-internal_link,
+                &.entry-user_link,
+                &.entry-plugin_link {
+                    @include icon-before('icon-link');
+                }
+                &.entry-page {
+                    @include icon-before('icon-file');
+                }
+                &.entry-separator {
+                    // TODO: find icon
                 }
             }
         }
+        &.menu-entry-placeholder {
+            height: 2em;
+            margin: 5px -5px 5px 5px;
+
+            border: 2px dashed $gray;
+        }
     }
 }
+
+// sub list of entries
+.menu-entry > .menu-entries {
+    @include border-all(darken($pastel-gray, $light-color-variation));
+    @include border-bottom-radius();
+
+    width: 303px;
+    margin: 0 5px;
+    padding-left: 25px;
+
+    border-top: 0;
+    background-color: $light-gray;
+}
+
+
