@@ -5,7 +5,9 @@
     <div class="datetime-widget">
         <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker">
         <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
-                {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}>
+               {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}
+               {% if field.earliest_dt %}min="{{ field.earliest_dt | format_time('short') }}"{% endif %}
+               {% if field.latest_dt %}max="{{ field.latest_dt | format_time('short') }}"{% endif %}>
     </div>
 {% endblock %}
 
@@ -22,13 +24,13 @@
             {% endif %}
 
             {% if field.earliest_dt %}
-                var minDate = moment({{ field.earliest_dt | format_datetime('short') | tojson }}, 'DD/MM/YYYY HH:mm');
-                $('#{{ field.id }}-date').datepicker('option', 'minDate', minDate.toDate());
+                var minDate = {{ field.earliest_dt | format_date('short') | tojson }};
+                $('#{{ field.id }}-date').datepicker('option', 'minDate', minDate);
             {% endif %}
 
             {% if field.latest_dt %}
-                var maxDate = moment({{ field.latest_dt | format_datetime('short') | tojson }}, 'DD/MM/YYYY HH:mm');
-                $('#{{ field.id }}-date').datepicker('option', 'maxDate', maxDate.toDate());
+                var maxDate = {{ field.latest_dt | format_date('short') | tojson }};
+                $('#{{ field.id }}-date').datepicker('option', 'maxDate', maxDate);
             {% endif %}
         })();
     </script>
