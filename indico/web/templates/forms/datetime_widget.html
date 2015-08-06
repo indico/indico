@@ -1,0 +1,19 @@
+{% extends 'forms/base_widget.html' %}
+{% from 'forms/_form.html' import form_field %}
+
+{% block html %}
+    <div class="datetime-widget">
+        <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker">
+        <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker">
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            $('#{{ field.id }}-date').datepicker();
+        })();
+    </script>
+{% endblock %}

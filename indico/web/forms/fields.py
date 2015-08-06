@@ -21,6 +21,7 @@ from datetime import timedelta
 from operator import attrgetter
 
 from markupsafe import escape
+from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select
@@ -397,3 +398,16 @@ class TimeDeltaField(Field):
             return u'', u''
         else:
             return int(self.data.total_seconds()) // self.magnitudes[self.best_unit], self.best_unit
+
+
+class IndicoDateTimeField(DateTimeField):
+    """"A combined date and time field with interactive selectors."""
+
+    widget = JinjaWidget('forms/datetime_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
+
+    def process_formdata(self, valuelist):
+        valuelist = [' '.join(valuelist)] if valuelist else valuelist
+        super(IndicoDateTimeField, self).process_formdata(valuelist)

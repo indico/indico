@@ -284,6 +284,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
         .form-field {
             > .form-row,
+            > .datetime-widget,
             > textarea,
             > select,
             > input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
@@ -561,6 +562,16 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     select {
         display: inline;
         width: auto;
+    }
+}
+
+.datetime-widget {
+    .datepicker {
+        width: 50%;
+    }
+
+    .timepicker {
+        width: 30%;
     }
 }
 
