@@ -103,6 +103,7 @@ class Survey(db.Model):
         'SurveyQuestion',
         cascade='all, delete-orphan',
         lazy=True,
+        order_by='SurveyQuestion.position',
         backref=db.backref(
             'survey',
             lazy=True
