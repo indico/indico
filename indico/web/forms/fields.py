@@ -35,7 +35,7 @@ from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget
-from indico.web.forms.validators import DateTimeRange, EarliestDateTime, LatestDateTime
+from indico.web.forms.validators import DateTimeRange, EarliestDateTime, LatestDateTime, LinkedDateTime
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -424,3 +424,15 @@ class IndicoDateTimeField(DateTimeField):
         for validator in self.validators:
             if isinstance(validator, (DateTimeRange, LatestDateTime)):
                 return validator.get_latest(self.get_form(), self)
+
+    @property
+    def linked_datetime_validator(self):
+        if self.flags.linked_datetime:
+            for validator in self.validators:
+                if isinstance(validator, LinkedDateTime):
+                    return validator
+
+    @property
+    def linked_field(self):
+        validator = self.linked_datetime_validator
+        return validator.linked_field if validator else None

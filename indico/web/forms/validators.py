@@ -131,7 +131,7 @@ class DateTimeRange(object):
 
 
 class EarliestDateTime(DateTimeRange):
-    """Validates the introduced datetime is after a given datetime or now"""
+    """Validates the introduced datetime is after a given datetime or now."""
 
     def __init__(self, earliest=None):
         self.earliest_now = False
@@ -156,7 +156,7 @@ class EarliestDateTime(DateTimeRange):
 
 
 class LatestDateTime(DateTimeRange):
-    """Validates the introduced datetime is before a given datetime or now"""
+    """Validates the introduced datetime is before a given datetime or now."""
 
     def __init__(self, latest=None):
         self.latest_now = False
@@ -178,6 +178,34 @@ class LatestDateTime(DateTimeRange):
         latest = super(LatestDateTime, self).get_latest(form, field)
         self.latest_now = latest is None
         return latest or now_utc()
+
+
+class LinkedDateTime(object):
+    """Validates a datetime field happens before or/and after another.
+
+    If both ``not_before`` and ``not_after`` are set to ``True``, both fields have to
+    be equal.
+    """
+
+    field_flags = ('linked_datetime',)
+
+    def __init__(self, field, not_before=True, not_after=False):
+        if not not_before and not not_after:
+            raise ValueError("Invalid validation")
+        self.not_before = not_before
+        self.not_after = not_after
+        self.linked_field = field
+
+    def __call__(self, form, field):
+        if field.data is None:
+            return
+        linked_field = form[self.linked_field]
+        linked_field_dt = as_utc(linked_field.data)
+        field_dt = as_utc(field.data)
+        if self.not_before and field_dt < linked_field_dt:
+            raise ValidationError(_("{} can't be before than {}").format(field.label, linked_field.label))
+        if self.not_after and field_dt > linked_field_dt:
+            raise ValidationError(_("{} can't be after than {}").format(field.label, linked_field.label))
 
 
 def used_if_not_synced(form, field):

@@ -3,7 +3,7 @@
 
 {% block html %}
     <div class="datetime-widget">
-        <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker">
+        <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker" readonly>
         <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
                {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}
                {% if field.earliest_dt %}min="{{ field.earliest_dt | format_time('short') }}"{% endif %}
@@ -16,21 +16,38 @@
         (function() {
             'use strict';
 
-            $('#{{ field.id }}-date').datepicker();
+            var dateField = $('#{{ field.id }}-date')
+            dateField.datepicker();
 
             {% if field.data %}
                 var date = {{ field.data | format_date('short') | tojson }};
-                $('#{{ field.id }}-date').datepicker('setDate', date);
+                dateField.datepicker('setDate', date);
             {% endif %}
 
             {% if field.earliest_dt %}
                 var minDate = {{ field.earliest_dt | format_date('short') | tojson }};
-                $('#{{ field.id }}-date').datepicker('option', 'minDate', minDate);
+                dateField.datepicker('option', 'minDate', minDate);
             {% endif %}
 
             {% if field.latest_dt %}
                 var maxDate = {{ field.latest_dt | format_date('short') | tojson }};
-                $('#{{ field.id }}-date').datepicker('option', 'maxDate', maxDate);
+                dateField.datepicker('option', 'maxDate', maxDate);
+            {% endif %}
+
+            {% if field.flags.linked_datetime %}
+                var linkedDateField = $('#{{ field.linked_field }}-date');
+
+                function updateLimits(new_date) {
+                    {% if field.linked_datetime_validator.not_before %}
+                        dateField.datepicker('option', 'minDate', new_date);
+                    {% endif %}
+                    {% if field.linked_datetime_validator.not_after %}
+                        dateField.datepicker('option', 'maxDate', new_date);
+                    {% endif %}
+                }
+
+                updateLimits(linkedDateField.datepicker('getDate'));
+                linkedDateField.datepicker('option', 'onSelect', updateLimits);
             {% endif %}
         })();
     </script>
