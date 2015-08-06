@@ -265,3 +265,24 @@ def _build_entry(event, data, position=0):
         entry.type = MenuEntryType.internal_link
 
     return entry
+
+
+def move_entry(entry, to):
+    from_ = entry.position
+    new_pos = to
+    value = -1
+    if to is None or to < 0:
+        new_pos = to = -1
+
+    if from_ > to:
+        new_pos += 1
+        from_, to = to, from_
+        to -= 1
+        value = 1
+
+    entries = MenuEntry.find(MenuEntry.parent_id == entry.parent_id,
+                             MenuEntry.event_id == entry.event_id,
+                             MenuEntry.position.between(from_ + 1, to))
+    for e in entries:
+        e.position += value
+    entry.position = new_pos

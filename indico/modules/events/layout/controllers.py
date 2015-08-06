@@ -22,12 +22,12 @@ from werkzeug.exceptions import NotFound
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm
 from indico.modules.events.layout.models.menu import MenuEntry
-from indico.modules.events.layout.util import menu_entries_for_event
+from indico.modules.events.layout.util import menu_entries_for_event, move_entry
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template
+from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -71,3 +71,22 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             form.populate_obj(self.entry)
             return redirect_or_jsonify(url_for('.menu', self._conf), entry=_render_menu_entry(self.entry))
         return jsonify_template('events/layout/menu_entry_form.html', form=form)
+
+
+class RHMenuEntryPosition(RHMenuEntryEditBase):
+    def _process(self):
+        position = request.form.get('position')
+        try:
+            position = int(position)
+        except ValueError:
+            if position:
+                jsonify_data(success=False)
+            position = None
+        move_entry(self.entry, position)
+        return jsonify_data()
+
+
+class RHMenuEntryVisibility(RHMenuEntryEditBase):
+    def _process(self):
+        self.entry.visible = not self.entry.visible
+        return redirect_or_jsonify(url_for('.menu', self._conf), visible=self.entry.visible)

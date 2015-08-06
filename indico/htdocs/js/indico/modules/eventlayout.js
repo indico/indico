@@ -19,5 +19,19 @@
     $('.menu-entries').sortable({
         handle: '.drag-handle',
         placeholder: 'menu-entry-placeholder'
+    })
+    .on('sortupdate', function(evt, ui) {
+        $.ajax({
+            url: ui.item.children('.menu-entry').data('position-url'),
+            type: 'POST',
+            dataType: 'json',
+            data: { position: ui.item.prev().children('.menu-entry').data('position') },
+            complete: IndicoUI.Dialogs.Util.progress(),
+            success: function(data) {
+                if (handleAjaxError(data)) {
+                    return;
+                }
+            }
+        });
     });
  });
