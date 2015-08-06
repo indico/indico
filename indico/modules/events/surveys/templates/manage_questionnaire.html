@@ -26,11 +26,14 @@
                 <ul class="group-list with-buttons no-content-before">
                 {% for question in survey.questions %}
                     <li>
-                        <a href="#" data-href="{{ url_for('.edit_question', question) }}"
-                                    data-title="{% trans %}Edit question{% endtrans %}"
-                                    class="js-question-dialog">
-                            <strong>{{ question.title }}</strong>
-                        </a>
+                        <div class="group">
+                            <a href="#" data-href="{{ url_for('.edit_question', question) }}"
+                                        data-title="{% trans %}Edit question{% endtrans %}"
+                                        class="js-question-dialog">
+                                <strong>{{ question.title }}</strong>
+                            </a>
+                            <a data-href="{{ url_for('.remove_question', question) }}" class="i-button icon-remove right js-remove-question"></a>
+                        </div>
                     </li>
                 {% else %}
                     <li>{% trans %}No questions defined{% endtrans %}</li>
@@ -41,4 +44,22 @@
 
         {% include 'events/surveys/questionnaire_preview.html' %}
     </div>
+
+    <script>
+        $('.js-remove-question').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var msg = $T('Do you really want to remove this question room from the survey?');
+            new ConfirmPopup($T('Delete this question ?'), msg, function(confirmed) {
+                if (!confirmed) {
+                    return;
+                }
+
+                $('<form>', {
+                    action: $this.data('href'),
+                    method: 'post'
+                }).appendTo('body').submit();
+            }).open();
+        });
+    </script>
 {% endblock %}
