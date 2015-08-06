@@ -4,7 +4,8 @@
 {% block html %}
     <div class="datetime-widget">
         <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker">
-        <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker">
+        <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
+                {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}>
     </div>
 {% endblock %}
 
@@ -14,6 +15,11 @@
             'use strict';
 
             $('#{{ field.id }}-date').datepicker();
+
+            {% if field.data %}
+                var date = {{ field.data | format_date('short') | tojson }};
+                $('#{{ field.id }}-date').datepicker('setDate', date);
+            {% endif %}
 
             {% if field.earliest_dt %}
                 var minDate = moment({{ field.earliest_dt | format_datetime('short') | tojson }}, 'DD/MM/YYYY HH:mm');
