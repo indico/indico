@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request, flash
+from flask import redirect, request, flash, jsonify
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -165,3 +165,18 @@ class RHDeleteSurveyQuestion(RHManageSurveysBase):
         db.session.flush()
         flash(_('Question {} successfully deleted'.format(self.question.title)), 'success')
         return redirect(url_for('.manage_questionnaire', self.survey))
+
+
+class RHChangeQuestionPosition(RHManageSurveysBase):
+    def _checkParams(self, params):
+        RHManageSurveysBase._checkParams(self, params)
+        self.survey = Survey.get_one(request.view_args['survey_id'])
+
+    def _process(self):
+        questions = {question.id: question for question in self.survey.questions}
+        question_ids = map(int, request.form.getlist('question_ids'))
+        for index, question_id in enumerate(question_ids):
+            question = questions[question_id]
+            question.position = index + 1
+        db.session.flush()
+        return jsonify(success=True)
