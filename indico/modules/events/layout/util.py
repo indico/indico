@@ -24,11 +24,10 @@ from itertools import chain, count
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.plugins import plugin_engine, url_for_plugin
+from indico.core.plugins import plugin_engine
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
 from indico.util.i18n import N_
 from indico.util.signals import values_from_signal
-from indico.web.flask.util import url_for
 from MaKaC.common.cache import GenericCache
 
 MenuEntryData = namedtuple('MenuEntryData', {'title', 'endpoint', 'visible', 'children', 'plugin'})
@@ -260,11 +259,9 @@ def _build_entry(event, data, position=0):
     )
 
     if data.plugin:
-        entry.link = url_for_plugin(data.endpoint, event)
         entry.type = MenuEntryType.plugin_link
         entry.plugin = data.plugin
     else:
-        entry.link = url_for(data.endpoint, event)
         entry.type = MenuEntryType.internal_link
 
     return entry

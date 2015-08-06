@@ -16,11 +16,15 @@
 
 from __future__ import unicode_literals
 
+from werkzeug.utils import cached_property
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.plugins import url_for_plugin
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
+from indico.web.flask.util import url_for
 from MaKaC.conference import ConferenceHolder
 
 
@@ -100,12 +104,6 @@ class MenuEntry(db.Model):
         nullable=True,
         default=None
     )
-    #: The link data if the entry is a link
-    link = db.Column(
-        db.String,
-        nullable=True,
-        default=None
-    )
     #: The name of the plugin from which the entry comes from (NULL if the entry does not come from a plugin)
     plugin = db.Column(
         db.String,
@@ -131,28 +129,30 @@ class MenuEntry(db.Model):
         lazy=False,
         post_update=True
     )
-    # #: The parent menu entry
-    # parent = db.relationship(
-    #     'MenuEntry',
-    #     remote_side=[id]
-    #     # primaryjoin=lambda: MenuEntry.parent_id == MenuEntry.id,
-    #     # foreign_keys=parent_id,
-    #     # lazy=False,
-    #     # post_update=True
-    # )
 
     #: The parent menu entry
     children = db.relationship(
         'MenuEntry',
         cascade="all, delete-orphan",
-        # primaryjoin=lambda: MenuEntry.id == MenuEntry.parent_id,
-        # foreign_keys=lambda: MenuEntry.id,
         order_by='MenuEntry.position',
         backref=db.backref(
             'parent',
             remote_side=[id]
         ),
     )
+
+    @property
+    def url(self):
+        if self.is_user_link:
+            return self.endpoint
+        elif self.is_internal_link:
+            return url_for(self.endpoint, self.event)
+        elif self.is_plugin_link:
+            return url_for_plugin(self.endpoint, self.event)
+        elif self.is_page:
+            #TODO: handle page url
+            pass
+        return None
 
     @property
     def is_root(self):
@@ -174,7 +174,7 @@ class MenuEntry(db.Model):
     def is_separator(self):
         return self.type == MenuEntryType.separator
 
-    @property
+    @cached_property
     def event(self):
         return ConferenceHolder().getById(str(self.event_id), True)
 
@@ -184,15 +184,12 @@ class MenuEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<MenuEntry({}, {}, {}{}, {}, {})>'.format(
+        return '<MenuEntry({}, {}, {}{}{})>'.format(
             self.id,
             self.title,
-            ('page' if self.type == MenuEntryType.page else
-                self.link_url if self.type == MenuEntryType.link
-                else 'separator'),
+            'page' if self.is_page else (self.link if self.is_link else 'separator'),
+            ', internal=False' if self.is_user_link else (', internal=True' if self.is_link else ''),
             ', is_root=True' if self.is_root else '',
-            self.protection_repr,
-            self.folder_id
         )
 
 
