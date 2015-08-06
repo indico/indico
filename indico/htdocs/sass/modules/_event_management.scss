@@ -111,6 +111,14 @@
     }
 }
 
+%visible-action {
+     @include icon-before('icon-eye');
+}
+
+%not-visible-action {
+    @include icon-before('icon-eye-blocked');
+    color: $red;
+}
 
 .menu-entries {
     width: 340px;
@@ -134,12 +142,25 @@
                     margin-right: -10px;
                     > * {
                         padding: 0 5px;
+                        color: $dark-gray;
                         &:hover {
                             color: $blue
                         }
                     }
+                    > .visible {
+                        @extend %visible-action;
+                        &:hover {
+                            @extend %not-visible-action;
+                        }
+                    }
+                    > .not-visible {
+                        @extend %not-visible-action;
+                        &:hover {
+                            @extend %visible-action;
+                        }
+                    }
                     > .drag-handle {
-                        @include icon-before('icon-menu-arrows');
+                        @include icon-before('icon-grid2');
                         cursor: move;
                     }
                     > .edit-entry {
@@ -158,7 +179,7 @@
                     @include icon-before('icon-file');
                 }
                 &.entry-separator {
-                    // TODO: find icon
+                    @include icon-before('icon-arrows-vert')
                 }
             }
         }
