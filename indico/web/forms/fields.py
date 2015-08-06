@@ -415,15 +415,17 @@ class IndicoDateTimeField(DateTimeField):
 
     @property
     def earliest_dt(self):
-        for validator in self.validators:
-            if isinstance(validator, (DateTimeRange, EarliestDateTime)):
-                return validator.get_earliest(self.get_form(), self)
+        if self.flags.datetime_range:
+            for validator in self.validators:
+                if isinstance(validator, (DateTimeRange, EarliestDateTime)):
+                    return validator.get_earliest(self.get_form(), self)
 
     @property
     def latest_dt(self):
-        for validator in self.validators:
-            if isinstance(validator, (DateTimeRange, LatestDateTime)):
-                return validator.get_latest(self.get_form(), self)
+        if self.flags.datetime_range:
+            for validator in self.validators:
+                if isinstance(validator, (DateTimeRange, LatestDateTime)):
+                    return validator.get_latest(self.get_form(), self)
 
     @property
     def linked_datetime_validator(self):
