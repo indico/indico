@@ -14,6 +14,16 @@
             'use strict';
 
             $('#{{ field.id }}-date').datepicker();
+
+            {% if field.earliest_dt %}
+                var minDate = moment({{ field.earliest_dt | format_datetime('short') | tojson }}, 'DD/MM/YYYY HH:mm');
+                $('#{{ field.id }}-date').datepicker('option', 'minDate', minDate.toDate());
+            {% endif %}
+
+            {% if field.latest_dt %}
+                var maxDate = moment({{ field.latest_dt | format_datetime('short') | tojson }}, 'DD/MM/YYYY HH:mm');
+                $('#{{ field.id }}-date').datepicker('option', 'maxDate', maxDate.toDate());
+            {% endif %}
         })();
     </script>
 {% endblock %}
