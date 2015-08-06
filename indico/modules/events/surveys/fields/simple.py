@@ -22,7 +22,7 @@ from wtforms.validators import NumberRange, Optional, ValidationError, Length, D
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoRadioField, MultipleItemsField
+from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
