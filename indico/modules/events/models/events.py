@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db.sqlalchemy import db
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import TSVECTOR, JSON
 
 
 class Event(db.Model):
@@ -52,5 +52,10 @@ class Event(db.Model):
         index=True
     )
     logo = db.Column(
-        db.LargeBinary
+        db.LargeBinary,
+        nullable=True
+    )
+    logo_metadata = db.Column(
+        JSON,
+        nullable=True
     )
