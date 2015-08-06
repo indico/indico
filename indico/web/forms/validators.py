@@ -105,6 +105,10 @@ class IndicoEmail(object):
 
 
 class DateTimeRange(object):
+    """Validates a datetime is within the specified boundaries"""
+
+    field_flags = ('datetime_range',)
+
     def __init__(self, earliest=None, latest=None):
         self.earliest = earliest
         self.latest = latest
