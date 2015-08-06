@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.events.surveys.controllers.management import (RHManageSurveys, RHCreateSurvey, RHManageSurvey,
                                                                   RHEditSurvey, RHScheduleSurvey, RHStartSurvey,
                                                                   RHEndSurvey, RHManageSurveyQuestionnaire,
-                                                                  RHAddSurveyQuestion, RHEditSurveyQuestion)
+                                                                  RHAddSurveyQuestion, RHEditSurveyQuestion,
+                                                                  RHDeleteSurveyQuestion, RHChangeQuestionPosition)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -48,3 +49,5 @@ _bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/add/<type>', 'add_que
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/<question_id>',
                  'edit_question', RHEditSurveyQuestion, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/<question_id>/delete',
+                 'remove_question', RHDeleteSurveyQuestion, methods=('POST',))

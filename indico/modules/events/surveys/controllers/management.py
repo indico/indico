@@ -29,7 +29,6 @@ from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.forms.widgets import SwitchWidget
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -153,3 +152,16 @@ class RHEditSurveyQuestion(RHManageSurveysBase):
             flash(_('Question "{title}" updated').format(title=self.question.title), 'success')
             return jsonify_data(flash=False)
         return jsonify_template('events/surveys/edit_question.html', form=form, question=self.question)
+
+
+class RHDeleteSurveyQuestion(RHManageSurveysBase):
+    def _checkParams(self, params):
+        RHManageSurveysBase._checkParams(self, params)
+        self.question = SurveyQuestion.get_one(request.view_args['question_id'])
+        self.survey = Survey.get(request.view_args['survey_id'])
+
+    def _process(self):
+        db.session.delete(self.question)
+        db.session.flush()
+        flash(_('Question {} successfully deleted'.format(self.question.title)), 'success')
+        return redirect(url_for('.manage_questionnaire', self.survey))
