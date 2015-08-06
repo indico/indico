@@ -31,7 +31,7 @@ _bp = IndicoBlueprint('survey', __name__, template_folder='templates', virtual_t
 _bp.add_url_rule('/manage/surveys/', 'management', RHManageSurveys)
 _bp.add_url_rule('/manage/surveys/create', 'create', RHCreateSurvey, methods=('GET', 'POST'))
 
-# Sinle survey management
+# Single survey management
 _bp.add_url_rule('/manage/survey/<survey_id>/', 'manage_survey', RHManageSurvey)
 _bp.add_url_rule('/manage/survey/<survey_id>/edit',
                  'edit_survey', RHEditSurvey, methods=('GET', 'POST'))
@@ -51,3 +51,5 @@ _bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/<question_id>',
                  'edit_question', RHEditSurveyQuestion, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/<question_id>/delete',
                  'remove_question', RHDeleteSurveyQuestion, methods=('POST',))
+_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/change-positions',
+                 'change_question_position', RHChangeQuestionPosition, methods=('POST',))

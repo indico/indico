@@ -16,19 +16,20 @@
         </div>
     </div>
     <div class="i-box-group vert">
-        <div class="i-box titled no-padding">
+        <div class="i-box titled no-padding sortblock" style="width: 100%">
             <div class="i-box-header">
                 <div class="i-box-title">
                 {% trans %}List of questions{% endtrans %}
                 </div>
             </div>
-            <div class="i-box-content">
+            <div id="questions" class="i-box-content">
                 <ul class="group-list with-buttons no-content-before">
                 {% for question in survey.questions %}
-                    <li>
-                        <div class="group">
+                    <li style="cursor: move">
+                        <div class="question group">
                             <a href="#" data-href="{{ url_for('.edit_question', question) }}"
                                         data-title="{% trans %}Edit question{% endtrans %}"
+                                        data-question-id="{{ question.id }}"
                                         class="js-question-dialog">
                                 <strong>{{ question.title }}</strong>
                             </a>
@@ -60,6 +61,27 @@
                     method: 'post'
                 }).appendTo('body').submit();
             }).open();
+        });
+
+        $('#questions').tablesorter({
+            sortables: 'ul',
+            sortableElements: '> li',
+            placeholderHTML: '<li></li>',
+            handle: '.question.group',
+            onReorder: function(sortable) {
+                var questionIdsInOrder = [];
+                $('[data-question-id]').each(function(index, obj) {
+                    questionIdsInOrder.push($(obj).data('question-id'));
+                });
+
+                $.ajax({
+                    url: {{ url_for('.change_question_position', survey) | tojson }},
+                    method: 'POST',
+                    data: {
+                        questionIdsInOrder: JSON.stringify(questionIdsInOrder)
+                    }
+                });
+            }
         });
     </script>
 {% endblock %}
