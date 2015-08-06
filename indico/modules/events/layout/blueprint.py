@@ -24,7 +24,7 @@ _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
 
 
-_bp.add_url_rule('/', 'index', RHLayoutEdit)
+_bp.add_url_rule('/', 'index', RHLayoutEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
 _bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu-entry-edit', RHMenuEntryEdit, methods=('GET', 'POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu-entry-position', RHMenuEntryPosition, methods=('POST',))

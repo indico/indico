@@ -6,22 +6,12 @@
 {% endblock %}
 
 {%- block content %}
-    {{ form_header(form) }}
-    {{ form_rows(form, fields=('timezone', 'is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
+    {{ form_header(form, id='dropzone', classes='dropzone', action=url_for('event_layout.index', event)) }}
+    {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
     <h3>{% trans %}Header Style{% endtrans %}</h3>
     {{ form_row(form.logo) }}
-    {% call form_row(form.header_text_color) -%}
-        <span class="enable-input">
-            <span>{{ form.enable_header_text_color.label() }}</span>
-            <span>{{ form_field(form.enable_header_text_color) }}</span>
-        </span>
-    {%- endcall %}
-    {% call form_row(form.header_background_color) -%}
-        <span class="enable-input">
-            <span>{{ form.enable_header_background_color.label() }}</span>
-            <span>{{ form_field(form.enable_header_background_color) }}</span>
-        </span>
-    {%- endcall %}
+    {{ form_row(form.header_text_color) }}
+    {{ form_row(form.header_background_color) }}
     <h3>{% trans %}Announcement{% endtrans %}</h3>
     {{ form_rows(form, fields=('announcement', 'show_annoucement')) }}
     {% call form_footer(form) %}
