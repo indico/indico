@@ -16,7 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+import mimetypes
+import json
+
+from flask import flash, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.modules.events.layout import layout_settings
@@ -24,6 +27,8 @@ from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLi
 from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.util import menu_entries_for_event, move_entry
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
+from indico.modules.events.models.events import Event
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
@@ -40,9 +45,42 @@ class RHLayoutEdit(RHConferenceModifBase):
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
         form = LayoutForm(obj=defaults)
+        event = Event.find(Event.id == self._conf.getId()).one()
         if form.validate_on_submit():
-            pass
-        return WPLayoutEdit.render_template('layout.html', self._conf, form=form)
+            layout_settings.set_multi(self._conf, {
+                'is_searchable': form.data['is_searchable'],
+                'show_nav_bar': form.data['show_nav_bar'],
+                'show_social_badges': form.data['show_social_badges'],
+                'show_banner': form.data['show_banner'],
+                'header_text_color': form.data['header_text_color'],
+                'header_background_color': form.data['header_background_color'],
+                'announcement': form.data['announcement'],
+                'show_annoucement': form.data['show_annoucement']
+                })
+
+            files = request.files.getlist('file')
+            if files:
+                f = files[0]
+                content = f.read()
+                event.logo = content
+                content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+                event.logo_metadata = {
+                    'size': len(content),
+                    'file_name': f.filename,
+                    'content_type': content_type
+                }
+
+            flash(_('Settings saved'), 'success')
+            return redirect(url_for('event_layout.index', self._conf))
+        else:
+            if event.logo:
+                form.logo.data = json.dumps({
+                    'content': event.logo.encode('base64'),
+                    'file_name': event.logo_metadata['file_name'],
+                    'size': event.logo_metadata['size'],
+                    'content_type': event.logo_metadata['content_type']
+                })
+        return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf)
 
 
 class RHMenuEdit(RHConferenceModifBase):

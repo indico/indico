@@ -16,22 +16,18 @@
 
 from __future__ import unicode_literals
 
-from pytz import all_timezones
 from wtforms.fields import BooleanField, FileField, TextAreaField
-from wtforms.fields.core import SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, InputRequired
-from wtforms_components import ColorField
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import UsedIf
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget, DropzoneWidget
 
 
 class LayoutForm(IndicoForm):
-    timezone = SelectField(_("Event Time zone"))
     is_searchable = BooleanField(_("Enable search"), widget=SwitchWidget(),
                                  description=_("Enable search within the event"))
     show_nav_bar = BooleanField(_("Show navigation bar"), widget=SwitchWidget(),
@@ -41,13 +37,10 @@ class LayoutForm(IndicoForm):
     show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
 
     # Style
-    logo = FileField("Logo", description=_("Logo to be displayed next to the event's title"))
-    header_text_color = ColorField(_("Text colour"),
-                                   [UsedIf(lambda form, field: form.enable_header_text_color.data)])
-    enable_header_text_color = BooleanField(_("Use custom colour"), widget=SwitchWidget())
-    header_background_color = ColorField(_("Background colour"),
-                                         [UsedIf(lambda form, field: form.enable_header_background_color.data)])
-    enable_header_background_color = BooleanField(_("Use custom colour"), widget=SwitchWidget())
+    logo = FileField("Logo", widget=DropzoneWidget(accepted_files='image/*'),
+                     description=_("Logo to be displayed next to the event's title"))
+    header_text_color = StringField(_("Text colour"), widget=ColorPickerWidget())
+    header_background_color = StringField(_("Background colour"), widget=ColorPickerWidget())
 
     # Announcement
     announcement = StringField(_("Announcement"),
@@ -55,10 +48,6 @@ class LayoutForm(IndicoForm):
                                description=_("Short message shown below the title"))
     show_annoucement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                     description=_("Show the announcement message"))
-
-    def __init__(self, *args, **kwargs):
-        super(LayoutForm, self).__init__(*args, **kwargs)
-        self.timezone.choices = zip(all_timezones, all_timezones)
 
 
 class MenuEntryForm(IndicoForm):

@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
-from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.modules.events.settings import EventSettingsProxy
 from indico.web.flask.util import url_for
@@ -31,12 +30,8 @@ layout_settings = EventSettingsProxy('layout', {
     'show_nav_bar': True,
     'show_social_badges': True,
     'show_banner': False,
-    'timezone': Config.getInstance().getDefaultTimezone(),
-    'logo': None,
     'header_text_color': None,
-    'enable_header_text_color': False,
     'header_background_color': None,
-    'enable_header_background_color': False,
     'announcement': None,
     'show_annoucement': False
     # TODO: handle style sheets
