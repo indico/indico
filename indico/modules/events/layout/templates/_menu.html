@@ -1,0 +1,28 @@
+{% macro menu_entry(entry) -%}
+    <div class="menu-entry {%- if entry.children %} with-children{% endif %}"
+         data-position="{{ entry.position }}"
+         data-position-url="{{ url_for('.menu-entry-position', entry) }}">
+        <div class="i-label disabled {%- if not entry.visible %} stripped{% endif %} entry-{{ entry.type.name }}">
+            <span>{{  _(entry.title)  }} ({{ entry.position }})</span>
+            <span class="right actions">
+                <a class="{% if not entry.visible %}not-{% endif %}visible" href="#"
+                   data-href="{{ url_for('.menu-entry-visibility', entry) }}"
+                   data-method="POST"
+                   ></a>
+                <a href="{{ url_for('.menu-entry-edit', entry) }}" class="edit-entry"></a>
+                <i class="drag-handle"></i>
+            </span>
+        </div>
+        {% if entry.children %}
+            {{ menu_entries(entry.children) }}
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{% macro menu_entries(entries) -%}
+    <ul class="menu-entries">
+        {% for entry in entries -%}
+            <li>{{ menu_entry(entry) }}</li>
+        {%- endfor %}
+    </ul>
+{%- endmacro %}
