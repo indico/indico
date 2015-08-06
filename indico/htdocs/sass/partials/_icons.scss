@@ -82,6 +82,9 @@ i[class^="icon-"]:before {
 .icon-arrow-up:before {
     content: "\34";
 }
+.icon-arrows-vert:before {
+    content: "\edfb";
+}
 .icon-attachment:before {
     content: "\eca9";
 }
@@ -240,6 +243,9 @@ i[class^="icon-"]:before {
 }
 .icon-grid:before {
     content: "\35";
+}
+.icon-grid2:before {
+    content: "\ec5f";
 }
 .icon-handle:before {
     content: "\e001";
