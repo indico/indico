@@ -17,15 +17,23 @@
 from __future__ import unicode_literals
 
 from flask import request
+from werkzeug.exceptions import NotFound
 
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm
 from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
+from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+def _render_menu_entry(entry):
+    tpl = get_template_module('events/layout/_menu.html')
+    return tpl.menu_entry(entry=entry)
 
 
 class RHLayoutEdit(RHConferenceModifBase):
@@ -42,14 +50,24 @@ class RHMenuEdit(RHConferenceModifBase):
         return WPMenuEdit.render_template('menu_edit.html', self._conf, menu=menu_entries_for_event(self._conf))
 
 
-class RHMenuEntryEdit(RHConferenceModifBase):
+class RHMenuEntryEditBase(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.entry = MenuEntry.find_first(id=request.view_args['menu_entry_id'], event_id=self._conf.getId())
+        if not self.entry:
+            raise NotFound
+
+
+class RHMenuEntryEdit(RHMenuEntryEditBase):
     def _process(self):
-        entry = MenuEntry.get(request.view_args['menu_entry_id'])
-        defaults = FormDefaults(entry)
+        defaults = FormDefaults(self.entry)
         form_cls = MenuEntryForm
-        if entry.is_user_link:
+        if self.entry.is_user_link:
             form_cls = MenuLinkForm
-        elif entry.is_page:
+        elif self.entry.is_page:
             form_cls = MenuPageForm
-        form = form_cls(linked_object=entry, obj=defaults)
-        return jsonify_template('events/layout/menu_entry_edit.html', form=form, event=self._conf)
+        form = form_cls(linked_object=self.entry, obj=defaults)
+        if form.validate_on_submit():
+            form.populate_obj(self.entry)
+            return redirect_or_jsonify(url_for('.menu', self._conf), entry=_render_menu_entry(self.entry))
+        return jsonify_template('events/layout/menu_entry_form.html', form=form)
