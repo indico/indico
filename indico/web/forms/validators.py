@@ -110,10 +110,12 @@ class DateTimeRange(object):
         self.latest = latest
 
     def __call__(self, form, field):
+        if field.data is None:
+            return
         field_dt = as_utc(field.data)
         earliest_dt = self.get_earliest(form, field)
         latest_dt = self.get_latest(form, field)
-        if field.data and field.data != field.object_data:
+        if field_dt != field.object_data:
             if earliest_dt and field_dt < earliest_dt:
                 raise ValidationError(_("Moment can't be before {}").format(format_datetime(earliest_dt)))
             if latest_dt and field_dt > latest_dt:
@@ -136,9 +138,11 @@ class EarliestDateTime(DateTimeRange):
         super(EarliestDateTime, self).__init__(earliest=earliest)
 
     def __call__(self, form, field):
+        if field.data is None:
+            return
         earliest_dt = self.get_earliest(form, field)
         field_dt = as_utc(field.data)
-        if field.data and field.data != field.object_data and field_dt < earliest_dt:
+        if field_dt != as_utc(field.object_data) and field_dt < earliest_dt:
             if self.earliest_now:
                 msg = _("Moment can't be in the past")
             else:
@@ -159,9 +163,11 @@ class LatestDateTime(DateTimeRange):
         super(LatestDateTime, self).__init__(latest=latest)
 
     def __call__(self, form, field):
+        if field.data is None:
+            return
         latest_dt = self.get_latest(form, field)
         field_dt = as_utc(field.data)
-        if field.data and field.data != field.object_data and field_dt > latest_dt:
+        if field_dt != as_utc(field.object_data) and field_dt > latest_dt:
             if self.latest_now:
                 msg = _("Moment can't be in the future")
             else:
