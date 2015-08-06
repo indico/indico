@@ -33,8 +33,31 @@
 {%- block content %}
     {{ menu_entries(menu) }}
     <script>
-    $('.edit-entry').ajaxDialog({
-        title: '{% trans %}Menu Entry Settings{% endtrans %}'
+    $(function initMenuEdit() {
+        $('.edit-entry').ajaxDialog({
+            title: '{% trans %}Menu Entry Settings{% endtrans %}',
+            onClose: function(data) {
+                $(this.trigger).closest('.menu-entry').replaceWith(data.entry)
+            }
+        });
+        $(document).on('indico:confirmed', '.visible, .not-visible', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    var visible = data.visible;
+                    $this.toggleClass('visible', visible)
+                        .toggleClass('not-visible', !visible)
+                        .parent('.actions')
+                            .parent('.i-label').toggleClass('stripped', !visible);
+                }
+            });
+        });
     });
     </script>
 {% endblock %}
