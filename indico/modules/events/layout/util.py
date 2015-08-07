@@ -22,6 +22,7 @@ from itertools import count
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
+from indico.modules.events.models.events import Event
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
 from indico.util.signals import named_objects_from_signal
 from MaKaC.common.cache import GenericCache
@@ -127,3 +128,15 @@ def move_entry(entry, to):
     for e in entries:
         e.position += value
     entry.position = new_pos
+
+
+def get_event_logo(event):
+    """Retrieves information on the event's logo, or ``None``
+       if there is none.
+    """
+    event = Event.get(event.id)
+    if event.logo_metadata:
+        return {
+            'content': event.logo,
+            'metadata': event.logo_metadata
+        }

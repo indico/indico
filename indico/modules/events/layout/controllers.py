@@ -16,24 +16,25 @@
 
 from __future__ import unicode_literals
 
+from io import BytesIO
 import mimetypes
-import json
 
-from flask import flash, redirect, request
+from flask import flash, redirect, request, jsonify
 from werkzeug.exceptions import NotFound
 
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm
 from indico.modules.events.layout.models.menu import MenuEntry
-from indico.modules.events.layout.util import menu_entries_for_event, move_entry
+from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_event_logo
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
 from indico.modules.events.models.events import Event
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import redirect_or_jsonify, url_for
+from indico.web.flask.util import redirect_or_jsonify, url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _render_menu_entry(entry):
@@ -41,11 +42,37 @@ def _render_menu_entry(entry):
     return tpl.menu_entry(entry=entry)
 
 
+class RHLayoutLogoUpload(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        event = Event.find(Event.id == self._conf.getId()).one()
+        f = request.files.get('file')
+        content = f.read()
+        event.logo = content
+        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+        event.logo_metadata = {
+            'size': len(content),
+            'file_name': f.filename,
+            'content_type': content_type
+        }
+        return jsonify({'success': True})
+
+
+class RHLogoDisplay(RHConferenceBaseDisplay):
+    def _process(self):
+        logo_data = get_event_logo(self._conf)
+        logo_content = BytesIO(logo_data['content'])
+        metadata = logo_data['metadata']
+        return send_file(metadata['file_name'], logo_content, mimetype=metadata['content_type'], no_cache=True,
+                         conditional=True)
+
+
 class RHLayoutEdit(RHConferenceModifBase):
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
-        form = LayoutForm(obj=defaults)
         event = Event.find(Event.id == self._conf.getId()).one()
+        form = LayoutForm(event=event, obj=defaults)
         if form.validate_on_submit():
             layout_settings.set_multi(self._conf, {
                 'is_searchable': form.data['is_searchable'],
@@ -57,29 +84,16 @@ class RHLayoutEdit(RHConferenceModifBase):
                 'announcement': form.data['announcement'],
                 'show_annoucement': form.data['show_annoucement']
                 })
-
-            files = request.files.getlist('file')
-            if files:
-                f = files[0]
-                content = f.read()
-                event.logo = content
-                content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-                event.logo_metadata = {
-                    'size': len(content),
-                    'file_name': f.filename,
-                    'content_type': content_type
-                }
-
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
         else:
             if event.logo:
-                form.logo.data = json.dumps({
-                    'content': event.logo.encode('base64'),
+                form.logo.data = {
+                    'url': url_for('event_images.logo-display', self._conf),
                     'file_name': event.logo_metadata['file_name'],
                     'size': event.logo_metadata['size'],
                     'content_type': event.logo_metadata['content_type']
-                })
+                }
         return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf)
 
 

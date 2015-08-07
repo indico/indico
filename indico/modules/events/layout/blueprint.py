@@ -17,16 +17,21 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.controllers import (RHLayoutEdit, RHMenuEdit, RHMenuEntryPosition, RHMenuEntryEdit,
-                                                      RHMenuEntryVisibility)
+from indico.modules.events.layout.controllers import (RHLayoutEdit, RHLayoutLogoUpload, RHLogoDisplay, RHMenuEdit,
+                                                      RHMenuEntryPosition, RHMenuEntryEdit, RHMenuEntryVisibility)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
 
-
 _bp.add_url_rule('/', 'index', RHLayoutEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/logo/upload', 'logo-upload', RHLayoutLogoUpload, methods=('POST',))
 _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
 _bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu-entry-edit', RHMenuEntryEdit, methods=('GET', 'POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu-entry-position', RHMenuEntryPosition, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/visibility', 'menu-entry-visibility', RHMenuEntryVisibility,
                  methods=('POST',))
+
+
+_bp_images = IndicoBlueprint('event_images', __name__, template_folder='templates',
+                             virtual_template_folder='events/layout', url_prefix='/event/<confId>')
+_bp_images.add_url_rule('/logo', 'logo-display', RHLogoDisplay, methods=('GET',))

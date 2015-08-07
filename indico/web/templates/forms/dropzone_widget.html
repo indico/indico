@@ -23,7 +23,7 @@
 
             $('#dropzone').dropzone({
                 // TODO: Check if we can move here the url from the form action
-                // url: '',
+                url: {{ post_url | tojson}},
                 clickable: '.dropzone-area',
                 previewsContainer: '.dropzone-previews',
                 autoProcessQueue: false,
@@ -37,7 +37,7 @@
                     var form = $('#dropzone');
                     var saveButton = form.find(':submit');
                     var self = this;
-                    var file = JSON.parse({{ field._value() | tojson | safe }});
+                    var file = {{ field.data | tojson }};
 
                     if (file) {
                         var existingFile = {
@@ -56,20 +56,21 @@
                         });
 
                         // Check if the existing file is an image and add the image preview.
-                        if (file['content']) {
-                            $('.dz-image > img').attr('src', 'data:' + file['content_type'] + ';base64,' + file['content']);
+                        if (file['url']) {
+                            $('.dz-image > img').attr('src', file['url']);
                             $('.dz-image > img').attr('width', '120px');
                             $('.dz-preview').removeClass('dz-file-preview').addClass('dz-image-preview');
                         }
                     }
 
                     saveButton.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
                         if (self.getQueuedFiles().length) {
-                            e.preventDefault();
-                            e.stopPropagation();
+                            $('.dz-progress').show();
+                            self.processQueue();
                         }
-                        $('.dz-progress').show();
-                        self.processQueue();
+                        form.submit();
                     });
 
                     self.on('addedfile', function(file) {
