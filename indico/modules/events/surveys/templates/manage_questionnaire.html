@@ -1,4 +1,5 @@
 {% extends 'events/surveys/manage_survey.html' %}
+{% from 'forms/_form.html' import form_row %}
 
 {% block content %}
     <div class="toolbar">
@@ -15,71 +16,65 @@
             {% endfor %}
         </div>
     </div>
-    <div class="i-box-group vert">
-        <div class="i-box titled no-padding sortblock" style="width: 100%">
-            <div class="i-box-header">
-                <div class="i-box-title">
-                {% trans %}List of questions{% endtrans %}
-                </div>
+
+    <div id="questions" class="i-box titled">
+         <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}Questionnaire{% endtrans %}
             </div>
-            <div id="questions" class="i-box-content">
-                <ul class="group-list with-buttons no-content-before">
+        </div>
+        <div class="sortblock i-box-content" style="width: 100%">
+            <ul class="group-list no-content-before">
                 {% for question in survey.questions %}
-                    <li style="cursor: move">
-                        <div class="question group">
-                            <a href="#" data-href="{{ url_for('.edit_question', question) }}"
-                                        data-title="{% trans %}Edit question{% endtrans %}"
-                                        data-question-id="{{ question.id }}"
-                                        class="js-question-dialog">
-                                <strong>{{ question.title }}</strong>
-                            </a>
-                            <a data-href="{{ url_for('.remove_question', question) }}" class="i-button icon-remove right js-remove-question"></a>
+                    <li>
+                        <div class="questions-handle i-form">
+                            <div class="question-list">
+                                <div class="question-row">
+                                    <div class="question-data position-td" style="width: 5%;">{{ loop.index }}.</div>
+                                    <div class="question-data">
+                                        {{ form_row(preview_form['question_{}'.format(question.id)],
+                                                    widget_attrs={'disabled': true}, orientation='horizontal') }}
+                                    </div>
+                                    <div class="question-data" style="width: 8%;">
+                                        <a data-href="{{ url_for('.remove_question', question) }}"
+                                           data-confirm="{% trans %}Are you sure you want to delete this question{% endtrans %}"
+                                           data-method="POST"
+                                           class="i-button icon-remove js-remove-question right"></a>
+                                        <a href="#" data-href="{{ url_for('.edit_question', question) }}"
+                                                    data-title="{% trans %}Edit question{% endtrans %}"
+                                                    data-question-id="{{ question.id }}"
+                                                    class="i-button js-question-dialog icon-edit right"></a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </li>
                 {% else %}
-                    <li>{% trans %}No questions defined{% endtrans %}</li>
+                    <li>{% trans %}No questions defined{% endtrans %}
                 {% endfor %}
-                </ul>
-            </div>
+            </ul>
         </div>
-
-        {% include 'events/surveys/questionnaire_preview.html' %}
     </div>
-
     <script>
-        $('.js-remove-question').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            var msg = $T('Do you really want to remove this question room from the survey?');
-            new ConfirmPopup($T('Delete this question ?'), msg, function(confirmed) {
-                if (!confirmed) {
-                    return;
-                }
-
-                $('<form>', {
-                    action: $this.data('href'),
-                    method: 'post'
-                }).appendTo('body').submit();
-            }).open();
-        });
-
         $('#questions').tablesorter({
-            sortables: 'ul',
+            sortables: '.sortblock ul',
             sortableElements: '> li',
-            placeholderHTML: '<li></li>',
-            handle: '.question.group',
+            placeholderElement: '<li></li>',
+            handle: '.questions-handle',
             onReorder: function(sortable) {
-                var questionIdsInOrder = [];
-                $('[data-question-id]').each(function(index, obj) {
-                    questionIdsInOrder.push($(obj).data('question-id'));
-                });
+                var questionIdsInOrder = $('[data-question-id]').map(function() {
+                    return $(this).data('question-id');
+                }).get();
 
                 $.ajax({
                     url: {{ url_for('.change_question_position', survey) | tojson }},
                     method: 'POST',
                     data: {
-                        questionIdsInOrder: JSON.stringify(questionIdsInOrder)
-                    }
+                        question_ids: questionIdsInOrder,
+                    },
+                    traditional: true,
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError
                 });
             }
         });
