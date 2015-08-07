@@ -404,7 +404,7 @@ class TimeDeltaField(Field):
 class IndicoDateTimeField(DateTimeField):
     """"A combined date and time field with interactive selectors."""
 
-    widget = JinjaWidget('forms/datetime_widget.html')
+    widget = JinjaWidget('forms/datetime_widget.html', single_line=True)
 
     def __init__(self, *args, **kwargs):
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
