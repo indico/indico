@@ -41,10 +41,10 @@ class MenuEntry(db.Model):
     __tablename__ = 'menu_entries'
     __table_args__ = (
         db.CheckConstraint(
-            '(type = {type.separator.value} AND link IS NULL AND page_id is NULL) OR'
+            '(type = {type.separator.value} AND endpoint IS NULL AND page_id is NULL) OR'
             ' (type in ({type.internal_link.value}, {type.user_link.value}, {type.plugin_link.value})'
-            ' AND link IS NOT NULL AND page_id is NULL) OR'
-            ' (type = {type.page.value} AND link IS NULL AND page_id is NOT NULL)'.format(type=MenuEntryType),
+            ' AND endpoint IS NOT NULL AND page_id is NULL) OR'
+            ' (type = {type.page.value} AND endpoint IS NULL AND page_id is NOT NULL)'.format(type=MenuEntryType),
             'valid_type'),
         db.CheckConstraint(
             '((type = {type.internal_link.value} OR type = {type.plugin_link.value}) AND endpoint IS NOT NULL) OR'
@@ -130,7 +130,7 @@ class MenuEntry(db.Model):
         post_update=True
     )
 
-    #: The parent menu entry
+    #: The children menu entries and parent backref
     children = db.relationship(
         'MenuEntry',
         cascade="all, delete-orphan",
@@ -187,7 +187,7 @@ class MenuEntry(db.Model):
         return '<MenuEntry({}, {}, {}{}{})>'.format(
             self.id,
             self.title,
-            'page' if self.is_page else (self.link if self.is_link else 'separator'),
+            'page' if self.is_page else (self.url if self.is_link else 'separator'),
             ', internal=False' if self.is_user_link else (', internal=True' if self.is_link else ''),
             ', is_root=True' if self.is_root else '',
         )

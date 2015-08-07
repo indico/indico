@@ -28,15 +28,14 @@ def upgrade():
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('new_tab', sa.Boolean(), nullable=False),
         sa.Column('endpoint', sa.String(), nullable=True),
-        sa.Column('link', sa.String(), nullable=True),
         sa.Column('plugin', sa.String(), nullable=True),
         sa.Column('page_id', sa.Integer(), nullable=True),
         sa.Column('type', PyIntEnum(MenuEntryType), nullable=False),
         sa.CheckConstraint('((type = 2 OR type = 4) AND endpoint IS NOT NULL) OR'
                            ' (type in (1, 3, 5) AND endpoint is NULL)', name=op.f('ck_menu_entries_valid_endpoint')),
-        sa.CheckConstraint('(type = 1 AND link IS NULL AND page_id is NULL) OR'
-                           ' (type in (2, 3, 4) AND link IS NOT NULL AND page_id is NULL) OR'
-                           ' (type = 5 AND link IS NULL AND page_id is NOT NULL)',
+        sa.CheckConstraint('(type = 1 AND endpoint IS NULL AND page_id is NULL) OR'
+                           ' (type in (2, 3, 4) AND endpoint IS NOT NULL AND page_id is NULL) OR'
+                           ' (type = 5 AND endpoint IS NULL AND page_id is NOT NULL)',
                            name=op.f('ck_menu_entries_valid_type')),
         sa.CheckConstraint('(type = 4 AND plugin IS NOT NULL) OR plugin is NULL',
                            name=op.f('ck_menu_entries_valid_plugin')),
