@@ -54,7 +54,7 @@ def localize_as_utc(dt, timezone='UTC'):
     """Localizes a naive datetime with the timezone and returns it as UTC.
 
     :param dt: A naive :class:`datetime.datetime` object.
-    :param from_timezone: The timezone from which to localize.  UTC by default.
+    :param timezone: The timezone from which to localize.  UTC by default.
     """
     timezone = pytz.timezone(timezone)
     return timezone.localize(dt).astimezone(pytz.utc)
