@@ -1,0 +1,30 @@
+.sortblock li {
+    cursor: move;
+}
+
+.questions-handle {
+    width: 100%;
+    display: table;
+    word-wrap: break-word;
+}
+
+.position-td {
+    text-align: center;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.question-list {
+    display: table-row-group;
+}
+
+.question-row {
+    display: table-row;
+    width: 100%;
+}
+
+.question-data {
+    display: table-cell;
+    vertical-align: middle;
+    width: 33%;
+}
