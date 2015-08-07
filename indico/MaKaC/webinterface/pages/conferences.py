@@ -67,6 +67,7 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
+from indico.modules.events.layout.util import menu_entries_for_event
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
@@ -421,13 +422,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["body"] = self._body
         vars["supportEmail"] = ""
         vars["supportTelephone"] = ""
-
-        sinfo = self._conf.getSupportInfo()
-
-        p = {"menu": self._menu,
-             "support_info": sinfo,
-             "event": self._conf}
-        vars["menu"] = WConfDisplayMenu(self._menu).getHTML(p)
+        vars['menu'] = menu_entries_for_event(self._conf)
+        vars['support_info'] = self._conf.getSupportInfo()
 
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
         format = dm.getFormat()

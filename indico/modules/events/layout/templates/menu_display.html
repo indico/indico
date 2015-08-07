@@ -1,0 +1,32 @@
+{% from 'events/layout/_menu.html' import menu_entry_display %}
+
+<div class="conf_leftMenu">
+    <ul id="outer">
+        {%- for entry in menu if entry.visible %}
+            {{ menu_entry_display(entry) }}
+        {% endfor -%}
+    </ul>
+
+    {% if not support_info.isEmpty() -%}
+        <div class="support_box">
+            <h3>{{ support_info.getCaption() }}</h3>
+            <ul>
+                {% if support_info.hasEmail() %}
+                    {% for email in support_info.getEmail().split(',') %}
+                        <li>
+                            <span class="icon icon-mail" aria-hidden="true"></span>
+                            <a href="mailto:{{ email }}?subject={{ event_title }}"> {{ email }}</a>
+                        </li>
+                        {% endfor %}
+                {% endif %}
+
+                {% if support_info.hasTelephone() %}
+                    <li>
+                      <span class="icon icon-phone" aria-hidden="true"></span>
+                      <a href="tel:{{ support_info.getTelephone().replace(' ', '') }}"> {{ support_info.getTelephone() }}</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    {%- endif %}
+</div>
