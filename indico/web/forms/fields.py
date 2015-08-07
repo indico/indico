@@ -31,11 +31,13 @@ from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.users import User
 from indico.modules.users.util import serialize_user
+from indico.util.date_time import localize_as_utc
+from indico.util.i18n import _
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
-from indico.util.i18n import _
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget
 from indico.web.forms.validators import DateTimeRange, EarliestDateTime, LatestDateTime, LinkedDateTime
+from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -402,16 +404,18 @@ class TimeDeltaField(Field):
 
 
 class IndicoDateTimeField(DateTimeField):
-    """"A combined date and time field with interactive selectors."""
+    """"Friendly datetime field that handles timezones and validations."""
 
     widget = JinjaWidget('forms/datetime_widget.html', single_line=True)
 
     def __init__(self, *args, **kwargs):
+        self._timezone = kwargs.pop('timezone', None)
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
 
     def process_formdata(self, valuelist):
         valuelist = [' '.join(valuelist)] if valuelist else valuelist
         super(IndicoDateTimeField, self).process_formdata(valuelist)
+        self.data = localize_as_utc(self.data)
 
     @property
     def earliest_dt(self):
@@ -438,3 +442,13 @@ class IndicoDateTimeField(DateTimeField):
     def linked_field(self):
         validator = self.linked_datetime_validator
         return validator.linked_field if validator else None
+
+    @property
+    def timezone(self):
+        if self._timezone:
+            return self._timezone
+        form = self.get_form()
+        if form and hasattr(self, 'timezone'):
+            return form.timezone
+        session_tz = DisplayTZ().getDisplayTZ()
+        return session_tz

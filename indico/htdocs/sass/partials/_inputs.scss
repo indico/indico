@@ -573,6 +573,14 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     .timepicker {
         width: 30%;
     }
+
+    .timezone {
+        @include icon-before('icon-earth');
+        font-size: 1.3em;
+        vertical-align: sub;
+        margin-left: 0.5em;
+        line-height: 1.5em;
+    }
 }
 
 .has-warning {
