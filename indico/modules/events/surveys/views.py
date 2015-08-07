@@ -28,3 +28,6 @@ class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
 
     def getJSFiles(self):
         return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls())
+
+    def getCSSFiles(self):
+        return (WPConferenceModifBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls())
