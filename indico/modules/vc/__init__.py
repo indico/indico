@@ -70,6 +70,7 @@ def _extend_event_menu(sender, **kwargs):
         return bool(get_vc_plugins()) and bool(VCRoomEventAssociation.find_for_event(event).count())
     return MenuEntryData(endpoint='vc.event_videoconference',
                          title='Videoconference Rooms',
+                         name='videoconference_rooms',
                          visible=_visible,
                          children=None,
                          plugin=None)
