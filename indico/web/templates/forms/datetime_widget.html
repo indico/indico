@@ -6,7 +6,8 @@
         <input type="hidden" autofocus>
         <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker" readonly>
         <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
-               {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}>
+               {% if field.data %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}>
+        <i class="timezone" title="{{ field.timezone }}"></i>
     </div>
 {% endblock %}
 
@@ -27,7 +28,7 @@
             }).data('onSelectHandlers', []);
 
             {% if field.data %}
-                var date = {{ field.data | format_date('short') | tojson }};
+                var date = {{ field.data | format_date('code', timezone=field.timezone) | tojson }};
                 dateField.datepicker('setDate', date);
             {% endif %}
 
@@ -41,8 +42,8 @@
                 }
 
                 {% if field.earliest_dt %}
-                    var minDate = {{ field.earliest_dt | format_date('short') | tojson }};
-                    var minTime = {{ field.earliest_dt | format_time('short') | tojson }};
+                    var minDate = {{ field.earliest_dt | format_date('code', timezone=field.timezone) | tojson }};
+                    var minTime = {{ field.earliest_dt | format_time('code', timezone=field.timezone) | tojson }};
                     function updateMinTime(selectedDate) { updateTimeLimits(selectedDate, minDate, minTime, 'min'); }
                     dateField.datepicker('option', 'minDate', minDate);
                     dateField.datepicker().data('onSelectHandlers').push(updateMinTime);
@@ -50,8 +51,8 @@
                 {% endif %}
 
                 {% if field.latest_dt %}
-                    var maxDate = {{ field.latest_dt | format_date('short') | tojson }};
-                    var maxTime = {{ field.latest_dt | format_time('short') | tojson }};
+                    var maxDate = {{ field.latest_dt | format_date('code', timezone=field.timezone) | tojson }};
+                    var maxTime = {{ field.latest_dt | format_time('code', timezone=field.timezone) | tojson }};
                     function updateMaxTime(selectedDate) { updateTimeLimits(selectedDate, maxDate, maxTime, 'max'); }
                     dateField.datepicker('option', 'maxDate', maxDate);
                     dateField.datepicker().data('onSelectHandlers').push(updateMaxTime);
