@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 import posixpath
 
-from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.config import Config
@@ -26,7 +25,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
-from indico.core.storage import get_storage
+from indico.core.storage import VersionedResourceMixin, StoredFileMixin
 from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.preview import get_file_previewer
 from indico.modules.attachments.util import can_manage_attachments
@@ -44,7 +43,84 @@ class AttachmentType(TitledIntEnum):
     link = 2
 
 
-class Attachment(ProtectionMixin, db.Model):
+class AttachmentFile(StoredFileMixin, db.Model):
+    __tablename__ = 'files'
+    __table_args__ = {'schema': 'attachments'}
+
+    version_of = 'attachment'
+
+    #: The ID of the file
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    #: The ID of the associated attachment
+    attachment_id = db.Column(
+        db.Integer,
+        db.ForeignKey('attachments.attachments.id'),
+        nullable=False,
+        index=True
+    )
+    #: The user who uploaded the file
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        nullable=False,
+        index=True
+    )
+
+    #: The user who uploaded the file
+    user = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'attachment_files',
+            lazy='dynamic'
+        )
+    )
+
+    # relationship backrefs:
+    # - attachment (Attachment.all_files)
+
+    @property
+    def is_previewable(self):
+        return get_file_previewer(self) is not None
+
+    def _build_storage_path(self):
+        folder = self.attachment.folder
+        assert folder.linked_object is not None
+        if folder.link_type == LinkType.category:
+            # category/<id>/...
+            path_segments = ['category', unicode(folder.category_id)]
+        else:
+            # event/<id>/event/...
+            path_segments = ['event', unicode(folder.event_id), folder.link_type.name]
+            if folder.link_type == LinkType.session:
+                # event/<id>/session/<session_id>/...
+                path_segments.append(unicode(folder.session_id))
+            elif folder.link_type == LinkType.contribution:
+                # event/<id>/contribution/<contribution_id>/...
+                path_segments.append(unicode(folder.contribution_id))
+            elif folder.link_type == LinkType.subcontribution:
+                # event/<id>/subcontribution/<contribution_id>-<subcontribution_id>/...
+                path_segments.append('{}-{}'.format(folder.contribution_id, folder.subcontribution_id))
+        self.attachment.assign_id()
+        self.assign_id()
+        filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
+        path = posixpath.join(*(path_segments + [filename]))
+        return Config.getInstance().getAttachmentStorage(), path
+
+    @return_ascii
+    def __repr__(self):
+        return '<AttachmentFile({}, {}, {}, {})>'.format(
+            self.id,
+            self.attachment_id,
+            self.filename,
+            self.content_type
+        )
+
+
+class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
     __tablename__ = 'attachments'
     __table_args__ = (
         # links: url but no file
@@ -56,10 +132,15 @@ class Attachment(ProtectionMixin, db.Model):
         {'schema': 'attachments'}
     )
 
+    stored_file_table = 'attachments.files'
+    stored_file_class = AttachmentFile
+    stored_file_fkey = 'attachment_id'
+
     #: The ID of the attachment
     id = db.Column(
         db.Integer,
         primary_key=True
+
     )
     #: The ID of the folder the attachment belongs to
     folder_id = db.Column(
@@ -109,12 +190,6 @@ class Attachment(ProtectionMixin, db.Model):
         db.String,
         nullable=True
     )
-    #: The ID of the latest file for a file attachment
-    file_id = db.Column(
-        db.Integer,
-        db.ForeignKey('attachments.files.id', use_alter=True),
-        nullable=True
-    )
 
     #: The user who created the attachment
     user = db.relationship(
@@ -124,27 +199,6 @@ class Attachment(ProtectionMixin, db.Model):
             'attachments',
             lazy='dynamic'
         )
-    )
-    #: The list of all files for the attachment
-    all_files = db.relationship(
-        'AttachmentFile',
-        primaryjoin=lambda: Attachment.id == AttachmentFile.attachment_id,
-        foreign_keys=lambda: AttachmentFile.attachment_id,
-        lazy=True,
-        cascade='all, delete-orphan',
-        order_by=lambda: AttachmentFile.created_dt.desc(),
-        backref=db.backref(
-            'attachment',
-            lazy=False
-        )
-    )
-    #: The currently active file for the attachment
-    file = db.relationship(
-        'AttachmentFile',
-        primaryjoin=lambda: Attachment.file_id == AttachmentFile.id,
-        foreign_keys=file_id,
-        lazy=False,
-        post_update=True
     )
     #: The folder containing the attachment
     folder = db.relationship(
@@ -217,151 +271,8 @@ class Attachment(ProtectionMixin, db.Model):
         )
 
 
-class AttachmentFile(db.Model):
-    __tablename__ = 'files'
-    __table_args__ = {'schema': 'attachments'}
-
-    #: The ID of the file
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    #: The ID of the associated attachment
-    attachment_id = db.Column(
-        db.Integer,
-        db.ForeignKey('attachments.attachments.id'),
-        nullable=False,
-        index=True
-    )
-    #: The user who uploaded the file
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.users.id'),
-        nullable=False,
-        index=True
-    )
-    #: The date/time when the file was uploaded
-    created_dt = db.Column(
-        UTCDateTime,
-        nullable=False,
-        default=now_utc
-    )
-    #: The name of the file
-    filename = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The MIME type of the file
-    content_type = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The size of the file (in bytes) - assigned automatically when `save()` is called
-    size = db.Column(
-        db.BigInteger,
-        nullable=False
-    )
-    storage_backend = db.Column(
-        db.String,
-        nullable=False
-    )
-    storage_file_id = db.Column(
-        db.String,
-        nullable=False
-    )
-
-    #: The user who uploaded the file
-    user = db.relationship(
-        'User',
-        lazy=True,
-        backref=db.backref(
-            'attachment_files',
-            lazy='dynamic'
-        )
-    )
-
-    # relationship backrefs:
-    # - attachment (Attachment.all_files)
-
-    @property
-    def storage(self):
-        """The Storage object used to store the file."""
-        if self.storage_backend is None:
-            raise RuntimeError('No storage backend set')
-        return get_storage(self.storage_backend)
-
-    @property
-    def is_previewable(self):
-        return get_file_previewer(self) is not None
-
-    def get_local_path(self):
-        """Return context manager that will yield physical path.
-           This should be avoided in favour of using the actual file contents"""
-        return self.storage.get_local_path(self.storage_file_id)
-
-    def save(self, data):
-        """Saves a file in the file storage.
-
-        This requires the AttachmentFile to be associated with
-        an Attachment which needs to be associated with a Folder since
-        the data from these objects is needed to generate the path
-        used to store the file.
-
-        :param data: bytes or a file-like object
-        """
-        assert self.storage_backend is None and self.storage_file_id is None and self.size is None
-        assert self.attachment is not None
-        folder = self.attachment.folder
-        assert folder.linked_object is not None
-        if folder.link_type == LinkType.category:
-            # category/<id>/...
-            path_segments = ['category', unicode(folder.category_id)]
-        else:
-            # event/<id>/event/...
-            path_segments = ['event', unicode(folder.event_id), folder.link_type.name]
-            if folder.link_type == LinkType.session:
-                # event/<id>/session/<session_id>/...
-                path_segments.append(unicode(folder.session_id))
-            elif folder.link_type == LinkType.contribution:
-                # event/<id>/contribution/<contribution_id>/...
-                path_segments.append(unicode(folder.contribution_id))
-            elif folder.link_type == LinkType.subcontribution:
-                # event/<id>/subcontribution/<contribution_id>-<subcontribution_id>/...
-                path_segments.append('{}-{}'.format(folder.contribution_id, folder.subcontribution_id))
-        self.attachment.assign_id()
-        self.assign_id()
-        filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
-        path = posixpath.join(*(path_segments + [filename]))
-        self.storage_backend = Config.getInstance().getAttachmentStorage()
-        self.storage_file_id = self.storage.save(path, self.content_type, self.filename, data)
-        self.size = self.storage.getsize(self.storage_file_id)
-
-    def open(self):
-        """Returns the stored file as a file-like object"""
-        return self.storage.open(self.storage_file_id)
-
-    def send(self):
-        """Sends the file to the user"""
-        return self.storage.send_file(self.storage_file_id, self.content_type, self.filename)
-
-    @return_ascii
-    def __repr__(self):
-        return '<AttachmentFile({}, {}, {}, {})>'.format(
-            self.id,
-            self.attachment_id,
-            self.filename,
-            self.content_type
-        )
-
-
-@listens_for(Attachment.file, 'set')
-def _add_file_to_relationship(target, value, *unused):
-    if value is None:
-        # we don't allow file<->link conversions so setting it to None is pointless
-        # and would just break integrity
-        raise ValueError('file cannot be set to None')
-    with db.session.no_autoflush:
-        target.all_files.append(value)
+# Register all SQLAlchemy-related events
+Attachment.register_events()
 
 
 def _offline_download_url(attachment):
