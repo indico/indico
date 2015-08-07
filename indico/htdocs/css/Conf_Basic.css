@@ -400,7 +400,7 @@ ul.chair_list {
     font-weight: normal;
 }
 
-.support_box > li {
+.support_box > ul > li {
     white-space: nowrap;
     margin: 0 5px 5px 10px;
     vertical-align: middle;
@@ -408,13 +408,13 @@ ul.chair_list {
     overflow: hidden;
 }
 
-.support_box > li .icon {
+.support_box > ul > li .icon {
     color: #777;
     font-size: 1.5em;
     vertical-align: middle;
 }
 
-.support_box > li > a {
+.support_box > ul > li > a {
     margin-left: 5px;
     line-height: 1.5em;
     vertical-align: middle;

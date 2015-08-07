@@ -26,3 +26,24 @@
         {%- endfor %}
     </ul>
 {%- endmacro %}
+
+
+{% macro menu_entry_display(entry, root_entry=True) %}
+    {% if entry.is_separator %}
+        <li class="spacer"></li>
+    {% else %}
+        {% set menu_class = 'menuConfTitle' if root_entry else 'menuConfMiddleCell' %}
+        <li id="menuLink_{% if entry.is_internal_link or entry.is_plugin_link %}entry.name{% else %}entry.id{% endif %}"
+            class="{{ menu_class }}"> {# TODO: handle selected #}
+            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>
+                {{- entry.title -}}
+            </a>
+            {% if entry.children %}
+                <ul class="inner">
+                    {% for child in entry.children if child.visible %}
+                        {{ menu_entry_display(child, root_entry=False) }}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    {% endif %}
+{% endmacro %}

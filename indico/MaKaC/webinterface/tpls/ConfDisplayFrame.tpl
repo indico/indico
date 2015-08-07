@@ -51,7 +51,7 @@ else:
     </div>
     <div id="confSectionsBox" class="clearfix">
     ${ render_template('flashed_messages.html') }
-    ${ menu }
+    ${ render_template('events/layout/menu_display.html', event_title=confTitle, menu=menu, support_info=support_info) }
     ${ body }
     </div>
     <script>
