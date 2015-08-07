@@ -6,9 +6,7 @@
         <input type="hidden" autofocus>
         <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker" readonly>
         <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
-               {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}
-               {% if field.earliest_dt %}min="{{ field.earliest_dt | format_time('short') }}"{% endif %}
-               {% if field.latest_dt %}max="{{ field.latest_dt | format_time('short') }}"{% endif %}>
+               {% if field.data %}value="{{ field.data | format_time('short') }}"{% endif %}>
     </div>
 {% endblock %}
 
@@ -18,37 +16,62 @@
             'use strict';
 
             var dateField = $('#{{ field.id }}-date');
-            dateField.datepicker();
+            var timeField = $('#{{ field.id }}-time');
+            dateField.datepicker({
+                onSelect: function applyOnSelectHandlers() {
+                    var handlers = $(this).data('onSelectHandlers');
+                    for (var i = 0; i < handlers.length; i++) {
+                        handlers[i].apply(this, arguments);
+                    }
+                }
+            }).data('onSelectHandlers', []);
 
             {% if field.data %}
                 var date = {{ field.data | format_date('short') | tojson }};
                 dateField.datepicker('setDate', date);
             {% endif %}
 
-            {% if field.earliest_dt %}
-                var minDate = {{ field.earliest_dt | format_date('short') | tojson }};
-                dateField.datepicker('option', 'minDate', minDate);
-            {% endif %}
+            {% if field.earliest_dt or field.latest_dt %}
+                function updateTimeLimits(selectedDate, limitDate, limitTime, attr) {
+                    if (selectedDate == limitDate) {
+                        timeField.attr(attr, limitTime);
+                    } else {
+                        timeField.removeAttr(attr);
+                    }
+                }
 
-            {% if field.latest_dt %}
-                var maxDate = {{ field.latest_dt | format_date('short') | tojson }};
-                dateField.datepicker('option', 'maxDate', maxDate);
+                {% if field.earliest_dt %}
+                    var minDate = {{ field.earliest_dt | format_date('short') | tojson }};
+                    var minTime = {{ field.earliest_dt | format_time('short') | tojson }};
+                    function updateMinTime(selectedDate) { updateTimeLimits(selectedDate, minDate, minTime, 'min'); }
+                    dateField.datepicker('option', 'minDate', minDate);
+                    dateField.datepicker().data('onSelectHandlers').push(updateMinTime);
+                    updateMinTime(date);
+                {% endif %}
+
+                {% if field.latest_dt %}
+                    var maxDate = {{ field.latest_dt | format_date('short') | tojson }};
+                    var maxTime = {{ field.latest_dt | format_time('short') | tojson }};
+                    function updateMaxTime(selectedDate) { updateTimeLimits(selectedDate, maxDate, maxTime, 'max'); }
+                    dateField.datepicker('option', 'maxDate', maxDate);
+                    dateField.datepicker().data('onSelectHandlers').push(updateMaxTime);
+                    updateMaxTime(date);
+                {% endif %}
             {% endif %}
 
             {% if field.flags.linked_datetime %}
-                var linkedDateField = $('#{{ field.linked_field }}-date');
-
-                function updateLimits(new_date) {
+                function updateDateLimits(selectedDate) {
                     {% if field.linked_datetime_validator.not_before %}
-                        dateField.datepicker('option', 'minDate', new_date);
+                        dateField.datepicker('option', 'minDate', selectedDate);
                     {% endif %}
                     {% if field.linked_datetime_validator.not_after %}
-                        dateField.datepicker('option', 'maxDate', new_date);
+                        dateField.datepicker('option', 'maxDate', selectedDate);
                     {% endif %}
                 }
 
-                updateLimits(linkedDateField.datepicker('getDate'));
-                linkedDateField.datepicker('option', 'onSelect', updateLimits);
+                var linkedDateField = $('#{{ field.linked_field }}-date');
+                linkedDateField.datepicker().data('onSelectHandlers').push(updateDateLimits);
+                updateDateLimits(linkedDateField.datepicker('getDate'));
             {% endif %}
         })();
     </script>
