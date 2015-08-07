@@ -403,6 +403,7 @@ vc_sass = sass_module_bundle('vc')
 news_sass = sass_module_bundle('news')
 users_sass = sass_module_bundle('users')
 auth_sass = sass_module_bundle('auth')
+surveys_sass = sass_module_bundle('surveys')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -484,6 +485,7 @@ def register_all_css(env, main_css_file):
     env.register('news_sass', news_sass)
     env.register('users_sass', users_sass)
     env.register('auth_sass', auth_sass)
+    env.register('surveys_sass', surveys_sass)
 
 
 core_env = IndicoEnvironment()
