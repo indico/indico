@@ -54,10 +54,14 @@ class MenuEntry(db.Model):
         db.CheckConstraint(
             '(type = {type.plugin_link.value} AND plugin IS NOT NULL) OR plugin is NULL'.format(type=MenuEntryType),
             'valid_plugin'),
+        db.UniqueConstraint('event_id', 'position', 'parent_id', name='uix_position_per_event'),
+        db.Index('uix_name_per_event', 'event_id', 'name', unique=True,
+                 postgresql_where=db.text('(type = {type.internal_link.value} OR type = {type.plugin_link.value})'
+                                          .format(type=MenuEntryType))),
         {'schema': 'events'}
     )
 
-    #: The ID of the attachment
+    #: The ID of the menu entry
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -81,12 +85,17 @@ class MenuEntry(db.Model):
         nullable=False,
         default=True
     )
-    #: The name of the menu entry
+    #: The title of the menu entry (to be displayed to the user)
     title = db.Column(
         db.String,
         nullable=False,
     )
-    #: The position of the entry relative to the start in the menu
+    #: The name of the menu entry (to uniquely identify a default entry for a given event)
+    name = db.Column(
+        db.String,
+        nullable=True
+    )
+    #: The relative position of the entry in the menu
     position = db.Column(
         db.Integer,
         nullable=False,
@@ -98,7 +107,7 @@ class MenuEntry(db.Model):
         nullable=False,
         default=False
     )
-    #: The endpoint of the link for internal and plugin links
+    #: The endpoint of the entry (endpoint for internal and plugin links, url for user links and pages)
     endpoint = db.Column(
         db.String,
         nullable=True,
@@ -116,7 +125,7 @@ class MenuEntry(db.Model):
         nullable=True,
         default=None
     )
-    #: The type of the attachment (file or link)
+    #: The type of the menu entry
     type = db.Column(
         PyIntEnum(MenuEntryType),
         nullable=False
@@ -165,6 +174,14 @@ class MenuEntry(db.Model):
     @property
     def is_user_link(self):
         return self.type == MenuEntryType.user_link
+
+    @property
+    def is_internal_link(self):
+        return self.type == MenuEntryType.internal_link
+
+    @property
+    def is_plugin_link(self):
+        return self.type == MenuEntryType.plugin_link
 
     @property
     def is_page(self):
