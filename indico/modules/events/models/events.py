@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import TSVECTOR, JSON
 
 class Event(db.Model):
 
-    __tablename__ = 'event'
+    __tablename__ = 'events'
     __table_args__ = (db.Index(None, 'title_vector', postgresql_using='gin'),
                       {'schema': 'events'})
 
