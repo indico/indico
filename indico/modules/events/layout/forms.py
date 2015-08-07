@@ -16,13 +16,15 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, FileField, TextAreaField
+from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, InputRequired
 
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget, DropzoneWidget
 
@@ -37,7 +39,7 @@ class LayoutForm(IndicoForm):
     show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
 
     # Style
-    logo = FileField("Logo", widget=DropzoneWidget(accepted_files='image/*'),
+    logo = JSONField("Logo", widget=DropzoneWidget(accepted_files='image/*'),
                      description=_("Logo to be displayed next to the event's title"))
     header_text_color = StringField(_("Text colour"), widget=ColorPickerWidget())
     header_background_color = StringField(_("Background colour"), widget=ColorPickerWidget())
@@ -48,6 +50,11 @@ class LayoutForm(IndicoForm):
                                description=_("Short message shown below the title"))
     show_annoucement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                     description=_("Show the announcement message"))
+
+    def __init__(self, *args, **kwargs):
+        super(LayoutForm, self).__init__(*args, **kwargs)
+        event = kwargs.pop('event')
+        self.logo.widget.post_url = url_for('event_layout.logo-upload', event)
 
 
 class MenuEntryForm(IndicoForm):

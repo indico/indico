@@ -206,9 +206,11 @@ class ColorPickerWidget(JinjaWidget):
 class DropzoneWidget(JinjaWidget):
     """Renders a dropzone file upload field"""
 
-    def __init__(self, accepted_files=None):
+    def __init__(self, accepted_files=None, post_url=None):
         super(DropzoneWidget, self).__init__('forms/dropzone_widget.html')
         self.accepted_files = accepted_files
+        self.post_url = post_url
 
     def __call__(self, field, **kwargs):
-        return super(DropzoneWidget, self).__call__(field, accepted_files=self.accepted_files, input_args=kwargs)
+        return super(DropzoneWidget, self).__call__(field, accepted_files=self.accepted_files, post_url=self.post_url,
+                                                    input_args=kwargs)

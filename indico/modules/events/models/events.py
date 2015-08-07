@@ -31,6 +31,10 @@ class Event(db.Model):
     )
 
     @property
+    def locator(self):
+        return {'confId': self.id}
+
+    @property
     def title(self):
         return self.title_vector
 
