@@ -77,10 +77,9 @@ class NumberField(SurveyField):
 class BoolField(SurveyField):
     name = 'bool'
     friendly_name = _('Yes/No')
-    wtf_field_class = BooleanField
 
     def create_wtf_field(self):
-        return self._make_wtforms_field(self.wtf_field_class, widget=SwitchWidget())
+        return self._make_wtforms_field(BooleanField, widget=SwitchWidget())
 
 
 class SingleChoiceConfigForm(FieldConfigForm):
@@ -102,21 +101,22 @@ class SingleChoiceField(SurveyField):
     name = 'single_choice'
     friendly_name = _('Single Choice')
     config_form = SingleChoiceConfigForm
-    wtf_field_class = None
 
     def create_wtf_field(self):
         field_options = {}
         if self.question.field_data['display_type'] == 'select':
-            self.wtf_field_class = SelectField
+            field_class = SelectField
         else:
-            self.wtf_field_class = IndicoRadioField
+            field_class = IndicoRadioField
             field_options['orientation'] = self.question.field_data['radio_display_type']
-        choices = [(iter['option'], iter['option']) for iter in self.question.field_data['options']]
-        return self._make_wtforms_field(self.wtf_field_class, choices=choices, **field_options)
+        options = [x['option'] for x in self.question.field_data['options']]
+        choices = zip(options, options)
+        return self._make_wtforms_field(field_class, choices=choices, **field_options)
 
 
 class MultiSelectConfigForm(FieldConfigForm):
-    choices = MultipleItemsField(_('choices'), [DataRequired()], fields=[('choice', _('Choice'))], unique_field='choice',
+    options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
+                                 unique_field='option',
                                  description=_('Specify choices available for selection by user'))
 
 
@@ -124,8 +124,8 @@ class MultiSelectField(SurveyField):
     name = 'multiselect'
     friendly_name = _('Select multiple')
     config_form = MultiSelectConfigForm
-    wtf_field_class = IndicoSelectMultipleCheckboxField
 
     def create_wtf_field(self):
-        choices = [(choice['choice'], choice['choice']) for choice in self.question.field_data['choices']]
-        return self._make_wtforms_field(self.wtf_field_class, choices=choices)
+        options = [x['option'] for x in self.question.field_data['options']]
+        choices = zip(options, options)
+        return self._make_wtforms_field(IndicoSelectMultipleCheckboxField, choices=choices)
