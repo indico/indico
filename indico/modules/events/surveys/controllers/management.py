@@ -89,8 +89,11 @@ class RHCreateSurvey(RHManageSurveysBase):
 
 
 class RHScheduleSurvey(RHManageSurvey):
+    def _get_form_defaults(self):
+        return FormDefaults(self.survey)
+
     def _process(self):
-        form = ScheduleSurveyForm()
+        form = ScheduleSurveyForm(obj=self._get_form_defaults(), survey=self.survey)
         if form.validate_on_submit():
             self.survey.start_dt = form.start_dt.data
             self.survey.end_dt = form.end_dt.data
