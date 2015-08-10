@@ -231,6 +231,7 @@ zero_clipboard_js = rjs_bundle('zero_clipboard_js',
                                'js/custom/zeroclipboard.js')
 
 dropzone_js = rjs_bundle('dropzone_js',
+                         'js/custom/dropzone.js',
                          'js/lib/dropzone.js/dropzone.js')
 
 dropzone_css = Bundle('css/lib/dropzone.js/dropzone.css',

@@ -32,7 +32,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import PrincipalListField, IndicoSelectMultipleCheckboxField, IndicoRadioField
 from indico.web.forms.validators import UsedIf, HiddenUnless
-from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
+from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget, DropzoneWidget
 
 
 class AttachmentFormBase(IndicoForm):
@@ -62,11 +62,12 @@ class EditAttachmentFormBase(AttachmentFormBase):
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):
-    pass
+    files = HiddenField(_("Files"), widget=DropzoneWidget(submit_form=False))
 
 
 class EditAttachmentFileForm(EditAttachmentFormBase):
-    pass
+    file = HiddenField(_("File"), widget=DropzoneWidget(max_files=1, submit_form=False),
+                       description=_("Already uploaded file. Replace it by adding a new file."))
 
 
 class AttachmentLinkFormMixin(object):

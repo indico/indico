@@ -520,3 +520,11 @@
         @include icon-before('icon-folder-open');
     }
 }
+
+form#file-upload.full-width .dropzone-area {
+    width: 770px;
+
+    .select-files-btn, .dropzone-previews {
+        display: block;
+    }
+}
