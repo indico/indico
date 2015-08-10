@@ -82,7 +82,7 @@ class RHLayoutEdit(RHConferenceModifBase):
                 'header_text_color': form.data['header_text_color'],
                 'header_background_color': form.data['header_background_color'],
                 'announcement': form.data['announcement'],
-                'show_annoucement': form.data['show_annoucement']
+                'show_announcement': form.data['show_announcement']
                 })
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))

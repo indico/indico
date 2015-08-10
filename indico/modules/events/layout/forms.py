@@ -46,10 +46,10 @@ class LayoutForm(IndicoForm):
 
     # Announcement
     announcement = StringField(_("Announcement"),
-                               [UsedIf(lambda form, field: form.show_annoucement.data), DataRequired()],
+                               [UsedIf(lambda form, field: form.show_announcement.data), DataRequired()],
                                description=_("Short message shown below the title"))
-    show_annoucement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
-                                    description=_("Show the announcement message"))
+    show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
+                                     description=_("Show the announcement message"))
 
     def __init__(self, *args, **kwargs):
         super(LayoutForm, self).__init__(*args, **kwargs)

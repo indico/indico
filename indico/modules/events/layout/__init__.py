@@ -34,7 +34,7 @@ layout_settings = EventSettingsProxy('layout', {
     'header_text_color': None,
     'header_background_color': None,
     'announcement': None,
-    'show_annoucement': False
+    'show_announcement': False
     # TODO: handle style sheets
 })
 
