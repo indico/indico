@@ -28,9 +28,9 @@
     </div>
 {%- endmacro %}
 
-{% macro form_field(field, field_classes, widget_attrs={}) -%}
+{% macro form_field(field, field_classes, widget_attrs={}, disabled=none) -%}
     <div class="{{ field_classes }}"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
-        {{ _render_field(field, widget_attrs) }}
+        {{ _render_field(field, widget_attrs, disabled) }}
         {% if field.widget.input_type == 'checkbox' %}
             <div class="checkbox-label">{{ field.label() }}</div>
         {% endif %}
@@ -43,7 +43,7 @@
     </div>
 {%- endmacro %}
 
-{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, disabled=true, placeholder=false) %}
+{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, disabled=none, placeholder=false) %}
     {% if field or not allow_missing %}
         <div id="form-group-{{ field.id }}"
              class="form-group {{ orientation }}
@@ -58,14 +58,14 @@
                     {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
                 </div>
             {% endif %}
-            {% set widget_attrs = dict(widget_attrs, disabled=disabled, placeholder=(field.label.text if placeholder else '')) %}
+            {% set widget_attrs = dict(widget_attrs, placeholder=(field.label.text if placeholder else '')) %}
             {%- if caller -%}
                 {% set caller_ = caller %}
-                {% call form_field(field, "form-field form-block", widget_attrs) -%}
+                {% call form_field(field, "form-field form-block", widget_attrs, disabled=disabled) -%}
                     {{ caller_() }}
                 {%- endcall %}
             {%- else -%}
-                {{ form_field(field, "form-field form-block", widget_attrs) }}
+                {{ form_field(field, "form-field form-block", widget_attrs, disabled=disabled) }}
             {%- endif -%}
         </div>
     {% endif %}

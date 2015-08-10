@@ -31,8 +31,8 @@
                                 <div class="question-row">
                                     <div class="question-data position-td" style="width: 5%;">{{ loop.index }}.</div>
                                     <div class="question-data">
-                                        {{ form_row(preview_form['question_{}'.format(question.id)],
-                                                    widget_attrs={'disabled': true}, orientation='horizontal') }}
+                                        {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true,
+                                                    orientation='horizontal') }}
                                     </div>
                                     <div class="question-data" style="width: 8%;">
                                         <a data-href="{{ url_for('.remove_question', question) }}"
