@@ -199,6 +199,10 @@ class MenuEntry(db.Model):
     def locator(self):
         return dict(self.event.getLocator(), menu_entry_id=self.id)
 
+    @classmethod
+    def get_for_event(cls, event):
+        return cls.find(event_id=int(event.id), parent_id=None).order_by(MenuEntry.position).all()
+
     @return_ascii
     def __repr__(self):
         return '<MenuEntry({}, {}, {}{})>'.format(

@@ -48,7 +48,7 @@ _cache = GenericCache('updated-menus')
 def menu_entries_for_event(event, show_hidden=False):
     from indico.core.plugins import plugin_engine
 
-    entries = MenuEntry.find(event_id=event.getId(), parent_id=None).order_by(MenuEntry.position).all()
+    entries = MenuEntry.get_for_event(event)
     signal_entries = named_objects_from_signal(signals.event.sidemenu.send())
 
     plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
@@ -72,7 +72,7 @@ def menu_entries_for_event(event, show_hidden=False):
             sess.add_all(new_entries)
             sess.commit()
             _cache.set(cache_key, True)
-        entries.extend(new_entries)
+        entries = MenuEntry.get_for_event(event)
 
     def _is_entry_visible(entry):
         if not show_hidden and not entry.visible:
