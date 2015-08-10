@@ -109,7 +109,7 @@ class DateTimeRange(object):
 
     field_flags = ('datetime_range',)
 
-    def __init__(self, earliest=None, latest=None):
+    def __init__(self, earliest='now', latest=None):
         self.earliest = earliest
         self.latest = latest
 
@@ -121,67 +121,33 @@ class DateTimeRange(object):
         latest_dt = self.get_latest(form, field)
         if field_dt != field.object_data:
             if earliest_dt and field_dt < earliest_dt:
-                raise ValidationError(_("Moment can't be before {}").format(format_datetime(earliest_dt)))
+                if self.earliest_now:
+                    msg = _("'{}' can't be in the past ({})").format(field.label, field.timezone)
+                else:
+                    dt = format_datetime(earliest_dt, timezone=field.timezone),
+                    msg = _("'{}' can't be before {} ({})").format(field.label, dt, field.timezone)
+                raise ValidationError(msg)
             if latest_dt and field_dt > latest_dt:
-                raise ValidationError(_("Moment can't be after {}").format(format_datetime(latest_dt)))
+                if self.latest_now:
+                    msg = _("'{}' can't be in the future ({})").format(field.label, field.timezone)
+                else:
+                    dt = format_datetime(latest_dt, timezone=field.timezone),
+                    msg = _("'{}' can't be after {} ({})").format(field.label, dt, field.timezone)
+                raise ValidationError(msg)
 
     def get_earliest(self, form, field):
-        earliest = self.earliest(form, field) if hasattr(self.earliest, '__call__') else self.earliest
+        earliest = self.earliest(form, field) if callable(self.earliest) else self.earliest
+        if earliest == 'now':
+            self.earliest_now = True
+            return now_utc()
         return as_utc(earliest) if earliest else earliest
 
-    def get_latest(self, form, field, default_now=False):
-        latest = self.latest(form, field) if hasattr(self.latest, '__call__') else self.latest
-        return as_utc(latest) if latest else latest
-
-
-class EarliestDateTime(DateTimeRange):
-    """Validates the introduced datetime is after a given datetime or now."""
-
-    def __init__(self, earliest=None):
-        self.earliest_now = False
-        super(EarliestDateTime, self).__init__(earliest=earliest)
-
-    def __call__(self, form, field):
-        if field.data is None:
-            return
-        earliest_dt = self.get_earliest(form, field)
-        field_dt = as_utc(field.data)
-        if field_dt != as_utc(field.object_data) and field_dt < earliest_dt:
-            if self.earliest_now:
-                msg = _("Moment can't be in the past")
-            else:
-                msg = _("Moment can't be before {}").format(format_datetime(earliest_dt))
-            raise ValidationError(msg)
-
-    def get_earliest(self, form, field):
-        earliest = super(EarliestDateTime, self).get_earliest(form, field)
-        self.earliest_now = earliest is None
-        return earliest or now_utc()
-
-
-class LatestDateTime(DateTimeRange):
-    """Validates the introduced datetime is before a given datetime or now."""
-
-    def __init__(self, latest=None):
-        self.latest_now = False
-        super(LatestDateTime, self).__init__(latest=latest)
-
-    def __call__(self, form, field):
-        if field.data is None:
-            return
-        latest_dt = self.get_latest(form, field)
-        field_dt = as_utc(field.data)
-        if field_dt != as_utc(field.object_data) and field_dt > latest_dt:
-            if self.latest_now:
-                msg = _("Moment can't be in the future")
-            else:
-                msg = _("Moment can't be after {}").format(format_datetime(latest_dt))
-            raise ValidationError(msg)
-
     def get_latest(self, form, field):
-        latest = super(LatestDateTime, self).get_latest(form, field)
-        self.latest_now = latest is None
-        return latest or now_utc()
+        latest = self.latest(form, field) if callable(self.latest) else self.latest
+        if latest == 'now':
+            self.latest_now = True
+            return now_utc()
+        return as_utc(latest) if latest else latest
 
 
 class LinkedDateTime(object):

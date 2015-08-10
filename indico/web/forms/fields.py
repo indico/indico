@@ -36,7 +36,7 @@ from indico.util.i18n import _
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
 from indico.web.forms.widgets import JinjaWidget, PasswordWidget
-from indico.web.forms.validators import DateTimeRange, EarliestDateTime, LatestDateTime, LinkedDateTime
+from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
@@ -425,14 +425,14 @@ class IndicoDateTimeField(DateTimeField):
     def earliest_dt(self):
         if self.flags.datetime_range:
             for validator in self.validators:
-                if isinstance(validator, (DateTimeRange, EarliestDateTime)):
+                if isinstance(validator, DateTimeRange):
                     return validator.get_earliest(self.get_form(), self)
 
     @property
     def latest_dt(self):
         if self.flags.datetime_range:
             for validator in self.validators:
-                if isinstance(validator, (DateTimeRange, LatestDateTime)):
+                if isinstance(validator, DateTimeRange):
                     return validator.get_latest(self.get_form(), self)
 
     @property
