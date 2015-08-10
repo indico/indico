@@ -17,6 +17,8 @@
     </div>
     <input class="change-trigger" type="hidden" value="0" name="__file_change_trigger">
     <script>
-    $(document).ready(setupDropzone);
+    $(document).ready(function() {
+        setupDropzone();
+    });
     </script>
 {% endblock %}
