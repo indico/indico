@@ -247,7 +247,7 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
 
     @property
     def absolute_download_url(self):
-        """The absolte download url for the attachment"""
+        """The absolute download url for the attachment"""
         return self.get_download_url(absolute=True)
 
     def can_access(self, user, *args, **kwargs):
