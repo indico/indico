@@ -30,12 +30,16 @@ from MaKaC.common.cache import GenericCache
 class MenuEntryData(object):
     plugin = None
 
-    def __init__(self, title, name, endpoint, visible=True, children=None):
+    def __init__(self, title, name, endpoint, visible_default=True, visible=None, children=None):
         self.title = title
         self.name = name
         self.endpoint = endpoint
-        self.visible = visible
+        self._visible = visible
+        self.visible_default = visible_default
         self.children = children if children is not None else []
+
+    def visible(self, event):
+        return self._visible(event) if self._visible else self.visible_default
 
 
 _cache = GenericCache('updated-menus')
@@ -80,7 +84,7 @@ def menu_entries_for_event(event, show_hidden=False):
                 return True
             if callable(entry_data.visible):
                 return entry_data.visible(event)
-        return True
+
     entries = filter(_is_entry_visible, entries)
     return entries
 
@@ -88,7 +92,7 @@ def menu_entries_for_event(event, show_hidden=False):
 def _build_entry(event, data, position=0):
     entry = MenuEntry(
         event_id=event.getId(),
-        visible=True if callable(data.visible) else data.visible,
+        visible=data.visible_default,
         title=data.title,
         name=data.name,
         endpoint=data.endpoint,
