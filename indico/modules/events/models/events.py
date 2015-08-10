@@ -16,6 +16,7 @@
 
 from indico.core.db.sqlalchemy import db
 from sqlalchemy.dialects.postgresql import TSVECTOR, JSON
+from sqlalchemy.orm import deferred
 
 
 class Event(db.Model):
@@ -55,10 +56,10 @@ class Event(db.Model):
         nullable=False,
         index=True
     )
-    logo = db.Column(
+    logo = deferred(db.Column(
         db.LargeBinary,
         nullable=True
-    )
+    ))
     logo_metadata = db.Column(
         JSON,
         nullable=True
