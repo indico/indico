@@ -4,14 +4,13 @@
 {% block content %}
     <div class="toolbar">
         <div class="group">
-            {% for field_type in field_types.iterkeys() %}
-                {% set friendly_name = field_types[field_type].friendly_name %}
-                <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type) }}"
-                   data-title="{% trans %}Add {{ friendly_name }} question{% endtrans %}"
+            {% for field_type in field_types.values() | sort(attribute='friendly_name') %}
+                <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type.name) }}"
+                   data-title="{% trans %}Add question{% endtrans %}"
                    class="i-button js-question-dialog">
-                        {% trans friendly_name=friendly_name %}
-                            Add {{ friendly_name }}
-                        {% endtrans %}
+                        {%- trans name=field_type.friendly_name -%}
+                            Add {{ name }}
+                        {%- endtrans -%}
                 </a>
             {% endfor %}
         </div>
@@ -62,7 +61,7 @@
             placeholderElement: '<li></li>',
             handle: '.questions-handle',
             onReorder: function(sortable) {
-                var questionIdsInOrder = $('[data-question-id]').map(function() {
+                var questionIds = $('[data-question-id]').map(function() {
                     return $(this).data('question-id');
                 }).get();
 
@@ -70,7 +69,7 @@
                     url: {{ url_for('.change_question_position', survey) | tojson }},
                     method: 'POST',
                     data: {
-                        question_ids: questionIdsInOrder,
+                        question_ids: questionIds
                     },
                     traditional: true,
                     complete: IndicoUI.Dialogs.Util.progress(),
