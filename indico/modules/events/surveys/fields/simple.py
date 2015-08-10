@@ -40,11 +40,12 @@ class TextField(SurveyField):
 
 
 class NumberConfigForm(FieldConfigForm):
-    min_value = IntegerField(_('Min value'))
-    max_value = IntegerField(_('Max value'))
+    min_value = IntegerField(_('Min value'), [Optional()])
+    max_value = IntegerField(_('Max value'), [Optional()])
 
     def _validate_min_max_value(self, field):
-        if self.min_value.data >= self.max_value.data:
+        if (self.min_value.data is not None and self.max_value.data is not None and
+                self.min_value.data >= self.max_value.data):
             raise ValidationError(_('The min value must be less than the max value.'))
 
     validate_min_value = _validate_min_max_value
