@@ -109,15 +109,17 @@ class EventNote(LinkMixin, db.Model):
                               be pre-loaded and cached in the app
                               context.
         """
+        event = linked_object.getConference()
         try:
-            return g.event_notes.get(linked_object)
-        except AttributeError:
+            return g.event_notes[event].get(linked_object)
+        except (AttributeError, KeyError):
             if not preload_event:
                 return cls.find_first(linked_object=linked_object, is_deleted=False)
-            g.event_notes = {n.linked_object: n
-                             for n in EventNote.find(event_id=int(linked_object.getConference().id),
-                                                     is_deleted=False)}
-            return g.event_notes.get(linked_object)
+            if 'event_notes' not in g:
+                g.event_notes = {}
+            g.event_notes[event] = {n.linked_object: n
+                                    for n in EventNote.find(event_id=int(event.id), is_deleted=False)}
+            return g.event_notes[event].get(linked_object)
 
     @classmethod
     def get_or_create(cls, linked_object):
