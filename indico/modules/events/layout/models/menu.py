@@ -20,7 +20,6 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.core.plugins import url_for_plugin
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
@@ -157,6 +156,7 @@ class MenuEntry(db.Model):
         elif self.is_internal_link:
             return url_for(self.endpoint, self.event)
         elif self.is_plugin_link:
+            from indico.core.plugins import url_for_plugin
             return url_for_plugin(self.endpoint, self.event)
         elif self.is_page:
             #TODO: handle page url

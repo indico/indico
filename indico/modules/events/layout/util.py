@@ -21,7 +21,6 @@ from itertools import count
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.plugins import plugin_engine
 from indico.modules.events.models.events import Event
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
 from indico.util.signals import named_objects_from_signal
@@ -47,6 +46,8 @@ _cache = GenericCache('updated-menus')
 
 
 def menu_entries_for_event(event, show_hidden=False):
+    from indico.core.plugins import plugin_engine
+
     entries = MenuEntry.find(event_id=event.getId(), parent_id=None).order_by(MenuEntry.position).all()
     signal_entries = named_objects_from_signal(signals.event.sidemenu.send())
 
