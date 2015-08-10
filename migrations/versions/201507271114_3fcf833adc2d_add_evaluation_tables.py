@@ -50,7 +50,6 @@ def upgrade():
     op.create_table(
         'survey_submissions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('survey_id', sa.Integer(), nullable=False),
         sa.Column('is_anonymous', sa.Boolean(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
