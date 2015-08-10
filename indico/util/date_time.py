@@ -89,6 +89,8 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     """
     Basically a wrapper around Babel's own format_datetime
     """
+    if format == 'code':
+        format = 'dd/MM/yyyy HH:mm'
     if not locale:
         locale = get_current_locale()
     if keep_tz:
@@ -106,6 +108,8 @@ def format_date(d, format='medium', locale=None, timezone=None):
     """
     Basically a wrapper around Babel's own format_date
     """
+    if format == 'code':
+        format = 'dd/MM/yyyy'
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
@@ -117,6 +121,8 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     """
     Basically a wrapper around Babel's own format_time
     """
+    if format == 'code':
+        format = 'HH:mm'
     if not locale:
         locale = get_current_locale()
     if not timezone and t.tzinfo:
