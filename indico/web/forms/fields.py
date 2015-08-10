@@ -417,7 +417,8 @@ class IndicoDateTimeField(DateTimeField):
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
 
     def process_formdata(self, valuelist):
-        valuelist = [' '.join(valuelist)] if valuelist else valuelist
+        if valuelist:
+            valuelist = [' '.join(valuelist).strip()]
         super(IndicoDateTimeField, self).process_formdata(valuelist)
         if self.data and not self.data.tzinfo:
             self.data = localize_as_utc(self.data, self.timezone)
