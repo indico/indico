@@ -32,24 +32,19 @@ _bp.add_url_rule('/manage/surveys/', 'management', RHManageSurveys)
 _bp.add_url_rule('/manage/surveys/create', 'create', RHCreateSurvey, methods=('GET', 'POST'))
 
 # Single survey management
-_bp.add_url_rule('/manage/survey/<survey_id>/', 'manage_survey', RHManageSurvey)
-_bp.add_url_rule('/manage/survey/<survey_id>/edit',
-                 'edit_survey', RHEditSurvey, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/survey/<survey_id>/schedule',
-                 'schedule_survey', RHScheduleSurvey, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/survey/<survey_id>/start',
-                 'start_survey', RHStartSurvey, methods=('POST',))
-_bp.add_url_rule('/manage/survey/<survey_id>/end',
-                 'end_survey', RHEndSurvey, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<survey_id>/', 'manage_survey', RHManageSurvey)
+_bp.add_url_rule('/manage/surveys/<survey_id>/edit', 'edit_survey', RHEditSurvey, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<survey_id>/schedule', 'schedule_survey', RHScheduleSurvey, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<survey_id>/start', 'start_survey', RHStartSurvey, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<survey_id>/end', 'end_survey', RHEndSurvey, methods=('POST',))
 
 # Survey question management
-_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/',
-                 'manage_questionnaire', RHManageSurveyQuestionnaire)
-_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/add/<type>', 'add_question', RHAddSurveyQuestion,
+_bp.add_url_rule('/manage/surveys/<survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)
+_bp.add_url_rule('/manage/surveys/<survey_id>/questionnaire/add/<type>', 'add_question', RHAddSurveyQuestion,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/<question_id>',
-                 'edit_question', RHEditSurveyQuestion, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/<question_id>/delete',
-                 'remove_question', RHDeleteSurveyQuestion, methods=('POST',))
-_bp.add_url_rule('/manage/survey/<survey_id>/questionnaire/change-positions',
-                 'change_question_position', RHChangeQuestionPosition, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<survey_id>/questionnaire/<question_id>', 'edit_question', RHEditSurveyQuestion,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<survey_id>/questionnaire/<question_id>/delete', 'remove_question',
+                 RHDeleteSurveyQuestion, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<survey_id>/questionnaire/change-positions', 'change_question_position',
+                 RHChangeQuestionPosition, methods=('POST',))
