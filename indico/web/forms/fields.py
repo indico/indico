@@ -419,7 +419,8 @@ class IndicoDateTimeField(DateTimeField):
     def process_formdata(self, valuelist):
         valuelist = [' '.join(valuelist)] if valuelist else valuelist
         super(IndicoDateTimeField, self).process_formdata(valuelist)
-        self.data = localize_as_utc(self.data, self.timezone)
+        if self.data and not self.data.tzinfo:
+            self.data = localize_as_utc(self.data, self.timezone)
 
     @property
     def earliest_dt(self):
