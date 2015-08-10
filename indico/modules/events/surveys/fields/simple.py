@@ -21,7 +21,6 @@ from wtforms.validators import NumberRange, Optional, ValidationError, Length, D
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
@@ -29,13 +28,19 @@ from indico.web.forms.widgets import SwitchWidget
 
 class TextConfigForm(FieldConfigForm):
     max_length = IntegerField(_('Max length'), [Optional(), NumberRange(min=1)])
+    multiline = BooleanField(_('Multiline'), widget=SwitchWidget(),
+                             description=_("If the field should be rendered as a textarea instead of a single-line "
+                                           "text field."))
 
 
 class TextField(SurveyField):
     name = 'text'
     friendly_name = _('Text')
     config_form = TextConfigForm
-    wtf_field_class = StringField
+
+    @property
+    def wtf_field_class(self):
+        return TextAreaField if self.question.field_data.get('multiline') else StringField
 
     @property
     def validators(self):
@@ -108,23 +113,6 @@ class SingleChoiceField(SurveyField):
             field_options['orientation'] = self.question.field_data['radio_display_type']
         choices = [(iter['option'], iter['option']) for iter in self.question.field_data['options']]
         return self._make_wtforms_field(self.wtf_field_class, choices=choices, **field_options)
-
-
-class TextParagraphConfigForm(IndicoForm):
-    _common_fields = {'title'}
-
-    title = StringField(_('Title'), [DataRequired()], description=_("The title of the field"))
-    content = TextAreaField(_('Content'), description=_('Text content displayed in the field'))
-
-
-class TextParagraphField(SurveyField):
-    name = 'text_paragraph'
-    friendly_name = _('Text Paragraph')
-    config_form = TextParagraphConfigForm
-    wtf_field_class = TextAreaField
-
-    def create_wtf_field(self):
-        return self._make_wtforms_field(self.wtf_field_class, default=self.question.field_data['content'])
 
 
 class MultiSelectConfigForm(FieldConfigForm):
