@@ -38,3 +38,13 @@ class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items_advanced['menu'].setActive()
+
+
+class WPImages(WPJinjaMixin, WPConferenceModifBase):
+    template_prefix = 'events/layout/'
+
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items_advanced['images'].setActive()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()

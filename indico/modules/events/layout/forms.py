@@ -72,3 +72,7 @@ class MenuLinkForm(MenuUserEntry):
 
 class MenuPageForm(MenuUserEntry):
     html = TextAreaField(_("Content"), widget=CKEditorWidget())
+
+
+class AddImagesForm(IndicoForm):
+    image = JSONField("Image", widget=DropzoneWidget(accepted_file_types='image/*'))

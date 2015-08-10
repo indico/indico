@@ -26,6 +26,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
+from indico.modules.events.layout.models.images import ImageFile
 from MaKaC.common.cache import GenericCache
 
 _cache = GenericCache('updated-menus')
@@ -152,3 +153,9 @@ def get_event_logo(event):
             'content': event.logo,
             'metadata': event.logo_metadata
         }
+
+
+def get_images_for_event(event):
+    """Return all non-deleted images uploaded to a specific event
+    """
+    return ImageFile.find_all(event_id=event.id)

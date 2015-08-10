@@ -349,6 +349,7 @@ if __name__ == '__main__':
             event_logs = indico_zodbimport.modules.event_logs:EventLogImporter
             event_notes = indico_zodbimport.modules.event_notes:EventNoteImporter
             attachments = indico_zodbimport.modules.attachments:AttachmentImporter
+            event_images = indico_zodbimport.modules.event_images:EventImageImporter
             """,
           zip_safe=False,
           packages=foundPackages,

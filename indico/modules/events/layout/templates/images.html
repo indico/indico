@@ -1,0 +1,76 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+
+<h2>Upload images</h2>
+
+{{ form_header(form, id='upload-images', classes='dropzone full-width', orientation='vertical', action=url_for('.images_upload', event)) }}
+{{ form_rows(form, skip_labels=true) }}
+
+{% call form_footer(attach_form) %}
+    <button class="i-button highlight js-dropzone-upload icon-upload right" data-disabled-until-change>
+        {% trans %}Upload{% endtrans %}
+    </button>
+{% endcall %}
+
+<h2>Existing Images</h2>
+
+{% include 'events/layout/image_list.html' %}
+
+
+<script>
+    $(document).ready(function() {
+        var dropzone = Dropzone.forElement('#upload-images');
+
+        dropzone.on("success", function(e, response) {
+            setTimeout(function() {
+                dropzone.removeAllFiles();
+            }, 2000);
+            $('.image-container').html(response.image_list);
+            handleFlashes(response);
+        });
+
+        $('.image-container').on('click', '.menu .get-link', function(event) {
+            var $this = $(this),
+                content = $this.closest('.image-list li').find('.clipboard-dialog').clone();
+
+            $this.qtip({
+                content: {
+                    text: content
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                },
+                hide: {
+                    event: 'mouseleave',
+                    fixed: true,
+                    delay: 700
+                },
+                show: {
+                    event: false,
+                    ready: true
+                },
+                events: {
+                    show: function() {
+                        var tip = $(this);
+                        _.defer(function() { tip.find('input[type="text"]').focus().select(); });
+                    }
+                }
+            });
+        }).on('indico:confirmed', '.menu .delete', function(e) {
+            var $this = $(this);
+            e.preventDefault();
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    $('.image-container').html(data.image_list);
+                    handleFlashes(data, true);
+                }
+            });
+        });
+
+    });
+</script>

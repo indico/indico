@@ -64,3 +64,6 @@ class Event(db.Model):
         JSON,
         nullable=True
     )
+
+    # relationship backrefs:
+    # - layout_images (Image.event)
