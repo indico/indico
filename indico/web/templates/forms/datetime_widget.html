@@ -20,10 +20,8 @@
 
             var dateField = $('#{{ field.id }}-date');
             var timeField = $('#{{ field.id }}-time');
-
-            function requireTime() {
-                timeField.attr('required', true);
-            }
+            var initialDate;
+            var initialTime;
 
             dateField.datepicker({
                 onSelect: function applyOnSelectHandlers() {
@@ -34,18 +32,31 @@
                 }
             }).data('onSelectHandlers', [requireTime]);
 
+            function requireTime() {
+                timeField.attr('required', true);
+            }
+
             {% if field.data %}
-                var date = {{ field.data | format_date('code', timezone=field.timezone) | tojson }};
-                dateField.datepicker('setDate', date);
+                initialDate = {{ field.data | format_date('code', timezone=field.timezone) | tojson }}
+                initialTime = {{ field.data | format_time('code', timezone=field.timezone) | tojson }}
+                dateField.datepicker('setDate', initialDate);
                 requireTime();
             {% endif %}
 
             {% if field.earliest_dt or field.latest_dt %}
+                timeField.on('change', function applyOnChangeHandlers() {
+                    var handlers = $(this).data('onChangeHandlers');
+                    for (var i = 0; i < handlers.length; i++) {
+                        handlers[i].apply(this, arguments);
+                    }
+                }).data('onChangeHandlers', []);
+
                 function updateTimeLimits(selectedDate, limitDate, limitTime, attr) {
-                    if (selectedDate == limitDate) {
-                        timeField.attr(attr, limitTime);
-                    } else {
+                    var selectedTime = timeField.val();
+                    if (selectedDate !== limitDate || (selectedDate === initialDate && selectedTime === initialTime)) {
                         timeField.removeAttr(attr);
+                    } else {
+                        timeField.attr(attr, limitTime);
                     }
                 }
 
@@ -57,7 +68,13 @@
                     }
                     dateField.datepicker('option', 'minDate', minDate);
                     dateField.datepicker().data('onSelectHandlers').push(updateMinTime);
-                    updateMinTime(date);
+                    timeField.data('onChangeHandlers').push(function() {
+                        var selectedDate = moment(dateField.datepicker('getDate'));
+                        updateMinTime(selectedDate.format('DD/MM/YYYY'));
+                    });
+                    if (initialDate) {
+                        updateMinTime(initialDate);
+                    }
                 {% endif %}
 
                 {% if field.latest_dt %}
@@ -68,7 +85,13 @@
                     }
                     dateField.datepicker('option', 'maxDate', maxDate);
                     dateField.datepicker().data('onSelectHandlers').push(updateMaxTime);
-                    updateMaxTime(date);
+                    timeField.data('onChangeHandlers').push(function() {
+                        var selectedDate = moment(dateField.datepicker('getDate'));
+                        updateMaxTime(selectedDate.format('DD/MM/YYYY'));
+                    });
+                    if (initialDate) {
+                        updateMaxTime(initialDate);
+                    }
                 {% endif %}
             {% endif %}
 
