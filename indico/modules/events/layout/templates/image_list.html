@@ -1,0 +1,35 @@
+{% from '_clipboard_input.html' import clipboard_input %}
+
+<div class="image-container">
+    <ul class="image-list">
+    {% for image in images: %}
+        <li>
+            <a href="{{ url_for('event_images.image_display', image) }}" class="js-lightbox">
+                <img src="{{ url_for('event_images.image_display', image) }}" alt="{% trans %}Image{% endtrans %}">
+            </a>
+            <span class="menu">
+                <a class="icon-link get-link" title="{% trans %}Get link to image{% endtrans %}"></a>
+                <a class="icon-remove danger delete" title="{% trans %}Delete image{% endtrans %}"
+                    data-href="{{ url_for('event_layout.image_delete', image) }}"
+                    data-method="DELETE"
+                    data-confirm="{% trans filename=image.filename %}Are you sure you want to delete '{{filename}}'? {% endtrans %}">
+                </a>
+            </span>
+            <div class="clipboard-dialog" style="display: none;">
+                <div class="dialog-message">
+                    {% trans %}You can copy the URL below using CTRL + C (&#8984; + C on OSX):{% endtrans %}
+                </div>
+                <input type="text" readonly value="{{ url_for('event_images.image_display', image, _external=True) }}">
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+
+    {% if not images: %}
+        <div class="info-message-box">
+            <div class="message-text">
+                {% trans %}There are no images in this event. You can upload some using the form above.{% endtrans %}
+            </div>
+        </div>
+    {% endif %}
+</div>

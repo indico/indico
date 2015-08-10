@@ -20,18 +20,21 @@ import mimetypes
 from io import BytesIO
 from itertools import count
 
-from flask import flash, redirect, request, jsonify
+from flask import flash, redirect, request, session, jsonify, render_template
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
-from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm
+from indico.modules.events.layout import layout_settings, logger
+from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm, AddImagesForm
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
-from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_event_logo
-from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
+from indico.modules.events.layout.models.images import ImageFile
+from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
+from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_images_for_event, get_event_logo
+from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit, WPImages
 from indico.modules.events.models.events import Event
-from indico.util.i18n import _
+from indico.util.fs import secure_filename
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import redirect_or_jsonify, url_for, send_file
 from indico.web.forms.base import FormDefaults
@@ -97,7 +100,7 @@ class RHLayoutEdit(RHConferenceModifBase):
         else:
             if event.logo:
                 form.logo.data = {
-                    'url': url_for('event_images.logo-display', self._conf),
+                    'url': url_for('event_images.logo_display', self._conf),
                     'file_name': event.logo_metadata['file_name'],
                     'size': event.logo_metadata['size'],
                     'content_type': event.logo_metadata['content_type']
@@ -214,3 +217,79 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         db.session.flush()
 
         return jsonify_data(menu=_render_menu_entries(self._conf, show_hidden=True))
+
+
+def _render_image_list(event):
+    return render_template('events/layout/image_list.html', images=get_images_for_event(event))
+
+
+class RHImages(RHConferenceModifBase):
+    def _process(self):
+        form = AddImagesForm()
+        return WPImages.render_template('images.html', self._conf, images=get_images_for_event(self._conf),
+                                        event=self._conf, form=form)
+
+
+class RHImageUpload(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        files = request.files.getlist('file')
+
+        for f in files:
+            filename = secure_filename(f.filename, 'image')
+            content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+            image = ImageFile(event_id=self._conf.id, filename=filename, content_type=content_type)
+            image.save(f.file)
+            db.session.add(image)
+            db.session.flush()
+            logger.info('Image {} uploaded by {}'.format(image, session.user))
+            # TODO: Add image-related signals as well as conference log entries
+            # signals.images.image_created.send(image, user=session.user)
+        flash(ngettext("The image has been uploaded", "{count} images have been uploaded", len(files))
+              .format(count=len(files)), 'success')
+        return jsonify_data(image_list=_render_image_list(self._conf))
+
+
+class RHImageDelete(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.image = ImageFile.find_first(id=request.view_args['image_id'], event_id=self._conf.getId())
+        if not self.image:
+            raise NotFound
+
+    def _process(self):
+        db.session.delete(self.image)
+        flash(_("The image '{}' has been deleted").format(self.image.filename), 'success')
+        return jsonify_data(image_list=_render_image_list(self._conf))
+
+
+class RHImageDisplay(RHConferenceBaseDisplay):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.image
+        }
+    }
+
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        image_id = request.view_args['image_id']
+        self.image = ImageFile.get_one(image_id)
+
+    def _process(self):
+        return self.image.send()
+
+
+class RHImageLegacyDisplay(RHConferenceBaseDisplay):
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self.pic_id = request.view_args['pic_id']
+
+    def _process(self):
+        legacy_image = LegacyImageMapping.find_first(event_id=self._conf.id, legacy_image_id=self.pic_id)
+        if legacy_image:
+            return redirect(url_for('event_images.image_display', legacy_image.image), 301)
+        else:
+            raise NotFound

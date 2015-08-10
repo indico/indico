@@ -20,8 +20,10 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.default import DEFAULT_MENU_ENTRIES
 from indico.modules.events.settings import EventSettingsProxy
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
@@ -42,17 +44,46 @@ layout_settings = EventSettingsProxy('layout', {
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu_layout(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'layout', SideMenuItem('Layout', url_for('event_layout.index', event),
+    return 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event),
                                   visible=event.canModify(session.user))
 
 
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu_event_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'menu', SideMenuItem('Menu', url_for('event_layout.menu', event), visible=event.canModify(session.user))
+    return 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=event.canModify(session.user))
 
 
 @signals.event.sidemenu.connect
 def _get_default_menu_entries(sender, **kwargs):
     for entry in DEFAULT_MENU_ENTRIES:
         yield entry
+
+
+@signals.event_management.sidemenu_advanced.connect
+def _extend_event_management_menu_event_images(event, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event),
+                                  visible=event.canModify(session.user), event_feature='images')
+
+
+@signals.event_management.clone.connect
+def _get_image_cloner(event, **kwargs):
+    from indico.modules.events.layout.clone import ImageCloner
+    return ImageCloner(event)
+
+
+@signals.event.get_feature_definitions.connect
+def _get_feature_definitions(sender, **kwargs):
+    return ImagesFeature
+
+
+class ImagesFeature(EventFeature):
+    name = 'images'
+    friendly_name = _('Image manager')
+    description = _('Allows event managers to attach images to the event, which can then be used from HTML code. '
+                    'Very useful for e.g. sponsor logos and conference custom pages.')
+
+    @classmethod
+    def is_default_for_event(cls, event):
+        return event.getType() == 'conference'

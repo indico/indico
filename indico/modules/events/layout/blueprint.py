@@ -17,9 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.controllers import (RHLayoutEdit, RHLayoutLogoUpload, RHLogoDisplay, RHMenuAddEntry,
-                                                      RHMenuDeleteEntry, RHMenuEdit, RHMenuEnableEntry, RHMenuEntryEdit,
-                                                      RHMenuEntryPosition)
+from indico.modules.events.layout.controllers import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
+                                                      RHImageUpload, RHImages, RHLayoutEdit, RHLayoutLogoUpload,
+                                                      RHLogoDisplay, RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
+                                                      RHMenuEnableEntry, RHMenuEntryEdit, RHMenuEntryPosition)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
@@ -32,8 +33,14 @@ _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu-entry-position', RH
 _bp.add_url_rule('/menu/<int:menu_entry_id>/enable', 'menu-enable-entry', RHMenuEnableEntry, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/delete', 'menu-delete-entry', RHMenuDeleteEntry, methods=('DELETE',))
 _bp.add_url_rule('/menu/add', 'menu-add-entry', RHMenuAddEntry, methods=('GET', 'POST'))
+_bp.add_url_rule('/images/', 'images', RHImages, methods=('GET', 'POST',))
+_bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
+_bp.add_url_rule('/images/<int:image_id>', 'image_delete', RHImageDelete, methods=('DELETE',))
 
 
 _bp_images = IndicoBlueprint('event_images', __name__, template_folder='templates',
                              virtual_template_folder='events/layout', url_prefix='/event/<confId>')
-_bp_images.add_url_rule('/logo', 'logo-display', RHLogoDisplay, methods=('GET',))
+_bp_images.add_url_rule('/logo', 'logo_display', RHLogoDisplay)
+_bp_images.add_url_rule('/images/<int:image_id>', 'image_display', RHImageDisplay)
+_bp_images.add_url_rule('/picture/<int:pic_id>.<pic_ext>', 'image_legacy_display', RHImageLegacyDisplay)
+_bp_images.add_url_rule('/picture/<int:pic_id>', 'image_legacy_display', RHImageLegacyDisplay)
