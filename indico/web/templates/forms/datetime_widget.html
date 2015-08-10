@@ -33,7 +33,7 @@
             }).data('onSelectHandlers', [requireTime]);
 
             function requireTime() {
-                timeField.attr('required', true);
+                timeField.prop('required', true);
             }
 
             {% if field.data %}
