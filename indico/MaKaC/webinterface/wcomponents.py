@@ -53,6 +53,7 @@ from indico.core import signals
 from indico.core.db import DBMgr
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
+from indico.modules.events.layout import layout_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.util.signals import values_from_signal
@@ -362,7 +363,7 @@ class WConferenceHeader(WHeader):
         vars["usingModifKey"]=False
         if self._conf.canKeyModify():
             vars["usingModifKey"]=True
-        vars["displayNavigationBar"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False).getDisplayNavigationBar()
+        vars["displayNavigationBar"] = layout_settings.get(self._conf, 'show_nav_bar')
 
         # This is basically the same WICalExportBase, but we need some extra
         # logic in order to have the detailed URLs
@@ -697,7 +698,7 @@ class WEventFooter(WFooter):
         v['icalURL'] = urlHandlers.UHConferenceToiCal.getURL(self._conf)
         v["shortURL"] = Config.getInstance().getShortEventURL() + cid
         v["app_data"] = app_data
-        v["showSocial"] = app_data.get('active', False) and self._conf.getDisplayMgr().getShowSocialApps()
+        v["showSocial"] = app_data.get('active', False) and layout_settings.get(self._conf, 'show_social_badges')
         v['conf'] = self._conf
 
         return v
@@ -1998,10 +1999,9 @@ class WConfTickerTapeDrawer(WTemplated):
         self._conf=conf
         self._tz = tz
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
-        self._tickerTape = dm.getTickerTape()
 
     def getNowHappeningHTML( self, params=None ):
-        if not self._tickerTape.isActive():
+        if not layout_settings.get(self._conf, 'show_banner'):
             return None
 
         html = WTemplated.getHTML( self, params )
@@ -2012,17 +2012,14 @@ class WConfTickerTapeDrawer(WTemplated):
         return html
 
     def getSimpleText( self ):
-        if not self._tickerTape.isSimpleTextEnabled() or \
-           self._tickerTape.getText().strip() == "":
-            return None
-
-        return self._tickerTape.getText()
+        if layout_settings.get(self._conf, 'show_announcement'):
+            return layout_settings.get(self._conf, 'announcement')
 
     def getVars(self):
         vars = WTemplated.getVars( self )
 
         vars["nowHappeningArray"] = None
-        if self._tickerTape.isNowHappeningEnabled():
+        if layout_settings.get(self._conf, 'show_banner'):
             vars["nowHappeningArray"] = self._getNowHappening()
 
         return vars

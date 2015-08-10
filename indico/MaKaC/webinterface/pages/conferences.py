@@ -68,6 +68,7 @@ from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
 from indico.modules.events.layout.util import menu_entries_for_event
+from indico.modules.events.layout import layout_settings
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
@@ -426,9 +427,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars['support_info'] = self._conf.getSupportInfo()
 
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
-        format = dm.getFormat()
-        vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"].replace("#","")
-        vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"].replace("#","")
+        vars["bgColorCode"] = layout_settings.get(self._conf, 'header_background_color').replace("#", "")
+        vars["textColorCode"] = layout_settings.get(self._conf, 'header_text_color').replace("#", "")
 
         vars["confId"] = self._conf.getId()
         vars["dm"] = dm
