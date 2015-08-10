@@ -201,11 +201,10 @@ class MenuEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<MenuEntry({}, {}, {}{}{})>'.format(
+        return '<MenuEntry({}, {}, {}{})>'.format(
             self.id,
             self.title,
-            'page' if self.is_page else (self.url if self.is_link else 'separator'),
-            ', internal=False' if self.is_user_link else (', internal=True' if self.is_link else ''),
+            self.endpoint,
             ', is_root=True' if self.is_root else '',
         )
 
