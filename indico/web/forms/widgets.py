@@ -20,6 +20,7 @@ from wtforms.widgets import TextInput, TextArea
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
+from indico.core.config import Config
 from indico.web.util import inject_js
 from indico.web.flask.templating import get_template_module
 
@@ -206,11 +207,27 @@ class ColorPickerWidget(JinjaWidget):
 class DropzoneWidget(JinjaWidget):
     """Renders a dropzone file upload field"""
 
-    def __init__(self, accepted_files=None, post_url=None):
+    def __init__(self, post_url=None, max_file_size=None, max_files=10, add_remove_links=True, accepted_file_types=None,
+                 param_name='file', submit_form=False):
         super(DropzoneWidget, self).__init__('forms/dropzone_widget.html')
-        self.accepted_files = accepted_files
-        self.post_url = post_url
+
+        config = Config.getInstance()
+
+        if max_file_size is None:
+            max_file_size = min(config.getMaxUploadFileSize() or 10240,
+                                config.getMaxUploadFilesTotalSize() or 10240)  # in MB
+
+        self.options = {
+            'url': post_url,
+            'uploadMultiple': max_files > 1,
+            'maxFilesize': max_file_size,
+            'maxFiles':  max_files,
+            'addRemoveLinks': add_remove_links,
+            'acceptedFiles': accepted_file_types,
+            'paramName': param_name,
+            'submit_form': submit_form,
+            'parallelUploads': max_files
+        }
 
     def __call__(self, field, **kwargs):
-        return super(DropzoneWidget, self).__call__(field, accepted_files=self.accepted_files, post_url=self.post_url,
-                                                    input_args=kwargs)
+        return super(DropzoneWidget, self).__call__(field, input_args=kwargs, options=self.options)

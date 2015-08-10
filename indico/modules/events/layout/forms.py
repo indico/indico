@@ -39,7 +39,7 @@ class LayoutForm(IndicoForm):
     show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
 
     # Style
-    logo = JSONField("Logo", widget=DropzoneWidget(accepted_files='image/*'),
+    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/*', max_files=1, submit_form=True),
                      description=_("Logo to be displayed next to the event's title"))
     header_text_color = StringField(_("Text colour"), widget=ColorPickerWidget())
     header_background_color = StringField(_("Background colour"), widget=ColorPickerWidget())
@@ -54,7 +54,7 @@ class LayoutForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(LayoutForm, self).__init__(*args, **kwargs)
         event = kwargs.pop('event')
-        self.logo.widget.post_url = url_for('event_layout.logo-upload', event)
+        self.logo.widget.options['url'] = url_for('event_layout.logo-upload', event)
 
 
 class MenuEntryForm(IndicoForm):

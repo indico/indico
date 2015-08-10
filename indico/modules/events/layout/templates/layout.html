@@ -6,7 +6,7 @@
 {% endblock %}
 
 {%- block content %}
-    {{ form_header(form, id='dropzone', classes='dropzone', action=url_for('event_layout.index', event)) }}
+    {{ form_header(form, classes='dropzone', action=url_for('event_layout.index', event)) }}
     {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
     <h3>{% trans %}Header Style{% endtrans %}</h3>
     {{ form_row(form.logo) }}

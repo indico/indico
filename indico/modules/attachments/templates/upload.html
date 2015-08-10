@@ -1,47 +1,15 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    {{ form_header(form, id='dropzone', classes='dropzone', action=action) }}
+    {{ form_header(form, id='file-upload', classes='dropzone ' + ('full-width' if not existing_attachment else ''),
+                   action=action) }}
+    <input type="hidden" autofocus>
     {% if existing_attachment %}
-        <div class="form-group" id="form-group-protected">
-            <div class="form-label form-block">
-                <label>{% trans %}File{% endtrans %}</label>
-            </div>
-            <div class="form-field form-block">
-                <div class="dropzone-area">
-                    <div class="dropzone-area-inner">
-                        <div class="dropzone-previews">
-                            <div class="dz-message"></div>
-                        </div>
-                        <div class="select-files-btn">
-                            <button type="button" class="i-button">
-                                {%- trans %}Choose from your computer{% endtrans -%}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <p class="form-field-description">
-                    <em>{% trans %}Already uploaded file. Replace it by adding a new file.{% endtrans %}</em>
-                </p>
-            </div>
-        </div>
-        <input id="file-change-trigger" type="hidden" value="0" name="__file_change_trigger">
+        {{ form_row(form.file) }}
     {% else %}
-        <div class="dropzone-area">
-            <div class="dropzone-previews">
-                <div class="dz-message">
-                  {% trans %}Drag files here{% endtrans %}
-                  <span class="message-seperator">- or -</span>
-                </div>
-            </div>
-            <div class="select-files-btn">
-                <button class="i-button" type="button">
-                    {%- trans %}Choose from your computer{% endtrans -%}
-                </button>
-            </div>
-        </div>
+        {{ form_row(form.files, skip_label=true) }}
     {% endif %}
-    {{ form_rows(form, skip=('folder', 'protected', 'acl')) }}
+    {{ form_rows(form, skip=('folder', 'protected', 'acl', 'files', 'file')) }}
     {{ form_rows(form, fields=('folder', 'protected', 'acl')) }}
     {{ protection_message | safe }}
     {% call form_footer(attach_form) %}
@@ -51,7 +19,7 @@
                        value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
             {%- else -%}
                 <input class="i-button big highlight js-dropzone-upload" type="submit" disabled
-                   value="{% trans %}Upload{% endtrans %}">
+                   value="{% trans %}Upload{% endtrans %}" data-disabled-until-change>
             {% endif %}
             <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
         </div>
@@ -66,85 +34,7 @@
             messageIfFolderProtected($('#protected'), $('#folder'), {{ folders_protection_info | tojson }},
                                      $('.self-protection-message'), $('.inherited-protection-message'),
                                      $('.folder-protection-message'));
-            $('#dropzone').dropzone({
-                clickable: '.dropzone-area',
-                previewsContainer: '.dropzone-previews',
-                autoProcessQueue: false,
-                uploadMultiple: true,
-                parallelUploads: 999,
-                maxFilesize: Math.min({{ indico_config.MaxUploadFileSize or 10240 }}, {{ indico_config.MaxUploadFilesTotalSize or 10240 }}),
-                maxFiles: {% if existing_attachment %}1{% else %}10{% endif %},
-                addRemoveLinks: {% if existing_attachment %}false{% else %}true{% endif %},
-
-                paramName: function() { return 'file'; },
-                init: function() {
-                    var uploadButton = $('.js-dropzone-upload');
-                    var saveButton = $('.js-dropzone-save');
-                    var self = this;
-                    var form = $('#dropzone');
-
-                    {% if existing_attachment %}
-                        var existingFile = {
-                            name: {{ existing_attachment.file.filename | tojson}},
-                            size: {{ existing_attachment.file.size | tojson }},
-                            accepted: true
-                        };
-
-                        self.emit('addedfile', existingFile);
-                        $('.dz-progress').hide();
-                        self.files[0] = existingFile;
-
-                        /* Disable opening the upload dialog when clicking on the file's preview element */
-                        $('.dz-preview').on('click', function(e) {
-                            e.stopPropagation();
-                        });
-                    {% endif %}
-
-                    uploadButton.on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        $('.dz-progress').show();
-                        self.processQueue();
-                    });
-
-                    saveButton.on('click', function(e) {
-                        if (self.getQueuedFiles().length) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        $('.dz-progress').show();
-                        self.processQueue();
-                    });
-
-                    self.on('addedfile', function(file) {
-                        {% if existing_attachment %}
-                            self.removeFile(self.files[0]);
-                            $('#file-change-trigger').val('1');
-                            $('#dropzone').trigger('change');
-                        {% endif %}
-                        uploadButton.prop('disabled', false);
-                        $('.dz-message').hide();
-                        $('.dz-progress').hide();
-                        $(file.previewElement).on('click', function(e) {
-                            e.stopPropagation();
-                        });
-                    });
-
-                    self.on('sendingmultiple', function() {
-                        form.trigger('ajaxDialog:beforeSubmit');
-                    });
-
-                    self.on('successmultiple', function(e, response) {
-                        form.trigger('ajaxDialog:success', [response]);
-                    });
-
-                    self.on('error', function(e, msg, xhr) {
-                        if (xhr) {
-                            form.trigger('ajaxDialog:error', [xhr]);
-                        }
-                    });
-                }
-            });
         })();
+
     </script>
 {%- endblock %}
