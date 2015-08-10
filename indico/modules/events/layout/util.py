@@ -17,269 +17,78 @@
 from __future__ import unicode_literals
 
 import binascii
-import transaction
-
-from collections import namedtuple
-from itertools import chain, count
+from itertools import count
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
-from indico.util.i18n import N_
-from indico.util.signals import values_from_signal
+from indico.util.signals import named_objects_from_signal
 from MaKaC.common.cache import GenericCache
 
-MenuEntryData = namedtuple('MenuEntryData', {'title', 'name', 'endpoint', 'visible', 'children', 'plugin'})
 
-DEFAULT_MENU_ENTRIES = [
-    MenuEntryData(
-        visible=True,
-        title=N_("Overview"),
-        name='overview',
-        endpoint='event.conferenceDisplay-overview',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Scientific Programme"),
-        name='program',
-        endpoint='event.conferenceProgram',
-        children=[
-            MenuEntryData(
-                visible=True,
-                title=N_("Manage my Tracks"),
-                name='program_my_tracks',
-                endpoint='event.myconference-myTracks',
-                children=None,
-                plugin=None),
-        ],
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Call for Abstracts"),
-        name='call_for_abstracts',
-        endpoint='event.conferenceCFA',
-        children=[
-            MenuEntryData(
-                visible=True,
-                title=N_("View my Abstracts"),
-                name='user_abstracts',
-                endpoint='event.userAbstracts',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Submit Abstract"),
-                name='abstract_submission',
-                endpoint='event.abstractSubmission',
-                children=None,
-                plugin=None),
-        ],
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Timetable"),
-        name='timetable',
-        endpoint='event.conferenceTimeTable',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Contribution List"),
-        name='contributions',
-        endpoint='event.contributionListDisplay',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Author List"),
-        name='author_index',
-        endpoint='event.confAuthorIndex',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Speaker List"),
-        name='speaker_index',
-        endpoint='event.confSpeakerIndex',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("My Conference"),
-        name='my_conference',
-        endpoint='event.myconference',
-        children=[
-            MenuEntryData(
-                visible=True,
-                title=N_("My Tracks"),
-                endpoint='event.myconference-myTracks',
-                name='my_tracks',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("My Sessions"),
-                name='my_sessions',
-                endpoint='event.myconference-mySessions',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("My Contributions"),
-                name='my_contributions',
-                endpoint='event.myconference-myContributions',
-                children=None,
-                plugin=None),
-        ],
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Paper Reviewing"),
-        name='paper_reviewing',
-        endpoint='event.paperReviewingDisplay',
-        children=[
-            MenuEntryData(
-                visible=True,
-                title=N_("Manage Paper Reviewing"),
-                name='paper_setup',
-                endpoint='event_mgmt.confModifReviewing-paperSetup',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Assign Papers"),
-                name='paper_assign',
-                endpoint='event_mgmt.assignContributions',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Referee Area"),
-                name='contributions_to_judge',
-                endpoint='event_mgmt.confListContribToJudge',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Content Reviewer Area"),
-                name='contributions_as_reviewer',
-                endpoint='event_mgmt.confListContribToJudge-asReviewer',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Layout Reviewer Area"),
-                name='contributions_as_editor',
-                endpoint='event_mgmt.confListContribToJudge-asEditor',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Upload Paper"),
-                name='paper_upload',
-                endpoint='event.paperReviewingDisplay-uploadPaper',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Download Template"),
-                name='download_template',
-                endpoint='event.paperReviewingDisplay-downloadTemplate',
-                children=None,
-                plugin=None),
-        ],
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Book of Abstracts"),
-        name='abstracts_book',
-        endpoint='event.conferenceDisplay-abstractBook',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Registration"),
-        name='registration',
-        endpoint='event.confRegistrationFormDisplay',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Participant List"),
-        name='registrants',
-        endpoint='event.confRegistrantsDisplay-list',
-        children=None,
-        plugin=None),
-    MenuEntryData(
-        visible=True,
-        title=N_("Evaluation"),
-        name='evaluation',
-        endpoint='event.confDisplayEvaluation',
-        children=[
-            MenuEntryData(
-                visible=True,
-                title=N_("Evaluation Form"),
-                name='evaluation_form',
-                endpoint='event.confDisplayEvaluation-display',
-                children=None,
-                plugin=None),
-            MenuEntryData(
-                visible=True,
-                title=N_("Modify my Evaluation"),
-                name='evaluation_edit',
-                endpoint='event.confDisplayEvaluation-modif',
-                children=None,
-                plugin=None),
-        ],
-        plugin=None)
-]
+class MenuEntryData(object):
+    plugin = None
+
+    def __init__(self, title, name, endpoint, visible=True, children=None):
+        self.title = title
+        self.name = name
+        self.endpoint = endpoint
+        self.visible = visible
+        self.children = children if children is not None else []
+
 
 _cache = GenericCache('updated-menus')
 
 
-def menu_entries_for_event(event):
-    entries = MenuEntry.find(event_id=event.getId(), parent_id=None).order_by(MenuEntry.position.asc()).all()
+def menu_entries_for_event(event, show_hidden=False):
+    entries = MenuEntry.find(event_id=event.getId(), parent_id=None).order_by(MenuEntry.position).all()
+    signal_entries = named_objects_from_signal(signals.event.sidemenu.send())
 
     plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
-    cache_key = binascii.crc32(plugin_key) & 0xffffffff
+    cache_key = binascii.crc32('{}_{}'.format(event.getId(), plugin_key)) & 0xffffffff
     processed = _cache.get(cache_key)
 
     if not processed:
         # menu entries from signal
-        pos_gen = count(start=entries[-1].position + 1)
-        existing = ((entry.endpoint, entry.type)
-                    for entry in entries
-                    if entry.type in {MenuEntryType.internal_link, MenuEntryType.plugin_link})
-        signal_entries = (_build_entry(event, entry_data)
-                          for entry_data in values_from_signal(signals.event.sidemenu.send())
-                          if (entry_data.endpoint,
-                              MenuEntryType.plugin_link if entry_data.plugin else MenuEntryType.internal_link)
-                          in existing)
-        for position, entry in zip(pos_gen, signal_entries):
-            entry.position = position
-        entries.extend(signal_entries)
-        _cache.set(cache_key, True)
-        transaction.commit()
+        pos_gen = count(start=(entries[-1].position + 1) if entries else 0)
+        entry_names = {entry.name for entry in entries}
 
-    # Filter out entries from disabled plugins
-    plugins = plugin_engine.get_active_plugins().viewkeys()
-    return (entry for entry in entries if entry.type != MenuEntryType.plugin_link or entry.plugin in plugins)
+        signal_entry_names = signal_entries.viewkeys()
 
+        # Keeping only new entries from the signal
+        new_entry_names = signal_entry_names - entry_names
+        new_entries = [_build_entry(event, data, position=position)
+                       for (name, data), position in zip(signal_entries.iteritems(), pos_gen)
+                       if name in new_entry_names]
 
-def default_menu_entries(event):
-    entries = (_build_entry(event, entry_data, i) for i, entry_data in
-               enumerate(chain(DEFAULT_MENU_ENTRIES, values_from_signal(signals.event.sidemenu.send()))))
-    db.session.add_all(entries)
-    transaction.commit()
+        with db.tmp_session() as sess:
+            sess.add_all(new_entries)
+            sess.commit()
+            _cache.set(cache_key, True)
+        entries.extend(new_entries)
+
+    def _is_entry_visible(entry):
+        if not show_hidden and not entry.visible:
+            return False
+        if entry.name:
+            try:
+                entry_data = signal_entries[entry.name]
+            except KeyError:
+                return False
+            if show_hidden:
+                return True
+            if callable(entry_data.visible):
+                return entry_data.visible(event)
+        return True
+    entries = filter(_is_entry_visible, entries)
     return entries
 
 
 def _build_entry(event, data, position=0):
     entry = MenuEntry(
         event_id=event.getId(),
-        visible=data.visible(event) if hasattr(data.visible, '__call__') else data.visible,
+        visible=True if callable(data.visible) else data.visible,
         title=data.title,
         name=data.name,
         endpoint=data.endpoint,
@@ -292,7 +101,6 @@ def _build_entry(event, data, position=0):
         entry.plugin = data.plugin
     else:
         entry.type = MenuEntryType.internal_link
-
     return entry
 
 

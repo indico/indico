@@ -20,6 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.layout.default import DEFAULT_MENU_ENTRIES
 from indico.modules.events.settings import EventSettingsProxy
 from indico.web.flask.util import url_for
 
@@ -49,3 +50,9 @@ def _extend_event_management_menu_layout(event, **kwargs):
 def _extend_event_management_menu_event_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'menu', SideMenuItem('Menu', url_for('event_layout.menu', event), visible=event.canModify(session.user))
+
+
+@signals.event.sidemenu.connect
+def _get_default_menu_entries(sender, **kwargs):
+    for entry in DEFAULT_MENU_ENTRIES:
+        yield entry

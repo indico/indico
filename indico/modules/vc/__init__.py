@@ -72,8 +72,7 @@ def _extend_event_menu(sender, **kwargs):
                          title='Videoconference Rooms',
                          name='videoconference_rooms',
                          visible=_visible,
-                         children=None,
-                         plugin=None)
+                         children=None)
 
 
 @signals.event.session_slot_deleted.connect

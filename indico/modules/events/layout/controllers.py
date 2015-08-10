@@ -85,7 +85,8 @@ class RHLayoutEdit(RHConferenceModifBase):
 
 class RHMenuEdit(RHConferenceModifBase):
     def _process(self):
-        return WPMenuEdit.render_template('menu_edit.html', self._conf, menu=menu_entries_for_event(self._conf))
+        return WPMenuEdit.render_template('menu_edit.html', self._conf,
+                                          menu=menu_entries_for_event(self._conf, show_hidden=True))
 
 
 class RHMenuEntryEditBase(RHConferenceModifBase):
