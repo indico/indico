@@ -16,14 +16,14 @@
 
 from __future__ import unicode_literals
 
-from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoDateTimeField
 from indico.web.forms.widgets import SwitchWidget
-from indico.web.forms.validators import HiddenUnless, ValidationError
+from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime
 from indico.util.i18n import _
 
 
@@ -54,15 +54,12 @@ class SurveyForm(IndicoForm):
 
 
 class ScheduleSurveyForm(IndicoForm):
-    start_dt = DateField(_('Start'), [Optional()], parse_kwargs={'dayfirst': True},
-                         description=_('Include only attachments uploaded after this date'))
-    end_dt = DateField(_('End'), [Optional()], parse_kwargs={'dayfirst': True},
-                       description=_('Include only attachments uploaded after this date'))
+    start_dt = IndicoDateTimeField(_('Start'), [DataRequired(), DateTimeRange(earliest='now')],
+                                   description=_('Moment when the survey will be open for submissions'))
+    end_dt = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt')],
+                                 description=_('Moment when the survey will be considered finished'))
 
     def __init__(self, *args, **kwargs):
         self.survey = kwargs.pop('survey', None)
+        self.timezone = self.survey.event.getTimezone()
         super(IndicoForm, self).__init__(*args, **kwargs)
-
-    def validate_end_dt(self, field):
-        if field.data < self.start_dt.data:
-            raise ValidationError(_("End date of the survey can't be before the start time"))
