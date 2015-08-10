@@ -102,13 +102,14 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
 
-def format_date(d, format='medium', locale=None):
+def format_date(d, format='medium', locale=None, timezone=None):
     """
     Basically a wrapper around Babel's own format_date
     """
     if not locale:
         locale = get_current_locale()
-
+    if timezone and isinstance(d, datetime) and d.tzinfo:
+        d = d.astimezone(pytz.timezone(timezone))
     return _format_date(d, format=format, locale=locale).encode('utf-8')
 
 
