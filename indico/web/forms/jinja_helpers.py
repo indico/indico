@@ -59,12 +59,14 @@ def _attrs_for_validators(field, validators):
     return attrs
 
 
-def render_field(field, widget_attrs):
+def render_field(field, widget_attrs, disabled=None):
     """Renders a WTForms field, taking into account validators"""
     args = _attrs_for_validators(field, field.validators)
     args['required'] = (field.flags.required and not field.flags.conditional
                         and not isinstance(field, IndicoSelectMultipleCheckboxField))
     args.update(widget_attrs)
+    if disabled is not None:
+        args['disabled'] = disabled
     return field(**args)
 
 
