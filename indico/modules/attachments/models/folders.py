@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import g, session
+from flask import g
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
@@ -157,7 +157,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
         """
-        if not self.linked_object.canView(AccessWrapper(session.user.as_avatar if session.user else None)):
+        if not self.linked_object.canView(AccessWrapper(user.as_avatar if user else None)):
             return False
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
 
