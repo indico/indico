@@ -18,6 +18,11 @@
 
             var dateField = $('#{{ field.id }}-date');
             var timeField = $('#{{ field.id }}-time');
+
+            function requireTime() {
+                timeField.attr('required', true);
+            }
+
             dateField.datepicker({
                 onSelect: function applyOnSelectHandlers() {
                     var handlers = $(this).data('onSelectHandlers');
@@ -25,11 +30,12 @@
                         handlers[i].apply(this, arguments);
                     }
                 }
-            }).data('onSelectHandlers', []);
+            }).data('onSelectHandlers', [requireTime]);
 
             {% if field.data %}
                 var date = {{ field.data | format_date('code', timezone=field.timezone) | tojson }};
                 dateField.datepicker('setDate', date);
+                requireTime();
             {% endif %}
 
             {% if field.earliest_dt or field.latest_dt %}
