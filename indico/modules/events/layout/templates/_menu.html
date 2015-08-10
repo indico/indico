@@ -3,7 +3,7 @@
          data-position="{{ entry.position }}"
          data-position-url="{{ url_for('.menu-entry-position', entry) }}">
         <div class="i-label disabled {%- if not entry.visible %} stripped{% endif %} entry-{{ entry.type.name }}">
-            <span>{{  _(entry.title)  }} ({{ entry.position }})</span>
+            <span>{{ _(entry.title) }} ({{ entry.position }})</span>
             <span class="right actions">
                 <a class="{% if not entry.visible %}not-{% endif %}visible" href="#"
                    data-href="{{ url_for('.menu-entry-visibility', entry) }}"
