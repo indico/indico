@@ -34,6 +34,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHManageSurveysBase(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf
