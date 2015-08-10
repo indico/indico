@@ -142,7 +142,7 @@
             }
 
             function updateField() {
-                field.val(JSON.stringify(data));
+                field.val(JSON.stringify(data)).trigger('change');
             }
         })();
     </script>
