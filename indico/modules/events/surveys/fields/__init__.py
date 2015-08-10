@@ -27,12 +27,11 @@ def get_field_types():
 
 @signals.event.get_survey_fields.connect
 def _get_fields(sender, **kwargs):
-    from .simple import TextField, NumberField, BoolField, SingleChoiceField, TextParagraphField, MultiSelectField
+    from .simple import TextField, NumberField, BoolField, SingleChoiceField, MultiSelectField
     yield TextField
     yield NumberField
     yield BoolField
     yield SingleChoiceField
-    yield TextParagraphField
     yield MultiSelectField
 
 
