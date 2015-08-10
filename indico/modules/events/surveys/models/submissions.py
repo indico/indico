@@ -33,12 +33,6 @@ class SurveySubmission(db.Model):
         db.Integer,
         primary_key=True
     )
-    #: The ID of the event
-    event_id = db.Column(
-        db.Integer,
-        index=True,
-        nullable=False
-    )
     #: The ID of the survey
     survey_id = db.Column(
         db.Integer,
@@ -97,7 +91,7 @@ class SurveySubmission(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<SurveySubmission({}, {}, {})>'.format(self.id, self.event_id, self.user_id)
+        return '<SurveySubmission({}, {}, {})>'.format(self.id, self.survey_id, self.user_id)
 
 
 class SurveyAnswer(db.Model):
