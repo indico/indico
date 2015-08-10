@@ -41,22 +41,30 @@ class RHManageSurveysBase(RHConferenceModifBase):
         self.event = self._conf
 
 
+class RHManageSurveyBase(RHManageSurveysBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.survey
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageSurveysBase._checkParams(self, params)
+        self.survey = Survey.find_one(id=request.view_args['survey_id'], is_deleted=False)
+
+
 class RHManageSurveys(RHManageSurveysBase):
     def _process(self):
-        surveys = Survey.find_all(event_id=self.event.id)
+        surveys = Survey.find(event_id=self.event.id).order_by(db.func.lower(Survey.title)).all()
         return WPManageSurvey.render_template('management.html', self.event, event=self.event, surveys=surveys)
 
 
-class RHManageSurvey(RHManageSurveysBase):
-    def _checkParams(self, params):
-        RHManageSurveysBase._checkParams(self, params)
-        self.survey = Survey.get(request.view_args['survey_id'])
-
+class RHManageSurvey(RHManageSurveyBase):
     def _process(self):
         return WPManageSurvey.render_template('manage_survey.html', self.event, survey=self.survey, states=SurveyState)
 
 
-class RHEditSurvey(RHManageSurvey):
+class RHEditSurvey(RHManageSurveyBase):
     back_button_endpoint = 'survey.manage_survey'
 
     def _process(self):
@@ -127,6 +135,13 @@ class RHManageSurveyQuestionnaire(RHManageSurvey):
 
 
 class RHAddSurveyQuestion(RHManageSurvey):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.survey
+        },
+        'preserved_args': {'type'}
+    }
+
     def _process(self):
         try:
             field_cls = get_field_types()[request.view_args['type']]
@@ -144,11 +159,19 @@ class RHAddSurveyQuestion(RHManageSurvey):
         return jsonify_template('events/surveys/edit_question.html', form=form)
 
 
-class RHEditSurveyQuestion(RHManageSurveysBase):
+class RHManageSurveyQuestionBase(RHManageSurveysBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.question
+        }
+    }
+
     def _checkParams(self, params):
         RHManageSurveysBase._checkParams(self, params)
         self.question = SurveyQuestion.get_one(request.view_args['question_id'])
 
+
+class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
     def _process(self):
         form = self.question.field.config_form(obj=FormDefaults(self.question, **self.question.field_data))
         if form.validate_on_submit():
@@ -159,24 +182,15 @@ class RHEditSurveyQuestion(RHManageSurveysBase):
         return jsonify_template('events/surveys/edit_question.html', form=form, question=self.question)
 
 
-class RHDeleteSurveyQuestion(RHManageSurveysBase):
-    def _checkParams(self, params):
-        RHManageSurveysBase._checkParams(self, params)
-        self.question = SurveyQuestion.get_one(request.view_args['question_id'])
-        self.survey = Survey.get(request.view_args['survey_id'])
-
+class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
     def _process(self):
         db.session.delete(self.question)
         db.session.flush()
         flash(_('Question {} successfully deleted'.format(self.question.title)), 'success')
-        return redirect(url_for('.manage_questionnaire', self.survey))
+        return redirect(url_for('.manage_questionnaire', self.question.survey))
 
 
-class RHChangeQuestionPosition(RHManageSurveysBase):
-    def _checkParams(self, params):
-        RHManageSurveysBase._checkParams(self, params)
-        self.survey = Survey.get_one(request.view_args['survey_id'])
-
+class RHChangeQuestionPosition(RHManageSurveyBase):
     def _process(self):
         questions = {question.id: question for question in self.survey.questions}
         question_ids = map(int, request.form.getlist('question_ids'))
