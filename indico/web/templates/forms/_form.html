@@ -43,7 +43,7 @@
     </div>
 {%- endmacro %}
 
-{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, placeholder=false) %}
+{% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, disabled=true, placeholder=false) %}
     {% if field or not allow_missing %}
         <div id="form-group-{{ field.id }}"
              class="form-group {{ orientation }}
@@ -58,7 +58,7 @@
                     {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
                 </div>
             {% endif %}
-            {% set widget_attrs = dict(widget_attrs, placeholder=(field.label.text if placeholder else '')) %}
+            {% set widget_attrs = dict(widget_attrs, disabled=disabled, placeholder=(field.label.text if placeholder else '')) %}
             {%- if caller -%}
                 {% set caller_ = caller %}
                 {% call form_field(field, "form-field form-block", widget_attrs) -%}
@@ -71,9 +71,10 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro form_rows(form, fields=none, skip=(), orientation='', skip_labels=false, widget_attrs={}, placeholder=false) %}
+{% macro form_rows(form, fields=none, skip=(), orientation='', skip_labels=false, widget_attrs={}, disable=(), placeholder=false) %}
     {% for field in _iter_form_fields(form, fields=fields, skip=skip) %}
-        {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation, skip_label=skip_labels, placeholder=placeholder) }}
+        {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation,
+                    skip_label=skip_labels, disabled=field.name in disable, placeholder=placeholder) }}
     {% endfor %}
 {% endmacro %}
 
