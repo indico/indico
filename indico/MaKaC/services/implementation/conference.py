@@ -1164,7 +1164,7 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['value'])
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -1466,7 +1466,7 @@ class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
             # remove pending email, self._submitterId is an email address
             self._conf.getAccessController().revokeModificationEmail(self._managerId)
         else:
-            self._conf.revokeModification(principal_from_fossil(self._params['principal']))
+            self._conf.revokeModification(principal_from_fossil(self._params['principal'], allow_missing_groups=True))
         return self._getManagersList()
 
 
@@ -1488,7 +1488,7 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
 
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['principal'])
+        self._principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
 
     def _getAnswer(self):
         self._conf.removeFromRegistrars(self._principal)
