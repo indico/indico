@@ -21,7 +21,7 @@ from indico.modules.events.surveys.controllers.management import (RHManageSurvey
                                                                   RHStartSurvey, RHEndSurvey,
                                                                   RHManageSurveyQuestionnaire, RHAddSurveyQuestion,
                                                                   RHEditSurveyQuestion, RHDeleteSurveyQuestion,
-                                                                  RHChangeQuestionPosition)
+                                                                  RHSortQuestions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -49,5 +49,5 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id
                  RHEditSurveyQuestion, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id>/delete', 'remove_question',
                  RHDeleteSurveyQuestion, methods=('POST',))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/change-positions', 'change_question_position',
-                 RHChangeQuestionPosition, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort-questions', 'sort_questions',
+                 RHSortQuestions, methods=('POST',))
