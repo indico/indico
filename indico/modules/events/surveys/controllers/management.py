@@ -28,6 +28,7 @@ from indico.modules.events.surveys.models.questions import SurveyQuestion
 from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
@@ -186,7 +187,7 @@ class RHAddSurveyQuestion(RHManageSurvey):
             db.session.flush()
             flash(_('Question "{title}" added').format(title=question.title), 'success')
             logger.info('Survey question {} added by {}'.format(question, session.user))
-            return jsonify_data(flash=False)
+            return jsonify_data(questionnaire=_render_questionnaire(self.survey))
         return jsonify_template('events/surveys/edit_question.html', form=form)
 
 
@@ -214,7 +215,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=self.question.title), 'success')
             logger.info('Survey question {} modified by {}'.format(self.question, session.user))
-            return jsonify_data(flash=False)
+            return jsonify_data(questionnaire=_render_questionnaire(self.question.survey))
         return jsonify_template('events/surveys/edit_question.html', form=form, question=self.question)
 
 
@@ -224,9 +225,9 @@ class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
     def _process(self):
         db.session.delete(self.question)
         db.session.flush()
-        flash(_('Question {} successfully deleted'.format(self.question.title)), 'success')
+        flash(_('Question "{title}" deleted'.format(title=self.question.title)), 'success')
         logger.info('Survey question {} deleted by {}'.format(self.question, session.user))
-        return redirect(url_for('.manage_questionnaire', self.question.survey))
+        return jsonify_data(questionnaire=_render_questionnaire(self.question.survey))
 
 
 class RHSortQuestions(RHManageSurveyBase):
@@ -240,3 +241,9 @@ class RHSortQuestions(RHManageSurveyBase):
         db.session.flush()
         logger.info('Questions in {} reordered by {}'.format(self.survey, session.user))
         return jsonify(success=True)
+
+
+def _render_questionnaire(survey):
+    tpl = get_template_module('events/surveys/_questionnaire.html')
+    form = make_survey_form(survey.questions)()
+    return tpl.render_questionnaire(survey, form)
