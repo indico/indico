@@ -1,11 +1,6 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from 'forms/_form.html' import simple_form %}
 
-{{ form_header(form) }}
-{{ form_rows(form) }}
-{% call form_footer(form) %}
-    <input class="i-button big highlight" type="submit" value="{% trans %}Schedule{% endtrans %}" data-disabled-until-change>
-    <button class="i-button big" data-button-back>{% trans %}Back{% endtrans %}</button>
-{% endcall %}
+{{ simple_form(form, submit=_('Schedule')) }}
 
 <script>
     $('#start_dt, #end_dt').datepicker();
