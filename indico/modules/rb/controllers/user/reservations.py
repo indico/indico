@@ -20,6 +20,7 @@ from collections import defaultdict
 import dateutil
 import transaction
 from flask import request, session, jsonify, flash
+from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import Forbidden
 
@@ -660,14 +661,18 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
             occurrences = []
         else:
             rooms = Room.find_all(is_active=True)
-            occurrences = ReservationOccurrence.find_all(
-                Reservation.room_id.in_(room.id for room in rooms),
-                ReservationOccurrence.start_dt >= self.start_dt,
-                ReservationOccurrence.end_dt <= self.end_dt,
-                ReservationOccurrence.is_valid,
-                _join=Reservation,
-                _eager=ReservationOccurrence.reservation
-            )
+            # avoid loading users we don't need anyway
+            reservation_strategy = joinedload('reservation')
+            reservation_strategy.noload('created_by_user')
+            reservation_strategy.noload('booked_for_user')
+            occurrences = (ReservationOccurrence
+                           .find(Reservation.room_id.in_(room.id for room in rooms),
+                                 ReservationOccurrence.start_dt >= self.start_dt,
+                                 ReservationOccurrence.end_dt <= self.end_dt,
+                                 ReservationOccurrence.is_valid,
+                                 _join=Reservation)
+                           .options(reservation_strategy)
+                           .all())
 
         return WPRoomBookingCalendar(self, rooms=rooms, occurrences=occurrences, start_dt=self.start_dt,
                                      end_dt=self.end_dt, overload=self._overload, max_days=self.MAX_DAYS).display()
