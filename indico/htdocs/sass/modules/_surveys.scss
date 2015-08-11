@@ -1,14 +1,10 @@
-.sortblock li {
-    cursor: move;
-}
-
 .questions-handle {
     width: 100%;
     display: table;
     word-wrap: break-word;
 }
 
-.position-td {
+.position-element {
     text-align: center;
     font-weight: bold;
     vertical-align: middle;
@@ -25,8 +21,13 @@
 
 .question-data {
     display: table-cell;
-    vertical-align: middle;
-    width: 33%;
+    cursor: move;
+}
+
+.action-buttons {
+    width: 11%;
+    vertical-align: top;
+    display: table-cell;
 }
 
 .action-buttons {
