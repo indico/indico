@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request, flash, jsonify
+from flask import redirect, request, flash, jsonify, session
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
+from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.fields import get_field_types
 from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
@@ -34,6 +35,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHManageSurveysBase(RHConferenceModifBase):
+    """Base class for all survey management RHs"""
+
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
@@ -42,6 +45,8 @@ class RHManageSurveysBase(RHConferenceModifBase):
 
 
 class RHManageSurveyBase(RHManageSurveysBase):
+    """Base class for specific survey management RHs."""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.survey
@@ -54,22 +59,29 @@ class RHManageSurveyBase(RHManageSurveysBase):
 
 
 class RHManageSurveys(RHManageSurveysBase):
+    """Survey management overview (list of surveys)"""
+
     def _process(self):
         surveys = Survey.find(event_id=self.event.id, is_deleted=False).order_by(db.func.lower(Survey.title)).all()
         return WPManageSurvey.render_template('management.html', self.event, event=self.event, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
+    """Specific survey management (overview)"""
+
     def _process(self):
         return WPManageSurvey.render_template('manage_survey.html', self.event, survey=self.survey, states=SurveyState)
 
 
 class RHEditSurvey(RHManageSurveyBase):
+    """Edit a survey's basic data/settings"""
+
     def _process(self):
         form = SurveyForm(event=self.event, obj=FormDefaults(self.survey))
         if form.validate_on_submit():
             form.populate_obj(self.survey)
             flash(_('Survey modified'), 'success')
+            logger.info('Survey {} modified by {}'.format(self.survey, session.user))
             return redirect(url_for('.manage_survey', self.survey))
 
         return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form,
@@ -77,13 +89,18 @@ class RHEditSurvey(RHManageSurveyBase):
 
 
 class RHDeleteSurvey(RHManageSurveyBase):
+    """Delete a survey"""
+
     def _process(self):
         self.survey.is_deleted = True
         flash(_('Survey deleted'), 'success')
+        logger.info('Survey {} deleted by {}'.format(self.survey, session.user))
         return redirect(url_for('.management', self.event))
 
 
 class RHCreateSurvey(RHManageSurveysBase):
+    """Create a new survey"""
+
     def _process(self):
         form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
         if form.validate_on_submit():
@@ -92,12 +109,15 @@ class RHCreateSurvey(RHManageSurveysBase):
             db.session.add(survey)
             db.session.flush()
             flash(_('Survey created'), 'success')
+            logger.info('Survey {} created by {}'.format(survey, session.user))
             return redirect(url_for('.manage_survey', survey))
 
         return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form, survey=None)
 
 
 class RHScheduleSurvey(RHManageSurvey):
+    """Schedule a survey's start/end dates"""
+
     def _get_form_defaults(self):
         return FormDefaults(self.survey)
 
@@ -108,23 +128,32 @@ class RHScheduleSurvey(RHManageSurvey):
             self.survey.end_dt = form.end_dt.data
             # TODO: open/close/schedule
             flash(_('Survey is now open'), 'success')
+            logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
             return jsonify_data(flash=False)
         return jsonify_template('events/surveys/schedule_survey.html', form=form)
 
 
 class RHStartSurvey(RHManageSurvey):
+    """Start a survey (allows users to submit responses)"""
+
     def _process(self):
         self.survey.start()
+        logger.info('Survey {} started by {}'.format(self.survey, session.user))
         return redirect(url_for('.manage_survey', self.survey))
 
 
 class RHEndSurvey(RHManageSurvey):
+    """End a survey (prevent users from submitting responses)"""
+
     def _process(self):
         self.survey.end()
+        logger.info('Survey {} ended by {}'.format(self.survey, session.user))
         return redirect(url_for('.manage_survey', self.survey))
 
 
 class RHManageSurveyQuestionnaire(RHManageSurvey):
+    """Manage the questionnaire of a survey (question overview page)"""
+
     def _process(self):
         field_types = get_field_types()
         preview_form = make_survey_form(self.survey.questions)()
@@ -134,6 +163,8 @@ class RHManageSurveyQuestionnaire(RHManageSurvey):
 
 
 class RHAddSurveyQuestion(RHManageSurvey):
+    """Add a new question to a survey"""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.survey
@@ -154,11 +185,14 @@ class RHAddSurveyQuestion(RHManageSurvey):
             db.session.add(question)
             db.session.flush()
             flash(_('Question "{title}" added').format(title=question.title), 'success')
+            logger.info('Survey question {} added by {}'.format(question, session.user))
             return jsonify_data(flash=False)
         return jsonify_template('events/surveys/edit_question.html', form=form)
 
 
 class RHManageSurveyQuestionBase(RHManageSurveysBase):
+    """Base class for RHs that deal with a specific survey question"""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.question
@@ -171,29 +205,38 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
 
 
 class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
+    """Edit a survey question"""
+
     def _process(self):
         form = self.question.field.config_form(obj=FormDefaults(self.question, **self.question.field_data))
         if form.validate_on_submit():
             self.question.field.save_config(form)
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=self.question.title), 'success')
+            logger.info('Survey question {} modified by {}'.format(self.question, session.user))
             return jsonify_data(flash=False)
         return jsonify_template('events/surveys/edit_question.html', form=form, question=self.question)
 
 
 class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
+    """Delete a survey question"""
+
     def _process(self):
         db.session.delete(self.question)
         db.session.flush()
         flash(_('Question {} successfully deleted'.format(self.question.title)), 'success')
+        logger.info('Survey question {} deleted by {}'.format(self.question, session.user))
         return redirect(url_for('.manage_questionnaire', self.question.survey))
 
 
 class RHSortQuestions(RHManageSurveyBase):
+    """Update the order of all survey questions"""
+
     def _process(self):
         questions = {question.id: question for question in self.survey.questions}
         question_ids = map(int, request.form.getlist('question_ids'))
         for position, question_id in enumerate(question_ids, 1):
             questions[question_id].position = position
         db.session.flush()
+        logger.info('Questions in {} reordered by {}'.format(self.survey, session.user))
         return jsonify(success=True)
