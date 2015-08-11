@@ -69,6 +69,7 @@ from MaKaC.common.TemplateExec import render
 from indico.core import signals
 from indico.modules.events.layout.util import menu_entries_for_event, get_entry_from_name
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.models.events import Event
 from indico.util import json
 from indico.util.signals import values_from_signal, named_objects_from_signal
 from indico.web.flask.util import url_for
@@ -188,14 +189,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
         frameParams = {
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf),
-            "logoURL": urlHandlers.UHConferenceLogo.getURL(self._conf),
+            "logoURL": self.logo_url,
             "currentURL": request.url,
             "nowHappening": drawer.getNowHappeningHTML(),
             "simpleTextAnnouncement": drawer.getSimpleText(),
             'active_menu_entry_id': self._get_active_menu_entry()
         }
-        if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL(self._conf)
+        if self.event.logo:
+            frameParams["logoURL"] = self.logo_url
 
         body = """
             <div class="confBodyBox clearfix">
@@ -239,6 +240,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         ])
 
     def _applyDecoration( self, body ):
+        self.event = Event.find(id=self._conf.getId()).one()
+        self.logo_url = url_for('event_images.logo_display', self._conf)
         body = self._applyConfDisplayDecoration( body )
         return WPConferenceBase._applyDecoration( self, body )
 
@@ -268,6 +271,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
     def __init__(self, aw, conf):
         self._aw = aw
         self._conf = conf
+        self.event = Event.find(id=self._conf.getId()).one()
 
     def getHTML(self, body, params):
         self._body = body
@@ -276,7 +280,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["logo"] = ""
-        if self._conf.getLogo():
+        if self.event.logo:
+            vars["logoURL"] = url_for('event_images.logo_display', self._conf)
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\" class=\"confLogo\" >"%(vars["logoURL"], escape_html(self._conf.getTitle(), escape_quotes = True))
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
