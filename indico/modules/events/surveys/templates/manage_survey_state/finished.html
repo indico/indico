@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block text %}
-    {% set tz = survey.event.getTimezone() %}
+    {% set tz = survey.event.tz %}
     {% trans date=survey.end_dt|format_date(timezone=tz), time=survey.end_dt|format_time(timezone=tz) -%}
         Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
     {%- endtrans %}
