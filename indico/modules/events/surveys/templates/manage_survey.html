@@ -13,13 +13,13 @@
         {% include 'events/surveys/manage_survey_state/finished.html' %}
     {% endif %}
 
-    {% if survey.state != states.not_ready  %}
+    {% if survey.state != states.not_ready %}
         <div class="action-box">
             <div class="section">
                 <div class="icon icon-clipboard"></div>
                 <div class="text">
                     <div class="label">
-                        Questionnaire
+                        {% trans %}Questionnaire{% endtrans %}
                     </div>
                 </div>
                 <div class="toolbar right">
