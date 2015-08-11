@@ -416,6 +416,11 @@ class IndicoDateTimeField(DateTimeField):
         self._timezone = kwargs.pop('timezone', None)
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
 
+    def pre_validate(self, form):
+        if self.object_data:
+            # Normalize datetime resolution of passed data
+            self.object_data = self.object_data.replace(second=0, microsecond=0)
+
     def process_formdata(self, valuelist):
         if valuelist:
             valuelist = [' '.join(valuelist).strip()]
