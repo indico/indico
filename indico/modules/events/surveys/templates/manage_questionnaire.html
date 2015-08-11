@@ -10,6 +10,9 @@
                 {% trans %}Questionnaire{% endtrans %}
             </div>
             <div class="i-box-buttons toolbar right">
+                <div class="group">
+                    <a href="{{ url_for('.manage_survey', survey) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
+                </div>
                 <div class="group js-add-question-dropdown">
                     <a class="i-button arrow" data-toggle="dropdown">{% trans %}Add new question{% endtrans %}</a>
                     <ul class="dropdown">
