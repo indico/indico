@@ -16,7 +16,7 @@
                     autoProcessQueue: false,
 
                     init: function() {
-                        var saveButton = $form.find('input[type="submit"], .js-dropzone-upload'),
+                        var $button = $form.find('input[type="submit"], .js-dropzone-upload'),
                             self = this,
                             file = $area.data('value');
 
@@ -44,9 +44,10 @@
                             }
                         }
 
-                        saveButton.on('click', function(e) {
+                        $button.on('click', function(e) {
                             e.preventDefault();
                             e.stopPropagation();
+                            $button.prop('disabled', true);
 
                             if (self.getQueuedFiles().length) {
                                 $('.dz-progress').show();
@@ -61,6 +62,7 @@
 
                             // force change in form, so that we can process
                             // the 'change' event
+                            $button.prop('disabled', false);
                             $form.find('.change-trigger').val(self.files.length);
                             $form.trigger('change');
 
