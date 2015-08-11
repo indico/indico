@@ -65,8 +65,6 @@ class RHManageSurvey(RHManageSurveyBase):
 
 
 class RHEditSurvey(RHManageSurveyBase):
-    back_button_endpoint = 'survey.manage_survey'
-
     def _process(self):
         form = SurveyForm(event=self.event, obj=FormDefaults(self.survey))
         if form.validate_on_submit():
@@ -74,19 +72,13 @@ class RHEditSurvey(RHManageSurveyBase):
             flash(_('Survey modified'), 'success')
             return redirect(url_for('.manage_survey', self.survey))
 
-        return WPManageSurvey.render_template('edit_survey.html', self.event,
-                                              survey=self.survey, form=form,
-                                              back_url=url_for(self.back_button_endpoint, self.survey))
+        return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form,
+                                              survey=self.survey)
 
 
 class RHCreateSurvey(RHManageSurveysBase):
-    back_button_endpoint = 'survey.management'
-
-    def _get_form_defaults(self):
-        return FormDefaults(require_user=True)
-
     def _process(self):
-        form = SurveyForm(obj=self._get_form_defaults(), event=self.event)
+        form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
         if form.validate_on_submit():
             survey = Survey(event=self.event)
             form.populate_obj(survey)
@@ -94,8 +86,8 @@ class RHCreateSurvey(RHManageSurveysBase):
             db.session.flush()
             flash(_('Survey created'), 'success')
             return redirect(url_for('.manage_survey', survey))
-        return WPManageSurvey.render_template('create_survey.html', self.event, form=form,
-                                              back_url=url_for(self.back_button_endpoint, self.event))
+
+        return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form, survey=None)
 
 
 class RHScheduleSurvey(RHManageSurvey):
