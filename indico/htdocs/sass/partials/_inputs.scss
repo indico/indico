@@ -18,7 +18,6 @@
  @import "partials/toolbars";
 
 %text-input {
-    @extend %font-size-body;
     @include border-all();
     @include box-sizing(border-box);
     @include single-transition(border-color);
