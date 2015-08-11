@@ -53,6 +53,9 @@
                                 $('.dz-progress').show();
                                 self.processQueue();
                             }
+                            else {
+                                $form.submit();
+                            }
                         });
 
                         self.on('addedfile', function(file) {
