@@ -45,19 +45,21 @@
                 error: handleAjaxError,
                 success: function(data) {
                     updateQuestions(data);
-                    handleFlashes(data, true, $('#questions'));
+                    handleFlashes(data, true, $('#questionnaire'));
                 }
             });
         });
+
+        $('.js-add-question-dropdown').dropdown();
     }
 
     function updateQuestions(data) {
-        $('#questions').tablesorter('destroy').html(data.questionnaire);
+        $('#questionnaire').tablesorter('destroy').html(data.questionnaire);
         setupQuestionSorter();
     }
 
     global.setupQuestionSorter = function setupQuestionSorter() {
-        var container = $('#questions');
+        var container = $('#questionnaire');
         container.tablesorter({
             sortables: '.sortblock ul',
             sortableElements: '> li',

@@ -4,22 +4,32 @@
 {% block content %}
     <div class="flashed-messages"></div>
 
-    <div class="toolbar">
-        <div class="group">
-            {% for field_type in field_types.values() | sort(attribute='friendly_name') %}
-                <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type.name) }}"
-                   data-title="{% trans %}Add question{% endtrans %}"
-                   class="i-button js-question-dialog">
-                        {%- trans name=field_type.friendly_name -%}
-                            Add {{ name }}
-                        {%- endtrans -%}
-                </a>
-            {% endfor %}
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}Questionnaire{% endtrans %}
+            </div>
+            <div class="i-box-buttons toolbar right">
+                <div class="group js-add-question-dropdown">
+                    <a class="i-button arrow" data-toggle="dropdown">{% trans %}Add new question{% endtrans %}</a>
+                    <ul class="dropdown">
+                        {% for field_type in field_types.values() | sort(attribute='friendly_name') %}
+                            <li>
+                                <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type.name) }}"
+                                   data-title="{% trans %}Add question{% endtrans %}"
+                                   class="js-question-dialog">
+                                    {{ field_type.friendly_name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div id="questions" class="i-box titled" data-sort-url="{{ url_for('.sort_questions', survey) }}">
-        {{ render_questionnaire(survey, preview_form) }}
+        <div id="questionnaire" data-sort-url="{{ url_for('.sort_questions', survey) }}">
+            {{ render_questionnaire(survey, preview_form) }}
+        </div>
     </div>
     <script>
         setupQuestionSorter();
