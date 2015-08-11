@@ -47,7 +47,7 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/add/<type>', 'ad
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id>/', 'edit_question',
                  RHEditSurveyQuestion, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id>/delete', 'remove_question',
-                 RHDeleteSurveyQuestion, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id>/', 'delete_question',
+                 RHDeleteSurveyQuestion, methods=('DELETE',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort-questions', 'sort_questions',
                  RHSortQuestions, methods=('POST',))
