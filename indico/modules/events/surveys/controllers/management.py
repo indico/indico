@@ -124,14 +124,19 @@ class RHScheduleSurvey(RHManageSurvey):
 
     def _process(self):
         form = ScheduleSurveyForm(obj=self._get_form_defaults(), survey=self.survey)
+        allow_reschedule_start = self.survey.state in (SurveyState.ready_to_open, SurveyState.active_and_clean)
         if form.validate_on_submit():
-            self.survey.start_dt = form.start_dt.data
+            # initial_state = self.survey.state
+            if allow_reschedule_start:
+                self.survey.start_dt = form.start_dt.data
             self.survey.end_dt = form.end_dt.data
             # TODO: open/close/schedule
-            flash(_('Survey is now open'), 'success')
+
+            flash(_('Survey scheduled to start'), 'success')
             logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
             return jsonify_data(flash=False)
-        return jsonify_template('events/surveys/schedule_survey.html', form=form)
+        disabled_fields = ('start_dt',) if not allow_reschedule_start else ()
+        return jsonify_template('events/surveys/schedule_survey.html', form=form, disabled_fields=disabled_fields)
 
 
 class RHStartSurvey(RHManageSurvey):
