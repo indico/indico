@@ -29,15 +29,18 @@ from MaKaC.common.contextManager import ContextManager
 
 def build_material_legacy_api_data(linked_object):
     # Skipping root folder and files in legacy API
+    event = linked_object.getConference()
     try:
-        cache = g.legacy_api_event_attachments
-    except AttributeError:
-        g.legacy_api_event_attachments = cache = defaultdict(list)
+        cache = g.legacy_api_event_attachments[event]
+    except (AttributeError, KeyError):
+        if 'legacy_api_event_attachments' not in g:
+            g.legacy_api_event_attachments = {}
+        g.legacy_api_event_attachments[event] = cache = defaultdict(list)
         query = (AttachmentFolder
                  .find(event_id=int(linked_object.getConference().id), is_deleted=False, is_default=False)
                  .options(joinedload(AttachmentFolder.legacy_mapping), joinedload(AttachmentFolder.attachments)))
         for folder in query:
-            g.legacy_api_event_attachments[folder.linked_object].append(folder)
+            cache[folder.linked_object].append(folder)
 
     return filter(None, map(_build_folder_legacy_api_data, cache.get(linked_object, [])))
 

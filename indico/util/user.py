@@ -75,7 +75,7 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
         raise ValueError('Unexpected type: {}'.format(type_))
 
 
-def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True):
+def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True, allow_missing_groups=False):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
@@ -117,7 +117,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
     elif type_ in {'LDAPGroupWrapper', 'MultipassGroup'}:
         provider = fossil['provider']
         group = GroupProxy(id_, provider)
-        if group.group is None:
+        if group.group is None and not allow_missing_groups:
             raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
         return group.as_legacy_group if legacy else group
     else:

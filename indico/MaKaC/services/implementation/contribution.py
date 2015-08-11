@@ -189,7 +189,7 @@ class ContributionProtectionAddUsers(ContributionModifBase):
 class ContributionProtectionRemoveUser(ContributionModifBase):
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['value'])
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -725,7 +725,7 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
             self._contribution.revokeSubmissionEmail(self._submitterId)
         else:
             try:
-                principal = principal_from_fossil(self._params['principal'])
+                principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
             except ValueError:
                 # WTF is this.. this used to be called if the user wasn't in avatarholder
                 self._removeUserFromSubmitterList(self._submitterId)
@@ -835,7 +835,7 @@ class ContributionRemoveManager(ContributionManagerListBase):
 
     def _checkParams(self):
         ContributionManagerListBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['principal'])
+        self._principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
 
     def _getAnswer(self):
         self._contribution.revokeModification(self._principal)

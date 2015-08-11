@@ -227,7 +227,7 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
 
     def _checkParams(self):
         CategoryModifBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['value'])
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -306,7 +306,7 @@ class CategoryRemoveControlUser(CategoryControlUserListBase):
 
     def _checkParams(self):
         CategoryControlUserListBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['principal'])
+        self._principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
 
     def _getAnswer(self):
         if self._kindOfList == "modification":

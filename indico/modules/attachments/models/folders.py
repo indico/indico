@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import g, session
+from flask import g
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
@@ -157,7 +157,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
         """
-        if not self.linked_object.canView(AccessWrapper(session.user.as_avatar if session.user else None)):
+        if not self.linked_object.canView(AccessWrapper(user.as_avatar if user else None)):
             return False
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
 
@@ -176,25 +176,28 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         """
         from MaKaC.conference import Category
 
-        try:
-            return g.event_attachments.get(linked_object, [])
-        except AttributeError:
-            if not preload_event or isinstance(linked_object, Category):
-                return (cls.find(linked_object=linked_object, is_deleted=False)
-                           .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
-                           .options(joinedload(AttachmentFolder.attachments))
-                           .all())
+        event = linked_object.getConference() if not isinstance(linked_object, Category) else None
 
-            g.event_attachments = defaultdict(list)
+        if event and event in g.get('event_attachments', {}):
+            return g.event_attachments[event].get(linked_object, [])
+        elif not preload_event or not event:
+            return (cls.find(linked_object=linked_object, is_deleted=False)
+                       .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
+                       .options(joinedload(AttachmentFolder.attachments))
+                       .all())
+        else:
+            if 'event_attachments' not in g:
+                g.event_attachments = {}
+            g.event_attachments[event] = defaultdict(list)
             query = (cls.find(event_id=int(linked_object.getConference().id), is_deleted=False)
                         .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
                         .options(joinedload(AttachmentFolder.attachments)))
 
             # populate cache
             for obj in query:
-                g.event_attachments[obj.linked_object].append(obj)
+                g.event_attachments[event][obj.linked_object].append(obj)
 
-            return g.event_attachments.get(linked_object, [])
+            return g.event_attachments[event].get(linked_object, [])
 
     @return_ascii
     def __repr__(self):

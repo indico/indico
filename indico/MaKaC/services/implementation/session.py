@@ -187,7 +187,7 @@ class SessionProtectionRemoveUser(SessionModifBase):
 
     def _checkParams(self):
         SessionModifBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['value'])
+        self._principal = principal_from_fossil(self._params['value'], allow_missing_groups=True)
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -265,7 +265,7 @@ class SessionRemoveChair(SessionChairListBase):
                     # the user is not in the list of conveners (the table is not updated). Do nothing and update the list
                     pass
         else:
-            principal = principal_from_fossil(self._params['principal'])
+            principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
             if self._kindOfList == "manager":
                 self._session.revokeModification(principal)
             elif self._kindOfList == "coordinator":
