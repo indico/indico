@@ -2022,7 +2022,8 @@ class Conference(CommonObjectBase, Locatable):
         from indico.modules.events.notes.util import get_nested_notes
         return set(get_nested_notes(self)) - {self.note}
 
-    def getTimezone(self):
+    @property
+    def tz(self):
         from MaKaC.common.timezoneUtils import DisplayTZ
         return DisplayTZ(conf=self).getDisplayTZ()
 
