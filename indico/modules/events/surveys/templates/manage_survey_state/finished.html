@@ -8,9 +8,11 @@
     {% trans %}You can re-open by extending the deadline{% endtrans %}
 {% endblock %}
 
-{% block schedule_button_text %}
-    {% trans %}Reopen{% endtrans %}
-{% endblock %}
-
-{% block close_button %}
+{% block now_button %}
+    <div class="group">
+        <a href="#" data-href="" data-method="POST"
+           class="i-button highlight">
+            {% trans %}Reopen now{% endtrans %}
+        </a>
+    </div>
 {% endblock %}

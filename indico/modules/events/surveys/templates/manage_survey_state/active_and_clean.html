@@ -5,7 +5,13 @@
 {% endblock %}
 
 {% block text %}
-    {% trans %}You can still reschedule it because nobody answered yet{% endtrans %}
+    {% if not survey.end_dt %}
+        {% trans %}Close now or schedule when to close it{% endtrans %}
+    {% else%}
+        {% trans date=survey.end_dt|format_datetime(), time=survey.end_td|format_time, tz=survey.event.getTimezone() -%}
+            Scheduled end: <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
+        {%- endtrans %}
+    {% endif %}
 {% endblock %}
 
 {% block buttons %}
@@ -13,14 +19,14 @@
         <a href="#" class="i-button icon-time js-survey-schedule-dialog"
            data-href="{{ url_for('.schedule_survey', survey) }}"
            data-title="{% trans %}Schedule survey{% endtrans %}">
-            {% block schedule_button_text %}{% trans %}Re-schedule{% endtrans %}{% endblock %}
+            {% trans %}Reschedule{% endtrans %}
         </a>
     </div>
-    {% block close_button %}
+    {% block now_button %}
         <div class="group">
             <a href="#" data-href="{{ url_for('.end_survey', survey) }}" data-method="POST"
                class="i-button highlight">
-                {% trans %}Close{% endtrans %}
+                {% trans %}Close now{% endtrans %}
             </a>
         </div>
     {% endblock %}

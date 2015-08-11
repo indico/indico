@@ -1,21 +1,5 @@
 {% extends 'events/surveys/manage_survey_state/active_and_clean.html' %}
 
-{% block text %}
-    {% if survey.end_dt %}
-        {% trans end_dt = survey.end_dt %}
-            Scheduled to finish {{ end_dt }}
-        {% endtrans %}
-    {% else%}
-        {% trans %}
-            Choose when to close it
-        {% endtrans %}
-    {% endif %}
-{% endblock %}
-
-{% block schedule_button_text %}
-    {% if survey.end_dt %}
-        {% trans %}Reschedule{% endtrans %}
-    {% else%}
-        {% trans %}Close{% endtrans %}
-    {% endif %}
+{% block label %}
+    {% trans %}Survey is live (with answers){% endtrans %}
 {% endblock %}
