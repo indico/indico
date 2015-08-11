@@ -59,11 +59,15 @@
             sortables: '.sortblock ul',
             sortableElements: '> li',
             placeholderElement: '<li></li>',
-            handle: '.questions-handle .question-list .question-row .question-data',
+            handle: '.question-data',
             onReorder: function(sortable) {
                 var questionIds = $('[data-question-id]').map(function() {
                     return $(this).data('question-id');
                 }).get();
+
+                $('.position-element').each(function(index, obj) {
+                    $(obj).text((index + 1) + '.');
+                });
 
                 $.ajax({
                     url: {{ url_for('.change_question_position', survey) | tojson }},
