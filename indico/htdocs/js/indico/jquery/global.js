@@ -95,6 +95,7 @@ $(document).ready(function() {
             maxHeight: '90%',
             maxWidth: '90%',
             loop: false,
+            photo: true,
             returnFocus: false
         });
     });
