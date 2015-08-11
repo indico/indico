@@ -33,8 +33,10 @@ from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
+from indico.modules.events.models.events import Event
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
+from indico.web.flask.util import url_for
 
 
 class WebFactory(WebFactory):
@@ -232,10 +234,10 @@ class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
     def _applyConfDisplayDecoration( self, body ):
         frame = WMConfDisplayFrame( self._getAW(), self._conf )
         frameParams = {\
-              "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
+              "logoURL": self.logo_url, \
                       }
-        if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
+        if self.event.logo:
+            frameParams["logoURL"] = self.logo_url
 
         confTitle = self._conf.getTitle()
         colspan=""
@@ -298,10 +300,10 @@ class WPMContributionDisplay(contributions.WPContributionDisplay):
     def _applyConfDisplayDecoration( self, body ):
         frame = WMConfDisplayFrame( self._getAW(), self._conf )
         frameParams = {\
-              "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
+              "logoURL": self.logo_url, \
                       }
-        if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
+        if self.event.logo:
+            frameParams["logoURL"] = self.logo_url
 
         confTitle = self._conf.getTitle()
         colspan=""
@@ -363,10 +365,10 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
     def _applyConfDisplayDecoration( self, body ):
         frame = WMConfDisplayFrame( self._getAW(), self._conf )
         frameParams = {\
-              "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
+              "logoURL": self.logo_url, \
                       }
-        if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
+        if self.event.logo:
+            frameParams["logoURL"] = self.logo_url
 
         confTitle = self._conf.getTitle()
         colspan=""
@@ -446,7 +448,8 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["logo"] = ""
-        if self._conf.getLogo():
+        if self.event.logo:
+            vars["logoURL"] = url_for('event_images.logo_display', self._conf)
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)

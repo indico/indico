@@ -54,7 +54,7 @@ class LayoutForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(LayoutForm, self).__init__(*args, **kwargs)
         event = kwargs.pop('event')
-        self.logo.widget.options['url'] = url_for('event_layout.logo-upload', event)
+        self.css_file.widget.options['url'] = url_for('event_layout.css-upload', event)
 
 
 class MenuEntryForm(IndicoForm):
