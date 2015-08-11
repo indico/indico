@@ -148,12 +148,12 @@ class Survey(db.Model):
     def __repr__(self):
         return '<Survey({}, {})>'.format(self.id, self.event_id)
 
-    def start(self):
+    def open(self):
         if self.state != SurveyState.ready_to_open:
-            raise IndicoError("Survey can't start")
+            raise IndicoError("Survey can't be opened")
         self.start_dt = now_utc()
 
-    def end(self):
+    def close(self):
         if self.state not in (SurveyState.active_and_clean, SurveyState.active_and_answered):
-            raise IndicoError("Survey can't end")
+            raise IndicoError("Survey can't be closed")
         self.end_dt = now_utc()
