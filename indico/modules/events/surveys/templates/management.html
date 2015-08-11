@@ -35,6 +35,13 @@
                         <a href="{{ url_for('.edit_survey', survey) }}" class="i-button icon-edit">
                             {% trans %}Edit{% endtrans %}
                         </a>
+                        <a href="#" class="i-button icon-remove"
+                           data-href="{{ url_for('.delete_survey', survey) }}"
+                           data-method="POST"
+                           data-title="{% trans %}Delete survey?{% endtrans %}"
+                           data-confirm="{% trans title=survey.title %}Do you really want to delete the survey &quot;{{ title }}&quot;?{% endtrans %}">
+                            {% trans %}Delete{% endtrans %}
+                        </a>
                     </div>
                     <div class="group">
                         <a href="{{ url_for('.manage_survey', survey) }}" class="i-button highlight icon-settings">
