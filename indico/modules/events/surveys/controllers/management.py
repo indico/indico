@@ -126,34 +126,36 @@ class RHScheduleSurvey(RHManageSurvey):
         form = ScheduleSurveyForm(obj=self._get_form_defaults(), survey=self.survey)
         allow_reschedule_start = self.survey.state in (SurveyState.ready_to_open, SurveyState.active_and_clean)
         if form.validate_on_submit():
-            # initial_state = self.survey.state
             if allow_reschedule_start:
                 self.survey.start_dt = form.start_dt.data
             self.survey.end_dt = form.end_dt.data
-            # TODO: open/close/schedule
-
-            flash(_('Survey scheduled to start'), 'success')
+            flash(_('Survey was scheduled'), 'success')
             logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
             return jsonify_data(flash=False)
         disabled_fields = ('start_dt',) if not allow_reschedule_start else ()
         return jsonify_template('events/surveys/schedule_survey.html', form=form, disabled_fields=disabled_fields)
 
 
-class RHStartSurvey(RHManageSurvey):
-    """Start a survey (allows users to submit responses)"""
+class RHCloseSurvey(RHManageSurvey):
+    """Close a survey (prevent users from submitting responses)"""
 
     def _process(self):
-        self.survey.start()
-        logger.info('Survey {} started by {}'.format(self.survey, session.user))
+        self.survey.close()
+        flash(_("Survey is now closed"), 'success')
+        logger.info("Survey {} closed by {}".format(self.survey, session.user))
         return redirect(url_for('.manage_survey', self.survey))
 
 
-class RHEndSurvey(RHManageSurvey):
-    """End a survey (prevent users from submitting responses)"""
+class RHOpenSurvey(RHManageSurvey):
+    """Open a survey (allows users to submit responses)"""
 
     def _process(self):
-        self.survey.end()
-        logger.info('Survey {} ended by {}'.format(self.survey, session.user))
+        if self.survey.state == SurveyState.finished:
+            self.survey.end_dt = None
+        else:
+            self.survey.open()
+        flash(_("Survey is now open"), 'success')
+        logger.info("Survey {} opened by {}".format(self.survey, session.user))
         return redirect(url_for('.manage_survey', self.survey))
 
 

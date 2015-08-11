@@ -6,10 +6,11 @@
 
 {% block text %}
     {% if not survey.start_dt %}
-        {% trans %}Start now or schedule it for later{% endtrans %}
+        {% trans %}Open now or schedule opening for later{% endtrans %}
     {% else %}
-        {% trans date=survey.start_dt|format_date, time=survey.start_dt|format_time, tz = survey.event.getTimezone() -%}
-            Scheduled start: <strong>{{ date }}</strong> at <strong>{{ time}}</strong> ({{ tz }})
+        {% set tz = survey.event.getTimezone() %}
+        {% trans date=survey.start_dt|format_date(timezone=tz), time=survey.start_dt|format_time(timezone=tz) -%}
+            Scheduled to open on <strong>{{ date }}</strong> at <strong>{{ time}}</strong> ({{ tz }})
         {%- endtrans %}
     {% endif %}
 {% endblock %}
@@ -27,9 +28,9 @@
         </a>
     </div>
     <div class="group">
-        <a href="#" data-href="{{ url_for('.start_survey', survey) }}" data-method="POST"
+        <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST"
            class="i-button highlight">
-            {% trans %}Start now{% endtrans %}
+            {% trans %}Open now{% endtrans %}
         </a>
     </div>
 {% endblock %}

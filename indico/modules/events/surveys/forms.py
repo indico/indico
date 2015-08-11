@@ -55,9 +55,9 @@ class SurveyForm(IndicoForm):
 
 class ScheduleSurveyForm(IndicoForm):
     start_dt = IndicoDateTimeField(_('Start'), [DataRequired(), DateTimeRange(earliest='now')],
-                                   description=_('Moment when the survey will be open for submissions'))
+                                   description=_('Moment when the survey will open for submissions'))
     end_dt = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt')],
-                                 description=_('Moment when the survey will be considered finished'))
+                                 description=_('Moment when the survey will close'))
 
     def __init__(self, *args, **kwargs):
         self.survey = kwargs.pop('survey', None)

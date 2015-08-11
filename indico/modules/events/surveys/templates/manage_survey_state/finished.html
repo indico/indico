@@ -5,13 +5,16 @@
 {% endblock %}
 
 {% block text %}
-    {% trans %}You can re-open by extending the deadline{% endtrans %}
+    {% set tz = survey.event.getTimezone() %}
+    {% trans date=survey.end_dt|format_date(timezone=tz), time=survey.end_dt|format_time(timezone=tz) -%}
+        Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
+    {%- endtrans %}
 {% endblock %}
 
 {% block now_button %}
     <div class="group">
-        <a href="#" data-href="" data-method="POST"
-           class="i-button highlight">
+        <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST"
+           class="i-button">
             {% trans %}Reopen now{% endtrans %}
         </a>
     </div>

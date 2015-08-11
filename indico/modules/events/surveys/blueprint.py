@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.surveys.controllers.management import (RHManageSurveys, RHCreateSurvey, RHManageSurvey,
                                                                   RHDeleteSurvey, RHEditSurvey, RHScheduleSurvey,
-                                                                  RHStartSurvey, RHEndSurvey,
+                                                                  RHCloseSurvey, RHOpenSurvey,
                                                                   RHManageSurveyQuestionnaire, RHAddSurveyQuestion,
                                                                   RHEditSurveyQuestion, RHDeleteSurveyQuestion,
                                                                   RHSortQuestions)
@@ -38,8 +38,8 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/delete', 'delete_survey', RHDe
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/edit', 'edit_survey', RHEditSurvey, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/schedule', 'schedule_survey', RHScheduleSurvey,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/start', 'start_survey', RHStartSurvey, methods=('POST',))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/end', 'end_survey', RHEndSurvey, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/open', 'open_survey', RHOpenSurvey, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/close', 'close_survey', RHCloseSurvey, methods=('POST',))
 
 # Survey question management
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)
