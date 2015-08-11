@@ -189,12 +189,11 @@ class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
         return redirect(url_for('.manage_questionnaire', self.question.survey))
 
 
-class RHChangeQuestionPosition(RHManageSurveyBase):
+class RHSortQuestions(RHManageSurveyBase):
     def _process(self):
         questions = {question.id: question for question in self.survey.questions}
         question_ids = map(int, request.form.getlist('question_ids'))
-        for index, question_id in enumerate(question_ids):
-            question = questions[question_id]
-            question.position = index + 1
+        for position, question_id in enumerate(question_ids, 1):
+            questions[question_id].position = position
         db.session.flush()
         return jsonify(success=True)

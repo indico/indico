@@ -60,7 +60,7 @@
             sortableElements: '> li',
             placeholderElement: '<li></li>',
             handle: '.question-data',
-            onReorder: function(sortable) {
+            onReorder: function() {
                 var questionIds = $('[data-question-id]').map(function() {
                     return $(this).data('question-id');
                 }).get();
@@ -70,7 +70,7 @@
                 });
 
                 $.ajax({
-                    url: {{ url_for('.change_question_position', survey) | tojson }},
+                    url: {{ url_for('.sort_questions', survey) | tojson }},
                     method: 'POST',
                     data: {
                         question_ids: questionIds
