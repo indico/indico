@@ -138,13 +138,24 @@
                 width: 100%;
 
                 text-align: left;
+                > span:first-child { /* menu title */
+                    display: inline-block;
+                    overflow: hidden;
+
+                    max-width: 73%;
+
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
                 > .actions {
+                    max-width: 27%;
                     margin-right: -10px;
                     > * {
                         padding: 0 5px;
+
                         color: $dark-gray;
                         &:hover {
-                            color: $blue
+                            color: $blue;
                         }
                     }
                     > .visible {
@@ -161,6 +172,7 @@
                     }
                     > .drag-handle {
                         @include icon-before('icon-grid2');
+
                         cursor: move;
                     }
                     > .edit-entry {
@@ -179,7 +191,7 @@
                     @include icon-before('icon-file');
                 }
                 &.entry-separator {
-                    @include icon-before('icon-arrows-vert')
+                    @include icon-before('icon-arrows-vert');
                 }
             }
         }
@@ -199,10 +211,20 @@
 
     width: 303px;
     margin: 0 5px;
-    padding-left: 25px;
+    padding-left: 20px;
+    padding-right: 15px;
 
     border-top: 0;
     background-color: $light-gray;
+
+    > li > .menu-entry > .i-label {
+        > span:first-child {
+            max-width: 70%;
+        }
+        > .actions {
+            max-width: 30%;
+        }
+    }
 }
 
 
