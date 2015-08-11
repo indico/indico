@@ -46,7 +46,7 @@ class LayoutForm(IndicoForm):
 
     # Announcement
     announcement = StringField(_("Announcement"),
-                               [UsedIf(lambda form, field: form.show_announcement.data), DataRequired()],
+                               [UsedIf(lambda form, field: form.show_announcement.data)],
                                description=_("Short message shown below the title"))
     show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                      description=_("Show the announcement message"))
