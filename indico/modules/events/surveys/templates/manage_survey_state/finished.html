@@ -14,6 +14,7 @@
 {% block now_button %}
     <div class="group">
         <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST"
+           data-confirm="{% trans %}The survey finished already. Do you want to open it again for submissions?{% endtrans %}"
            class="i-button">
             {% trans %}Reopen now{% endtrans %}
         </a>
