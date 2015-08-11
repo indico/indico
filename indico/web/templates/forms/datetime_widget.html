@@ -30,7 +30,12 @@
                         handlers[i].apply(this, arguments);
                     }
                 }
-            }).data('onSelectHandlers', [requireTime]);
+            }).data('onSelectHandlers', [
+                requireTime,
+                function() {
+                    dateField.trigger('change');
+                }
+            ]);
 
             function requireTime() {
                 timeField.prop('required', true);
