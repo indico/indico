@@ -1,11 +1,6 @@
 {% from 'forms/_form.html' import form_row %}
 
 {% macro render_questionnaire(survey, preview_form) %}
-    <div class="i-box-header">
-        <div class="i-box-title">
-            {% trans %}Questionnaire{% endtrans %}
-        </div>
-    </div>
     <div class="sortblock i-box-content" style="width: 100%;">
         <ul class="group-list no-content-before">
             {% for question in survey.questions %}
