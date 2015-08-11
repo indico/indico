@@ -2,7 +2,7 @@ $(function zeroclipboardInit() {
     'use strict';
 
     // check if ZeroClipboard is loaded and if the HTML init class is defined
-    if (!window.ZeroClipboard || !$('.zeroclicboard-init').length) { return; }
+    if (!window.ZeroClipboard || !$('.zeroclipboard-init').length) { return; }
 
     ZeroClipboard.config({'swfPath': Indico.Urls.Base + '/js/lib/zeroclipboard/ZeroClipboard.swf'});
 
@@ -28,7 +28,7 @@ $(function zeroclipboardInit() {
         });
     }
 
-    $(document).one('mouseover', '.zeroclicboard-init', function loadZeroClipBoardFlash() {
+    $(document).one('mouseover', '.zeroclipboard-init', function loadZeroClipBoardFlash() {
         ZeroClipboard.create(); // loads the Flash file
     });
 });
