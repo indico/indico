@@ -27,6 +27,14 @@ from indico.web.flask.util import url_for
 from MaKaC.conference import ConferenceHolder
 
 
+def _get_next_position(context):
+    """Get the next menu entry position for the event."""
+    event_id = context.current_parameters['event_id']
+    parent_id = context.current_parameters['parent_id']
+    res = db.session.query(db.func.max(MenuEntry.position)).filter_by(event_id=event_id, parent_id=parent_id).one()
+    return (res[0] or 0) + 1
+
+
 class MenuEntryType(TitledIntEnum):
     __titles__ = [None, _('Separator'), _('Internal Link'), _('User Link'), _('Plugin Link'), _('Page')]
     separator = 1
@@ -40,21 +48,29 @@ class MenuEntry(db.Model):
     __tablename__ = 'menu_entries'
     __table_args__ = (
         db.CheckConstraint(
-            '(type = {type.separator.value} AND endpoint IS NULL AND page_id is NULL) OR'
-            ' (type in ({type.internal_link.value}, {type.user_link.value}, {type.plugin_link.value})'
-            ' AND endpoint IS NOT NULL AND page_id is NULL) OR'
-            ' (type = {type.page.value} AND endpoint IS NULL AND page_id is NOT NULL)'.format(type=MenuEntryType),
-            'valid_type'),
+            '(type IN ({type.internal_link.value}, {type.plugin_link.value}) AND name IS NOT NULL) OR '
+            '(type NOT IN ({type.internal_link.value}, {type.plugin_link.value}) and name IS NULL)'
+            .format(type=MenuEntryType),
+            'valid_name'),
         db.CheckConstraint(
-            '((type = {type.internal_link.value} OR type = {type.plugin_link.value}) AND endpoint IS NOT NULL) OR'
-            ' (type in ({type.separator.value}, {type.user_link.value}, {type.page.value}) AND endpoint is NULL)'
+            '(type IN ({type.separator.value}, {type.page.value}) AND endpoint IS NULL) OR '
+            '(type NOT IN ({type.separator.value}, {type.page.value}) AND endpoint IS NOT NULL)'
             .format(type=MenuEntryType),
             'valid_endpoint'),
         db.CheckConstraint(
-            '(type = {type.plugin_link.value} AND plugin IS NOT NULL) OR plugin is NULL'.format(type=MenuEntryType),
+            '(type = {type.page.value} AND page_id IS NOT NULL) OR'
+            ' (type != {type.page.value} AND page_id IS NULL)'.format(type=MenuEntryType),
+            'valid_page_id'),
+        db.CheckConstraint(
+            '(type = {type.plugin_link.value} AND plugin IS NOT NULL) OR'
+            ' (type != {type.plugin_link.value} AND plugin IS NULL)'.format(type=MenuEntryType),
             'valid_plugin'),
-        db.UniqueConstraint('event_id', 'position', 'parent_id', name='uix_position_per_event'),
-        db.Index('uix_name_per_event', 'event_id', 'name', unique=True,
+        db.CheckConstraint(
+            '(type = {type.separator.value} AND title IS NULL) OR'
+            ' (type != {type.separator.value} AND title IS NOT NULL)'.format(type=MenuEntryType),
+            'valid_title'),
+        db.UniqueConstraint('event_id', 'position', 'parent_id'),
+        db.Index(None, 'event_id', 'name', unique=True,
                  postgresql_where=db.text('(type = {type.internal_link.value} OR type = {type.plugin_link.value})'
                                           .format(type=MenuEntryType))),
         {'schema': 'events'}
@@ -87,7 +103,7 @@ class MenuEntry(db.Model):
     #: The title of the menu entry (to be displayed to the user)
     title = db.Column(
         db.String,
-        nullable=False,
+        nullable=True,
     )
     #: The name of the menu entry (to uniquely identify a default entry for a given event)
     name = db.Column(
@@ -98,7 +114,7 @@ class MenuEntry(db.Model):
     position = db.Column(
         db.Integer,
         nullable=False,
-        default=0
+        default=_get_next_position
     )
     #: Whether the menu entry should be opened in a new tab or window
     new_tab = db.Column(
@@ -132,10 +148,12 @@ class MenuEntry(db.Model):
     #: The page of the menu entry
     page = db.relationship(
         'MenuPage',
-        primaryjoin=lambda: MenuEntry.page_id == MenuPage.id,
-        foreign_keys=page_id,
-        lazy=False,
-        post_update=True
+        lazy=True,
+        backref=db.backref(
+            'menu_entry',
+            lazy=True,
+            uselist=False
+        ),
     )
 
     #: The children menu entries and parent backref
@@ -159,7 +177,7 @@ class MenuEntry(db.Model):
             from indico.core.plugins import url_for_plugin
             return url_for_plugin(self.endpoint, self.event)
         elif self.is_page:
-            #TODO: handle page url
+            return url_for('.page', self.page)
             pass
         return None
 
@@ -217,19 +235,12 @@ class MenuPage(db.Model):
     __tablename__ = 'menu_pages'
     __table_args__ = {'schema': 'events'}
 
-    #: The ID of the file
+    #: The ID of the page
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    #: The ID of the associated menu entry
-    menu_entry_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.menu_entries.id'),
-        nullable=False,
-        index=True
-    )
-    #: The rendered HTML of the note
+    #: The rendered HTML of the page
     html = db.Column(
         db.Text,
         nullable=False
