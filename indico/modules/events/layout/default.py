@@ -93,191 +93,193 @@ DEFAULT_MENU_ENTRIES = [
         title=N_("Overview"),
         name='overview',
         endpoint='event.conferenceDisplay-overview',
-        children=None,
+        position=0
     ),
     MenuEntryData(
         title=N_("Scientific Programme"),
         name='program',
         endpoint='event.conferenceProgram',
+        position=1,
         children=[
             MenuEntryData(
                 title=N_("Manage my Tracks"),
                 name='program_my_tracks',
                 visible=_visibility_my_tracks,
                 endpoint='event.myconference-myTracks',
-                children=None,
             ),
-        ],
+        ]
     ),
     MenuEntryData(
         title=N_("Call for Abstracts"),
         name='call_for_abstracts',
-        visible=_visibility_call_for_abstracts,
         endpoint='event.conferenceCFA',
+        position=2,
+        visible=_visibility_call_for_abstracts,
         children=[
             MenuEntryData(
                 title=N_("View my Abstracts"),
                 name='user_abstracts',
                 endpoint='event.userAbstracts',
-                children=None,
+                position=0
             ),
             MenuEntryData(
                 title=N_("Submit Abstract"),
                 name='abstract_submission',
                 endpoint='event.abstractSubmission',
-                children=None,
+                position=1
             ),
-        ],
+        ]
     ),
     MenuEntryData(
         title=N_("Timetable"),
         name='timetable',
         endpoint='event.conferenceTimeTable',
-        children=None,
+        position=3
     ),
     MenuEntryData(
         title=N_("Contribution List"),
         name='contributions',
         endpoint='event.contributionListDisplay',
-        children=None,
+        position=4
     ),
     MenuEntryData(
         title=N_("Author List"),
         name='author_index',
-        visible_default=False,
         endpoint='event.confAuthorIndex',
-        children=None,
+        position=5,
+        visible_default=False
     ),
     MenuEntryData(
         title=N_("Speaker List"),
         name='speaker_index',
-        visible_default=False,
         endpoint='event.confSpeakerIndex',
-        children=None,
+        position=6,
+        visible_default=False
     ),
     MenuEntryData(
         title=N_("My Conference"),
         name='my_conference',
-        visible=_visibility_my_conference,
         endpoint='event.myconference',
+        position=7,
+        visible=_visibility_my_conference,
         children=[
             MenuEntryData(
                 title=N_("My Tracks"),
                 endpoint='event.myconference-myTracks',
-                visible=_visibility_my_tracks,
                 name='my_tracks',
-                children=None,
+                visible=_visibility_my_tracks,
+                position=0
             ),
             MenuEntryData(
                 title=N_("My Sessions"),
                 name='my_sessions',
                 endpoint='event.myconference-mySessions',
-                children=None,
+                position=1
             ),
             MenuEntryData(
                 title=N_("My Contributions"),
                 name='my_contributions',
                 visible=_visibility_my_contributions,
                 endpoint='event.myconference-myContributions',
-                children=None,
+                position=2
             ),
-        ],
+        ]
     ),
     MenuEntryData(
         title=N_("Paper Reviewing"),
         name='paper_reviewing',
-        visible=_visibility_paper_review,
         endpoint='event.paperReviewingDisplay',
+        position=8,
+        visible=_visibility_paper_review,
         children=[
             MenuEntryData(
                 title=N_("Manage Paper Reviewing"),
                 name='paper_setup',
-                visible=_visibility_paper_review_managment,
                 endpoint='event_mgmt.confModifReviewing-paperSetup',
-                children=None,
+                visible=_visibility_paper_review_managment,
+                position=0
             ),
             MenuEntryData(
                 title=N_("Assign Papers"),
                 name='paper_assign',
-                visible=_visibility_paper_assign,
                 endpoint='event_mgmt.assignContributions',
-                children=None,
+                visible=_visibility_paper_assign,
+                position=1
             ),
             MenuEntryData(
                 title=N_("Referee Area"),
                 name='contributions_to_judge',
-                visible=_visibility_judge,
                 endpoint='event_mgmt.confListContribToJudge',
-                children=None,
+                visible=_visibility_judge,
+                position=2
             ),
             MenuEntryData(
                 title=N_("Content Reviewer Area"),
                 name='contributions_as_reviewer',
-                visible=_visibility_contributions_as_reviewer,
                 endpoint='event_mgmt.confListContribToJudge-asReviewer',
-                children=None,
+                visible=_visibility_contributions_as_reviewer,
+                position=3
             ),
             MenuEntryData(
                 title=N_("Layout Reviewer Area"),
                 name='contributions_as_editor',
-                visible=_visibility_contributions_as_editor,
                 endpoint='event_mgmt.confListContribToJudge-asEditor',
-                children=None,
+                visible=_visibility_contributions_as_editor,
+                position=4
             ),
             MenuEntryData(
                 title=N_("Upload Paper"),
                 name='paper_upload',
-                visible=_visibility_paper_review_transfer,
                 endpoint='event.paperReviewingDisplay-uploadPaper',
-                children=None,
+                visible=_visibility_paper_review_transfer,
+                position=5
             ),
             MenuEntryData(
                 title=N_("Download Template"),
                 name='download_template',
-                visible=_visibility_paper_review_transfer,
                 endpoint='event.paperReviewingDisplay-downloadTemplate',
-                children=None,
+                visible=_visibility_paper_review_transfer,
+                position=6
             ),
-        ],
+        ]
     ),
     MenuEntryData(
         title=N_("Book of Abstracts"),
         name='abstracts_book',
-        visible=_visibility_abstracts_book,
         endpoint='event.conferenceDisplay-abstractBook',
-        children=None,
+        position=9,
+        visible=_visibility_abstracts_book
     ),
     MenuEntryData(
         title=N_("Registration"),
         name='registration',
-        visible=_visibility_registration,
         endpoint='event.confRegistrationFormDisplay',
-        children=None,
+        position=10,
+        visible=_visibility_registration
     ),
     MenuEntryData(
         title=N_("Participant List"),
         name='registrants',
-        visible=_visibility_registration,
         endpoint='event.confRegistrantsDisplay-list',
-        children=None,
+        position=11,
+        visible=_visibility_registration
     ),
     MenuEntryData(
         title=N_("Evaluation"),
         name='evaluation',
         endpoint='event.confDisplayEvaluation',
+        position=12,
         children=[
             MenuEntryData(
                 title=N_("Evaluation Form"),
                 name='evaluation_form',
                 endpoint='event.confDisplayEvaluation-display',
-                children=None,
             ),
             MenuEntryData(
                 title=N_("Modify my Evaluation"),
                 name='evaluation_edit',
                 endpoint='event.confDisplayEvaluation-modif',
-                children=None,
             ),
-        ],
+        ]
     )
 ]
