@@ -430,7 +430,8 @@ $dropdown-transition: $dropdown-transition-step ease-out;
             > .form-row,
             > textarea,
             > select,
-            > input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
+            > input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+            input.clearabletext {
                 width: 400px;
             }
 

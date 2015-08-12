@@ -34,9 +34,9 @@
             }
         }
 
-        > input[type='text'] {
-            width: 6.5em;
-            margin-right: 0.5em;
+        > input[type='text'],
+        > .clearableinput input[type='text'] {
+            width: 7em;
         }
     }
 
