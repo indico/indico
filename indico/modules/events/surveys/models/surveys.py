@@ -154,6 +154,10 @@ class Survey(db.Model):
             return SurveyState.active_and_answered
         return SurveyState.finished
 
+    @property
+    def is_active(self):
+        return self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean}
+
     @return_ascii
     def __repr__(self):
         return '<Survey({}, {})>'.format(self.id, self.event_id)
