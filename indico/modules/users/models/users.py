@@ -256,7 +256,7 @@ class User(db.Model):
     # - event_notes_revisions (EventNoteRevision.user)
     # - attachments (Attachment.user)
     # - attachment_files (AttachmentFile.user)
-    # - evaluations (SurveySubmission.user)
+    # - survey_submissions (SurveySubmission.user)
 
     @property
     def as_principal(self):
