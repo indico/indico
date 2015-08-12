@@ -103,7 +103,7 @@
         }
 
         function showDialog(dialogData) {
-            popup = new ExclusivePopup($.isFunction(options.title) ? options.title() : options.title, function() {
+            popup = new ExclusivePopup($.isFunction(options.title) ? options.title.call(options.trigger) : options.title, function() {
                 closeDialog(null);
                 return false;
             }, false, false);
