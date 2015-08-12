@@ -32,7 +32,7 @@
 
     function hideFieldUnless(field, conditionField, requiredValue, checkedOnly) {
         conditionField.on('change', function() {
-            var value = checkedOnly ? conditionField.filter(':checked').val() : conditionField.val();
+            var value = checkedOnly ? conditionField.filter(':checked').val() || false : conditionField.val();
             var active = !!((requiredValue === null && value) || (requiredValue !== null && requiredValue === value));
             field.closest('.form-group').toggle(active);
             if (!field.is(':input')) {
