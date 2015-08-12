@@ -20,11 +20,13 @@ from io import BytesIO
 import mimetypes
 
 from flask import flash, redirect, request, jsonify
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm
-from indico.modules.events.layout.models.menu import MenuEntry
+from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_event_logo
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit
 from indico.modules.events.models.events import Event
@@ -83,7 +85,7 @@ class RHLayoutEdit(RHConferenceModifBase):
                 'header_background_color': form.data['header_background_color'],
                 'announcement': form.data['announcement'],
                 'show_announcement': form.data['show_announcement']
-                })
+            })
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
         else:
@@ -99,7 +101,8 @@ class RHLayoutEdit(RHConferenceModifBase):
 
 class RHMenuEdit(RHConferenceModifBase):
     def _process(self):
-        return WPMenuEdit.render_template('menu_edit.html', self._conf,
+
+        return WPMenuEdit.render_template('menu_edit.html', self._conf, event=self._conf, MenuEntryType=MenuEntryType,
                                           menu=menu_entries_for_event(self._conf, show_hidden=True))
 
 
@@ -119,10 +122,11 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             form_cls = MenuLinkForm
         elif self.entry.is_page:
             form_cls = MenuPageForm
+            defaults['html'] = self.entry.page.html
         form = form_cls(linked_object=self.entry, obj=defaults)
         if form.validate_on_submit():
             form.populate_obj(self.entry)
-            return redirect_or_jsonify(url_for('.menu', self._conf), entry=_render_menu_entry(self.entry))
+            return jsonify_data(entry=_render_menu_entry(self.entry))
         return jsonify_template('events/layout/menu_entry_form.html', form=form)
 
 
@@ -133,7 +137,7 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
             position = int(position)
         except ValueError:
             if position:
-                jsonify_data(success=False)
+                return jsonify_data(success=False)
             position = None
         move_entry(self.entry, position)
         return jsonify_data()
@@ -143,3 +147,39 @@ class RHMenuEntryVisibility(RHMenuEntryEditBase):
     def _process(self):
         self.entry.visible = not self.entry.visible
         return redirect_or_jsonify(url_for('.menu', self._conf), visible=self.entry.visible)
+
+
+class RHMenuAddEntry(RHConferenceModifBase):
+    def _process(self):
+        defaults = FormDefaults(get_default_values(MenuEntry))
+        form_cls = None
+        entry_type = request.args['type']
+
+        if entry_type == MenuEntryType.separator.name:
+            entry = MenuEntry(event_id=self._conf.id, type=MenuEntryType.separator)
+            db.session.add(entry)
+            db.session.flush()
+            return jsonify_data(entry=_render_menu_entry(entry))
+
+        elif entry_type == MenuEntryType.user_link.name:
+            form_cls = MenuLinkForm
+        elif entry_type == MenuEntryType.page.name:
+            form_cls = MenuPageForm
+        else:
+            raise BadRequest
+
+        form = form_cls(obj=defaults)
+        if form.validate_on_submit():
+            entry = MenuEntry(
+                event_id=self._conf.id,
+                type=MenuEntryType[entry_type]
+            )
+            form.populate_obj(entry, skip={'html'})
+
+            if entry.is_page:
+                entry.page = MenuPage(html=form.html.data)
+
+            db.session.add(entry)
+            db.session.flush()
+            return jsonify_data(entry=_render_menu_entry(entry))
+        return jsonify_template('events/layout/menu_entry_form.html', form=form)

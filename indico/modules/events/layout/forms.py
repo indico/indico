@@ -71,4 +71,4 @@ class MenuLinkForm(MenuUserEntry):
 
 
 class MenuPageForm(MenuUserEntry):
-    source = TextAreaField(_("Content"), widget=CKEditorWidget())
+    html = TextAreaField(_("Content"), widget=CKEditorWidget())
