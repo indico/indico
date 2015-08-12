@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import StringField, TextAreaField, BooleanField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -54,6 +54,10 @@ class SurveyField(object):
     wtf_field_class = None
     #: the WTForm used to configure the field
     config_form = FieldConfigForm
+    #: the validator to use if the field is required
+    required_validator = DataRequired
+    #: the validator to use if the field is not required
+    not_required_validator = Optional
 
     def __init__(self, question):
         self.question = question
@@ -71,12 +75,17 @@ class SurveyField(object):
 
     def create_wtf_field(self):
         """Returns a WTForms field for this field"""
-        return self._make_wtforms_field(self.wtf_field_class, self.validators)
+        return self._make_wtforms_field(self.wtf_field_class, self.validators, **self.wtf_field_kwargs)
 
     @property
     def validators(self):
         """Returns a list of validators for this field"""
         return None
+
+    @property
+    def wtf_field_kwargs(self):
+        """Returns a dict of kwargs for this field's wtforms field"""
+        return {}
 
     def _make_wtforms_field(self, field_cls, validators=None, **kwargs):
         """Util to instantiate a WTForms field.
@@ -90,5 +99,7 @@ class SurveyField(object):
         """
         validators = list(validators) if validators is not None else []
         if self.question.is_required:
-            validators.append(DataRequired())
+            validators.append(self.required_validator())
+        elif self.not_required_validator:
+            validators.append(self.not_required_validator())
         return field_cls(self.question.title, validators, description=self.question.description, **kwargs)

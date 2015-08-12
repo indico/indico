@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import SelectField
-from wtforms.validators import DataRequired
+from wtforms.fields import SelectField, IntegerField
+from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError, Length
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import HiddenUnless
 
@@ -31,13 +31,19 @@ class SingleChoiceConfigForm(FieldConfigForm):
                                     choices=[('radio', _('Show as radio button')),
                                              ('select', _('Show as select field'))],
                                     default='radio')
-    radio_display_type = IndicoRadioField(_('Arrangment of available options'),
-                                          [HiddenUnless('display_type', 'radio')],
+    radio_display_type = IndicoRadioField(_('Arrangement of available options'),
+                                          [DataRequired(), HiddenUnless('display_type', 'radio')],
                                           choices=[('vertical', _('Vertical alignment')),
                                                    ('horizontal', _('Horizontal alignment'))])
     options = MultipleItemsField(_('Options'), [DataRequired()],
                                  fields=[('option', _('Option'))], unique_field='option', uuid_field='id',
                                  description=_('Specify the answers the user can choose from'))
+
+
+class _EmptyNoneSelectField(SelectField):
+    def process_formdata(self, valuelist):
+        super(_EmptyNoneSelectField, self).process_data(valuelist)
+        self.data = filter(None, self.data)
 
 
 class SingleChoiceField(SurveyField):
@@ -46,13 +52,14 @@ class SingleChoiceField(SurveyField):
     config_form = SingleChoiceConfigForm
 
     def create_wtf_field(self):
-        field_options = {}
+        field_options = {'coerce': lambda x: x}
+        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
         if self.question.field_data['display_type'] == 'select':
-            field_class = SelectField
+            field_class = _EmptyNoneSelectField
+            choices = [('', '')] + choices
         else:
             field_class = IndicoRadioField
             field_options['orientation'] = self.question.field_data['radio_display_type']
-        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
         return self._make_wtforms_field(field_class, choices=choices, **field_options)
 
 
@@ -60,13 +67,61 @@ class MultiSelectConfigForm(FieldConfigForm):
     options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
                                  unique_field='option', uuid_field='id',
                                  description=_('Specify the answers the user can select'))
+    min_choices = IntegerField(_('Min options'), [Optional(), NumberRange(min=0)],
+                               description=_('The minimum number of options the user has to select. '
+                                             'If the field is not marked as required, selecting zero options is always '
+                                             'allowed and this check only applies if some options are selected.'))
+    max_choices = IntegerField(_('Max options'), [Optional(), NumberRange(min=1)],
+                               description=_('The maximum number of options the user may select.'))
+
+    def _validate_min_max_choices(self):
+        if (self.min_choices.data is not None and self.max_choices.data is not None and
+                self.min_choices.data > self.max_choices.data):
+            raise ValidationError(_('The min number of options must be less or equal than the max number of options.'))
+
+    def validate_min_choices(self, field):
+        if field.data is None:
+            return
+        self._validate_min_max_choices()
+        if field.data >= len(self.options.data):
+            raise ValidationError(_('The min number of options must be less than the total number of options.'))
+
+    def validate_max_choices(self, field):
+        if field.data is None:
+            return
+        self._validate_min_max_choices()
+        if field.data > len(self.options.data):
+            raise ValidationError(_('The max number of options must be less or equal than the total number of '
+                                    'options.'))
 
 
 class MultiSelectField(SurveyField):
     name = 'multiselect'
     friendly_name = _('Select multiple')
     config_form = MultiSelectConfigForm
+    wtf_field_class = IndicoSelectMultipleCheckboxField
 
-    def create_wtf_field(self):
-        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
-        return self._make_wtforms_field(IndicoSelectMultipleCheckboxField, choices=choices)
+    @property
+    def validators(self):
+        min_choices = self.question.field_data.get('min_choices')
+        max_choices = self.question.field_data.get('max_choices')
+        if min_choices is None and max_choices is None:
+            return
+        if min_choices is None:
+            min_choices = -1
+        if max_choices is None:
+            max_choices = -1
+        if max_choices == -1:
+            message = ngettext('Please select at least %(min)d option.',
+                               'Please select at least %(min)d options.', min_choices)
+        elif min_choices == -1:
+            message = ngettext('Please select no more than %(max)d option.',
+                               'Please select no more than %(max)d options.', max_choices)
+        else:
+            message = _('Please select between %(min)d and %(max)d options.')
+        return [Length(min=min_choices, max=max_choices, message=message)]
+
+    @property
+    def wtf_field_kwargs(self):
+        return {'choices': [(x['id'], x['option']) for x in self.question.field_data['options']],
+                'coerce': lambda x: x}

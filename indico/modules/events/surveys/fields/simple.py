@@ -15,9 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+from indico.web.forms.fields import IndicoRadioField
 
 from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length
+from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
@@ -64,17 +65,25 @@ class NumberField(SurveyField):
     friendly_name = _('Number')
     config_form = NumberConfigForm
     wtf_field_class = IntegerField
+    required_validator = InputRequired
 
     @property
     def validators(self):
         min_value = self.question.field_data.get('min_value')
         max_value = self.question.field_data.get('max_value')
+        if min_value is None and max_value is None:
+            return
         return [NumberRange(min=min_value, max=max_value)]
 
 
 class BoolField(SurveyField):
     name = 'bool'
     friendly_name = _('Yes/No')
+    wtf_field_class = IndicoRadioField
+    required_validator = InputRequired
 
-    def create_wtf_field(self):
-        return self._make_wtforms_field(BooleanField, widget=SwitchWidget())
+    @property
+    def wtf_field_kwargs(self):
+        return {'orientation': 'horizontal',
+                'choices': [(1, _('Yes')), (0, _('No'))],
+                'coerce': lambda x: bool(int(x))}
