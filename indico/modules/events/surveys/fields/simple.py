@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 from indico.web.forms.fields import IndicoRadioField
 
 from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
+from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired, DataRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
+from indico.web.forms.fields import IndicoStaticTextField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -87,3 +88,27 @@ class BoolField(SurveyField):
         return {'orientation': 'horizontal',
                 'choices': [(1, _('Yes')), (0, _('No'))],
                 'coerce': lambda x: bool(int(x))}
+
+    def create_wtf_field(self):
+        return self._make_wtforms_field(BooleanField, widget=SwitchWidget())
+
+
+class StaticTextConfigForm(FieldConfigForm):
+    text = TextAreaField(_('Content'), description=_('Static text that will be shown to users. You can use Markdown to '
+                                                     'format the text.'))
+
+
+class StaticTextField(SurveyField):
+    name = 'static_text'
+    friendly_name = _('Static text')
+    wtf_field_class = IndicoStaticTextField
+
+    @classmethod
+    def config_form(cls, *args, **kwargs):
+        form = StaticTextConfigForm(*args, **kwargs)
+        del form.help, form.description, form.is_required
+        return form
+
+    @property
+    def wtf_field_kwargs(self):
+        return {'text': self.question.field_data['text']}

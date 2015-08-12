@@ -138,3 +138,8 @@ i.info-helper {
     @extend .text-superfluous;
     cursor: default;
 }
+
+.static-text-widget {
+    word-wrap: break-word;
+    width: 90%;
+}

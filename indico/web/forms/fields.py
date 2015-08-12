@@ -463,3 +463,15 @@ class IndicoDateTimeField(DateTimeField):
             return form.timezone
         session_tz = DisplayTZ().getDisplayTZ()
         return session_tz
+
+
+class IndicoStaticTextField(Field):
+    """Returns an html element with text taken from this field's value"""
+    widget = JinjaWidget('forms/static_text_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.text_value = kwargs.pop('text')
+        super(IndicoStaticTextField, self).__init__(*args, **kwargs)
+
+    def _value(self):
+        return self.text_value
