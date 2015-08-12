@@ -1,0 +1,14 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {%- trans %}Survey{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {{ survey.title }}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, submit=_('Save answers'), back_url=url_for('.display_survey_list', event)) }}
+{% endblock %}
