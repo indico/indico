@@ -26,23 +26,27 @@ from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
 from indico.util.signals import named_objects_from_signal
 from MaKaC.common.cache import GenericCache
 
+_cache = GenericCache('updated-menus')
+
+
+def _entry_key(entry_data):
+    return entry_data.position, entry_data.name
+
 
 class MenuEntryData(object):
     plugin = None
 
-    def __init__(self, title, name, endpoint, visible_default=True, visible=None, children=None):
+    def __init__(self, title, name, endpoint, position=0, visible_default=True, visible=None, children=None):
         self.title = title
         self.name = name
         self.endpoint = endpoint
+        self.position = position
         self._visible = visible
         self.visible_default = visible_default
         self.children = children if children is not None else []
 
     def visible(self, event):
         return self._visible(event) if self._visible else self.visible_default
-
-
-_cache = GenericCache('updated-menus')
 
 
 def menu_entries_for_event(event, show_hidden=False):
@@ -65,7 +69,8 @@ def menu_entries_for_event(event, show_hidden=False):
         # Keeping only new entries from the signal
         new_entry_names = signal_entry_names - entry_names
         new_entries = [_build_entry(event, data, position=position)
-                       for (name, data), position in zip(signal_entries.iteritems(), pos_gen)
+                       for (name, data), position in zip(sorted(signal_entries.iteritems(),
+                                                         key=lambda (name, data):_entry_key(data)), pos_gen)
                        if name in new_entry_names]
 
         with db.tmp_session() as sess:
@@ -99,7 +104,8 @@ def _build_entry(event, data, position=0):
         name=data.name,
         endpoint=data.endpoint,
         position=position,
-        children=[_build_entry(event, entry_data, i) for i, entry_data in enumerate(data.children or [])]
+        children=[_build_entry(event, entry_data, i)
+                  for i, entry_data in enumerate(sorted(data.children or [], key=_entry_key))]
     )
 
     if data.plugin:
