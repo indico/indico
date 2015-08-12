@@ -22,11 +22,16 @@ from indico.modules.events.surveys.controllers.management import (RHManageSurvey
                                                                   RHManageSurveyQuestionnaire, RHAddSurveyQuestion,
                                                                   RHEditSurveyQuestion, RHDeleteSurveyQuestion,
                                                                   RHSortQuestions)
+from indico.modules.events.surveys.controllers.display import RHShowSurveyMainInformation, RHSubmitSurveyForm
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('survey', __name__, template_folder='templates', virtual_template_folder='events/surveys',
                       url_prefix='/event/<confId>', event_feature='surveys')
+
+# surveys display
+_bp.add_url_rule('/surveys/', 'display_survey_list', RHShowSurveyMainInformation)
+_bp.add_url_rule('/surveys/<int:survey_id>', 'display_survey_form', RHSubmitSurveyForm, methods=('GET', 'POST'))
 
 # surveys management
 _bp.add_url_rule('/manage/surveys/', 'management', RHManageSurveys)
