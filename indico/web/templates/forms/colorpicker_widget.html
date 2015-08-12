@@ -6,13 +6,9 @@
             <span class="color-preview"></span>
             <input id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}" type="text">
         </div>
-        <a class="icon-close clear-color-btn" title="{% trans %}Clear color{% endtrans %}"></a>
     </div>
     <script>
         $('.i-color-field').colorpicker();
-        $('.clear-color-btn').on('click', function(e) {
-            e.preventDefault();
-            $(this).closest('.i-color-field').find('#{{ field.id }}').val('').trigger('keyup');
-        });
+        $('.i-color-field input').clearableinput();
     </script>
 {% endblock %}
