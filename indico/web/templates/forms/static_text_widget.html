@@ -2,6 +2,6 @@
 
 {% block html %}
     <div class="static-text-widget">
-        {{- field._value() -}}
+        {{- field._value()|markdown -}}
     </div>
 {% endblock %}
