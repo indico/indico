@@ -18,5 +18,5 @@
 {% endblock %}
 
 {% block content %}
-    {{ simple_form(form, back=_('Cancel')) }}
+    {{ simple_form(form, back=_('Cancel'), back_url=url_for('.management', event)) }}
 {% endblock %}
