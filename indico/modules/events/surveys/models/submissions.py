@@ -65,7 +65,7 @@ class SurveySubmission(db.Model):
         'User',
         lazy=True,
         backref=db.backref(
-            'surveys',
+            'survey_submissions',
             lazy='dynamic'
         )
     )
