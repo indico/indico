@@ -17,12 +17,9 @@
 from __future__ import unicode_literals
 
 import mimetypes
-import os
-import sys
 from collections import OrderedDict
 from itertools import chain
 from operator import attrgetter
-from uuid import uuid4
 
 import click
 
@@ -37,7 +34,7 @@ from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico_zodbimport import Importer, convert_to_unicode
-from indico_zodbimport.util import protection_from_ac, patch_default_group_provider
+from indico_zodbimport.util import protection_from_ac, patch_default_group_provider, LocalFileImporterMixin
 
 
 def _link_repr(folder):
@@ -79,44 +76,20 @@ class ProtectionTarget(object):
         return [self._make_principal(principal, **data) for principal in self.acl]
 
 
-class AttachmentImporter(Importer):
+class AttachmentImporter(LocalFileImporterMixin, Importer):
     def __init__(self, **kwargs):
         self.janitor_user_id = kwargs.pop('janitor_user_id')
-        self.storage_backend = kwargs.pop('storage_backend')
-        self.symlink_backend = kwargs.pop('symlink_backend')
-        self.archive_dirs = kwargs.pop('archive_dir')
         self.default_group_provider = kwargs.pop('default_group_provider')
-        self.avoid_storage_check = kwargs.pop('avoid_storage_check')
-        self.symlink_target = kwargs.pop('symlink_target', None)
-        if (self.avoid_storage_check or self.symlink_target) and len(self.archive_dirs) != 1:
-            raise click.exceptions.UsageError('Invalid number of archive-dirs for --no-storage-access or '
-                                              '--symlink-target')
-        if bool(self.symlink_target) != bool(self.symlink_backend):
-            raise click.exceptions.UsageError('Both or none of --symlink-target and --symlink-backend must be used.')
+
+        kwargs = super(AttachmentImporter, self)._set_config_options(**kwargs)
         super(AttachmentImporter, self).__init__(**kwargs)
 
     @staticmethod
     def decorate_command(command):
         command = click.option('--janitor-user-id', type=int, required=True, help="The ID of the Janitor user")(command)
-        command = click.option('--storage-backend', required=True,
-                               help="The name of the storage backend used for attachments.")(command)
-        command = click.option('--archive-dir', required=True, multiple=True,
-                               help="The base path where materials are stored (ArchiveDir in indico.conf). "
-                                    "When used multiple times, the dirs are checked in order until a file is "
-                                    "found.")(command)
         command = click.option('--default-group-provider', default='legacy-ldap',
                                help="Name of the default group provider")(command)
-        command = click.option('--avoid-storage-check', is_flag=True,
-                               help="Avoid checking files in storage unless absolutely necessary due to encoding "
-                                    "issues. This will migrate all files with size=0.  When this option is specified, "
-                                    "--archive-dir must be used exactly once.")(command)
-        command = click.option('--symlink-backend',
-                               help="The name of the storage backend used for symlinks.")(command)
-        command = click.option('--symlink-target',
-                               help="If set, any files with a non-UTF8 path will be symlinked in this location and "
-                                    "store the path to the symlink instead (relative to the archive dir). "
-                                    "When this option is specified, --archive-dir must be used exactly once."
-                               )(command)
+        command = super(AttachmentImporter, AttachmentImporter).decorate_command(command)
         return command
 
     def has_data(self):
@@ -241,46 +214,6 @@ class AttachmentImporter(Importer):
         folder['protection_mode'] = tmp.protection_mode
         return folder
 
-    def _get_file_info(self, resource):
-        archive_id = resource._LocalFile__archivedId
-        repo_path = resource._LocalFile__repository._MaterialLocalRepository__files[archive_id]
-        for archive_path in map(bytes, self.archive_dirs):
-            path = os.path.join(archive_path, repo_path)
-            if any(ord(c) > 127 for c in repo_path):
-                foobar = (('strict', 'iso-8859-1'), ('replace', sys.getfilesystemencoding()), ('replace', 'ascii'))
-                for mode, enc in foobar:
-                    try:
-                        dec_path = path.decode('utf-8', mode)
-                    except UnicodeDecodeError:
-                        dec_path = path.decode('iso-8859-1', mode)
-                    enc_path = dec_path.encode(enc, 'replace')
-                    if os.path.exists(enc_path):
-                        path = enc_path
-                        break
-                else:
-                    parent_path = os.path.dirname(path)
-                    candidates = os.listdir(parent_path)
-                    if len(candidates) != 1:
-                        return None, None, 0
-                    path = os.path.join(parent_path, candidates[0])
-                    if not os.path.exists(path):
-                        return None, None, 0
-
-            assert path
-            size = 0 if self.avoid_storage_check else os.path.getsize(path)
-            rel_path = os.path.relpath(path, archive_path)
-            try:
-                rel_path = rel_path.decode('utf-8')
-            except UnicodeDecodeError:
-                if not self.symlink_target:
-                    return None, None, 0
-                symlink_name = uuid4()
-                symlink = os.path.join(self.symlink_target, bytes(symlink_name))
-                os.symlink(path, symlink)
-                return self.symlink_backend, symlink_name, size
-            else:
-                return self.storage_backend, rel_path, size
-
     def _attachment_from_resource(self, folder, material, resource, base_object=None):
         modified_dt = (getattr(material, '_modificationDS', None) or getattr(base_object, 'startDate', None) or
                        getattr(base_object, '_modificationDS', None) or now_utc())
@@ -299,7 +232,7 @@ class AttachmentImporter(Importer):
                 return None
         else:
             data['type'] = AttachmentType.file
-            storage_backend, storage_path, size = self._get_file_info(resource)
+            storage_backend, storage_path, size = self._get_local_file_info(resource)
             if storage_path is None:
                 self.print_error(cformat('%{red!}File {} not found on disk').format(resource._LocalFile__archivedId),
                                  event_id=base_object.id)
