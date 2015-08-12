@@ -77,14 +77,18 @@ class RHManageSurvey(RHManageSurveyBase):
 class RHEditSurvey(RHManageSurveyBase):
     """Edit a survey's basic data/settings"""
 
+    def _get_form_defaults(self):
+        return FormDefaults(self.survey, unlimited_submissions=self.survey.submission_limit is None)
+
     def _process(self):
-        form = SurveyForm(event=self.event, obj=FormDefaults(self.survey))
+        form = SurveyForm(event=self.event, obj=self._get_form_defaults())
         if form.validate_on_submit():
+            if form.unlimited_submissions.data:
+                form.submission_limit.data = None
             form.populate_obj(self.survey)
             flash(_('Survey modified'), 'success')
             logger.info('Survey {} modified by {}'.format(self.survey, session.user))
-            return redirect(url_for('.manage_survey', self.survey))
-
+            return redirect(url_for('.management', self.survey))
         return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form,
                                               survey=self.survey)
 
@@ -112,7 +116,6 @@ class RHCreateSurvey(RHManageSurveysBase):
             flash(_('Survey created'), 'success')
             logger.info('Survey {} created by {}'.format(survey, session.user))
             return redirect(url_for('.manage_survey', survey))
-
         return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form, survey=None)
 
 
