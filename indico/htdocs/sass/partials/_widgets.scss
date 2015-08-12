@@ -142,4 +142,8 @@ i.info-helper {
 .static-text-widget {
     word-wrap: break-word;
     width: 90%;
+
+    & > p:first-child {
+        margin-top: 0;
+    }
 }
