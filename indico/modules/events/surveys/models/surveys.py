@@ -52,8 +52,14 @@ class Survey(db.Model):
         db.String,
         nullable=False
     )
-    #: The description of the survey
+    #: A brief description of the survey
     description = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    # An introduction text for users of the survey
+    introduction = db.Column(
         db.Text,
         nullable=False,
         default=''
@@ -69,6 +75,10 @@ class Survey(db.Model):
         db.Boolean,
         nullable=False,
         default=True
+    )
+    submission_limit = db.Column(
+        db.Integer,
+        nullable=True
     )
     #: Datetime when the survey is open
     start_dt = db.Column(
