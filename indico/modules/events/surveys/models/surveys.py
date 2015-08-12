@@ -158,6 +158,9 @@ class Survey(db.Model):
     def is_active(self):
         return self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean}
 
+    def can_submit(self, user):
+        return self.is_active and (not self.require_user or (self.require_user and user))
+
     @return_ascii
     def __repr__(self):
         return '<Survey({}, {})>'.format(self.id, self.event_id)
