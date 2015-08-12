@@ -57,6 +57,7 @@
                 onChange: function (hsb, hex, rgb) {
                         colorInput.val('#' + hex);
                         updateColorPreview('#' + hex);
+                        colorInput.trigger('input');
                 },
                 onShow: function (colorpicker) {
                     $(colorpicker).fadeIn(500);
