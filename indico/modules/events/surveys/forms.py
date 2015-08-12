@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import StringField, TextAreaField, BooleanField
-from wtforms.validators import DataRequired, Optional
+from wtforms.fields.html5 import IntegerField
+from wtforms.validators import DataRequired, Optional, NumberRange
 
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
@@ -31,11 +32,16 @@ class SurveyForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the survey'))
     description = TextAreaField(_('Description'), description=_('The description of the room'))
     anonymous = BooleanField(_("Anonymous submissions"),
-                             description=_('User information will not be attached to submissions'),
+                             description=_("User information will not be attached to submissions"),
                              widget=SwitchWidget())
     require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')],
-                                description=_('Still require users to be logged in for submitting the survey'),
+                                description=_("Still require users to be logged in for submitting the survey"),
                                 widget=SwitchWidget())
+    unlimited_submissions = BooleanField(_("Unlimitted submissions"), widget=SwitchWidget(), default=True,
+                                         description=_("Whether there is a submission cap"))
+    submission_limit = IntegerField(_("Capacity"),
+                                    [HiddenUnless('unlimited_submissions', False), DataRequired(), NumberRange(min=1)],
+                                    description=_("Maximum number of submissions accepted"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event', None)
