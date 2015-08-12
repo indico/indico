@@ -23,10 +23,14 @@
                         <div class="icon icon-plus"></div>
                         <div class="toolbar right">
                             <div class="group">
-                                <a class="i-button icon-link add-link" href="#">
+                                <a class="i-button icon-link add-link" href="#"
+                                   data-href="{{ url_for('.menu-add-entry', event, type='user_link') }}"
+                                   data-title="{% trans %}New link{% endtrans %}">
                                     {%- trans %}Add link{% endtrans -%}
                                 </a>
-                                <a class="i-button icon-file-text add-page" href="#">
+                                <a class="i-button icon-file-text add-page" href="#"
+                                    data-href="{{ url_for('.menu-add-entry', event, type='page') }}"
+                                    data-title="{% trans %}New page{% endtrans %}">
                                     {%- trans %}Add page{% endtrans -%}
                                 </a>
                                 <a class="i-button icon-arrows-vert add-separator" href="#">
@@ -55,57 +59,19 @@
             }
         }
 
-        $('.menu-entries').on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
-            evt.preventDefault();
-
-            ajaxDialog({
-                trigger: this,
-                url: $(this).data('href'),
-                title: $T.gettext('Menu Entry Settings'),
-                onClose: function(data) {
-                    if (data) {
-                        $(this.trigger).closest('.menu-entry').replaceWith(data.entry);
-                    }
-                }
-            });
-        });
-        $('.add-link').ajaxDialog({
-            title: '{% trans %}New link{% endtrans %}',
-            url: "{{ url_for('.menu-add-entry', event, type=MenuEntryType.user_link.name) }}",
-            onClose: addNewEntry
-        });
-        $('.add-page').ajaxDialog({
-            title: '{% trans %}New page{% endtrans %}',
-            url: "{{ url_for('.menu-add-entry', event, type=MenuEntryType.page.name) }}",
+        $('.add-link, .add-page').ajaxDialog({
+            title: function() { return $(this).data('title'); },
             onClose: addNewEntry
         });
         $('.add-separator').on('click', function addSeparator (evt) {
             evt.preventDefault();
 
             $.ajax({
-                url: {{ url_for('.menu-add-entry', event, type=MenuEntryType.separator.name)|tojson }},
+                url: {{ url_for('.menu-add-entry', event, type='separator')|tojson }},
                 method: 'POST',
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: addNewEntry
-            });
-        });
-        $(document).on('indico:confirmed', '.visible, .not-visible', function(evt) {
-            evt.preventDefault();
-
-            var $this = $(this);
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                success: function(data) {
-                    var visible = data.visible;
-                    $this.toggleClass('visible', visible)
-                        .toggleClass('not-visible', !visible)
-                        .parent('.actions')
-                            .parent('.i-label').toggleClass('stripped', !visible);
-                }
             });
         });
     });
