@@ -16,13 +16,11 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import IntegerField, BooleanField, StringField, SelectField, TextAreaField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, DataRequired
+from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
+from wtforms.validators import NumberRange, Optional, ValidationError, Length
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
-from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, IndicoSelectMultipleCheckboxField
-from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -80,50 +78,3 @@ class BoolField(SurveyField):
 
     def create_wtf_field(self):
         return self._make_wtforms_field(BooleanField, widget=SwitchWidget())
-
-
-class SingleChoiceConfigForm(FieldConfigForm):
-    display_type = IndicoRadioField(_('Display type'), [DataRequired()],
-                                    description=_('Show the question either as radio button or select'),
-                                    choices=[('radio', _('Show as radio button')),
-                                             ('select', _('Show as select field'))],
-                                    default='radio')
-    radio_display_type = IndicoRadioField(_('Arrangment of available options'),
-                                          [HiddenUnless('display_type', 'radio')],
-                                          choices=[('vertical', _('Vertical alignment')),
-                                                   ('horizontal', _('Horizontal alignment'))])
-    options = MultipleItemsField(_('Options'), [DataRequired()],
-                                 fields=[('option', _('Option'))], unique_field='option', uuid_field='id',
-                                 description=_('Specify the answers the user can choose from'))
-
-
-class SingleChoiceField(SurveyField):
-    name = 'single_choice'
-    friendly_name = _('Single Choice')
-    config_form = SingleChoiceConfigForm
-
-    def create_wtf_field(self):
-        field_options = {}
-        if self.question.field_data['display_type'] == 'select':
-            field_class = SelectField
-        else:
-            field_class = IndicoRadioField
-            field_options['orientation'] = self.question.field_data['radio_display_type']
-        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
-        return self._make_wtforms_field(field_class, choices=choices, **field_options)
-
-
-class MultiSelectConfigForm(FieldConfigForm):
-    options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
-                                 unique_field='option', uuid_field='id',
-                                 description=_('Specify the answers the user can select'))
-
-
-class MultiSelectField(SurveyField):
-    name = 'multiselect'
-    friendly_name = _('Select multiple')
-    config_form = MultiSelectConfigForm
-
-    def create_wtf_field(self):
-        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
-        return self._make_wtforms_field(IndicoSelectMultipleCheckboxField, choices=choices)
