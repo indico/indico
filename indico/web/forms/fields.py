@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import json
+import uuid
 from collections import OrderedDict
 from datetime import timedelta
 from operator import attrgetter
@@ -218,30 +219,53 @@ class MultipleItemsField(HiddenField):
     """A field with multiple items consisting of multiple string values.
 
     :param fields: A list of ``(fieldname, title)`` tuples
+    :param uuid_field: If set, each item will have a UUID assigned and
+                       stored in the field specified here.  The name
+                       specified here may not be in `fields`.
+    :param unique_field: The name of a field in `fields` that needs
+                         to be unique.
     """
     widget = JinjaWidget('forms/multiple_items_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.fields = kwargs.pop('fields')
+        self.uuid_field = kwargs.pop('uuid_field', None)
         self.unique_field = kwargs.pop('unique_field', None)
+        if self.uuid_field:
+            assert self.uuid_field != self.unique_field
+            assert self.uuid_field not in self.fields
         self.field_names = dict(self.fields)
         super(MultipleItemsField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = json.loads(valuelist[0])
+            if self.uuid_field:
+                for item in self.data:
+                    if self.uuid_field not in item:
+                        item[self.uuid_field] = unicode(uuid.uuid4())
 
     def pre_validate(self, form):
         unique_used = set()
+        uuid_used = set()
         for item in self.data:
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
-            elif item.viewkeys() != {x[0] for x in self.fields}:
+            item_keys = set(item)
+            if self.uuid_field:
+                item_keys.discard(self.uuid_field)
+            if item_keys != {x[0] for x in self.fields}:
                 raise ValueError(u'Invalid item (bad keys): {}'.format(escape(u', '.join(item.viewkeys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
                     raise ValueError(u'{} must be unique'.format(self.field_names[self.unique_field]))
                 unique_used.add(item[self.unique_field])
+            if self.uuid_field:
+                if item[self.uuid_field] in uuid_used:
+                    raise ValueError(u'UUID must be unique')
+                # raises ValueError if uuid is invalid
+                uuid.UUID(item[self.uuid_field], version=4)
+                uuid_used.add(item[self.uuid_field])
 
     def _value(self):
         return self.data or []
@@ -255,6 +279,9 @@ class OverrideMultipleItemsField(HiddenField):
     :param field_data: the data from the corresponding `MultipleItemsField`.
     :param unique_field: the name of the field which is unique among all rows
     :param edit_fields: a set containing the field names which can be edited
+
+    If you decide to use this field, please consider adding support
+    for `uuid_field` here!
     """
     widget = JinjaWidget('forms/override_multiple_items_widget.html')
 

@@ -26,6 +26,7 @@
         (function() {
             'use strict';
 
+            var uuidField = {{ field.uuid_field | tojson }};
             var columns = {{ field.fields | tojson }};
             var widget = $('#{{ field.id }}-widget');
             var widgetBody = widget.children('table').children('tbody');
@@ -40,7 +41,7 @@
                 createRow();
             }
 
-            data.forEach(function(item, i) {
+            data.forEach(function(item) {
                 createRow(item);
             });
 
@@ -51,6 +52,9 @@
                 e.preventDefault();
                 var row = $(this).closest('tr');
                 var item = {};
+                if (uuidField && row.data('uuid')) {
+                    item[uuidField] = row.data('uuid');
+                }
                 columns.forEach(function(col, i) {
                     item[col[0]] = row.find('input').eq(i).val();
                 });
@@ -103,6 +107,9 @@
             function createRow(item) {
                 var row = $('<tr>');
                 row.data('hasItem', !!item);
+                if (uuidField && item) {
+                    row.data('uuid', item[uuidField]);
+                }
                 columns.forEach(function(col) {
                     $('<td>', makeColData(item, col)).appendTo(row);
                 });
