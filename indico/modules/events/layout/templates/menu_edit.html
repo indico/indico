@@ -1,3 +1,4 @@
+{% from 'message_box.html' import message_box %}
 {% from 'events/layout/_menu.html' import menu_entries %}
 {% extends 'layout/base.html' %}
 
@@ -6,14 +7,88 @@
 {% endblock %}
 
 {%- block content %}
-    {{ menu_entries(menu) }}
+    <div class="fixed-width-page layout-wrapper">
+        <div class="row">
+            <div id="menu-entries" class="column col-40">
+                {{ menu_entries(menu) }}
+            </div>
+            <div class="column col-60">
+                {% call message_box('info') %}
+                    {%- trans grid_icon='<i class="icon-grid2"></i>'|safe -%}
+                        Click and drag the grid icon ({{ grid_icon }}) to reorder the menu entries
+                    {%- endtrans -%}
+                {% endcall %}
+                <div class="action-box">
+                    <div class="section">
+                        <div class="icon icon-plus"></div>
+                        <div class="toolbar right">
+                            <div class="group">
+                                <a class="i-button icon-link add-link" href="#">
+                                    {%- trans %}Add link{% endtrans -%}
+                                </a>
+                                <a class="i-button icon-file-text add-page" href="#">
+                                    {%- trans %}Add page{% endtrans -%}
+                                </a>
+                                <a class="i-button icon-arrows-vert add-separator" href="#">
+                                    {%- trans %}Add spacer{% endtrans -%}
+                                </a>
+                            </div>
+                        </div>
+                        <span class="text">
+                            <div class="label">
+                                {%- trans %}New menu entries{% endtrans -%}
+                            </div>
+                            <div>
+                                {%- trans %}Add entries to the event's menu.{% endtrans -%}
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
     $(function initMenuEdit() {
-        $('.edit-entry').ajaxDialog({
-            title: '{% trans %}Menu Entry Settings{% endtrans %}',
-            onClose: function(data) {
-                $(this.trigger).closest('.menu-entry').replaceWith(data.entry)
+        function addNewEntry(data) {
+            if (data) {
+                $('#menu-entries > .menu-entries').append($('<li>').html(data.entry));
             }
+        }
+
+        $('.menu-entries').on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
+            evt.preventDefault();
+
+            ajaxDialog({
+                trigger: this,
+                url: $(this).data('href'),
+                title: $T.gettext('Menu Entry Settings'),
+                onClose: function(data) {
+                    if (data) {
+                        $(this.trigger).closest('.menu-entry').replaceWith(data.entry);
+                    }
+                }
+            });
+        });
+        $('.add-link').ajaxDialog({
+            title: '{% trans %}New link{% endtrans %}',
+            url: "{{ url_for('.menu-add-entry', event, type=MenuEntryType.user_link.name) }}",
+            onClose: addNewEntry
+        });
+        $('.add-page').ajaxDialog({
+            title: '{% trans %}New page{% endtrans %}',
+            url: "{{ url_for('.menu-add-entry', event, type=MenuEntryType.page.name) }}",
+            onClose: addNewEntry
+        });
+        $('.add-separator').on('click', function addSeparator (evt) {
+            evt.preventDefault();
+
+            $.ajax({
+                url: {{ url_for('.menu-add-entry', event, type=MenuEntryType.separator.name)|tojson }},
+                method: 'POST',
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: addNewEntry
+            });
         });
         $(document).on('indico:confirmed', '.visible, .not-visible', function(evt) {
             evt.preventDefault();
