@@ -33,5 +33,36 @@
                 }
             }
         });
+    }).on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
+        evt.preventDefault();
+        ajaxDialog({
+            trigger: this,
+            url: $(this).data('href'),
+            title: $T.gettext('Menu Entry Settings'),
+            onClose: function(data) {
+                if (data) {
+                    $(this.trigger).closest('.menu-entry').replaceWith(data.entry);
+                }
+            }
+        });
+    });
+
+    $(document).on('indico:confirmed', '.menu-entry .visible, .menu-entry .not-visible', function(evt) {
+        evt.preventDefault();
+
+        var $this = $(this);
+        $.ajax({
+            url: $this.data('href'),
+            method: $this.data('method'),
+            complete: IndicoUI.Dialogs.Util.progress(),
+            error: handleAjaxError,
+            success: function(data) {
+                var visible = data.visible;
+                $this.toggleClass('visible', visible)
+                    .toggleClass('not-visible', !visible)
+                    .parent('.actions')
+                        .parent('.i-label').toggleClass('stripped', !visible);
+            }
+        });
     });
  });
