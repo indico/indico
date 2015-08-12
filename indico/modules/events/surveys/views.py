@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
@@ -31,3 +31,16 @@ class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
 
     def getCSSFiles(self):
         return (WPConferenceModifBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls())
+
+
+class WPDisplaySurvey(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/surveys/'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls()
