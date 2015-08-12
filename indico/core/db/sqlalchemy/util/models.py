@@ -163,6 +163,16 @@ def attrs_changed(obj, *attrs):
     return any(get_history(obj, attr).has_changes() for attr in attrs)
 
 
+def get_default_values(model):
+    """Returns a dict containing all static default values of a model.
+    This only takes `default` into account, not `server_default`.
+    :param model: A SQLAlchemy model
+    """
+    return {attr.key: attr.columns[0].default.arg
+            for attr in model.__mapper__.column_attrs
+            if len(attr.columns) == 1 and attr.columns[0].default and attr.columns[0].default.is_scalar}
+
+
 def auto_table_args(cls, **extra_kwargs):
     """Merges SQLAlchemy ``__table_args__`` values.
 
