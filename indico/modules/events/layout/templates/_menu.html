@@ -2,8 +2,14 @@
     <div class="menu-entry {%- if entry.children %} with-children{% endif %}"
          data-position="{{ entry.position }}"
          data-position-url="{{ url_for('.menu-entry-position', entry) }}">
-        <div class="i-label disabled {%- if not entry.visible %} stripped{% endif %} entry-{{ entry.type.name }}">
-            <span>{{ _(entry.title) }} ({{ entry.position }})</span>
+        <div class="i-label
+        {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
+        {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
+        {%- if not entry.visible %} stripped{% endif %} entry-{{ entry.type.name }}">
+            <span>
+                {%- if entry.type.name != 'separator' %}{{ _(entry.title) }}{% endif %}
+                ({{ entry.position }})
+            </span>
             <span class="right actions">
                 <a class="{% if not entry.visible %}not-{% endif %}visible" href="#"
                    data-href="{{ url_for('.menu-entry-visibility', entry) }}"

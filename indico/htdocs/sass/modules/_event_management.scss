@@ -112,12 +112,13 @@
 }
 
 %visible-action {
-     @include icon-before('icon-eye');
+    @include icon-before('icon-eye');
 }
 
 %not-visible-action {
     @include icon-before('icon-eye-blocked');
-    color: $red;
+
+    color: $red !important;
 }
 
 .menu-entries {
@@ -138,7 +139,8 @@
                 width: 100%;
 
                 text-align: left;
-                > span:first-child { /* menu title */
+                /* menu title */
+                > span:first-child {
                     display: inline-block;
                     overflow: hidden;
 
@@ -179,8 +181,11 @@
                         @include icon-before('icon-edit');
                     }
                 }
-                &.highlight > .actions > *:hover {
-                    color: $pastel-gray;
+                &.highlight > .actions > * {
+                    color: #fdfdfd;
+                    &:hover {
+                        color: $link;
+                    }
                 }
                 &.entry-internal_link,
                 &.entry-user_link,
@@ -211,12 +216,11 @@
 
     width: 303px;
     margin: 0 5px;
-    padding-left: 20px;
     padding-right: 15px;
+    padding-left: 20px;
 
     border-top: 0;
     background-color: $light-gray;
-
     > li > .menu-entry > .i-label {
         > span:first-child {
             max-width: 70%;
