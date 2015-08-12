@@ -29,14 +29,13 @@ from indico.util.i18n import _
 
 
 class SurveyForm(IndicoForm):
-    title = StringField(_('Title'), [DataRequired()], description=_('The title of the survey'))
-    description = TextAreaField(_('Description'), description=_('The description of the room'))
-    anonymous = BooleanField(_("Anonymous submissions"),
-                             description=_("User information will not be attached to submissions"),
-                             widget=SwitchWidget())
-    require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')],
-                                description=_("Still require users to be logged in for submitting the survey"),
-                                widget=SwitchWidget())
+    title = StringField(_("Title"), [DataRequired()], description=_("The title of the survey"))
+    description = TextAreaField(_("Description"), [DataRequired()], description=_("The description of the survey"))
+    introduction = TextAreaField(_("Introduction"), description=_("An introduction to be displayed before the survey"))
+    anonymous = BooleanField(_("Anonymous submissions"), widget=SwitchWidget(),
+                             description=_("User information will not be attached to submissions"))
+    require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')], widget=SwitchWidget(),
+                                description=_("Still require users to be logged in for submitting the survey"))
     unlimited_submissions = BooleanField(_("Unlimitted submissions"), widget=SwitchWidget(), default=True,
                                          description=_("Whether there is a submission cap"))
     submission_limit = IntegerField(_("Capacity"),
@@ -60,10 +59,10 @@ class SurveyForm(IndicoForm):
 
 
 class ScheduleSurveyForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_('Start'), [DataRequired(), DateTimeRange(earliest='now')],
-                                   description=_('Moment when the survey will open for submissions'))
-    end_dt = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt')],
-                                 description=_('Moment when the survey will close'))
+    start_dt = IndicoDateTimeField(_("Start"), [DataRequired(), DateTimeRange(earliest='now')],
+                                   description=_("Moment when the survey will open for submissions"))
+    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
+                                 description=_("Moment when the survey will close"))
 
     def __init__(self, *args, **kwargs):
         self.survey = kwargs.pop('survey', None)
