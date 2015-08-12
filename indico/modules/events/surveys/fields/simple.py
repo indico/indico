@@ -93,8 +93,8 @@ class SingleChoiceConfigForm(FieldConfigForm):
                                           choices=[('vertical', _('Vertical alignment')),
                                                    ('horizontal', _('Horizontal alignment'))])
     options = MultipleItemsField(_('Options'), [DataRequired()],
-                                 fields=[('option', _('Option'))], unique_field='option',
-                                 description=_('Specify options available for selection by user'))
+                                 fields=[('option', _('Option'))], unique_field='option', uuid_field='id',
+                                 description=_('Specify the answers the user can choose from'))
 
 
 class SingleChoiceField(SurveyField):
@@ -109,15 +109,14 @@ class SingleChoiceField(SurveyField):
         else:
             field_class = IndicoRadioField
             field_options['orientation'] = self.question.field_data['radio_display_type']
-        options = [x['option'] for x in self.question.field_data['options']]
-        choices = zip(options, options)
+        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
         return self._make_wtforms_field(field_class, choices=choices, **field_options)
 
 
 class MultiSelectConfigForm(FieldConfigForm):
     options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
-                                 unique_field='option',
-                                 description=_('Specify choices available for selection by user'))
+                                 unique_field='option', uuid_field='id',
+                                 description=_('Specify the answers the user can select'))
 
 
 class MultiSelectField(SurveyField):
@@ -126,6 +125,5 @@ class MultiSelectField(SurveyField):
     config_form = MultiSelectConfigForm
 
     def create_wtf_field(self):
-        options = [x['option'] for x in self.question.field_data['options']]
-        choices = zip(options, options)
+        choices = [(x['id'], x['option']) for x in self.question.field_data['options']]
         return self._make_wtforms_field(IndicoSelectMultipleCheckboxField, choices=choices)
