@@ -18,13 +18,9 @@
             {% for survey in surveys %}
                 <tr>
                     <td>{{ survey.title }}</td>
-                    <td>{{ survey.start_dt | format_datetime(locale='en_GB') if survey.start_dt else 'Not started' }}</td>
-                    <td>
-                        {{ survey.end_dt | format_datetime(locale='en_GB') if survey.end_dt else 'No deadline' }}
-                    </td>
-                    <td>
-                        {{ render_available_buttons(survey) }}
-                    </td>
+                    <td>{{ survey.start_dt | format_datetime if survey.start_dt else _('Not started') }}</td>
+                    <td>{{ survey.end_dt | format_datetime if survey.end_dt else _('No deadline') }}</td>
+                    <td>{{ render_available_buttons(survey) }}</td>
                 </tr>
             {% else %}
                 <tr>
@@ -38,7 +34,7 @@
 {% macro render_available_buttons(survey) %}
     {% if not was_survey_submitted(survey) and survey.can_submit(session.user) %}
         <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight">
-            {%trans %}Fill in{% endtrans %}
+            {% trans %}Fill in{% endtrans %}
         </a>
     {% endif %}
 {% endmacro %}
