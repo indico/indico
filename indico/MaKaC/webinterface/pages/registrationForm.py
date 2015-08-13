@@ -346,7 +346,7 @@ class WPRegistrationForm(conferences.WPConferenceDefaultDisplayBase):
 
 class WConfRegistrationForm(WConfDisplayBodyBase):
 
-    _linkname = "registrationForm"
+    _linkname = 'registration'
 
     def __init__(self, conf, av, registrant, registrant_id=None, authkey=None):
         self._conf = conf
@@ -769,7 +769,7 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
 
 class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
 
-    _linkname = "registrationForm"
+    _linkname = 'registration'
 
     def __init__(self, conf, user):
         self._currentUser = user
@@ -821,7 +821,7 @@ class WPRegFormInactive(conferences.WPConferenceDefaultDisplayBase):
 
 class WConfRegFormDeactivated(WConfDisplayBodyBase):
 
-    _linkname = "registrationForm"
+    _linkname = 'registration'
 
     def __init__(self, conf):
         self._conf = conf

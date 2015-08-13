@@ -56,7 +56,7 @@ class WPEvaluationMainInformation( WPEvaluationBase ):
 class WEvaluationMainInformation(WConfDisplayBodyBase):
     """[DisplayArea] display evaluation general information."""
 
-    _linkname = "evaluation"
+    _linkname = 'evaluation'
 
     def __init__(self, conf, user):
         self._conf = conf
@@ -102,7 +102,7 @@ class WPEvaluationDisplay( WPEvaluationBase ):
 class WEvaluationDisplay(WConfDisplayBodyBase):
     """[DisplayArea] Evaluation default display."""
 
-    _linkname = "newEvaluation"
+    _linkname = 'evaluation_form'
 
     def __init__(self, conf):
         self._conf = conf
@@ -136,7 +136,7 @@ class WPEvaluationDisplayModif( WPEvaluationBase ):
 class WEvaluationDisplayModif(WEvaluationDisplay):
     """[DisplayArea] The user modifies his already submitted evaluation."""
 
-    _linkname = "viewMyEvaluation"
+    _linkname = 'evaluation_edit'
 
     def __init__(self, conf):
         self._conf = conf
@@ -173,7 +173,7 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
 class WEvaluationSubmitted(WEvaluationDisplay):
     """Submitted Evaluation."""
 
-    _linkname = "newEvaluation"
+    _linkname = 'evaluation_form'
 
     def __init__(self, conference, mode=Evaluation._SUBMIT):
         self._conf = conference
@@ -212,7 +212,7 @@ class WPEvaluationFull( WPEvaluationBase ):
 class WEvaluationFull(WEvaluationDisplay):
     """[DisplayArea] Evaluation is full."""
 
-    _linkname = "evaluation"
+    _linkname = 'evaluation'
 
     def __init__(self, conf):
         self._conf = conf
@@ -239,7 +239,7 @@ class WPEvaluationClosed( WPEvaluationBase ):
 class WEvaluationClosed(WEvaluationDisplay):
     """[DisplayArea] Evaluation is closed."""
 
-    _linkname = "evaluation"
+    _linkname = 'evaluation'
 
     def __init__(self, conf):
         self._conf = conf
@@ -275,7 +275,7 @@ class WPEvaluationInactive( WPEvaluationBase ):
 class WEvaluationInactive(WEvaluationDisplay):
     """[DisplayArea] Inactive evaluation."""
 
-    _linkname = "evaluation"
+    _linkname = 'evaluation'
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)

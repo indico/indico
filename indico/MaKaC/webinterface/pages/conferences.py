@@ -67,10 +67,10 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
-from indico.modules.events.layout.util import menu_entries_for_event
+from indico.modules.events.layout.util import menu_entries_for_event, get_entry_from_name
 from indico.modules.events.layout import layout_settings
 from indico.util import json
-from indico.util.signals import values_from_signal
+from indico.util.signals import values_from_signal, named_objects_from_signal
 from indico.web.flask.util import url_for
 
 LECTURE_SERIES_RE = re.compile(r'^part\d+$')
@@ -288,10 +288,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 link = self._sectionMenu.getLinkByName(item.name)
                 link.setVisible(item.visible(self._conf))
 
-    def _display( self, params ):
-        self._defineSectionMenu()
-        return WPConferenceBase._display(self,params)
-
     def _getNavigationBarHTML(self):
         item=None
         if self.navigationEntry:
@@ -334,7 +330,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                                         </div>
                                   </div>
             </div>""" % (self._getNavigationBarHTML(), body)
-        return frame.getHTML( self._sectionMenu, body, frameParams)
+        return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
         dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
@@ -1000,14 +996,14 @@ class WPrintPageFrame (wcomponents.WTemplated):
 class WConfDisplayBodyBase(wcomponents.WTemplated):
 
     def _getTitle(self):
-        default_caption = displayMgr.SystemLinkData().getLinkData()[self._linkname]["caption"]
-        caption = self._conf.getDisplayMgr().getMenu().getLinkByName(self._linkname).getCaption()
-        return _(caption) if caption == default_caption else caption
+        entry = get_entry_from_name(self._linkname, self._conf)
+        entries = named_objects_from_signal(signals.event.sidemenu.send())
+        return _(entry.title) if entry.title == entries[entry.name].title else entry.title
 
 
 class WConfProgram(WConfDisplayBodyBase):
 
-    _linkname = "programme"
+    _linkname = 'program'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -1089,7 +1085,7 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
 
 class WConferenceTimeTable(WConfDisplayBodyBase):
 
-    _linkname = "timetable"
+    _linkname = 'timetable'
 
     def __init__(self, conference, aw):
         self._conf = conference
@@ -4624,7 +4620,7 @@ class WPContributionList( WPConferenceDefaultDisplayBase ):
 
 class WConfContributionList (WConfDisplayBodyBase):
 
-    _linkname = "contributionList"
+    _linkname = 'contributions'
 
     def __init__(self, aw, conf, filterCrit, filterText):
         self._aw = aw
@@ -4649,7 +4645,7 @@ class WConfContributionList (WConfDisplayBodyBase):
 
 class WConfAuthorIndex(WConfDisplayBodyBase):
 
-    _linkname = "authorIndex"
+    _linkname = 'author_index'
 
     def __init__(self, conf):
         self._conf = conf
@@ -4708,7 +4704,7 @@ class WPAuthorIndex(WPConferenceDefaultDisplayBase):
 
 class WConfSpeakerIndex(WConfDisplayBodyBase):
 
-    _linkname = "speakerIndex"
+    _linkname = 'speaker_index'
 
     def __init__(self, conf):
         self._conf = conf
@@ -4777,7 +4773,7 @@ class WConfMyContributions(wcomponents.WTemplated):
 
 class WConfMyStuffMySessions(WConfDisplayBodyBase):
 
-    _linkname = "mysessions"
+    _linkname = 'my_sessions'
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -4840,7 +4836,7 @@ class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
 
 class WConfMyStuffMyContributions(WConfDisplayBodyBase):
 
-    _linkname = "mycontribs"
+    _linkname = 'my_contributions'
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -4870,7 +4866,7 @@ class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
 
 class WConfMyStuffMyTracks(WConfDisplayBodyBase):
 
-    _linkname = "mytracks"
+    _linkname = 'my_tracks'
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -4927,7 +4923,7 @@ class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
 
 class WConfMyStuff(WConfDisplayBodyBase):
 
-    _linkname = "mystuff"
+    _linkname = 'my_conference'
 
     def __init__(self, aw, conf):
         self._aw = aw
