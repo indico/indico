@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.modules.events.surveys.models.submissions import SurveySubmission
+from indico.util.caching import memoize_request
 from indico.web.forms.base import IndicoForm
 
 
@@ -42,14 +44,18 @@ def make_survey_form(questions):
     return form_class
 
 
-def save_submitted_survey_to_session(survey):
+def save_submitted_survey_to_session(submission):
     """Save submission of a survey to session for further checks"""
-    session.setdefault('submitted_surveys', set()).add(survey.id)
+    session.setdefault('submitted_surveys', {})[submission.survey.id] = submission.id
     session.modified = True
 
 
+@memoize_request
 def was_survey_submitted(survey):
-    """Check whether the user submitted a survey"""
+    """Check whether the current user has submitted a survey"""
     if session.user and session.user.survey_submissions.filter_by(survey=survey).count():
         return True
-    return survey.id in session.get('submitted_surveys', set())
+    submission_id = session.get('submitted_surveys', {}).get(survey.id)
+    if submission_id is None:
+        return False
+    return bool(SurveySubmission.find(id=submission_id).count())
