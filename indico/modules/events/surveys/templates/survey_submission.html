@@ -10,5 +10,11 @@
 {% endblock %}
 
 {% block content %}
-    {{ simple_form(form, submit=_('Save answers'), back_url=url_for('.display_survey_list', event)) }}
+    {{ simple_form(form, submit=_('Save answers'), back_url=url_for('.display_survey_list', event),
+                   form_header_kwargs={'id': 'survey-form'}) }}
+
+    <script>
+        // allow deselecting a horizontal radio button unless it's required
+        $('#survey-form .inline-vcentered input:radio:not([required])').resettableRadioButtons();
+    </script>
 {% endblock %}

@@ -42,8 +42,16 @@ class SingleChoiceConfigForm(FieldConfigForm):
 
 class _EmptyNoneSelectField(SelectField):
     def process_formdata(self, valuelist):
-        super(_EmptyNoneSelectField, self).process_data(valuelist)
-        self.data = filter(None, self.data)
+        super(_EmptyNoneSelectField, self).process_formdata(valuelist)
+        if not self.data:
+            self.data = None
+
+
+class _EmptyNoneRadioField(IndicoRadioField):
+    def process_formdata(self, valuelist):
+        super(_EmptyNoneRadioField, self).process_formdata(valuelist)
+        if not self.data:
+            self.data = None
 
 
 class SingleChoiceField(SurveyField):
@@ -58,8 +66,11 @@ class SingleChoiceField(SurveyField):
             field_class = _EmptyNoneSelectField
             choices = [('', '')] + choices
         else:
-            field_class = IndicoRadioField
+            field_class = _EmptyNoneRadioField
             field_options['orientation'] = self.question.field_data['radio_display_type']
+            if field_options['orientation'] == 'vertical' and not self.question.is_required:
+                field_options['default'] = ''
+                choices = [('', _('No selection'))] + choices
         return self._make_wtforms_field(field_class, choices=choices, **field_options)
 
 
