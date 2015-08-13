@@ -78,13 +78,11 @@ class RHEditSurvey(RHManageSurveyBase):
     """Edit a survey's basic data/settings"""
 
     def _get_form_defaults(self):
-        return FormDefaults(self.survey, unlimited_submissions=self.survey.submission_limit is None)
+        return FormDefaults(self.survey, limit_submissions=self.survey.submission_limit is not None)
 
     def _process(self):
         form = SurveyForm(event=self.event, obj=self._get_form_defaults())
         if form.validate_on_submit():
-            if form.unlimited_submissions.data:
-                form.submission_limit.data = None
             form.populate_obj(self.survey)
             flash(_('Survey modified'), 'success')
             logger.info('Survey {} modified by {}'.format(self.survey, session.user))

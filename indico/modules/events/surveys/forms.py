@@ -36,10 +36,10 @@ class SurveyForm(IndicoForm):
                              description=_("User information will not be attached to submissions"))
     require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')], widget=SwitchWidget(),
                                 description=_("Still require users to be logged in for submitting the survey"))
-    unlimited_submissions = BooleanField(_("Unlimitted submissions"), widget=SwitchWidget(), default=True,
-                                         description=_("Whether there is a submission cap"))
+    limit_submissions = BooleanField(_("Limit submissions"), widget=SwitchWidget(),
+                                     description=_("Whether there is a submission cap"))
     submission_limit = IntegerField(_("Capacity"),
-                                    [HiddenUnless('unlimited_submissions', False), DataRequired(), NumberRange(min=1)],
+                                    [HiddenUnless('limit_submissions'), DataRequired(), NumberRange(min=1)],
                                     description=_("Maximum number of submissions accepted"))
 
     def __init__(self, *args, **kwargs):
