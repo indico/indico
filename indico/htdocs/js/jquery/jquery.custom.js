@@ -26,6 +26,40 @@
         return this.css(propertyName) === value;
     };
 
+    $.fn.resettableRadioButtons = function() {
+        /*
+         * Allows deselecting a radio button by clicking it or its label again.
+         * Based on http://stackoverflow.com/a/6246260/298479
+         */
+        var ns = '.resettable_radio_buttons';
+        var labels = this.map(function() {
+            var parentLabel = $(this).closest('label');
+            if (parentLabel.length) {
+                return parentLabel[0];
+            }
+            else if (this.id) {
+                return $('label[for="{0}"]'.format(this.id))[0];
+            }
+        }).get();
+        return this.add.call(this, labels).on('mousedown', function() {
+            var $this = $(this);
+            var radio = $this.is('label') ? document.getElementById(this.htmlFor) : this;
+            if (radio.checked) {
+                function _mouseout() {
+                    $this.off(ns);
+                }
+                function _mouseup() {
+                    _.defer(function() {
+                        radio.checked = false;
+                    });
+                    $this.off(ns);
+                }
+                $this.one('mouseout' + ns, _mouseout);
+                $this.one('mouseup' + ns, _mouseup);
+            }
+        }).end();
+    };
+
     var __gotoToday = $.datepicker._gotoToday;
 
     $.extend($.datepicker, {
