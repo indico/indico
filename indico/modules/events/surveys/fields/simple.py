@@ -106,7 +106,7 @@ class StaticTextField(SurveyField):
     @classmethod
     def config_form(cls, *args, **kwargs):
         form = StaticTextConfigForm(*args, **kwargs)
-        del form.help, form.description, form.is_required
+        del form.description, form.is_required
         return form
 
     @property

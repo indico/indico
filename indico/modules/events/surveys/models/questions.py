@@ -63,14 +63,6 @@ class SurveyQuestion(db.Model):
         nullable=False,
         default=''
     )
-    # XXX do we need this? check old data if/how it's being used!
-    #: The help tooltip of the question
-    help = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
-    )
-    # XXX there's also a "keyword" in the old code. check if we need that.
     #: If the question must be answered (wtforms DataRequired)
     is_required = db.Column(
         db.Boolean,
