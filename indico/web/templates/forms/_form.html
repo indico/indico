@@ -116,10 +116,10 @@
 {% endmacro %}
 
 {# Renders a form with the most common default markup #}
-{% macro simple_form(form, submit=none, back=none, back_url=none) %}
+{% macro simple_form(form, submit=none, back=none, back_url=none, form_header_kwargs={}) %}
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
-    {{ form_header(form) }}
+    {{ form_header(form, **form_header_kwargs) }}
     {{ form_rows(form) }}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{{ submit }}" data-disabled-until-change>
