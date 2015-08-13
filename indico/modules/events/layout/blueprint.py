@@ -17,9 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.controllers import (RHLayoutEdit, RHLayoutLogoUpload, RHLogoDisplay, RHMenuAddEntry,
-                                                      RHMenuEdit, RHMenuEntryEdit, RHMenuEntryPosition,
-                                                      RHMenuEntryVisibility)
+from indico.modules.events.layout.controllers import (RHMenuDeleteEntry, RHLayoutEdit, RHLayoutLogoUpload,
+                                                      RHLogoDisplay, RHMenuAddEntry, RHMenuEdit, RHMenuEntryEdit,
+                                                      RHMenuEntryPosition, RHMenuEntryVisibility)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
@@ -31,6 +31,8 @@ _bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu-entry-edit', RHMenuEntryEdi
 _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu-entry-position', RHMenuEntryPosition, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/visibility', 'menu-entry-visibility', RHMenuEntryVisibility,
                  methods=('POST',))
+_bp.add_url_rule('/menu/<int:menu_entry_id>/delete', 'menu-delete-entry', RHMenuDeleteEntry,
+                 methods=('DELETE',))
 _bp.add_url_rule('/menu/add', 'menu-add-entry', RHMenuAddEntry, methods=('GET', 'POST'))
 
 

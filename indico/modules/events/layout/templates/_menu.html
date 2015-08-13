@@ -16,6 +16,17 @@
                    data-method="POST"
                    ></a>
                 <a href="#" data-href="{{ url_for('.menu-entry-edit', entry) }}" class="edit-entry"></a>
+                {% if entry.type.name in ('user_link', 'page', 'separaotr') %}
+                    <a href="#" class="delete-entry"
+                       data-method="DELETE"
+                       data-href="{{ url_for('.menu-delete-entry', entry) }}"
+                       data-title="{% trans name=entry.title %}Remove {{ name }}?{% endtrans %}"
+                       data-confirm="{% trans name=entry.title -%}
+                           Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                           This will remove the attachment permanently.
+                           {%- endtrans %}"> {# TODO: handle response #}
+                    </a>
+                {% endif %}
                 <i class="drag-handle"></i>
             </span>
         </div>
