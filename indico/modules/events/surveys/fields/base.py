@@ -26,11 +26,10 @@ from indico.web.forms.widgets import SwitchWidget
 
 class FieldConfigForm(IndicoForm):
     # data that is stored directly on the question and not in data
-    _common_fields = {'title', 'description', 'help', 'is_required'}
+    _common_fields = {'title', 'description', 'is_required'}
 
     title = StringField(_('Title'), [DataRequired()], description=_("The title of the question"))
     description = TextAreaField(_('Description'), description=_("The description (shown below the question's field.)"))
-    help = TextAreaField(_('Help'), description=_("The help tooltip for the question."))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
                                description=_("If the user has to answer the question."))
 

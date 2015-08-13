@@ -41,7 +41,6 @@ def upgrade():
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
-        sa.Column('help', sa.Text(), nullable=False),
         sa.Column('is_required', sa.Boolean(), nullable=False),
         sa.Column('field_type', sa.String(), nullable=False),
         sa.Column('field_data', postgresql.JSON(), nullable=False),
