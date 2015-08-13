@@ -43,7 +43,7 @@ class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
         return survey.is_active and not was_survey_submitted(survey)
 
     def _process(self):
-        surveys = Survey.find_all(event_id=self.event.getId(), is_deleted=False)
+        surveys = Survey.find_all(event_id=int(self.event.id), is_deleted=False)
         if len(surveys) == 1 and self._can_redirect_to_survey_form(surveys[0]):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
@@ -85,8 +85,9 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
             flash(_('Your answers has been saved'), 'success')
             return redirect(url_for('.display_survey_list', self.event))
 
+        single_survey = Survey.find(event_id=int(self.event.id), is_deleted=False).count()
         return WPDisplaySurvey.render_template('survey_submission.html', self.event, form=form,
-                                               event=self.event, survey=self.survey)
+                                               event=self.event, survey=self.survey, show_back_button=single_survey)
 
     def _save_answers(self, form):
         survey = self.survey
