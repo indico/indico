@@ -122,7 +122,7 @@
 }
 
 .menu-entries {
-    width: 340px;
+    width: 370px;
     padding: 5px 10px 5px 5px;
 
     list-style: none;
@@ -139,21 +139,26 @@
                 width: 100%;
 
                 text-align: left;
+                > * {
+                    line-height: 1.2em;
+                    height: 1.2em;
+                    vertical-align: middle;
+                }
                 /* menu title */
                 > span:first-child {
                     display: inline-block;
                     overflow: hidden;
 
-                    max-width: 73%;
+                    max-width: 75%;
 
                     white-space: nowrap;
                     text-overflow: ellipsis;
                 }
                 > .actions {
-                    max-width: 27%;
-                    margin-right: -10px;
+                    max-width: 25%;
+                    margin-right: -5px;
                     > * {
-                        padding: 0 5px;
+                        padding: 0 2px;
 
                         color: $dark-gray;
                         &:hover {
@@ -172,13 +177,19 @@
                             @extend %visible-action;
                         }
                     }
+                    > .edit-entry {
+                        @include icon-before('icon-edit');
+                    }
+                    > .delete-entry {
+                        @include icon-before('icon-remove');
+                        &:hover {
+                            color: $red !important;
+                        }
+                    }
                     > .drag-handle {
                         @include icon-before('icon-grid2');
 
                         cursor: move;
-                    }
-                    > .edit-entry {
-                        @include icon-before('icon-edit');
                     }
                 }
                 &.highlight > .actions > * {
@@ -214,7 +225,7 @@
     @include border-all(darken($pastel-gray, $light-color-variation));
     @include border-bottom-radius();
 
-    width: 303px;
+    width: 333px;
     margin: 0 5px;
     padding-right: 15px;
     padding-left: 20px;
@@ -223,10 +234,10 @@
     background-color: $light-gray;
     > li > .menu-entry > .i-label {
         > span:first-child {
-            max-width: 70%;
+            max-width: 74%;
         }
         > .actions {
-            max-width: 30%;
+            max-width: 26%;
         }
     }
 }

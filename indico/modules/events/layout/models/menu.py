@@ -159,7 +159,6 @@ class MenuEntry(db.Model):
     #: The children menu entries and parent backref
     children = db.relationship(
         'MenuEntry',
-        cascade="all, delete-orphan",
         order_by='MenuEntry.position',
         backref=db.backref(
             'parent',

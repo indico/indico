@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from io import BytesIO
 import mimetypes
+from io import BytesIO
+from itertools import count
 
 from flask import flash, redirect, request, jsonify
 from werkzeug.exceptions import BadRequest, NotFound
@@ -42,6 +43,11 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 def _render_menu_entry(entry):
     tpl = get_template_module('events/layout/_menu.html')
     return tpl.menu_entry(entry=entry)
+
+
+def _render_menu_entries(event, show_hidden=False):
+    tpl = get_template_module('events/layout/_menu.html')
+    return tpl.menu_entries(menu_entries_for_event(event, show_hidden=show_hidden))
 
 
 class RHLayoutLogoUpload(RHConferenceModifBase):
@@ -183,3 +189,28 @@ class RHMenuAddEntry(RHConferenceModifBase):
             db.session.flush()
             return jsonify_data(entry=_render_menu_entry(entry))
         return jsonify_template('events/layout/menu_entry_form.html', form=form)
+
+
+class RHMenuDeleteEntry(RHMenuEntryEditBase):
+    def _process(self):
+        if self.entry.type not in (MenuEntryType.user_link, MenuEntryType.page, MenuEntryType.separator):
+            raise BadRequest('Menu entry of type {} cannot be deleted'.format(self.entry.type.name))
+
+        position_gen = count(self.entry.position)
+        if self.entry.children:
+            for child in self.entry.children:
+                child.parent_id = self.entry.parent_id
+                child.position = next(position_gen)
+
+        with db.session.no_autoflush:
+            entries = MenuEntry.find_all(MenuEntry.event_id == self.entry.event_id,
+                                         MenuEntry.parent_id == self.entry.parent_id,
+                                         MenuEntry.position >= self.entry.position,
+                                         MenuEntry.id != self.entry.id)
+        for entry in entries:
+            entry.position = next(position_gen)
+
+        db.session.delete(self.entry)
+        db.session.flush()
+
+        return jsonify_data(menu=_render_menu_entries(self._conf, show_hidden=True))
