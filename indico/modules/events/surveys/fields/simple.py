@@ -89,9 +89,6 @@ class BoolField(SurveyField):
                 'choices': [(1, _('Yes')), (0, _('No'))],
                 'coerce': lambda x: bool(int(x))}
 
-    def create_wtf_field(self):
-        return self._make_wtforms_field(BooleanField, widget=SwitchWidget())
-
 
 class StaticTextConfigForm(FieldConfigForm):
     text = TextAreaField(_('Content'), description=_('Static text that will be shown to users. You can use Markdown to '
