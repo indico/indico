@@ -99,15 +99,14 @@ DEFAULT_MENU_ENTRIES = [
         title=N_("Scientific Programme"),
         name='program',
         endpoint='event.conferenceProgram',
-        position=1,
-        children=[
-            MenuEntryData(
-                title=N_("Manage my Tracks"),
-                name='program_my_tracks',
-                visible=_visibility_my_tracks,
-                endpoint='event.myconference-myTracks',
-            ),
-        ]
+        position=1
+    ),
+    MenuEntryData(
+        title=N_("Manage my Tracks"),
+        name='program_my_tracks',
+        visible=_visibility_my_tracks,
+        endpoint='event.myconference-myTracks',
+        parent='program',
     ),
     MenuEntryData(
         title=N_("Call for Abstracts"),
@@ -115,20 +114,20 @@ DEFAULT_MENU_ENTRIES = [
         endpoint='event.conferenceCFA',
         position=2,
         visible=_visibility_call_for_abstracts,
-        children=[
-            MenuEntryData(
-                title=N_("View my Abstracts"),
-                name='user_abstracts',
-                endpoint='event.userAbstracts',
-                position=0
-            ),
-            MenuEntryData(
-                title=N_("Submit Abstract"),
-                name='abstract_submission',
-                endpoint='event.abstractSubmission',
-                position=1
-            ),
-        ]
+    ),
+    MenuEntryData(
+        title=N_("View my Abstracts"),
+        name='user_abstracts',
+        endpoint='event.userAbstracts',
+        position=0,
+        parent='call_for_abstracts'
+    ),
+    MenuEntryData(
+        title=N_("Submit Abstract"),
+        name='abstract_submission',
+        endpoint='event.abstractSubmission',
+        position=1,
+        parent='call_for_abstracts'
     ),
     MenuEntryData(
         title=N_("Timetable"),
@@ -161,87 +160,93 @@ DEFAULT_MENU_ENTRIES = [
         name='my_conference',
         endpoint='event.myconference',
         position=7,
-        visible=_visibility_my_conference,
-        children=[
-            MenuEntryData(
-                title=N_("My Tracks"),
-                endpoint='event.myconference-myTracks',
-                name='my_tracks',
-                visible=_visibility_my_tracks,
-                position=0
-            ),
-            MenuEntryData(
-                title=N_("My Sessions"),
-                name='my_sessions',
-                endpoint='event.myconference-mySessions',
-                position=1
-            ),
-            MenuEntryData(
-                title=N_("My Contributions"),
-                name='my_contributions',
-                visible=_visibility_my_contributions,
-                endpoint='event.myconference-myContributions',
-                position=2
-            ),
-        ]
+        visible=_visibility_my_conference
+    ),
+    MenuEntryData(
+        title=N_("My Tracks"),
+        endpoint='event.myconference-myTracks',
+        name='my_tracks',
+        visible=_visibility_my_tracks,
+        position=0,
+        parent='my_conference'
+    ),
+    MenuEntryData(
+        title=N_("My Sessions"),
+        name='my_sessions',
+        endpoint='event.myconference-mySessions',
+        position=1,
+        parent='my_conference'
+    ),
+    MenuEntryData(
+        title=N_("My Contributions"),
+        name='my_contributions',
+        visible=_visibility_my_contributions,
+        endpoint='event.myconference-myContributions',
+        position=2,
+        parent='my_conference'
     ),
     MenuEntryData(
         title=N_("Paper Reviewing"),
         name='paper_reviewing',
         endpoint='event.paperReviewingDisplay',
         position=8,
-        visible=_visibility_paper_review,
-        children=[
-            MenuEntryData(
-                title=N_("Manage Paper Reviewing"),
-                name='paper_setup',
-                endpoint='event_mgmt.confModifReviewing-paperSetup',
-                visible=_visibility_paper_review_managment,
-                position=0
-            ),
-            MenuEntryData(
-                title=N_("Assign Papers"),
-                name='paper_assign',
-                endpoint='event_mgmt.assignContributions',
-                visible=_visibility_paper_assign,
-                position=1
-            ),
-            MenuEntryData(
-                title=N_("Referee Area"),
-                name='contributions_to_judge',
-                endpoint='event_mgmt.confListContribToJudge',
-                visible=_visibility_judge,
-                position=2
-            ),
-            MenuEntryData(
-                title=N_("Content Reviewer Area"),
-                name='contributions_as_reviewer',
-                endpoint='event_mgmt.confListContribToJudge-asReviewer',
-                visible=_visibility_contributions_as_reviewer,
-                position=3
-            ),
-            MenuEntryData(
-                title=N_("Layout Reviewer Area"),
-                name='contributions_as_editor',
-                endpoint='event_mgmt.confListContribToJudge-asEditor',
-                visible=_visibility_contributions_as_editor,
-                position=4
-            ),
-            MenuEntryData(
-                title=N_("Upload Paper"),
-                name='paper_upload',
-                endpoint='event.paperReviewingDisplay-uploadPaper',
-                visible=_visibility_paper_review_transfer,
-                position=5
-            ),
-            MenuEntryData(
-                title=N_("Download Template"),
-                name='download_template',
-                endpoint='event.paperReviewingDisplay-downloadTemplate',
-                visible=_visibility_paper_review_transfer,
-                position=6
-            ),
-        ]
+        visible=_visibility_paper_review
+    ),
+    MenuEntryData(
+        title=N_("Manage Paper Reviewing"),
+        name='paper_setup',
+        endpoint='event_mgmt.confModifReviewing-paperSetup',
+        visible=_visibility_paper_review_managment,
+        position=0,
+        parent='paper_reviewing'
+    ),
+    MenuEntryData(
+        title=N_("Assign Papers"),
+        name='paper_assign',
+        endpoint='event_mgmt.assignContributions',
+        visible=_visibility_paper_assign,
+        position=1,
+        parent='paper_reviewing'
+    ),
+    MenuEntryData(
+        title=N_("Referee Area"),
+        name='contributions_to_judge',
+        endpoint='event_mgmt.confListContribToJudge',
+        visible=_visibility_judge,
+        position=2,
+        parent='paper_reviewing'
+    ),
+    MenuEntryData(
+        title=N_("Content Reviewer Area"),
+        name='contributions_as_reviewer',
+        endpoint='event_mgmt.confListContribToJudge-asReviewer',
+        visible=_visibility_contributions_as_reviewer,
+        position=3,
+        parent='paper_reviewing'
+    ),
+    MenuEntryData(
+        title=N_("Layout Reviewer Area"),
+        name='contributions_as_editor',
+        endpoint='event_mgmt.confListContribToJudge-asEditor',
+        visible=_visibility_contributions_as_editor,
+        position=4,
+        parent='paper_reviewing'
+    ),
+    MenuEntryData(
+        title=N_("Upload Paper"),
+        name='paper_upload',
+        endpoint='event.paperReviewingDisplay-uploadPaper',
+        visible=_visibility_paper_review_transfer,
+        position=5,
+        parent='paper_reviewing'
+    ),
+    MenuEntryData(
+        title=N_("Download Template"),
+        name='download_template',
+        endpoint='event.paperReviewingDisplay-downloadTemplate',
+        visible=_visibility_paper_review_transfer,
+        position=6,
+        parent='paper_reviewing'
     ),
     MenuEntryData(
         title=N_("Book of Abstracts"),
@@ -268,18 +273,20 @@ DEFAULT_MENU_ENTRIES = [
         title=N_("Evaluation"),
         name='evaluation',
         endpoint='event.confDisplayEvaluation',
-        position=12,
-        children=[
-            MenuEntryData(
-                title=N_("Evaluation Form"),
-                name='evaluation_form',
-                endpoint='event.confDisplayEvaluation-display',
-            ),
-            MenuEntryData(
-                title=N_("Modify my Evaluation"),
-                name='evaluation_edit',
-                endpoint='event.confDisplayEvaluation-modif',
-            ),
-        ]
+        position=12
+    ),
+    MenuEntryData(
+        title=N_("Evaluation Form"),
+        name='evaluation_form',
+        endpoint='event.confDisplayEvaluation-display',
+        position=0,
+        parent='evalutation'
+    ),
+    MenuEntryData(
+        title=N_("Modify my Evaluation"),
+        name='evaluation_edit',
+        endpoint='event.confDisplayEvaluation-modif',
+        position=1,
+        parent='evalutation'
     )
 ]

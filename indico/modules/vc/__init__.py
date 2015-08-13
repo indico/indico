@@ -71,8 +71,7 @@ def _extend_event_menu(sender, **kwargs):
     return MenuEntryData(endpoint='vc.event_videoconference',
                          title='Videoconference Rooms',
                          name='videoconference_rooms',
-                         visible=_visible,
-                         children=None)
+                         visible=_visible)
 
 
 @signals.event.session_slot_deleted.connect

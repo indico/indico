@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import binascii
+from collections import defaultdict
 from itertools import count
 
 from indico.core import signals
@@ -36,14 +37,14 @@ def _entry_key(entry_data):
 class MenuEntryData(object):
     plugin = None
 
-    def __init__(self, title, name, endpoint, position=0, visible_default=True, visible=None, children=None):
+    def __init__(self, title, name, endpoint, position=0, visible_default=True, visible=None, parent=None):
         self.title = title
         self.name = name
         self.endpoint = endpoint
         self.position = position
         self._visible = visible
         self.visible_default = visible_default
-        self.children = children if children is not None else []
+        self.parent = parent
 
     def visible(self, event):
         return self._visible(event) if self._visible else self.visible_default
@@ -64,14 +65,19 @@ def menu_entries_for_event(event, show_hidden=False):
         pos_gen = count(start=(entries[-1].position + 1) if entries else 0)
         entry_names = {entry.name for entry in entries}
 
-        signal_entry_names = signal_entries.viewkeys()
-
         # Keeping only new entries from the signal
-        new_entry_names = signal_entry_names - entry_names
-        new_entries = [_build_entry(event, data, position=position)
-                       for (name, data), position in zip(sorted(signal_entries.iteritems(),
-                                                         key=lambda (name, data):_entry_key(data)), pos_gen)
-                       if name in new_entry_names]
+        new_entry_names = signal_entries.viewkeys() - entry_names
+
+        # Mapping children data to their parent
+        children = defaultdict(list)
+        for name, data in signal_entries.iteritems():
+            if name in new_entry_names and data.parent is not None:
+                children[data.parent].append(data)
+
+        # Building the entries
+        new_entries = [_build_entry(event, data, next(pos_gen), children=children.get(data.name))
+                       for (name, data) in sorted(signal_entries.iteritems(), key=lambda (name, data):_entry_key(data))
+                       if name in new_entry_names and data.parent is None]
 
         with db.tmp_session() as sess:
             sess.add_all(new_entries)
@@ -96,7 +102,7 @@ def menu_entries_for_event(event, show_hidden=False):
     return entries
 
 
-def _build_entry(event, data, position=0):
+def _build_entry(event, data, position, children=None):
     entry = MenuEntry(
         event_id=event.getId(),
         visible=data.visible_default,
@@ -105,7 +111,7 @@ def _build_entry(event, data, position=0):
         endpoint=data.endpoint,
         position=position,
         children=[_build_entry(event, entry_data, i)
-                  for i, entry_data in enumerate(sorted(data.children or [], key=_entry_key))]
+                  for i, entry_data in enumerate(sorted(children or [], key=_entry_key))]
     )
 
     if data.plugin:
