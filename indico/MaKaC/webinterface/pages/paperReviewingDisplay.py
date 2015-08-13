@@ -59,7 +59,7 @@ class WPUploadPaper(WPConferenceDefaultDisplayBase):
 
 class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
-    _linkname = "paperreviewing"
+    _linkname = 'paper_reviewing'
 
     def __init__(self, conference):
         self._conf = conference
@@ -72,7 +72,7 @@ class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
 class WDownloadPRTemplate(WConfDisplayBodyBase):
 
-    _linkname = "downloadtemplate"
+    _linkname = 'download_template'
 
     def __init__(self, conference):
         self._conf = conference
@@ -89,7 +89,7 @@ class WDownloadPRTemplate(WConfDisplayBodyBase):
 
 class WUploadPaper(WConfDisplayBodyBase):
 
-    _linkname = "uploadpaper"
+    _linkname = 'paper_upload'
 
     def __init__(self, aw, conf):
         self._aw = aw

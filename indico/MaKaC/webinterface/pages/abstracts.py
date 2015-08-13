@@ -44,7 +44,7 @@ from indico.util.string import render_markdown, natural_sort_key
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
 
-    _linkname = "CFA"
+    _linkname = 'call_for_abstracts'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -65,7 +65,7 @@ class WPCFAInactive(WPConferenceDefaultDisplayBase):
 
 class WCFANotYetOpened(WConfDisplayBodyBase):
 
-    _linkname = "SubmitAbstract"
+    _linkname = 'abstract_submission'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -92,7 +92,7 @@ class WPCFANotYetOpened(WPConferenceDefaultDisplayBase):
 
 class WCFAClosed(WConfDisplayBodyBase):
 
-    _linkname = "SubmitAbstract"
+    _linkname = 'abstract_submission'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -123,7 +123,7 @@ class WPCFAClosed(WPConferenceDefaultDisplayBase):
 
 class WConfCFA(WConfDisplayBodyBase):
 
-    _linkname = "CFA"
+    _linkname = 'call_for_abstracts'
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -205,7 +205,7 @@ class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
 
 class WUserAbstracts(WConfDisplayBodyBase):
 
-    _linkname = "ViewAbstracts"
+    _linkname = 'user_abstracts'
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -403,7 +403,7 @@ class WPAbstractDisplay(WPAbstractDisplayBase):
 
 class WAbstractDataModification(WConfDisplayBodyBase):
 
-    _linkname = "SubmitAbstract"
+    _linkname = 'abstract_submission'
 
     def __init__(self, conf):
         self._conf = conf

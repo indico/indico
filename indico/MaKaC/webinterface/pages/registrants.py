@@ -1706,7 +1706,7 @@ class WPConfRegistrantsList( WPConferenceDefaultDisplayBase ):
 
 class WConfRegistrantsList(WConfDisplayBodyBase):
 
-    _linkname = "registrants"
+    _linkname = 'registrants'
 
     def __init__(self, conference, filterCrit, sortingCrit, order, sessionFilterName):
         self._conf = conference

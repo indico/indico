@@ -143,6 +143,13 @@ def move_entry(entry, to):
     entry.position = new_pos
 
 
+def get_entry_from_name(name, event):
+    return MenuEntry.find_first(
+        MenuEntry.name == name,
+        MenuEntry.event_id == event.id,
+        MenuEntry.type.in_((MenuEntryType.internal_link, MenuEntryType.plugin_link)))
+
+
 def get_event_logo(event):
     """Retrieves information on the event's logo, or ``None``
        if there is none.
