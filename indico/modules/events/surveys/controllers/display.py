@@ -70,15 +70,18 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
         RHSurveyBaseDisplay._checkParams(self, params)
         self.survey = Survey.find_one(id=request.view_args['survey_id'], is_deleted=False)
 
-        if not self.survey.is_active or was_survey_submitted(self.survey):
-            flash(_('You have already answered this survey'))
+        if not self.survey.is_active:
+            flash(_('This survey is not active'), 'error')
+            return redirect(url_for('.display_survey_list', self.event))
+        elif was_survey_submitted(self.survey):
+            flash(_('You have already answered this survey'), 'error')
             return redirect(url_for('.display_survey_list', self.event))
 
     def _process(self):
         form = make_survey_form(self.survey.questions)()
         if form.validate_on_submit():
-            self._save_answers(form)
-            save_submitted_survey_to_session(self.survey)
+            submission = self._save_answers(form)
+            save_submitted_survey_to_session(submission)
             flash(_('Your answers has been saved'), 'success')
             return redirect(url_for('.display_survey_list', self.event))
 
@@ -87,24 +90,17 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
 
     def _save_answers(self, form):
         survey = self.survey
-        submission = SurveySubmission(survey_id=survey.id)
-        if not survey.anonymous:
-            submission.user = session.user
-        else:
+        submission = SurveySubmission(survey=survey)
+        if survey.anonymous:
             submission.is_anonymous = True
-
-        db.session.add(submission)
-        db.session.flush()
+        else:
+            submission.user = session.user
 
         for question in survey.questions:
             if isinstance(question.field, StaticTextField):
                 continue
+            answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
+            submission.answers.append(answer)
 
-            answer = SurveyAnswer(
-                submission=submission,
-                question=question,
-                data=getattr(form, 'question_{}'.format(question.id)).data
-            )
-
-            db.session.add(answer)
         db.session.flush()
+        return submission
