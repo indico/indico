@@ -5,7 +5,7 @@
 {% block html %}
     <div class="{{ 'i-group' if vertical_alignment else 'group i-selection' }}">
         {% for subfield in field %}
-            <div class="{{ 'i-radio' if vertical_alignment else 'inline-vcentered'}}">
+            <div class="{{ 'i-radio' if vertical_alignment else 'inline-vcentered'}} radio-item-{{ loop.index0 }}">
                 {{ subfield(**input_args) }}
                 {{ subfield.label(class_=('i-button' if not vertical_alignment)) }}
             </div>
