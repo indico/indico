@@ -16,10 +16,12 @@
 
 from __future__ import unicode_literals
 
+from markupsafe import escape
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import DataRequired, Optional, NumberRange
 
+from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoDateTimeField
@@ -48,10 +50,10 @@ class SurveyForm(IndicoForm):
 
     def validate_title(self, field):
         query = Survey.find(Survey.event_id == self.event.id,
-                            Survey.title == field.data,
+                            db.func.lower(Survey.title) == field.data.lower(),
                             Survey.title != field.object_data)
         if query.count():
-            raise ValidationError(_("There is already an survey named {} on this event".format(field.data)))
+            raise ValidationError(_("There is already an survey named \"{}\" on this event".format(escape(field.data))))
 
     def validate_require_user(self, field):
         if not field.data and not self.anonymous.data:
