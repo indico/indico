@@ -36,7 +36,7 @@
                 ${ _('Interior') }
             </td>
             <td align="left" class="thumbnail">
-                <a href="${ room.large_photo_url }" nofollow="lightbox">
+                <a href="${ room.large_photo_url }" class="js-lightbox">
                     <img border="1" src="${ room.small_photo_url }" alt="${ _('Room picture') }"/>
                 </a>
             </td>
