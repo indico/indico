@@ -331,7 +331,14 @@ class RH(RequestHandlerBase):
         defaults = set(itertools.chain.from_iterable(r.defaults
                                                      for r in current_app.url_map.iter_rules(request.endpoint)
                                                      if r.defaults))
-        provided = {k: v for k, v in request.view_args.iteritems() if k not in defaults}
+
+        def _convert(v):
+            # some legacy code has numeric ids in the locator data, but still takes
+            # string ids in the url rule (usually for confId)
+            return unicode(v) if isinstance(v, (int, long)) else v
+
+        provided = {k: _convert(v) for k, v in request.view_args.iteritems() if k not in defaults}
+        new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems()}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
                 return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
