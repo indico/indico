@@ -90,7 +90,7 @@ $(document).ready(function() {
     });
 
     // Enable colorbox for links with rel="lightbox"
-    $('body').on('click', 'a[nofollow="lightbox"]', function() {
+    $('body').on('click', 'a.js-lightbox', function() {
         $(this).colorbox({
             maxHeight: '90%',
             maxWidth: '90%',

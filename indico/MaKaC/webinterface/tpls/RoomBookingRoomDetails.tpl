@@ -103,7 +103,7 @@
                     </td>
                     <td width="20%" align="right" class="thumbnail">
                       % if room.photo_id:
-                        <a href="${ room.large_photo_url }" nofollow="lightbox" title="${ _('Room Photo') }">
+                        <a href="${ room.large_photo_url }" class="js-lightbox" title="${ _('Room Photo') }">
                           <img border="1px" height="100" src="${ room.small_photo_url }" alt="${ _('Room Photo') }">
                         </a>
                       % endif

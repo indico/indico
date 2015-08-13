@@ -195,7 +195,7 @@
                           ${ _('Interior') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="thumbnail">
-                          <a href="${ reservation.room.large_photo_url }" nofollow="lightbox">
+                          <a href="${ reservation.room.large_photo_url }" class="js-lightbox">
                             <img border="1px" src="${ reservation.room.small_photo_url }"/>
                           </a>
                         </td>
