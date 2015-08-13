@@ -58,6 +58,11 @@ class HiddenUnless(object):
         active = (value and self.value is None) or (value == self.value and self.value is not None)
         if not active:
             field.errors[:] = []
+            if field.raw_data:
+                raise ValidationError("Received data for disabled field")
+            # Clear existing data and use field default empty value
+            field.data = None
+            field.process_formdata([])
             raise StopValidation()
 
 
