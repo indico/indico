@@ -11,7 +11,7 @@
 
 {% block content %}
     {{ simple_form(form, submit=_('Save answers'), back_url=url_for('.display_survey_list', event),
-                   form_header_kwargs={'id': 'survey-form'}) }}
+                   back_button=show_back_button, form_header_kwargs={'id': 'survey-form'}) }}
 
     <script>
         // allow deselecting a horizontal radio button unless it's required
