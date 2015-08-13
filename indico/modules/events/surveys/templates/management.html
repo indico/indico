@@ -18,17 +18,8 @@
             <div class="section">
                 <div class="icon icon-file-check"></div>
                 <div class="text">
-                    <div class="label">
-                        {{ survey.title }}
-                    </div>
-                    <div>
-                        {{ survey.description }}
-                        {% if not survey.description %}
-                            {% trans %}
-                                TODO
-                            {% endtrans %}
-                        {% endif %}
-                    </div>
+                    <div class="label">{{ survey.title }}</div>
+                    <div>{{ survey.description }}</div>
                 </div>
                 <div class="toolbar right">
                     <div class="group">
