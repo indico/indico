@@ -20,12 +20,13 @@ from itertools import groupby
 from operator import attrgetter
 
 from flask import session
+from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import MultiDict
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import iterdays, format_time, overlaps
+from indico.util.date_time import iterdays, overlaps
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import natural_sort_key
@@ -61,10 +62,15 @@ class RoomBookingCalendarWidget(object):
         self.rooms = sorted(self.rooms, key=lambda x: natural_sort_key(x.full_name))
 
         if self.show_blockings:
-            self.blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
-                                                                'state': BlockedRoom.State.accepted,
-                                                                'start_date': self.start_dt.date(),
-                                                                'end_date': self.end_dt.date()})
+            # avoid loading user data we don't care about
+            user_strategy = joinedload('blocking').defaultload('created_by_user')
+            user_strategy.noload('*')
+            user_strategy.load_only('first_name', 'last_name')
+            self.blocked_rooms = (BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
+                                                                 'state': BlockedRoom.State.accepted,
+                                                                 'start_date': self.start_dt.date(),
+                                                                 'end_date': self.end_dt.date()})
+                                  .options(user_strategy))
         else:
             self.blocked_rooms = []
 
