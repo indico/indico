@@ -116,17 +116,19 @@
 {% endmacro %}
 
 {# Renders a form with the most common default markup #}
-{% macro simple_form(form, submit=none, back=none, back_url=none, form_header_kwargs={}) %}
+{% macro simple_form(form, submit=none, back=none, back_url=none, back_button=true, form_header_kwargs={}) %}
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
     {{ form_header(form, **form_header_kwargs) }}
     {{ form_rows(form) }}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{{ submit }}" data-disabled-until-change>
-        {% if back_url %}
-            <a href="{{ back_url }}" class="i-button big" data-button-back>{{ back }}</a>
-        {% else %}
-            <button type="button" class="i-button big" data-button-back>{{ back }}</button>
+        {% if back_button %}
+            {% if back_url %}
+                <a href="{{ back_url }}" class="i-button big" data-button-back>{{ back }}</a>
+            {% else %}
+                <button type="button" class="i-button big" data-button-back>{{ back }}</button>
+            {% endif %}
         {% endif %}
     {% endcall %}
 {% endmacro %}
