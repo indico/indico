@@ -131,13 +131,21 @@ class Survey(db.Model):
     def event(self, event):
         self.event_id = int(event.getId())
 
-    @property
+    @hybrid_property
     def has_ended(self):
-        return bool(self.end_dt) and self.end_dt <= now_utc()
+        return self.end_dt is not None and self.end_dt <= now_utc()
 
-    @property
+    @has_ended.expression
+    def has_ended(cls):
+        return (cls.end_dt != None) & (cls.end_dt <= now_utc())  # noqa
+
+    @hybrid_property
     def has_started(self):
-        return bool(self.start_dt) and self.start_dt <= now_utc()
+        return self.start_dt is not None and self.start_dt <= now_utc()
+
+    @has_started.expression
+    def has_started(cls):
+        return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
 
     @property
     def locator(self):
@@ -162,11 +170,7 @@ class Survey(db.Model):
 
     @is_active.expression
     def is_active(cls):
-        now = now_utc()
-        return db.and_(~cls.is_deleted,
-                       cls.questions.any(),
-                       (cls.start_dt != None) & (cls.start_dt <= now),  # noqa
-                       (cls.end_dt == None) | (cls.end_dt > now))  # noqa
+        return ~cls.is_deleted & cls.questions.any() & cls.has_started & ~cls.has_ended
 
     @hybrid_property
     def is_visible(self):
@@ -175,10 +179,7 @@ class Survey(db.Model):
 
     @is_visible.expression
     def is_visible(cls):
-        now = now_utc()
-        return db.and_(~cls.is_deleted,
-                       cls.questions.any(),
-                       (cls.start_dt != None) & (cls.start_dt <= now))  # noqa
+        return ~cls.is_deleted & cls.questions.any() & cls.has_started
 
     def can_submit(self, user):
         return self.is_active and (not self.require_user or (self.require_user and user))
