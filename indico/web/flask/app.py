@@ -237,7 +237,7 @@ def configure_db(app):
     import_all_models()
     db.init_app(app)
     if not app.config['TESTING']:
-        apply_db_loggers(app.debug)
+        apply_db_loggers(app)
 
     plugins_loaded.connect(lambda sender: configure_mappers(), app, weak=False)
     models_committed.connect(on_models_committed, app)

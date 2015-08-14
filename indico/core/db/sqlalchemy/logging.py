@@ -22,7 +22,7 @@ import pprint
 import time
 import traceback
 
-from flask import current_app, g
+from flask import current_app, g, request_tearing_down, request_started, request
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
@@ -54,8 +54,8 @@ def _get_sql_line():
                 'items': stack[i:i+5]}
 
 
-def apply_db_loggers(debug=False):
-    if not debug or getattr(db, '_loggers_applied', False):
+def apply_db_loggers(app):
+    if not app.debug or getattr(db, '_loggers_applied', False):
         return
     db._loggers_applied = True
     from indico.core.logger import Logger
@@ -65,6 +65,12 @@ def apply_db_loggers(debug=False):
 
     @listens_for(Engine, 'before_cursor_execute')
     def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        if not g.req_start_sent:
+            g.req_start_sent = True
+            logger.debug('Request started', extra={'sql_log_type': 'start_request',
+                                                   'req_path': request.path,
+                                                   'req_url': request.url})
+
         context._query_start_time = time.time()
         source_line = _get_sql_line()
         if source_line:
@@ -81,6 +87,7 @@ def apply_db_loggers(debug=False):
             ).rstrip()
         logger.debug(log_msg,
                      extra={'sql_log_type': 'start',
+                            'req_path': request.path,
                             'sql_source': source_line['items'] if source_line else None,
                             'sql_statement': statement,
                             'sql_verb': statement.split()[0],
@@ -89,7 +96,27 @@ def apply_db_loggers(debug=False):
     @listens_for(Engine, 'after_cursor_execute')
     def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
         total = time.time() - context._query_start_time
+        source_line = _get_sql_line()
+        source = source_line['items'] if source_line else None
         logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
+                                                                            'req_path': request.path,
+                                                                            'sql_source': source,
                                                                             'sql_duration': total,
                                                                             'sql_verb': statement.split()[0]})
         g.sql_query_count = g.get('sql_query_count', 0) + 1
+
+    @request_started.connect_via(app)
+    def on_request_started(sender, **kwargs):
+        g.req_start_ts = time.time()
+        g.req_start_sent = False
+
+    @request_tearing_down.connect_via(app)
+    def on_request_tearing_down(sender, **kwargs):
+        query_count = g.get('sql_query_count', 0)
+        if not query_count:
+            return
+        logger.debug('Request finished', extra={'sql_log_type': 'end_request',
+                                                'sql_query_count': query_count,
+                                                'req_url': request.url,
+                                                'req_path': request.path,
+                                                'req_duration': time.time() - g.req_start_ts})
