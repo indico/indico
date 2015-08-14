@@ -1,0 +1,9 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {{ page.menu_entry.title }}
+{% endblock %}
+
+{% block content %}
+    {{ page.html|safe }}
+{% endblock %}
