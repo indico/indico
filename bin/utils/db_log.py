@@ -81,7 +81,10 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
         if not source or not self.server.ignored_sources:
             return None
         for entry in self.server.ignored_sources:
-            frame = source[int(entry['frame'] or 1) - 1]
+            try:
+                frame = source[int(entry['frame'] or 1) - 1]
+            except IndexError:
+                continue
             if frame[0].endswith(entry['file']) and (entry['line'] is None or frame[1] == int(entry['line'])):
                 return entry
         return None
@@ -94,7 +97,7 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             with output_lock:
                 print '\n' * 5
                 print_linesep(True, 10)
-                print '\x1b[38;5;70mBegin request\x1b[0m   {}'.format(obj['req_url'])
+                print '\x1b[38;5;70mBegin request\x1b[0m   {}'.format(obj['req_url'] or '')
                 print_linesep()
             return
         elif sql_log_type == 'end_request':

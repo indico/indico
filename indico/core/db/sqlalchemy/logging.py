@@ -22,7 +22,7 @@ import pprint
 import time
 import traceback
 
-from flask import current_app, g, request_tearing_down, request_started, request
+from flask import current_app, g, request_tearing_down, request_started, request, has_request_context
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
@@ -65,11 +65,11 @@ def apply_db_loggers(app):
 
     @listens_for(Engine, 'before_cursor_execute')
     def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-        if not g.req_start_sent:
+        if not g.get('req_start_sent'):
             g.req_start_sent = True
             logger.debug('Request started', extra={'sql_log_type': 'start_request',
-                                                   'req_path': request.path,
-                                                   'req_url': request.url})
+                                                   'req_path': request.path if has_request_context() else None,
+                                                   'req_url': request.url if has_request_context() else None})
 
         context._query_start_time = time.time()
         source_line = _get_sql_line()
@@ -87,7 +87,7 @@ def apply_db_loggers(app):
             ).rstrip()
         logger.debug(log_msg,
                      extra={'sql_log_type': 'start',
-                            'req_path': request.path,
+                            'req_path': request.path if has_request_context() else None,
                             'sql_source': source_line['items'] if source_line else None,
                             'sql_statement': statement,
                             'sql_verb': statement.split()[0],
@@ -99,7 +99,9 @@ def apply_db_loggers(app):
         source_line = _get_sql_line()
         source = source_line['items'] if source_line else None
         logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
-                                                                            'req_path': request.path,
+                                                                            'req_path': (request.path
+                                                                                         if has_request_context()
+                                                                                         else None),
                                                                             'sql_source': source,
                                                                             'sql_duration': total,
                                                                             'sql_verb': statement.split()[0]})
@@ -117,6 +119,6 @@ def apply_db_loggers(app):
             return
         logger.debug('Request finished', extra={'sql_log_type': 'end_request',
                                                 'sql_query_count': query_count,
-                                                'req_url': request.url,
-                                                'req_path': request.path,
+                                                'req_url': request.url if has_request_context() else None,
+                                                'req_path': request.path if has_request_context() else None,
                                                 'req_duration': time.time() - g.req_start_ts})
