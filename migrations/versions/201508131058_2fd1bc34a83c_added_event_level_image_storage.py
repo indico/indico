@@ -1,7 +1,7 @@
 """Added event-level image storage
 
 Revision ID: 2fd1bc34a83c
-Revises: 365fe2261342
+Revises: bda21647f61
 Create Date: 2015-08-13 10:58:25.469907
 """
 
@@ -12,7 +12,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '2fd1bc34a83c'
-down_revision = '365fe2261342'
+down_revision = 'bda21647f61'
 
 
 def upgrade():
