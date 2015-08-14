@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired, Optional, NumberRange
 from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoDateTimeField
+from indico.web.forms.fields import IndicoDateTimeField, EmailListField
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime
 from indico.util.i18n import _
@@ -43,6 +43,16 @@ class SurveyForm(IndicoForm):
     submission_limit = IntegerField(_("Capacity"),
                                     [HiddenUnless('limit_submissions'), DataRequired(), NumberRange(min=1)],
                                     description=_("Maximum number of submissions accepted"))
+    notifications_enabled = BooleanField(_('Notifications'), widget=SwitchWidget(),
+                                         description=_('Whether users are to be notified on specific events within the '
+                                                       'survey'))
+    notify_participants = BooleanField(_('Participants'), [HiddenUnless('notifications_enabled')], widget=SwitchWidget(),
+                                       description=_('Notify participants of the event when this survey starts.'))
+    start_notification_emails = EmailListField(_('Start notification recipients'), [HiddenUnless('notifications_enabled')],
+                                               description=_('Email addresses to notify about the start of the survey'))
+    new_submission_emails = EmailListField(_('New submission notification recipients'),
+                                           [HiddenUnless('notifications_enabled')],
+                                           description=_('Email addresses to notify when a new submission is made'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event', None)
