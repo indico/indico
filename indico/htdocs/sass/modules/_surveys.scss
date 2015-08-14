@@ -61,7 +61,13 @@
     width: 400px;
 }
 
-#survey-form .radio-item-0:not(.inline-vcentered) input:not([required]) + label {
-    color: $gray;
-    font-style: italic;
+#survey-form {
+    .form-group + .form-group {
+        margin-top: 1.5em;
+    }
+
+    .radio-item-0:not(.inline-vcentered) input:not([required]) + label {
+        color: $gray;
+        font-style: italic;
+    }
 }
