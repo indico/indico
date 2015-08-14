@@ -47,7 +47,7 @@
         });
     });
 
-    $(document).on('indico:confirmed', '.menu-entry .visible, .menu-entry .not-visible', function(evt) {
+    $(document).on('indico:confirmed', '.menu-entry .enabled, .menu-entry .not-enabled', function(evt) {
         evt.preventDefault();
 
         var $this = $(this);
@@ -57,11 +57,11 @@
             complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
             success: function(data) {
-                var visible = data.visible;
-                $this.toggleClass('visible', visible)
-                    .toggleClass('not-visible', !visible)
+                var is_enabled = data.is_enabled;
+                $this.toggleClass('enabled', is_enabled)
+                    .toggleClass('not-enabled', !is_enabled)
                     .parent('.actions')
-                        .parent('.i-label').toggleClass('stripped', !visible);
+                        .parent('.i-label').toggleClass('stripped', !is_enabled);
             }
         });
     }).on('indico:confirmed', '.menu-entry .delete-entry', function(evt) {

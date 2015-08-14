@@ -95,7 +95,7 @@ class MenuEntry(db.Model):
         nullable=False
     )
     #: Whether the entry is visible in the event's menu
-    visible = db.Column(
+    is_enabled = db.Column(
         db.Boolean,
         nullable=False,
         default=True
@@ -221,7 +221,7 @@ class MenuEntry(db.Model):
 
     @property
     def is_visible(self):
-        if not self.visible:
+        if not self.is_enabled:
             return False
         if not self.name:
             return True
