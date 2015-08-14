@@ -1691,6 +1691,7 @@ class WPRegistrantStatusesModify( WPRegistrantModifMain ):
 # ----------------- DISPLAY AREA ---------------------------
 
 class WPConfRegistrantsList( WPConferenceDefaultDisplayBase ):
+    menu_entry_name = 'registrants'
 
     def _getBody( self, params ):
         sortingCrit=params.get("sortingCrit",None)
@@ -1699,10 +1700,6 @@ class WPConfRegistrantsList( WPConferenceDefaultDisplayBase ):
         order = params.get("order",None)
         wc = WConfRegistrantsList( self._conf, filterCrit, sortingCrit, order, sessionFilterName)
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._registrantsListOpt)
 
 
 class WConfRegistrantsList(WConfDisplayBodyBase):

@@ -44,13 +44,10 @@ class WPEvaluationBase( conferences.WPConferenceDefaultDisplayBase ):
 class WPEvaluationMainInformation( WPEvaluationBase ):
     """[DisplayArea] display evaluation general information."""
     navigationEntry = NEEvaluationMainInformation
+    menu_entry_name = 'evaluation'
 
     def _getBody(self, params):
         return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML()
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
 
 class WEvaluationMainInformation(WConfDisplayBodyBase):
@@ -87,16 +84,13 @@ class WEvaluationMainInformation(WConfDisplayBodyBase):
 class WPEvaluationDisplay( WPEvaluationBase ):
     """[DisplayArea] Evaluation default display."""
     navigationEntry = NEEvaluationDisplay
+    menu_entry_name = 'evaluation'
 
     def _getBody(self, params):
         pars = {
             'user': self._rh._getUser()
         }
         return WEvaluationDisplay(self._conf).getHTML(pars)
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._newEvaluationOpt)
 
 
 class WEvaluationDisplay(WConfDisplayBodyBase):
@@ -121,16 +115,13 @@ class WEvaluationDisplay(WConfDisplayBodyBase):
 class WPEvaluationDisplayModif( WPEvaluationBase ):
     """[DisplayArea] The user modifies his already submitted evaluation."""
     navigationEntry = NEEvaluationDisplayModif
+    menu_entry_name = 'evaluation_edit'
 
     def _getBody(self, params):
         pars = {
             'user': self._rh._getUser()
         }
         return WEvaluationDisplayModif(self._conf).getHTML(pars)
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._viewEvaluationOpt)
 
 
 class WEvaluationDisplayModif(WEvaluationDisplay):
@@ -151,6 +142,7 @@ class WEvaluationDisplayModif(WEvaluationDisplay):
 class WPEvaluationSubmitted( WPEvaluationBase ):
     """[DisplayArea] Submitted Evaluation."""
     navigationEntry = NEEvaluationMainInformation
+    menu_entry_name = 'evaluation'
 
     def __init__(self, rh, conf, mode):
         self._mode = mode
@@ -164,10 +156,6 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
         else:  #Event == Conference
             pars["redirection"] = None
         return WEvaluationSubmitted(self._conf, self._mode).getHTML(pars)
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
 
 class WEvaluationSubmitted(WEvaluationDisplay):
@@ -200,13 +188,10 @@ class WEvaluationSubmitted(WEvaluationDisplay):
 class WPEvaluationFull( WPEvaluationBase ):
     """[DisplayArea] Evaluation is full."""
     navigationEntry = NEEvaluationDisplay
+    menu_entry_name = 'evaluation'
 
     def _getBody( self, params ):
         return WEvaluationFull(self._conf).getHTML()
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
 
 class WEvaluationFull(WEvaluationDisplay):
@@ -227,13 +212,10 @@ class WEvaluationFull(WEvaluationDisplay):
 class WPEvaluationClosed( WPEvaluationBase ):
     """[DisplayArea] Evaluation is closed."""
     navigationEntry = NEEvaluationDisplay
+    menu_entry_name = 'evaluation'
 
     def _getBody( self, params ):
         return WEvaluationClosed(self._conf).getHTML()
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
 
 class WEvaluationClosed(WEvaluationDisplay):
@@ -263,13 +245,10 @@ class WEvaluationClosed(WEvaluationDisplay):
 
 class WPEvaluationInactive( WPEvaluationBase ):
     """[DisplayArea] Inactive evaluation."""
+    menu_entry_name = 'evaluation'
 
     def _getBody( self, params ):
         return WEvaluationInactive(self._conf).getHTML()
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
 
 class WEvaluationInactive(WEvaluationDisplay):

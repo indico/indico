@@ -138,6 +138,7 @@ class WPConferenceDisplayBase(WPConferenceBase):
 
 class WPConferenceDefaultDisplayBase( WPConferenceBase):
     navigationEntry = None
+    menu_entry_name = None
 
     def getJSFiles(self):
         return (WPConferenceBase.getJSFiles(self) + self._includeJSPackage('Display') +
@@ -162,131 +163,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                              "confId": self._conf.getId(), \
                              "dark": True} )
 
-    def _defineSectionMenu( self ):
-
-        awUser = self._getAW().getUser()
-        self._sectionMenu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        self._overviewOpt = self._sectionMenu.getLinkByName("overview")
-        self._programOpt = self._sectionMenu.getLinkByName("programme")
-        link = self._programOpt
-        self._cfaOpt = self._sectionMenu.getLinkByName("CFA")
-        self._cfaNewSubmissionOpt = self._sectionMenu.getLinkByName("SubmitAbstract")
-        self._cfaViewSubmissionsOpt = self._sectionMenu.getLinkByName("ViewAbstracts")
-        self._abstractsBookOpt = self._sectionMenu.getLinkByName("abstractsBook")
-        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
-            self._cfaOpt.setVisible(False)
-            self._abstractsBookOpt.setVisible(False)
-        else:
-            self._cfaOpt.setVisible(True)
-            self._abstractsBookOpt.setVisible(True)
-        self._trackMgtOpt = self._sectionMenu.getLinkByName("manageTrack")
-
-        #registration form
-        self._regFormOpt = self._sectionMenu.getLinkByName("registrationForm")
-        self._registrantsListOpt = self._sectionMenu.getLinkByName("registrants")
-        if not self._conf.getRegistrationForm().isActivated() or not self._conf.hasEnabledSection("regForm"):
-            self._regFormOpt.setVisible(False)
-            self._registrantsListOpt.setVisible(False)
-        else:
-            self._regFormOpt.setVisible(True)
-            self._registrantsListOpt.setVisible(True)
-
-        #evaluation
-        evaluation = self._conf.getEvaluation()
-        self._evaluationOpt = self._sectionMenu.getLinkByName("evaluation")
-        self._newEvaluationOpt = self._sectionMenu.getLinkByName("newEvaluation")
-        self._viewEvaluationOpt = self._sectionMenu.getLinkByName("viewMyEvaluation")
-        self._evaluationOpt.setVisible(self._conf.hasEnabledSection("evaluation") and evaluation.isVisible() and evaluation.getNbOfQuestions()>0)
-        if awUser!=None and awUser.hasSubmittedEvaluation(evaluation):
-            self._newEvaluationOpt.setVisible(not awUser.hasSubmittedEvaluation(evaluation))
-            self._viewEvaluationOpt.setVisible(awUser.hasSubmittedEvaluation(evaluation))
-        else:
-            self._newEvaluationOpt.setVisible(True)
-            self._viewEvaluationOpt.setVisible(False)
-
-
-
-        self._sectionMenu.setCurrentItem(None)
-
-        self._timetableOpt = self._sectionMenu.getLinkByName("timetable")
-        self._contribListOpt = self._sectionMenu.getLinkByName("contributionList")
-        self._authorIndexOpt = self._sectionMenu.getLinkByName("authorIndex")
-        self._speakerIndexOpt = self._sectionMenu.getLinkByName("speakerIndex")
-        self._myStuffOpt=self._sectionMenu.getLinkByName("mystuff")
-        self._myStuffOpt.setVisible(awUser is not None)
-        self._mySessionsOpt=self._sectionMenu.getLinkByName("mysessions")
-        ls = set(self._conf.getCoordinatedSessions(awUser)) | set(self._conf.getManagedSession(awUser))
-        self._mySessionsOpt.setVisible(len(ls)>0)
-        self._myTracksOpt=self._sectionMenu.getLinkByName("mytracks")
-        lt=self._conf.getCoordinatedTracks(awUser)
-        self._myTracksOpt.setVisible(len(lt)>0)
-        if not self._conf.getAbstractMgr().isActive():
-            self._myTracksOpt.setVisible(False)
-        self._myContribsOpt=self._sectionMenu.getLinkByName("mycontribs")
-        lc=self._conf.getContribsForSubmitter(awUser)
-        self._myContribsOpt.setVisible(len(lc)>0)
-        self._trackMgtOpt.setVisible(len(lt)>0)
-        if not self._conf.getAbstractMgr().isActive():
-            self._trackMgtOpt.setVisible(False)
-
-        #paper reviewing related
-        self._paperReviewingOpt = self._sectionMenu.getLinkByName("paperreviewing")
-        self._paperReviewingMgtOpt=self._sectionMenu.getLinkByName("managepaperreviewing")
-        self._paperReviewingMgtOpt.setVisible(False)
-
-        self._assignContribOpt=self._sectionMenu.getLinkByName("assigncontributions")
-        self._assignContribOpt.setVisible(False)
-
-        self._judgeListOpt=self._sectionMenu.getLinkByName("judgelist")
-        self._judgeListOpt.setVisible(False)
-        self._judgereviewerListOpt=self._sectionMenu.getLinkByName("judgelistreviewer")
-
-        self._judgereviewerListOpt.setVisible(False)
-        self._judgeeditorListOpt=self._sectionMenu.getLinkByName("judgelisteditor")
-        self._judgeeditorListOpt.setVisible(False)
-
-        self._uploadPaperOpt = self._sectionMenu.getLinkByName("uploadpaper")
-        self._downloadTemplateOpt = self._sectionMenu.getLinkByName("downloadtemplate")
-
-        if self._conf.getConfPaperReview().hasReviewing():
-            self._paperReviewingOpt.setVisible(True)
-            # These options are shown if there is any contribution of this user
-            self._uploadPaperOpt.setVisible(len(lc)>0)
-            self._downloadTemplateOpt.setVisible(len(lc)>0)
-        else:
-            self._paperReviewingOpt.setVisible(False)
-            self._uploadPaperOpt.setVisible(False)
-            self._downloadTemplateOpt.setVisible(False)
-
-        if awUser is not None:
-            conferenceRoles = awUser.user.get_linked_roles('conference')
-
-            if "paperReviewManager" in conferenceRoles:
-                if self._conf in awUser.user.get_linked_objects('conference', 'paperReviewManager'):
-                    self._paperReviewingMgtOpt.setVisible(True)
-                    self._assignContribOpt.setVisible(True)
-                    self._uploadPaperOpt.setVisible(len(lc)>0)
-                    self._downloadTemplateOpt.setVisible(True)
-
-            if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
-                showrefereearea = self._conf in awUser.user.get_linked_objects('conference', 'referee')
-                showreviewerarea = self._conf in awUser.user.get_linked_objects('conference', 'reviewer')
-                showeditorarea = self._conf in awUser.user.get_linked_objects('conference', 'editor')
-
-                if showrefereearea and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
-                    self._assignContribOpt.setVisible(True)
-                    self._judgeListOpt.setVisible(True)
-
-                if showreviewerarea and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
-                    self._judgereviewerListOpt.setVisible(True)
-
-                if showeditorarea and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
-                    self._judgeeditorListOpt.setVisible(True)
-
-        for item in values_from_signal(signals.event.sidemenu.send()):
-            if item.visible is not None:
-                link = self._sectionMenu.getLinkByName(item.name)
-                link.setVisible(item.visible(self._conf))
+    def _get_active_menu_entry(self):
+        entry = get_entry_from_name(self.menu_entry_name, self._conf)
+        if entry:
+            return entry.id
 
     def _getNavigationBarHTML(self):
         item=None
@@ -312,6 +192,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             "currentURL": request.url,
             "nowHappening": drawer.getNowHappeningHTML(),
             "simpleTextAnnouncement": drawer.getSimpleText(),
+            'active_menu_entry_id': self._get_active_menu_entry()
         }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL(self._conf)
@@ -388,9 +269,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         self._aw = aw
         self._conf = conf
 
-    def getHTML( self, menu, body, params ):
+    def getHTML(self, body, params):
         self._body = body
-        self._menu = menu
         return wcomponents.WTemplated.getHTML( self, params )
 
     def getVars(self):
@@ -515,6 +395,7 @@ class WConfDetails:
 
 
 class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'overview'
 
     def getCSSFiles(self):
         return (WPConferenceDefaultDisplayBase.getCSSFiles(self)
@@ -534,9 +415,6 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
         wc = wcomponents.WEventFooter(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._overviewOpt)
 
 class WSentMail  (wcomponents.WTemplated):
     def __init__(self,conf):
@@ -588,6 +466,7 @@ class WPXSLConferenceDisplay(WPConferenceBase):
     """
     Use this class just to transform to XML
     """
+    menu_entry_name = 'overview'
 
     def __init__(self, rh, conference, view, type, params):
         WPConferenceBase.__init__(self, rh, conference)
@@ -643,10 +522,6 @@ class WPXSLConferenceDisplay(WPConferenceBase):
             return body
         else:
             return _("Cannot find the %s stylesheet") % view
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._overviewOpt)
 
 
 class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
@@ -1043,14 +918,11 @@ class WConfProgram(WConfDisplayBodyBase):
 
 
 class WPConferenceProgram(WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'program'
 
     def _getBody(self, params):
         wc = WConfProgram(self._getAW(), self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._programOpt)
 
 
 class WInternalPageDisplay(wcomponents.WTemplated):
@@ -1074,7 +946,7 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
         wc = WInternalPageDisplay( self._conf, self._page )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
+    def _get_active_menu_entry(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
 
         for link in self._sectionMenu.getAllLinks():
@@ -1114,6 +986,7 @@ class WConferenceTimeTable(WConfDisplayBodyBase):
 
 class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEConferenceTimeTable
+    menu_entry_name = 'timetable'
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
@@ -1127,10 +1000,6 @@ class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
     def _getBody( self, params ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._timetableOpt)
 
 
 class WPMeetingTimeTable( WPTPLConferenceDisplay ):
@@ -4608,14 +4477,11 @@ _("You can now close this window.")</b>
 
 class WPContributionList( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEContributionList
+    menu_entry_name = 'contributions'
 
     def _getBody( self, params ):
         wc = WConfContributionList( self._getAW(), self._conf, params["filterCrit"], params.get("filterText",""))
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._contribListOpt)
 
 
 class WConfContributionList (WConfDisplayBodyBase):
@@ -4688,6 +4554,7 @@ class WConfAuthorIndex(WConfDisplayBodyBase):
 
 class WPAuthorIndex(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEAuthorIndex
+    menu_entry_name = 'author_index'
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
@@ -4696,10 +4563,6 @@ class WPAuthorIndex(WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         wc = WConfAuthorIndex(self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
 
 class WConfSpeakerIndex(WConfDisplayBodyBase):
@@ -4741,6 +4604,7 @@ class WConfSpeakerIndex(WConfDisplayBodyBase):
 
 class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NESpeakerIndex
+    menu_entry_name = 'speaker_index'
 
     def _getBody(self, params):
         wc=WConfSpeakerIndex(self._conf)
@@ -4750,9 +4614,6 @@ class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._asset_env['indico_authors'].urls()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._speakerIndexOpt)
 
 class WConfMyContributions(wcomponents.WTemplated):
 
@@ -4824,14 +4685,11 @@ class WConfMyStuffMySessions(WConfDisplayBodyBase):
 
 class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
+    menu_entry_name = 'my_conference'
 
     def _getBody(self,params):
         wc=WConfMyStuffMySessions(self._getAW(),self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myStuffOpt)
 
 
 class WConfMyStuffMyContributions(WConfDisplayBodyBase):
@@ -4854,14 +4712,11 @@ class WConfMyStuffMyContributions(WConfDisplayBodyBase):
 
 class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
+    menu_entry_name = 'my_contributions'
 
     def _getBody(self,params):
         wc=WConfMyStuffMyContributions(self._getAW(),self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myContribsOpt)
 
 
 class WConfMyStuffMyTracks(WConfDisplayBodyBase):
@@ -4911,14 +4766,11 @@ class WConfMyStuffMyTracks(WConfDisplayBodyBase):
 
 class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
+    menu_entry_name = 'my_tracks'
 
     def _getBody(self,params):
         wc=WConfMyStuffMyTracks(self._getAW(),self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myTracksOpt)
 
 
 class WConfMyStuff(WConfDisplayBodyBase):
@@ -4937,14 +4789,11 @@ class WConfMyStuff(WConfDisplayBodyBase):
 
 class WPMyStuff(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
+    menu_entry_name = 'my_conference'
 
     def _getBody(self,params):
         wc=WConfMyStuff(self._getAW(),self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myStuffOpt)
 
 
 class WConfModAbstractBook(wcomponents.WTemplated):
@@ -5014,14 +4863,11 @@ class WTimeTableCustomizePDF(wcomponents.WTemplated):
 
 class WPTimeTableCustomizePDF(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NETimeTableCustomizePDF
+    menu_entry_name = 'timetable'
 
     def _getBody(self, params):
         wc = WTimeTableCustomizePDF(self._conf)
         return wc.getHTML(params)
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._timetableOpt)
 
 
 class WConfModifPendingQueuesList(wcomponents.WTemplated):
@@ -5982,7 +5828,6 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         # injecting ConferenceDisplay #
         ###############################
         p = WPConferenceDisplay( self._rh, self._conf )
-        p._defineSectionMenu()
         params["bodyConf"] = p._applyConfDisplayDecoration(p._getBody(params))
         ###############################
         ###############################
