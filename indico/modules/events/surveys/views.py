@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 
 
 class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
@@ -27,20 +29,36 @@ class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
         self.extra_menu_items['surveys'].setActive()
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls())
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
 
     def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls())
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls()
 
 
-class WPDisplaySurvey(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class DisplaySurveyMixin(WPJinjaMixin):
     template_prefix = 'events/surveys/'
+    base_class = None
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
+        return self.base_class.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls()
+        return self.base_class.getCSSFiles(self) + self._asset_env['surveys_sass'].urls()
+
+
+class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/surveys/'
+    base_class = WPConferenceDefaultDisplayBase
+
+
+class WPDisplaySurveyMeeting(DisplaySurveyMixin, WPMeetingDisplay):
+    template_prefix = 'events/surveys/'
+    base_class = WPMeetingDisplay
+
+
+class WPDisplaySurveyLecture(DisplaySurveyMixin, WPSimpleEventDisplay):
+    template_prefix = 'events/surveys/'
+    base_class = WPSimpleEventDisplay

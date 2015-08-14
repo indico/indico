@@ -1,4 +1,4 @@
-{% extends 'layout/base.html' %}
+{% extends 'layout/event_page_base.html' %}
 
 {% block title %}
     {%- trans %}Surveys{% endtrans -%}
@@ -29,6 +29,13 @@
             {% endfor %}
         </tbody>
     </table>
+    {% if event.getType() != 'conference' %}
+        <p>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+                {%- trans %}Back to the event{% endtrans -%}
+            </a>
+        </p>
+    {% endif %}
 {% endblock %}
 
 {% macro render_available_buttons(survey) %}
