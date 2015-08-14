@@ -43,17 +43,17 @@ def get_menu_entries_from_signal():
 class MenuEntryData(object):
     plugin = None
 
-    def __init__(self, title, name, endpoint, position=0, visible_default=True, visible=None, parent=None):
+    def __init__(self, title, name, endpoint, position=0, is_enabled=True, visible=None, parent=None):
         self.title = title
         self.name = name
         self.endpoint = endpoint
         self.position = position
         self._visible = visible
-        self.visible_default = visible_default
+        self.is_enabled = is_enabled
         self.parent = parent
 
     def visible(self, event):
-        return self._visible(event) if self._visible else self.visible_default
+        return self._visible(event) if self._visible else self.is_enabled
 
 
 def menu_entries_for_event(event, show_hidden=False):
@@ -97,7 +97,7 @@ def menu_entries_for_event(event, show_hidden=False):
 def _build_entry(event, data, position, children=None):
     entry = MenuEntry(
         event_id=event.getId(),
-        visible=data.visible_default,
+        is_enabled=data.is_enabled,
         title=data.title,
         name=data.name,
         endpoint=data.endpoint,

@@ -29,7 +29,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('visible', sa.Boolean(), nullable=False),
+        sa.Column('is_enabled', sa.Boolean(), nullable=False),
         sa.Column('title', sa.String(), nullable=True),
         sa.Column('name', sa.String(), nullable=True),
         sa.Column('position', sa.Integer(), nullable=False),

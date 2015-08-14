@@ -5,18 +5,18 @@
         <div class="i-label
         {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
         {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
-        {%- if not entry.visible %} stripped{% endif %} entry-{{ entry.type.name }}">
+        {%- if not entry.is_enabled %} stripped{% endif %} entry-{{ entry.type.name }}">
             <span>
                 {%- if entry.type.name != 'separator' %}{{ _(entry.title) }}{% endif %}
                 ({{ entry.position }})
             </span>
             <span class="right actions">
-                <a class="{% if not entry.visible %}not-{% endif %}visible" href="#"
-                   data-href="{{ url_for('.menu-entry-visibility', entry) }}"
+                <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
+                   data-href="{{ url_for('.menu-enable-entry', entry) }}"
                    data-method="POST"
                    ></a>
                 <a href="#" data-href="{{ url_for('.menu-entry-edit', entry) }}" class="edit-entry"></a>
-                {% if entry.type.name in ('user_link', 'page', 'separaotr') %}
+                {% if entry.type.name in ('user_link', 'page', 'separator') %}
                     <a href="#" class="delete-entry"
                        data-method="DELETE"
                        data-href="{{ url_for('.menu-delete-entry', entry) }}"

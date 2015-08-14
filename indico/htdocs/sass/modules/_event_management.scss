@@ -111,11 +111,11 @@
     }
 }
 
-%visible-action {
+%enabled-action {
     @include icon-before('icon-eye');
 }
 
-%not-visible-action {
+%not-enabled-action {
     @include icon-before('icon-eye-blocked');
 
     color: $red !important;
@@ -165,16 +165,16 @@
                             color: $blue;
                         }
                     }
-                    > .visible {
-                        @extend %visible-action;
+                    > .enabled {
+                        @extend %enabled-action;
                         &:hover {
-                            @extend %not-visible-action;
+                            @extend %not-enabled-action;
                         }
                     }
-                    > .not-visible {
-                        @extend %not-visible-action;
+                    > .not-enabled {
+                        @extend %not-enabled-action;
                         &:hover {
-                            @extend %visible-action;
+                            @extend %enabled-action;
                         }
                     }
                     > .edit-entry {

@@ -146,14 +146,14 @@ DEFAULT_MENU_ENTRIES = [
         name='author_index',
         endpoint='event.confAuthorIndex',
         position=5,
-        visible_default=False
+        is_enabled=False
     ),
     MenuEntryData(
         title=N_("Speaker List"),
         name='speaker_index',
         endpoint='event.confSpeakerIndex',
         position=6,
-        visible_default=False
+        is_enabled=False
     ),
     MenuEntryData(
         title=N_("My Conference"),

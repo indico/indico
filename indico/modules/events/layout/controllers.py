@@ -149,10 +149,10 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
         return jsonify_data()
 
 
-class RHMenuEntryVisibility(RHMenuEntryEditBase):
+class RHMenuEnableEntry(RHMenuEntryEditBase):
     def _process(self):
-        self.entry.visible = not self.entry.visible
-        return redirect_or_jsonify(url_for('.menu', self._conf), visible=self.entry.visible)
+        self.entry.is_enabled = not self.entry.is_enabled
+        return redirect_or_jsonify(url_for('.menu', self._conf), is_enabled=self.entry.is_enabled)
 
 
 class RHMenuAddEntry(RHConferenceModifBase):
