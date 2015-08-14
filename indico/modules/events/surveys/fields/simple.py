@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 from indico.web.forms.fields import IndicoRadioField
 
 from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired, DataRequired
+from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
