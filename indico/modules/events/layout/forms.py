@@ -64,7 +64,7 @@ class LayoutForm(IndicoForm):
 
 class MenuEntryForm(IndicoForm):
     title = StringField(_("Title"), [InputRequired()])
-    visible = BooleanField(_("Show"), widget=SwitchWidget())
+    is_enabled = BooleanField(_("Show"), widget=SwitchWidget())
 
 
 class MenuUserEntry(MenuEntryForm):
