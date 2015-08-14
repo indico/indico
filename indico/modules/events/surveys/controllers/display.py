@@ -93,6 +93,7 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
         if form.validate_on_submit():
             submission = self._save_answers(form)
             save_submitted_survey_to_session(submission)
+            self.survey.send_submission_notification(submission)
             flash(_('Your answers has been saved'), 'success')
             return redirect(url_for('.display_survey_list', self.event))
 
