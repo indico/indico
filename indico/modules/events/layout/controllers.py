@@ -58,7 +58,7 @@ class RHLayoutLogoUpload(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def _process(self):
-        event = Event.find(Event.id == self._conf.getId()).one()
+        event = Event.get_one(self._conf.getId())
         f = request.files.get('file')
         content = f.read()
         event.logo = content
@@ -98,7 +98,7 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
 class RHLayoutEdit(RHConferenceModifBase):
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
-        event = Event.find(Event.id == self._conf.getId()).one()
+        event = Event.get_one(self._conf.getId())
         form = LayoutForm(event=event, obj=defaults)
         if form.validate_on_submit():
             layout_settings.set_multi(self._conf, {
