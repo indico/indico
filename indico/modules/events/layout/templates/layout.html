@@ -8,6 +8,8 @@
 {%- block content %}
     {{ form_header(form, action=url_for('event_layout.index', event)) }}
     {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
+    <h3>{% trans %}Stylesheets{% endtrans %}</h3>
+    {{ form_row(form.css_file) }}
     <h3>{% trans %}Header Style{% endtrans %}</h3>
     {{ form_row(form.logo) }}
     {{ form_row(form.header_text_color) }}

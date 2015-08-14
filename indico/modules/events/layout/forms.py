@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
-from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.fields.simple import StringField, HiddenField
+from wtforms.validators import InputRequired
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -50,11 +50,16 @@ class LayoutForm(IndicoForm):
                                description=_("Short message shown below the title"))
     show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                      description=_("Show the announcement message"))
+    css_file = HiddenField(_("Custom CSS file"),
+                           widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=True),
+                           description=_("If you want to fully customize your conference page you can create your own "
+                                         "stylesheet and upload it. An example stylesheet can be downloaded here."))
 
     def __init__(self, *args, **kwargs):
         super(LayoutForm, self).__init__(*args, **kwargs)
         event = kwargs.pop('event')
-        self.css_file.widget.options['url'] = url_for('event_layout.css-upload', event)
+        self.logo.widget.options['url'] = url_for('event_layout.logo_upload', event)
+        self.css_file.widget.options['url'] = url_for('event_layout.css_upload', event)
 
 
 class MenuEntryForm(IndicoForm):

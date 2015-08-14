@@ -30,6 +30,7 @@ from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLi
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
+from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_images_for_event, get_event_logo
 from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit, WPImages
 from indico.modules.events.models.events import Event
@@ -70,6 +71,21 @@ class RHLayoutLogoUpload(RHConferenceModifBase):
         return jsonify({'success': True})
 
 
+class RHLayoutCSSUpload(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        f = request.files.get('file')
+        filename = secure_filename(f.filename, 'stylesheet')
+        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+        css_file = StylesheetFile(event_id=self._conf.id, filename=filename, content_type=content_type)
+        css_file.save(f.file)
+        db.session.add(css_file)
+        db.session.flush()
+        logger.info('CSS file {} uploaded by {}'.format(css_file, session.user))
+        return jsonify({'success': True})
+
+
 class RHLogoDisplay(RHConferenceBaseDisplay):
     def _process(self):
         logo_data = get_event_logo(self._conf)
@@ -104,6 +120,14 @@ class RHLayoutEdit(RHConferenceModifBase):
                     'file_name': event.logo_metadata['file_name'],
                     'size': event.logo_metadata['size'],
                     'content_type': event.logo_metadata['content_type']
+                }
+            css_file = StylesheetFile.find(StylesheetFile.event_id == self._conf.id).first()
+            if css_file:
+                form.css_file.data = {
+                    # 'url': url_for('event_images.logo-display', self._conf),
+                    'file_name': css_file.filename,
+                    'size': css_file.size,
+                    'content_type': css_file.content_type
                 }
         return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf)
 
