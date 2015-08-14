@@ -17,13 +17,17 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.db.sqlalchemy import UTCDateTime
+from indico.modules.events.surveys import logger
+from indico.core.notifications import make_email, send_email
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
+from indico.web.flask.templating import get_template_module
 
 
 class SurveyState(IndicoEnum):
@@ -98,6 +102,36 @@ class Survey(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether start notification has been already sent
+    start_notification_sent = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Whether to send survey related notifications to users
+    notifications_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Whether include Participants / Registrants when sending start notifications
+    notify_participants = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Email addresses to notify about the start of a survey
+    start_notification_emails = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
+    #: Email addresses t notify about new submissions
+    new_submission_emails = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
 
     #: The list of submissions
     submissions = db.relationship(
@@ -164,6 +198,24 @@ class Survey(db.Model):
             return SurveyState.active_and_answered
         return SurveyState.finished
 
+    @property
+    def start_notification_recipients(self):
+        """Returns all recipients of the notifications.
+
+        This includes both explicit recipients and, if enabled,
+        participants of the event.
+        """
+        recipients = set(self.start_notification_emails)
+        if self.notify_participants:
+            event = self.event
+            if event.getType() == 'conference':
+                recipients.update(to_unicode(r.getEmail().strip().lower()) for r in event.getRegistrantsList())
+            else:
+                recipients.update(to_unicode(p.getEmail().strip().lower())
+                                  for p in event.getParticipation().getParticipantList())
+        recipients.discard('')  # just in case there was an empty email address somewhere
+        return recipients
+
     @hybrid_property
     def is_active(self):
         return not self.is_deleted and self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean}
@@ -197,3 +249,12 @@ class Survey(db.Model):
         if self.state not in (SurveyState.active_and_clean, SurveyState.active_and_answered):
             raise IndicoError("Survey can't be closed")
         self.end_dt = now_utc()
+
+    def send_start_notification(self):
+        if not self.notifications_enabled or self.start_notification_sent:
+            return
+        template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
+        send_email(make_email(bcc_list=self.start_notification_recipients, template=template_module), event=self.event,
+                              module='Surveys')
+        logger.info('Sending start notification for survey {}'.format(self))
+        self.start_notification_sent = True
