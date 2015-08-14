@@ -88,6 +88,16 @@
     }
 }
 
+.fixed-width-event-page {
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+
+    .page-content {
+        max-width: 800px;
+    }
+}
+
 .layout-wrapper {
     .row {
         .column {
