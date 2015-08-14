@@ -157,6 +157,7 @@ class RHOpenSurvey(RHManageSurvey):
             self.survey.end_dt = None
         else:
             self.survey.open()
+        self.survey.send_start_notification()
         flash(_("Survey is now open"), 'success')
         logger.info("Survey {} opened by {}".format(self.survey, session.user))
         return redirect(url_for('.manage_survey', self.survey))
