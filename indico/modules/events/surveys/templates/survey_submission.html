@@ -7,6 +7,13 @@
 
 {% block subtitle %}
     {{ survey.title }}
+    {% if event.getType() != 'conference' %}
+        <small>({{ event.getTitle() }})</small>
+    {% endif %}
+{% endblock %}
+
+{% block description %}
+    {{ survey.introduction }}
 {% endblock %}
 
 {% block content %}
