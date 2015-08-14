@@ -32,7 +32,7 @@ from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
 from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_images_for_event, get_event_logo
-from indico.modules.events.layout.views import WPLayoutEdit, WPMenuEdit, WPImages
+from indico.modules.events.layout.views import WPImages, WPLayoutEdit, WPMenuEdit, WPPage
 from indico.modules.events.models.events import Event
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -244,6 +244,21 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         db.session.flush()
 
         return jsonify_data(menu=_render_menu_entries(self._conf, show_hidden=True))
+
+
+class RHPageDisplay(RHConferenceBaseDisplay):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.page
+        }
+    }
+
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self.page = MenuPage.get_one(request.view_args['page_id'])
+
+    def _process(self):
+        return WPPage.render_template('events/layout/page.html', self._conf, page=self.page)
 
 
 def _render_image_list(event):

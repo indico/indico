@@ -18,10 +18,10 @@ from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.modules.events.layout.controllers import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
-                                                      RHImageUpload, RHImages, RHLayoutEdit, RHLayoutLogoUpload,
-                                                      RHLogoDisplay, RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
-                                                      RHMenuEnableEntry, RHMenuEntryEdit, RHMenuEntryPosition,
-                                                      RHLayoutCSSUpload)
+                                                      RHImageUpload, RHImages, RHLayoutCSSUpload, RHLayoutEdit,
+                                                      RHLayoutLogoUpload, RHLogoDisplay, RHMenuAddEntry,
+                                                      RHMenuDeleteEntry, RHMenuEdit, RHMenuEnableEntry, RHMenuEntryEdit,
+                                                      RHMenuEntryPosition, RHPageDisplay)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
@@ -46,3 +46,8 @@ _bp_images.add_url_rule('/logo', 'logo_display', RHLogoDisplay)
 _bp_images.add_url_rule('/images/<int:image_id>', 'image_display', RHImageDisplay)
 _bp_images.add_url_rule('/picture/<int:pic_id>.<pic_ext>', 'image_legacy_display', RHImageLegacyDisplay)
 _bp_images.add_url_rule('/picture/<int:pic_id>', 'image_legacy_display', RHImageLegacyDisplay)
+
+
+_bp_pages = IndicoBlueprint('event_pages', __name__, template_folder='templates',
+                            virtual_template_folder='events/layout', url_prefix='/event/<confId>')
+_bp_pages.add_url_rule('/page/<int:page_id>', 'page_display', RHPageDisplay)
