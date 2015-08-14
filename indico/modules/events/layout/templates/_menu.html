@@ -1,7 +1,7 @@
 {% macro menu_entry(entry) -%}
     <div class="menu-entry {%- if entry.children %} with-children{% endif %}"
          data-position="{{ entry.position }}"
-         data-position-url="{{ url_for('.menu-entry-position', entry) }}">
+         data-position-url="{{ url_for('.menu_entry_position', entry) }}">
         <div class="i-label
         {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
         {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
@@ -12,14 +12,14 @@
             </span>
             <span class="right actions">
                 <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
-                   data-href="{{ url_for('.menu-enable-entry', entry) }}"
+                   data-href="{{ url_for('.menu_enable_entry', entry) }}"
                    data-method="POST"
                    ></a>
-                <a href="#" data-href="{{ url_for('.menu-entry-edit', entry) }}" class="edit-entry"></a>
+                <a href="#" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
                 {% if entry.type.name in ('user_link', 'page', 'separator') %}
                     <a href="#" class="delete-entry"
                        data-method="DELETE"
-                       data-href="{{ url_for('.menu-delete-entry', entry) }}"
+                       data-href="{{ url_for('.menu_delete_entry', entry) }}"
                        data-title="{% trans name=entry.title %}Remove {{ name }}?{% endtrans %}"
                        data-confirm="{% trans name=entry.title -%}
                            Are you sure you want to remove &quot;{{ name }}&quot;?<br>
