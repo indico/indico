@@ -10,8 +10,11 @@
 {% endblock %}
 
 {% block content %}
-    {{ simple_form(form, submit=_('Save answers'), back_url=url_for('.display_survey_list', event),
-                   back_button=show_back_button, form_header_kwargs={'id': 'survey-form'}) }}
+    {{ simple_form(form,
+                   submit=_('Save answers'),
+                   back_url=url_for(back_button_endpoint, event) if back_button_endpoint else none,
+                   back_button=back_button_endpoint is not none,
+                   form_header_kwargs={'id': 'survey-form'}) }}
 
     <script>
         // allow deselecting a horizontal radio button unless it's required
