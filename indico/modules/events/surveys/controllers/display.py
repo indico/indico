@@ -25,7 +25,8 @@ from indico.modules.events.surveys.fields.simple import StaticTextField
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
-from indico.modules.events.surveys.views import WPDisplaySurvey
+from indico.modules.events.surveys.views import (WPDisplaySurveyConference, WPDisplaySurveyMeeting,
+                                                 WPDisplaySurveyLecture)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
@@ -41,6 +42,13 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.event = self._conf
 
+    @property
+    def view_class(self):
+        mapping = {'conference': WPDisplaySurveyConference,
+                   'meeting': WPDisplaySurveyMeeting,
+                   'simple_event': WPDisplaySurveyLecture}
+        return mapping[self.event.getType()]
+
 
 class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
     def _process(self):
@@ -48,7 +56,7 @@ class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
-        return WPDisplaySurvey.render_template('surveys_list.html', self.event, surveys=surveys,
+        return self.view_class.render_template('surveys_list.html', self.event, surveys=surveys, event=self.event,
                                                states=SurveyState, was_survey_submitted=was_survey_submitted)
 
 
@@ -88,7 +96,7 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
 
         surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id))
         show_back_button = not _can_redirect_to_single_survey(surveys)
-        return WPDisplaySurvey.render_template('survey_submission.html', self.event, form=form,
+        return self.view_class.render_template('survey_submission.html', self.event, form=form,
                                                event=self.event, survey=self.survey, show_back_button=show_back_button)
 
     def _save_answers(self, form):
