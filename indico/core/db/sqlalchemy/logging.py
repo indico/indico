@@ -117,8 +117,9 @@ def apply_db_loggers(app):
         query_count = g.get('sql_query_count', 0)
         if not query_count:
             return
+        duration = (time.time() - g.req_start_ts) if 'req_start_ts' in g else 0
         logger.debug('Request finished', extra={'sql_log_type': 'end_request',
                                                 'sql_query_count': query_count,
                                                 'req_url': request.url if has_request_context() else None,
                                                 'req_path': request.path if has_request_context() else None,
-                                                'req_duration': time.time() - g.req_start_ts})
+                                                'req_duration': duration})
