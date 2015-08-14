@@ -46,6 +46,7 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
 
 
 class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'videoconference_rooms'
 
     def __init__(self, rh, conf, **kwargs):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
@@ -63,10 +64,6 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
         return self._getPageContent(params)
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('vc-event-page'))
 
 
 class WPVCService(WPVCJinjaMixin, WPMainBase):

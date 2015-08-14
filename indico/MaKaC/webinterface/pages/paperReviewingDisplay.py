@@ -21,40 +21,31 @@ import MaKaC.webinterface.wcomponents as wcomponents
 class WPPaperReviewingDisplay(WPConferenceDefaultDisplayBase):
 
     ''' Display page of paper reviewing '''
+    menu_entry_name = 'paper_reviewing'
 
     def _getBody(self,params):
         wc = WPaperReviewingDisplay(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._paperReviewingOpt)
-
 
 class WPDownloadPRTemplate(WPConferenceDefaultDisplayBase):
 
     ''' Class for the page with the list of available templates '''
+    menu_entry_name = 'download_template'
 
     def _getBody(self,params):
         wc = WDownloadPRTemplate(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._downloadTemplateOpt)
-
 
 class WPUploadPaper(WPConferenceDefaultDisplayBase):
 
     ''' Class for the page to upload papers '''
+    menu_entry_name = 'paper_upload'
 
     def _getBody(self,params):
         wc = WUploadPaper(self._getAW(),self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._uploadPaperOpt)
 
 
 class WPaperReviewingDisplay(WConfDisplayBodyBase):

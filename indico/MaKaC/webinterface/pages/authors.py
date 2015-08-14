@@ -55,6 +55,7 @@ class WAuthorDisplay( wcomponents.WTemplated ):
 
 class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEAuthorDisplay
+    menu_entry_name = 'author_index'
 
     def __init__(self, rh, contrib, authId):
         WPConferenceDefaultDisplayBase.__init__(self, rh, contrib.getConference())
@@ -68,7 +69,3 @@ class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         wc = WAuthorDisplay(self._getAW(), self._contrib, self._authorId)
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._authorIndexOpt)

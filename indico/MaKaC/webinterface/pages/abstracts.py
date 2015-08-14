@@ -80,14 +80,11 @@ class WCFANotYetOpened(WConfDisplayBodyBase):
 
 
 class WPCFANotYetOpened(WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'abstract_submission'
 
     def _getBody(self, params):
         wc = WCFANotYetOpened(self._getAW(), self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
 
 
 class WCFAClosed(WConfDisplayBodyBase):
@@ -107,6 +104,7 @@ class WCFAClosed(WConfDisplayBodyBase):
 
 
 class WPCFAClosed(WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'abstract_submission'
 
     def __init__(self, rh, conf, is_modif):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
@@ -115,10 +113,6 @@ class WPCFAClosed(WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         wc = WCFAClosed(self._getAW(), self._conf)
         return wc.getHTML({'is_modif': self._is_modif})
-
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
 
 
 class WConfCFA(WConfDisplayBodyBase):
@@ -165,18 +159,16 @@ class WConfCFA(WConfDisplayBodyBase):
 
 class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEConferenceCFA
+    menu_entry_name = 'call_for_abstracts'
 
     def _getBody(self, params):
         wc = WConfCFA(self._getAW(), self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._cfaOpt)
-
 
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmission
+    menu_entry_name = 'abstract_submission'
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -197,10 +189,6 @@ class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
         params["origin"] = "display"
         wc = WAbstractDataModification( self._conf )
         return wc.getHTML( params )
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._cfaNewSubmissionOpt)
 
 
 class WUserAbstracts(WConfDisplayBodyBase):
@@ -249,14 +237,11 @@ class WUserAbstracts(WConfDisplayBodyBase):
 
 class WPUserAbstracts( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEUserAbstracts
+    menu_entry_name = 'user_abstracts'
 
     def _getBody( self, params ):
         wc = WUserAbstracts( self._getAW(), self._conf )
         return wc.getHTML()
-
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._cfaViewSubmissionsOpt)
 
 
 class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):

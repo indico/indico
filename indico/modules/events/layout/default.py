@@ -280,13 +280,13 @@ DEFAULT_MENU_ENTRIES = [
         name='evaluation_form',
         endpoint='event.confDisplayEvaluation-display',
         position=0,
-        parent='evalutation'
+        parent='evaluation'
     ),
     MenuEntryData(
         title=N_("Modify my Evaluation"),
         name='evaluation_edit',
         endpoint='event.confDisplayEvaluation-modif',
         position=1,
-        parent='evalutation'
+        parent='evaluation'
     )
 ]

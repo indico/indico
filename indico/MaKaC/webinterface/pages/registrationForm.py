@@ -329,15 +329,12 @@ class WConfModifRegFormStatusModif(wcomponents.WTemplated):
 
 class WPRegistrationForm(conferences.WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NERegistrationForm
+    menu_entry_name = 'registration'
 
     def _getBody(self, params):
         wc = WConfRegistrationForm(self._conf, self._getAW().getUser(),
                                    params.get('registrant'), params.get('registrant_id'), params.get('authkey'))
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -748,6 +745,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
 class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
 
     navigationEntry = navigation.NERegistrationFormDisplay
+    menu_entry_name = 'registration'
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
@@ -757,10 +755,6 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
         return wc.getHTML(params)
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -809,14 +803,11 @@ class WConfRegistrationFormPreview(WConfRegistrationFormDisplay):
 
 
 class WPRegFormInactive(conferences.WPConferenceDefaultDisplayBase):
+    menu_entry_name = 'registration'
 
     def _getBody(self, params):
         wc = WConfRegFormDeactivated(self._conf)
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
 
 class WConfRegFormDeactivated(WConfDisplayBodyBase):
@@ -834,6 +825,7 @@ class WConfRegFormDeactivated(WConfDisplayBodyBase):
 
 class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NERegistrationFormModify
+    menu_entry_name = 'registration'
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
@@ -842,10 +834,6 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())
         return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \

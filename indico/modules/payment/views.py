@@ -38,9 +38,7 @@ class WPPaymentEventManagement(WPConfModifRegFormBase, WPPaymentJinjaMixin):
 
 
 class WPPaymentEvent(WPConferenceDefaultDisplayBase, WPPaymentJinjaMixin):
-    def _defineSectionMenu(self):
-        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
+    menu_entry_name = 'registration'
 
     def _getBody(self, params):
         return WPPaymentJinjaMixin._getPageContent(self, params)
