@@ -176,8 +176,7 @@ class MenuEntry(db.Model):
             from indico.core.plugins import url_for_plugin
             return url_for_plugin(self.endpoint, self.event)
         elif self.is_page:
-            return url_for('.page', self.page)
-            pass
+            return url_for('event_pages.page_display', self.page)
         return None
 
     @property
@@ -266,6 +265,10 @@ class MenuPage(db.Model):
         db.Text,
         nullable=False
     )
+
+    @property
+    def locator(self):
+        return dict(self.menu_entry.event.getLocator(), page_id=self.id)
 
     @return_ascii
     def __repr__(self):

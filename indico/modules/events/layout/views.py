@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPLayoutEdit(WPJinjaMixin, WPConferenceModifBase):
@@ -38,6 +38,19 @@ class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items_advanced['menu'].setActive()
+
+
+class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+
+    def __init__(self, rh, conference, **kwargs):
+        WPConferenceDefaultDisplayBase.__init__(self, rh, conference, **kwargs)
+        self.page = kwargs['page']
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+    def _get_active_menu_entry(self):
+        return self.page.menu_entry.id
 
 
 class WPImages(WPJinjaMixin, WPConferenceModifBase):
