@@ -2,7 +2,7 @@
 
 <h2>Upload images</h2>
 
-{{ form_header(form, id='upload-images', classes='dropzone full-width', orientation='vertical', action=url_for('.images_upload', event)) }}
+{{ form_header(form, id='upload-images', classes='full-width', orientation='vertical', action=url_for('.images_upload', event)) }}
 {{ form_rows(form, skip_labels=true) }}
 
 {% call form_footer(attach_form) %}
