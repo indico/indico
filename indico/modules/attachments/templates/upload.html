@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    {{ form_header(form, id='file-upload', classes='dropzone ' + ('full-width' if not existing_attachment else ''),
+    {{ form_header(form, id='file-upload', classes=('full-width' if not existing_attachment else ''),
                    action=action) }}
     <input type="hidden" autofocus>
     {% if existing_attachment %}
