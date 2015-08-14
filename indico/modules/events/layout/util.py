@@ -24,6 +24,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
+from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
 from MaKaC.common.cache import GenericCache
 
@@ -32,6 +33,11 @@ _cache = GenericCache('updated-menus')
 
 def _entry_key(entry_data):
     return entry_data.position, entry_data.name
+
+
+@memoize_request
+def get_menu_entries_from_signal():
+    return named_objects_from_signal(signals.event.sidemenu.send())
 
 
 class MenuEntryData(object):
@@ -54,7 +60,7 @@ def menu_entries_for_event(event, show_hidden=False):
     from indico.core.plugins import plugin_engine
 
     entries = MenuEntry.get_for_event(event)
-    signal_entries = named_objects_from_signal(signals.event.sidemenu.send())
+    signal_entries = get_menu_entries_from_signal()
 
     plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
     cache_key = binascii.crc32('{}_{}'.format(event.getId(), plugin_key)) & 0xffffffff
@@ -85,20 +91,6 @@ def menu_entries_for_event(event, show_hidden=False):
             _cache.set(cache_key, True)
         entries = MenuEntry.get_for_event(event)
 
-    def _is_entry_visible(entry):
-        if not show_hidden and not entry.visible:
-            return False
-        if entry.name:
-            try:
-                entry_data = signal_entries[entry.name]
-            except KeyError:
-                return False
-            if show_hidden:
-                return True
-            if callable(entry_data.visible):
-                return entry_data.visible(event)
-
-    entries = filter(_is_entry_visible, entries)
     return entries
 
 

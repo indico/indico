@@ -22,7 +22,7 @@ from MaKaC.paperReviewing import ConferencePaperReview
 
 
 def _visibility_my_tracks(event):
-    return event.getAbstractMgr().isActive() and event.getCoordinatedTracks(session.user.as_avatar)
+    return bool(event.getAbstractMgr().isActive() and event.getCoordinatedTracks(session.user.as_avatar))
 
 
 def _visibility_call_for_abstracts(event):
@@ -46,7 +46,7 @@ def _visibility_paper_review(event):
 
 
 def _visibility_paper_review_transfer(event):
-    return _visibility_paper_review(event) and event.getContribsForSubmitter(session.user.as_avatar)
+    return bool(_visibility_paper_review(event) and event.getContribsForSubmitter(session.user.as_avatar))
 
 
 def _visibility_role(event, role):
