@@ -257,10 +257,11 @@ class WConfMetadata(wcomponents.WTemplated):
         v['site_name'] = minfo.getTitle()
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
 
-        if self._conf.getLogo():
-            v['image'] = urlHandlers.UHConferenceLogo.getURL(self._conf)
+        self.event = Event.find(id=self._conf.getId()).one()
+        if self.event.logo:
+            v['image'] = url_for('event_images.logo_display', self._conf)
         else:
-            v['image'] = Config.getInstance().getSystemIconURL("indico_co")
+            v['image'] = Config.getInstance().getSystemIconURL("logo_indico")
 
         v['description'] = strip_ml_tags(self._conf.getDescription()[:500])
         return v

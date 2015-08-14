@@ -24,12 +24,12 @@
                         <div class="toolbar right">
                             <div class="group">
                                 <a class="i-button icon-link add-link" href="#"
-                                   data-href="{{ url_for('.menu-add-entry', event, type='user_link') }}"
+                                   data-href="{{ url_for('.menu_add_entry', event, type='user_link') }}"
                                    data-title="{% trans %}New link{% endtrans %}">
                                     {%- trans %}Add link{% endtrans -%}
                                 </a>
                                 <a class="i-button icon-file-text add-page" href="#"
-                                    data-href="{{ url_for('.menu-add-entry', event, type='page') }}"
+                                    data-href="{{ url_for('.menu_add_entry', event, type='page') }}"
                                     data-title="{% trans %}New page{% endtrans %}">
                                     {%- trans %}Add page{% endtrans -%}
                                 </a>
@@ -67,7 +67,7 @@
             evt.preventDefault();
 
             $.ajax({
-                url: {{ url_for('.menu-add-entry', event, type='separator')|tojson }},
+                url: {{ url_for('.menu_add_entry', event, type='separator')|tojson }},
                 method: 'POST',
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
