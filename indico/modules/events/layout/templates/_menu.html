@@ -38,7 +38,7 @@
 
 {% macro menu_entries(entries) -%}
     <ul class="menu-entries">
-        {% for entry in entries -%}
+        {% for entry in entries if not entry.is_orphaned -%}
             <li>{{ menu_entry(entry) }}</li>
         {%- endfor %}
     </ul>
@@ -63,7 +63,7 @@
             </a>
             {% if entry.children %}
                 <ul class="inner">
-                    {% for child in entry.children if child.visible %}
+                    {% for child in entry.children if child.is_visible %}
                         {{ menu_entry_display(child, root_entry=False, active_entry_id=active_entry_id) }}
                     {% endfor %}
                 </ul>

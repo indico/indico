@@ -209,6 +209,28 @@ class MenuEntry(db.Model):
         return self.type == MenuEntryType.separator
 
     @cached_property
+    def default_data(self):
+        from indico.modules.events.layout.util import get_menu_entries_from_signal
+        if self.name is None:
+            return None
+        return get_menu_entries_from_signal().get(self.name)
+
+    @property
+    def is_orphaned(self):
+        return bool(self.name and self.default_data is None)
+
+    @property
+    def is_visible(self):
+        if not self.visible:
+            return False
+        if not self.name:
+            return True
+        if self.is_orphaned:
+            return False
+
+        return self.default_data.visible(self.event)
+
+    @cached_property
     def event(self):
         return ConferenceHolder().getById(str(self.event_id), True)
 

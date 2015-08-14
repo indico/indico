@@ -2,7 +2,7 @@
 
 <div class="conf_leftMenu">
     <ul id="outer">
-        {%- for entry in menu if entry.visible %}
+        {%- for entry in menu if entry.is_visible %}
             {{ menu_entry_display(entry, active_entry_id=active_entry_id) }}
         {% endfor -%}
     </ul>
