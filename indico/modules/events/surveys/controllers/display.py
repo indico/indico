@@ -26,19 +26,10 @@ from indico.modules.events.surveys.models.submissions import SurveyAnswer, Surve
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
 from indico.modules.events.surveys.views import WPDisplaySurvey
-from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-
-
-def _get_active_surveys(event):
-    query = Survey.find(Survey.event_id == int(event.id),
-                        Survey.start_dt != None,  # noqa
-                        Survey.start_dt <= now_utc(),
-                        ~Survey.is_deleted)
-    return [s for s in query if s.is_active]
 
 
 def _can_redirect_to_single_survey(surveys):
@@ -53,7 +44,7 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
 
 class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
     def _process(self):
-        surveys = _get_active_surveys(self.event)
+        surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id))
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
@@ -78,7 +69,7 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
 
     def _checkParams(self, params):
         RHSurveyBaseDisplay._checkParams(self, params)
-        self.survey = Survey.find_one(id=request.view_args['survey_id'], is_deleted=False)
+        self.survey = Survey.find_one(Survey.id == request.view_args['survey_id'], Survey.is_visible)
 
         if not self.survey.is_active:
             flash(_('This survey is not active'), 'error')
@@ -95,7 +86,8 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
             flash(_('Your answers has been saved'), 'success')
             return redirect(url_for('.display_survey_list', self.event))
 
-        show_back_button = not _can_redirect_to_single_survey(_get_active_surveys(self.event))
+        surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id))
+        show_back_button = not _can_redirect_to_single_survey(surveys)
         return WPDisplaySurvey.render_template('survey_submission.html', self.event, form=form,
                                                event=self.event, survey=self.survey, show_back_button=show_back_button)
 

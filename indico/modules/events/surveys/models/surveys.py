@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -154,9 +156,29 @@ class Survey(db.Model):
             return SurveyState.active_and_answered
         return SurveyState.finished
 
-    @property
+    @hybrid_property
     def is_active(self):
-        return self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean}
+        return not self.is_deleted and self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean}
+
+    @is_active.expression
+    def is_active(cls):
+        now = now_utc()
+        return db.and_(~cls.is_deleted,
+                       cls.questions.any(),
+                       (cls.start_dt != None) & (cls.start_dt <= now),  # noqa
+                       (cls.end_dt == None) | (cls.end_dt > now))  # noqa
+
+    @hybrid_property
+    def is_visible(self):
+        return (self.is_deleted and
+                self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean, SurveyState.finished})
+
+    @is_visible.expression
+    def is_visible(cls):
+        now = now_utc()
+        return db.and_(~cls.is_deleted,
+                       cls.questions.any(),
+                       (cls.start_dt != None) & (cls.start_dt <= now))  # noqa
 
     def can_submit(self, user):
         return self.is_active and (not self.require_user or (self.require_user and user))
