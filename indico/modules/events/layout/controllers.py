@@ -154,7 +154,9 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             defaults['html'] = self.entry.page.html
         form = form_cls(linked_object=self.entry, obj=defaults)
         if form.validate_on_submit():
-            form.populate_obj(self.entry)
+            form.populate_obj(self.entry, skip={'html'})
+            if self.entry.is_page:
+                self.entry.page.html = form.html.data
             return jsonify_data(entry=_render_menu_entry(self.entry))
         return jsonify_template('events/layout/menu_entry_form.html', form=form)
 
