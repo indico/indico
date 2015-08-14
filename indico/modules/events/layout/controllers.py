@@ -132,14 +132,17 @@ class RHLayoutEdit(RHConferenceModifBase):
         return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf)
 
 
-class RHMenuEdit(RHConferenceModifBase):
-    def _process(self):
+class RHMenuBase(RHConferenceModifBase):
+    CSRF_ENABLED = True
 
+
+class RHMenuEdit(RHMenuBase):
+    def _process(self):
         return WPMenuEdit.render_template('menu_edit.html', self._conf, event=self._conf, MenuEntryType=MenuEntryType,
                                           menu=menu_entries_for_event(self._conf, show_hidden=True))
 
 
-class RHMenuEntryEditBase(RHConferenceModifBase):
+class RHMenuEntryEditBase(RHMenuBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.entry = MenuEntry.find_first(id=request.view_args['menu_entry_id'], event_id=self._conf.getId())
@@ -182,7 +185,7 @@ class RHMenuEnableEntry(RHMenuEntryEditBase):
         return redirect_or_jsonify(url_for('.menu', self._conf), is_enabled=self.entry.is_enabled)
 
 
-class RHMenuAddEntry(RHConferenceModifBase):
+class RHMenuAddEntry(RHMenuBase):
     def _process(self):
         defaults = FormDefaults(get_default_values(MenuEntry))
         form_cls = None
