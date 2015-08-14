@@ -52,7 +52,8 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
 
 class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
     def _process(self):
-        surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id))
+        surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id),
+                                  _eager=(Survey.questions, Survey.submissions))
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
@@ -77,7 +78,8 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
 
     def _checkParams(self, params):
         RHSurveyBaseDisplay._checkParams(self, params)
-        self.survey = Survey.find_one(Survey.id == request.view_args['survey_id'], Survey.is_visible)
+        self.survey = Survey.find_one(Survey.id == request.view_args['survey_id'], Survey.is_visible,
+                                      _eager=(Survey.questions, Survey.submissions))
 
         if not self.survey.is_active:
             flash(_('This survey is not active'), 'error')
