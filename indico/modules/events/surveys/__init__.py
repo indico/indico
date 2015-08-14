@@ -57,6 +57,11 @@ def _get_feature_definitions(sender, **kwargs):
     return SurveysFeature
 
 
+@signals.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.events.surveys.tasks
+
+
 class SurveysFeature(EventFeature):
     name = 'surveys'
     friendly_name = _('Surveys')
