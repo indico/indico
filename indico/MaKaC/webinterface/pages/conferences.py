@@ -257,7 +257,7 @@ class WConfMetadata(wcomponents.WTemplated):
         v['site_name'] = minfo.getTitle()
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
 
-        self.event = Event.find(id=self._conf.getId()).one()
+        self.event = Event.get_one(self._conf.getId())
         if self.event.logo:
             v['image'] = url_for('event_images.logo_display', self._conf)
         else:

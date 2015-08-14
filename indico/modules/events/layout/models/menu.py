@@ -151,7 +151,7 @@ class MenuEntry(db.Model):
         lazy=True,
         backref=db.backref(
             'menu_entry',
-            lazy=True,
+            lazy=False,
             uselist=False
         ),
     )
@@ -240,7 +240,7 @@ class MenuEntry(db.Model):
 
     @classmethod
     def get_for_event(cls, event):
-        return cls.find(event_id=int(event.id), parent_id=None).order_by(MenuEntry.position).all()
+        return cls.find(event_id=int(event.id), parent_id=None, _eager=cls.children).order_by(MenuEntry.position).all()
 
     @return_ascii
     def __repr__(self):
