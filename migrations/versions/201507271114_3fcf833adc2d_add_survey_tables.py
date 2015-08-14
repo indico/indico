@@ -31,6 +31,11 @@ def upgrade():
         sa.Column('start_dt', UTCDateTime, nullable=True),
         sa.Column('end_dt', UTCDateTime, nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.Column('start_notification_sent', sa.Boolean(), nullable=False),
+        sa.Column('notifications_enabled', sa.Boolean(), nullable=False),
+        sa.Column('notify_participants', sa.Boolean(), nullable=False),
+        sa.Column('start_notification_emails', postgresql.ARRAY(sa.String()), nullable=False),
+        sa.Column('new_submission_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
