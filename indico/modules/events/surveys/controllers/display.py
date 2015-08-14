@@ -95,9 +95,14 @@ class RHSubmitSurveyForm(RHSurveyBaseDisplay):
             return redirect(url_for('.display_survey_list', self.event))
 
         surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id))
-        show_back_button = not _can_redirect_to_single_survey(surveys)
-        return self.view_class.render_template('survey_submission.html', self.event, form=form,
-                                               event=self.event, survey=self.survey, show_back_button=show_back_button)
+        if not _can_redirect_to_single_survey(surveys):
+            back_button_endpoint = '.display_survey_list'
+        elif self.event.getType() != 'conference':
+            back_button_endpoint = 'event.conferenceDisplay'
+        else:
+            back_button_endpoint = None
+        return self.view_class.render_template('survey_submission.html', self.event, form=form, event=self.event,
+                                               survey=self.survey, back_button_endpoint=back_button_endpoint)
 
     def _save_answers(self, form):
         survey = self.survey
