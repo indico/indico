@@ -1,0 +1,28 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    New survey submission
+{%- endblock %}
+
+{% block header %}Event "{{ submission.survey.event.title }}" {% endblock %}
+
+{% block body -%}
+    {% filter dedent %}
+        {% if not submission.user %}
+            An anonymous submission has been made in the survey "{{ submission.survey.title }}".
+        {% else %}
+            A new submission has been made in the survey "{{ submission.survey.title }}" by {{ submission.user.full_name }}.
+        {%- endif %}
+
+        You can access all the submissions by clicking the link below:
+        {{ url_for('survey.management', submission.survey.event, _external=true) }}
+    {%- endfilter %}
+{%- endblock %}
+
+{% block footer_title -%}
+    Link to the event page
+{%- endblock %}
+
+{% block footer_url -%}
+    {{ url_for('event.conferenceDisplay', submission.survey.event, _external=true) }}
+{%- endblock %}

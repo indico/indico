@@ -258,3 +258,11 @@ class Survey(db.Model):
                               module='Surveys')
         logger.info('Sending start notification for survey {}'.format(self))
         self.start_notification_sent = True
+
+    def send_submission_notification(self, submission):
+        if not self.notifications_enabled:
+            return
+        template_module = get_template_module('events/surveys/emails/new_submission_email.txt', submission=submission)
+        send_email(make_email(bcc_list=self.new_submission_emails, template=template_module), event=self.event,
+                              module='Surveys')
+        logger.info('Sending submission notification for survey {}'.format(self))
