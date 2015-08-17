@@ -23,6 +23,7 @@ from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from MaKaC.webinterface.displayMgr import EventMenuEntry
 
 
 logger = Logger.get('events.survey')
@@ -39,6 +40,16 @@ def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'surveys', SideMenuItem(_('Surveys'), url_for('survey.management', event),
                                    visible=event.canModify(session.user), event_feature='surveys')
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.surveys.models.surveys import Survey
+
+    def _visible(event):
+        return bool(Survey.find(Survey.is_visible, Survey.event_id == int(event.id)).count())
+
+    return EventMenuEntry('survey.display_survey_list', _('Surveys'), name='surveys', visible=_visible)
 
 
 @signals.event.get_feature_definitions.connect
