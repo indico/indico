@@ -33,8 +33,10 @@
                 }
             }
         });
-    }).on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
+    });
+    $('#menu-entries').on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
         evt.preventDefault();
+        evt.stopPropagation();
         ajaxDialog({
             trigger: this,
             url: $(this).data('href'),
