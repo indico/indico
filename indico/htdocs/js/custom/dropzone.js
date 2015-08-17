@@ -64,7 +64,7 @@
                         // force change in form, so that we can process
                         // the 'change' event
                         $button.prop('disabled', false);
-                        $form.find('.change-trigger').val(self.files.length);
+                        $form.find('.change-trigger').val(Math.random());
                         $form.trigger('change');
 
                         $dz.find('.dz-message').hide();
@@ -78,7 +78,7 @@
 
                         // force change in form, so that we can process
                         // the 'change' event
-                        $form.find('.change-trigger').val(self.files.length);
+                        $form.find('.change-trigger').val(Math.random());
                         $form.trigger('change');
 
                         if (self.files.length === 0) {
