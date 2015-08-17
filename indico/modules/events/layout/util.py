@@ -20,6 +20,7 @@ import binascii
 from collections import defaultdict
 from itertools import count
 
+import MaKaC
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.models.events import Event
@@ -63,9 +64,10 @@ def menu_entries_for_event(event, show_hidden=False):
     entries = MenuEntry.get_for_event(event)
     signal_entries = get_menu_entries_from_signal()
 
-    plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
-    cache_key = binascii.crc32('{}_{}'.format(event.getId(), plugin_key)) & 0xffffffff
-    processed = _cache.get(cache_key)
+    cache_key = unicode(event.id)
+    plugin_hash = binascii.crc32(','.join(sorted(plugin_engine.get_active_plugins()))) & 0xffffffff
+    cache_version = '{}:{}'.format(MaKaC.__version__, plugin_hash)
+    processed = _cache.get(cache_key) == cache_version
 
     if not processed:
         # menu entries from signal
@@ -89,7 +91,7 @@ def menu_entries_for_event(event, show_hidden=False):
         with db.tmp_session() as sess:
             sess.add_all(new_entries)
             sess.commit()
-            _cache.set(cache_key, True)
+            _cache.set(cache_key, cache_version)
         entries = MenuEntry.get_for_event(event)
 
     return entries
