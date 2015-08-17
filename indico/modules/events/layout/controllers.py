@@ -265,14 +265,18 @@ def _render_image_list(event):
     return render_template('events/layout/image_list.html', images=get_images_for_event(event))
 
 
-class RHImages(RHConferenceModifBase):
+class RHManageImagesBase(RHConferenceModifBase):
+    EVENT_FEATURE = 'images'
+
+
+class RHImages(RHManageImagesBase):
     def _process(self):
         form = AddImagesForm()
         return WPImages.render_template('images.html', self._conf, images=get_images_for_event(self._conf),
                                         event=self._conf, form=form)
 
 
-class RHImageUpload(RHConferenceModifBase):
+class RHImageUpload(RHManageImagesBase):
     CSRF_ENABLED = True
 
     def _process(self):
@@ -293,11 +297,11 @@ class RHImageUpload(RHConferenceModifBase):
         return jsonify_data(image_list=_render_image_list(self._conf))
 
 
-class RHImageDelete(RHConferenceModifBase):
+class RHImageDelete(RHManageImagesBase):
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageImagesBase._checkParams(self, params)
         self.image = ImageFile.find_first(id=request.view_args['image_id'], event_id=self._conf.getId())
         if not self.image:
             raise NotFound
@@ -309,6 +313,7 @@ class RHImageDelete(RHConferenceModifBase):
 
 
 class RHImageDisplay(RHConferenceBaseDisplay):
+    EVENT_FEATURE = 'images'
     normalize_url_spec = {
         'locators': {
             lambda self: self.image
@@ -325,6 +330,8 @@ class RHImageDisplay(RHConferenceBaseDisplay):
 
 
 class RHImageLegacyDisplay(RHConferenceBaseDisplay):
+    EVENT_FEATURE = 'images'
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.pic_id = request.view_args['pic_id']
