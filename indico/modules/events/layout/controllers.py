@@ -23,6 +23,7 @@ from itertools import count
 from flask import flash, redirect, request, session, jsonify, render_template
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings, logger
@@ -290,8 +291,7 @@ class RHImageUpload(RHManageImagesBase):
             db.session.add(image)
             db.session.flush()
             logger.info('Image {} uploaded by {}'.format(image, session.user))
-            # TODO: Add image-related signals as well as conference log entries
-            # signals.images.image_created.send(image, user=session.user)
+            signals.event_management.image_created.send(image, user=session.user)
         flash(ngettext("The image has been uploaded", "{count} images have been uploaded", len(files))
               .format(count=len(files)), 'success')
         return jsonify_data(image_list=_render_image_list(self._conf))
@@ -307,6 +307,7 @@ class RHImageDelete(RHManageImagesBase):
             raise NotFound
 
     def _process(self):
+        signals.event_management.image_deleted.send(self.image, user=session.user)
         db.session.delete(self.image)
         flash(_("The image '{}' has been deleted").format(self.image.filename), 'success')
         return jsonify_data(image_list=_render_image_list(self._conf))

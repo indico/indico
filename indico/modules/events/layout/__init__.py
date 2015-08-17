@@ -17,11 +17,14 @@
 from __future__ import unicode_literals
 
 from flask import session
+from jinja2.filters import do_filesizeformat
+
 
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.default import DEFAULT_MENU_ENTRIES
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -67,6 +70,26 @@ def _get_image_cloner(event, **kwargs):
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
     return ImagesFeature
+
+
+@signals.event_management.image_created.connect
+def _log_image_created(image, user, **kwargs):
+    image.event.as_legacy.log(EventLogRealm.management, EventLogKind.positive,
+                              'Layout', 'Added image "{}"'.format(image.filename), user, data={
+                                  'Type': 'Image File',
+                                  'File name': image.filename,
+                                  'File type': image.content_type,
+                                  'File size': do_filesizeformat(image.size)
+                              })
+
+
+@signals.event_management.image_deleted.connect
+def _log_image_deleted(image, user, **kwargs):
+    image.event.as_legacy.log(EventLogRealm.management, EventLogKind.negative,
+                              'Layout', 'Deleted image "{}"'.format(image.filename), user, data={
+                                  'Type': 'Image File',
+                                  'File name': image.filename
+                              })
 
 
 class ImagesFeature(EventFeature):
