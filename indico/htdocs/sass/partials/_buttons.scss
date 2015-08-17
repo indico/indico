@@ -346,24 +346,22 @@ button::-moz-focus-inner {
     padding: 0.1em 1em !important;
     text-decoration: none;
     text-shadow: 0 1px 0 #fff;
-}
-
-.dropdown > li a {
-    display: block;
-    line-height: 1.7rem;
-    padding-top: 0.1em;
-    width: 100%;
-}
-
-.dropdown > li a[class*="icon-"]:before {
-    color: #777;
-    font-size: 1.2rem;
-    margin-right: 0.3em;
-    vertical-align: -10%;
-}
-
-.dropdown > li:hover a {
-    color: #888;
+    & a {
+        display: block;
+        line-height: 1.7rem;
+        padding-top: 0.1em;
+        width: 100%;
+        &[class*="icon-"]:before {
+            font-size: 1.2rem;
+            margin-right: 0.3em;
+            vertical-align: -10%;
+        }
+    }
+    &:hover {
+        & a, & a[class*="icon-"]:before {
+            color: #888;
+        }
+    }
 }
 
 .trusted, .trusted:hover {
