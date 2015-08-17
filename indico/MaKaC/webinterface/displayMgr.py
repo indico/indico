@@ -189,10 +189,10 @@ class ConfDisplayMgr(DisplayMgr):
     def getMenu(self):
         if self._menu.getParent() is None:
             self._menu.setParent(self)
-        extra_items = frozenset(x.name for x in values_from_signal(signals.event.sidemenu.send()))
-        if getattr(self, 'extra_items', frozenset()) != extra_items:
-            self._menu.updateSystemLink()
-        self.extra_items = extra_items
+        # extra_items = frozenset(x.name for x in values_from_signal(signals.event.sidemenu.send()))
+        # if getattr(self, 'extra_items', frozenset()) != extra_items:
+        #     self._menu.updateSystemLink()
+        # self.extra_items = frozenset()
         return self._menu
 
     def getConference(self):
@@ -914,9 +914,9 @@ class SystemLink(Link):
 
 class SystemLinkData(object):
     def __init__(self, conf=None):
-        plugin_entries = None
-        if not hasattr(self, '_linkData') or not hasattr(self, '_linkDataOrderedKeys'):
-            plugin_entries = values_from_signal(signals.event.sidemenu.send())
+        # plugin_entries = None
+        # if not hasattr(self, '_linkData') or not hasattr(self, '_linkDataOrderedKeys'):
+        #     plugin_entries = values_from_signal(signals.event.sidemenu.send())
         #the following dict is used to update the system link of the menu. each new entry is added to the menu,
         #and all entries in the menu whiche are not is this dict are removed.
         if not hasattr(self, "_linkData"):
@@ -1037,13 +1037,13 @@ class SystemLinkData(object):
                     "URL": 'UHConfEvaluationDisplayModif',
                     "parent": "evaluation"}
             }
-            for entry in plugin_entries:
-                assert entry.name not in self._linkData
-                self._linkData[entry.name] = {
-                    'caption': entry.caption,
-                    'URL': entry.endpoint,
-                    'parent': entry.parent
-                }
+            # for entry in plugin_entries:
+            #     assert entry.name not in self._linkData
+            #     self._linkData[entry.name] = {
+            #         'caption': entry.caption,
+            #         'URL': entry.endpoint,
+            #         'parent': entry.parent
+            #     }
 
         #this ordered list allow us to keep the order we want for the menu
         if not hasattr(self, "_linkDataOrderedKeys"):
@@ -1075,7 +1075,7 @@ class SystemLinkData(object):
                                         "evaluation",
                                         "newEvaluation",
                                         "viewMyEvaluation"]
-            self._linkDataOrderedKeys += [x.name for x in plugin_entries]
+            # self._linkDataOrderedKeys += [x.name for x in plugin_entries]
 
     def getLinkData(self):
         return self._linkData
