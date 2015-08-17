@@ -3,28 +3,33 @@
          data-position="{{ entry.position }}"
          data-position-url="{{ url_for('.menu_entry_position', entry) }}">
         <div class="i-label
-        {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
-        {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
-        {%- if not entry.is_enabled %} stripped{% endif %} entry-{{ entry.type.name }}">
-            <span>
-                {%- if entry.type.name != 'separator' %}{{ _(entry.title) }}{% endif %}
-                ({{ entry.position }})
-            </span>
+            {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
+            {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
+            {%- if not entry.is_enabled %} stripped{% endif %} entry-{{ entry.type.name }}">
+            <span>{%- if entry.type.name != 'separator' %}{{ _(entry.title) }}{% endif %}</span>
             <span class="right actions">
                 <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
                    data-href="{{ url_for('.menu_enable_entry', entry) }}"
                    data-method="POST"
-                   ></a>
-                <a href="#" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
+                ></a>
+                {% if entry.type.name != 'separator' %}
+                    <a href="#" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
+                {% endif %}
                 {% if entry.type.name in ('user_link', 'page', 'separator') %}
                     <a href="#" class="delete-entry"
-                       data-method="DELETE"
-                       data-href="{{ url_for('.menu_delete_entry', entry) }}"
-                       data-title="{% trans name=entry.title %}Remove {{ name }}?{% endtrans %}"
-                       data-confirm="{% trans name=entry.title -%}
-                           Are you sure you want to remove &quot;{{ name }}&quot;?<br>
-                           This will remove the attachment permanently.
-                           {%- endtrans %}"> {# TODO: handle response #}
+                         data-method="DELETE"
+                         data-href="{{ url_for('.menu_delete_entry', entry) }}"
+                         data-title="{% trans%}Remove the menu entry?{% endtrans %}"
+                         data-confirm="
+                            {%- if entry.type.name != 'separator' -%}
+                                {%- trans name=entry.title -%}
+                                    Are you sure you want to remove &quot;{{ name }}&quot;?
+                                {%- endtrans -%}
+                            {% else %}
+                                {%- trans name=entry.title -%}
+                                    Are you sure you want to remove this spacer?
+                                {%- endtrans -%}
+                            {% endif %}">
                     </a>
                 {% endif %}
                 <i class="drag-handle"></i>
@@ -46,23 +51,21 @@
 
 
 {% macro menu_entry_display(entry, root_entry=true, active_entry_id=none) %}
-    {% if entry.is_separator %}
+    {%- if entry.is_separator -%}
         <li class="spacer"></li>
-    {% else %}
+    {%- else -%}
         {% set menu_class = 'menuConfTitle' if root_entry else 'menuConfMiddleCell' %}
         <li class="{{ menu_class }}
-                  {%- if entry.id == active_entry_id %} selected menuConfSelected
-                      {%- if not root_entry %} sublink{% endif -%}
-                  {%- endif %}">
-            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>
-                {{- entry.title -}}
-            </a>
-            {% if root_entry and entry.children %}
+            {%- if entry.id == active_entry_id %} selected menuConfSelected
+                    {%- if not root_entry %} sublink{% endif -%}
+            {%- endif %}">
+            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>{{ entry.title }}</a>
+            {%- if root_entry and entry.children -%}
                 <ul class="inner">
-                    {% for child in entry.children if child.is_visible %}
+                    {%- for child in entry.children if child.is_visible -%}
                         {{ menu_entry_display(child, root_entry=False, active_entry_id=active_entry_id) }}
-                    {% endfor %}
+                    {%- endfor -%}
                 </ul>
-            {% endif %}
-    {% endif %}
+            {%- endif -%}
+    {%- endif -%}
 {% endmacro %}
