@@ -20,8 +20,11 @@ import shutil
 import signal
 import subprocess
 import tempfile
+from contextlib import contextmanager
 
 import pytest
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 
 from indico.core.db import db as db_
 from indico.core.db.sqlalchemy.util.management import delete_all_tables
@@ -112,3 +115,36 @@ def db(database, monkeypatch):
     yield database
     database.session.rollback()
     database.session.remove()
+
+
+@pytest.yield_fixture
+@pytest.mark.usefixtures('db')
+def count_queries():
+    """Provides a query counter.
+
+    Usage::
+
+        with count_queries() as count:
+            do_stuff()
+        assert count() == number_of_queries
+    """
+    def _after_cursor_execute(*args, **kwargs):
+        if active_counter[0]:
+            active_counter[0][0] += 1
+
+    @contextmanager
+    def _counter():
+        if active_counter[0]:
+            raise RuntimeError('Cannot nest count_queries calls')
+        active_counter[0] = counter = [0]
+        try:
+            yield lambda: counter[0]
+        finally:
+            active_counter[0] = None
+
+    active_counter = [None]
+    event.listen(Engine, 'after_cursor_execute', _after_cursor_execute)
+    try:
+        yield _counter
+    finally:
+        event.remove(Engine, 'after_cursor_execute', _after_cursor_execute)
