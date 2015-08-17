@@ -229,6 +229,11 @@ class MenuEntry(db.Model):
 
         return self.default_data.visible(self.event)
 
+    @property
+    def is_default_title(self):
+        defaults = self.default_data
+        return defaults.title == self.title if defaults is not None else False
+
     @cached_property
     def event(self):
         return ConferenceHolder().getById(str(self.event_id), True)
