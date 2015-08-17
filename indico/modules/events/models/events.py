@@ -14,9 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.db.sqlalchemy import db
 from sqlalchemy.dialects.postgresql import TSVECTOR, JSON
 from sqlalchemy.orm import deferred
+
+from indico.core.db.sqlalchemy import db
+from indico.util.caching import memoize_request
 
 
 class Event(db.Model):
@@ -38,6 +40,15 @@ class Event(db.Model):
     @property
     def title(self):
         return self.title_vector
+
+    @property
+    @memoize_request
+    def as_legacy(self):
+        """
+        Return a legacy ``Conference`` object (ZODB)
+        """
+        from MaKaC.conference import ConferenceHolder
+        return ConferenceHolder().getById(self.id)
 
     @title.setter
     def title(self, title):
