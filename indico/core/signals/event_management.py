@@ -44,3 +44,14 @@ specific plugin's management page. The signal should return None if the current
 user (available via ``session.user``) cannot access the management area.
 The *sender* is the event object.
 """)
+
+image_created = _signals.signal('image-uploaded', """
+Called when a new image is created.  The *sender* object is the new ``ImageFile``.
+The user who uploaded the image is passed in the ``user`` kwarg.
+""")
+
+image_deleted = _signals.signal('image-deleted', """
+Called when an image is deleted.  The *sender* object is the ``ImageFile`` that is
+about to be deleted.  The user who uploaded the image is passed in the ``user``
+kwarg.
+""")
