@@ -240,7 +240,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         ])
 
     def _applyDecoration( self, body ):
-        self.event = Event.find(id=self._conf.getId()).one()
+        self.event = Event.get_one(int(self._conf.getId()))
         self.logo_url = url_for('event_images.logo_display', self._conf)
         body = self._applyConfDisplayDecoration( body )
         return WPConferenceBase._applyDecoration( self, body )
@@ -272,7 +272,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
     def __init__(self, aw, conf):
         self._aw = aw
         self._conf = conf
-        self.event = Event.find(id=self._conf.getId()).one()
+        self.event = Event.get_one(int(self._conf.getId()))
 
     def getHTML(self, body, params):
         self._body = body
