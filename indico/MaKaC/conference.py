@@ -990,8 +990,8 @@ class Category(CommonObjectBase):
         catIdx.unindexConf(conf)
         conf.unindexConf()
 
-    def newConference(self, creator, id="", creationDate=None, modificationDate=None):
-        conf = Conference(creator, id, creationDate, modificationDate)
+    def newConference(self, creator):
+        conf = Conference(creator)
         ConferenceHolder().add(conf)
         self._addConference(conf)
         conf.linkCreator()
@@ -4361,9 +4361,18 @@ class ConferenceHolder( ObjectHolder ):
     idxName = "conferences"
     counterName = "CONFERENCE"
 
-    def _newId( self ):
-        id = ObjectHolder._newId( self )
-        return "%s"%id
+    def _newId(self):
+        raise RuntimeError('Tried to get new event id from zodb')
+
+    def add(self, conf):
+        from indico.modules.events import Event
+        event = Event()
+        db.session.add(event)
+        db.session.flush()
+        conf.setId(event.id)
+        if conf.id in self._getIdx():
+            raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
+        ObjectHolder.add(self, conf)
 
     def getById(self, id, quiet=False):
         if id == 'default':

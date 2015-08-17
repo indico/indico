@@ -14,70 +14,61 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from sqlalchemy.dialects.postgresql import TSVECTOR, JSON
+from __future__ import unicode_literals
+
+from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db.sqlalchemy import db
 from indico.util.caching import memoize_request
+from indico.util.string import return_ascii
 
 
 class Event(db.Model):
-
     __tablename__ = 'events'
-    __table_args__ = (db.Index(None, 'title_vector', postgresql_using='gin'),
+    __table_args__ = (db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                       {'schema': 'events'})
 
+    #: The ID of the event
     id = db.Column(
         db.Integer,
-        primary_key=True,
-        autoincrement=False
+        primary_key=True
     )
-
-    @property
-    def locator(self):
-        return {'confId': self.id}
-
-    @property
-    def title(self):
-        return self.title_vector
-
-    @property
-    @memoize_request
-    def as_legacy(self):
-        """
-        Return a legacy ``Conference`` object (ZODB)
-        """
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(self.id)
-
-    @title.setter
-    def title(self, title):
-        self.title_vector = db.func.to_tsvector('simple', title)
-
-    title_vector = db.Column(
-        TSVECTOR
-    )
-    start_date = db.Column(
-        db.DateTime,
+    #: If the event has been deleted
+    is_deleted = db.Column(
+        db.Boolean,
         nullable=False,
-        index=True
+        default=False
     )
-    end_date = db.Column(
-        db.DateTime,
+    #: The metadata of the logo (size, file_name, content_type)
+    logo_metadata = db.Column(
+        JSON,
         nullable=False,
-        index=True
+        default=None
     )
+    #: The logo's raw image data
     logo = db.deferred(db.Column(
         db.LargeBinary,
         nullable=True
     ))
-    logo_metadata = db.Column(
-        JSON,
-        nullable=True
-    )
+
+    # relationship backrefs:
+    # - layout_images (Image.event)
+
+    @property
+    @memoize_request
+    def as_legacy(self):
+        """Returns a legacy `Conference` object (ZODB)"""
+        from MaKaC.conference import ConferenceHolder
+        return ConferenceHolder().getById(self.id, None)
 
     @property
     def has_logo(self):
         return self.logo_metadata is not None
 
-    # relationship backrefs:
-    # - layout_images (Image.event)
+    @property
+    def locator(self):
+        return {'confId': self.id}
+
+    @return_ascii
+    def __repr__(self):
+        return '<Event({})>'.format(self.id)
