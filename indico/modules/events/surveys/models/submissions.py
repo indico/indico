@@ -40,12 +40,6 @@ class SurveySubmission(db.Model):
         index=True,
         nullable=False
     )
-    #: If the submission is anonymous
-    is_anonymous = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     #: The ID of the user who submitted the survey
     user_id = db.Column(
         db.Integer,
@@ -88,6 +82,10 @@ class SurveySubmission(db.Model):
     @event.setter
     def event(self, event):
         self.event_id = int(event.getId())
+
+    @property
+    def is_anonymous(self):
+        return self.user is None
 
     @return_ascii
     def __repr__(self):
