@@ -22,20 +22,31 @@
                     <div class="section">
                         <div class="icon icon-plus"></div>
                         <div class="toolbar right">
-                            <div class="group">
-                                <a class="i-button icon-link add-link" href="#"
-                                   data-href="{{ url_for('.menu_add_entry', event, type='user_link') }}"
-                                   data-title="{% trans %}New link{% endtrans %}">
-                                    {%- trans %}Add link{% endtrans -%}
+                            <div class="group js-add-entry-dropdown">
+                                <a class="i-button arrow icon-plus" data-toggle="dropdown">
+                                    {%- trans %}Add an entry{% endtrans -%}
                                 </a>
-                                <a class="i-button icon-file-text add-page" href="#"
-                                    data-href="{{ url_for('.menu_add_entry', event, type='page') }}"
-                                    data-title="{% trans %}New page{% endtrans %}">
-                                    {%- trans %}Add page{% endtrans -%}
-                                </a>
-                                <a class="i-button icon-arrows-vert add-separator" href="#">
-                                    {%- trans %}Add spacer{% endtrans -%}
-                                </a>
+                                <ul class="dropdown">
+                                    <li>
+                                        <a class="icon-link add-link" href="#"
+                                           data-href="{{ url_for('.menu_add_entry', event, type='user_link') }}"
+                                           data-title="{% trans %}New link{% endtrans %}">
+                                            {%- trans %}Add link{% endtrans -%}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="icon-file-text add-page" href="#"
+                                            data-href="{{ url_for('.menu_add_entry', event, type='page') }}"
+                                            data-title="{% trans %}New page{% endtrans %}">
+                                            {%- trans %}Add page{% endtrans -%}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="icon-arrows-vert add-separator" href="#">
+                                            {%- trans %}Add spacer{% endtrans -%}
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                         <span class="text">
@@ -58,6 +69,8 @@
                 $('#menu-entries > .menu-entries').append($('<li>').html(data.entry));
             }
         }
+
+        $('.js-add-entry-dropdown').dropdown();
 
         $('.add-link, .add-page').ajaxDialog({
             title: function() { return $(this).data('title'); },
