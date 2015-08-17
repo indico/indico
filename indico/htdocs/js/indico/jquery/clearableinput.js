@@ -25,7 +25,7 @@
             focusOnClear: true,
             focusOnStart: false,
             onClear: function() {},
-            onInput: function() {},
+            onInput: function() {}
         },
 
         _create: function() {
@@ -67,7 +67,7 @@
 
         _clear: function() {
             var self = this;
-            self.element.val(self.options.emptyvalue).trigger('propertychange');
+            self.element.val(self.options.emptyvalue).trigger('propertychange').trigger('change');
             self._refreshClearIcon();
             self.options.onClear();
             if (self.options.focusOnClear) {
