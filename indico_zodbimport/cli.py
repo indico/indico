@@ -33,6 +33,7 @@ from indico.core.db.sqlalchemy.util.management import delete_all_tables
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.plugins import plugin_engine
+from indico.modules.users.models.users import User
 from indico.util.console import cformat, clear_line
 from indico.util.decorators import classproperty
 from indico.web.flask.wrappers import IndicoFlask
@@ -184,6 +185,17 @@ class Importer(object):
 
     def migrate(self):
         raise NotImplementedError
+
+    def update_merged_users(self, db_column, msg_in):
+        self.print_step("Updating merged users in {}".format(msg_in))
+        for obj in db_column.class_.find(User.merged_into_id != None, _join=db_column):  # noqa
+            initial_user = getattr(obj, db_column.key)
+            while getattr(obj, db_column.key).merged_into_user:
+                merged_into_user = getattr(obj, db_column.key).merged_into_user
+                setattr(obj, db_column.key, merged_into_user)
+            msg = cformat('%{cyan}{}%{reset} -> %{cyan}{}%{reset}').format(initial_user, getattr(obj, db_column.key))
+            self.print_success(msg, always=True)
+        db.session.commit()
 
     def fix_sequences(self, schema=None, tables=None):
         for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
