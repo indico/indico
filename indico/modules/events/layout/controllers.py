@@ -97,6 +97,11 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
 
 
 class RHLayoutEdit(RHConferenceModifBase):
+    def _checkProtection(self):
+        RHConferenceModifBase._checkProtection(self)
+        if self._conf.getType() != 'conference':
+            raise NotFound('Only conferences have layout settings')
+
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
         event = Event.get_one(self._conf.getId())
@@ -127,6 +132,11 @@ class RHLayoutEdit(RHConferenceModifBase):
 
 class RHMenuBase(RHConferenceModifBase):
     CSRF_ENABLED = True
+
+    def _checkProtection(self):
+        RHConferenceModifBase._checkProtection(self)
+        if self._conf.getType() != 'conference':
+            raise NotFound('Only conferences have a menu')
 
 
 class RHMenuEdit(RHMenuBase):
