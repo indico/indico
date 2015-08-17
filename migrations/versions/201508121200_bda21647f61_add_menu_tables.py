@@ -50,7 +50,6 @@ def upgrade():
         sa.ForeignKeyConstraint(['page_id'], ['events.menu_pages.id']),
         sa.ForeignKeyConstraint(['parent_id'], ['events.menu_entries.id']),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('event_id', 'position', 'parent_id'),
         schema='events'
     )
     op.create_index(None, 'menu_entries', ['event_id', 'name'], unique=True, schema='events',

@@ -69,7 +69,6 @@ class MenuEntry(db.Model):
             '(type = {type.separator.value} AND title IS NULL) OR'
             ' (type != {type.separator.value} AND title IS NOT NULL)'.format(type=MenuEntryType),
             'valid_title'),
-        db.UniqueConstraint('event_id', 'position', 'parent_id'),
         db.Index(None, 'event_id', 'name', unique=True,
                  postgresql_where=db.text('(type = {type.internal_link.value} OR type = {type.plugin_link.value})'
                                           .format(type=MenuEntryType))),
