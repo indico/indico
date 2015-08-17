@@ -102,16 +102,8 @@ class RHLayoutEdit(RHConferenceModifBase):
         event = Event.get_one(self._conf.getId())
         form = LayoutForm(event=event, obj=defaults)
         if form.validate_on_submit():
-            layout_settings.set_multi(self._conf, {
-                'is_searchable': form.data['is_searchable'],
-                'show_nav_bar': form.data['show_nav_bar'],
-                'show_social_badges': form.data['show_social_badges'],
-                'show_banner': form.data['show_banner'],
-                'header_text_color': form.data['header_text_color'],
-                'header_background_color': form.data['header_background_color'],
-                'announcement': form.data['announcement'],
-                'show_announcement': form.data['show_announcement']
-            })
+            data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
+            layout_settings.set_multi(self._conf, data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
         else:
