@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from sqlalchemy.dialects.postgresql import TSVECTOR, JSON
-from sqlalchemy.orm import deferred
 
 from indico.core.db.sqlalchemy import db
 from indico.util.caching import memoize_request
@@ -67,7 +66,7 @@ class Event(db.Model):
         nullable=False,
         index=True
     )
-    logo = deferred(db.Column(
+    logo = db.deferred(db.Column(
         db.LargeBinary,
         nullable=True
     ))
@@ -75,6 +74,10 @@ class Event(db.Model):
         JSON,
         nullable=True
     )
+
+    @property
+    def has_logo(self):
+        return self.logo_metadata is not None
 
     # relationship backrefs:
     # - layout_images (Image.event)

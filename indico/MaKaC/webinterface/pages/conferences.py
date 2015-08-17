@@ -195,7 +195,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             "simpleTextAnnouncement": drawer.getSimpleText(),
             'active_menu_entry_id': self._get_active_menu_entry()
         }
-        if self.event.logo:
+        if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
 
         body = """
@@ -258,7 +258,7 @@ class WConfMetadata(wcomponents.WTemplated):
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
 
         self.event = Event.get_one(self._conf.getId())
-        if self.event.logo:
+        if self.event.has_logo:
             v['image'] = url_for('event_images.logo_display', self._conf)
         else:
             v['image'] = Config.getInstance().getSystemIconURL("logo_indico")
@@ -281,7 +281,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["logo"] = ""
-        if self.event.logo:
+        if self.event.has_logo:
             vars["logoURL"] = url_for('event_images.logo_display', self._conf)
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\" class=\"confLogo\" >"%(vars["logoURL"], escape_html(self._conf.getTitle(), escape_quotes = True))
         vars["confTitle"] = self._conf.getTitle()

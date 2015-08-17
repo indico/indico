@@ -236,7 +236,7 @@ class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
         frameParams = {\
               "logoURL": self.logo_url, \
                       }
-        if self.event.logo:
+        if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
 
         confTitle = self._conf.getTitle()
@@ -302,7 +302,7 @@ class WPMContributionDisplay(contributions.WPContributionDisplay):
         frameParams = {\
               "logoURL": self.logo_url, \
                       }
-        if self.event.logo:
+        if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
 
         confTitle = self._conf.getTitle()
@@ -367,7 +367,7 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
         frameParams = {\
               "logoURL": self.logo_url, \
                       }
-        if self.event.logo:
+        if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
 
         confTitle = self._conf.getTitle()
@@ -448,7 +448,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["logo"] = ""
-        if self.event.logo:
+        if self.event.has_logo:
             vars["logoURL"] = url_for('event_images.logo_display', self._conf)
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
         vars["confTitle"] = self._conf.getTitle()
