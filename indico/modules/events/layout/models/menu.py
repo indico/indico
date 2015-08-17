@@ -242,9 +242,15 @@ class MenuEntry(db.Model):
         return self.default_data.visible(self.event)
 
     @property
-    def is_default_title(self):
+    def localized_title(self):
+        if self.is_separator:
+            return ''
+
         defaults = self.default_data
-        return defaults.title == self.title if defaults is not None else False
+        if defaults is not None and defaults.title == self.title:
+            return _(self.title)
+
+        return self.title
 
     @cached_property
     def event(self):

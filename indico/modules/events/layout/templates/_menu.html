@@ -6,13 +6,7 @@
             {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
             {%- if not entry.is_enabled %} stripped{% endif %} entry-{{ entry.type.name }}">
-            <span>
-                {%- if entry.is_default_title -%}
-                    {{ _(entry.title) }}
-                {%- elif not entry.is_separator -%}
-                    {{ entry.title }}
-                {%- endif -%}
-            </span>
+            <span>{{ entry.localized_title }}</span>
             <span class="right actions">
                 <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
                    data-href="{{ url_for('.menu_enable_entry', entry) }}"
@@ -28,7 +22,7 @@
                          data-title="{% trans%}Remove the menu entry?{% endtrans %}"
                          data-confirm="
                             {%- if not entry.is_separator -%}
-                                {%- trans name='&quot;{}&quot;'.format(entry.title) -%}
+                                {%- trans name='&quot;{}&quot;'.format(entry.localized_title) -%}
                                     Are you sure you want to remove {{ name }}?
                                 {%- endtrans -%}
                             {% else %}
@@ -63,13 +57,7 @@
             {%- if entry.id == active_entry_id %} selected menuConfSelected
                     {%- if not root_entry %} sublink{% endif -%}
             {%- endif %}">
-            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>
-                {%- if entry.is_default_title -%}
-                    {{ _(entry.title) }}
-                {%- else -%}
-                    {{ entry.title }}
-                {%- endif -%}
-            </a>
+            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>{{ entry.localized_title }}</a>
             {%- if root_entry and entry.children -%}
                 <ul class="inner">
                     {%- for child in entry.children if child.is_visible -%}
