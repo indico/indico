@@ -41,7 +41,7 @@ layout_settings = EventSettingsProxy('layout', {
     'announcement': None,
     'show_announcement': False
     # TODO: handle style sheets
-})
+}, preload=True)
 
 
 @signals.event_management.sidemenu_advanced.connect
