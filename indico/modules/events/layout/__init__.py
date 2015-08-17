@@ -44,27 +44,17 @@ layout_settings = EventSettingsProxy('layout', {
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu_layout(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event),
-                                  visible=event.canModify(session.user))
-
-
-@signals.event_management.sidemenu_advanced.connect
-def _extend_event_management_menu_event_menu(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=event.canModify(session.user))
+    can_modify = event.canModify(session.user)
+    yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), visible=can_modify)
+    yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=can_modify)
+    yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), visible=can_modify,
+                                 event_feature='images')
 
 
 @signals.event.sidemenu.connect
 def _get_default_menu_entries(sender, **kwargs):
     for entry in DEFAULT_MENU_ENTRIES:
         yield entry
-
-
-@signals.event_management.sidemenu_advanced.connect
-def _extend_event_management_menu_event_images(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event),
-                                  visible=event.canModify(session.user), event_feature='images')
 
 
 @signals.event_management.clone.connect
