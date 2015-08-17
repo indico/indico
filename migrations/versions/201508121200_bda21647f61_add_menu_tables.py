@@ -57,5 +57,7 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_constraint('fk_menu_entries_page_id_menu_pages', 'menu_entries', schema='events')
+    op.drop_constraint('fk_menu_pages_menu_entry_id_menu_entries', 'menu_pages', schema='events')
     op.drop_table('menu_entries', schema='events')
     op.drop_table('menu_pages', schema='events')
