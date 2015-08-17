@@ -876,8 +876,7 @@ class WConfDisplayBodyBase(wcomponents.WTemplated):
 
     def _getTitle(self):
         entry = get_entry_from_name(self._linkname, self._conf)
-        entries = named_objects_from_signal(signals.event.sidemenu.send())
-        return _(entry.title) if entry.title == entries[entry.name].title else entry.title
+        return entry.localized_title
 
 
 class WConfProgram(WConfDisplayBodyBase):
