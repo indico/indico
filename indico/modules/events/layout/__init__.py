@@ -45,8 +45,9 @@ layout_settings = EventSettingsProxy('layout', {
 def _extend_event_management_menu_layout(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     can_modify = event.canModify(session.user)
-    yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), visible=can_modify)
-    yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=can_modify)
+    if event.getType() == 'conference':
+        yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), visible=can_modify)
+        yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=can_modify)
     yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), visible=can_modify,
                                  event_feature='images')
 
