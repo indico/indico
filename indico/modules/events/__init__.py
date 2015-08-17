@@ -20,6 +20,7 @@ from flask import request, redirect
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
+from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.web.flask.util import url_for
@@ -51,6 +52,7 @@ event_management_object_url_prefixes = {
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
+    Event.get_one(int(event.id)).is_deleted = True
     EventSetting.delete_event(int(event.id))
     EventSettingPrincipal.delete_event(int(event.id))
     if hasattr(event, '_old_id'):

@@ -23,7 +23,7 @@ import transaction
 from indico.core.db import db, DBMgr
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
-from indico.modules.events.models.events import Event
+from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.console import cformat, verbose_iterator
 from indico_zodbimport import Importer
 from MaKaC.webinterface.displayMgr import ConfDisplayMgrRegistery
@@ -74,7 +74,7 @@ class LegacyEventImporter(Importer):
                     ipmr[event.id] = ipm
                 self.zodb_root['conferences'][event.id] = event
                 event.indexConf()
-                Event.find(id=event._old_id).update({Event.id: event.id})
+                IndexedEvent.find(id=event._old_id).update({IndexedEvent.id: event.id})
                 EventSetting.find(event_id=event._old_id).update({EventSetting.event_id: event.id})
                 EventSettingPrincipal.find(event_id=event._old_id).update({EventSettingPrincipal.event_id: event.id})
                 db.session.add(LegacyEventMapping(legacy_event_id=event._old_id, event_id=int(event.id)))
