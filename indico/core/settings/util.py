@@ -22,6 +22,18 @@ from indico.core.settings.proxy import SettingsProxyBase
 _not_in_db = object()
 
 
+def _get_cache_key(proxy, name, kwargs):
+    return type(proxy), proxy.module, name, frozenset(kwargs.viewitems())
+
+
+def _preload_settings(cls, proxy, cache, **kwargs):
+    settings = cls.get_all(proxy.module, **kwargs)
+    for name, value in settings.iteritems():
+        cache_key = _get_cache_key(proxy, name, kwargs)
+        cache[cache_key] = value
+    return settings
+
+
 def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
     """Helper function for SettingsProxy.get_all"""
     if no_defaults:
@@ -40,11 +52,14 @@ def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):
 
 def get_setting(cls, proxy, name, default, cache, **kwargs):
     """Helper function for SettingsProxy.get"""
-    cache_key = proxy.module, name, frozenset(kwargs.viewitems())
+    cache_key = _get_cache_key(proxy, name, kwargs)
     try:
         return cache[cache_key]
     except KeyError:
-        setting = cls.get(proxy.module, name, _not_in_db, **kwargs)
+        if proxy.preload:
+            setting = _preload_settings(cls, proxy, cache, **kwargs).get(name, _not_in_db)
+        else:
+            setting = cls.get(proxy.module, name, _not_in_db, **kwargs)
         if setting is _not_in_db:
             # we never cache a default value - it would have to be included in the cache key and we
             # cannot do that because of mutable values (lists/dicts). of course we could convert
@@ -58,7 +73,7 @@ def get_setting(cls, proxy, name, default, cache, **kwargs):
 
 def get_setting_acl(cls, proxy, name, cache, **kwargs):
     """Helper function for ACLProxy.get"""
-    cache_key = proxy.module, name, frozenset(kwargs.viewitems())
+    cache_key = _get_cache_key(proxy, name, kwargs)
     try:
         return cache[cache_key]
     except KeyError:

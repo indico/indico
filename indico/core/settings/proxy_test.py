@@ -68,6 +68,25 @@ def test_proxy_delete_all():
     assert proxy.get_all() == defaults
 
 
+@pytest.mark.usefixtures('db', 'request_context')  # use req ctx so the cache is active
+@pytest.mark.parametrize('preload', (True, False))
+def test_proxy_preload(count_queries, preload):
+    defaults = {'hello': 'world', 'foo': None, 'bar': None}
+    proxy = SettingsProxy('test', defaults, preload=preload)
+    proxy.set('bar', 'test')
+    with count_queries() as cnt:
+        # this one preloads
+        assert proxy.get('hello') == 'world'
+    assert cnt() == 1
+    with count_queries() as cnt:
+        # this one has no value, so it always queries
+        assert proxy.get('foo') is None
+    assert cnt() == 1
+    with count_queries() as cnt:
+        assert proxy.get('bar') is 'test'
+    assert cnt() == (0 if preload else 1)
+
+
 @pytest.mark.usefixtures('db')
 def test_acls_invalid():
     user = User()
