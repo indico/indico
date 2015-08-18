@@ -186,7 +186,7 @@ class MenuEntry(db.Model):
             from indico.core.plugins import url_for_plugin
             return url_for_plugin(self.endpoint, self.event)
         elif self.is_page:
-            return url_for('event_pages.page_display', self.page)
+            return url_for('event_pages.page_display', self.event, page_id=self.page_id)
         return None
 
     @property
