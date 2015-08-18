@@ -36,10 +36,8 @@ class SurveyImporter(Importer):
 
     def migrate(self):
         self.print_step("Migrating old event evaluations")
-        for event, evaluation in committing_iterator(self._iter_evaluations()):
-            survey = self.migrate_survey(evaluation, event)
-            db.session.add(survey)
-            self.print_success(cformat('%{cyan}{}%{reset}').format(survey), event_id=event.id, always=True)
+        for event, evaluation in committing_iterator(self._iter_evaluations(), 10):
+            db.session.add(self.migrate_survey(evaluation, event))
         self.update_merged_users(SurveySubmission.user, "survey submissions")
 
     def migrate_survey(self, evaluation, event):
@@ -61,6 +59,8 @@ class SurveyImporter(Importer):
             survey.end_dt = localize_as_utc(evaluation.endDate, event.tz)
         if survey.end_dt < survey.start_dt:
             survey.end_dt = survey.end_dt + timedelta(days=7)
+
+        self.print_success(cformat('%{cyan}{}%{reset}').format(survey), event_id=event.id, always=True)
 
         question_map = {}
         for position, old_question in enumerate(evaluation._questions):
