@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
-from indico.core.db import db
+from indico.core.db import db, DBMgr
 from indico.modules.events.features import event_settings as features_event_settings
 from indico.util.signals import named_objects_from_signal
 
@@ -76,12 +76,16 @@ def is_feature_enabled(event, name):
     :param event: The event (or event ID) to check.
     :param name: The name of the feature.
     """
+    from MaKaC.conference import ConferenceHolder
     feature = get_feature_definition(name)
     enabled_features = features_event_settings.get(event, 'enabled')
     if enabled_features is not None:
         return feature.name in enabled_features
     else:
-        return feature.is_default_for_event(event)
+        with DBMgr.getInstance().global_connection():
+            if isinstance(event, (basestring, int, long)):
+                event = ConferenceHolder().getById(event, True)
+            return event and feature.is_default_for_event(event)
 
 
 def require_feature(event, name):
