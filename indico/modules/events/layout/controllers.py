@@ -27,7 +27,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm, AddImagesForm
+from indico.modules.events.layout.forms import (LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm, AddImagesForm,
+                                                CSSSelectionForm)
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
@@ -40,6 +41,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import redirect_or_jsonify, url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
+from MaKaC.webinterface.pages.conferences import WPConfModifPreviewCSS
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -86,6 +88,21 @@ class RHLayoutCSSUpload(RHConferenceModifBase):
         return jsonify({'success': True})
 
 
+class RHLayoutCSSPreview(RHConferenceModifBase):
+    def _process(self):
+        theme = request.args.get('theme', '')
+        return WPConfModifPreviewCSS(self, self._conf, theme).display()
+
+
+class RHLayoutCSSSaveTheme(RHConferenceModifBase):
+    def _process(self):
+        form = CSSSelectionForm(event=self._conf)
+        if form.validate_on_submit():
+            layout_settings.set(self._conf, 'theme', form.theme.data)
+            flash(_('Settings saved'), 'success')
+            return redirect(url_for('event_layout.index', self._conf))
+
+
 class RHLogoDisplay(RHConferenceBaseDisplay):
     def _process(self):
         logo_data = get_event_logo(self._conf)
@@ -93,6 +110,16 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
         metadata = logo_data['metadata']
         return send_file(metadata['file_name'], logo_content, mimetype=metadata['content_type'], no_cache=True,
                          conditional=True)
+
+
+class RHLayoutCSSDisplay(RHConferenceBaseDisplay):
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        css_id = request.view_args['css_id']
+        self.css = StylesheetFile.get_one(css_id)
+
+    def _process(self):
+        return self.css.send()
 
 
 class RHLayoutEdit(RHConferenceModifBase):

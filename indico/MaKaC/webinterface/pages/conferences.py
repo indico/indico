@@ -66,8 +66,9 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
-from indico.modules.events.layout.util import menu_entries_for_event, get_entry_from_name
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout.forms import CSSSelectionForm
+from indico.modules.events.layout.util import menu_entries_for_event, get_entry_from_name, get_css_url
 from indico.util import json
 from indico.util.signals import values_from_signal, named_objects_from_signal
 from indico.web.flask.util import url_for
@@ -213,7 +214,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
-        dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         path = self._getBaseURL()
         try:
             timestamp = os.stat(__file__).st_mtime
@@ -222,10 +222,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         printCSS = """
         <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
             """ % (path, timestamp)
-        confCSS = dmgr.getStyleManager().getCSS()
 
-        if confCSS:
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">""" % (confCSS.getURL())
+        theme = layout_settings.get(self._conf, 'theme')
+        if theme:
+            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=get_css_url(theme, self._conf))
+            printCSS += link
 
         # Include MathJax
 
@@ -720,7 +721,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def _getHeadContent( self ):
         config = Config.getInstance()
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         htdocs = config.getHtdocsDir()
         baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
@@ -736,9 +736,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                                                                                                        timestamp)
 
         # And finally the specific display stylesheet
-        if styleMgr.existsCSSFile(self._view):
-            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
-            styleText += """        <link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
+        theme = layout_settings.get(self._conf, 'theme')
+        if theme:
+            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=get_css_url(theme, self._conf))
+            styleText += link
 
         confMetadata = WConfMetadata(self._conf).getHTML()
 
@@ -5810,27 +5811,20 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         return "%s%s%s"%( self._getHeader(), body, self._getFooter() )
 
     def _getBody( self, params ):
-        params["URL2Back"] = urlHandlers.UHConfModifDisplay.getURL(self._conf)
-        params["cssurl"] = ""
-        params['selectedCSSId'] = ""
-        if self._selectedCSS:
-            params["cssurl"] = self._selectedCSS.getURL()
-            params['selectedCSSId'] = self._selectedCSS.getId()
-        elif self._styleMgr.getCSS():
-            params["cssurl"] = self._styleMgr.getCSS().getURL()
-            params['selectedCSSId'] = self._styleMgr.getCSS().getId()
-        params["saveCSS"]=urlHandlers.UHUseCSS.getURL(self._conf)
         params['confId'] = self._conf.getId()
-        params["previewURL"]= urlHandlers.UHConfModifPreviewCSS.getURL(self._conf)
-        params["templatesList"]=[]
-        if self._styleMgr.getLocalCSS():
-            params["templatesList"].append(self._styleMgr.getLocalCSS())
-        params["templatesList"].extend(self._cssTplsModule.getCssTplsList())
+        params['conf'] = self._conf
+
+        form = CSSSelectionForm(event=self._conf)
+        form.theme.data = request.values.get('theme')
+        params["css_url"] = get_css_url(form.theme.data, self._conf)
+        params["form"] = form
 
         ###############################
         # injecting ConferenceDisplay #
         ###############################
         p = WPConferenceDisplay( self._rh, self._conf )
+        p.event = self._conf.as_event
+        p.logo_url = url_for('event_images.logo_display', self._conf)
         params["bodyConf"] = p._applyConfDisplayDecoration(p._getBody(params))
         ###############################
         ###############################
@@ -5850,8 +5844,10 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
 
         if self._selectedCSS:
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._selectedCSS.getURL()
-        elif self._styleMgr.getCSS():
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._styleMgr.getCSS().getURL()
+        theme = request.values.get('theme')
+        if theme:
+            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=get_css_url(theme, self._conf))
+            printCSS += link
         return printCSS
 
 

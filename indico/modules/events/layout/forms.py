@@ -16,17 +16,26 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, TextAreaField
+from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField, HiddenField
 from wtforms.validators import InputRequired, DataRequired
 
+from indico.modules.events.layout.models.stylesheets import StylesheetFile
+from indico.modules.events.layout.util import get_css_url
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget, DropzoneWidget
+
+THEMES = [('', _('No theme selected')),
+          ('orange.css', _('Orange')),
+          ('brown.css', _('Brown')),
+          ('right_menu.css', _('Right menu')),
+          ('template_indico.css', _('Indico default')),
+          ('template0.css', _('Template 0'))]
 
 
 class LayoutForm(IndicoForm):
@@ -51,15 +60,24 @@ class LayoutForm(IndicoForm):
     show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                      description=_("Show the announcement message"))
     css_file = HiddenField(_("Custom CSS file"),
-                           widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=True),
-                           description=_("If you want to fully customize your conference page you can create your own "
-                                         "stylesheet and upload it. An example stylesheet can be downloaded here."))
+                           widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=True))
+
+    theme = SelectField(_("Selected theme"),
+                        description=_("Currently selected theme of the conference page. Click on the Preview button to "
+                                      "preview and select a different one."))
 
     def __init__(self, *args, **kwargs):
-        super(LayoutForm, self).__init__(*args, **kwargs)
         event = kwargs.pop('event')
+        super(LayoutForm, self).__init__(*args, **kwargs)
+        self.css_file.description = _("If you want to fully customize your conference page you can create your own "
+                                      "stylesheet and upload it. An example stylesheet can be downloaded "
+                                      "<a href='{url}'>here</a>.".format(url=get_css_url('standard.css')))
         self.logo.widget.options['url'] = url_for('event_layout.logo_upload', event)
         self.css_file.widget.options['url'] = url_for('event_layout.css_upload', event)
+        css_file = StylesheetFile.find(StylesheetFile.event_id == event.id).first()
+        self.theme.choices = list(THEMES)
+        if css_file:
+            self.theme.choices = list(THEMES) + [(css_file.filename, css_file.filename)]
 
 
 class MenuEntryForm(IndicoForm):
@@ -81,3 +99,15 @@ class MenuPageForm(MenuUserEntry):
 
 class AddImagesForm(IndicoForm):
     image = JSONField("Image", widget=DropzoneWidget(accepted_file_types='image/*'))
+
+
+class CSSSelectionForm(IndicoForm):
+    theme = SelectField(_("Theme"))
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event')
+        super(CSSSelectionForm, self).__init__(*args, **kwargs)
+        css_file = StylesheetFile.find_first(event_id=event.id)
+        self.theme.choices = list(THEMES)
+        if css_file:
+            self.theme.choices = list(THEMES) + [(css_file.filename, css_file.filename)]
