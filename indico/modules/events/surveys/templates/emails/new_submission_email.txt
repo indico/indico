@@ -1,28 +1,29 @@
 {% extends 'emails/base.txt' %}
+{% set survey = submission.survey %}
 
 {% block subject -%}
-    New survey submission
+    New survey submission in "{{ survey.event.getTitle() }}"
 {%- endblock %}
 
-{% block header %}Event "{{ submission.survey.event.title }}" {% endblock %}
+{% block header -%}{%- endblock %}
 
 {% block body -%}
-    {% filter dedent %}
-        {% if not submission.user %}
-            An anonymous submission has been made in the survey "{{ submission.survey.title }}".
-        {% else %}
-            A new submission has been made in the survey "{{ submission.survey.title }}" by {{ submission.user.full_name }}.
+    {%- filter dedent -%}
+        {%- if not submission.user -%}
+            An anonymous submission has been made in the survey "{{ survey.title }}".
+        {%- else -%}
+            A new submission has been made in the survey "{{ survey.title }}" by {{ submission.user.full_name }}.
         {%- endif %}
 
         You can access all the submissions by clicking the link below:
-        {{ url_for('survey.management', submission.survey.event, _external=true) }}
-    {%- endfilter %}
+        {{ url_for('survey.management', survey.event, _external=true) }}
+    {%- endfilter -%}
 {%- endblock %}
 
 {% block footer_title -%}
-    Link to the event page
+    Surveys
 {%- endblock %}
 
 {% block footer_url -%}
-    {{ url_for('event.conferenceDisplay', submission.survey.event, _external=true) }}
+    {{ url_for('event.conferenceDisplay', survey.event, _external=true) }}
 {%- endblock %}

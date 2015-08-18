@@ -1,16 +1,24 @@
 {% extends 'emails/base.txt' %}
 
 {% block subject -%}
-    Survey has started
+    Survey "{{ survey.title }}" started in "{{ survey.event.getTitle() }}"
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
-    {%- filter dedent %}
+    {%- filter dedent -%}
         The survey "{{ survey.title }}" in the event "{{ survey.event.title }}" is now open.
 
         You may answer the survey by clicking the link below:
-        {{ url_for('.display_survey_form', survey, _external=true) }}
-    {% endfilter -%}
+        {{ url_for('survey.display_survey_form', survey, _external=true) }}
+    {%- endfilter -%}
+{%- endblock %}
+
+{% block footer_title -%}
+    Surveys
+{%- endblock %}
+
+{% block footer_url -%}
+    {{ url_for('event.conferenceDisplay', survey.event, _external=true) }}
 {%- endblock %}
