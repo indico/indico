@@ -58,7 +58,6 @@ from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
-from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
@@ -69,7 +68,6 @@ from MaKaC.common.TemplateExec import render
 from indico.core import signals
 from indico.modules.events.layout.util import menu_entries_for_event, get_entry_from_name
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.models.events import Event
 from indico.util import json
 from indico.util.signals import values_from_signal, named_objects_from_signal
 from indico.web.flask.util import url_for
@@ -240,7 +238,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         ])
 
     def _applyDecoration( self, body ):
-        self.event = Event.get_one(int(self._conf.getId()))
+        self.event = self._conf.as_event
         self.logo_url = url_for('event_images.logo_display', self._conf)
         body = self._applyConfDisplayDecoration( body )
         return WPConferenceBase._applyDecoration( self, body )
@@ -257,7 +255,7 @@ class WConfMetadata(wcomponents.WTemplated):
         v['site_name'] = minfo.getTitle()
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
 
-        self.event = Event.get_one(self._conf.getId())
+        self.event = self._conf.as_event
         if self.event.has_logo:
             v['image'] = url_for('event_images.logo_display', self._conf)
         else:
@@ -272,7 +270,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
     def __init__(self, aw, conf):
         self._aw = aw
         self._conf = conf
-        self.event = Event.get_one(int(self._conf.getId()))
+        self.event = self._conf.as_event
 
     def getHTML(self, body, params):
         self._body = body

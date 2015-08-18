@@ -2005,6 +2005,12 @@ class Conference(CommonObjectBase, Locatable):
 
     @property
     @memoize_request
+    def as_event(self):
+        from indico.modules.events.models.events import Event
+        return Event.get_one(int(self.id))
+
+    @property
+    @memoize_request
     def note(self):
         from indico.modules.events.notes.models.notes import EventNote
         return EventNote.get_for_linked_object(self)

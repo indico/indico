@@ -34,7 +34,6 @@ from indico.modules.events.layout.models.legacy_mapping import LegacyImageMappin
 from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_images_for_event, get_event_logo
 from indico.modules.events.layout.views import WPImages, WPLayoutEdit, WPMenuEdit, WPPage
-from indico.modules.events.models.events import Event
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
@@ -59,7 +58,7 @@ class RHLayoutLogoUpload(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def _process(self):
-        event = Event.get_one(self._conf.getId())
+        event = self._conf.as_event
         f = request.files.get('file')
         content = f.read()
         event.logo = content
@@ -104,7 +103,7 @@ class RHLayoutEdit(RHConferenceModifBase):
 
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
-        event = Event.get_one(self._conf.getId())
+        event = self._conf.as_event
         form = LayoutForm(event=event, obj=defaults)
         if form.validate_on_submit():
             data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}

@@ -23,7 +23,6 @@ from itertools import count
 import MaKaC
 from indico.core import signals
 from indico.core.db import db
-from indico.modules.events.models.events import Event
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
@@ -149,7 +148,7 @@ def get_event_logo(event):
     """Retrieves information on the event's logo, or ``None``
        if there is none.
     """
-    event = Event.get(event.id)
+    event = event.as_event
     if event.logo_metadata:
         return {
             'content': event.logo,
