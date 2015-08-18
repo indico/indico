@@ -91,6 +91,7 @@ class MenuEntry(db.Model):
     #: The ID of the event which contains the menu
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
@@ -133,7 +134,7 @@ class MenuEntry(db.Model):
         db.String,
         nullable=True
     )
-    #: The page data if the entry is a page
+    #: The page ID if the entry is a page
     page_id = db.Column(
         db.Integer,
         db.ForeignKey('events.menu_pages.id'),
@@ -145,6 +146,16 @@ class MenuEntry(db.Model):
         PyIntEnum(MenuEntryType),
         nullable=False
     )
+
+    #: The Event containing the menu entry
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'menu_entries',
+            lazy='dynamic'
+        )
+    )
     #: The page of the menu entry
     page = db.relationship(
         'MenuPage',
@@ -155,7 +166,6 @@ class MenuEntry(db.Model):
             uselist=False
         ),
     )
-
     #: The children menu entries and parent backref
     children = db.relationship(
         'MenuEntry',
