@@ -84,6 +84,7 @@ class RHEditSurvey(RHManageSurveyBase):
         form = SurveyForm(event=self.event, obj=self._get_form_defaults())
         if form.validate_on_submit():
             form.populate_obj(self.survey)
+            db.session.flush()
             flash(_('Survey modified'), 'success')
             logger.info('Survey {} modified by {}'.format(self.survey, session.user))
             return redirect(url_for('.management', self.event))

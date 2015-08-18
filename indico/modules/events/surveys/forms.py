@@ -31,6 +31,9 @@ from indico.util.i18n import _
 
 
 class SurveyForm(IndicoForm):
+    _notification_fields = ('notifications_enabled', 'notify_participants', 'start_notification_emails',
+                            'new_submission_emails')
+
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the survey"))
     introduction = TextAreaField(_("Introduction"), description=_("An introduction to be displayed before the survey"))
     anonymous = BooleanField(_("Anonymous submissions"), widget=SwitchWidget(),
@@ -42,15 +45,17 @@ class SurveyForm(IndicoForm):
     submission_limit = IntegerField(_("Capacity"),
                                     [HiddenUnless('limit_submissions'), DataRequired(), NumberRange(min=1)],
                                     description=_("Maximum number of submissions accepted"))
-    notifications_enabled = BooleanField(_('Notifications'), widget=SwitchWidget(),
-                                         description=_('Whether users are to be notified on specific events within the '
-                                                       'survey'))
-    notify_participants = BooleanField(_('Participants'), [HiddenUnless('notifications_enabled')], widget=SwitchWidget(),
+    notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
+                                         description=_('Send email notifications for specific events related to the '
+                                                       'survey.'))
+    notify_participants = BooleanField(_('Participants'), [HiddenUnless('notifications_enabled', preserve_data=True)],
+                                       widget=SwitchWidget(),
                                        description=_('Notify participants of the event when this survey starts.'))
-    start_notification_emails = EmailListField(_('Start notification recipients'), [HiddenUnless('notifications_enabled')],
+    start_notification_emails = EmailListField(_('Start notification recipients'),
+                                               [HiddenUnless('notifications_enabled', preserve_data=True)],
                                                description=_('Email addresses to notify about the start of the survey'))
     new_submission_emails = EmailListField(_('New submission notification recipients'),
-                                           [HiddenUnless('notifications_enabled')],
+                                           [HiddenUnless('notifications_enabled', preserve_data=True)],
                                            description=_('Email addresses to notify when a new submission is made'))
 
     def __init__(self, *args, **kwargs):
