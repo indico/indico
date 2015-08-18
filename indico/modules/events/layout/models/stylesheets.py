@@ -46,9 +46,9 @@ class StylesheetFile(StoredFileMixin, db.Model):
         index=True
     )
 
-    event = db.relationship(
+    event_new = db.relationship(
         'Event',
-        lazy=True,
+        lazy=False,
         backref=db.backref(
             'layout_stylesheets',
             lazy='dynamic'
@@ -57,14 +57,14 @@ class StylesheetFile(StoredFileMixin, db.Model):
 
     @property
     def locator(self):
-        return dict(self.event.locator, image_id=self.id)
+        return dict(self.event_new.locator, image_id=self.id)
 
     def _build_storage_path(self):
         path_segments = ['event', unicode(self.event_id), 'stylesheets']
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))
-        return (Config.getInstance().getAttachmentStorage(), path)
+        return Config.getInstance().getAttachmentStorage(), path
 
     @return_ascii
     def __repr__(self):

@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.layout.util import get_images_for_event
