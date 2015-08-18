@@ -88,6 +88,15 @@ def test_proxy_preload(count_queries, preload):
     assert cnt() == (0 if preload else 1)
 
 
+@pytest.mark.usefixtures('db', 'request_context')  # use req ctx so the cache is active
+def test_proxy_cache_mutable():
+    proxy = SettingsProxy('test', {'foo': []})
+    foo = proxy.get('foo')
+    assert foo is not proxy.defaults['foo']
+    foo.append('test')
+    assert not proxy.get('foo')
+
+
 @pytest.mark.usefixtures('db')
 def test_acls_invalid():
     user = User()
