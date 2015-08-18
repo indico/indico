@@ -12,7 +12,7 @@
     {% endcall %}
     {% call form_fieldset(_('Stylesheets')) %}
         {% call form_row(form.theme) %}
-            <a class="i-button i-form-field-button" target="_blank"
+            <a class="i-button i-form-field-button icon-eye" target="_blank"
                href="{{ url_for('event_layout.css_preview', event) }}">
                 {%- trans %}Preview{% endtrans -%}
             </a>
