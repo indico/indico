@@ -2,7 +2,7 @@
 
 <div class="image-container">
     <ul class="image-list">
-    {% for image in images: %}
+    {% for image in images %}
         <li>
             <a href="{{ url_for('event_images.image_display', image) }}" class="js-lightbox">
                 <img src="{{ url_for('event_images.image_display', image) }}" alt="{% trans %}Image{% endtrans %}">
@@ -25,7 +25,7 @@
     {% endfor %}
     </ul>
 
-    {% if not images: %}
+    {% if not images %}
         <div class="info-message-box">
             <div class="message-text">
                 {% trans %}There are no images in this event. You can upload some using the form above.{% endtrans %}
