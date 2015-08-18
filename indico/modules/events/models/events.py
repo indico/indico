@@ -52,7 +52,8 @@ class Event(db.Model):
     ))
 
     # relationship backrefs:
-    # - layout_images (Image.event)
+    # - layout_images (ImageFile.event_new)
+    # - layout_stylesheets (StylesheetFile.event_new)
 
     @property
     @memoize_request

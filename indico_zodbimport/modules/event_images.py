@@ -39,7 +39,7 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
         super(EventImageImporter, self).__init__(**kwargs)
 
     def has_data(self):
-        return bool(ImageFile.query.count())
+        return ImageFile.has_rows
 
     def migrate(self):
         self.migrate_event_images()
