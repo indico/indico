@@ -160,6 +160,8 @@ class MenuEntry(db.Model):
     page = db.relationship(
         'MenuPage',
         lazy=True,
+        cascade='all, delete-orphan',
+        single_parent=True,
         backref=db.backref(
             'menu_entry',
             lazy=False,
