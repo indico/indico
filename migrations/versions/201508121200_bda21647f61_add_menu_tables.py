@@ -46,6 +46,7 @@ def upgrade():
                            name='valid_endpoint'),
         sa.CheckConstraint('(type IN (2, 4) AND name IS NOT NULL) OR (type NOT IN (2, 4) and name IS NULL)',
                            name='valid_name'),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['page_id'], ['events.menu_pages.id']),
         sa.ForeignKeyConstraint(['parent_id'], ['events.menu_entries.id']),
         sa.PrimaryKeyConstraint('id'),
