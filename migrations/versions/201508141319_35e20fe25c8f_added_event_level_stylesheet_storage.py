@@ -24,15 +24,11 @@ def upgrade():
                     sa.Column('storage_backend', sa.String(), nullable=False),
                     sa.Column('storage_file_id', sa.String(), nullable=False),
                     sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('event_id', sa.Integer(), nullable=False),
-                    sa.ForeignKeyConstraint(['event_id'], [u'events.events.id'],
-                                            name=op.f('fk_css_files_event_id_events')),
-                    sa.PrimaryKeyConstraint('id', name=op.f('pk_css_files')),
-                    schema='events'
-                    )
-    op.create_index(op.f('ix_css_files_event_id'), 'css_files', ['event_id'], unique=False, schema='events')
+                    sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+                    sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+                    sa.PrimaryKeyConstraint('id'),
+                    schema='events')
 
 
 def downgrade():
-    op.drop_index(op.f('ix_css_files_event_id'), table_name='css_files', schema='events')
     op.drop_table('css_files', schema='events')
