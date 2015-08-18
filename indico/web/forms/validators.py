@@ -49,12 +49,16 @@ class HiddenUnless(object):
     :param field: The name of the other field to check
     :param value: The value to check for.  If unspecified, any truthy
                   value is accepted.
+    :param preserve_data: If True, a disabled field will keep whatever
+                          ``object_data`` it had before (i.e. data set
+                          via `FormDefaults`).
     """
     field_flags = ('initially_hidden',)
 
-    def __init__(self, field, value=None):
+    def __init__(self, field, value=None, preserve_data=False):
         self.field = field
         self.value = value
+        self.preserve_data = preserve_data
 
     def __call__(self, form, field):
         value = form[self.field].data
@@ -63,9 +67,14 @@ class HiddenUnless(object):
             field.errors[:] = []
             if field.raw_data:
                 raise ValidationError("Received data for disabled field")
-            # Clear existing data and use field default empty value
-            field.data = None
-            field.process_formdata([])
+            if not self.preserve_data:
+                # Clear existing data and use field default empty value
+                field.data = None
+                field.process_formdata([])
+            else:
+                # Clear existing data (just in case) and use the existing data for the field
+                field.data = None
+                field.process_data(field.object_data)
             raise StopValidation()
 
 
