@@ -1,0 +1,23 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+
+{{ form_header(form, action=url_for('event_layout.css_save_theme', event)) }}
+{{ form_rows(form) }}
+{% call form_footer(form) %}
+    <input class="i-button highlight" type="submit" value="{% trans %}Use selected template{% endtrans %}">
+    <a href="{{ url_for('event_layout.index', event) }}" class="i-button" data-button-back>
+        {%- trans %}Back to management area{% endtrans -%}
+    </a>
+    {% if download_url %}
+        <a href="{{ download_url }}" class="i-button">{% trans %}Download CSS{% endtrans %}</a>
+    {% endif %}
+{% endcall %}
+<script>
+    $(document).ready(function() {
+        $('#theme').nullableselector({nullvalue: ''})
+        .on('change', function() {
+            location.href = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
+                theme: $(this).val()
+            });
+        });
+    });
+</script>

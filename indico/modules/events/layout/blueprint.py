@@ -21,7 +21,8 @@ from indico.modules.events.layout.controllers import (RHImageDelete, RHImageDisp
                                                       RHImageUpload, RHImages, RHLayoutCSSUpload, RHLayoutEdit,
                                                       RHLayoutLogoUpload, RHLogoDisplay, RHMenuAddEntry,
                                                       RHMenuDeleteEntry, RHMenuEdit, RHMenuEnableEntry, RHMenuEntryEdit,
-                                                      RHMenuEntryPosition, RHPageDisplay)
+                                                      RHMenuEntryPosition, RHPageDisplay, RHLayoutCSSSaveTheme,
+                                                      RHLayoutCSSDisplay, RHLayoutCSSPreview)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
@@ -35,6 +36,9 @@ _bp.add_url_rule('/menu/<int:menu_entry_id>/delete', 'menu_delete_entry', RHMenu
 _bp.add_url_rule('/menu/add', 'menu_add_entry', RHMenuAddEntry, methods=('GET', 'POST'))
 _bp.add_url_rule('/logo/upload', 'logo_upload', RHLayoutLogoUpload, methods=('POST',))
 _bp.add_url_rule('/css/upload', 'css_upload', RHLayoutCSSUpload, methods=('POST',))
+_bp.add_url_rule('/css/save-theme', 'css_save_theme', RHLayoutCSSSaveTheme, methods=('POST',))
+_bp.add_url_rule('/css/preview', 'css_preview', RHLayoutCSSPreview)
+_bp.add_url_rule('/css/<int:css_id>', 'css_display', RHLayoutCSSDisplay)
 _bp.add_url_rule('/images/', 'images', RHImages, methods=('GET', 'POST',))
 _bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
 _bp.add_url_rule('/images/<int:image_id>', 'image_delete', RHImageDelete, methods=('DELETE',))

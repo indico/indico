@@ -22,11 +22,14 @@ from itertools import count
 
 import MaKaC
 from indico.core import signals
+from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
+from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
-from indico.modules.events.layout.models.images import ImageFile
+from indico.web.flask.util import url_for
 from MaKaC.common.cache import GenericCache
 
 _cache = GenericCache('updated-menus')
@@ -160,3 +163,12 @@ def get_images_for_event(event):
     """Return all non-deleted images uploaded to a specific event
     """
     return ImageFile.find_all(event_id=event.id)
+
+
+def get_css_url(template_id, event=None):
+    if template_id:
+        if event:
+            uploaded_css = StylesheetFile.find_first(event_id=event.id, filename=template_id)
+            if uploaded_css:
+                return url_for('event_layout.css_display', event, uploaded_css, _external=True)
+        return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), template_id)
