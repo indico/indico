@@ -52,7 +52,7 @@ event_management_object_url_prefixes = {
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    Event.get_one(int(event.id)).is_deleted = True
+    event.as_event.is_deleted = True
     EventSetting.delete_event(int(event.id))
     EventSettingPrincipal.delete_event(int(event.id))
     if hasattr(event, '_old_id'):
