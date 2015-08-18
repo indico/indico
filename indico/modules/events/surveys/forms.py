@@ -32,7 +32,6 @@ from indico.util.i18n import _
 
 class SurveyForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the survey"))
-    description = TextAreaField(_("Description"), [DataRequired()], description=_("The description of the survey"))
     introduction = TextAreaField(_("Introduction"), description=_("An introduction to be displayed before the survey"))
     anonymous = BooleanField(_("Anonymous submissions"), widget=SwitchWidget(),
                              description=_("User information will not be attached to submissions"))

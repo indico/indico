@@ -58,12 +58,6 @@ class Survey(db.Model):
         db.String,
         nullable=False
     )
-    #: A brief description of the survey
-    description = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
-    )
     # An introduction text for users of the survey
     introduction = db.Column(
         db.Text,

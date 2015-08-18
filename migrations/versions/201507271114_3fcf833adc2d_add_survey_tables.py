@@ -23,7 +23,6 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
-        sa.Column('description', sa.Text(), nullable=False),
         sa.Column('introduction', sa.Text(), nullable=False),
         sa.Column('anonymous', sa.Boolean(), nullable=False),
         sa.Column('require_user', sa.Boolean(), nullable=False),
