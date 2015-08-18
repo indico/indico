@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField, HiddenField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, DataRequired
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -72,11 +72,11 @@ class MenuUserEntry(MenuEntryForm):
 
 
 class MenuLinkForm(MenuUserEntry):
-    endpoint = URLField(_("URL"))
+    endpoint = URLField(_("URL"), [DataRequired()])
 
 
 class MenuPageForm(MenuUserEntry):
-    html = TextAreaField(_("Content"), widget=CKEditorWidget())
+    html = TextAreaField(_("Content"), [DataRequired()], widget=CKEditorWidget())
 
 
 class AddImagesForm(IndicoForm):
