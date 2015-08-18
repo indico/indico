@@ -4,11 +4,11 @@
 {{ form_rows(form) }}
 {% call form_footer(form) %}
     <input class="i-button highlight" type="submit" value="{% trans %}Use selected template{% endtrans %}">
-    <a href="{{ url_for('event_layout.index', event) }}" class="i-button" data-button-back>
+    <a href="{{ url_for('event_layout.index', event) }}" class="i-button icon-arrow-left" data-button-back>
         {%- trans %}Back to management area{% endtrans -%}
     </a>
     {% if download_url %}
-        <a href="{{ download_url }}" class="i-button">{% trans %}Download CSS{% endtrans %}</a>
+        <a href="{{ download_url }}" class="i-button icon-file-download">{% trans %}Download CSS{% endtrans %}</a>
     {% endif %}
 {% endcall %}
 <script>
