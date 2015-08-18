@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from copy import copy
+
 from indico.core.settings.proxy import SettingsProxyBase
 
 
@@ -70,7 +72,8 @@ def get_setting(cls, proxy, name, default, cache, **kwargs):
         if setting is not _not_in_db:
             return setting
     # value is not_in_db, so use the default
-    return proxy.defaults.get(name) if default is SettingsProxyBase.default_sentinel else default
+    # we always copy the proxy's default in case it's something mutable
+    return copy(proxy.defaults.get(name)) if default is SettingsProxyBase.default_sentinel else default
 
 
 def get_setting_acl(cls, proxy, name, cache, **kwargs):
