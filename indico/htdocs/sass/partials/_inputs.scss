@@ -435,7 +435,8 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 width: 400px;
             }
 
-            textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
+            textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+            .i-form-field-button {
                 @extend %form-field;
             }
 
