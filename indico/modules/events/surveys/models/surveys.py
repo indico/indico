@@ -254,8 +254,8 @@ class Survey(db.Model):
         if not self.notifications_enabled or self.start_notification_sent:
             return
         template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
-        send_email(make_email(bcc_list=self.start_notification_recipients, template=template_module), event=self.event,
-                              module='Surveys')
+        email = make_email(bcc_list=self.start_notification_recipients, template=template_module)
+        send_email(email, event=self.event, module='Surveys')
         logger.info('Sending start notification for survey {}'.format(self))
         self.start_notification_sent = True
 
@@ -263,6 +263,6 @@ class Survey(db.Model):
         if not self.notifications_enabled:
             return
         template_module = get_template_module('events/surveys/emails/new_submission_email.txt', submission=submission)
-        send_email(make_email(bcc_list=self.new_submission_emails, template=template_module), event=self.event,
-                              module='Surveys')
+        email = make_email(bcc_list=self.new_submission_emails, template=template_module)
+        send_email(email, event=self.event, module='Surveys')
         logger.info('Sending submission notification for survey {}'.format(self))
