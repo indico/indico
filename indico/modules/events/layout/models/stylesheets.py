@@ -57,7 +57,7 @@ class StylesheetFile(StoredFileMixin, db.Model):
 
     @property
     def locator(self):
-        return dict(self.event_new.locator, image_id=self.id)
+        return dict(self.event_new.locator, css_id=self.id)
 
     def _build_storage_path(self):
         path_segments = ['event', unicode(self.event_id), 'stylesheets']
