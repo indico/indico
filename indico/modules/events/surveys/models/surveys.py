@@ -186,7 +186,7 @@ class Survey(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<Survey({}, {})>'.format(self.id, self.event_id)
+        return '<Survey({}, {}): {}>'.format(self.id, self.event_id, self.title)
 
     def open(self):
         if self.state != SurveyState.ready_to_open:
