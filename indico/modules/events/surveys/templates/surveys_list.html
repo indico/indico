@@ -8,8 +8,8 @@
     <table class="i-table-widget">
         <thead>
             <tr>
-                <th>{% trans %}Survey title{% endtrans %}</th>
-                <th>{% trans %}Opening day{% endtrans %}</th>
+                <th>{% trans %}Survey{% endtrans %}</th>
+                <th>{% trans %}Available from{% endtrans %}</th>
                 <th>{% trans %}Deadline{% endtrans %}</th>
                 <th></th>
             </tr>
@@ -24,7 +24,9 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="4">{% trans %}No surveys defined{% endtrans %}</td>
+                    <td colspan="4">
+                        {% trans %}No surveys available for this event{% endtrans %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -41,7 +43,7 @@
 {% macro render_available_buttons(survey) %}
     {% if not was_survey_submitted(survey) and survey.can_submit(session.user) %}
         <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight">
-            {% trans %}Fill in{% endtrans %}
+            {% trans %}Fill out{% endtrans %}
         </a>
     {% endif %}
 {% endmacro %}
