@@ -145,11 +145,15 @@ class RHMenuEdit(RHMenuBase):
 
 
 class RHMenuEntryEditBase(RHMenuBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.entry
+        }
+    }
+
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.entry = MenuEntry.find_first(id=request.view_args['menu_entry_id'], event_id=self._conf.getId())
-        if not self.entry:
-            raise NotFound
+        RHMenuBase._checkParams(self, params)
+        self.entry = MenuEntry.get_one(request.view_args['menu_entry_id'])
 
 
 class RHMenuEntryEdit(RHMenuEntryEditBase):
@@ -192,7 +196,6 @@ class RHMenuEnableEntry(RHMenuEntryEditBase):
 class RHMenuAddEntry(RHMenuBase):
     def _process(self):
         defaults = FormDefaults(get_default_values(MenuEntry))
-        form_cls = None
         entry_type = request.args['type']
 
         if entry_type == MenuEntryType.separator.name:
