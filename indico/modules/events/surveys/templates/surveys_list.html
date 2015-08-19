@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <table class="i-table-widget">
+    <table id="survey-table" class="i-table-widget">
         <thead>
             <tr>
                 <th>{% trans %}Survey{% endtrans %}</th>
@@ -26,7 +26,9 @@
                     </td>
                     <td>{{ survey.start_dt | format_datetime if survey.start_dt else _('Not started') }}</td>
                     <td>{{ survey.end_dt | format_datetime if survey.end_dt else _('No deadline') }}</td>
-                    <td>{{ render_available_buttons(survey) }}</td>
+                    <td class="survey-actions">
+                        {{ render_available_buttons(survey) }}
+                    </td>
                 </tr>
             {% else %}
                 <tr>
