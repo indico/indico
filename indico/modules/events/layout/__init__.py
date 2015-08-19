@@ -40,6 +40,7 @@ layout_settings = EventSettingsProxy('layout', {
     'header_background_color': '',
     'announcement': None,
     'show_announcement': False,
+    'use_custom_css': False,
     'theme': None
 }, preload=True)
 

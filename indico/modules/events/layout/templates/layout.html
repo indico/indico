@@ -11,6 +11,7 @@
         {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
     {% endcall %}
     {% call form_fieldset(_('Stylesheets')) %}
+        {{ form_row(form.use_custom_css) }}
         {% call form_row(form.theme) %}
             <a class="i-button i-form-field-button icon-eye" target="_blank"
                href="{{ url_for('event_layout.css_preview', event) }}">
