@@ -54,7 +54,7 @@ class MenuEntryData(object):
         self.parent = parent
 
     def visible(self, event):
-        return self._visible(event) if self._visible else self.is_enabled
+        return self._visible(event) if self._visible else True
 
 
 def menu_entries_for_event(event, show_hidden=False):
