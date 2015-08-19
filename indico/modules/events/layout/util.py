@@ -102,7 +102,6 @@ def _build_entry(event, data, position, children=None):
         is_enabled=data.is_enabled,
         title=data.title,
         name=data.name,
-        endpoint=data.endpoint,
         position=position,
         children=[_build_entry(event, entry_data, i)
                   for i, entry_data in enumerate(sorted(children or [], key=_entry_key))]
