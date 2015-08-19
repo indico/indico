@@ -225,6 +225,13 @@ angular = rjs_bundle(
     'js/indico/angular/filters.js',
     'js/indico/angular/services.js')
 
+chartist_js = rjs_bundle('chartist_js',
+                         'js/lib/chartist.js/chartist.js')
+
+chartist_css = Bundle('css/lib/chartist.js/chartist.scss',
+                      'css/lib/chartist.js/settings/_chartist-settings.scss',
+                      filters=('pyscss', 'cssmin'), output='css/chartist_css_%(version)s.min.css')
+
 zero_clipboard_js = rjs_bundle('zero_clipboard_js',
                                'js/lib/zeroclipboard/ZeroClipboard.js',
                                'js/custom/zeroclipboard.js')
@@ -450,6 +457,7 @@ def register_all_js(env):
     env.register('zero_clipboard_js', zero_clipboard_js)
     env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
+    env.register('chartist_js', chartist_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
@@ -479,6 +487,7 @@ def register_all_css(env, main_css_file):
     env.register('jqplot_css', jqplot_css)
     env.register('dropzone_css', dropzone_css)
     env.register('selectize_css', selectize_css)
+    env.register('chartist_css', chartist_css)
 
     # SASS/SCSS
     env.register('agreements_sass', agreements_sass)
