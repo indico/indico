@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import mimetypes
 
+import click
 import pytz
 from babel.dates import get_timezone
 
@@ -35,8 +36,16 @@ from indico_zodbimport.util import LocalFileImporterMixin
 
 class EventImageImporter(LocalFileImporterMixin, Importer):
     def __init__(self, **kwargs):
+        self.silence_old_events = kwargs.pop('silence_old_events')
         kwargs = super(EventImageImporter, self)._set_config_options(**kwargs)
         super(EventImageImporter, self).__init__(**kwargs)
+
+    @staticmethod
+    def decorate_command(command):
+        command = click.option('--silence-old-events', is_flag=True,
+                               help="Don't mention any schema abnormalities in old events")(command)
+        command = super(EventImageImporter, EventImageImporter).decorate_command(command)
+        return command
 
     def has_data(self):
         return ImageFile.has_rows
@@ -50,6 +59,11 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
             local_file = picture._localFile
             content_type = mimetypes.guess_type(local_file.fileName)[0]
             storage_backend, storage_path, size = self._get_local_file_info(local_file)
+
+            if storage_path is None:
+                self.print_warning(cformat('%{yellow}[{}]%{reset} -> %{red!}Not found in filesystem').format(
+                    local_file.id), event_id=event.id)
+                continue
 
             image = ImageFile(event_id=event.id,
                               filename=local_file.fileName,
@@ -67,7 +81,7 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
             db.session.add(map_entry)
 
             self.print_success(cformat('%{cyan}[{}]%{reset} -> %{blue!}{}').format(
-                local_file.id, local_file.fileName, image), event_id=event.id)
+                local_file.id, image), event_id=event.id)
 
     def _dt_with_tz(self, dt):
         if dt.tzinfo is not None:
@@ -82,9 +96,11 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
 
             if imgr:
                 if not Event.find_first(id=event_id):
-                    self.print_warning('Event does not exist (anymore)!', event_id=event_id)
+                    if not self.silence_old_events:
+                        self.print_warning('Event does not exist (anymore)!', event_id=event_id)
                 else:
                     for _, picture in imgr._picList.iteritems():
                         yield dmgr._conf, picture
             else:
-                self.print_warning('No _imagesMngr attribute!', event_id=event_id)
+                if not self.silence_old_events:
+                    self.print_warning('No _imagesMngr attribute!', event_id=event_id)
