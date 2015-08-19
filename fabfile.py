@@ -231,6 +231,19 @@ def install_angular():
             local('cp css/angular.css {0}'.format(dest_dir_css))
 
 
+@recipe('chartist.js')
+def install_chartist_js():
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'chartist.js')):
+            dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'chartist.js/')
+            dest_dir_css = os.path.join(lib_dir(env.src_dir, 'css'), 'chartist.js/')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('mkdir -p {0}'.format(dest_dir_css))
+            local('cp dist/chartist.js {0}/'.format(dest_dir_js))
+            local('cp dist/scss/chartist.scss {0}/'.format(dest_dir_css))
+            local('cp -r dist/scss/settings {0}/'.format(dest_dir_css))
+
+
 @recipe('ui-sortable')
 def install_ui_sortable():
     with node_env():
