@@ -39,12 +39,18 @@
             </div>
             <div class="i-box-buttons">
                 <button id="export-submissions" data-href="{{ url_for('.export_submissions', survey) }}"
-                        class="i-button icon-file-excel" {{ 'disabled' if not survey.submissions }}>
+                        class="i-button icon-file-excel js-submission-action" {{ 'disabled' if not survey.submissions }}>
                     {% trans %}Export{% endtrans %}
                 </button>
                 <a href="{{ url_for('.survey_results', survey) }}" class="i-button">
                     {% trans %}Show results{% endtrans %}
                 </a>
+                <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
+                        data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
+                        data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
+                        data-method="DELETE" class="i-button icon-remove" disabled>
+                    {% trans %}Delete{% endtrans %}
+                </button>
             </div>
         </div>
         <div class="i-box-content">
@@ -53,6 +59,14 @@
                     <li class="submission-row">
                         <input class="inline-vcentered submission-ids" type="checkbox" value="{{ submission.id }}">
                         <strong>{{ _render_submission_row(submission) }}</strong>
+                        <span class="group right">
+                            <a href="#" class="big icon-remove right js-delete-submission"
+                               data-href="{{ url_for('.delete_submissions', survey) }}"
+                               data-method="DELETE"
+                               data-title="{% trans %}Remove submission?{% endtrans %}"
+                               data-confirm="{% trans %}Are you sure you want to remove this submission?{% endtrans %}"
+                               data-submission-id="{{ submission.id }}"></a>
+                        </span>
                     </li>
                 {% endfor -%}
                 <li class="empty-message">{% trans %}There are no submissions.{% endtrans %}</li>
