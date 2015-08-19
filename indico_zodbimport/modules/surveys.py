@@ -45,7 +45,9 @@ class SurveyImporter(Importer):
         survey.title = convert_to_unicode(evaluation.title) if evaluation.title else "Evaluation"
         survey.introduction = convert_to_unicode(evaluation.announcement)
         if evaluation.contactInfo:
-            survey.introduction += "\n\nContact: {}".format(convert_to_unicode(evaluation.contactInfo))
+            contact = convert_to_unicode(evaluation.contactInfo)
+            contact_text = "Contact: ".format(contact)
+            survey.introduction += "\n\n{}".format(contact_text) if survey.introduction else contact_text
         survey.submission_limit = evaluation.submissionsLimit if evaluation.submissionsLimit else None
         survey.anonymous = evaluation.anonymous
         # Guest users can only submit if survey is not anonymous
@@ -88,6 +90,9 @@ class SurveyImporter(Importer):
         question.position = position
         question.title = convert_to_unicode(old_question.questionValue)
         question.description = convert_to_unicode(old_question.description)
+        if old_question.help:
+            help_text = convert_to_unicode(old_question.help)
+            question.description += "\n\nHelp: {}".format(help_text) if question.description else help_text
         question.is_required = old_question.required
         question.field_data = {}
         class_name = old_question.__class__.__name__
