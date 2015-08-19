@@ -38,7 +38,7 @@ _bp.add_url_rule('/logo/upload', 'logo_upload', RHLayoutLogoUpload, methods=('PO
 _bp.add_url_rule('/css/upload', 'css_upload', RHLayoutCSSUpload, methods=('POST',))
 _bp.add_url_rule('/css/save-theme', 'css_save_theme', RHLayoutCSSSaveTheme, methods=('POST',))
 _bp.add_url_rule('/css/preview', 'css_preview', RHLayoutCSSPreview)
-_bp.add_url_rule('/css/<int:css_id>', 'css_display', RHLayoutCSSDisplay)
+_bp.add_url_rule('/css/<int:css_id>.css', 'css_display', RHLayoutCSSDisplay)
 _bp.add_url_rule('/images/', 'images', RHImages, methods=('GET', 'POST',))
 _bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
 _bp.add_url_rule('/images/<int:image_id>', 'image_delete', RHImageDelete, methods=('DELETE',))

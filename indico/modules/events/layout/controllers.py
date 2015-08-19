@@ -114,6 +114,12 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
 
 
 class RHLayoutCSSDisplay(RHConferenceBaseDisplay):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.css
+        }
+    }
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         css_id = request.view_args['css_id']
