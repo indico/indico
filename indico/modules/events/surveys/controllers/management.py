@@ -316,3 +316,8 @@ class RHDeleteSubmissions(RHManageSurveyBase):
         return jsonify(success=True)
 
 
+class RHDisplaySubmission(RHSurveySubmissionBase):
+    """Display a single submission-page"""
+
+    def _process(self):
+        return WPManageSurvey.render_template('submission.html', self.event, submission=self.submission)

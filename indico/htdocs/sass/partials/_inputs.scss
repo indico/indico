@@ -122,6 +122,7 @@ span[contenteditable] {
         display: none;
 
         &:checked + label,
+        &:checked:disabled + label,
         &:checked:not(:disabled) + label:hover {
             @include gradient(#387EE5, #5D95EA);
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
