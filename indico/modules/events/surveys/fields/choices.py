@@ -86,6 +86,11 @@ class SingleChoiceField(SurveyField):
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
 
+    def render_answer(self, answer):
+        question_options = {option_dict['id']: option_dict['option']
+                            for option_dict in self.question.field_data['options']}
+        return question_options.get(answer) or ''
+
 
 class MultiSelectConfigForm(FieldConfigForm):
     options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
@@ -162,3 +167,8 @@ class MultiSelectField(SurveyField):
 
     def is_answer_empty(self, answer):
         return not answer.data
+
+    def render_answer(self, answer):
+        question_options = {option_dict['id']: option_dict['option']
+                            for option_dict in self.question.field_data['options']}
+        return [question_options[value] for value in answer if value in question_options]

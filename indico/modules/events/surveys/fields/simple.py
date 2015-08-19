@@ -118,6 +118,11 @@ class BoolField(SurveyField):
                 'absolute': OrderedDict(((_('Yes'), counter[True]), (_('No'), counter[False]))),
                 'relative': OrderedDict(((_('Yes'), counter[True] / total), (_('No'), counter[False] / total)))}
 
+    def render_answer(self, answer):
+        if answer is None:
+            return ''
+        return _('Yes') if answer else _('No')
+
 
 class StaticTextConfigForm(FieldConfigForm):
     text = TextAreaField(_('Content'), description=_('Static text that will be shown to users. You can use Markdown to '
