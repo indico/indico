@@ -72,12 +72,15 @@ def _css_file_data(css_file):
     }
 
 
-class RHLayoutLogoUpload(RHConferenceModifBase):
+class RHLayoutBase(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf.as_event
+
+
+class RHLayoutLogoUpload(RHLayoutBase):
 
     def _process(self):
         f = request.files.get('file')
@@ -94,12 +97,7 @@ class RHLayoutLogoUpload(RHConferenceModifBase):
         return jsonify_data(content=_logo_data(self.event))
 
 
-class RHLayoutLogoDelete(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event = self._conf.as_event
+class RHLayoutLogoDelete(RHLayoutBase):
 
     def _process(self):
         self.event.logo = None
@@ -109,29 +107,28 @@ class RHLayoutLogoDelete(RHConferenceModifBase):
         return jsonify_data(content=None)
 
 
-class RHLayoutCSSUpload(RHConferenceModifBase):
-    CSRF_ENABLED = True
+class RHLayoutCSSUpload(RHLayoutBase):
 
     def _process(self):
         f = request.files.get('file')
         filename = secure_filename(f.filename, 'stylesheet')
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-        StylesheetFile.find(event_id=self._conf.id).delete()
 
-        css_file = StylesheetFile(event_id=self._conf.id, filename=filename, content_type=content_type)
+        StylesheetFile.find(event_id=self.event.id).delete()
+        css_file = StylesheetFile(event_id=self.event.id, filename=filename, content_type=content_type)
         css_file.save(f.file)
         db.session.add(css_file)
         db.session.flush()
+
         flash(_('New CSS file saved'), 'success')
         logger.info('CSS file {} uploaded by {}'.format(css_file, session.user))
         return jsonify_data(content=_css_file_data(css_file))
 
 
-class RHLayoutCSSDelete(RHConferenceModifBase):
-    CSRF_ENABLED = True
+class RHLayoutCSSDelete(RHLayoutBase):
 
     def _process(self):
-        css_file = StylesheetFile.find_one(event_id=self._conf.id)
+        css_file = StylesheetFile.find_one(event_id=self.event.id)
         db.session.delete(css_file)
         flash(_('CSS file deleted'), 'success')
         logger.info("CSS file {} deleted by {}".format(css_file, session.user))
@@ -147,15 +144,15 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
                          conditional=True)
 
 
-class RHLayoutEdit(RHConferenceModifBase):
+class RHLayoutEdit(RHLayoutBase):
+
     def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
+        RHLayoutBase._checkProtection(self)
         if self._conf.getType() != 'conference':
             raise NotFound('Only conferences have layout settings')
 
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
-        event = self._conf.as_event
         form = LayoutForm(obj=defaults)
         css_form = CSSForm()
         logo_form = LogoForm()
@@ -166,8 +163,8 @@ class RHLayoutEdit(RHConferenceModifBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
         else:
-            if event.logo_metadata:
-                logo_form.logo.data = _logo_data(event)
+            if self.event.logo_metadata:
+                logo_form.logo.data = _logo_data(self.event)
             css_file = StylesheetFile.find(StylesheetFile.event_id == self._conf.id).first()
             if css_file:
                 css_form.css_file.data = _css_file_data(css_file)
