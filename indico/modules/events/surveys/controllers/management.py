@@ -25,11 +25,11 @@ from indico.modules.events.surveys.fields import get_field_types
 from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.models.questions import SurveyQuestion
-from indico.modules.events.surveys.util import make_survey_form
+from indico.modules.events.surveys.util import make_survey_form, generate_csv_from_survey
 from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -264,3 +264,20 @@ def _render_questionnaire(survey):
     tpl = get_template_module('events/surveys/_questionnaire.html')
     form = make_survey_form(survey.questions)()
     return tpl.render_questionnaire(survey, form)
+
+
+class RHExportSubmissions(RHManageSurveyBase):
+    """Export submissions from the survey to a CSV file"""
+
+    CSRF_ENABLED = False
+
+    def _process(self):
+        if not self.survey.submissions:
+            flash(_('There are no submissions in this survey'))
+            return redirect(url_for('.manage_survey', self.survey))
+
+        submission_ids = set(map(int, request.form.getlist('submission_ids')))
+        csv_file = generate_csv_from_survey(self.survey, submission_ids)
+        return send_file('submissions-{}.csv'.format(self.survey.id), csv_file, 'text/csv')
+
+
