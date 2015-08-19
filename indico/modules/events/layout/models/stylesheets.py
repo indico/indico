@@ -42,6 +42,7 @@ class StylesheetFile(StoredFileMixin, db.Model):
     event_id = db.Column(
         db.Integer,
         db.ForeignKey('events.events.id'),
+        unique=True,
         nullable=False,
         index=True
     )
