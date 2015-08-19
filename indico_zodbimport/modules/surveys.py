@@ -60,6 +60,15 @@ class SurveyImporter(Importer):
         if survey.end_dt < survey.start_dt:
             survey.end_dt = survey.end_dt + timedelta(days=7)
 
+        for kind, notification in evaluation.notifications.iteritems():
+            recipients = set(notification._toList)
+            recipients |= set(notification._ccList)
+            if kind == 'evaluationStartNotify':
+                survey.notifications_enabled = True
+                survey.start_notification_emails = list(recipients)
+            elif kind == 'newSubmissionNotify':
+                survey.new_submission_emails = list(recipients)
+
         self.print_success(cformat('%{cyan}{}%{reset}').format(survey), event_id=event.id, always=True)
 
         question_map = {}
