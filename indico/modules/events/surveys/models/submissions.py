@@ -75,6 +75,10 @@ class SurveySubmission(db.Model):
     )
 
     @property
+    def locator(self):
+        return dict(self.survey.locator, submission_id=self.id)
+
+    @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(str(self.event_id), True)
