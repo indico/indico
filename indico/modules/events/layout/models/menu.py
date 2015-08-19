@@ -53,10 +53,9 @@ class MenuEntry(db.Model):
             .format(type=MenuEntryType),
             'valid_name'),
         db.CheckConstraint(
-            '(type IN ({type.separator.value}, {type.page.value}) AND endpoint IS NULL) OR '
-            '(type NOT IN ({type.separator.value}, {type.page.value}) AND endpoint IS NOT NULL)'
+            '(type = {type.user_link.value}) = (link_url IS NOT NULL)'
             .format(type=MenuEntryType),
-            'valid_endpoint'),
+            'valid_link_url'),
         db.CheckConstraint(
             '(type = {type.page.value} AND page_id IS NOT NULL) OR'
             ' (type != {type.page.value} AND page_id IS NULL)'.format(type=MenuEntryType),
@@ -122,8 +121,8 @@ class MenuEntry(db.Model):
         nullable=False,
         default=False
     )
-    #: The endpoint of the entry (endpoint for internal and plugin links, url for user links and pages)
-    endpoint = db.Column(
+    #: The target URL of a custom link
+    link_url = db.Column(
         db.String,
         nullable=True,
         default=None
@@ -180,12 +179,12 @@ class MenuEntry(db.Model):
     @property
     def url(self):
         if self.is_user_link:
-            return self.endpoint
+            return self.link_url
         elif self.is_internal_link:
-            return url_for(self.endpoint, self.event)
+            return url_for(self.default_data.endpoint, self.event)
         elif self.is_plugin_link:
             from indico.core.plugins import url_for_plugin
-            return url_for_plugin(self.endpoint, self.event)
+            return url_for_plugin(self.default_data.endpoint, self.event)
         elif self.is_page:
             return url_for('event_pages.page_display', self.event, page_id=self.page_id)
         return None
@@ -268,7 +267,7 @@ class MenuEntry(db.Model):
         return '<MenuEntry({}, {}, {}{})>'.format(
             self.id,
             self.title,
-            self.endpoint,
+            self.name,
             ', is_root=True' if self.is_root else '',
         )
 
