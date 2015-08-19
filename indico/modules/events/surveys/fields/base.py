@@ -93,6 +93,10 @@ class SurveyField(object):
                                     for name, field in form._fields.iteritems()
                                     if name not in form._common_fields and name != 'csrf_token'}
 
+    def render_answer(self, answer):
+        """Returns the human-friendly version of the answer"""
+        return answer if answer is not None else ''
+
     def _make_wtforms_field(self, field_cls, validators=None, **kwargs):
         """Util to instantiate a WTForms field.
 

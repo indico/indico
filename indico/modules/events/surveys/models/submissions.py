@@ -139,3 +139,7 @@ class SurveyAnswer(db.Model):
     @return_ascii
     def __repr__(self):
         return '<SurveyAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)
+
+    @property
+    def answer_data(self):
+        return self.question.field.render_answer(self.data)
