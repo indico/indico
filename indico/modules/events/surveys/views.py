@@ -35,6 +35,18 @@ class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['surveys_sass'].urls()
 
 
+class WPSurveyResults(WPManageSurvey):
+    template_prefix = 'events/surveys/'
+
+    def getCSSFiles(self):
+        return (WPManageSurvey.getCSSFiles(self) +
+                self._asset_env['chartist_css'].urls())
+
+    def getJSFiles(self):
+        return (WPManageSurvey.getJSFiles(self) +
+                self._asset_env['chartist_js'].urls())
+
+
 class DisplaySurveyMixin(WPJinjaMixin):
     template_prefix = 'events/surveys/'
     base_class = None

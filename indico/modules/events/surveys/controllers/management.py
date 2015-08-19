@@ -26,7 +26,7 @@ from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.models.questions import SurveyQuestion
 from indico.modules.events.surveys.util import make_survey_form
-from indico.modules.events.surveys.views import WPManageSurvey
+from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -72,6 +72,13 @@ class RHManageSurvey(RHManageSurveyBase):
 
     def _process(self):
         return WPManageSurvey.render_template('manage_survey.html', self.event, survey=self.survey, states=SurveyState)
+
+
+class RHSurveyResults(RHManageSurveyBase):
+    """Displays summarized results of the survey"""
+
+    def _process(self):
+        return WPSurveyResults.render_template('survey_results.html', self.event, survey=self.survey)
 
 
 class RHEditSurvey(RHManageSurveyBase):
