@@ -55,4 +55,4 @@
 	url = https://github.com/brianreavis/selectize.js.git
 [submodule "ext_modules/chartist.js"]
 	path = ext_modules/chartist.js
-	url = git@github.com:gionkunz/chartist-js.git
+	url = git://github.com/gionkunz/chartist-js.git
