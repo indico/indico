@@ -77,10 +77,9 @@ class RHLayoutCSSUpload(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def _process(self):
-        f = request.files.get('file')
-        filename = secure_filename(f.filename, 'stylesheet')
-        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-        css_file = StylesheetFile(event_id=self._conf.id, filename=filename, content_type=content_type)
+        f = request.files['file']
+        filename = secure_filename(f.filename, 'stylesheet.css')
+        css_file = StylesheetFile(event_id=self._conf.id, filename=filename, content_type='text/css')
         css_file.save(f.file)
         db.session.add(css_file)
         db.session.flush()
