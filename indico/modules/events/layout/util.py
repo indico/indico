@@ -137,6 +137,7 @@ def move_entry(entry, to):
     entry.position = new_pos
 
 
+@memoize_request
 def get_entry_from_name(name, event):
     return MenuEntry.find_first(
         MenuEntry.name == name,
