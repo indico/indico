@@ -107,6 +107,58 @@
             form.appendTo('body').submit();
             form.remove();
         });
+
+        function _disableButtons() {
+            $('#export-submissions, #delete-submissions').prop('disabled', !$('li.submission-row').length);
+            $('#delete-submissions').prop('disabled', !$('.submission-ids:checked').length);
+        }
+
+        $('.js-delete-submission').on('indico:confirmed', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: {
+                    submission_ids: $this.data('submission-id')
+                },
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    $this.closest('.submission-row').remove();
+                    _disableButtons();
+                }
+            });
+
+        });
+
+        $('#delete-submissions').on('indico:confirmed', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var submissionIds = $('.submission-ids:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: {
+                    submission_ids: submissionIds
+                },
+                traditional: true,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    $('.submission-ids:checked').closest('.submission-row').remove();
+                    _disableButtons();
+                }
+            });
+        });
+
+        $('.submission-ids').change(function() {
+            $('#delete-submissions').prop('disabled', !$('.submission-ids:checked').length);
+        });
     }
 
     function updateQuestions(data) {

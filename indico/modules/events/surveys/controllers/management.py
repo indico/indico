@@ -20,9 +20,11 @@ from flask import redirect, request, flash, jsonify, session
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
+from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.fields import get_field_types
 from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm
+from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.models.questions import SurveyQuestion
 from indico.modules.events.surveys.util import make_survey_form, generate_csv_from_survey
@@ -279,5 +281,32 @@ class RHExportSubmissions(RHManageSurveyBase):
         submission_ids = set(map(int, request.form.getlist('submission_ids')))
         csv_file = generate_csv_from_survey(self.survey, submission_ids)
         return send_file('submissions-{}.csv'.format(self.survey.id), csv_file, 'text/csv')
+
+
+class RHSurveySubmissionBase(RHManageSurveysBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.submission
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageSurveysBase._checkParams(self, params)
+        self.submission = SurveySubmission.get_one(request.view_args['submission_id'])
+
+
+class RHDeleteSubmissions(RHManageSurveyBase):
+    """Remove submissions from the survey"""
+
+    def _process(self):
+        submission_ids = set(map(int, request.form.getlist('submission_ids')))
+        for submission in self.survey.submissions[:]:
+            if submission.id in submission_ids:
+                self.survey.submissions.remove(submission)
+                logger.info('Submission {} deleted from survey {}'.format(submission, self.survey))
+                self.event.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
+                               'Submission removed from survey "{}"'.format(self.survey.title),
+                               data={'Submitter': submission.user.full_name if submission.user else 'Anonymous'})
+        return jsonify(success=True)
 
 
