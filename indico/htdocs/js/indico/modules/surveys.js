@@ -91,6 +91,24 @@
         $('.js-add-question-dropdown').dropdown();
     }
 
+    global.setupSubmissionButtons = function setupSubmissionButtons() {
+        $('#export-submissions').on('click', function(evt) {
+            var $this = $(this);
+
+            var form = $('<form>', {
+                method: 'POST',
+                action: $this.data('href'),
+            });
+
+            $('.submission-ids:checked').each(function() {
+                $('<input>', {type: 'hidden', name: 'submission_ids', value: this.value}).appendTo(form);
+            });
+
+            form.appendTo('body').submit();
+            form.remove();
+        });
+    }
+
     function updateQuestions(data) {
         $('#questionnaire').tablesorter('destroy').html(data.questionnaire);
         setupQuestionSorter();

@@ -16,10 +16,16 @@
 
 from __future__ import unicode_literals
 
+import csv
+import re
+from io import BytesIO
+
 from flask import session
 
 from indico.modules.events.surveys.models.submissions import SurveySubmission
+from indico.modules.events.surveys.fields.simple import StaticTextField
 from indico.util.caching import memoize_request
+from indico.util.date_time import format_datetime
 from indico.web.forms.base import IndicoForm
 
 
@@ -59,3 +65,45 @@ def was_survey_submitted(survey):
     if submission_id is None:
         return False
     return bool(SurveySubmission.find(id=submission_id).count())
+
+
+def generate_csv_from_survey(survey, submission_ids):
+    """Generates a CSV file from a given survey.
+
+    :param survey: `Survey` for which the user wants to export submissions
+    :param submission_ids: The list of submissions to include in the file
+    """
+    field_names = {'submitter', 'submission_date'}
+    field_names |= {'{}_{}'.format(question.title, question.id) for question in survey.questions
+                    if not isinstance(question.field, StaticTextField)}
+
+    buf = BytesIO()
+    submissions = _filter_submissions(survey, submission_ids)
+    writer = csv.DictWriter(buf, fieldnames=field_names)
+    writer.writeheader()
+    for submission in submissions:
+        submission_dict = {
+            'submitter': submission.user.full_name.encode('utf-8') if submission.user else None,
+            'submission_date': format_datetime(submission.submitted_dt),
+        }
+
+        for answer in submission.answers:
+            key = '{}_{}'.format(answer.question.title, answer.question.id)
+            submission_dict[key] = _prepare_data(answer.answer_data)
+        writer.writerow(submission_dict)
+    buf.seek(0)
+    return buf
+
+
+def _filter_submissions(survey, submission_ids):
+    if submission_ids:
+        return SurveySubmission.find_all(SurveySubmission.id.in_(submission_ids), survey=survey)
+    return survey.submissions
+
+
+def _prepare_data(data):
+    if isinstance(data, list):
+        data = ','.join(data)
+    elif data is None:
+        data = ''
+    return re.sub(r'(\r?\n)+', '    ', unicode(data)).encode('utf-8')

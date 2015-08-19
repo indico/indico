@@ -38,19 +38,42 @@
                 {% trans %}Submissions{% endtrans %}
             </div>
             <div class="i-box-buttons">
+                <button id="export-submissions" data-href="{{ url_for('.export_submissions', survey) }}"
+                        class="i-button icon-file-excel" {{ 'disabled' if not survey.submissions }}>
+                    {% trans %}Export{% endtrans %}
+                </button>
                 <a href="{{ url_for('.survey_results', survey) }}" class="i-button">
                     {% trans %}Show results{% endtrans %}
                 </a>
             </div>
         </div>
         <div class="i-box-content">
-            {% for submission in survey.submissions %}
-                <div>
-                    {{ submission }}
-                </div>
-            {% else %}
-                {% trans %}There are no submissions.{% endtrans %}
-            {% endfor %}
+            <ul class="group-list with-buttons no-content-before">
+                {%- for submission in survey.submissions %}
+                    <li class="submission-row">
+                        <input class="inline-vcentered submission-ids" type="checkbox" value="{{ submission.id }}">
+                        <strong>{{ _render_submission_row(submission) }}</strong>
+                    </li>
+                {% endfor -%}
+                <li class="empty-message">{% trans %}There are no submissions.{% endtrans %}</li>
+            </ul>
         </div>
     </div>
+    <script>
+        setupSubmissionButtons();
+    </script>
 {% endblock %}
+
+{% macro _render_submission_row(submission) %}
+    <a href="{{ url_for('.display_submission', submission) }}">
+        {% if not submission.user -%}
+            {% trans date=submission.submitted_dt | format_datetime %}
+                Anonymous submission made on {{ date }}
+            {% endtrans %}
+        {% else %}
+            {% trans date=submission.submitted_dt | format_datetime, submitter=submission.user.full_name %}
+                Submission made by user {{ submitter }} on {{ date }}
+            {% endtrans %}
+        {%- endif %}
+    </a>
+{% endmacro %}
