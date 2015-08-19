@@ -48,8 +48,6 @@ class LayoutForm(IndicoForm):
     show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
 
     # Style
-    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/*', max_files=1, submit_form=True),
-                     description=_("Logo to be displayed next to the event's title"))
     header_text_color = StringField(_("Text colour"), widget=ColorPickerWidget())
     header_background_color = StringField(_("Background colour"), widget=ColorPickerWidget())
 
@@ -59,8 +57,7 @@ class LayoutForm(IndicoForm):
                                description=_("Short message shown below the title"))
     show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                      description=_("Show the announcement message"))
-    css_file = HiddenField(_("Custom CSS file"),
-                           widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=True))
+    # Themes
     use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
                                   description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
                                                 "this option to reveal the available Indico themes."))
@@ -68,15 +65,24 @@ class LayoutForm(IndicoForm):
                         description=_("Currently selected theme of the conference page. Click on the Preview button to "
                                       "preview and select a different one."))
 
+
+class LogoForm(IndicoForm):
+    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/*', max_files=1, submit_form=False,
+                                                   add_remove_links=False, handle_flashes=True),
+                     description=_("Logo to be displayed next to the event's title"))
+
+
+class CSSForm(IndicoForm):
+    css_file = HiddenField(_("Custom CSS file"),
+                           widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=False,
+                                                 add_remove_links=False, handle_flashes=True))
+
     def __init__(self, *args, **kwargs):
-        event = kwargs.pop('event')
-        super(LayoutForm, self).__init__(*args, **kwargs)
+        super(CSSForm, self).__init__(*args, **kwargs)
         self.css_file.description = _("If you want to fully customize your conference page you can create your own "
                                       "stylesheet and upload it. An example stylesheet can be downloaded "
                                       "<a href='{base_url}/standard.css' target='_blank'>here</a>."
                                       .format(base_url=Config.getInstance().getCssConfTemplateBaseURL()))
-        self.logo.widget.options['url'] = url_for('event_layout.logo_upload', event)
-        self.css_file.widget.options['url'] = url_for('event_layout.css_upload', event)
 
 
 class MenuEntryForm(IndicoForm):

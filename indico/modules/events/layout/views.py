@@ -23,6 +23,9 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConfer
 class WPLayoutEdit(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
 
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+
     def _setActiveSideMenuItem(self):
         self.extra_menu_items_advanced['layout'].setActive()
 

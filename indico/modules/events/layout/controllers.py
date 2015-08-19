@@ -27,8 +27,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import (LayoutForm, MenuEntryForm, MenuLinkForm, MenuPageForm, AddImagesForm,
-                                                CSSSelectionForm)
+from indico.modules.events.layout.forms import (LayoutForm, LogoForm, CSSForm, MenuEntryForm, MenuLinkForm,
+                                                MenuPageForm, AddImagesForm, CSSSelectionForm)
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
@@ -57,21 +57,58 @@ def _render_menu_entries(event, connect_menu=False):
     return tpl.menu_entries(menu_entries_for_event(event), connect_menu=connect_menu)
 
 
+def _logo_data(event):
+    return {
+        'url': url_for('event_images.logo_display', event),
+        'file_name': event.logo_metadata['file_name'],
+        'size': event.logo_metadata['size'],
+        'content_type': event.logo_metadata['content_type']
+    }
+
+
+def _css_file_data(css_file):
+    return {
+        'file_name': css_file.filename,
+        'size': css_file.size,
+        'content_type': css_file.content_type
+    }
+
+
 class RHLayoutLogoUpload(RHConferenceModifBase):
     CSRF_ENABLED = True
 
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.event = self._conf.as_event
+
     def _process(self):
-        event = self._conf.as_event
-        f = request.files.get('file')
+        f = request.files['file']
         content = f.read()
-        event.logo = content
+        self.event.logo = content
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-        event.logo_metadata = {
+        self.event.logo_metadata = {
             'size': len(content),
             'file_name': f.filename,
             'content_type': content_type
         }
-        return jsonify({'success': True})
+        flash(_('New logo saved'), 'success')
+        logger.info("New logo '{}' uploaded by {} ({})".format(f.filename, session.user, self.event))
+        return jsonify_data(content=_logo_data(self.event))
+
+
+class RHLayoutLogoDelete(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.event = self._conf.as_event
+
+    def _process(self):
+        self.event.logo = None
+        self.event.logo_metadata = None
+        flash(_('Logo deleted'), 'success')
+        logger.info("Logo of {} deleted by {}".format(self.event, session.user))
+        return jsonify_data(content=None)
 
 
 class RHLayoutCSSUpload(RHConferenceModifBase):
@@ -80,12 +117,25 @@ class RHLayoutCSSUpload(RHConferenceModifBase):
     def _process(self):
         f = request.files['file']
         filename = secure_filename(f.filename, 'stylesheet.css')
+        StylesheetFile.find(event_id=self._conf.id).delete()
         css_file = StylesheetFile(event_id=self._conf.id, filename=filename, content_type='text/css')
         css_file.save(f.file)
         db.session.add(css_file)
         db.session.flush()
+        flash(_('New CSS file saved'), 'success')
         logger.info('CSS file {} uploaded by {}'.format(css_file, session.user))
-        return jsonify({'success': True})
+        return jsonify_data(content=_css_file_data(css_file))
+
+
+class RHLayoutCSSDelete(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        css_file = StylesheetFile.find_one(event_id=self._conf.id)
+        db.session.delete(css_file)
+        flash(_('CSS file deleted'), 'success')
+        logger.info("CSS file {} deleted by {}".format(css_file, session.user))
+        return jsonify_data(content=None)
 
 
 class RHLayoutCSSPreview(RHConferenceModifBase):
@@ -141,7 +191,10 @@ class RHLayoutEdit(RHConferenceModifBase):
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
         event = self._conf.as_event
-        form = LayoutForm(event=event, obj=defaults)
+        form = LayoutForm(obj=defaults)
+        css_form = CSSForm()
+        logo_form = LogoForm()
+
         if form.validate_on_submit():
             data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
             layout_settings.set_multi(self._conf, data)
@@ -150,21 +203,13 @@ class RHLayoutEdit(RHConferenceModifBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
         else:
-            if event.logo:
-                form.logo.data = {
-                    'url': url_for('event_images.logo_display', self._conf),
-                    'file_name': event.logo_metadata['file_name'],
-                    'size': event.logo_metadata['size'],
-                    'content_type': event.logo_metadata['content_type']
-                }
-            css_file = StylesheetFile.find(StylesheetFile.event_id == self._conf.id).first()
+            if event.logo_metadata:
+                logo_form.logo.data = _logo_data(event)
+            css_file = StylesheetFile.find_first(event_id=int(self._conf.id))
             if css_file:
-                form.css_file.data = {
-                    'file_name': css_file.filename,
-                    'size': css_file.size,
-                    'content_type': css_file.content_type
-                }
-        return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf)
+                css_form.css_file.data = _css_file_data(css_file)
+        return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf,
+                                            logo_form=logo_form, css_form=css_form)
 
 
 class RHMenuBase(RHConferenceModifBase):

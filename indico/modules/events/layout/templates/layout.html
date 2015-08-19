@@ -7,46 +7,95 @@
 
 {%- block content %}
     {{ form_header(form, action=url_for('event_layout.index', event)) }}
-    {% call form_fieldset(_('General')) %}
-        {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
-    {% endcall %}
-    {% call form_fieldset(_('Stylesheets')) %}
-        {{ form_row(form.use_custom_css) }}
-        {% call form_row(form.theme) %}
-            <a class="i-button i-form-field-button js-theme-preview-btn icon-eye" target="_blank"
-               href="{{ url_for('event_layout.css_preview', event) }}">
-                {%- trans %}Preview{% endtrans -%}
-            </a>
+        {% call form_fieldset(_('General')) %}
+            {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
         {% endcall %}
-        {% call form_row(form.css_file) %}
-            {% if form.css_file.data %}
+        {% call form_fieldset(_('Header Style')) %}
+            {{ form_rows(form, fields=('header_text_color', 'header_background_color')) }}
+        {% endcall %}
+        {% call form_fieldset(_('Announcement')) %}
+            {{ form_rows(form, fields=('announcement', 'show_announcement')) }}
+        {% endcall %}
+        {% call form_fieldset(_('Theme')) %}
+            {{ form_row(form.use_custom_css) }}
+            {% call form_row(form.theme) %}
+                <a class="i-button i-form-field-button js-theme-preview-btn icon-eye" target="_blank"
+                   href="{{ url_for('event_layout.css_preview', event) }}">
+                    {%- trans %}Preview{% endtrans -%}
+                </a>
+            {% endcall %}
+        {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
+    {% endcall %}
+
+    <h2>{% trans %}Stylesheet{% endtrans %}</h2>
+    {{ form_header(css_form, classes='css-form', action=url_for('event_layout.upload_css', event)) }}
+        <div class="flashed-messages"></div>
+        {% call form_row(css_form.css_file, skip_label=true) %}
+            {% if css_form.css_file.data %}
                 <a class="i-button i-form-field-button i-form-field-width icon-eye" target="_blank"
                    href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}">
                     {%- trans %}Preview{% endtrans -%}
                 </a>
             {% endif %}
         {% endcall %}
+    {% call form_footer(css_form) %}
+        <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
+            {% trans %}Upload CSS file{% endtrans %}
+        </button>
+        <button class="i-button js-remove-button danger icon-remove{% if not css_form.css_file.data %} weak-hidden{% endif %}"
+                data-href="{{ url_for('event_layout.delete_css', event) }}" data-method="DELETE">
+            {% trans %}Delete{% endtrans %}
+        </button>
     {% endcall %}
-    {% call form_fieldset(_('Header Style')) %}
-    {{ form_rows(form, fields=('logo', 'header_text_color', 'header_background_color')) }}
+
+    <h2>{% trans %}Event Logo{% endtrans %}</h2>
+    {{ form_header(logo_form, classes='logo-form', action=url_for('event_layout.upload_logo', event)) }}
+        <div class="flashed-messages"></div>
+        {{ form_rows(logo_form, skip_labels=true) }}
+    {% call form_footer(css_form) %}
+        <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
+            {% trans %}Upload logo{% endtrans %}
+        </button>
+        <button class="i-button js-remove-button danger icon-remove{% if not logo_form.logo.data %} weak-hidden{% endif %}"
+                data-href="{{ url_for('event_layout.delete_logo', event) }}" data-method="DELETE">
+            {% trans %}Delete{% endtrans %}
+        </button>
     {% endcall %}
-    {% call form_fieldset(_('Announcement')) %}
-        {{ form_rows(form, fields=('announcement', 'show_announcement')) }}
-    {% endcall %}
-    {% call form_footer(form) %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
-    {% endcall %}
+
     <script>
         $(document).ready(function() {
-            $('#theme')
-            .nullableselector({nullvalue: ''})
-            .on('change', function() {
-                var preview_url = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
+            $('#theme').nullableselector({nullvalue: ''}).on('change', function() {
+                var previewURL = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
                     theme: $(this).val()
                 });
-                $(this).nextAll('.js-theme-preview-btn').attr('href', preview_url);
-            })
-            .trigger('change');
+                $(this).nextAll('.js-theme-preview-btn').attr('href', previewURL);
+            }).trigger('change');
+
+            $('.css-form, .logo-form').on('indico:fieldsSaved', function(e, response) {
+                var hidden = !response.content;
+                $(this).find('.js-remove-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+            }).on('click', '.js-remove-button', function(e) {
+                var $this = $(this);
+                var $form = $this.closest('form');
+                var dropzone = $form.get(0).dropzone;
+
+                $this.prop('disabled', true);
+                e.preventDefault();
+
+                $.ajax({
+                    url: $this.data('href'),
+                    method: $this.data('method'),
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        handleFlashes(data, true, $form.find('.flashed-messages'));
+                        dropzone.removeAllFiles();
+                        $form.trigger('indico:fieldsSaved', data);
+                    }
+                });
+            });
         });
     </script>
 {%- endblock %}

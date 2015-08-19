@@ -337,3 +337,9 @@ form#upload-images.full-width .dropzone {
         margin-bottom: 1em;
     }
 }
+
+.logo-form, .css-form {
+    .form-label {
+        display: none !important;
+    }
+}
