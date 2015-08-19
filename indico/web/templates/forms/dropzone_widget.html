@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div id="dz-{{ field.id }}"class="dropzone" data-options="{{ options|tojson|forceescape }}" data-value="{{ field.data|tojson|forceescape }}">
+    <div id="dz-{{ field.id }}" class="dropzone" data-options="{{ options|tojson|forceescape }}" data-value="{{ field.data|tojson|forceescape }}">
         <div class="dropzone-inner">
             <div class="dropzone-previews"></div>
             <div class="select-files-btn">
@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-    <input class="change-trigger" type="hidden" value="0" name="__file_change_trigger">
+    <input class="change-trigger" type="hidden" value="{{ 1 if field.data else 0}}" name="__file_change_trigger">
     <script>
     $(document).ready(function() {
         setupDropzone('#dz-{{ field.id }}');
