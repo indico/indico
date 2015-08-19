@@ -17,7 +17,13 @@
         <tbody>
             {% for survey in surveys %}
                 <tr>
-                    <td>{{ survey.title }}</td>
+                    <td>
+                        {% if event.canModify(session.user) %}
+                            <a href="{{ url_for('.manage_survey', survey) }}">{{ survey.title }}</a>
+                        {% else %}
+                            {{ survey.title }}
+                        {% endif %}
+                    </td>
                     <td>{{ survey.start_dt | format_datetime if survey.start_dt else _('Not started') }}</td>
                     <td>{{ survey.end_dt | format_datetime if survey.end_dt else _('No deadline') }}</td>
                     <td>{{ render_available_buttons(survey) }}</td>
