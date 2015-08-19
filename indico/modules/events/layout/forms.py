@@ -27,7 +27,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import JSONField
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.validators import UsedIf, HiddenUnless
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget, DropzoneWidget
 
 THEMES = [('', _('No theme selected')),
@@ -61,8 +61,10 @@ class LayoutForm(IndicoForm):
                                      description=_("Show the announcement message"))
     css_file = HiddenField(_("Custom CSS file"),
                            widget=DropzoneWidget(accepted_file_types='.css', max_files=1, submit_form=True))
-
-    theme = SelectField(_("Selected theme"),
+    use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
+                                  description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
+                                                "this option to reveal the available Indico themes."))
+    theme = SelectField(_("Selected theme"), [HiddenUnless('use_custom_css', False)],
                         description=_("Currently selected theme of the conference page. Click on the Preview button to "
                                       "preview and select a different one."))
 
@@ -77,7 +79,8 @@ class LayoutForm(IndicoForm):
         css_file = StylesheetFile.find(StylesheetFile.event_id == event.id).first()
         self.theme.choices = list(THEMES)
         if css_file:
-            self.theme.choices = list(THEMES) + [(css_file.filename, css_file.filename)]
+            self.theme.choices = (THEMES +
+                                  [('_custom', _("Custom CSS file ({file_name})".format(file_name=css_file.filename)))])
 
 
 class MenuEntryForm(IndicoForm):
@@ -110,4 +113,5 @@ class CSSSelectionForm(IndicoForm):
         css_file = StylesheetFile.find_first(event_id=event.id)
         self.theme.choices = list(THEMES)
         if css_file:
-            self.theme.choices = list(THEMES) + [(css_file.filename, css_file.filename)]
+            self.theme.choices = (THEMES +
+                                  [('_custom', _("Custom CSS file ({file_name})".format(file_name=css_file.filename)))])

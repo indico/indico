@@ -5846,7 +5846,8 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
             printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._selectedCSS.getURL()
         theme = request.values.get('theme')
         if theme:
-            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=get_css_url(theme, self._conf))
+            url = get_css_url(theme, self._conf, priority_to_theme=True)
+            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=url)
             printCSS += link
         return printCSS
 

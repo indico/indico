@@ -98,7 +98,9 @@ class RHLayoutCSSSaveTheme(RHConferenceModifBase):
     def _process(self):
         form = CSSSelectionForm(event=self._conf)
         if form.validate_on_submit():
-            layout_settings.set(self._conf, 'theme', form.theme.data)
+            layout_settings.set(self._conf, 'use_custom_css', form.theme.data == '_custom')
+            if form.theme.data != '_custom':
+                layout_settings.set(self._conf, 'theme', form.theme.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
 
@@ -135,6 +137,8 @@ class RHLayoutEdit(RHConferenceModifBase):
         if form.validate_on_submit():
             data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
             layout_settings.set_multi(self._conf, data)
+            if form.theme.data == '_custom':
+                layout_settings.set(self._conf, 'use_custom_css', True)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('event_layout.index', self._conf))
         else:
@@ -148,7 +152,6 @@ class RHLayoutEdit(RHConferenceModifBase):
             css_file = StylesheetFile.find(StylesheetFile.event_id == self._conf.id).first()
             if css_file:
                 form.css_file.data = {
-                    # 'url': url_for('event_images.logo-display', self._conf),
                     'file_name': css_file.filename,
                     'size': css_file.size,
                     'content_type': css_file.content_type
