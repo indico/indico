@@ -64,8 +64,16 @@
         forms.find('[data-disabled-until-change]').prop('disabled', true);
         forms.each(function() {
             var $this = $(this);
-            $this.data('initialData', $this.serialize());
-            $this.data('fieldsChanged', false);
+            function _resetData() {
+                $this.data('initialData', $this.serialize());
+                $this.data('fieldsChanged', false);
+            }
+            _resetData();
+
+            $this.on('indico:fieldsSaved', function() {
+                _resetData();
+                $this.find('[data-disabled-until-change]').prop('disabled', true);
+            });
         }).on('change input', function() {
             var $this = $(this);
             var untouched = $this.serialize() == $this.data('initialData');
