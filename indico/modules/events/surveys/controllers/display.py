@@ -57,7 +57,7 @@ class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
-        return self.view_class.render_template('surveys_list.html', self.event, surveys=surveys, event=self.event,
+        return self.view_class.render_template('survey_list.html', self.event, surveys=surveys, event=self.event,
                                                states=SurveyState, was_survey_submitted=was_survey_submitted)
 
 
