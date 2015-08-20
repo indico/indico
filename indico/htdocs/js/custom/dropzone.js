@@ -8,6 +8,7 @@
     global.setupDropzone = function(element) {
         var $dz = $(element),
             $form = $dz.closest('form'),
+            $flashArea = $form.find('.flashed-messages'),
             options = {
                 clickable: element + ' .dropzone-inner',
                 previewsContainer: element + ' .dropzone-previews',
@@ -50,8 +51,7 @@
                         if (self.getQueuedFiles().length) {
                             $dz.find('.dz-progress').show();
                             self.processQueue();
-                        }
-                        else {
+                        } else {
                             $form.submit();
                         }
                     });
@@ -64,7 +64,7 @@
                         // force change in form, so that we can process
                         // the 'change' event
                         $button.prop('disabled', false);
-                        $form.find('.change-trigger').val(Math.random());
+                        $form.find('.change-trigger').val('2');
                         $form.trigger('change');
 
                         $dz.find('.dz-message').hide();
@@ -76,9 +76,10 @@
 
                     self.on('removedfile', function(file) {
 
+                        $button.prop('disabled', false);
                         // force change in form, so that we can process
                         // the 'change' event
-                        $form.find('.change-trigger').val(Math.random());
+                        $form.find('.change-trigger').val('0');
                         $form.trigger('change');
 
                         if (self.files.length === 0) {
@@ -91,9 +92,16 @@
                     });
 
                     self.on('success', function(e, response) {
-                        if (options.submit_form) {
+                        if (options.submitForm) {
                             $form.submit();
                         }
+                        if (options.handleFlashes) {
+                            handleFlashes(response, true, $flashArea);
+                        }
+
+                        $dz.data('value', response.content);
+                        $form.find('.change-trigger').val($dz.data('value') ? '1' : '0');
+                        $form.trigger('indico:fieldsSaved', response);
                         $form.trigger('ajaxDialog:success', [response]);
                     });
 

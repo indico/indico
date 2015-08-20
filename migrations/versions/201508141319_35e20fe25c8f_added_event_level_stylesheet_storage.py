@@ -24,7 +24,7 @@ def upgrade():
                     sa.Column('storage_backend', sa.String(), nullable=False),
                     sa.Column('storage_file_id', sa.String(), nullable=False),
                     sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+                    sa.Column('event_id', sa.Integer(), nullable=False, unique=True, index=True),
                     sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
                     sa.PrimaryKeyConstraint('id'),
                     schema='events')

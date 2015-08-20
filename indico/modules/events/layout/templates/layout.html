@@ -10,11 +10,8 @@
     {% call form_fieldset(_('General')) %}
         {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
     {% endcall %}
-    {% call form_fieldset(_('Stylesheets')) %}
-        {{ form_row(form.css_file) }}
-    {% endcall %}
     {% call form_fieldset(_('Header Style')) %}
-    {{ form_rows(form, fields=('logo', 'header_text_color', 'header_background_color')) }}
+        {{ form_rows(form, fields=('header_text_color', 'header_background_color')) }}
     {% endcall %}
     {% call form_fieldset(_('Announcement')) %}
         {{ form_rows(form, fields=('announcement', 'show_announcement')) }}
@@ -22,4 +19,58 @@
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
     {% endcall %}
+    <h2>{% trans %}Stylesheets{% endtrans %}</h2>
+    {{ form_header(css_form, classes='css-form', action=url_for('event_layout.upload_css', event)) }}
+        <div class="flashed-messages"></div>
+        {{ form_rows(css_form, skip_labels=true) }}
+    {% call form_footer(form) %}
+        <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
+            {% trans %}Upload CSS file{% endtrans %}
+        </button>
+        <button class="i-button js-remove-button danger icon-remove{% if not css_form.css_file.data %} weak-hidden{% endif %}"
+                data-href="{{ url_for('event_layout.delete_css', event) }}" data-method="DELETE">
+            {% trans %}Delete{% endtrans %}
+        </button>
+    {% endcall %}
+    <h2>{% trans %}Event Logo{% endtrans %}</h2>
+    {{ form_header(logo_form, classes='logo-form',  action=url_for('event_layout.upload_logo', event)) }}
+        <div class="flashed-messages"></div>
+        {{ form_rows(logo_form, skip_labels=true) }}
+    {% call form_footer(form) %}
+        <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
+            {% trans %}Upload logo{% endtrans %}
+        </button>
+        <button class="i-button js-remove-button danger icon-remove{% if not logo_form.logo.data %} weak-hidden{% endif %}"
+                data-href="{{ url_for('event_layout.delete_logo', event) }}" data-method="DELETE">
+            {% trans %}Delete{% endtrans %}
+        </button>
+    {% endcall %}
+    <script>
+        $(document).ready(function() {
+            $('.css-form, .logo-form').on('indico:fieldsSaved', function(e, response) {
+                var $form = $(this),
+                    hidden = !response.content;
+                $form.find('.js-remove-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+            }).on('click', '.js-remove-button', function(e) {
+                var $this = $(this),
+                    $form = $this.closest('form'),
+                    dropzone = $form.get(0).dropzone;
+
+                $this.prop('disabled', true);
+                e.preventDefault();
+
+                $.ajax({
+                    url: $this.data('href'),
+                    method: $this.data('method'),
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        handleFlashes(data, true, $form.find('.flashed-messages'));
+                        dropzone.removeAllFiles();
+                        $form.trigger('indico:fieldsSaved', data);
+                    }
+                });
+            });
+        });
+    </script>
 {%- endblock %}

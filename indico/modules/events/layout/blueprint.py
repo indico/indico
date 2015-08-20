@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.modules.events.layout.controllers import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
-                                                      RHImageUpload, RHImages, RHLayoutCSSUpload, RHLayoutEdit,
-                                                      RHLayoutLogoUpload, RHLogoDisplay, RHMenuAddEntry,
-                                                      RHMenuDeleteEntry, RHMenuEdit, RHMenuEnableEntry, RHMenuEntryEdit,
-                                                      RHMenuEntryPosition, RHPageDisplay)
+                                                      RHImageUpload, RHImages, RHLayoutCSSUpload, RHLayoutCSSDelete,
+                                                      RHLayoutEdit, RHLayoutLogoUpload, RHLayoutLogoDelete,
+                                                      RHLogoDisplay, RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
+                                                      RHMenuEnableEntry, RHMenuEntryEdit, RHMenuEntryPosition,
+                                                      RHPageDisplay)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
@@ -33,8 +34,10 @@ _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu_entry_position', RH
 _bp.add_url_rule('/menu/<int:menu_entry_id>/enable', 'menu_enable_entry', RHMenuEnableEntry, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/delete', 'menu_delete_entry', RHMenuDeleteEntry, methods=('DELETE',))
 _bp.add_url_rule('/menu/add', 'menu_add_entry', RHMenuAddEntry, methods=('GET', 'POST'))
-_bp.add_url_rule('/logo/upload', 'logo_upload', RHLayoutLogoUpload, methods=('POST',))
-_bp.add_url_rule('/css/upload', 'css_upload', RHLayoutCSSUpload, methods=('POST',))
+_bp.add_url_rule('/logo', 'upload_logo', RHLayoutLogoUpload, methods=('POST',))
+_bp.add_url_rule('/logo', 'delete_logo', RHLayoutLogoDelete, methods=('DELETE',))
+_bp.add_url_rule('/css', 'upload_css', RHLayoutCSSUpload, methods=('POST',))
+_bp.add_url_rule('/css', 'delete_css', RHLayoutCSSDelete, methods=('DELETE',))
 _bp.add_url_rule('/images/', 'images', RHImages, methods=('GET', 'POST',))
 _bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
 _bp.add_url_rule('/images/<int:image_id>', 'image_delete', RHImageDelete, methods=('DELETE',))
