@@ -69,7 +69,7 @@ def menu_entries_for_event(event, show_hidden=False):
     cache_key = unicode(event.id)
     plugin_hash = binascii.crc32(','.join(sorted(plugin_engine.get_active_plugins()))) & 0xffffffff
     cache_version = '{}:{}'.format(MaKaC.__version__, plugin_hash)
-    processed = _cache.get(cache_key) == cache_version
+    processed = entries and _cache.get(cache_key) == cache_version
 
     if not processed:
         # menu entries from signal
