@@ -220,7 +220,7 @@ class Survey(db.Model):
 
     @hybrid_property
     def is_visible(self):
-        return (self.is_deleted and
+        return (not self.is_deleted and
                 self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean, SurveyState.finished})
 
     @is_visible.expression
