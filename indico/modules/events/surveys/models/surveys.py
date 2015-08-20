@@ -245,7 +245,7 @@ class Survey(db.Model):
         self.end_dt = now_utc()
 
     def send_start_notification(self):
-        if not self.notifications_enabled or self.start_notification_sent:
+        if not self.notifications_enabled or self.start_notification_sent or not self.event.has_feature('surveys'):
             return
         template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
         email = make_email(bcc_list=self.start_notification_recipients, template=template_module)
