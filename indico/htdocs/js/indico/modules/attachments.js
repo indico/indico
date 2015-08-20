@@ -32,7 +32,7 @@
         }
 
         $(window).on('hashchange', function(e, initial) {
-            if (location.hash.indexOf('#preview:') != 0) {
+            if (location.hash.indexOf('#preview:') !== 0) {
                 $('.attachment-preview-dialog').trigger('ajaxDialog:close', [true]);
             } else {
                 if (initial && HISTORY_API_SUPPORTED) {
