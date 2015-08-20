@@ -2043,6 +2043,7 @@ class Conference(CommonObjectBase, Locatable):
         alphabetically or a list of ``key, value`` pairs which will
         be displayed in the given order.
         """
+        # XXX: If you have a new Event object, use its `log` method instead!
         db.session.add(EventLogEntry(event_id=int(self.id), user=user, realm=realm, kind=kind, module=module,
                                      type=type_, summary=summary, data=data or {}))
 
