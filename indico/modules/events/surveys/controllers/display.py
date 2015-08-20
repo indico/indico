@@ -110,16 +110,12 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
     def _save_answers(self, form):
         survey = self.survey
         submission = SurveySubmission(survey=survey)
-        if survey.anonymous:
-            submission.is_anonymous = True
-        else:
+        if not survey.anonymous:
             submission.user = session.user
-
         for question in survey.questions:
             if isinstance(question.field, StaticTextField):
                 continue
             answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
             submission.answers.append(answer)
-
         db.session.flush()
         return submission
