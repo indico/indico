@@ -35,6 +35,12 @@ $dropzone-border-width: 2;
     .dz-preview.dz-file-preview .dz-image,
     .dz-preview .dz-image {
         @include border-radius(5px);
+
+        > img {
+            object-fit: cover;
+            width: 120px;
+            height: 120px;
+        }
     }
 
     .dz-message {
