@@ -48,10 +48,10 @@ class UserPreferencesForm(IndicoForm):
     timezone = SelectField(_('Timezone'))
     force_timezone = BooleanField(_('Use my timezone'),
                                   widget=SwitchWidget(),
-                                  description='Always use my current timezone instead of an event\'s timezone.')
+                                  description=_('Always use my current timezone instead of an event\'s timezone.'))
     show_past_events = BooleanField(_('Show past events'),
                                     widget=SwitchWidget(),
-                                    description='Show past events by default.')
+                                    description=_('Show past events by default.'))
 
     def __init__(self, *args, **kwargs):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)
