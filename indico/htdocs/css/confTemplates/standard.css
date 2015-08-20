@@ -1,4 +1,4 @@
-/*  
+/*
     Use this stylesheet to modify the layout of your
     conference.
 */
@@ -13,7 +13,7 @@
 .conf {
     width: 100%;
     border: none;
-    margin: 0;
+    margin: auto;
 }
 
 /*
@@ -24,7 +24,7 @@
     min-height: 90px;
     border-top: 3px solid #234173;
     border-bottom: 1px solid #0f4c80;
-    background: #1a64a0 url("../../images/conf/sprites_blue.png") repeat-x scroll 0 -24px;
+    background: #1a64a0;
 }
 
 /*
@@ -37,7 +37,7 @@
 }
 
 /*
-    The box containing the logo. By the default the logo is placed 
+    The box containing the logo. By the default the logo is placed
     on the left of the conference title.
 */
 .confLogoBox {
@@ -50,16 +50,17 @@
 */
 .conferencetitlelink {
     font-size:22pt;
+    display: block;
     padding: 25px 0;
     color: white;
 }
 
 /*
-    Wrapper around the bottom part of the conference header 
+    Wrapper around the bottom part of the conference header
 */
 .confSubTitleBox {
     min-height: 45px;
-    background: #f5faff url("../../images/conf/sprites_blue.png") repeat-x 0 -213px;
+    background: #f5faff;
     border-bottom: 1px solid #d5e4f1;
     border-top: 1px solid #d5e4f1;
 }
@@ -98,6 +99,9 @@
 .confSearchBox {
     float: right;
     background: transparent url("../../images/conf/sprites_blue.png") no-repeat 0 0;
+    width: 250px;
+    height: 24px;
+    margin-top: 10px;
 }
 .confSearchBox .searchButton {
     color: white;
@@ -125,6 +129,7 @@
     font-size: 10pt;
     text-align: center;
     color: #0f283d;
+    padding: 8px 0;
 }
 
 
@@ -135,6 +140,7 @@
     By default centered with a fix width.
 */
 #confSectionsBox {
+    padding-top: 30px;
     width: 950px;
     margin: 0 auto;
 }
@@ -152,13 +158,14 @@
 .conf_leftMenu {
     float:left;
     width:200px;
-} 
+}
 
 /*
     Styles for the menu box
 */
 #outer {
     border: 1px solid #ccc;
+    background: #f6f6f6;
 }
 
 /*
@@ -174,11 +181,11 @@
 */
 #outer li a:hover {
     background: #e0e0e0;
-}  
+}
 
 /*
     A non selected menu item
-*/    
+*/
 .menuConfTitle {
     text-align: left;
 }
@@ -202,7 +209,7 @@
 /*
     sub menu item
 */
-li ul.inner li a { 
+li ul.inner li a {
     padding: 3px 12px 3px 30px;
     background: transparent url(../../images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 }
@@ -229,7 +236,7 @@ li ul.inner li a {
     Wrapper around the content
 */
 .confBodyBox {
-    margin-left:230px;
+    margin-left: 230px;
 }
 
 
