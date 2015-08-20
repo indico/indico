@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import redirect, request, flash, jsonify, session
+from sqlalchemy.orm import defaultload, joinedload
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -292,7 +293,12 @@ class RHSurveySubmissionBase(RHManageSurveysBase):
 
     def _checkParams(self, params):
         RHManageSurveysBase._checkParams(self, params)
-        self.submission = SurveySubmission.get_one(request.view_args['submission_id'])
+        survey_strategy = joinedload('survey')
+        answers_strategy = defaultload('answers').joinedload('question')
+        self.submission = (SurveySubmission
+                           .find(id=request.view_args['submission_id'])
+                           .options(answers_strategy, survey_strategy)
+                           .one())
 
 
 class RHDeleteSubmissions(RHManageSurveyBase):
