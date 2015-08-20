@@ -106,7 +106,19 @@ class IndicoForm(Form):
 
     def validate(self):
         valid = super(IndicoForm, self).validate()
-        return valid and all(values_from_signal(signals.form_validated.send(self), single_value=True))
+        if not valid:
+            return False
+        if not all(values_from_signal(signals.form_validated.send(self), single_value=True)):
+            return False
+        self.post_validate()
+        return True
+
+    def post_validate(self):
+        """Called after the form was successfully validated.
+
+        This method is a good place e.g. to override the data of fields in
+        certain cases without going through the hassle of generated_data.
+        """
 
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.
