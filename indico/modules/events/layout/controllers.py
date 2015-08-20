@@ -94,6 +94,8 @@ class RHLayoutCSSPreview(RHConferenceModifBase):
 
 
 class RHLayoutCSSSaveTheme(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         form = CSSSelectionForm(event=self._conf)
         if form.validate_on_submit():

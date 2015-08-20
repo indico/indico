@@ -13,12 +13,19 @@
     {% call form_fieldset(_('Stylesheets')) %}
         {{ form_row(form.use_custom_css) }}
         {% call form_row(form.theme) %}
-            <a class="i-button i-form-field-button icon-eye" target="_blank"
+            <a class="i-button i-form-field-button js-theme-preview-btn icon-eye" target="_blank"
                href="{{ url_for('event_layout.css_preview', event) }}">
                 {%- trans %}Preview{% endtrans -%}
             </a>
         {% endcall %}
-        {{ form_row(form.css_file) }}
+        {% call form_row(form.css_file) %}
+            {% if form.css_file.data %}
+                <a class="i-button i-form-field-button i-form-field-width icon-eye" target="_blank"
+                   href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}">
+                    {%- trans %}Preview{% endtrans -%}
+                </a>
+            {% endif %}
+        {% endcall %}
     {% endcall %}
     {% call form_fieldset(_('Header Style')) %}
     {{ form_rows(form, fields=('logo', 'header_text_color', 'header_background_color')) }}
@@ -31,12 +38,13 @@
     {% endcall %}
     <script>
         $(document).ready(function() {
-            $('#theme').nullableselector({nullvalue: ''})
+            $('#theme')
+            .nullableselector({nullvalue: ''})
             .on('change', function() {
                 var preview_url = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
                     theme: $(this).val()
                 });
-                $(this).nextAll('.i-form-field-button').attr('href', preview_url);
+                $(this).nextAll('.js-theme-preview-btn').attr('href', preview_url);
             })
             .trigger('change');
         });

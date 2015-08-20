@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField, HiddenField
-from wtforms.validators import InputRequired, DataRequired
+from wtforms.validators import InputRequired, DataRequired, Optional
 
+from indico.core.config import Config
 from indico.modules.events.layout.models.stylesheets import StylesheetFile
-from indico.modules.events.layout.util import get_css_url
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -64,7 +64,7 @@ class LayoutForm(IndicoForm):
     use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
                                   description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
                                                 "this option to reveal the available Indico themes."))
-    theme = SelectField(_("Selected theme"), [HiddenUnless('use_custom_css', False)],
+    theme = SelectField(_("Theme"), [HiddenUnless('use_custom_css', False)], choices=THEMES,
                         description=_("Currently selected theme of the conference page. Click on the Preview button to "
                                       "preview and select a different one."))
 
@@ -73,14 +73,10 @@ class LayoutForm(IndicoForm):
         super(LayoutForm, self).__init__(*args, **kwargs)
         self.css_file.description = _("If you want to fully customize your conference page you can create your own "
                                       "stylesheet and upload it. An example stylesheet can be downloaded "
-                                      "<a href='{url}'>here</a>.".format(url=get_css_url('standard.css')))
+                                      "<a href='{base_url}/standard.css' target='_blank'>here</a>."
+                                      .format(base_url=Config.getInstance().getCssConfTemplateBaseURL()))
         self.logo.widget.options['url'] = url_for('event_layout.logo_upload', event)
         self.css_file.widget.options['url'] = url_for('event_layout.css_upload', event)
-        css_file = StylesheetFile.find(StylesheetFile.event_id == event.id).first()
-        self.theme.choices = list(THEMES)
-        if css_file:
-            self.theme.choices = (THEMES +
-                                  [('_custom', _("Custom CSS file ({file_name})".format(file_name=css_file.filename)))])
 
 
 class MenuEntryForm(IndicoForm):
@@ -105,7 +101,7 @@ class AddImagesForm(IndicoForm):
 
 
 class CSSSelectionForm(IndicoForm):
-    theme = SelectField(_("Theme"))
+    theme = SelectField(_("Theme"), [Optional()], coerce=lambda x: x)
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
@@ -114,4 +110,4 @@ class CSSSelectionForm(IndicoForm):
         self.theme.choices = list(THEMES)
         if css_file:
             self.theme.choices = (THEMES +
-                                  [('_custom', _("Custom CSS file ({file_name})".format(file_name=css_file.filename)))])
+                                  [('_custom', _("Custom CSS file ({name})".format(name=css_file.filename)))])

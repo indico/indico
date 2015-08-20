@@ -165,24 +165,23 @@ def get_images_for_event(event):
     return ImageFile.find_all(event_id=event.id)
 
 
-def get_css_url(theme_id, event=None, priority_to_theme=False):
+def get_css_url(event, force_theme=None, for_preview=False):
     """Builds the URL of a CSS resource.
 
-    :param theme_id: The ID of the theme to be used
     :param event: Required to build the URL of a custom CSS resource
-    :param priority_to_theme: Override the layout settings and use the theme_id
-                              to generate the URL
+    :param force_theme: The ID of the theme to override the custom CSS resource
+                        only if it exists
+    :param for_preview: Whether the URL is used in the CSS preview page
     :return: The URL to the CSS resource
     """
     from indico.modules.events.layout import layout_settings
-    if theme_id:
-        use_custom_css = False
-        if priority_to_theme:
-            use_custom_css = theme_id == '_custom'
-        elif event:
-            use_custom_css = layout_settings.get(event, 'use_custom_css')
-        if event and use_custom_css:
-            uploaded_css = StylesheetFile.find_first(event_id=event.id)
-            if uploaded_css:
-                return url_for('event_layout.css_display', event, uploaded_css, _external=True)
-        return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), theme_id)
+
+    if force_theme and force_theme != '_custom':
+        return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), force_theme)
+    elif for_preview and force_theme is None:
+        return None
+    elif force_theme == '_custom' or layout_settings.get(event, 'use_custom_css'):
+        uploaded_css = StylesheetFile.find_first(event_id=event.id)
+        return url_for('event_layout.css_display', event, uploaded_css, _external=True) if uploaded_css else None
+    elif layout_settings.get(event, 'theme'):
+        return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), layout_settings.get(event, 'theme'))
