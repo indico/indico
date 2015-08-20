@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db.sqlalchemy import db
+from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
 
@@ -70,6 +71,30 @@ class Event(db.Model):
     @property
     def locator(self):
         return {'confId': self.id}
+
+    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
+        """Creates a new log entry for the event
+
+        :param realm: A value from :class:`.EventLogRealm` indicating
+                      the realm of the action.
+        :param kind: A value from :class:`.EventLogKind` indicating
+                     the kind of the action that was performed.
+        :param module: A human-friendly string describing the module
+                       related to the action.
+        :param summary: A one-line summary describing the logged action.
+        :param user: The user who performed the action.
+        :param type_: The type of the log entry. This is used for custom
+                      rendering of the log message/data
+        :param data: JSON-serializable data specific to the log type.
+
+        In most cases the ``simple`` log type is fine. For this type,
+        any items from data will be shown in the detailed view of the
+        log entry.  You may either use a dict (which will be sorted)
+        alphabetically or a list of ``key, value`` pairs which will
+        be displayed in the given order.
+        """
+        db.session.add(EventLogEntry(event_id=self.id, user=user, realm=realm, kind=kind, module=module, type=type_,
+                                     summary=summary, data=data or {}))
 
     @return_ascii
     def __repr__(self):
