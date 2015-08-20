@@ -75,22 +75,20 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.event_management.image_created.connect
 def _log_image_created(image, user, **kwargs):
-    image.event.as_legacy.log(EventLogRealm.management, EventLogKind.positive,
-                              'Layout', 'Added image "{}"'.format(image.filename), user, data={
-                                  'Type': 'Image File',
-                                  'File name': image.filename,
-                                  'File type': image.content_type,
-                                  'File size': do_filesizeformat(image.size)
-                              })
+    image.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Layout',
+                        'Added image "{}"'.format(image.filename), user, data={
+                            'File name': image.filename,
+                            'File type': image.content_type,
+                            'File size': do_filesizeformat(image.size)
+                        })
 
 
 @signals.event_management.image_deleted.connect
 def _log_image_deleted(image, user, **kwargs):
-    image.event.as_legacy.log(EventLogRealm.management, EventLogKind.negative,
-                              'Layout', 'Deleted image "{}"'.format(image.filename), user, data={
-                                  'Type': 'Image File',
-                                  'File name': image.filename
-                              })
+    image.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Layout',
+                        'Deleted image "{}"'.format(image.filename), user, data={
+                            'File name': image.filename
+                        })
 
 
 class ImagesFeature(EventFeature):
