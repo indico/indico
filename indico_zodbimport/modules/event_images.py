@@ -90,17 +90,15 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
         return server_tz.localize(dt).astimezone(pytz.utc)
 
     def _iter_pictures(self):
-        for dmgr in self.flushing_iterator(self.zodb_root['displayRegistery'].itervalues()):
+
+        for event_data in self.flushing_iterator(db.session.query(Event.id)):
+            event_id = event_data[0]
+            dmgr = self.zodb_root['displayRegistery'][str(event_id)]
             imgr = getattr(dmgr, '_imagesMngr', None)
-            event_id = dmgr._conf.id
 
             if imgr:
-                if not Event.find_first(id=event_id):
-                    if not self.silence_old_events:
-                        self.print_warning('Event does not exist (anymore)!', event_id=event_id)
-                else:
-                    for _, picture in imgr._picList.iteritems():
-                        yield dmgr._conf, picture
+                for _, picture in imgr._picList.iteritems():
+                    yield dmgr._conf, picture
             else:
                 if not self.silence_old_events:
                     self.print_warning('No _imagesMngr attribute!', event_id=event_id)
