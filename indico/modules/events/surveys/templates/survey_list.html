@@ -27,7 +27,16 @@
                     <td>{{ survey.start_dt | format_datetime if survey.start_dt else _('Not started') }}</td>
                     <td>{{ survey.end_dt | format_datetime if survey.end_dt else _('No deadline') }}</td>
                     <td class="survey-actions">
-                        {{ render_available_buttons(survey) }}
+                        {% if was_survey_submitted(survey) %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Survey already filled out{% endtrans %}">
+                                {% trans %}Fill out{% endtrans %}
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight disabled">
+                                {% trans %}Fill out{% endtrans %}
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% else %}
@@ -47,11 +56,3 @@
         </p>
     {% endif %}
 {% endblock %}
-
-{% macro render_available_buttons(survey) %}
-    {% if not was_survey_submitted(survey) and survey.can_submit(session.user) %}
-        <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight">
-            {% trans %}Fill out{% endtrans %}
-        </a>
-    {% endif %}
-{% endmacro %}
