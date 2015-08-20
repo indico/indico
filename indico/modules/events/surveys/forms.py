@@ -69,9 +69,9 @@ class SurveyForm(IndicoForm):
         if query.count():
             raise ValidationError(_("There is already an survey named \"{}\" on this event".format(escape(field.data))))
 
-    def validate_require_user(self, field):
-        if not field.data and not self.anonymous.data:
-            raise ValidationError(_("Guests can't submit surveys if submissions are not anonymous"))
+    def post_validate(self):
+        if not self.anonymous.data:
+            self.require_user.data = True
 
 
 class ScheduleSurveyForm(IndicoForm):

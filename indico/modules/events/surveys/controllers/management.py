@@ -117,8 +117,6 @@ class RHCreateSurvey(RHManageSurveysBase):
         if form.validate_on_submit():
             survey = Survey(event=self.event)
             form.populate_obj(survey)
-            if not form.anonymous.data:
-                survey.require_user = True
             db.session.add(survey)
             db.session.flush()
             flash(_('Survey created'), 'success')
