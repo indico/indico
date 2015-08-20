@@ -50,7 +50,7 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
         return mapping[self.event.getType()]
 
 
-class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
+class RHSurveyList(RHSurveyBaseDisplay):
     def _process(self):
         surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id),
                                   _eager=(Survey.questions, Survey.submissions))
@@ -61,7 +61,7 @@ class RHShowSurveyMainInformation(RHSurveyBaseDisplay):
                                                states=SurveyState, was_survey_submitted=was_survey_submitted)
 
 
-class RHSubmitSurveyForm(RHSurveyBaseDisplay):
+class RHSubmitSurvey(RHSurveyBaseDisplay):
     CSRF_ENABLED = True
 
     normalize_url_spec = {
