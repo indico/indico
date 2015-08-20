@@ -33,7 +33,8 @@ from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, M
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
 from indico.modules.events.layout.models.stylesheets import StylesheetFile
-from indico.modules.events.layout.util import menu_entries_for_event, move_entry, get_images_for_event, get_event_logo
+from indico.modules.events.layout.util import (get_event_logo, get_images_for_event, insert_entry,
+                                               menu_entries_for_event, move_entry)
 from indico.modules.events.layout.views import WPImages, WPLayoutEdit, WPMenuEdit, WPPage
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -51,9 +52,9 @@ def _render_menu_entry(entry):
     return tpl.menu_entry(entry=entry)
 
 
-def _render_menu_entries(event, show_hidden=False):
+def _render_menu_entries(event, show_hidden=False, connect_menu=False):
     tpl = get_template_module('events/layout/_menu.html')
-    return tpl.menu_entries(menu_entries_for_event(event, show_hidden=show_hidden))
+    return tpl.menu_entries(menu_entries_for_event(event, show_hidden=show_hidden), connect_menu=connect_menu)
 
 
 class RHLayoutLogoUpload(RHConferenceModifBase):
@@ -216,11 +217,34 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
         position = request.form.get('position')
         try:
             position = int(position)
-        except ValueError:
-            if position:
-                return jsonify_data(success=False)
+        except (TypeError, ValueError):
             position = None
-        move_entry(self.entry, position)
+
+        parent_id = request.form.get('parent_id')
+        try:
+            parent_id = int(parent_id)
+        except (TypeError, ValueError):
+            parent_id = None
+
+        if parent_id != self.entry.parent_id:
+            if self.entry.type not in (MenuEntryType.user_link, MenuEntryType.page):
+                raise BadRequest('Menu entry {0.title} cannot be moved to another menu: Invalid type {0.type.name}.'
+                                 .format(self.entry))
+            if self.entry.is_root and self.entry.children:
+                raise BadRequest('Menu entry {entry.title} cannot be moved to another menu: Entry has nested entries.'
+                                 .format(self.entry))
+
+            if parent_id is not None:
+                parent_entry = MenuEntry.find_first(MenuEntry.type.in_({MenuEntryType.user_link, MenuEntryType.page}),
+                                                    id=parent_id, parent_id=None)
+                if not parent_entry:
+                    raise NotFound('New parent entry not found for Menu entry {entry.title}.'.format(entry=self.entry))
+
+            insert_entry(self.entry, parent_id, position)
+
+        else:
+            move_entry(self.entry, position)
+
         return jsonify_data()
 
 
@@ -287,7 +311,7 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         db.session.delete(self.entry)
         db.session.flush()
 
-        return jsonify_data(menu=_render_menu_entries(self._conf, show_hidden=True))
+        return jsonify_data(menu=_render_menu_entries(self._conf, show_hidden=True, connect_menu=True))
 
 
 class RHPageDisplay(RHConferenceBaseDisplay):

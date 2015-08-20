@@ -10,7 +10,7 @@
     <div class="fixed-width-page layout-wrapper">
         <div class="row">
             <div id="menu-entries" class="column col-40">
-                {{ menu_entries(menu) }}
+                {{ menu_entries(menu, connect_menu=true) }}
             </div>
             <div class="column col-60">
                 {% call message_box('info') %}
@@ -64,9 +64,11 @@
     </div>
     <script>
     $(function initMenuEdit() {
-        function addNewEntry(data) {
+        function _addNewEntry(data, classes) {
             if (data) {
-                $('#menu-entries > .menu-entries').append($('<li>').html(data.entry));
+                $('#menu-entries > .menu-entries').append($('<li>', {
+                    class: classes
+                }).html(data.entry));
             }
         }
 
@@ -74,7 +76,7 @@
 
         $('.add-link, .add-page').ajaxDialog({
             title: function() { return $(this).data('title'); },
-            onClose: addNewEntry
+            onClose: function(data) { _addNewEntry(data, 'nestable allow-nested'); }
         });
         $('.add-separator').on('click', function addSeparator (evt) {
             evt.preventDefault();
@@ -84,7 +86,7 @@
                 method: 'POST',
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
-                success: addNewEntry
+                success: function(data) { _addNewEntry(data, ''); }
             });
         });
     });

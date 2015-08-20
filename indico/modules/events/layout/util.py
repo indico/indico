@@ -139,6 +139,22 @@ def move_entry(entry, to):
     entry.position = new_pos
 
 
+def insert_entry(entry, parent_id, position):
+    if position is None or position < 0:
+        position = -1
+    old_siblings = MenuEntry.find(MenuEntry.position > entry.position,
+                                  event_id=entry.event_id, parent_id=entry.parent_id)
+    for sibling in old_siblings:
+        sibling.position -= 1
+
+    new_siblings = MenuEntry.find(MenuEntry.position > position, event_id=entry.event_id, parent_id=parent_id)
+    for sibling in new_siblings:
+        sibling.position += 1
+
+    entry.parent_id = parent_id
+    entry.position = position + 1
+
+
 @memoize_request
 def get_entry_from_name(name, event):
     return MenuEntry.find_first(

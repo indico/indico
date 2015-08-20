@@ -218,6 +218,25 @@
             border: 2px dashed $gray;
         }
     }
+    &.empty,
+    &.hide-placeholder > li.menu-entry-placeholder {
+        display: none;
+    }
+    &.empty {
+        display: none;
+        height: 2.8em;
+        &.expand {
+            display: block;
+        }
+        &:before {
+            content: attr(data-empty-text);
+            color: $dark-gray;
+            font-style: italic;
+            line-height: 2.8em;
+            position: absolute;
+            padding-left: 20px;
+        }
+    }
 }
 
 // sub list of entries
