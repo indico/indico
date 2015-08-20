@@ -16,12 +16,15 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, render_template
 
 from indico.core import signals
+from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.surveys.util import was_survey_submitted
 from indico.util.i18n import _
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 
@@ -50,6 +53,18 @@ def _extend_event_menu(sender, **kwargs):
         return bool(Survey.find(Survey.is_visible, Survey.event_id == int(event.id)).count())
 
     return EventMenuEntry('survey.display_survey_list', _('Surveys'), name='surveys', visible=_visible)
+
+
+@template_hook('event-header')
+def _inject_event_header(event, **kwargs):
+    from indico.modules.events.surveys.models.surveys import Survey
+    surveys = (Survey
+               .find(Survey.is_active, Survey.event_id == int(event.id))
+               .order_by(db.func.lower(Survey.title))
+               .all())
+    if surveys:
+        return render_template('events/surveys/event_header.html', surveys=surveys,
+                               was_survey_submitted=was_survey_submitted)
 
 
 @signals.event.get_feature_definitions.connect
