@@ -3,6 +3,7 @@
 {{ form_header(form, action=url_for('event_layout.css_save_theme', event)) }}
 {{ form_rows(form) }}
 {% call form_footer(form) %}
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <input class="i-button highlight" type="submit" value="{% trans %}Use selected template{% endtrans %}">
     <a href="{{ url_for('event_layout.index', event) }}" class="i-button icon-arrow-left" data-button-back>
         {%- trans %}Back to management area{% endtrans -%}
@@ -13,7 +14,8 @@
 {% endcall %}
 <script>
     $(document).ready(function() {
-        $('#theme').nullableselector({nullvalue: ''})
+        $('#theme')
+        .nullableselector({nullvalue: ''})
         .on('change', function() {
             location.href = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
                 theme: $(this).val()
