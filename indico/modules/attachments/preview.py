@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import re
 
-from flask import render_template
+from flask import render_template, session
 
 from indico.core import signals
 from indico.util.signals import values_from_signal
@@ -56,6 +56,11 @@ class ImagePreviewer(Previewer):
 class PDFPreviewer(Previewer):
     ALLOWED_CONTENT_TYPE = re.compile(r'^application/pdf$')
     TEMPLATE = 'iframe_preview.html'
+
+    @classmethod
+    def can_preview(cls, attachment_file):
+        use_previewer = session.user.settings.get('use_previewer_pdf', False) if session.user else False
+        return (super(PDFPreviewer, cls).can_preview(attachment_file) and use_previewer)
 
 
 class MarkdownPreviewer(Previewer):
