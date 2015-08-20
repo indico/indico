@@ -228,7 +228,7 @@ class Survey(db.Model):
         return ~cls.is_deleted & cls.questions.any() & cls.has_started
 
     def can_submit(self, user):
-        return self.is_active and (not self.require_user or (self.require_user and user))
+        return self.is_active and (not self.require_user or user)
 
     @return_ascii
     def __repr__(self):
