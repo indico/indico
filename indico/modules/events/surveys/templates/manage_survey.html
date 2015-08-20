@@ -21,13 +21,7 @@
                     <div class="label">
                         {% trans %}Questionnaire{% endtrans %}
                     </div>
-                    {% if survey.state == states.active_and_answered %}
-                        {% trans %}Questions can't be modified since there are submissions registered already{% endtrans %}
-                    {% elif survey.state == states.finished %}
-                        {% trans %}Questions can't be modified since the survey finished already{% endtrans %}
-                    {% else %}
-                        {% trans %}Add, remove or modify questions{% endtrans %}
-                    {% endif %}
+                    {% trans %}Add, remove or modify questions{% endtrans %}
                 </div>
                 <div class="toolbar right">
                     <a href="{{ url_for('.manage_questionnaire', survey) }}" class="i-button icon-settings">
