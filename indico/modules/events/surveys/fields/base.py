@@ -61,21 +61,6 @@ class SurveyField(object):
     def __init__(self, question):
         self.question = question
 
-    def save_config(self, form):
-        """Populates an object with the field settings
-
-        :param form: A `FieldConfigForm` instance
-        """
-        form.populate_obj(self.question, fields=form._common_fields)
-        self.question.field_type = self.name
-        self.question.field_data = {name: field.data
-                                    for name, field in form._fields.iteritems()
-                                    if name not in form._common_fields and name != 'csrf_token'}
-
-    def create_wtf_field(self):
-        """Returns a WTForms field for this field"""
-        return self._make_wtforms_field(self.wtf_field_class, self.validators, **self.wtf_field_kwargs)
-
     @property
     def validators(self):
         """Returns a list of validators for this field"""
@@ -86,9 +71,24 @@ class SurveyField(object):
         """Returns a dict of kwargs for this field's wtforms field"""
         return {}
 
+    def create_wtf_field(self):
+        """Returns a WTForms field for this field"""
+        return self._make_wtforms_field(self.wtf_field_class, self.validators, **self.wtf_field_kwargs)
+
     def get_summary(self):
-        """Returns a summary of answers for this field."""
+        """Returns the summary of answers submitted for this field."""
         raise NotImplementedError
+
+    def save_config(self, form):
+        """Populates an object with the field settings
+
+        :param form: A `FieldConfigForm` instance
+        """
+        form.populate_obj(self.question, fields=form._common_fields)
+        self.question.field_type = self.name
+        self.question.field_data = {name: field.data
+                                    for name, field in form._fields.iteritems()
+                                    if name not in form._common_fields and name != 'csrf_token'}
 
     def _make_wtforms_field(self, field_cls, validators=None, **kwargs):
         """Util to instantiate a WTForms field.
