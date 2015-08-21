@@ -20,6 +20,7 @@ from functools import wraps
 
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
 from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
+from indico.modules.events import Event
 from indico.modules.events.models.settings import EventSettingPrincipal, EventSetting
 from indico.util.user import iter_acl
 
@@ -28,9 +29,9 @@ def event_or_id(f):
     @wraps(f)
     def wrapper(self, event, *args, **kwargs):
         from MaKaC.conference import Conference
-        if isinstance(event, Conference):
+        if isinstance(event, (Conference, Event)):
             event = event.id
-        return f(self, unicode(event), *args, **kwargs)
+        return f(self, int(event), *args, **kwargs)
 
     return wrapper
 
