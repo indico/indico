@@ -61,26 +61,29 @@
                                 </ul>
                             </div>
                         </div>
-                        <span class="text">
+                        <div class="text">
                             <div class="label">
                                 {%- trans %}New menu entries{% endtrans -%}
                             </div>
                             <div>
                                 {%- trans %}Add entries to the event's menu.{% endtrans -%}
                             </div>
-                        </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-    $(function initMenuEdit() {
+    $(document).ready(function initMenuEdit() {
+        initMenuSortable();
+
         function _addNewEntry(data, classes) {
             if (data) {
                 $('#menu-entries > .menu-entries').append($('<li>', {
-                    class: classes
+                    'class': classes
                 }).html(data.entry));
+                initMenuSortable();
             }
         }
 

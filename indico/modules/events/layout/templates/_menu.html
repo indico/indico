@@ -7,7 +7,7 @@
             {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
             {%- if not entry.is_enabled %} stripped{% endif %} entry-{{ entry.type.name }}">
-            <span>{{ entry.localized_title }} ({{ entry.position}})</span>
+            <span>{{ entry.localized_title }}{% if config.DEBUG %} ({{ entry.position}}){% endif %}</span>
             <span class="right actions">
                 <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
                    data-href="{{ url_for('.menu_enable_entry', entry) }}"
@@ -47,13 +47,12 @@
     <ul class="menu-entries {%- if connect_menu %} connect-menu{% endif %}{% if not entries %} empty {% endif %}"
         data-empty-text="{% trans %}Drop here to create a nested entry.{% endtrans %}">
         {%- for entry in entries if not entry.is_orphaned %}
-            <li
-                {%- if entry.type.name in ('user_link', 'page') %}{#
-                    #} class="{% if entry.is_root -%}
-                                  allow-nested {%- if not entry.children %} nestable{% endif -%}
-                              {%- else -%}
-                                  nestable
-                              {%- endif -%}"
+            <li {% if entry.type.name in ('user_link', 'page') -%}
+                    class="{% if entry.is_root -%}
+                        allow-nested {%- if not entry.children %} nestable{% endif -%}
+                    {%- else -%}
+                        nestable
+                    {%- endif -%}"
                 {%- endif %}>
                 {{- menu_entry(entry) -}}
             </li>

@@ -15,15 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- $(function initEventLayout() {
+ (function(global) {
+    'use strict';
 
-    function _initSortable() {
-        /* ui.sender seems broken (returns null) so we keep track of the sortable who sent the item manually... */
+    global.initMenuSortable = function initMenuSortable() {
+        // ui.sender seems broken (returns null) so we keep track of the sortable who sent the item manually...
         var _sender = null;
-        /* .sortable('cancel') is also broken thus we need to keep track of the validity of an update manually as well.
+        /*
+         *.sortable('cancel') is also broken thus we need to keep track of the validity of an update manually as well.
          * See 'beforeStop' for a more detailed explanation.
          */
-        var _invalid_update = false;
+        var _invalidUpdate = false;
 
         function _canDrop(evt, ui) {
             if (_sender[0] === ui.placeholder.parent()[0]) { // entry moved within the same list
@@ -53,28 +55,35 @@
                         _sender.addClass('empty');
                     }
                     // Show empty children list which accept children
-                    $('.menu-entries > .allow-nested > .menu-entry > .menu-entries.empty').addClass('expand');
-                    ui.item.find('> .menu-entry > .menu-entries.empty').removeClass('expand');
+                    $('.menu-entries > .allow-nested > .menu-entry > .menu-entries.empty').addClass('expand')
+                        .parent('.menu-entry')
+                            .addClass('with-children');
+                    ui.item.find('> .menu-entry > .menu-entries.empty').removeClass('expand')
+                        .parent('.menu-entry')
+                            .removeClass('with-children');
                 }
             },
             beforeStop: function(evt, ui) {
-                /* In the case of an invalid update we need to cancel the move. But .sortable('cancel') fails internally
+                /*
+                 * In the case of an invalid update we need to cancel the move. But .sortable('cancel') fails internally
                  * when called from here so we keep track of whether the move is valid, check in 'update' if can update
                  * and then cancel the move in 'stop' if needed.
                  */
-                _invalid_update = !_canDrop(evt, ui);
+                _invalidUpdate = !_canDrop(evt, ui);
             },
             stop: function(evt, ui) {
                 // mandatory clean-up
                 $('menu-entries').removeClass('hide-placeholder');
                 if (ui.item.hasClass('nestable')) {
-                    $('.menu-entries > .allow-nested > .menu-entry > .menu-entries.empty').removeClass('expand');
+                    $('.menu-entries > .allow-nested > .menu-entry > .menu-entries.empty').removeClass('expand')
+                        .parent('.menu-entry')
+                            .removeClass('with-children');
                 }
 
                 // Check if move is valid
-                if (_invalid_update) {            // This can only happen if a nested user-submitted entry is dropped on
-                    _sender.removeClass('empty'); // an invalid target list, which shouldn't happen as internal nested
-                                                  // list are not connected with the other lists.
+                if (_invalidUpdate) {
+                    // This can only happen if a nested user-submitted entry is dropped on an invalid target list, which
+                    // shouldn't happen as internal nested list are not connected with the other lists.
                     $(this).sortable('cancel');
 
                 } else {
@@ -83,16 +92,17 @@
                         ui.item.closest('.menu-entries')
                             .removeClass('empty')
                             .parent('.menu-entry')
+                                .addClass('with-children')
                                 .parent()
                                     .removeClass('nestable');
 
-                        var is_root = ui.item.closest('.menu-entry')[0] === undefined;
-                        // remove .allow-nesting for nested entries
-                        if (!is_root) {
+                        var isRoot = ui.item.closest('.menu-entry')[0] === undefined;
+                        // disallow adding child elements
+                        if (!isRoot) {
                              ui.item.removeClass('allow-nested');
                         }
-                        // add .allow-nested to root entries which have a list of children
-                        if (is_root && ui.item.find('> .menu-entry > .menu-entries')) {
+                        // allow adding children to root entries which have a list of children
+                        if (isRoot && ui.item.find('> .menu-entry > .menu-entries')) {
                             ui.item.addClass('allow-nested');
                         }
 
@@ -119,7 +129,7 @@
                     return;
                 }
                 // Don't update an invalid move.
-                if (_invalid_update) {
+                if (_invalidUpdate) {
                     return;
                 }
 
@@ -146,11 +156,9 @@
                 });
             }
         });
-    }
+    };
 
-    _initSortable();
-
-    $('#menu-entries').on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
+    $(document).on('click', '.menu-entry > .i-label > .actions > .edit-entry', function(evt) {
         evt.preventDefault();
         evt.stopPropagation();
         ajaxDialog({
@@ -174,11 +182,11 @@
             complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
             success: function(data) {
-                var is_enabled = data.is_enabled;
-                $this.toggleClass('enabled', is_enabled)
-                    .toggleClass('not-enabled', !is_enabled)
+                var isEnabled = data.is_enabled;
+                $this.toggleClass('enabled', isEnabled)
+                    .toggleClass('not-enabled', !isEnabled)
                     .parent('.actions')
-                        .parent('.i-label').toggleClass('stripped', !is_enabled);
+                        .parent('.i-label').toggleClass('stripped', !isEnabled);
             }
         });
     }).on('indico:confirmed', '.menu-entry .delete-entry', function(evt) {
@@ -193,9 +201,9 @@
             success: function(data) {
                 if (data) {
                     $('#menu-entries > .menu-entries').replaceWith(data.menu);
-                    _initSortable();
+                    initMenuSortable();
                 }
             }
         });
     });
- });
+ })(window);

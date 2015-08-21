@@ -240,25 +240,30 @@
 }
 
 // sub list of entries
-.menu-entry > .menu-entries {
-    @include border-all(darken($pastel-gray, $light-color-variation));
-    @include border-bottom-radius();
+.menu-entry  {
+    > .menu-entries {
+        @include border-all(darken($pastel-gray, $light-color-variation));
+        @include border-bottom-radius();
 
-    width: 333px;
-    margin: 0 5px;
-    padding-right: 15px;
-    padding-left: 20px;
+        width: 333px;
+        margin: 0 5px;
+        padding-right: 15px;
+        padding-left: 20px;
 
-    border-top: 0;
-    background-color: $light-gray;
-    > li > .menu-entry > .i-label {
-        > span:first-child {
-            max-width: 74%;
-        }
-        > .actions {
-            max-width: 26%;
+        border-top: 0;
+        background-color: $light-gray;
+        > li > .menu-entry > .i-label {
+            > span:first-child {
+                max-width: 73%;
+            }
+            > .actions {
+                max-width: 27%;
+            }
         }
     }
+     > .highlight + .menu-entries {
+        background-color: $light-blue;
+     }
 }
 
 .info-message-box > .message-text > i.icon-grid2 {

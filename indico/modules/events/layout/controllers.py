@@ -253,18 +253,18 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
             parent_id = None
 
         if parent_id != self.entry.parent_id:
-            if self.entry.type not in (MenuEntryType.user_link, MenuEntryType.page):
-                raise BadRequest('Menu entry {0.title} cannot be moved to another menu: Invalid type {0.type.name}.'
+            if self.entry.type not in {MenuEntryType.user_link, MenuEntryType.page}:
+                raise BadRequest('Menu entry "{0.title}" cannot be moved to another menu: Invalid type "{0.type.name}".'
                                  .format(self.entry))
             if self.entry.is_root and self.entry.children:
-                raise BadRequest('Menu entry {entry.title} cannot be moved to another menu: Entry has nested entries.'
+                raise BadRequest('Menu entry "{0.title}" cannot be moved to another menu: Entry has nested entries.'
                                  .format(self.entry))
 
             if parent_id is not None:
                 parent_entry = MenuEntry.find_first(MenuEntry.type.in_({MenuEntryType.user_link, MenuEntryType.page}),
-                                                    id=parent_id, parent_id=None)
+                                                    id=parent_id, parent_id=None, event_id=self.entry.event_id)
                 if not parent_entry:
-                    raise NotFound('New parent entry not found for Menu entry {entry.title}.'.format(entry=self.entry))
+                    raise BadRequest('New parent entry not found for Menu entry "{0.title}".'.format(self.entry))
 
             insert_entry(self.entry, parent_id, position)
 
