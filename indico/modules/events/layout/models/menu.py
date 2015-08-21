@@ -44,7 +44,108 @@ class MenuEntryType(TitledIntEnum):
     page = 5
 
 
-class MenuEntry(db.Model):
+class MenuEntryMixin(object):
+    @cached_property
+    def event(self):
+        return ConferenceHolder().getById(str(self.event_id), True)
+
+    @property
+    def url(self):
+        if self.is_user_link:
+            return self.link_url
+        elif self.is_internal_link:
+            return url_for(self.default_data.endpoint, self.event)
+        elif self.is_plugin_link:
+            from indico.core.plugins import url_for_plugin
+            return url_for_plugin(self.default_data.endpoint, self.event)
+        elif self.is_page:
+            return url_for('event_pages.page_display', self.event, page_id=self.page_id)
+        return None
+
+    @property
+    def is_link(self):
+        return self.type in {MenuEntryType.internal_link, MenuEntryType.plugin_link, MenuEntryType.user_link}
+
+    @property
+    def is_user_link(self):
+        return self.type == MenuEntryType.user_link
+
+    @property
+    def is_internal_link(self):
+        return self.type == MenuEntryType.internal_link
+
+    @property
+    def is_plugin_link(self):
+        return self.type == MenuEntryType.plugin_link
+
+    @property
+    def is_page(self):
+        return self.type == MenuEntryType.page
+
+    @property
+    def is_separator(self):
+        return self.type == MenuEntryType.separator
+
+    @cached_property
+    def default_data(self):
+        from indico.modules.events.layout.util import get_menu_entries_from_signal
+        if self.name is None:
+            return None
+        return get_menu_entries_from_signal().get(self.name)
+
+    @property
+    def is_orphaned(self):
+        return bool(self.name and self.default_data is None)
+
+    @property
+    def is_visible(self):
+        if not self.is_enabled:
+            return False
+        if not self.name:
+            return True
+        if self.is_orphaned:
+            return False
+
+        return self.default_data.visible(self.event)
+
+    @property
+    def localized_title(self):
+        if self.is_separator:
+            return ''
+
+        defaults = self.default_data
+        if defaults is not None and defaults.title == self.title:
+            return _(self.title)
+
+        return self.title
+
+    @property
+    def locator(self):
+        return dict(self.event.getLocator(), menu_entry_id=self.id)
+
+
+class TransientMenuEntry(MenuEntryMixin):
+    def __init__(self, event_id, is_enabled, title, name, position, children):
+        self.event_id = event_id
+        self.is_enabled = is_enabled
+        self.title = title
+        self.name = name
+        self.position = position
+        self.children = children
+        self.type = None
+        self.plugin = None
+        self.link_url = None
+        self.page_id = None
+        self.is_root = True
+        for child in self.children:
+            child.is_root = False
+
+    @property
+    def id(self):
+        return self.name
+
+
+class MenuEntry(MenuEntryMixin, db.Model):
     __tablename__ = 'menu_entries'
     __table_args__ = (
         db.CheckConstraint(
@@ -177,86 +278,8 @@ class MenuEntry(db.Model):
     )
 
     @property
-    def url(self):
-        if self.is_user_link:
-            return self.link_url
-        elif self.is_internal_link:
-            return url_for(self.default_data.endpoint, self.event)
-        elif self.is_plugin_link:
-            from indico.core.plugins import url_for_plugin
-            return url_for_plugin(self.default_data.endpoint, self.event)
-        elif self.is_page:
-            return url_for('event_pages.page_display', self.event, page_id=self.page_id)
-        return None
-
-    @property
     def is_root(self):
         return self.parent_id is None
-
-    @property
-    def is_link(self):
-        return self.type in {MenuEntryType.internal_link, MenuEntryType.plugin_link, MenuEntryType.user_link}
-
-    @property
-    def is_user_link(self):
-        return self.type == MenuEntryType.user_link
-
-    @property
-    def is_internal_link(self):
-        return self.type == MenuEntryType.internal_link
-
-    @property
-    def is_plugin_link(self):
-        return self.type == MenuEntryType.plugin_link
-
-    @property
-    def is_page(self):
-        return self.type == MenuEntryType.page
-
-    @property
-    def is_separator(self):
-        return self.type == MenuEntryType.separator
-
-    @cached_property
-    def default_data(self):
-        from indico.modules.events.layout.util import get_menu_entries_from_signal
-        if self.name is None:
-            return None
-        return get_menu_entries_from_signal().get(self.name)
-
-    @property
-    def is_orphaned(self):
-        return bool(self.name and self.default_data is None)
-
-    @property
-    def is_visible(self):
-        if not self.is_enabled:
-            return False
-        if not self.name:
-            return True
-        if self.is_orphaned:
-            return False
-
-        return self.default_data.visible(self.event)
-
-    @property
-    def localized_title(self):
-        if self.is_separator:
-            return ''
-
-        defaults = self.default_data
-        if defaults is not None and defaults.title == self.title:
-            return _(self.title)
-
-        return self.title
-
-    @cached_property
-    def event(self):
-        return ConferenceHolder().getById(str(self.event_id), True)
-
-    @property
-    def locator(self):
-        return dict(self.event.getLocator(), menu_entry_id=self.id)
 
     @classmethod
     def get_for_event(cls, event):
@@ -264,7 +287,8 @@ class MenuEntry(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<MenuEntry({}, {}, {}{})>'.format(
+        return '<{}({}, {}, {}{})>'.format(
+            type(self).__name__,
             self.id,
             self.title,
             self.name,

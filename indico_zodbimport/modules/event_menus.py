@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from indico.core.db import db
+from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.util.console import verbose_iterator, cformat
 from indico.util.struct.iterables import committing_iterator
@@ -143,6 +144,7 @@ class EventMenuImporter(Importer):
                 continue
             self.print_success('', event_id=event.id)
             db.session.add_all(self._migrate_menu(event, display_mgr._menu))
+            layout_settings.set(event, 'use_custom_menu', True)
 
     def _migrate_menu(self, event, container, parent=None, used=None):
         if used is None:

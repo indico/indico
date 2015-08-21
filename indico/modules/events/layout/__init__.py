@@ -23,7 +23,6 @@ from jinja2.filters import do_filesizeformat
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
-from indico.modules.events.layout.default import DEFAULT_MENU_ENTRIES
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
@@ -59,6 +58,7 @@ def _extend_event_management_menu_layout(event, **kwargs):
 
 @signals.event.sidemenu.connect
 def _get_default_menu_entries(sender, **kwargs):
+    from indico.modules.events.layout.default import DEFAULT_MENU_ENTRIES
     for entry in DEFAULT_MENU_ENTRIES:
         yield entry
 

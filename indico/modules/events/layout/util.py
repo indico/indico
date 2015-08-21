@@ -18,14 +18,15 @@ from __future__ import unicode_literals
 
 import binascii
 from collections import defaultdict
-from itertools import count
+from itertools import count, chain
 
 import MaKaC
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.images import ImageFile
-from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType
+from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
@@ -60,10 +61,12 @@ class MenuEntryData(object):
         return self._visible(event) if self._visible else True
 
 
+@memoize_request
 def menu_entries_for_event(event, show_hidden=False):
     from indico.core.plugins import plugin_engine
 
-    entries = MenuEntry.get_for_event(event)
+    custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
+    entries = MenuEntry.get_for_event(event) if custom_menu_enabled else []
     signal_entries = get_menu_entries_from_signal()
 
     cache_key = unicode(event.id)
@@ -86,27 +89,31 @@ def menu_entries_for_event(event, show_hidden=False):
                 children[data.parent].append(data)
 
         # Building the entries
-        new_entries = [_build_entry(event, data, next(pos_gen), children=children.get(data.name))
+        new_entries = [_build_entry(event, custom_menu_enabled, data, next(pos_gen), children=children.get(data.name))
                        for (name, data) in sorted(signal_entries.iteritems(), key=lambda (name, data):_entry_key(data))
                        if name in new_entry_names and data.parent is None]
 
-        with db.tmp_session() as sess:
-            sess.add_all(new_entries)
-            sess.commit()
-            _cache.set(cache_key, cache_version)
-        entries = MenuEntry.get_for_event(event)
+        if custom_menu_enabled:
+            with db.tmp_session() as sess:
+                sess.add_all(new_entries)
+                sess.commit()
+                _cache.set(cache_key, cache_version)
+            entries = MenuEntry.get_for_event(event)
+        else:
+            entries = new_entries
 
     return entries
 
 
-def _build_entry(event, data, position, children=None):
-    entry = MenuEntry(
+def _build_entry(event, custom_menu_enabled, data, position, children=None):
+    entry_cls = MenuEntry if custom_menu_enabled else TransientMenuEntry
+    entry = entry_cls(
         event_id=event.getId(),
         is_enabled=data.is_enabled,
         title=data.title,
         name=data.name,
         position=position,
-        children=[_build_entry(event, entry_data, i)
+        children=[_build_entry(event, custom_menu_enabled, entry_data, i)
                   for i, entry_data in enumerate(sorted(children or [], key=_entry_key))]
     )
 
@@ -157,10 +164,14 @@ def insert_entry(entry, parent_id, position):
 
 @memoize_request
 def get_entry_from_name(name, event):
-    return MenuEntry.find_first(
-        MenuEntry.name == name,
-        MenuEntry.event_id == event.id,
-        MenuEntry.type.in_((MenuEntryType.internal_link, MenuEntryType.plugin_link)))
+    custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
+    if custom_menu_enabled:
+        return MenuEntry.find_first(MenuEntry.name == name,
+                                    MenuEntry.event_id == event.id,
+                                    MenuEntry.type.in_((MenuEntryType.internal_link, MenuEntryType.plugin_link)))
+    else:
+        entries = menu_entries_for_event(event)
+        return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
 
 
 def get_event_logo(event):
