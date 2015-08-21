@@ -43,11 +43,12 @@ class AdminLoginAs(AdminService):
     def _getAnswer(self):
         # We don't overwrite a previous entry - the original (admin) user should be kept there
         session.setdefault('login_as_orig_user', {
-            'timezone': session.timezone,
+            'session_data': {k: session.pop(k) for k in session.keys() if k[0] != '_' or k in {'_timezone', '_lang'}},
             'user_id': session.user.id,
             'user_name': session.user.get_full_name(last_name_first=False, last_name_upper=False)
         })
         session.user = self._user
+        session.lang = session.user.settings.get('lang')
         session.timezone = timezoneUtils.SessionTZ(self._user.as_avatar).getSessionTZ()
         return True
 
@@ -61,7 +62,7 @@ class AdminUndoLoginAs(LoggedOnlyService):
             raise NoReportError(_('No login-as history entry found'))
 
         session.user = User.get(entry['user_id'])
-        session.timezone = entry['timezone']
+        session.update(entry['session_data'])
         return True
 
 
