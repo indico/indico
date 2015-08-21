@@ -46,12 +46,21 @@ class UserDetailsForm(SyncedInputsMixin, IndicoForm):
 class UserPreferencesForm(IndicoForm):
     lang = SelectField(_('Language'))
     timezone = SelectField(_('Timezone'))
-    force_timezone = BooleanField(_('Use my timezone'),
-                                  widget=SwitchWidget(),
-                                  description='Always use my current timezone instead of an event\'s timezone.')
-    show_past_events = BooleanField(_('Show past events'),
-                                    widget=SwitchWidget(),
-                                    description='Show past events by default.')
+
+    force_timezone = BooleanField(
+        _('Use my timezone'),
+        widget=SwitchWidget(),
+        description=_("Always use my current timezone instead of an event's timezone."))
+
+    show_past_events = BooleanField(
+        _('Show past events'),
+        widget=SwitchWidget(),
+        description=_('Show past events by default.'))
+
+    use_previewer_pdf = BooleanField(
+        _('Use previewer for PDF files'),
+        widget=SwitchWidget(),
+        description=_('The previewer is used by default for image and text files, but not for PDF files.'))
 
     def __init__(self, *args, **kwargs):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)

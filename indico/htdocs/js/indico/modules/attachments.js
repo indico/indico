@@ -26,8 +26,13 @@
         var attachment = $('.js-preview-dialog');
         var pageURL = location.href.replace(/#.*$/, '');
 
+        // Previewer not supported on mobile browsers
+        if ($.mobileBrowser) {
+            return;
+        }
+
         $(window).on('hashchange', function(e, initial) {
-            if (location.hash.indexOf('#preview:') != 0) {
+            if (location.hash.indexOf('#preview:') !== 0) {
                 $('.attachment-preview-dialog').trigger('ajaxDialog:close', [true]);
             } else {
                 if (initial && HISTORY_API_SUPPORTED) {
