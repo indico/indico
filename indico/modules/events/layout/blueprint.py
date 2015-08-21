@@ -17,13 +17,15 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.controllers import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
-                                                      RHImageUpload, RHImages, RHLayoutEdit, RHLayoutCSSUpload,
-                                                      RHLayoutCSSDelete, RHLayoutLogoUpload, RHLayoutLogoDelete,
-                                                      RHLogoDisplay, RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
-                                                      RHMenuToggleCustom, RHMenuEnableEntry, RHMenuEntryEdit,
-                                                      RHMenuEntryPosition, RHPageDisplay, RHLayoutCSSSaveTheme,
-                                                      RHLayoutCSSDisplay, RHLayoutCSSPreview)
+from indico.modules.events.layout.controllers.images import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
+                                                             RHImageUpload, RHImages)
+from indico.modules.events.layout.controllers.layout import (RHLayoutEdit, RHLayoutCSSUpload, RHLayoutCSSDelete,
+                                                             RHLayoutLogoUpload, RHLayoutLogoDelete, RHLogoDisplay,
+                                                             RHLayoutCSSSaveTheme, RHLayoutCSSDisplay,
+                                                             RHLayoutCSSPreview)
+from indico.modules.events.layout.controllers.menu import (RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
+                                                           RHMenuToggleCustom, RHMenuEnableEntry, RHMenuEntryEdit,
+                                                           RHMenuEntryPosition, RHPageDisplay)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
