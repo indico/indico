@@ -107,7 +107,11 @@
 
                     self.on('error', function(e, msg, xhr) {
                         if (xhr) {
-                            $form.trigger('ajaxDialog:error', [xhr]);
+                            var evt = $.Event('ajaxDialog:error');
+                            $form.trigger(evt, [xhr]);
+                            if (!evt.isDefaultPrevented()) {
+                                handleAjaxError(xhr);
+                            }
                         }
                     });
                 }
