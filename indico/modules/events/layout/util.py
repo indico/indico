@@ -45,16 +45,58 @@ def get_menu_entries_from_signal():
 
 
 def build_menu_entry_name(name, plugin=None):
+    """ Builds the proper name for a menu entry.
+
+    Given a menu entry's name and optionally a plugin, returns the
+    correct name of the menu entry.
+
+    :param name: str -- The name of the menu entry.
+    :param plugin: IndicoPlugin or str -- The plugin (or the name of the
+        plugin) which created the entry.
+    """
     if plugin:
+        plugin = getattr(plugin, 'name', plugin)
         return '{}:{}'.format(plugin, name)
     else:
         return name
 
 
 class MenuEntryData(object):
+    """Container to transmit menu entry-related data via signals
+
+    The data contained is transmitted via the `sidemenu` signal and used
+    to build the side menu of an event.
+
+    :param title: str -- The title of the menu, displayed to the user.
+        The title must be marked for translation, but not directly
+        translated, using `N_(...)` from `indico.util.i18n`.
+    :param name: str -- Name used to refer to the entry internally.
+        This is never shown to the user. The name must be unique,
+        names from plugins are automatically prefixed with the plugin
+        name and a colon and therefore have to be unique only within the
+        plugin. To mark the entry as active, its name must be specified
+        in the `menu_entry_name` class attribute of the WP class. For
+        plugins, the plugin name must be specified via the
+        `menu_entry_plugin` attribute as well.
+    :param endpoint: str -- The endpoint the entry will point to.
+    :param position: int -- The desired position of the menu entry.
+        the position is indicative only, relative to the other entries
+        and not the exact position. Entries with the same position will
+        be sorted alphanumerically on their name. A position of `-1`
+        will append the entry at the end of the menu.
+    :param is_enabled: bool -- Whether the entry should be enabled by
+        default (Default: `True`).
+    :param visible: function -- Determines if the entry should be
+        visible. This is a simple function which takes only the `event`
+        as parameter and returns a boolean to indicate if the entry is
+        visible or not. It is called whenever the menu is displayed, so
+        the current state of the event/user can be taken into account.
+    :param parent: str -- The name of the parent entry (None for root
+        entries).
+    """
     plugin = None
 
-    def __init__(self, title, name, endpoint, position=0, is_enabled=True, visible=None, parent=None):
+    def __init__(self, title, name, endpoint, position=-1, is_enabled=True, visible=None, parent=None):
         self.title = title
         self._name = name
         self.endpoint = endpoint
@@ -65,7 +107,7 @@ class MenuEntryData(object):
 
     @property
     def name(self):
-        return build_menu_entry_name(self._name, self.plugin.name if self.plugin else None)
+        return build_menu_entry_name(self._name, self.plugin)
 
     def visible(self, event):
         return self._visible(event) if self._visible else True
