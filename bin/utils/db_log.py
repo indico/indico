@@ -97,19 +97,20 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             with output_lock:
                 print '\n' * 5
                 print_linesep(True, 10)
-                print '\x1b[38;5;70mBegin request\x1b[0m   {}'.format(obj['req_url'] or '')
+                print '\x1b[38;5;70mBegin request\x1b[0m  {} {}'.format(obj['req_verb'] or '', obj['req_url'] or '')
                 print_linesep()
             return
         elif sql_log_type == 'end_request':
             with output_lock:
-                print '\x1b[38;5;202mEnd request\x1b[0m     {} [{} queries | {:.06f}s]'.format(obj['req_url'],
-                                                                                               obj['sql_query_count'],
-                                                                                               obj['req_duration'])
+                print '\x1b[38;5;202mEnd request\x1b[0m    {} {} [{} queries | {:.06f}s]'.format(obj['req_verb'],
+                                                                                                 obj['req_url'],
+                                                                                                 obj['sql_query_count'],
+                                                                                                 obj['req_duration'])
                 print_linesep(True, 196)
             return
         if self.server.ignore_selects and obj.get('sql_verb') == 'SELECT':
             return
-        ignored = self._check_ignored_sources(obj['sql_source'])
+        ignored = obj.get('sql_verb') == 'SELECT' and self._check_ignored_sources(obj['sql_source'])
         if ignored:
             if sql_log_type == 'end':
                 with output_lock:
@@ -211,8 +212,8 @@ def sigint(*unused):
               help='Number of stack frames to show (max. 5)')
 @click.option('-S', '--ignore-selects', is_flag=True, help='If SELECTs should be hidden')
 @click.option('-i', '--ignored-sources', multiple=True, metavar='[FRAME:]FILE[:LINENO]',
-              help='Query origins to ignore. May be used multiple times.  If no line is specified, the whole file is '
-                   'ignored.  If no frame is specified, frame 1 (the topmost one in the log) will be used.')
+              help='SELECT Query origins to ignore. May be used multiple times.  If no line is specified, the whole '
+                   'file is ignored.  If no frame is specified, frame 1 (the topmost one in the log) will be used.')
 @click.option('-I', '--ignored-request-paths', multiple=True, metavar='PATH',
               help='Request paths to ignore. May be used multiple times.  Matched against request.path (e.g. '
                    '/assets/js-vars/user.js).')

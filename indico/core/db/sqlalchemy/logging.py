@@ -68,6 +68,7 @@ def apply_db_loggers(app):
         if not g.get('req_start_sent'):
             g.req_start_sent = True
             logger.debug('Request started', extra={'sql_log_type': 'start_request',
+                                                   'req_verb': request.method if has_request_context() else None,
                                                    'req_path': request.path if has_request_context() else None,
                                                    'req_url': request.url if has_request_context() else None})
 
@@ -120,6 +121,7 @@ def apply_db_loggers(app):
         duration = (time.time() - g.req_start_ts) if 'req_start_ts' in g else 0
         logger.debug('Request finished', extra={'sql_log_type': 'end_request',
                                                 'sql_query_count': query_count,
+                                                'req_verb': request.method if has_request_context() else None,
                                                 'req_url': request.url if has_request_context() else None,
                                                 'req_path': request.path if has_request_context() else None,
                                                 'req_duration': duration})
