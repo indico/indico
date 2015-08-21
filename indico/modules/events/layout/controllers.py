@@ -21,7 +21,7 @@ from io import BytesIO
 from itertools import count
 
 from flask import flash, redirect, request, session, jsonify, render_template
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, NotFound, Forbidden
 
 from indico.core import signals
 from indico.core.db import db
@@ -175,11 +175,33 @@ class RHMenuBase(RHConferenceModifBase):
         if self._conf.getType() != 'conference':
             raise NotFound('Only conferences have a menu')
 
+    def _require_custom_menu(self):
+        if not layout_settings.get(self._conf, 'use_custom_menu'):
+            raise Forbidden('The menu cannot be changed unless menu customization is enabled')
+
 
 class RHMenuEdit(RHMenuBase):
     def _process(self):
+        custom_menu_enabled = layout_settings.get(self._conf, 'use_custom_menu')
+        menu = menu_entries_for_event(self._conf, show_hidden=True) if custom_menu_enabled else None
         return WPMenuEdit.render_template('menu_edit.html', self._conf, event=self._conf, MenuEntryType=MenuEntryType,
-                                          menu=menu_entries_for_event(self._conf, show_hidden=True))
+                                          menu=menu, custom_menu_enabled=custom_menu_enabled)
+
+
+class RHMenuToggleCustom(RHMenuBase):
+    def _process(self):
+        enabled = request.form['enabled'] == '1'
+        if enabled:
+            # nothing else to do here. menu items are added to the DB when retrieving the menu
+            flash(_('Menu customization has been enabled.'), 'success')
+        else:
+            for entry in MenuEntry.find(event_id=int(self._conf.id)):
+                db.session.delete(entry)
+            flash(_('Menu customization has been disabled.'), 'success')
+        layout_settings.set(self._conf, 'use_custom_menu', enabled)
+        logger.info('Menu customization for {} {} by {}'.format(self._conf, 'enabled' if enabled else 'disabled',
+                                                                session.user))
+        return jsonify(enabled=enabled)
 
 
 class RHMenuEntryEditBase(RHMenuBase):
@@ -188,6 +210,10 @@ class RHMenuEntryEditBase(RHMenuBase):
             lambda self: self.entry
         }
     }
+
+    def _checkProtection(self):
+        RHMenuBase._checkProtection(self)
+        self._require_custom_menu()
 
     def _checkParams(self, params):
         RHMenuBase._checkParams(self, params)
@@ -255,6 +281,10 @@ class RHMenuEnableEntry(RHMenuEntryEditBase):
 
 
 class RHMenuAddEntry(RHMenuBase):
+    def _checkProtection(self):
+        RHMenuBase._checkProtection(self)
+        self._require_custom_menu()
+
     def _process(self):
         defaults = FormDefaults(get_default_values(MenuEntry))
         entry_type = request.args['type']

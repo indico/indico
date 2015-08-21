@@ -20,15 +20,17 @@ from indico.web.flask.wrappers import IndicoBlueprint
 from indico.modules.events.layout.controllers import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
                                                       RHImageUpload, RHImages, RHLayoutCSSUpload, RHLayoutEdit,
                                                       RHLayoutLogoUpload, RHLogoDisplay, RHMenuAddEntry,
-                                                      RHMenuDeleteEntry, RHMenuEdit, RHMenuEnableEntry, RHMenuEntryEdit,
-                                                      RHMenuEntryPosition, RHPageDisplay, RHLayoutCSSSaveTheme,
-                                                      RHLayoutCSSDisplay, RHLayoutCSSPreview)
+                                                      RHMenuDeleteEntry, RHMenuEdit, RHMenuToggleCustom,
+                                                      RHMenuEnableEntry, RHMenuEntryEdit, RHMenuEntryPosition,
+                                                      RHPageDisplay, RHLayoutCSSSaveTheme, RHLayoutCSSDisplay,
+                                                      RHLayoutCSSPreview)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
 
 _bp.add_url_rule('/', 'index', RHLayoutEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
+_bp.add_url_rule('/menu/toggle-customize', 'menu_toggle_custom', RHMenuToggleCustom, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu_entry_edit', RHMenuEntryEdit, methods=('GET', 'POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu_entry_position', RHMenuEntryPosition, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/enable', 'menu_enable_entry', RHMenuEnableEntry, methods=('POST',))

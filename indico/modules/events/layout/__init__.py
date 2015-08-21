@@ -41,7 +41,8 @@ layout_settings = EventSettingsProxy('layout', {
     'announcement': None,
     'show_announcement': False,
     'use_custom_css': False,
-    'theme': None
+    'theme': None,
+    'use_custom_menu': False
 }, preload=True)
 
 
