@@ -89,7 +89,7 @@ class MenuUserEntry(MenuEntryForm):
 
 
 class MenuLinkForm(MenuUserEntry):
-    endpoint = URLField(_("URL"), [DataRequired()])
+    link_url = URLField(_("URL"), [DataRequired()])
 
 
 class MenuPageForm(MenuUserEntry):
