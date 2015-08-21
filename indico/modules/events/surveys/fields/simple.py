@@ -14,15 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from indico.web.forms.fields import IndicoRadioField
+from __future__ import unicode_literals, division
+
+from collections import Counter
 
 from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
 from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
-from indico.web.forms.fields import IndicoStaticTextField
+from indico.web.forms.fields import IndicoStaticTextField, IndicoRadioField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -46,6 +47,9 @@ class TextField(SurveyField):
     def validators(self):
         max_length = self.question.field_data.get('max_length')
         return [Length(max=max_length)] if max_length else None
+
+    def get_summary(self):
+        return [a.data for a in self.question.answers if a.data]
 
 
 class NumberConfigForm(FieldConfigForm):
@@ -76,6 +80,18 @@ class NumberField(SurveyField):
             return
         return [NumberRange(min=min_value, max=max_value)]
 
+    def get_summary(self):
+        counter = Counter()
+        for answer in self.question.answers:
+            if answer.data:
+                counter[answer.data] += 1
+        results = {'total': sum(counter.elements()),
+                   'max': max(counter.elements()),
+                   'min': min(counter.elements()),
+                   'counter': counter}
+        results['average'] = (results['max'] + results['min']) / len(list(counter.elements()))
+        return results
+
 
 class BoolField(SurveyField):
     name = 'bool'
@@ -88,6 +104,17 @@ class BoolField(SurveyField):
         return {'orientation': 'horizontal',
                 'choices': [(1, _('Yes')), (0, _('No'))],
                 'coerce': lambda x: bool(int(x))}
+
+    def get_summary(self):
+        counter = Counter()
+        for answer in self.question.answers:
+            if answer.data:
+                counter[answer.data] += 1
+        total = sum(counter.values())
+        results = {'total': total,
+                   'absolute': {_('Yes'): counter[True], _('No'): counter[False]},
+                   'relative': {_('Yes'): counter[True] / total, _('No'): counter[False] / total}}
+        return results
 
 
 class StaticTextConfigForm(FieldConfigForm):
