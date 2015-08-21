@@ -8,18 +8,36 @@
 {% endblock %}
 
 {%- block content %}
-    Customize menu
-    {{ switch(id='toggle-menu-customization', checked=custom_menu_enabled, data_href=url_for('.menu_toggle_custom', event),
-              data_confirm_enable=_('When enabling menu customization, you can re-arrange menu entries and add custom links/pages to your event.'),
-              data_confirm_disable=_('Disabling menu customizations will revert to the default menu and PERMANENTLY DELETE all menu customizations including custom pages.')) }}
-    <script>
+    <div class="fixed-width-page layout-wrapper" id="menu-customization">
+        <div class="row">
+            <div class="col-100">
+                <div class="action-box">
+                    <div class="section">
+                        <div class="icon icon-wrench"></div>
+                        <div class="toolbar right">
+                            {{ switch(id='toggle-menu-customization',
+                                      checked=custom_menu_enabled,
+                                      data_href=url_for('.menu_toggle_custom', event),
+                                      data_confirm_disable=_('Disabling menu customizations will revert to the default menu and PERMANENTLY DELETE all menu customizations including custom pages.')) }}
+                        </div>
+                        <div class="text">
+                            <div class="label">
+                                {%- trans %}Customize menu{% endtrans -%}
+                            </div>
+                            <div>
+                                {%- trans %}When enabling menu customization, you can re-arrange menu entries and add custom links/pages to your event.{% endtrans -%}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
         $('#toggle-menu-customization').ajaxCheckbox().on('ajaxCheckbox:changed', function() {
-            location.reload();
-        });
-    </script>
-
-    {% if custom_menu_enabled %}
-        <div class="fixed-width-page layout-wrapper" id="menu-customization">
+                location.reload();
+            });
+        </script>
+        {% if custom_menu_enabled %}
             <div class="row">
                 <div id="menu-entries" class="column col-40">
                     {{ menu_entries(menu, connect_menu=true) }}
@@ -72,39 +90,39 @@
                         </div>
                     </div>
                 </div>
+                <script>
+                    $(document).ready(function initMenuEdit() {
+                        initMenuSortable();
+
+                        function _addNewEntry(data, classes) {
+                            if (data) {
+                                $('#menu-entries > .menu-entries').append($('<li>', {
+                                    'class': classes
+                                }).html(data.entry));
+                                initMenuSortable();
+                            }
+                        }
+
+                        $('.js-add-entry-dropdown').dropdown();
+
+                        $('.add-link, .add-page').ajaxDialog({
+                            title: function() { return $(this).data('title'); },
+                            onClose: function(data) { _addNewEntry(data, 'nestable allow-nested'); }
+                        });
+                        $('.add-separator').on('click', function addSeparator (evt) {
+                            evt.preventDefault();
+
+                            $.ajax({
+                                url: {{ url_for('.menu_add_entry', event, type='separator')|tojson }},
+                                method: 'POST',
+                                complete: IndicoUI.Dialogs.Util.progress(),
+                                error: handleAjaxError,
+                                success: function(data) { _addNewEntry(data, ''); }
+                            });
+                        });
+                    });
+                </script>
             </div>
-        </div>
-        <script>
-        $(document).ready(function initMenuEdit() {
-            initMenuSortable();
-
-            function _addNewEntry(data, classes) {
-                if (data) {
-                    $('#menu-entries > .menu-entries').append($('<li>', {
-                        'class': classes
-                    }).html(data.entry));
-                    initMenuSortable();
-                }
-            }
-
-            $('.js-add-entry-dropdown').dropdown();
-
-            $('.add-link, .add-page').ajaxDialog({
-                title: function() { return $(this).data('title'); },
-                onClose: function(data) { _addNewEntry(data, 'nestable allow-nested'); }
-            });
-            $('.add-separator').on('click', function addSeparator (evt) {
-                evt.preventDefault();
-
-                $.ajax({
-                    url: {{ url_for('.menu_add_entry', event, type='separator')|tojson }},
-                    method: 'POST',
-                    complete: IndicoUI.Dialogs.Util.progress(),
-                    error: handleAjaxError,
-                    success: function(data) { _addNewEntry(data, ''); }
-                });
-            });
-        });
-        </script>
-    {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}
