@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
+
+from collections import Counter
 
 from wtforms.fields import SelectField, IntegerField
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError, Length
@@ -72,6 +74,18 @@ class SingleChoiceField(SurveyField):
                 field_options['default'] = ''
                 choices = [('', _('No selection'))] + choices
         return self._make_wtforms_field(field_class, choices=choices, **field_options)
+
+    def get_summary(self, include_empty=False):
+        counter = Counter()
+        for answer in self.question.answers:
+            if answer.data is not None or include_empty:
+                counter[answer.data] += 1
+        total = sum(counter.values())
+        options = self.question.field_data['options']
+        results = {'total': total,
+                   'absolute': {opt['option']: counter[opt['id']] for opt in options},
+                   'relative': {opt['option']: counter[opt['id']] / total for opt in options}}
+        return results
 
 
 class MultiSelectConfigForm(FieldConfigForm):
@@ -136,3 +150,14 @@ class MultiSelectField(SurveyField):
     def wtf_field_kwargs(self):
         return {'choices': [(x['id'], x['option']) for x in self.question.field_data['options']],
                 'coerce': lambda x: x}
+
+    def get_summary(self):
+        counter = Counter()
+        for answer in self.question.answers:
+            counter.update(answer.data)
+        total = sum(counter.values())
+        options = self.question.field_data['options']
+        results = {'total': total,
+                   'absolute': {opt['option']: counter[opt['id']] for opt in options},
+                   'relative': {opt['option']: counter[opt['id']] / total for opt in options}}
+        return results
