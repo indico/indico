@@ -144,6 +144,20 @@
                     height: 1.2em;
                     vertical-align: middle;
                 }
+                > .entry-internal_link,
+                > .entry-user_link,
+                > .entry-plugin_link {
+                    @include icon-before('icon-link');
+                }
+                > .entry-page {
+                    @include icon-before('icon-file');
+                }
+                > .entry-separator {
+                    @include icon-before('icon-arrows-vert');
+                }
+                .drag-handle {
+                    cursor: move;
+                }
                 /* menu title */
                 > span:first-child {
                     display: inline-block;
@@ -188,8 +202,6 @@
                     }
                     > .drag-handle {
                         @include icon-before('icon-grid2');
-
-                        cursor: move;
                     }
                 }
                 &.highlight > .actions > * {
@@ -197,17 +209,6 @@
                     &:hover {
                         color: $link;
                     }
-                }
-                &.entry-internal_link,
-                &.entry-user_link,
-                &.entry-plugin_link {
-                    @include icon-before('icon-link');
-                }
-                &.entry-page {
-                    @include icon-before('icon-file');
-                }
-                &.entry-separator {
-                    @include icon-before('icon-arrows-vert');
                 }
             }
         }
@@ -262,6 +263,7 @@
         }
     }
      > .highlight + .menu-entries {
+        @include border-all(darken($pastel-blue, $light-color-variation));
         background-color: $light-blue;
      }
 }

@@ -46,6 +46,7 @@
         $('.menu-entries').sortable({
             handle: '.drag-handle',
             placeholder: 'menu-entry-placeholder',
+            axis: 'y',
             connectWith: '.connect-menu',
             start: function(evt, ui) {
                 _sender = $(this);
