@@ -295,6 +295,41 @@ class MenuEntry(MenuEntryMixin, db.Model):
     def get_for_event(cls, event):
         return cls.find(event_id=int(event.id), parent_id=None, _eager=cls.children).order_by(MenuEntry.position).all()
 
+    def move(self, to):
+        from_ = self.position
+        new_pos = to
+        value = -1
+        if to is None or to < 0:
+            new_pos = to = -1
+
+        if from_ > to:
+            new_pos += 1
+            from_, to = to, from_
+            to -= 1
+            value = 1
+
+        entries = MenuEntry.find(MenuEntry.parent_id == self.parent_id,
+                                 MenuEntry.event_id == self.event_id,
+                                 MenuEntry.position.between(from_ + 1, to))
+        for e in entries:
+            e.position += value
+        self.position = new_pos
+
+    def insert(self, parent_id, position):
+        if position is None or position < 0:
+            position = -1
+        old_siblings = MenuEntry.find(MenuEntry.position > self.position,
+                                      event_id=self.event_id, parent_id=self.parent_id)
+        for sibling in old_siblings:
+            sibling.position -= 1
+
+        new_siblings = MenuEntry.find(MenuEntry.position > position, event_id=self.event_id, parent_id=parent_id)
+        for sibling in new_siblings:
+            sibling.position += 1
+
+        self.parent_id = parent_id
+        self.position = position + 1
+
 
 class MenuPage(db.Model):
     __tablename__ = 'menu_pages'

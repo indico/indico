@@ -35,7 +35,7 @@ from MaKaC.common.cache import GenericCache
 _cache = GenericCache('updated-menus')
 
 
-def _entry_key(entry_data):
+def _menu_entry_key(entry_data):
     return entry_data.position == -1, entry_data.position, entry_data.name
 
 
@@ -99,8 +99,10 @@ def menu_entries_for_event(event):
                 children[data.parent].append(data)
 
         # Building the entries
-        new_entries = [_build_entry(event, custom_menu_enabled, data, next(pos_gen), children=children.get(data.name))
-                       for (name, data) in sorted(signal_entries.iteritems(), key=lambda (name, data):_entry_key(data))
+        new_entries = [_build_menu_entry(event, custom_menu_enabled, data, next(pos_gen),
+                                         children=children.get(data.name))
+                       for (name, data) in sorted(signal_entries.iteritems(),
+                                                  key=lambda (name, data): _menu_entry_key(data))
                        if name in new_entry_names and data.parent is None]
 
         if custom_menu_enabled:
@@ -115,7 +117,7 @@ def menu_entries_for_event(event):
     return entries
 
 
-def _build_entry(event, custom_menu_enabled, data, position, children=None):
+def _build_menu_entry(event, custom_menu_enabled, data, position, children=None):
     entry_cls = MenuEntry if custom_menu_enabled else TransientMenuEntry
     entry = entry_cls(
         event_id=event.getId(),
@@ -123,8 +125,8 @@ def _build_entry(event, custom_menu_enabled, data, position, children=None):
         title=data.title,
         name=data.name,
         position=position,
-        children=[_build_entry(event, custom_menu_enabled, entry_data, i)
-                  for i, entry_data in enumerate(sorted(children or [], key=_entry_key))]
+        children=[_build_menu_entry(event, custom_menu_enabled, entry_data, i)
+                  for i, entry_data in enumerate(sorted(children or [], key=_menu_entry_key))]
     )
 
     if data.plugin:
@@ -135,45 +137,8 @@ def _build_entry(event, custom_menu_enabled, data, position, children=None):
     return entry
 
 
-def move_entry(entry, to):
-    from_ = entry.position
-    new_pos = to
-    value = -1
-    if to is None or to < 0:
-        new_pos = to = -1
-
-    if from_ > to:
-        new_pos += 1
-        from_, to = to, from_
-        to -= 1
-        value = 1
-
-    entries = MenuEntry.find(MenuEntry.parent_id == entry.parent_id,
-                             MenuEntry.event_id == entry.event_id,
-                             MenuEntry.position.between(from_ + 1, to))
-    for e in entries:
-        e.position += value
-    entry.position = new_pos
-
-
-def insert_entry(entry, parent_id, position):
-    if position is None or position < 0:
-        position = -1
-    old_siblings = MenuEntry.find(MenuEntry.position > entry.position,
-                                  event_id=entry.event_id, parent_id=entry.parent_id)
-    for sibling in old_siblings:
-        sibling.position -= 1
-
-    new_siblings = MenuEntry.find(MenuEntry.position > position, event_id=entry.event_id, parent_id=parent_id)
-    for sibling in new_siblings:
-        sibling.position += 1
-
-    entry.parent_id = parent_id
-    entry.position = position + 1
-
-
 @memoize_request
-def get_entry_from_name(name, event):
+def get_menu_entry_by_name(name, event):
     entries = menu_entries_for_event(event)
     return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
 

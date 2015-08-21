@@ -67,7 +67,7 @@ from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_entry_from_name,
+from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.util import json
 from indico.util.signals import values_from_signal
@@ -168,7 +168,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         if not self.menu_entry_name:
             return None
         name = build_menu_entry_name(self.menu_entry_name, self.menu_entry_plugin)
-        entry = get_entry_from_name(name, self._conf)
+        entry = get_menu_entry_by_name(name, self._conf)
         if entry:
             return entry.id
 
@@ -882,7 +882,7 @@ class WPrintPageFrame (wcomponents.WTemplated):
 class WConfDisplayBodyBase(wcomponents.WTemplated):
 
     def _getTitle(self):
-        entry = get_entry_from_name(self._linkname, self._conf)
+        entry = get_menu_entry_by_name(self._linkname, self._conf)
         return entry.localized_title
 
 

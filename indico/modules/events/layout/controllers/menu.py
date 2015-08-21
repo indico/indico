@@ -26,7 +26,7 @@ from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings, logger
 from indico.modules.events.layout.forms import (MenuEntryForm, MenuLinkForm, MenuPageForm)
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
-from indico.modules.events.layout.util import (insert_entry, menu_entries_for_event, move_entry)
+from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPMenuEdit, WPPage
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -146,10 +146,10 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
                 if not parent_entry:
                     raise BadRequest('New parent entry not found for Menu entry "{0.title}".'.format(self.entry))
 
-            insert_entry(self.entry, parent_id, position)
+            self.entry.insert(parent_id, position)
 
         else:
-            move_entry(self.entry, position)
+            self.entry.move(position)
 
         return jsonify_data()
 

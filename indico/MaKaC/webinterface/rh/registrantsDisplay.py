@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.events.layout.util import get_entry_from_name
+from indico.modules.events.layout.util import get_menu_entry_by_name
 import MaKaC.webinterface.pages.registrants as registrants
 import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
 import MaKaC.webinterface.common.regFilters as regFilters
@@ -27,7 +27,7 @@ class RHRegistrantsDisplayBase( conferenceDisplay.RHConferenceBaseDisplay):
         conferenceDisplay.RHConferenceBaseDisplay._checkProtection(self)
         if (not self._conf.getRegistrationForm().isActivated()
                 or not self._conf.hasEnabledSection("regForm")
-                or not get_entry_from_name('registrants', self._conf).visible):
+                or not get_menu_entry_by_name('registrants', self._conf).visible):
             raise NoReportError("The registrants list page was disabled by the conference managers")
 
 class RHRegistrantsList( RHRegistrantsDisplayBase ):
