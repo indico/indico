@@ -141,7 +141,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
         file_attrs = {
             'url': url_for('attachments.download', self.attachment,
                            filename=self.attachment.file.filename, from_preview='1'),
-            'file_name': file_.filename,
+            'filename': file_.filename,
             'size': file_.size,
             'content_type': file_.content_type
         }

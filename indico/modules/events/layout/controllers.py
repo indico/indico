@@ -61,7 +61,7 @@ def _render_menu_entries(event, connect_menu=False):
 def _logo_data(event):
     return {
         'url': url_for('event_images.logo_display', event),
-        'file_name': event.logo_metadata['file_name'],
+        'filename': event.logo_metadata['filename'],
         'size': event.logo_metadata['size'],
         'content_type': event.logo_metadata['content_type']
     }
@@ -69,7 +69,7 @@ def _logo_data(event):
 
 def _css_file_data(event):
     return {
-        'file_name': event.stylesheet_metadata['filename'],
+        'filename': event.stylesheet_metadata['filename'],
         'size': event.stylesheet_metadata['size'],
         'content_type': 'text/css'
     }
@@ -92,7 +92,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         self.event.logo_metadata = {
             'size': len(content),
-            'file_name': f.filename,
+            'filename': f.filename,
             'content_type': content_type
         }
         flash(_('New logo saved'), 'success')
@@ -165,7 +165,7 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
         logo_data = get_event_logo(self._conf)
         logo_content = BytesIO(logo_data['content'])
         metadata = logo_data['metadata']
-        return send_file(metadata['file_name'], logo_content, mimetype=metadata['content_type'], no_cache=True,
+        return send_file(metadata['filename'], logo_content, mimetype=metadata['content_type'], no_cache=True,
                          conditional=True)
 
 

@@ -42,7 +42,7 @@ class Event(db.Model):
         nullable=False,
         default=False
     )
-    #: The metadata of the logo (size, file_name, content_type)
+    #: The metadata of the logo (size, filename, content_type)
     logo_metadata = db.Column(
         JSON,
         nullable=False,

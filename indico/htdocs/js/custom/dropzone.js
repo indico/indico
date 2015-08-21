@@ -21,7 +21,7 @@
 
                     if (file) {
                         var existingFile = {
-                            name: file.file_name,
+                            name: file.filename,
                             size: file.size,
                             accepted: true
                         };
