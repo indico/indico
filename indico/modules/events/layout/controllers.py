@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
+import binascii
 import mimetypes
 from io import BytesIO
 from itertools import count
 
 from flask import flash, redirect, request, session, jsonify, render_template
+from indico.util.string import to_unicode
 from werkzeug.exceptions import BadRequest, NotFound, Forbidden
 
 from indico.core import signals
@@ -32,9 +34,8 @@ from indico.modules.events.layout.forms import (LayoutForm, LogoForm, CSSForm, M
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
-from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.modules.events.layout.util import (get_event_logo, get_images_for_event, insert_entry,
-                                               menu_entries_for_event, move_entry)
+                                               menu_entries_for_event, move_entry, get_css_url)
 from indico.modules.events.layout.views import WPImages, WPLayoutEdit, WPMenuEdit, WPPage
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -66,11 +67,11 @@ def _logo_data(event):
     }
 
 
-def _css_file_data(css_file):
+def _css_file_data(event):
     return {
-        'file_name': css_file.filename,
-        'size': css_file.size,
-        'content_type': css_file.content_type
+        'file_name': event.stylesheet_metadata['filename'],
+        'size': event.stylesheet_metadata['size'],
+        'content_type': 'text/css'
     }
 
 
@@ -113,39 +114,44 @@ class RHLayoutCSSUpload(RHLayoutBase):
 
     def _process(self):
         f = request.files['file']
-        filename = secure_filename(f.filename, 'stylesheet.css')
-        StylesheetFile.find(event_id=self.event.id).delete()
-        css_file = StylesheetFile(event_id=self.event.id, filename=filename, content_type='text/css')
-        css_file.save(f.file)
-        db.session.add(css_file)
+        self.event.stylesheet = to_unicode(f.read()).strip()
+        self.event.stylesheet_metadata = {
+            'hash': binascii.crc32(self.event.stylesheet) & 0xffffffff,
+            'size': len(self.event.stylesheet),
+            'filename': secure_filename(f.filename, 'stylesheet.css')
+        }
         db.session.flush()
-
-        flash(_('New CSS file saved'), 'success')
-        logger.info('CSS file {} uploaded by {}'.format(css_file, session.user))
-        return jsonify_data(content=_css_file_data(css_file))
+        flash(_('New CSS file saved. Do not forget to enable it ("Use custom CSS") after verifying that it is correct '
+                'using the preview.'), 'success')
+        logger.info('CSS file for {} uploaded by {}'.format(self.event, session.user))
+        return jsonify_data(content=_css_file_data(self.event))
 
 
 class RHLayoutCSSDelete(RHLayoutBase):
 
     def _process(self):
-        css_file = StylesheetFile.find_one(event_id=self.event.id)
-        db.session.delete(css_file)
+        self.event.stylesheet = None
+        self.event.stylesheet_metadata = None
+        layout_settings.set(self.event, 'use_custom_css', False)
         flash(_('CSS file deleted'), 'success')
-        logger.info("CSS file {} deleted by {}".format(css_file, session.user))
+        logger.info("CSS file for {} deleted by {}".format(self.event, session.user))
         return jsonify_data(content=None)
 
 
 class RHLayoutCSSPreview(RHConferenceModifBase):
     def _process(self):
-        theme = request.args.get('theme', '')
-        return WPConfModifPreviewCSS(self, self._conf, theme).display()
+        form = CSSSelectionForm(event=self._conf.as_event, formdata=request.args, csrf_enabled=False)
+        css_url = None
+        if form.validate():
+            css_url = get_css_url(self._conf.as_event, force_theme=form.theme.data, for_preview=True)
+        return WPConfModifPreviewCSS(self, self._conf, form=form, css_url=css_url).display()
 
 
 class RHLayoutCSSSaveTheme(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def _process(self):
-        form = CSSSelectionForm(event=self._conf)
+        form = CSSSelectionForm(event=self._conf.as_event)
         if form.validate_on_submit():
             layout_settings.set(self._conf, 'use_custom_css', form.theme.data == '_custom')
             if form.theme.data != '_custom':
@@ -164,19 +170,12 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
 
 
 class RHLayoutCSSDisplay(RHConferenceBaseDisplay):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.css
-        }
-    }
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        css_id = request.view_args['css_id']
-        self.css = StylesheetFile.get_one(css_id)
-
     def _process(self):
-        return self.css.send()
+        event = self._conf.as_event
+        if not event.has_stylesheet:
+            raise NotFound
+        data = BytesIO(event.stylesheet.encode('utf-8'))
+        return send_file(event.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True)
 
 
 class RHLayoutEdit(RHLayoutBase):
@@ -187,7 +186,7 @@ class RHLayoutEdit(RHLayoutBase):
 
     def _process(self):
         defaults = FormDefaults(**layout_settings.get_all(self._conf))
-        form = LayoutForm(obj=defaults)
+        form = LayoutForm(obj=defaults, event=self.event)
         css_form = CSSForm()
         logo_form = LogoForm()
 
@@ -201,9 +200,8 @@ class RHLayoutEdit(RHLayoutBase):
         else:
             if self.event.logo_metadata:
                 logo_form.logo.data = _logo_data(self.event)
-            css_file = StylesheetFile.find_first(event_id=self.event.id)
-            if css_file:
-                css_form.css_file.data = _css_file_data(css_file)
+            if self.event.has_stylesheet:
+                css_form.css_file.data = _css_file_data(self.event)
         return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf,
                                             logo_form=logo_form, css_form=css_form)
 

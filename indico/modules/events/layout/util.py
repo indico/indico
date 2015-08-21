@@ -27,7 +27,6 @@ from indico.core.db import db
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
-from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
 from indico.web.flask.util import url_for
@@ -200,7 +199,7 @@ def get_images_for_event(event):
 def get_css_url(event, force_theme=None, for_preview=False):
     """Builds the URL of a CSS resource.
 
-    :param event: Required to build the URL of a custom CSS resource
+    :param event: The `Event` to get the CSS url for
     :param force_theme: The ID of the theme to override the custom CSS resource
                         only if it exists
     :param for_preview: Whether the URL is used in the CSS preview page
@@ -213,7 +212,8 @@ def get_css_url(event, force_theme=None, for_preview=False):
     elif for_preview and force_theme is None:
         return None
     elif force_theme == '_custom' or layout_settings.get(event, 'use_custom_css'):
-        uploaded_css = StylesheetFile.find_first(event_id=event.id)
-        return url_for('event_layout.css_display', event, uploaded_css, _external=True) if uploaded_css else None
+        if not event.has_stylesheet:
+            return None
+        return url_for('event_layout.css_display', event, slug=event.stylesheet_metadata['hash'])
     elif layout_settings.get(event, 'theme'):
         return "{}/{}".format(Config.getInstance().getCssConfTemplateBaseURL(), layout_settings.get(event, 'theme'))

@@ -27,6 +27,8 @@ from indico.util.string import return_ascii
 class Event(db.Model):
     __tablename__ = 'events'
     __table_args__ = (db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
+                      db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
+                                         'valid_stylesheet'),
                       {'schema': 'events'})
 
     #: The ID of the event
@@ -51,10 +53,20 @@ class Event(db.Model):
         db.LargeBinary,
         nullable=True
     ))
+    #: The metadata of the stylesheet (hash, size, filename)
+    stylesheet_metadata = db.Column(
+        JSON,
+        nullable=False,
+        default=None
+    )
+    #: The stylesheet's raw image data
+    stylesheet = db.deferred(db.Column(
+        db.Text,
+        nullable=True
+    ))
 
     # relationship backrefs:
     # - layout_images (ImageFile.event_new)
-    # - layout_stylesheets (StylesheetFile.event_new)
     # - menu_entries (MenuEntry.event_new)
 
     @property
@@ -67,6 +79,10 @@ class Event(db.Model):
     @property
     def has_logo(self):
         return self.logo_metadata is not None
+
+    @property
+    def has_stylesheet(self):
+        return self.stylesheet_metadata is not None
 
     @property
     def locator(self):

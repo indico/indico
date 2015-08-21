@@ -33,12 +33,12 @@
     {{ form_header(css_form, classes='css-form', action=url_for('event_layout.upload_css', event)) }}
         <div class="flashed-messages"></div>
         {% call form_row(css_form.css_file, skip_label=true) %}
-            {% if css_form.css_file.data %}
-                <a class="i-button i-form-field-button i-form-field-width icon-eye" target="_blank"
-                   href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}">
-                    {%- trans %}Preview{% endtrans -%}
-                </a>
-            {% endif %}
+            <a class="i-button i-form-field-button i-form-field-width icon-eye js-preview-button
+                      {%- if not css_form.css_file.data %} weak-hidden{% endif %}"
+               target="_blank"
+               href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}">
+                {%- trans %}Preview{% endtrans -%}
+            </a>
         {% endcall %}
     {% call form_footer(css_form) %}
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
@@ -66,6 +66,8 @@
 
     <script>
         $(document).ready(function() {
+            'use strict';
+
             $('#theme').nullableselector({nullvalue: ''}).on('change', function() {
                 var previewURL = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
                     theme: $(this).val()
@@ -73,9 +75,32 @@
                 $(this).nextAll('.js-theme-preview-btn').attr('href', previewURL);
             }).trigger('change');
 
+            function updateCustomCSS(hasFile) {
+                var useCustomCSS = $('#use_custom_css');
+                useCustomCSS.prop('disabled', !hasFile);
+                if (!hasFile) {
+                    var form = $('#use_custom_css').closest('form');
+                    var formData = form.data('initialData');
+                    useCustomCSS.prop('checked', false).trigger('change');
+                    // we need to inform the change tracking system about the new server-side value
+                    formData = formData.replace(/&use_custom_css=y/, '');
+                    // also add the theme field (it's enabled now so it's empty instead of not present)
+                    if (!~formData.indexOf('&theme=')) {
+                        formData += '&theme=' + encodeURIComponent($('#theme').val());
+                    }
+                    form.data('initialData', formData).trigger('change');
+                }
+            }
+
+            updateCustomCSS({{ (css_form.css_file.data is not none) | tojson }});
+
             $('.css-form, .logo-form').on('indico:fieldsSaved', function(e, response) {
                 var hidden = !response.content;
-                $(this).find('.js-remove-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+                var $this = $(this);
+                $this.find('.js-remove-button, .js-preview-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+                if ($this.is('.css-form')) {
+                    updateCustomCSS(!hidden);
+                }
             }).on('click', '.js-remove-button', function(e) {
                 var $this = $(this);
                 var $form = $this.closest('form');

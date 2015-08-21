@@ -19,12 +19,10 @@ from __future__ import unicode_literals
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField, HiddenField
-from wtforms.validators import InputRequired, DataRequired, Optional
+from wtforms.validators import InputRequired, DataRequired, Optional, ValidationError
 
 from indico.core.config import Config
-from indico.modules.events.layout.models.stylesheets import StylesheetFile
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import UsedIf, HiddenUnless
@@ -61,9 +59,18 @@ class LayoutForm(IndicoForm):
     use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
                                   description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
                                                 "this option to reveal the available Indico themes."))
-    theme = SelectField(_("Theme"), [HiddenUnless('use_custom_css', False)], choices=THEMES,
+    theme = SelectField(_("Theme"), [Optional(), HiddenUnless('use_custom_css', False)], choices=THEMES,
+                        coerce=lambda x: (x or None),
                         description=_("Currently selected theme of the conference page. Click on the Preview button to "
                                       "preview and select a different one."))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(LayoutForm, self).__init__(*args, **kwargs)
+
+    def validate_use_custom_css(self, field):
+        if field.data and not self.event.has_stylesheet:
+            raise ValidationError(_('Cannot enable custom stylesheet unless there is one.'))
 
 
 class LogoForm(IndicoForm):
@@ -112,8 +119,7 @@ class CSSSelectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super(CSSSelectionForm, self).__init__(*args, **kwargs)
-        css_file = StylesheetFile.find_first(event_id=event.id)
         self.theme.choices = list(THEMES)
-        if css_file:
-            self.theme.choices = (THEMES +
-                                  [('_custom', _("Custom CSS file ({name})".format(name=css_file.filename)))])
+        if event.has_stylesheet:
+            custom = [('_custom', _("Custom CSS file ({name})").format(name=event.stylesheet_metadata['filename']))]
+            self.theme.choices = THEMES + custom

@@ -67,7 +67,6 @@ from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.forms import CSSSelectionForm
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_entry_from_name,
                                                menu_entries_for_event)
 from indico.util import json
@@ -224,13 +223,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             timestamp = os.stat(__file__).st_mtime
         except OSError:
             timestamp = 0
-        printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/css/Conf_Basic.css?%d" >
-            """ % (path, timestamp)
-        theme_url = get_css_url(self._conf)
+        printCSS = '<link rel="stylesheet" type="text/css" href="{}/css/Conf_Basic.css?{}">'.format(path, timestamp)
+        theme_url = get_css_url(self._conf.as_event)
         if theme_url:
-            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
-            printCSS += link
+            printCSS += '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
 
         # Include MathJax
 
@@ -745,7 +741,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
             styleText += """<link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
 
-        theme_url = get_css_url(self._conf)
+        theme_url = get_css_url(self._conf.as_event)
         if theme_url:
             link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
             styleText += link
@@ -5801,22 +5797,12 @@ class WPConfModifPosterDesign(WPBadgeBase):
 
 class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
 
-    def __init__( self, rh, conf, selectedCSSId):
-        WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
+    def __init__(self, rh, conf, **kwargs):
+        WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
 
         self._conf = conf
         self._cssTplsModule = ModuleHolder().getById("cssTpls")
         self._styleMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        self.css_url = None
-
-        self._selectedCSS = None
-        if selectedCSSId == "css": # local uploaded file choice
-            self._selectedCSS = self._styleMgr.getLocalCSS()
-        elif selectedCSSId:
-            self._selectedCSS = self._cssTplsModule.getCssTplById(selectedCSSId)
-        self.form = CSSSelectionForm(event=self._conf, formdata=request.args, csrf_enabled=False)
-        if self.form.validate():
-            self.css_url = get_css_url(self._conf, force_theme=self.form.theme.data, for_preview=True)
 
     def _applyDecoration( self, body ):
         """
@@ -5826,8 +5812,6 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
     def _getBody( self, params ):
         params['confId'] = self._conf.getId()
         params['conf'] = self._conf
-        params['css_url'] = self.css_url
-        params['form'] = self.form
 
         ###############################
         # injecting ConferenceDisplay #
@@ -5842,20 +5826,16 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         wc = WPreviewPage()
         return wc.getHTML(params)
 
-    def _getHeadContent( self ):
+    def _getHeadContent(self):
         path = Config.getInstance().getCssBaseURL()
         try:
             timestamp = os.stat(__file__).st_mtime
         except OSError:
             timestamp = 0
-        printCSS = """
-        <link rel="stylesheet" type="text/css" href="%s/Conf_Basic.css?%d" >
-            """ % (path, timestamp)
+        printCSS = '<link rel="stylesheet" type="text/css" href="{}/Conf_Basic.css?{}">\n'.format(path, timestamp)
 
-        if self._selectedCSS:
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s" >"""%self._selectedCSS.getURL()
-        if self.css_url:
-            printCSS += '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=self.css_url)
+        if self._kwargs['css_url']:
+            printCSS += '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=self._kwargs['css_url'])
         return printCSS
 
 

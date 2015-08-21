@@ -45,7 +45,7 @@ _bp.add_url_rule('/logo', 'delete_logo', RHLayoutLogoDelete, methods=('DELETE',)
 _bp.add_url_rule('/images/', 'images', RHImages)
 _bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
 _bp.add_url_rule('/images/<int:image_id>', 'image_delete', RHImageDelete, methods=('DELETE',))
-_bp.add_url_rule('!/event/<confId>/<int:css_id>.css', 'css_display', RHLayoutCSSDisplay)
+_bp.add_url_rule('!/event/<confId>/<slug>.css', 'css_display', RHLayoutCSSDisplay)
 
 
 _bp_images = IndicoBlueprint('event_images', __name__, template_folder='templates',

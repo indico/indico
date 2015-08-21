@@ -22,7 +22,10 @@ def upgrade():
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('logo_metadata', postgresql.JSON(), nullable=False),
         sa.Column('logo', sa.LargeBinary(), nullable=True),
+        sa.Column('stylesheet_metadata', postgresql.JSON(), nullable=False),
+        sa.Column('stylesheet', sa.Text(), nullable=True),
         sa.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", name='valid_logo'),
+        sa.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')", name='valid_stylesheet'),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
