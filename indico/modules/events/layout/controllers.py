@@ -34,8 +34,8 @@ from indico.modules.events.layout.forms import (LayoutForm, LogoForm, CSSForm, M
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
-from indico.modules.events.layout.util import (get_event_logo, get_images_for_event, insert_entry,
-                                               menu_entries_for_event, move_entry, get_css_url)
+from indico.modules.events.layout.util import (get_images_for_event, insert_entry, menu_entries_for_event, move_entry,
+                                               get_css_url)
 from indico.modules.events.layout.views import WPImages, WPLayoutEdit, WPMenuEdit, WPPage
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -138,35 +138,35 @@ class RHLayoutCSSDelete(RHLayoutBase):
         return jsonify_data(content=None)
 
 
-class RHLayoutCSSPreview(RHConferenceModifBase):
+class RHLayoutCSSPreview(RHLayoutBase):
     def _process(self):
-        form = CSSSelectionForm(event=self._conf.as_event, formdata=request.args, csrf_enabled=False)
+        form = CSSSelectionForm(event=self.event, formdata=request.args, csrf_enabled=False)
         css_url = None
         if form.validate():
-            css_url = get_css_url(self._conf.as_event, force_theme=form.theme.data, for_preview=True)
+            css_url = get_css_url(self.event, force_theme=form.theme.data, for_preview=True)
         return WPConfModifPreviewCSS(self, self._conf, form=form, css_url=css_url).display()
 
 
-class RHLayoutCSSSaveTheme(RHConferenceModifBase):
-    CSRF_ENABLED = True
+class RHLayoutCSSSaveTheme(RHLayoutBase):
 
     def _process(self):
-        form = CSSSelectionForm(event=self._conf.as_event)
+        form = CSSSelectionForm(event=self.event)
         if form.validate_on_submit():
-            layout_settings.set(self._conf, 'use_custom_css', form.theme.data == '_custom')
+            layout_settings.set(self.event, 'use_custom_css', form.theme.data == '_custom')
             if form.theme.data != '_custom':
                 layout_settings.set(self._conf, 'theme', form.theme.data)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('event_layout.index', self._conf))
+            return redirect(url_for('event_layout.index', self.event))
 
 
 class RHLogoDisplay(RHConferenceBaseDisplay):
     def _process(self):
-        logo_data = get_event_logo(self._conf)
-        logo_content = BytesIO(logo_data['content'])
-        metadata = logo_data['metadata']
-        return send_file(metadata['filename'], logo_content, mimetype=metadata['content_type'], no_cache=True,
-                         conditional=True)
+        event = self._conf.as_event
+        if not event.has_logo:
+            raise NotFound
+        metadata = event.logo_metadata
+        return send_file(metadata['filename'], BytesIO(event.logo), mimetype=metadata['content_type'],
+                         no_cache=True, conditional=True)
 
 
 class RHLayoutCSSDisplay(RHConferenceBaseDisplay):
@@ -404,6 +404,7 @@ def _render_image_list(event):
 
 class RHManageImagesBase(RHConferenceModifBase):
     EVENT_FEATURE = 'images'
+    CSRF_ENABLED = True
 
 
 class RHImages(RHManageImagesBase):
@@ -414,7 +415,6 @@ class RHImages(RHManageImagesBase):
 
 
 class RHImageUpload(RHManageImagesBase):
-    CSRF_ENABLED = True
 
     def _process(self):
         files = request.files.getlist('file')
@@ -434,7 +434,6 @@ class RHImageUpload(RHManageImagesBase):
 
 
 class RHImageDelete(RHManageImagesBase):
-    CSRF_ENABLED = True
 
     def _checkParams(self, params):
         RHManageImagesBase._checkParams(self, params)

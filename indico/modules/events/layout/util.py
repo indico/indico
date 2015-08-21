@@ -178,18 +178,6 @@ def get_entry_from_name(name, event):
     return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
 
 
-def get_event_logo(event):
-    """Retrieves information on the event's logo, or ``None``
-       if there is none.
-    """
-    event = event.as_event
-    if event.logo_metadata:
-        return {
-            'content': event.logo,
-            'metadata': event.logo_metadata
-        }
-
-
 def get_images_for_event(event):
     """Return all non-deleted images uploaded to a specific event
     """
