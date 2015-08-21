@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask import session
 
 from indico.modules.events.layout.util import MenuEntryData
@@ -22,7 +24,7 @@ from MaKaC.paperReviewing import ConferencePaperReview
 
 
 def _visibility_my_tracks(event):
-    return bool(event.getAbstractMgr().isActive() and event.getCoordinatedTracks(session.user.as_avatar))
+    return bool(event.getAbstractMgr().isActive() and event.getCoordinatedTracks(session.avatar))
 
 
 def _visibility_call_for_abstracts(event):
@@ -38,7 +40,7 @@ def _visibility_abstracts_book(event):
 
 
 def _visibility_my_contributions(event):
-    return event.getContribsForSubmitter(session.user.as_avatar)
+    return event.getContribsForSubmitter(session.avatar)
 
 
 def _visibility_paper_review(event):
@@ -46,7 +48,7 @@ def _visibility_paper_review(event):
 
 
 def _visibility_paper_review_transfer(event):
-    return bool(_visibility_paper_review(event) and event.getContribsForSubmitter(session.user.as_avatar))
+    return bool(_visibility_paper_review(event) and event.getContribsForSubmitter(session.avatar))
 
 
 def _visibility_role(event, role):
@@ -59,7 +61,7 @@ def _visibility_role(event, role):
 
 
 def _visibility_paper_review_managment(event):
-    return _visibility_role('paperReviewManager')
+    return _visibility_role(event, 'paperReviewManager')
 
 
 def _visibility_registration(event):
