@@ -52,9 +52,9 @@ def _render_menu_entry(entry):
     return tpl.menu_entry(entry=entry)
 
 
-def _render_menu_entries(event, show_hidden=False, connect_menu=False):
+def _render_menu_entries(event, connect_menu=False):
     tpl = get_template_module('events/layout/_menu.html')
-    return tpl.menu_entries(menu_entries_for_event(event, show_hidden=show_hidden), connect_menu=connect_menu)
+    return tpl.menu_entries(menu_entries_for_event(event), connect_menu=connect_menu)
 
 
 class RHLayoutLogoUpload(RHConferenceModifBase):
@@ -183,7 +183,7 @@ class RHMenuBase(RHConferenceModifBase):
 class RHMenuEdit(RHMenuBase):
     def _process(self):
         custom_menu_enabled = layout_settings.get(self._conf, 'use_custom_menu')
-        menu = menu_entries_for_event(self._conf, show_hidden=True) if custom_menu_enabled else None
+        menu = menu_entries_for_event(self._conf) if custom_menu_enabled else None
         return WPMenuEdit.render_template('menu_edit.html', self._conf, event=self._conf, MenuEntryType=MenuEntryType,
                                           menu=menu, custom_menu_enabled=custom_menu_enabled)
 
@@ -341,7 +341,7 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         db.session.delete(self.entry)
         db.session.flush()
 
-        return jsonify_data(menu=_render_menu_entries(self._conf, show_hidden=True, connect_menu=True))
+        return jsonify_data(menu=_render_menu_entries(self._conf, connect_menu=True))
 
 
 class RHPageDisplay(RHConferenceBaseDisplay):

@@ -62,7 +62,7 @@ class MenuEntryData(object):
 
 
 @memoize_request
-def menu_entries_for_event(event, show_hidden=False):
+def menu_entries_for_event(event):
     from indico.core.plugins import plugin_engine
 
     custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
