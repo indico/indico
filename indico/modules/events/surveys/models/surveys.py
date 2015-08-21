@@ -227,12 +227,12 @@ class Survey(db.Model):
     def is_visible(cls):
         return ~cls.is_deleted & cls.questions.any() & cls.has_started
 
-    def can_submit(self, user):
-        return self.is_active and (not self.require_user or user)
-
     @return_ascii
     def __repr__(self):
         return '<Survey({}, {}): {}>'.format(self.id, self.event_id, self.title)
+
+    def can_submit(self, user):
+        return self.is_active and (not self.require_user or user)
 
     def open(self):
         if self.state != SurveyState.ready_to_open:
