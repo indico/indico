@@ -100,3 +100,8 @@ class SurveyQuestion(db.Model):
     @return_ascii
     def __repr__(self):
         return '<SurveyQuestion({}, {}, {}, {})>'.format(self.id, self.survey_id, self.field_type, self.title)
+
+    def get_summary(self, **kwargs):
+        """Returns the summary of answers submitted for this question."""
+        if self.field:
+            return self.field.get_summary(**kwargs)

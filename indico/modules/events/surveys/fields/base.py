@@ -86,6 +86,10 @@ class SurveyField(object):
         """Returns a dict of kwargs for this field's wtforms field"""
         return {}
 
+    def get_summary(self):
+        """Returns a summary of answers for this field."""
+        raise NotImplementedError
+
     def _make_wtforms_field(self, field_cls, validators=None, **kwargs):
         """Util to instantiate a WTForms field.
 
