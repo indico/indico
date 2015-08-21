@@ -19,92 +19,92 @@
     </script>
 
     {% if custom_menu_enabled %}
-    <div class="fixed-width-page layout-wrapper" id="menu-customization">
-        <div class="row">
-            <div id="menu-entries" class="column col-40">
-                {{ menu_entries(menu, connect_menu=true) }}
-            </div>
-            <div class="column col-60">
-                {% call message_box('info') %}
-                    {%- trans grid_icon='<i class="icon-grid2"></i>'|safe -%}
-                        Click and drag the grid icon ({{ grid_icon }}) to reorder the menu entries
-                    {%- endtrans -%}
-                {% endcall %}
-                <div class="action-box">
-                    <div class="section">
-                        <div class="icon icon-plus"></div>
-                        <div class="toolbar right">
-                            <div class="group js-add-entry-dropdown">
-                                <a class="i-button arrow icon-plus" data-toggle="dropdown">
-                                    {%- trans %}Add an entry{% endtrans -%}
-                                </a>
-                                <ul class="dropdown">
-                                    <li>
-                                        <a class="icon-link add-link" href="#"
-                                           data-href="{{ url_for('.menu_add_entry', event, type='user_link') }}"
-                                           data-title="{% trans %}New link{% endtrans %}">
-                                            {%- trans %}Add link{% endtrans -%}
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="icon-file-text add-page" href="#"
-                                            data-href="{{ url_for('.menu_add_entry', event, type='page') }}"
-                                            data-title="{% trans %}New page{% endtrans %}">
-                                            {%- trans %}Add page{% endtrans -%}
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="icon-arrows-vert add-separator" href="#">
-                                            {%- trans %}Add spacer{% endtrans -%}
-                                        </a>
-                                    </li>
-                                </ul>
+        <div class="fixed-width-page layout-wrapper" id="menu-customization">
+            <div class="row">
+                <div id="menu-entries" class="column col-40">
+                    {{ menu_entries(menu, connect_menu=true) }}
+                </div>
+                <div class="column col-60">
+                    {% call message_box('info') %}
+                        {%- trans grid_icon='<i class="icon-grid2"></i>'|safe -%}
+                            Click and drag the grid icon ({{ grid_icon }}) to reorder the menu entries
+                        {%- endtrans -%}
+                    {% endcall %}
+                    <div class="action-box">
+                        <div class="section">
+                            <div class="icon icon-plus"></div>
+                            <div class="toolbar right">
+                                <div class="group js-add-entry-dropdown">
+                                    <a class="i-button arrow icon-plus" data-toggle="dropdown">
+                                        {%- trans %}Add an entry{% endtrans -%}
+                                    </a>
+                                    <ul class="dropdown">
+                                        <li>
+                                            <a class="icon-link add-link" href="#"
+                                               data-href="{{ url_for('.menu_add_entry', event, type='user_link') }}"
+                                               data-title="{% trans %}New link{% endtrans %}">
+                                                {%- trans %}Add link{% endtrans -%}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="icon-file-text add-page" href="#"
+                                                data-href="{{ url_for('.menu_add_entry', event, type='page') }}"
+                                                data-title="{% trans %}New page{% endtrans %}">
+                                                {%- trans %}Add page{% endtrans -%}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="icon-arrows-vert add-separator" href="#">
+                                                {%- trans %}Add spacer{% endtrans -%}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                        <div class="text">
-                            <div class="label">
-                                {%- trans %}New menu entries{% endtrans -%}
-                            </div>
-                            <div>
-                                {%- trans %}Add entries to the event's menu.{% endtrans -%}
+                            <div class="text">
+                                <div class="label">
+                                    {%- trans %}New menu entries{% endtrans -%}
+                                </div>
+                                <div>
+                                    {%- trans %}Add entries to the event's menu.{% endtrans -%}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-    $(document).ready(function initMenuEdit() {
-        initMenuSortable();
+        <script>
+        $(document).ready(function initMenuEdit() {
+            initMenuSortable();
 
-        function _addNewEntry(data, classes) {
-            if (data) {
-                $('#menu-entries > .menu-entries').append($('<li>', {
-                    'class': classes
-                }).html(data.entry));
-                initMenuSortable();
+            function _addNewEntry(data, classes) {
+                if (data) {
+                    $('#menu-entries > .menu-entries').append($('<li>', {
+                        'class': classes
+                    }).html(data.entry));
+                    initMenuSortable();
+                }
             }
-        }
 
-        $('.js-add-entry-dropdown').dropdown();
+            $('.js-add-entry-dropdown').dropdown();
 
-        $('.add-link, .add-page').ajaxDialog({
-            title: function() { return $(this).data('title'); },
-            onClose: function(data) { _addNewEntry(data, 'nestable allow-nested'); }
-        });
-        $('.add-separator').on('click', function addSeparator (evt) {
-            evt.preventDefault();
+            $('.add-link, .add-page').ajaxDialog({
+                title: function() { return $(this).data('title'); },
+                onClose: function(data) { _addNewEntry(data, 'nestable allow-nested'); }
+            });
+            $('.add-separator').on('click', function addSeparator (evt) {
+                evt.preventDefault();
 
-            $.ajax({
-                url: {{ url_for('.menu_add_entry', event, type='separator')|tojson }},
-                method: 'POST',
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                success: function(data) { _addNewEntry(data, ''); }
+                $.ajax({
+                    url: {{ url_for('.menu_add_entry', event, type='separator')|tojson }},
+                    method: 'POST',
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function(data) { _addNewEntry(data, ''); }
+                });
             });
         });
-    });
-    </script>
+        </script>
     {% endif %}
 {% endblock %}
