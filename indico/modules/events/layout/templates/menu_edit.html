@@ -25,7 +25,11 @@
                                 {%- trans %}Customize menu{% endtrans -%}
                             </div>
                             <div>
-                                {%- trans %}When enabling menu customization, you can re-arrange menu entries and add custom links/pages to your event.{% endtrans -%}
+                                {% if custom_menu_enabled %}
+                                    {%- trans %}Menu customization is currently enabled. Disabling it will revert all changes.{% endtrans -%}
+                                {% else %}
+                                    {%- trans %}When enabling menu customization, you can re-arrange menu entries and add custom links/pages to your event.{% endtrans -%}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
