@@ -64,7 +64,7 @@
                         // force change in form, so that we can process
                         // the 'change' event
                         $button.prop('disabled', false);
-                        $form.find('.change-trigger').val('2');
+                        $form.find('.change-trigger').val('added-file');
                         $form.trigger('change');
 
                         $dz.find('.dz-message').hide();
@@ -79,7 +79,7 @@
                         $button.prop('disabled', false);
                         // force change in form, so that we can process
                         // the 'change' event
-                        $form.find('.change-trigger').val('0');
+                        $form.find('.change-trigger').val('no-file');
                         $form.trigger('change');
 
                         if (self.files.length === 0) {
@@ -100,7 +100,7 @@
                         }
 
                         $dz.data('value', response.content);
-                        $form.find('.change-trigger').val($dz.data('value') ? '1' : '0');
+                        $form.find('.change-trigger').val($dz.data('value') ? 'uploaded-file' : 'no-file');
                         $form.trigger('indico:fieldsSaved', response);
                         $form.trigger('ajaxDialog:success', [response]);
                     });

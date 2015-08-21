@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-    <input class="change-trigger" type="hidden" value="{{ 1 if field.data else 0}}" name="__file_change_trigger">
+    <input class="change-trigger" type="hidden" value="{{ 'initial-file' if field.data else 'no-file' }}" name="__file_change_trigger">
     <script>
     $(document).ready(function() {
         setupDropzone('#dz-{{ field.id }}');
