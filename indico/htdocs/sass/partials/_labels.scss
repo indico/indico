@@ -33,7 +33,7 @@
     @extend %label;
     margin: 0 5px;
 
-    &.stripped {
+    &.striped {
         background-color: lighten($pastel-gray, $light-color-variation);
         background: repeating-linear-gradient(
             -40deg,
@@ -61,7 +61,7 @@
         @include border-all(darken($blue, $light-color-variation));
         background: $blue;
         color: #FDFDFD !important;
-        &.stripped {
+        &.striped {
             background-color: lighten($blue, $light-color-variation);
             background: repeating-linear-gradient(
                 -40deg,
@@ -82,7 +82,7 @@
         @include border-all(darken($pastel-gray, $light-color-variation));
         background: $pastel-gray;
         color: $light-black;
-        &.stripped {
+        &.striped {
             background-color: lighten($pastel-gray, $light-color-variation);
             background: repeating-linear-gradient(
                 -40deg,

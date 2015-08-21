@@ -187,7 +187,7 @@
                 $this.toggleClass('enabled', isEnabled)
                     .toggleClass('not-enabled', !isEnabled)
                     .parent('.actions')
-                        .parent('.i-label').toggleClass('stripped', !isEnabled);
+                        .parent('.i-label').toggleClass('striped', !isEnabled);
             }
         });
     }).on('indico:confirmed', '.menu-entry .delete-entry', function(evt) {

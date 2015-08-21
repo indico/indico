@@ -6,7 +6,7 @@
         <div class="i-label
             {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
-            {%- if not entry.is_enabled %} stripped{% endif %}">
+            {%- if not entry.is_enabled %} striped{% endif %}">
             <i class="entry-{{ entry.type.name }} drag-handle"></i>
             <span>{{ entry.localized_title }}{% if config.DEBUG %} ({{ entry.position}}){% endif %}</span>
             <span class="right actions">
