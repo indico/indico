@@ -164,14 +164,8 @@ def insert_entry(entry, parent_id, position):
 
 @memoize_request
 def get_entry_from_name(name, event):
-    custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
-    if custom_menu_enabled:
-        return MenuEntry.find_first(MenuEntry.name == name,
-                                    MenuEntry.event_id == event.id,
-                                    MenuEntry.type.in_((MenuEntryType.internal_link, MenuEntryType.plugin_link)))
-    else:
-        entries = menu_entries_for_event(event)
-        return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
+    entries = menu_entries_for_event(event)
+    return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
 
 
 def get_event_logo(event):
