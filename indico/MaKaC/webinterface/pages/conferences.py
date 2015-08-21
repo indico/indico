@@ -68,9 +68,10 @@ from MaKaC.common.TemplateExec import render
 from indico.core import signals
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.forms import CSSSelectionForm
-from indico.modules.events.layout.util import menu_entries_for_event, get_entry_from_name, get_css_url
+from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_entry_from_name,
+                                               menu_entries_for_event)
 from indico.util import json
-from indico.util.signals import values_from_signal, named_objects_from_signal
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 
 LECTURE_SERIES_RE = re.compile(r'^part\d+$')
@@ -138,6 +139,7 @@ class WPConferenceDisplayBase(WPConferenceBase):
 
 class WPConferenceDefaultDisplayBase( WPConferenceBase):
     navigationEntry = None
+    menu_entry_plugin = None
     menu_entry_name = None
 
     def getJSFiles(self):
@@ -164,7 +166,10 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                              "dark": True} )
 
     def _get_active_menu_entry(self):
-        entry = get_entry_from_name(self.menu_entry_name, self._conf)
+        if not self.menu_entry_name:
+            return None
+        name = build_menu_entry_name(self.menu_entry_name, self.menu_entry_plugin)
+        entry = get_entry_from_name(name, self._conf)
         if entry:
             return entry.id
 

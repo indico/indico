@@ -37,12 +37,19 @@ _cache = GenericCache('updated-menus')
 
 
 def _entry_key(entry_data):
-    return entry_data.position, entry_data.name
+    return entry_data.position == -1, entry_data.position, entry_data.name
 
 
 @memoize_request
 def get_menu_entries_from_signal():
-    return named_objects_from_signal(signals.event.sidemenu.send())
+    return named_objects_from_signal(signals.event.sidemenu.send(), plugin_attr='plugin')
+
+
+def build_menu_entry_name(name, plugin=None):
+    if plugin:
+        return '{}:{}'.format(plugin, name)
+    else:
+        return name
 
 
 class MenuEntryData(object):
@@ -50,12 +57,16 @@ class MenuEntryData(object):
 
     def __init__(self, title, name, endpoint, position=0, is_enabled=True, visible=None, parent=None):
         self.title = title
-        self.name = name
+        self._name = name
         self.endpoint = endpoint
         self.position = position
         self._visible = visible
         self.is_enabled = is_enabled
         self.parent = parent
+
+    @property
+    def name(self):
+        return build_menu_entry_name(self._name, self.plugin.name if self.plugin else None)
 
     def visible(self, event):
         return self._visible(event) if self._visible else True
@@ -119,7 +130,7 @@ def _build_entry(event, custom_menu_enabled, data, position, children=None):
 
     if data.plugin:
         entry.type = MenuEntryType.plugin_link
-        entry.plugin = data.plugin
+        entry.plugin = data.plugin.name
     else:
         entry.type = MenuEntryType.internal_link
     return entry

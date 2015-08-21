@@ -123,6 +123,16 @@ class MenuEntryMixin(object):
     def locator(self):
         return dict(self.event.getLocator(), menu_entry_id=self.id)
 
+    @return_ascii
+    def __repr__(self):
+        return '<{}({}, {}, {}, position={})>'.format(
+            type(self).__name__,
+            self.id,
+            self.title,
+            self.name,
+            self.position,
+        )
+
 
 class TransientMenuEntry(MenuEntryMixin):
     def __init__(self, event_id, is_enabled, title, name, position, children):
@@ -284,16 +294,6 @@ class MenuEntry(MenuEntryMixin, db.Model):
     @classmethod
     def get_for_event(cls, event):
         return cls.find(event_id=int(event.id), parent_id=None, _eager=cls.children).order_by(MenuEntry.position).all()
-
-    @return_ascii
-    def __repr__(self):
-        return '<{}({}, {}, {}{})>'.format(
-            type(self).__name__,
-            self.id,
-            self.title,
-            self.name,
-            ', is_root=True' if self.is_root else '',
-        )
 
 
 class MenuPage(db.Model):
