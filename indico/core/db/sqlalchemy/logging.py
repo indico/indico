@@ -54,6 +54,12 @@ def _get_sql_line():
                 'items': stack[i:i+5]}
 
 
+def _fix_param(param):
+    if hasattr(param, 'iteritems'):
+        return {k: _fix_param(v) for k, v in param.iteritems()}
+    return '<binary>' if param.__class__.__name__ == 'Binary' else param
+
+
 def apply_db_loggers(app):
     if not app.debug or getattr(db, '_loggers_applied', False):
         return
@@ -86,6 +92,11 @@ def apply_db_loggers(app):
                 _prettify_sql(statement),
                 _prettify_params(parameters) if parameters else ''
             ).rstrip()
+        # psycopg2._psycopg.Binary objects are extremely weird and don't work in isinstance checks
+        if hasattr(parameters, 'iteritems'):
+            parameters = {k: _fix_param(v) for k, v in parameters.iteritems()}
+        else:
+            parameters = tuple(_fix_param(v) for v in parameters)
         logger.debug(log_msg,
                      extra={'sql_log_type': 'start',
                             'req_path': request.path if has_request_context() else None,
