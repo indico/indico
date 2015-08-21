@@ -50,7 +50,7 @@ _bp.add_url_rule('!/event/<confId>/<slug>.css', 'css_display', RHLayoutCSSDispla
 
 _bp_images = IndicoBlueprint('event_images', __name__, template_folder='templates',
                              virtual_template_folder='events/layout', url_prefix='/event/<confId>')
-_bp_images.add_url_rule('/logo', 'logo_display', RHLogoDisplay)
+_bp_images.add_url_rule('/logo-<slug>', 'logo_display', RHLogoDisplay)
 _bp_images.add_url_rule('/images/<int:image_id>', 'image_display', RHImageDisplay)
 _bp_images.add_url_rule('/picture/<int:pic_id>.<pic_ext>', 'image_legacy_display', RHImageLegacyDisplay)
 _bp_images.add_url_rule('/picture/<int:pic_id>', 'image_legacy_display', RHImageLegacyDisplay)

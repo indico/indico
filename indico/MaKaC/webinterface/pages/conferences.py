@@ -240,7 +240,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
     def _applyDecoration( self, body ):
         self.event = self._conf.as_event
-        self.logo_url = url_for('event_images.logo_display', self._conf)
+        self.logo_url = (url_for('event_images.logo_display', self._conf, slug=self.event.logo_metadata['hash'])
+                         if self.event.has_logo else None)
         body = self._applyConfDisplayDecoration( body )
         return WPConferenceBase._applyDecoration( self, body )
 
@@ -256,9 +257,9 @@ class WConfMetadata(wcomponents.WTemplated):
         v['site_name'] = minfo.getTitle()
         v['fb_config'] = minfo.getSocialAppConfig().get('facebook', {})
 
-        self.event = self._conf.as_event
-        if self.event.has_logo:
-            v['image'] = url_for('event_images.logo_display', self._conf)
+        event = self._conf.as_event
+        if event.has_logo:
+            v['image'] = url_for('event_images.logo_display', self._conf, slug=event.logo_metadata['hash'])
         else:
             v['image'] = Config.getInstance().getSystemIconURL("logo_indico")
 
@@ -281,7 +282,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["logo"] = ""
         if self.event.has_logo:
-            vars["logoURL"] = url_for('event_images.logo_display', self._conf)
+            vars["logoURL"] = url_for('event_images.logo_display', self._conf, slug=self.event.logo_metadata['hash'])
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\" class=\"confLogo\" >"%(vars["logoURL"], escape_html(self._conf.getTitle(), escape_quotes = True))
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
@@ -5818,7 +5819,8 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         ###############################
         p = WPConferenceDisplay( self._rh, self._conf )
         p.event = self._conf.as_event
-        p.logo_url = url_for('event_images.logo_display', self._conf)
+        p.logo_url = (url_for('event_images.logo_display', self._conf, slug=p.event.logo_metadata['hash'])
+                      if p.event.has_logo else None)
         params["bodyConf"] = p._applyConfDisplayDecoration(p._getBody(params))
         ###############################
         ###############################

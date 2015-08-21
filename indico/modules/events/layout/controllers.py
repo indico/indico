@@ -60,7 +60,7 @@ def _render_menu_entries(event, connect_menu=False):
 
 def _logo_data(event):
     return {
-        'url': url_for('event_images.logo_display', event),
+        'url': url_for('event_images.logo_display', event, slug=event.logo_metadata['hash']),
         'filename': event.logo_metadata['filename'],
         'size': event.logo_metadata['size'],
         'content_type': event.logo_metadata['content_type']
@@ -91,6 +91,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
         self.event.logo = content
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         self.event.logo_metadata = {
+            'hash': binascii.crc32(content) & 0xffffffff,
             'size': len(content),
             'filename': f.filename,
             'content_type': content_type
@@ -165,8 +166,7 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
         if not event.has_logo:
             raise NotFound
         metadata = event.logo_metadata
-        return send_file(metadata['filename'], BytesIO(event.logo), mimetype=metadata['content_type'],
-                         no_cache=True, conditional=True)
+        return send_file(metadata['filename'], BytesIO(event.logo), mimetype=metadata['content_type'], conditional=True)
 
 
 class RHLayoutCSSDisplay(RHConferenceBaseDisplay):

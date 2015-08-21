@@ -132,7 +132,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         vars = wcomponents.WTemplated.getVars( self )
         vars["logo"] = ""
         if self.event.has_logo:
-            vars["logoURL"] = url_for('event_images.logo_display', self._conf)
+            vars["logoURL"] = url_for('event_images.logo_display', self._conf, slug=self.event.logo_metadata['hash'])
             vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
