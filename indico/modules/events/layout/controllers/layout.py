@@ -41,7 +41,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 def _logo_data(event):
     return {
-        'url': url_for('event_images.logo_display', event, slug=event.logo_metadata['hash']),
+        'url': event.logo_url,
         'filename': event.logo_metadata['filename'],
         'size': event.logo_metadata['size'],
         'content_type': event.logo_metadata['content_type']

@@ -22,6 +22,7 @@ from indico.core.db.sqlalchemy import db
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
+from indico.web.flask.util import url_for
 
 
 class Event(db.Model):
@@ -79,6 +80,10 @@ class Event(db.Model):
     @property
     def has_logo(self):
         return self.logo_metadata is not None
+
+    @property
+    def logo_url(self):
+        return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'])
 
     @property
     def has_stylesheet(self):
