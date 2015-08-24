@@ -41,7 +41,9 @@ layout_settings = EventSettingsProxy('layout', {
     'show_announcement': False,
     'use_custom_css': False,
     'theme': None,
-    'use_custom_menu': False
+    'use_custom_menu': False,
+    'timetable_by_room': False,
+    'timetable_detailed': False
 }, preload=True)
 
 

@@ -55,6 +55,13 @@ class LayoutForm(IndicoForm):
                                description=_("Short message shown below the title"))
     show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
                                      description=_("Show the announcement message"))
+
+    # Timetable
+    timetable_by_room = BooleanField(_("Group by room"), widget=SwitchWidget(),
+                                     description=_("Group the entries of the timetable by room by default"))
+    timetable_detailed = BooleanField(_("Show detailed view"), widget=SwitchWidget(),
+                                      description=_("Show the detailed view of the timetable by default."))
+
     # Themes
     use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
                                   description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
