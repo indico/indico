@@ -133,6 +133,7 @@
             series: [{{ question.get_summary().absolute.values() | tojson }}]
         }, {
             horizontalBars: true,
+            reverseData: true,
             axisX: {
                 onlyInteger: true,
             },
