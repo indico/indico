@@ -77,7 +77,6 @@
     @include border-radius();
     background: $light-gray;
     color: $light-black;
-    font-style: italic;
     margin: 1em 0;
     padding: 1em;
 }
@@ -95,6 +94,7 @@
 
     .text-answer {
         @extend %survey-results-text-box;
+        font-style: italic;
 
         &:last-of-type {
             margin-bottom: 0;
