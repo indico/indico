@@ -15,20 +15,18 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
+from indico.modules.events.layout.views import WPPage
 from MaKaC.webinterface.pages.conferences import (WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable,
-                                                  WPConferenceProgram, WPContributionList, WPInternalPageDisplay,
-                                                  WPAuthorIndex, WPSpeakerIndex)
+                                                  WPConferenceProgram, WPContributionList, WPAuthorIndex,
+                                                  WPSpeakerIndex)
 from MaKaC.webinterface.pages.sessions import WPSessionDisplay
 from MaKaC.webinterface.pages.contributions import WPContributionDisplay
 from MaKaC.webinterface.pages.registrants import WPConfRegistrantsList, WConfRegistrantsList
 from MaKaC.webinterface.pages.subContributions import WPSubContributionDisplay
 from MaKaC.webinterface.pages.authors import WPAuthorDisplay
-from MaKaC.webinterface.displayMgr import SystemLink
-from indico.util.contextManager import ContextManager
 
 
 class WPStaticEventBase:
-
     def _getBaseURL(self):
         return "static"
 
@@ -37,11 +35,6 @@ class WPStaticEventBase:
 
     def _getFooter(self):
         return ""
-
-    def _getMenu(self):
-        for link in self._sectionMenu.getLinkList():
-            if isinstance(link, SystemLink) and link.getName() not in ContextManager.get("_menu_offline_items"):
-                link.setVisible(False)
 
     def getJSFiles(self):
         return (self._asset_env['base_js'].urls() + self._asset_env['modules_event_display_js'].urls() +
@@ -65,34 +58,22 @@ class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
 
 
 class WPStaticConferenceDisplay(WPStaticEventBase, WPConferenceDisplay):
-
-    def _defineSectionMenu(self):
-        WPConferenceDisplay._defineSectionMenu(self)
-        self._getMenu()
+    pass
 
 
 class WPStaticConferenceTimeTable(WPStaticEventBase, WPConferenceTimeTable):
-
-    def _defineSectionMenu(self):
-        WPConferenceTimeTable._defineSectionMenu(self)
-        self._getMenu()
+    endpoint = 'event.conferenceTimeTable'
 
     def getJSFiles(self):
         return WPStaticEventBase.getJSFiles(self) + self._includeJSPackage('Timetable')
 
 
 class WPStaticConferenceProgram(WPStaticEventBase, WPConferenceProgram):
-
-    def _defineSectionMenu(self):
-        WPConferenceProgram._defineSectionMenu(self)
-        self._getMenu()
+    endpoint = 'event.conferenceProgram'
 
 
 class WPStaticContributionList(WPStaticEventBase, WPContributionList):
-
-    def _defineSectionMenu(self):
-        WPContributionList._defineSectionMenu(self)
-        self._getMenu()
+    endpoint = 'event.contributionListDisplay'
 
     def _getBody(self, params):
         from MaKaC.webinterface.rh.conferenceDisplay import RHContributionList
@@ -103,55 +84,35 @@ class WPStaticContributionList(WPStaticEventBase, WPContributionList):
         return wc.getHTML()
 
 
-class WPStaticInternalPageDisplay(WPStaticEventBase, WPInternalPageDisplay):
-
-    def _defineSectionMenu(self):
-        WPInternalPageDisplay._defineSectionMenu(self)
-        self._getMenu()
+class WPStaticInternalPageDisplay(WPStaticEventBase, WPPage):
+    pass
 
 
 class WPStaticAuthorIndex(WPStaticEventBase, WPAuthorIndex):
-
-    def _defineSectionMenu(self):
-        WPAuthorIndex._defineSectionMenu(self)
-        self._getMenu()
+    endpoint = 'event.confAuthorIndex'
 
     def getJSFiles(self):
         return WPStaticEventBase.getJSFiles(self) + WPAuthorIndex.getJSFiles(self) + self._includeJSPackage('authors')
 
 
 class WPStaticSpeakerIndex(WPStaticEventBase, WPSpeakerIndex):
-
-    def _defineSectionMenu(self):
-        WPSpeakerIndex._defineSectionMenu(self)
-        self._getMenu()
+    endpoint = 'event.confSpeakerIndex'
 
     def getJSFiles(self):
         return WPStaticEventBase.getJSFiles(self) + WPSpeakerIndex.getJSFiles(self)
 
 
 class WPStaticSessionDisplay(WPStaticEventBase, WPSessionDisplay):
-
-    def _defineSectionMenu(self):
-        WPSessionDisplay._defineSectionMenu(self)
-        self._getMenu()
-
     def getJSFiles(self):
         return WPStaticEventBase.getJSFiles(self) + self._includeJSPackage('Timetable')
 
 
 class WPStaticContributionDisplay(WPStaticEventBase, WPContributionDisplay):
-
-    def _defineSectionMenu(self):
-        WPContributionDisplay._defineSectionMenu(self)
-        self._getMenu()
+    pass
 
 
 class WPStaticConfRegistrantsList(WPStaticEventBase, WPConfRegistrantsList):
-
-    def _defineSectionMenu(self):
-        WPConfRegistrantsList._defineSectionMenu(self)
-        self._getMenu()
+    endpoint = 'event.confRegistrantsDisplay-list'
 
     def _getBody(self, params):
         from MaKaC.webinterface.rh.registrantsDisplay import RHRegistrantsList
@@ -164,17 +125,9 @@ class WPStaticConfRegistrantsList(WPStaticEventBase, WPConfRegistrantsList):
 
 
 class WPStaticSubContributionDisplay(WPStaticEventBase, WPSubContributionDisplay):
-
-    def _defineSectionMenu(self):
-        WPSubContributionDisplay._defineSectionMenu(self)
-        self._getMenu()
+    pass
 
 
 class WPStaticAuthorDisplay(WPStaticEventBase, WPAuthorDisplay):
-
-    def _defineSectionMenu(self):
-        WPAuthorDisplay._defineSectionMenu(self)
-        self._getMenu()
-
     def getJSFiles(self):
         return WPStaticEventBase.getJSFiles(self) + WPAuthorDisplay.getJSFiles(self)

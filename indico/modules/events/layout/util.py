@@ -93,10 +93,15 @@ class MenuEntryData(object):
         the current state of the event/user can be taken into account.
     :param parent: str -- The name of the parent entry (None for root
         entries).
+    :param static_site: bool or str -- If True, this menu item should
+        be shown in the menu of a static site.  When set to a string,
+        the string will be used instead of a mangled version of the
+        endpoint's URL.
     """
     plugin = None
 
-    def __init__(self, title, name, endpoint, position=-1, is_enabled=True, visible=None, parent=None):
+    def __init__(self, title, name, endpoint, position=-1, is_enabled=True, visible=None, parent=None,
+                 static_site=False):
         self.title = title
         self._name = name
         self.endpoint = endpoint
@@ -104,6 +109,7 @@ class MenuEntryData(object):
         self._visible = visible
         self.is_enabled = is_enabled
         self.parent = parent
+        self.static_site = static_site
 
     @property
     def name(self):

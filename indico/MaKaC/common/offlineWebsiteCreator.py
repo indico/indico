@@ -42,9 +42,11 @@ from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, Abstra
 from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.util.contextManager import ContextManager
+from indico.modules.events.layout.models.menu import MenuEntryType
+from indico.modules.events.layout.util import menu_entries_for_event
 from indico.util.string import remove_tags
 from indico.web.assets import ie_compatibility
+from indico.web.flask.util import url_for
 
 
 RE_CSS_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?!data:)(?P<url>[^\\\')]+)(?P=quote)\s*\)')
@@ -91,6 +93,7 @@ class OfflineEventCreator(object):
     def __init__(self, rh, conf, event_type=""):
         self._rh = rh
         self._conf = conf
+        self.event = conf.as_event
         self._html = ""
         self._fileHandler = None
         self._mainPath = ""
@@ -141,8 +144,8 @@ class OfflineEventCreator(object):
         # A custom event CSS might reference an uploaded image so we need to check for failed paths again
         self._get_failed_paths()
 
-        # Creating ConferenceDisplay.html file
-        conferenceDisplayPath = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL())
+        # Create overview.html file (main page for the event)
+        conferenceDisplayPath = os.path.join(self._mainPath, 'overview.html')
         self._fileHandler.addNewFile(conferenceDisplayPath, self._html)
 
         # Creating index.html file
@@ -155,10 +158,11 @@ class OfflineEventCreator(object):
     def _get_static_files(self, html):
         config = Config.getInstance()
         soup = BeautifulSoup(html)
+        images = set(_fix_url_path(x['src']) for x in soup.select('img[src]'))
         scripts = set(_fix_url_path(x['src']) for x in soup.select('script[src]'))
         styles = set(_fix_url_path(x['href']) for x in soup.select('link[rel="stylesheet"]'))
-        for path in itertools.chain(scripts, styles):
-            src_path = os.path.join(config.getHtdocsDir(), path)
+        for path in itertools.chain(images, scripts, styles):
+            src_path = re.sub(r'#.*$', '', os.path.join(config.getHtdocsDir(), path))
             dst_path = os.path.join(self._staticPath, path)
             if path in styles:
                 self._css_files.add(path)
@@ -166,6 +170,8 @@ class OfflineEventCreator(object):
                 self._failed_paths.add(path)
             elif path not in styles:
                 self._addFileFromSrc(dst_path, src_path)
+        for image in soup.select('img[src]'):
+            image['src'] = os.path.join('static', _fix_url_path(image['src']))
         for script in soup.select('script[src]'):
             script['src'] = os.path.join('static', _fix_url_path(script['src']))
         for style in soup.select('link[rel="stylesheet"]'):
@@ -180,7 +186,7 @@ class OfflineEventCreator(object):
         cfg = Config.getInstance()
         # If we have the embedded webserver prefer its base url since the iptables hack does
         # not work for connections from the same machine
-        base_url = cfg.getEmbeddedWebserverBaseURL() or cfg.getBaseURL()
+        base_url = cfg.getBaseURL()
         for path in self._failed_paths:
             dst_path = os.path.join(self._staticPath, path)
             if not self._fileHandler.hasFile(dst_path):
@@ -221,6 +227,7 @@ class OfflineEventCreator(object):
                     static_url = os.path.relpath(ref_src_path, os.path.dirname(css_abs_path))
                 if not os.path.isfile(ref_src_path):
                     htdocs_relative_path = os.path.relpath(ref_src_path, config.getHtdocsDir())
+                    htdocs_relative_path = re.sub(r'#.*$', '', htdocs_relative_path)
                     self._failed_paths.add(htdocs_relative_path)
                 else:
                     self._addFileFromSrc(ref_dst_path, ref_src_path)
@@ -296,25 +303,22 @@ class ConferenceOfflineCreator(OfflineEventCreator):
 
     def __init__(self, rh, conf, event_type=""):
         super(ConferenceOfflineCreator, self).__init__(rh, conf, event_type)
-        self._menu_offline_items = {"overview": None,
-                                    "programme": None,
-                                    "timetable": None,
-                                    "authorIndex": None,
-                                    "speakerIndex": None,
-                                    "contributionList": None,
-                                    "registrants": None,
-                                    "abstractsBook": None}
-        self._initializeMenuItensComponents()
+        # Menu entries we want to include in the offline version.
+        # Those which are backed by a WP class get their name from that class;
+        # the others are simply hardcoded.
+        self._menu_offline_items = {'overview': None, 'abstracts_book': None}
+        wps = {WPStaticConferenceProgram, WPStaticConferenceTimeTable, WPStaticAuthorIndex, WPStaticSpeakerIndex,
+               WPStaticContributionList, WPStaticConfRegistrantsList}
+        for cls in wps:
+            self._menu_offline_items[cls.menu_entry_name] = cls(self._rh, self._conf)
 
     def _create_home(self):
         p = WPStaticConferenceDisplay(self._rh, self._conf)
         self._html = p.display()
 
     def _create_other_pages(self):
-        # Getting conference logo
-        self._addLogo()
         # Getting all menu items
-        self._getMenuItems()
+        self._get_menu_items()
         # Getting conference timetable in PDF
         self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain,
                      conf=self._conf, aw=self._rh._aw, legacy=True)
@@ -332,49 +336,37 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         for session in self._conf.getSessionList():
             self._getSession(session)
 
-    def _initializeMenuItensComponents(self):
-        self._menu_offline_items["programme"] = WPStaticConferenceProgram(self._rh, self._conf)
-        self._menu_offline_items["timetable"] = WPStaticConferenceTimeTable(self._rh, self._conf)
-        self._menu_offline_items["authorIndex"] = WPStaticAuthorIndex(self._rh, self._conf)
-        self._menu_offline_items["speakerIndex"] = WPStaticSpeakerIndex(self._rh, self._conf)
-        self._menu_offline_items["contributionList"] = WPStaticContributionList(self._rh, self._conf)
-        self._menu_offline_items["registrants"] = WPStaticConfRegistrantsList(self._rh, self._conf)
-        ContextManager.set("_menu_offline_items", self._menu_offline_items)
+    def _get_menu_items(self):
+        entries = menu_entries_for_event(self._conf)
+        visible_entries = [e for e in itertools.chain(entries, *(e.children for e in entries)) if e.is_visible]
+        for entry in visible_entries:
+            if entry.type == MenuEntryType.page:
+                self._get_custom_page(entry.page)
+            elif entry.type == MenuEntryType.internal_link:
+                self._get_builtin_page(entry)
+            # we ignore plugin links as there is no way for plugins to
+            # register something to be included in the static site
 
-    def _addLogo(self):
-        if self._conf.getLogo():
-            logoDstPath = os.path.join(
-                self._mainPath, Config.getInstance().getImagesBaseURL(), "logo", str(self._conf.getLogo()))
-            self._fileHandler.addNewFile(logoDstPath, self._conf.getLogo().readBin())
-
-    def _getMenuItems(self):
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        for link in menu.getEnabledLinkList():
-            if link.isVisible():
-                if isinstance(link, displayMgr.PageLink):
-                    self._getInternalPage(link)
-                elif not isinstance(link, displayMgr.Spacer):
-                    self._getMenuSystemItem(link)
-
-    def _getMenuSystemItem(self, link):
-        if link.getName() in self._menu_offline_items.keys():
-            if self._menu_offline_items[link.getName()]:
-                html = self._menu_offline_items[link.getName()].display()
-                handler = getattr(urlHandlers, link.getURLHandler())
-                self._addPage(html, handler, target=None)
-        if link.getName() == 'abstractsBook':
+    def _get_builtin_page(self, entry):
+        wp = self._menu_offline_items.get(entry.name)
+        if wp:
+            content = wp.display()
+            self._addPage(content, wp.endpoint, self._conf)
+        if entry.name == 'abstracts_book':
             self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
-        if link.getName() == 'programme':
-            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF,
-                         conf=self._conf, legacy=True)
+        if entry.name == 'program':
+            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf, legacy=True)
 
-    def _getInternalPage(self, link):
-        page = link.getPage()
-        html = WPStaticInternalPageDisplay(self._rh, self._conf, page).display()
-        self._addPage(html, urlHandlers.UHInternalPageDisplay, target=page)
+    def _get_custom_page(self, page):
+        html = WPStaticInternalPageDisplay.render_template('page.html', self._conf, page=page)
+        self._addPage(html, 'event_pages.page_display', page)
 
-    def _addPage(self, html, rh, target, **params):
-        fname = os.path.join(self._mainPath, str(rh.getStaticURL(target, **params)))
+    def _addPage(self, html, uh_or_endpoint, target=None, **params):
+        if isinstance(uh_or_endpoint, basestring):
+            url = url_for(uh_or_endpoint, target, _external=False, **params)
+        else:
+            url = str(uh_or_endpoint.getStaticURL(target, **params))
+        fname = os.path.join(self._mainPath, url)
         html = self._get_static_files(html)
         self._fileHandler.addNewFile(fname, html)
 

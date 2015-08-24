@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from celery.schedules import crontab
-from flask import session
+from flask import session, g
 
 from indico.core.celery import celery
 from indico.core.db import db
@@ -47,6 +47,7 @@ def build_static_site(static_site):
         rh._aw = AccessWrapper()
         rh._conf = rh._target = static_site.event
 
+        g.rh = rh
         ContextManager.set('currentRH', rh)
         ContextManager.set('offlineMode', True)
 

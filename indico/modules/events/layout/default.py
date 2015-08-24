@@ -95,13 +95,15 @@ DEFAULT_MENU_ENTRIES = [
         title=N_("Overview"),
         name='overview',
         endpoint='event.conferenceDisplay-overview',
-        position=0
+        position=0,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("Scientific Programme"),
         name='program',
         endpoint='event.conferenceProgram',
-        position=1
+        position=1,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("Manage my Tracks"),
@@ -135,27 +137,31 @@ DEFAULT_MENU_ENTRIES = [
         title=N_("Timetable"),
         name='timetable',
         endpoint='event.conferenceTimeTable',
-        position=3
+        position=3,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("Contribution List"),
         name='contributions',
         endpoint='event.contributionListDisplay',
-        position=4
+        position=4,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("Author List"),
         name='author_index',
         endpoint='event.confAuthorIndex',
         position=5,
-        is_enabled=False
+        is_enabled=False,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("Speaker List"),
         name='speaker_index',
         endpoint='event.confSpeakerIndex',
         position=6,
-        is_enabled=False
+        is_enabled=False,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("My Conference"),
@@ -255,7 +261,8 @@ DEFAULT_MENU_ENTRIES = [
         name='abstracts_book',
         endpoint='event.conferenceDisplay-abstractBook',
         position=9,
-        visible=_visibility_abstracts_book
+        visible=_visibility_abstracts_book,
+        static_site='files/generatedPdf/BookOfAbstracts.pdf'
     ),
     MenuEntryData(
         title=N_("Registration"),
@@ -269,7 +276,8 @@ DEFAULT_MENU_ENTRIES = [
         name='registrants',
         endpoint='event.confRegistrantsDisplay-list',
         position=11,
-        visible=_visibility_registration
+        visible=_visibility_registration,
+        static_site=True
     ),
     MenuEntryData(
         title=N_("Evaluation"),

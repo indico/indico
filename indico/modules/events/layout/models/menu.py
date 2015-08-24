@@ -20,6 +20,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.contextManager import ContextManager
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
@@ -51,16 +52,23 @@ class MenuEntryMixin(object):
 
     @property
     def url(self):
+        # explicit _external=False since offline site creation forces
+        # _external=True if not specified and we want to be able to mangle
+        # the generated urls into something suitable as filenames
         if self.is_user_link:
             return self.link_url
         elif self.is_internal_link:
-            return url_for(self.default_data.endpoint, self.event)
+            data = self.default_data
+            if data.static_site and isinstance(data.static_site, basestring) and ContextManager.get('offlineMode'):
+                return data.static_site
+            return url_for(data.endpoint, self.event, _external=False)
         elif self.is_plugin_link:
             from indico.core.plugins import url_for_plugin
-            return url_for_plugin(self.default_data.endpoint, self.event)
+            return url_for_plugin(self.default_data.endpoint, self.event, _external=False)
         elif self.is_page:
-            return url_for('event_pages.page_display', self.event, page_id=self.page_id)
-        return None
+            return url_for('event_pages.page_display', self.event, page_id=self.page_id, _external=False)
+        else:
+            return None
 
     @property
     def is_link(self):
@@ -106,7 +114,10 @@ class MenuEntryMixin(object):
         if self.is_orphaned:
             return False
 
-        return self.default_data.visible(self.event)
+        data = self.default_data
+        if not data.static_site and ContextManager.get('offlineMode'):
+            return False
+        return data.visible(self.event)
 
     @property
     def localized_title(self):

@@ -256,14 +256,23 @@ def url_for(endpoint, *targets, **values):
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
-    values.setdefault('_external', bool(ContextManager.get('offlineMode')))
+    static_site_mode = bool(ContextManager.get('offlineMode'))
+    values.setdefault('_external', static_site_mode)
 
     for key, value in values.iteritems():
         # Avoid =True and =False in the URL
         if isinstance(value, bool):
             values[key] = int(value)
 
-    return _url_for(endpoint, **values)
+    url = _url_for(endpoint, **values)
+    if static_site_mode and not values['_external']:
+        # for static sites we assume all relative urls need to be
+        # mangled to a filename
+        # we should really fine a better way to handle anything
+        # related to offline site urls...
+        from indico.modules.events.static.util import url_to_static_filename
+        url = url_to_static_filename(url)
+    return url
 
 
 def url_rule_to_js(endpoint):
