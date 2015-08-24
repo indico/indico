@@ -94,7 +94,7 @@
     {{ _choice_answer(question) }}
     {% set summary = question.get_summary() %}
     <script>
-        new Chartist.Pie('#q-{{ question.id }}-chart', {
+        var chart = new Chartist.Pie('#q-{{ question.id }}-chart', {
             labels: {{ summary.relative.keys()|tojson }},
             series: {{ summary.relative.values()|tojson }}
         }, {
@@ -105,6 +105,10 @@
             chartPadding: 20,
             labelOffset: 20,
             labelDirection: 'explode'
+        }).on('draw', function(data) {
+            if (data.value === 0) {
+                chart.data.labels[data.index] = ''
+            }
         });
     </script>
 {% endmacro %}
