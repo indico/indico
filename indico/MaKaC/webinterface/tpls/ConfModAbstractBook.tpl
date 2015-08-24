@@ -7,7 +7,7 @@
 <div style="margin-top: 10px;">
 % if bookOfAbstractsActive:
     % if bookOfAbstractsMenuActive:
-        ${ _("Users will be able to download the book from the <a href='%s'>event home page</a>. You can disable the download from the <a href='%s'>Layout->Menu</a> configuration page.") % (urlHandlers.UHConferenceDisplay.getURL(conf), urlHandlers.UHConfModifDisplayMenu.getURL(conf))}
+        ${ _("Users will be able to download the book from the <a href='{0}'>event home page</a>. You can disable the download from the <a href='{1}'>Layout-&gt;Menu</a> configuration page.").format(urlHandlers.UHConferenceDisplay.getURL(conf), url_for('event_layout.menu', conf))}
     % else:
         ${ _("Note that you need to enable the book of abstracts link in <a href='%s'>Layout->Menu</a>") % urlHandlers.UHConfModifDisplayMenu.getURL(conf) }.
     % endif
