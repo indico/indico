@@ -119,7 +119,7 @@
                         % endif
                     </div>
                 % endif
-                <div class="i-box-metadata right">
+                <div class="i-box-metadata">
                     <span>
                         <span class="label">
                             ${ _("Reference") }:
