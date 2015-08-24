@@ -16,7 +16,8 @@
  */
 
 
-@import 'base/palette';
+@import 'base';
+@import 'compass';
 
 
 .questions-handle {
@@ -70,4 +71,50 @@
     .survey-actions {
         text-align: right;
     }
+}
+
+%survey-results-text-box {
+    @include border-radius();
+    background: $light-gray;
+    color: $light-black;
+    font-style: italic;
+    margin: 1em 0;
+    padding: 1em;
+}
+
+#survey-results {
+    .chart-answer {
+        display: inline-block;
+        vertical-align: top;
+        width: 49%;
+    }
+
+    .number-answer {
+        text-align: center;
+    }
+
+    .text-answer {
+        @extend %survey-results-text-box;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    .chart-option-details {
+        @extend %survey-results-text-box;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .survey-bar-chart {
+        .ct-bar {
+            stroke-width: 30px;
+        }
 }
