@@ -38,7 +38,7 @@
                 {% trans %}Submissions{% endtrans %}
             </div>
             <div class="i-box-buttons">
-                <a href="#" class="i-button">
+                <a href="{{ url_for('.survey_results', survey) }}" class="i-button">
                     {% trans %}Show results{% endtrans %}
                 </a>
             </div>
