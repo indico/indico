@@ -507,7 +507,6 @@ class Config:
         'PropagateAllExceptions'    : False,
         'Debug'                     : False,
         'EmbeddedWebserver'         : False,
-        'EmbeddedWebserverBaseURL'  : None,
         'OAuthGrantTokenTTL'        : 120,
         'MobileURL'                 : '',
         'CheckinURL'                : 'http://old.indico-software.org/wiki/apps/check-in',
