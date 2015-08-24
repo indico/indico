@@ -120,22 +120,18 @@
                     </div>
                 % endif
                 <div class="i-box-metadata">
-                    <span>
-                        <span class="label">
-                            ${ _("Reference") }:
-                        </span>
-                        <span class="content">
-                            #${ registrant.getId() }
-                        </span>
+                    <span class="label">
+                        ${ _("Reference") }:
+                    </span>
+                    <span class="content">
+                        #${ registrant.getId() }
                     </span>
                     % if registration_date:
-                        <span>
-                            <span class="label">
-                                ${ _("Date") }:
-                            </span>
-                            <span class="content">
-                                ${ registration_date }
-                            </span>
+                        <span class="label">
+                            ${ _("Date") }:
+                        </span>
+                        <span class="content">
+                            ${ registration_date }
                         </span>
                     % endif
                 </div>

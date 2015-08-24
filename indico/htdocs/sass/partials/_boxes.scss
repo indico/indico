@@ -122,13 +122,13 @@
             float: right;
             line-height: $toolbar-thin-height;
 
-            > span:not(:last-child) {
-                margin-right: 0.7em;
-            }
-
             .label {
                 color: $black;
                 font-weight: bold;
+
+                &:not(:first-child) {
+                    margin-left: 0.7em;
+                }
             }
 
             .content {
