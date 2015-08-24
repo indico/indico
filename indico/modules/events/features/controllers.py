@@ -71,8 +71,8 @@ class RHSwitchFeature(RHFeaturesBase):
         if set_feature_enabled(self.event, feature.name, True):
             flash(_('Feature enabled: {feature}').format(feature=feature.friendly_name), 'success')
             logger.info("Feature '{}' for event {} was enabled by {}".format(feature, self.event, session.user))
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features', 'Enabled {}'.format(feature),
-                           session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
+                           'Enabled {}'.format(feature.friendly_name), session.user)
         return jsonify_data(enabled=True)
 
     def _process_DELETE(self):
@@ -80,6 +80,6 @@ class RHSwitchFeature(RHFeaturesBase):
         if set_feature_enabled(self.event, feature.name, False):
             flash(_('Feature disabled: {feature}').format(feature=feature.friendly_name), 'warning')
             logger.info("Feature '{}' for event {} was disabled by {}".format(feature, self.event, session.user))
-            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features', 'Disabled {}'.format(feature),
-                           session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
+                           'Disabled {}'.format(feature.friendly_name), session.user)
         return jsonify_data(enabled=False)
