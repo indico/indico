@@ -51,6 +51,9 @@ class TextField(SurveyField):
     def get_summary(self):
         return [a.data for a in self.question.answers if a.data]
 
+    def is_answer_empty(self, answer):
+        return not answer.data
+
 
 class NumberConfigForm(FieldConfigForm):
     min_value = IntegerField(_('Min value'), [Optional()])

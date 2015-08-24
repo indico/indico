@@ -79,6 +79,9 @@ class SurveyField(object):
         """Returns the summary of answers submitted for this field."""
         raise NotImplementedError
 
+    def is_answer_empty(self, answer):
+        return answer.data is None
+
     def save_config(self, form):
         """Populates an object with the field settings
 

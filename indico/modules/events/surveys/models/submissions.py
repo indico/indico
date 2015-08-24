@@ -128,6 +128,10 @@ class SurveyAnswer(db.Model):
     # relationship backrefs:
     # - submission (SurveySubmission.answers)
 
+    @property
+    def is_empty(self):
+        return self.question.field.is_answer_empty(self)
+
     @return_ascii
     def __repr__(self):
         return '<SurveyAnswer({}, {}): {}>'.format(self.submission_id, self.question_id, self.data)

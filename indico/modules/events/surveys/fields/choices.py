@@ -161,3 +161,6 @@ class MultiSelectField(SurveyField):
                    'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                    'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
         return results
+
+    def is_answer_empty(self, answer):
+        return not answer.data

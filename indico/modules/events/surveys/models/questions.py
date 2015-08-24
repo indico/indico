@@ -97,6 +97,10 @@ class SurveyQuestion(db.Model):
     def locator(self):
         return dict(self.survey.locator, question_id=self.id)
 
+    @property
+    def not_empty_answers(self):
+        return [a for a in self.answers if not a.is_empty]
+
     @return_ascii
     def __repr__(self):
         return '<SurveyQuestion({}, {}, {}, {})>'.format(self.id, self.survey_id, self.field_type, self.title)
