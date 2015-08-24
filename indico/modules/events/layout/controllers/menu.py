@@ -236,4 +236,4 @@ class RHPageDisplay(RHConferenceBaseDisplay):
         self.page = MenuPage.get_one(request.view_args['page_id'])
 
     def _process(self):
-        return WPPage.render_template('events/layout/page.html', self._conf, page=self.page)
+        return WPPage.render_template('page.html', self._conf, page=self.page)

@@ -44,6 +44,7 @@ class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
 
 
 class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/layout/'
 
     def __init__(self, rh, conference, **kwargs):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conference, **kwargs)
