@@ -5,5 +5,137 @@
 {% endblock %}
 
 {% block content %}
-    TODO
+    <div id="survey-results" class="i-box-group vert">
+        {% for question in survey.questions %}
+            <div class="i-box titled">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        <div>
+                            {{ loop.index }}. {{ question.title }}
+                        </div>
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    {% if question.field_type == 'text' %}
+                        {{ text(question) }}
+                    {% elif question.field_type == 'number' %}
+                        {{ number(question) }}
+                    {% elif question.field_type == 'bool' %}
+                        {{ single_choice_chart(question) }}
+                    {% elif question.field_type == 'single_choice' %}
+                        {{ single_choice_chart(question) }}
+                    {% elif question.field_type == 'multiselect' %}
+                        {{ multiple_choice_chart(question) }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
+
+{% macro text(question) %}
+    {% for answer in question.get_summary() %}
+        <div class="text-answer">{{ answer }}</div>
+    {% endfor %}
+{% endmacro %}
+
+{% macro number(question) %}
+    {% set summary = question.get_summary() %}
+    {% if summary %}
+        <div class="number-answer">
+            <div class="i-badge">
+                <div class="i-badge-content">
+                    <div class="i-badge-value">
+                        {{ summary.min }}
+                    </div>
+                    <span class="i-badge-title">
+                        {% trans %}Min{% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="i-badge">
+                <div class="i-badge-content">
+                    <div class="i-badge-value">
+                        {{ '%0.2f'|format(summary.average) }}
+                    </div>
+                    <span class="i-badge-title">
+                        {% trans %}Average{% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="i-badge">
+                <div class="i-badge-content">
+                    <div class="i-badge-value">
+                        {{ summary.max }}
+                    </div>
+                    <span class="i-badge-title">
+                        {% trans %}Max{% endtrans %}
+                    </span>
+                </div>
+            </div>
+            <div class="i-badge">
+                <div class="i-badge-content">
+                    <div class="i-badge-value">
+                        {{ summary.total }}
+                    </div>
+                    <span class="i-badge-title">
+                        {% trans %}Total{% endtrans %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro single_choice_chart(question) %}
+    <div class="chart-answer">
+        {% for label, value in question.get_summary().relative.iteritems() %}
+            <div class="chart-option-details">
+                <strong>{{ label }}</strong>: {{ '%0.2f'|format(value * 100) }}%
+            </div>
+        {% endfor %}
+    </div>
+    <div class="chart-answer">
+        <div id="q-{{ question.id }}-chart" class="chart"></div>
+    </div>
+    <script>
+        new Chartist.Pie('#q-{{ question.id }}-chart', {
+            labels: {{ question.get_summary().relative.keys() | tojson }},
+            series: {{ question.get_summary().relative.values() | tojson }}
+        }, {
+            donut: true,
+            donutWidth: 30,
+            startAngle: 270,
+            total: 1
+        });
+    </script>
+{% endmacro %}
+
+
+{% macro multiple_choice_chart(question) %}
+    <div class="chart-answer">
+        {% for label, value in question.get_summary().absolute.iteritems() %}
+            <div class="chart-option-details">
+                <strong>{{ label }}</strong>: {{ value }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="chart-answer">
+        <div id="q-{{ question.id }}-chart" class="chart"></div>
+    </div>
+    <script>
+        new Chartist.Bar('#q-{{ question.id }}-chart', {
+            labels: {{ question.get_summary().absolute.keys() | tojson }},
+            series: [{{ question.get_summary().absolute.values() | tojson }}]
+        }, {
+            horizontalBars: true,
+            axisX: {
+                onlyInteger: true,
+            },
+            axisY: {
+                offset: 50
+            }
+        });
+    </script>
+{% endmacro %}
