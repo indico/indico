@@ -82,10 +82,9 @@ class SingleChoiceField(SurveyField):
                 counter[answer.data] += 1
         total = sum(counter.values())
         options = self.question.field_data['options']
-        results = {'total': total,
-                   'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
-                   'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
-        return results
+        return {'total': total,
+                'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
+                'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
 
 
 class MultiSelectConfigForm(FieldConfigForm):
@@ -157,10 +156,9 @@ class MultiSelectField(SurveyField):
             counter.update(answer.data)
         total = sum(counter.values())
         options = self.question.field_data['options']
-        results = {'total': total,
-                   'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
-                   'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
-        return results
+        return {'total': total,
+                'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
+                'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
 
     def is_answer_empty(self, answer):
         return not answer.data

@@ -114,10 +114,9 @@ class BoolField(SurveyField):
             if answer.data is not None:
                 counter[answer.data] += 1
         total = sum(counter.values())
-        results = {'total': total,
-                   'absolute': OrderedDict(((_('Yes'), counter[True]), (_('No'), counter[False]))),
-                   'relative': OrderedDict(((_('Yes'), counter[True] / total), (_('No'), counter[False] / total)))}
-        return results
+        return {'total': total,
+                'absolute': OrderedDict(((_('Yes'), counter[True]), (_('No'), counter[False]))),
+                'relative': OrderedDict(((_('Yes'), counter[True] / total), (_('No'), counter[False] / total)))}
 
 
 class StaticTextConfigForm(FieldConfigForm):
