@@ -10,22 +10,22 @@
             <div class="i-box titled">
                 <div class="i-box-header">
                     <div class="i-box-title">
-                        <div>
-                            {{ loop.index }}. {{ question.title }}
-                        </div>
+                        {{ loop.index }}. {{ question.title }}
+                    </div>
+                    <div class="i-box-metadata">
+                        <span class="label">{% trans %}Answered:{% endtrans %}</span>
+                        <span class="content">{{ question.not_empty_answers|count }}</span>
                     </div>
                 </div>
                 <div class="i-box-content">
                     {% if question.field_type == 'text' %}
-                        {{ text(question) }}
+                        {{ text_answer(question) }}
                     {% elif question.field_type == 'number' %}
-                        {{ number(question) }}
-                    {% elif question.field_type == 'bool' %}
-                        {{ single_choice_chart(question) }}
-                    {% elif question.field_type == 'single_choice' %}
-                        {{ single_choice_chart(question) }}
+                        {{ number_answer(question) }}
+                    {% elif question.field_type in ('bool', 'single_choice') %}
+                        {{ single_choice_answer(question) }}
                     {% elif question.field_type == 'multiselect' %}
-                        {{ multiple_choice_chart(question) }}
+                        {{ multiple_choice_answer(question) }}
                     {% endif %}
                 </div>
             </div>
@@ -33,13 +33,15 @@
     </div>
 {% endblock %}
 
-{% macro text(question) %}
+
+{% macro text_answer(question) %}
     {% for answer in question.get_summary() %}
         <div class="text-answer">{{ answer }}</div>
     {% endfor %}
 {% endmacro %}
 
-{% macro number(question) %}
+
+{% macro number_answer(question) %}
     {% set summary = question.get_summary() %}
     {% if summary %}
         <div class="number-answer">
@@ -88,22 +90,13 @@
 {% endmacro %}
 
 
-{% macro single_choice_chart(question) %}
+{% macro single_choice_answer(question) %}
+    {{ _choice_answer(question) }}
     {% set summary = question.get_summary() %}
-    <div class="chart-answer">
-        {% for label, value in summary.relative.iteritems() %}
-            <div class="chart-option-details">
-                <strong>{{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
-            </div>
-        {% endfor %}
-    </div>
-    <div class="chart-answer">
-        <div id="q-{{ question.id }}-chart" class="chart"></div>
-    </div>
     <script>
         new Chartist.Pie('#q-{{ question.id }}-chart', {
-            labels: {{ summary.relative.keys() | tojson }},
-            series: {{ summary.relative.values() | tojson }}
+            labels: {{ summary.relative.keys()|tojson }},
+            series: {{ summary.relative.values()|tojson }}
         }, {
             donut: true,
             donutWidth: 20,
@@ -117,22 +110,13 @@
 {% endmacro %}
 
 
-{% macro multiple_choice_chart(question) %}
+{% macro multiple_choice_answer(question) %}
+    {{ _choice_answer(question) }}
     {% set summary = question.get_summary() %}
-    <div class="chart-answer">
-        {% for label, value in summary.relative.iteritems() %}
-            <div class="chart-option-details">
-                <strong>{{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
-            </div>
-        {% endfor %}
-    </div>
-    <div class="chart-answer">
-        <div id="q-{{ question.id }}-chart" class="chart"></div>
-    </div>
     <script>
         new Chartist.Bar('#q-{{ question.id }}-chart', {
-            labels: {{ summary.absolute.keys() | tojson }},
-            series: [{{ summary.absolute.values() | tojson }}]
+            labels: {{ summary.absolute.keys()|tojson }},
+            series: [{{ summary.absolute.values()|tojson }}]
         }, {
             horizontalBars: true,
             reverseData: true,
@@ -144,4 +128,19 @@
             }
         });
     </script>
+{% endmacro %}
+
+
+{% macro _choice_answer(question) %}
+    {% set summary = question.get_summary() %}
+    <div class="chart-answer">
+        {% for label, value in summary.relative.iteritems() %}
+            <div class="chart-option-details">
+                <strong>{{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
+            </div>
+        {% endfor %}
+    </div>
+    <div class="chart-answer">
+        <div id="q-{{ question.id }}-chart" class="chart"></div>
+    </div>
 {% endmacro %}
