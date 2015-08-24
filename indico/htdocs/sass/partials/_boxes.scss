@@ -112,8 +112,8 @@
         }
 
         .i-box-metadata {
+            float: right;
             line-height: $toolbar-thin-height;
-            margin: 0 1em;
 
             > span:not(:last-child) {
                 margin-right: 0.7em;
@@ -128,6 +128,10 @@
                 color: $light-black;
                 font-style: italic;
             }
+        }
+
+        .i-box-buttons + .i-box-metadata {
+            margin-right: 1em;
         }
     }
 
