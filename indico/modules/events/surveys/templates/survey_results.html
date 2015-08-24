@@ -105,9 +105,12 @@
             series: {{ question.get_summary().relative.values() | tojson }}
         }, {
             donut: true,
-            donutWidth: 30,
+            donutWidth: 20,
             startAngle: 270,
-            total: 1
+            total: 1,
+            chartPadding: 20,
+            labelOffset: 20,
+            labelDirection: 'explode'
         });
     </script>
 {% endmacro %}
