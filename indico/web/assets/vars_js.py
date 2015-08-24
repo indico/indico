@@ -22,6 +22,7 @@ from werkzeug.urls import url_parse
 from indico.core.auth import multipass
 from indico.modules.auth.util import url_for_login
 from indico.modules.rb.models.locations import Location
+from indico.web.assets import core_env
 from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
 from MaKaC.webinterface import urlHandlers
@@ -89,7 +90,8 @@ def generate_global_file(config):
             'AuthorEmail': urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router,
 
             'APIKeyCreate': url_for('api.key_create'),
-            'APIKeyTogglePersistent': url_for('api.key_toggle_persistent')
+            'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
+            'fonts_sass': core_env['fonts_sass'].urls()
         },
 
         'Data': {

@@ -392,7 +392,13 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
             //CKEDITOR Custom Config
             blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
             removeButtons      : '',
-            disableNativeSpellChecker: false
+            disableNativeSpellChecker: false,
+            font_names: ['Liberation Sans/"Liberation Sans", sans-serif',
+                         'Liberation Serif/"Liberation Serif", serif',
+                         'Liberation Mono/"Liberation Mono", monospace',
+                         'Roboto/"Roboto", sans-serif',
+                         'Roboto Light/"Roboto Light", sans-serif'].join(';'),
+            contentsCss: _.union(CKEDITOR.getUrl( 'contents.css' ), Indico.Urls.fonts_sass)
         };
         if (simple) {
             config.toolbar = [
