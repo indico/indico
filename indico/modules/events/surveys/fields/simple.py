@@ -111,7 +111,7 @@ class BoolField(SurveyField):
     def get_summary(self):
         counter = Counter()
         for answer in self.question.answers:
-            if answer.data:
+            if answer.data is not None:
                 counter[answer.data] += 1
         total = sum(counter.values())
         results = {'total': total,
