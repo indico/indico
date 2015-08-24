@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals, division
 
-from collections import Counter
+from collections import Counter, OrderedDict
 
 from wtforms.fields import SelectField, IntegerField
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError, Length
@@ -83,8 +83,8 @@ class SingleChoiceField(SurveyField):
         total = sum(counter.values())
         options = self.question.field_data['options']
         results = {'total': total,
-                   'absolute': {opt['option']: counter[opt['id']] for opt in options},
-                   'relative': {opt['option']: counter[opt['id']] / total for opt in options}}
+                   'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
+                   'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
         return results
 
 
@@ -158,6 +158,6 @@ class MultiSelectField(SurveyField):
         total = sum(counter.values())
         options = self.question.field_data['options']
         results = {'total': total,
-                   'absolute': {opt['option']: counter[opt['id']] for opt in options},
-                   'relative': {opt['option']: counter[opt['id']] / total for opt in options}}
+                   'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
+                   'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
         return results

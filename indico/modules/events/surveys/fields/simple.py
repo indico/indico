@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals, division
 
-from collections import Counter
+from collections import Counter, OrderedDict
 
 from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
 from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
@@ -112,8 +112,8 @@ class BoolField(SurveyField):
                 counter[answer.data] += 1
         total = sum(counter.values())
         results = {'total': total,
-                   'absolute': {_('Yes'): counter[True], _('No'): counter[False]},
-                   'relative': {_('Yes'): counter[True] / total, _('No'): counter[False] / total}}
+                   'absolute': OrderedDict(((_('Yes'), counter[True]), (_('No'), counter[False]))),
+                   'relative': OrderedDict(((_('Yes'), counter[True] / total), (_('No'), counter[False] / total)))}
         return results
 
 
