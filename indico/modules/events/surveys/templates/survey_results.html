@@ -89,10 +89,11 @@
 
 
 {% macro single_choice_chart(question) %}
+    {% set summary = question.get_summary() %}
     <div class="chart-answer">
-        {% for label, value in question.get_summary().relative.iteritems() %}
+        {% for label, value in summary.relative.iteritems() %}
             <div class="chart-option-details">
-                <strong>{{ label }}</strong>: {{ '%0.2f'|format(value * 100) }}%
+                <strong>{{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
             </div>
         {% endfor %}
     </div>
@@ -101,8 +102,8 @@
     </div>
     <script>
         new Chartist.Pie('#q-{{ question.id }}-chart', {
-            labels: {{ question.get_summary().relative.keys() | tojson }},
-            series: {{ question.get_summary().relative.values() | tojson }}
+            labels: {{ summary.relative.keys() | tojson }},
+            series: {{ summary.relative.values() | tojson }}
         }, {
             donut: true,
             donutWidth: 20,
@@ -117,10 +118,11 @@
 
 
 {% macro multiple_choice_chart(question) %}
+    {% set summary = question.get_summary() %}
     <div class="chart-answer">
-        {% for label, value in question.get_summary().absolute.iteritems() %}
+        {% for label, value in summary.relative.iteritems() %}
             <div class="chart-option-details">
-                <strong>{{ label }}</strong>: {{ value }}
+                <strong>{{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
             </div>
         {% endfor %}
     </div>
@@ -129,8 +131,8 @@
     </div>
     <script>
         new Chartist.Bar('#q-{{ question.id }}-chart', {
-            labels: {{ question.get_summary().absolute.keys() | tojson }},
-            series: [{{ question.get_summary().absolute.values() | tojson }}]
+            labels: {{ summary.absolute.keys() | tojson }},
+            series: [{{ summary.absolute.values() | tojson }}]
         }, {
             horizontalBars: true,
             reverseData: true,
