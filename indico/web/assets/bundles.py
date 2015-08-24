@@ -202,6 +202,9 @@ indico_badges_js = rjs_bundle('indico_badges', 'js/indico/Management/ConfModifBa
 indico_badges_css = Bundle('css/badges.css',
                            filters='cssmin', output='css/indico_badges_%(version)s.min.css')
 
+fonts_sass = Bundle('sass/partials/_fonts.scss',
+                    filters=('pyscss', 'cssmin'), output='css/indico_fonts_%(version)s.min.css')
+
 indico_regform = rjs_bundle(
     'indico_regform',
     *namespace('js/indico/RegistrationForm',
@@ -492,6 +495,7 @@ def register_all_css(env, main_css_file):
     env.register('news_sass', news_sass)
     env.register('users_sass', users_sass)
     env.register('auth_sass', auth_sass)
+    env.register('fonts_sass', fonts_sass)
 
 
 core_env = IndicoEnvironment()
