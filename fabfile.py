@@ -242,6 +242,12 @@ def install_chartist_js():
             local('cp dist/chartist.js {0}/'.format(dest_dir_js))
             local('cp dist/scss/chartist.scss {0}/'.format(dest_dir_css))
             local('cp -r dist/scss/settings {0}/'.format(dest_dir_css))
+        with lcd(os.path.join(env.ext_dir, 'chartist-plugin-axistitle')):
+            dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'chartist-plugin-axistitle/')
+            dest_dir_css = os.path.join(lib_dir(env.src_dir, 'css'), 'chartist-plugin-axistitle/')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('mkdir -p {0}'.format(dest_dir_css))
+            local('cp dist/chartist-plugin-axistitle.js {0}/'.format(dest_dir_js))
 
 
 @recipe('ui-sortable')
