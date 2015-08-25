@@ -1,25 +1,37 @@
+{% if management %}{% extends 'layout/base.html' %}{% endif %}
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-<div class="i-box-group vert fixed-width attachments-package">
-    <div class="i-box titled no-padding">
-        <div class="i-box-header">
-            <div class="i-box-title">{%- trans %}Material Package{% endtrans -%}</div>
-            <div class="i-box-buttons toolbar right">
-                <div class="group">
-                    <a href="{{ url_for('.management', event) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
-                </div>
+
+{% if management %}
+    {% block title %}{% trans %}Materials{% endtrans %}{% endblock %}
+    {% block subtitle %}{% trans %}Package{% endtrans %}{% endblock %}
+{% endif %}
+
+
+{% block content %}
+    <div class="i-box-group vert fixed-width attachments-package">
+        <div class="i-box titled no-padding">
+            <div class="i-box-header">
+                <div class="i-box-title">{%- trans %}Material Package{% endtrans -%}</div>
+                {% if management %}
+                    <div class="i-box-buttons toolbar right">
+                        <div class="group">
+                            <a href="{{ url_for('.management', event) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="i-box-content">
+                {{ form_header(form) }}
+                {{ form_rows(form) }}
+                {% call form_footer(form) %}
+                    <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
+                {% endcall %}
             </div>
         </div>
-        <div class="i-box-content">
-            {{ form_header(form) }}
-            {{ form_rows(form) }}
-            {% call form_footer(form) %}
-                <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
-            {% endcall %}
-        </div>
     </div>
-</div>
 
-<script>
-    $('#added_since').datepicker();
-</script>
+    <script>
+        $('#added_since').datepicker();
+    </script>
+{% endblock %}

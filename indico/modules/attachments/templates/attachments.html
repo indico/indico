@@ -12,13 +12,12 @@
                 <span class="icon icon-package-download"></span>
                 <div class="text">
                     <div class="label">
-                        {% trans %}Generate a material package{% endtrans %}
+                        {% trans %}Generate a material package.{% endtrans %}
                     </div>
-                    <div>{% trans %}You can generate a file consisting of attachments in the event{% endtrans %}</div>
+                    <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
                 </div>
                 <div class="toolbar right">
-                    <a href="{{ url_for('.package_management', linked_object) }}"
-                       class="i-button icon-file">
+                    <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
                         {%- trans %}Material Package{% endtrans -%}
                     </a>
                 </div>

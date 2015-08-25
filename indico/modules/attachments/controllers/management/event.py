@@ -105,4 +105,5 @@ class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagement
 
 class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHConferenceModifBase):
     wp = WPPackageEventAttachmentsManagement
+    management = True
     CSRF_ENABLED = True

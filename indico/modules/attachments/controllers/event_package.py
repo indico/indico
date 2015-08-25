@@ -183,6 +183,7 @@ class AttachmentPackageGeneratorMixin:
 
 class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     wp = None
+    management = False
 
     def _process(self):
         form = self._prepare_form()
@@ -193,7 +194,8 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             else:
                 flash(_('There are no materials matching your criteria.'), 'warning')
 
-        return self.wp.render_template('generate_package.html', self._conf, form=form, event=self._conf)
+        return self.wp.render_template('generate_package.html', self._conf, form=form, event=self._conf,
+                                       management=self.management)
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
