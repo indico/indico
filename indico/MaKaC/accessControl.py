@@ -444,7 +444,7 @@ class AccessController(Persistent):
         self._p_changed = 1
 
     def getNonInheritingChildren(self):
-        return [elem for elem in self.nonInheritingChildren
+        return [elem for elem in getattr(self, 'nonInheritingChildren', [])
                 if elem.__class__.__name__ not in LEGACY_MATERIALS]
 
     def updateNonInheritingChildren(self, elem, delete=False):
