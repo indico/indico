@@ -393,11 +393,9 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
             blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
             removeButtons      : '',
             disableNativeSpellChecker: false,
-            font_names: ['Liberation Sans/"Liberation Sans", sans-serif',
-                         'Liberation Serif/"Liberation Serif", serif',
-                         'Liberation Mono/"Liberation Mono", monospace',
-                         'Roboto/"Roboto", sans-serif',
-                         'Roboto Light/"Roboto Light", sans-serif'].join(';'),
+            font_names: ['Sans Serif/"Liberation Sans", sans-serif',
+                         'Serif/"Liberation Serif", serif',
+                         'Monospace/"Liberation Mono", monospace'].join(';'),
             contentsCss: _.union(CKEDITOR.getUrl( 'contents.css' ), Indico.Urls.fonts_sass)
         };
         if (simple) {
