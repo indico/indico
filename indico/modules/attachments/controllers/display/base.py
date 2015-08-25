@@ -49,4 +49,4 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
             if self.attachment.type == AttachmentType.link:
                 return redirect(self.attachment.link_url)
             else:
-                return self.attachment.file.send()
+                return self.attachment.file.send(inline=not from_preview)
