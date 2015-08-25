@@ -4,7 +4,45 @@
     $(document).ready(function() {
         setupSurveyScheduleWindows();
         setupQuestionWindows();
+        setupSurveyResultCharts();
     });
+
+    function setupSurveyResultCharts() {
+        $('#survey-results .survey-pie-chart').each(function(idx, elem) {
+            var chart = new Chartist.Pie(elem, {
+                labels: $(elem).data('labels'),
+                series: $(elem).data('series-relative')
+            }, {
+                donut: true,
+                donutWidth: 20,
+                startAngle: 270,
+                total: 1,
+                chartPadding: 20,
+                labelOffset: 20,
+                labelDirection: 'explode'
+            }).on('draw', function removeEmptyLabels(data) {
+                if (data.value === 0) {
+                    chart.data.labels[data.index] = '';
+                }
+            });
+        });
+
+        $('#survey-results .survey-bar-chart').each(function(idx, elem) {
+            new Chartist.Bar(elem, {
+                labels: $(elem).data('labels'),
+                series: [$(elem).data('series-absolute')]
+            }, {
+                horizontalBars: true,
+                reverseData: true,
+                axisX: {
+                    onlyInteger: true,
+                },
+                axisY: {
+                    offset: 50
+                }
+            });
+        });
+    }
 
     function setupSurveyScheduleWindows() {
         $('a.js-survey-schedule-dialog').on('click', function(evt) {

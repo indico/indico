@@ -113,13 +113,10 @@
         }
     }
 
-    .survey-bar-chart {
-        .ct-bar {
-            stroke-width: 30px;
+    .survey-pie-chart,
+    .surve-bar-chart {
+        .ct-label {
+            font-weight: bold;
         }
-    }
-
-    .ct-label {
-        font-weight: bold;
     }
 }
