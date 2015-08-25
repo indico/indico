@@ -70,9 +70,8 @@ class WebFactory(WebFactory):
         webPageWithSideMenu._regFormMenuItem.setVisible(False)
 
     @staticmethod
-    def customiseToolsTabCtrl( tabCtrl ):
+    def customiseToolsTabCtrl(tabCtrl):
         tabCtrl.getTabById("clone").enable()
-        tabCtrl.getTabById("matPackage").enable()
         tabCtrl.getTabById("delete").enable()
         tabCtrl.getTabById("badges").disable()
         tabCtrl.getTabById("posters").enable()
