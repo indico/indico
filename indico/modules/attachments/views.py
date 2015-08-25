@@ -78,11 +78,8 @@ class WPEventFolderDisplay(WPMeetingDisplay, WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPPackageEventAttachmentsManagement(WPConfModifToolsBase, WPJinjaMixin):
+class WPPackageEventAttachmentsManagement(WPEventAttachments, WPJinjaMixin):
     template_prefix = 'attachments/'
-
-    def _setActiveTab(self):
-        self._tabMatPackage.setActive()
 
     def _getTabContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)

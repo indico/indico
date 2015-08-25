@@ -9,6 +9,23 @@
     <div class="attachment-editor">
         <div class="action-box fixed-width">
             <div class="section">
+                <span class="icon icon-package-download"></span>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Generate a material package{% endtrans %}
+                    </div>
+                    <div>{% trans %}You can generate a file consisting of attachments in the event{% endtrans %}</div>
+                </div>
+                <div class="toolbar right">
+                    <a href="{{ url_for('.package_management', linked_object) }}"
+                       class="i-button icon-file">
+                        {%- trans %}Material Package{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="action-box fixed-width">
+            <div class="section">
                 <span class="icon icon-upload"></span>
                 <div class="text">
                     <div class="label">
