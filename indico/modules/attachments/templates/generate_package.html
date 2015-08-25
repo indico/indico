@@ -4,6 +4,11 @@
     <div class="i-box titled no-padding">
         <div class="i-box-header">
             <div class="i-box-title">{%- trans %}Material Package{% endtrans -%}</div>
+            <div class="i-box-buttons toolbar right">
+                <div class="group">
+                    <a href="{{ url_for('.management', event) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
+                </div>
+            </div>
         </div>
         <div class="i-box-content">
             {{ form_header(form) }}

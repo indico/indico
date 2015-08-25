@@ -1894,8 +1894,6 @@ class WPConfModifToolsBase(WPConferenceModifBase):
                 urlHandlers.UHConferenceClose.getURL(self._conf))
         self._tabDelete = self._tabCtrl.newTab("delete", _("Delete"), \
                 urlHandlers.UHConfDeletion.getURL(self._conf))
-        self._tabMatPackage = self._tabCtrl.newTab("matPackage", _("Material Package"),
-                                                   url_for('attachments.package_management', self._conf))
 
         if Config.getInstance().getOfflineStore():
             self._tabOffline = self._tabCtrl.newTab("offline", _("Offline copy"),
