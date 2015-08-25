@@ -30,7 +30,6 @@ from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPMenuEdit, WPPage
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -151,13 +150,27 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
         else:
             self.entry.move(position)
 
-        return jsonify_data()
+        return jsonify_data(flash=False)
 
 
-class RHMenuEnableEntry(RHMenuEntryEditBase):
+class RHMenuEntryToggleEnabled(RHMenuEntryEditBase):
     def _process(self):
         self.entry.is_enabled = not self.entry.is_enabled
-        return redirect_or_jsonify(url_for('.menu', self._conf), is_enabled=self.entry.is_enabled)
+        return jsonify(is_enabled=self.entry.is_enabled)
+
+
+class RHMenuEntryToggleDefault(RHMenuEntryEditBase):
+    def _process(self):
+        if self.entry.type != MenuEntryType.page:
+            raise BadRequest
+        event = self._conf.as_event
+        if event.default_page_id == self.entry.page_id:
+            is_default = False
+            event.default_page_id = None
+        else:
+            is_default = True
+            event.default_page_id = self.entry.page_id
+        return jsonify(is_default=is_default)
 
 
 class RHMenuAddEntry(RHMenuBase):
@@ -173,7 +186,7 @@ class RHMenuAddEntry(RHMenuBase):
             entry = MenuEntry(event_id=self._conf.id, type=MenuEntryType.separator)
             db.session.add(entry)
             db.session.flush()
-            return jsonify_data(entry=_render_menu_entry(entry))
+            return jsonify_data(flash=False, entry=_render_menu_entry(entry))
 
         elif entry_type == MenuEntryType.user_link.name:
             form_cls = MenuLinkForm
@@ -221,7 +234,7 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         db.session.delete(self.entry)
         db.session.flush()
 
-        return jsonify_data(menu=_render_menu_entries(self._conf, connect_menu=True))
+        return jsonify_data(flash=False, menu=_render_menu_entries(self._conf, connect_menu=True))
 
 
 class RHPageDisplay(RHConferenceBaseDisplay):

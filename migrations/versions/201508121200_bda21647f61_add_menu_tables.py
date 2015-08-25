@@ -54,9 +54,16 @@ def upgrade():
     )
     op.create_index(None, 'menu_entries', ['event_id', 'name'], unique=True, schema='events',
                     postgresql_where=sa.text('(type = 2 OR type = 4)'))
+    op.add_column('events', sa.Column('default_page_id', sa.Integer(), nullable=True), schema='events')
+    op.create_index(None, 'events', ['default_page_id'], unique=False, schema='events')
+    op.create_foreign_key(None,
+                          'events', 'menu_pages',
+                          ['default_page_id'], ['id'],
+                          source_schema='events', referent_schema='events')
 
 
 def downgrade():
+    op.drop_column('events', 'default_page_id', schema='events')
     op.drop_constraint('fk_menu_entries_page_id_menu_pages', 'menu_entries', schema='events')
     op.drop_table('menu_entries', schema='events')
     op.drop_table('menu_pages', schema='events')

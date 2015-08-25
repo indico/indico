@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from indico.core.db import db
+from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.util.console import verbose_iterator, cformat
@@ -189,7 +190,8 @@ class EventMenuImporter(Importer):
                 data['type'] = MenuEntryType.page
                 data['title'] = strip_tags(convert_to_unicode(item._caption)).strip()
                 data['page'] = MenuPage(html=item._page._content)
-                # TODO: handle item._page._isHome
+                if item._page._isHome:
+                    Event.get(event.id).default_page = data['page']
             else:
                 self.print_error('Unexpected menu item type: {}'.format(item_type), event_id=event.id)
                 continue

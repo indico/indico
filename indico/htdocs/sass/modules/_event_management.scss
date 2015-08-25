@@ -164,14 +164,17 @@
                     display: inline-block;
                     overflow: hidden;
 
-                    max-width: 75%;
+                    max-width: 69%;
 
                     white-space: nowrap;
                     text-overflow: ellipsis;
                 }
                 > .actions {
-                    max-width: 25%;
+                    max-width: 31%;
                     margin-right: -5px;
+                    a, a:active, a:focus {
+                        outline: none;
+                    }
                     > * {
                         padding: 0 2px;
 
@@ -192,6 +195,14 @@
                             @extend %enabled-action;
                         }
                     }
+                    > .default {
+                        @include icon-before('icon-home');
+                        color: #46F936 !important;
+                    }
+                    > .not-default {
+                        @include icon-before('icon-home');
+                        display: none;
+                    }
                     > .edit-entry {
                         @include icon-before('icon-edit');
                     }
@@ -204,6 +215,9 @@
                     > .drag-handle {
                         @include icon-before('icon-grid2');
                     }
+                }
+                &:hover > .actions > .not-default {
+                    display: inline !important;
                 }
                 &.highlight > .actions > * {
                     color: #fdfdfd;
@@ -256,10 +270,10 @@
         background-color: $light-gray;
         > li > .menu-entry > .i-label {
             > span:first-child {
-                max-width: 73%;
+                max-width: 66%;
             }
             > .actions {
-                max-width: 27%;
+                max-width: 34%;
             }
         }
     }

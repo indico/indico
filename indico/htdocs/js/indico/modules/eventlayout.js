@@ -190,6 +190,22 @@
                         .parent('.i-label').toggleClass('striped', !isEnabled);
             }
         });
+    }).on('indico:confirmed', '.menu-entry .default, .menu-entry .not-default', function(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        var $this = $(this);
+        $.ajax({
+            url: $this.data('href'),
+            method: $this.data('method'),
+            complete: IndicoUI.Dialogs.Util.progress(),
+            error: handleAjaxError,
+            success: function(data) {
+                var isDefault = data.is_default;
+                $('.menu-entry .default').removeClass('default').addClass('not-default');
+                $this.toggleClass('default', isDefault).toggleClass('not-default', !isDefault);
+            }
+        });
     }).on('indico:confirmed', '.menu-entry .delete-entry', function(evt) {
         evt.preventDefault();
 

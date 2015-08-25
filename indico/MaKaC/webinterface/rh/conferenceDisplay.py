@@ -47,6 +47,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.core import signals
 from indico.modules.events.api import CategoryEventHook
+from indico.modules.events.layout.views import WPPage
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
 from indico.web.http_api.metadata.serializer import Serializer
@@ -125,15 +126,11 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
             if params.get("ovw", False):
                 p = conferences.WPConferenceDisplay( self, self._target )
             else:
-                self._page = None
-                intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._target)
-                for page in intPagesMgr.getPagesList():
-                    if page.isHome():
-                        self._page = page
-                if not self._page:
-                    p = conferences.WPConferenceDisplay( self, self._target )
+                event = self._conf.as_event
+                if event.default_page_id is None:
+                    p = conferences.WPConferenceDisplay(self, self._conf)
                 else:
-                    p = conferences.WPInternalPageDisplay(self,self._target, self._page)
+                    p = WPPage.render_template('page.html', self._conf, page=event.default_page).encode('utf-8')
         elif view in styleMgr.getXSLStyles():
             if not isLibxml:
                 warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
@@ -147,7 +144,7 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
             else:
                 p = conferences.WPConferenceDisplay( self, self._target )
 
-        return warningText + p.display(**params)
+        return warningText + (p if isinstance(p, basestring) else p.display(**params))
 
 
 class RHRelativeEvent(RHConferenceBaseDisplay):

@@ -65,6 +65,22 @@ class Event(db.Model):
         db.Text,
         nullable=True
     ))
+    #: The ID of the event's default page (conferences only)
+    default_page_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.menu_pages.id'),
+        index=True,
+        nullable=True
+    )
+
+    #: The event's default page (conferences only)
+    default_page = db.relationship(
+        'MenuPage',
+        lazy=True,
+        # don't use this backref. we just need it so SA properly NULLs
+        # this column when deleting the default page
+        backref=db.backref('_default_page_of_event', lazy=True)
+    )
 
     # relationship backrefs:
     # - layout_images (ImageFile.event_new)

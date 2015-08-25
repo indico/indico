@@ -10,8 +10,15 @@
             <i class="entry-{{ entry.type.name }} drag-handle"></i>
             <span>{{ entry.localized_title }}{% if config.DEBUG %} ({{ entry.position}}){% endif %}</span>
             <span class="right actions">
+                {% if entry.type.name == 'page' %}
+                    <a class="{% if not entry.page.is_default %}not-{% endif %}default" href="#"
+                       data-href="{{ url_for('.menu_entry_toggle_default', entry) }}"
+                       data-method="POST"
+                       title="{% trans %}Toggle default event homepage{% endtrans %}"
+                    ></a>
+                {% endif %}
                 <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
-                   data-href="{{ url_for('.menu_enable_entry', entry) }}"
+                   data-href="{{ url_for('.menu_entry_toggle_enabled', entry) }}"
                    data-method="POST"
                 ></a>
                 {% if not entry.is_separator %}

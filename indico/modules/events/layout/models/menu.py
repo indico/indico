@@ -357,9 +357,16 @@ class MenuPage(db.Model):
         nullable=False
     )
 
+    # relationship backrefs:
+    # - menu_entry (MenuEntry.page)
+
     @property
     def locator(self):
         return dict(self.menu_entry.event.getLocator(), page_id=self.id)
+
+    @property
+    def is_default(self):
+        return self.menu_entry.event_new.default_page_id == self.id
 
     @return_ascii
     def __repr__(self):

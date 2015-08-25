@@ -24,7 +24,8 @@ from indico.modules.events.layout.controllers.layout import (RHLayoutEdit, RHLay
                                                              RHLayoutCSSSaveTheme, RHLayoutCSSDisplay,
                                                              RHLayoutCSSPreview)
 from indico.modules.events.layout.controllers.menu import (RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
-                                                           RHMenuToggleCustom, RHMenuEnableEntry, RHMenuEntryEdit,
+                                                           RHMenuToggleCustom, RHMenuEntryToggleEnabled,
+                                                           RHMenuEntryToggleDefault, RHMenuEntryEdit,
                                                            RHMenuEntryPosition, RHPageDisplay)
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
@@ -35,7 +36,10 @@ _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
 _bp.add_url_rule('/menu/toggle-customize', 'menu_toggle_custom', RHMenuToggleCustom, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu_entry_edit', RHMenuEntryEdit, methods=('GET', 'POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu_entry_position', RHMenuEntryPosition, methods=('POST',))
-_bp.add_url_rule('/menu/<int:menu_entry_id>/enable', 'menu_enable_entry', RHMenuEnableEntry, methods=('POST',))
+_bp.add_url_rule('/menu/<int:menu_entry_id>/toggle-enabled', 'menu_entry_toggle_enabled', RHMenuEntryToggleEnabled,
+                 methods=('POST',))
+_bp.add_url_rule('/menu/<int:menu_entry_id>/toggle-default', 'menu_entry_toggle_default', RHMenuEntryToggleDefault,
+                 methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/delete', 'menu_delete_entry', RHMenuDeleteEntry, methods=('DELETE',))
 _bp.add_url_rule('/menu/add', 'menu_add_entry', RHMenuAddEntry, methods=('GET', 'POST'))
 _bp.add_url_rule('/theme/save', 'css_save_theme', RHLayoutCSSSaveTheme, methods=('POST',))
