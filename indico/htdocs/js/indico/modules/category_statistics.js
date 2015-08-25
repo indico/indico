@@ -1,56 +1,54 @@
 $(function initCategoryStats() {
     $('.plot-container .plot').each(function drawPlot() {
         var $this = $(this);
-        var xMin = $this.data('min-x');
-        var xMax = $this.data('max-x');
-        var yMin = $this.data('min-y');
-        var yMax = $this.data('max-y');
-
-        var data = $this.data('values') || {};
-
-        var currentYear = new Date().getFullYear();
-        var current = [[currentYear, data[currentYear]]];
-
-        var options = {
-            axes: {
-                xaxis: {
-                    label: $this.data('label-xaxis'),
-                    max: xMax,
-                    min: xMin,
-                    tickOptions: { showGridline: false }
-                },
-                yaxis: {
-                    label: $this.data('label-yaxis'),
-                    max: yMax,
-                    min: yMin
-                }
-            },
-            height: 400,
-            highlighter: {
-                location: 'n',
-                tooltipAxes: 'yx',
-                tooltipSeparator: $this.data('tooltip'),
-            },
+        var data = {
             series: [
-                {
-                    fillAlpha: 0.9,
-                    fill: true,
-                    fillAndStroke: true
-                },{
-                    markerOptions: {
-                    color: '#005272',
-                    style: 'circle',
-                }},
-            ],
-            width: 400
+                _.sortBy(
+                    _.map($this.data('values') || {}, function(value, key) { return {x: key, y: value}; }),
+                    function(datum) { return datum.x; }
+                )
+            ]
         };
-        data = [
-            _.pairs(data).map(function(datum) { return [parseInt(datum[0]), datum[1]]; }),
-            current
-        ];
-        var plot = $.jqplot(this.id, data, processJqPlotOptions(options));
-        $(window).resize(function() {
-              plot.replot( { resetAxes: true } );
+        var options = {
+            showArea: true,
+            fullWidth: true,
+            chartPadding: { right: 30 },
+            axisX: {
+                type: Chartist.AutoScaleAxis,
+                onlyInteger: true,
+            },
+            axisY: {
+                type: Chartist.AutoScaleAxis,
+                onlyInteger: true,
+            },
+            lineSmooth: Chartist.Interpolation.none(),
+            plugins: [
+                Chartist.plugins.ctAxisTitle({
+                    axisX: {
+                        axisTitle: 'Time (mins)',
+                        axisClass: 'ct-axis-title',
+                        offset: { x: 0, y: 50 },
+                        textAnchor: 'middle'
+                    },
+                    axisY: {
+                        axisTitle: 'Goals',
+                        axisClass: 'ct-axis-title',
+                        offset: { x: 0, y: 0 },
+                        textAnchor: 'middle',
+                        flipTitle: false
+                      }
+                })
+            ]
+        };
+
+        var chart = new Chartist.Line(elem, data, options);
+        // Add tooltips via qtip
+        var tooltipLabel = $this.data('tooltip');
+        chart.on('draw', function(data) {
+            if(data.type === 'point') {
+                var point = $(data.element._node);
+                point.attr('title', '{0}{1}{2}'.format(data.value.y, tooltipLabel, data.value.x));
+            }
         });
     });
 });

@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from math import ceil
+import sys
 
 from flask import jsonify, request
 
@@ -29,18 +29,20 @@ from MaKaC.webinterface.rh.categoryDisplay import RHCategDisplayBase
 
 def _plot_data(stats, tooltip=''):
     years = sorted(stats.iterkeys())
-    min_year = now_utc().year
-    max_year = min_year
+    now = now_utc().year
+    data = {}
     if years:
-        min_year = min(min_year, years[0]) - 1
-        max_year = max(max_year, years[-1])
-        data = {year: stats.get(year, 0) for year in xrange(min_year, max_year + 1)}
-        max_y = ceil(max(data.itervalues()) * 1.1)  # 1.1 for padding in the graph
-    else:
-        data = {}
-        max_y = 0
-    return {'min_x': min_year, 'max_x': max_year, 'min_y': 0, 'max_y': max_y, 'values': data,
-            'total': sum(data.itervalues()), 'label_x': _("Years"), 'label_y': '', 'tooltip': tooltip}
+        year = min(now, years[0]) - 1
+        max_year = max(now, years[-1])
+        while year <= max_year:
+            val = stats.get(year, 0)
+            if not val and not any(stats.get(y, 0) for y in xrange(year, min(max_year, year + 10))):
+                end = next((y - 1 for y in xrange(year, max_year) if stats.get(y, 0)), sys.maxint)
+                year = end + 1
+            else:
+                data[year] = val
+                year += 1
+    return {'values': data, 'total': sum(data.itervalues()), 'label_x': _("Years"), 'label_y': '', 'tooltip': tooltip}
 
 
 def _process_stats(stats, root=False):
