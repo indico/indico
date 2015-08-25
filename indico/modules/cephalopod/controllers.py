@@ -37,9 +37,11 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
-class RHCephalopod(RHAdminBase):
+class RHCephalopodBase(RHAdminBase):
     CSRF_ENABLED = True
 
+
+class RHCephalopod(RHCephalopodBase):
     def _process_GET(self):
         defaults = FormDefaults(**settings.get_all())
         form = CephalopodForm(request.form, obj=defaults)
@@ -81,9 +83,8 @@ class RHCephalopod(RHAdminBase):
         return redirect(url_for('.index'))
 
 
-class RHCephalopodSync(RHAdminBase):
-
-    def _process_GET(self):
+class RHCephalopodSync(RHCephalopodBase):
+    def _process(self):
         if not settings.get('joined'):
             flash(_("Synchronization is not possible if you don't join the community first."),
                   'error')
@@ -104,7 +105,6 @@ class RHCephalopodSync(RHAdminBase):
 
 
 class RHSystemInfo(RH):
-
     def _process(self):
         language = HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
         stats = {'python_version': python_version(),
