@@ -88,10 +88,12 @@ class NumberField(SurveyField):
         for answer in self.question.answers:
             if answer.data:
                 counter[answer.data] += 1
+        total_answers = sum(counter.values())
         results = {'total': sum(counter.elements()),
                    'max': max(counter.elements()),
                    'min': min(counter.elements()),
-                   'counter': counter}
+                   'absolute': OrderedDict(sorted(counter.iteritems())),
+                   'relative': OrderedDict((k, v / total_answers) for k, v in sorted(counter.iteritems()))}
         results['average'] = (results['max'] + results['min']) / len(list(counter.elements()))
         return results
 

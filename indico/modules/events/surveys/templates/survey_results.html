@@ -44,48 +44,21 @@
 {% macro number_answer(question) %}
     {% set summary = question.get_summary() %}
     {% if summary %}
-        <div class="number-answer">
-            <div class="i-badge">
-                <div class="i-badge-content">
-                    <div class="i-badge-value">
-                        {{ summary.min }}
-                    </div>
-                    <span class="i-badge-title">
-                        {% trans %}Min{% endtrans %}
-                    </span>
-                </div>
+        <div class="chart-answer">
+            <div class="chart-option-details">
+                <strong>{% trans %}Average:{% endtrans %}</strong> {{ '%0.2f'|format(summary.average) }}
             </div>
-            <div class="i-badge">
-                <div class="i-badge-content">
-                    <div class="i-badge-value">
-                        {{ '%0.2f'|format(summary.average) }}
-                    </div>
-                    <span class="i-badge-title">
-                        {% trans %}Average{% endtrans %}
-                    </span>
-                </div>
+            <div class="chart-option-details">
+                <strong>{% trans %}Min:{% endtrans %}</strong> {{ summary.min }}
             </div>
-            <div class="i-badge">
-                <div class="i-badge-content">
-                    <div class="i-badge-value">
-                        {{ summary.max }}
-                    </div>
-                    <span class="i-badge-title">
-                        {% trans %}Max{% endtrans %}
-                    </span>
-                </div>
+            <div class="chart-option-details">
+                <strong>{% trans %}Max:{% endtrans %}</strong> {{ summary.max }}
             </div>
-            <div class="i-badge">
-                <div class="i-badge-content">
-                    <div class="i-badge-value">
-                        {{ summary.total }}
-                    </div>
-                    <span class="i-badge-title">
-                        {% trans %}Total{% endtrans %}
-                    </span>
-                </div>
+            <div class="chart-option-details">
+                <strong>{% trans %}Total:{% endtrans %}</strong> {{ summary.total }}
             </div>
         </div>
+        {{ _chart('bar', summary) }}
     {% endif %}
 {% endmacro %}
 
@@ -109,8 +82,13 @@
             </div>
         {% endfor %}
     </div>
+    {{ _chart(chart_type, summary) }}
+{% endmacro %}
+
+
+{% macro _chart(chart_type, summary) %}
     <div class="chart-answer">
-        <div id="q-{{ question.id }}-chart" class="survey-{{ chart_type }}-chart"
+        <div class="survey-{{ chart_type }}-chart"
             data-labels="{{ summary.absolute.keys()|tojson|forceescape }}"
             data-series-absolute="{{ summary.absolute.values() }}"
             data-series-relative="{{ summary.relative.values() }}"></div>
