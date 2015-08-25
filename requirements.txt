@@ -1,7 +1,7 @@
 --find-links http://indico-software.org/wiki/Admin/Installation/IndicoExtras
 Babel==1.3
 Mako==0.9.1
-MarkupSafe==0.15
+MarkupSafe==0.23
 ZConfig==2.9.2
 ZODB3==3.10.5
 cds-indico-extras==0.2
@@ -77,3 +77,4 @@ contextlib2==0.4.0
 Flask-OAuthlib==0.9.1
 translitcodec
 certifi
+Jinja2==2.8

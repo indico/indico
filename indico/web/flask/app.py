@@ -56,7 +56,7 @@ from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         equalto, call_template_hook, groupby, strip_tags)
+                                         call_template_hook, groupby, strip_tags)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
@@ -195,7 +195,6 @@ def setup_jinja(app):
     app.add_template_filter(strip_tags)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
-    app.add_template_test(equalto)
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)

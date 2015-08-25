@@ -97,15 +97,6 @@ def instanceof(value, type_):
     return isinstance(value, type_)
 
 
-def equalto(value, other):
-    """Checks if `value` equals `other`
-
-    :param value: something
-    :param other: something
-    """
-    return value == other
-
-
 def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''):
     """Returns template names for templates that may be overridden in a plugin.
 
