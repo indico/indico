@@ -38,13 +38,13 @@
                 {% trans %}Submissions{% endtrans %}
             </div>
             <div class="i-box-buttons">
+                <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart {{ 'disabled' if not survey.submissions }}">
+                    {% trans %}Results{% endtrans %}
+                </a>
                 <button id="export-submissions" data-href="{{ url_for('.export_submissions', survey) }}"
                         class="i-button icon-file-excel js-submission-action" {{ 'disabled' if not survey.submissions }}>
                     {% trans %}Export{% endtrans %}
                 </button>
-                <a href="{{ url_for('.survey_results', survey) }}" class="i-button">
-                    {% trans %}Show results{% endtrans %}
-                </a>
                 <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
                         data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
                         data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
