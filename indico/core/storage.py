@@ -171,7 +171,7 @@ class Storage(object):
         """
         raise NotImplementedError
 
-    def send_file(self, file_id, content_type, filename):  # pragma: no cover
+    def send_file(self, file_id, content_type, filename, inline=True):  # pragma: no cover
         """Sends the file to the client.
 
         This returns a flask response that will eventually result in
@@ -185,6 +185,10 @@ class Storage(object):
         :param filename: The file name to use when sending the file to
                          the client (may or may not be used depending
                          on the backend).
+        :param inline: Whether the file should be displayed inline or
+                       downloaded. Typically this will set the
+                       Content-Disposition header. Depending on the
+                       backend, this argument could be ignored.
         """
         raise NotImplementedError
 
@@ -252,9 +256,9 @@ class FileSystemStorage(Storage):
         except Exception as e:
             raise StorageError('Could not get size of "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 
-    def send_file(self, file_id, content_type, filename):
+    def send_file(self, file_id, content_type, filename, inline=True):
         try:
-            return send_file(filename, self._resolve_path(file_id).encode('utf-8'), content_type)
+            return send_file(filename, self._resolve_path(file_id).encode('utf-8'), content_type, inline=inline)
         except Exception as e:
             raise StorageError('Could not send "{}": {}'.format(file_id, e)), None, sys.exc_info()[2]
 

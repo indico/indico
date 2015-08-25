@@ -340,9 +340,9 @@ class AttachmentFile(db.Model):
         """Returns the stored file as a file-like object"""
         return self.storage.open(self.storage_file_id)
 
-    def send(self):
+    def send(self, inline=True):
         """Sends the file to the user"""
-        return self.storage.send_file(self.storage_file_id, self.content_type, self.filename)
+        return self.storage.send_file(self.storage_file_id, self.content_type, self.filename, inline=inline)
 
     @return_ascii
     def __repr__(self):
