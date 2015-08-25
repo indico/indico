@@ -91,51 +91,16 @@
 
 
 {% macro single_choice_answer(question) %}
-    {{ _choice_answer(question) }}
-    {% set summary = question.get_summary() %}
-    <script>
-        var chart = new Chartist.Pie('#q-{{ question.id }}-chart', {
-            labels: {{ summary.relative.keys()|tojson }},
-            series: {{ summary.relative.values()|tojson }}
-        }, {
-            donut: true,
-            donutWidth: 20,
-            startAngle: 270,
-            total: 1,
-            chartPadding: 20,
-            labelOffset: 20,
-            labelDirection: 'explode'
-        }).on('draw', function(data) {
-            if (data.value === 0) {
-                chart.data.labels[data.index] = ''
-            }
-        });
-    </script>
+    {{ _choice_answer(question, 'pie') }}
 {% endmacro %}
 
 
 {% macro multiple_choice_answer(question) %}
-    {{ _choice_answer(question) }}
-    {% set summary = question.get_summary() %}
-    <script>
-        new Chartist.Bar('#q-{{ question.id }}-chart', {
-            labels: {{ summary.absolute.keys()|tojson }},
-            series: [{{ summary.absolute.values()|tojson }}]
-        }, {
-            horizontalBars: true,
-            reverseData: true,
-            axisX: {
-                onlyInteger: true,
-            },
-            axisY: {
-                offset: 50
-            }
-        });
-    </script>
+    {{ _choice_answer(question, 'bar') }}
 {% endmacro %}
 
 
-{% macro _choice_answer(question) %}
+{% macro _choice_answer(question, chart_type) %}
     {% set summary = question.get_summary() %}
     <div class="chart-answer">
         {% for label, value in summary.relative.iteritems() %}
@@ -145,6 +110,9 @@
         {% endfor %}
     </div>
     <div class="chart-answer">
-        <div id="q-{{ question.id }}-chart" class="chart"></div>
+        <div id="q-{{ question.id }}-chart" class="survey-{{ chart_type }}-chart"
+            data-labels="{{ summary.absolute.keys()|tojson|forceescape }}"
+            data-series-absolute="{{ summary.absolute.values() }}"
+            data-series-relative="{{ summary.relative.values() }}"></div>
     </div>
 {% endmacro %}
