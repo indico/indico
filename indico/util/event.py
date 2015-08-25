@@ -18,11 +18,6 @@
 Event-related utils
 """
 
-import re
-
-
-UID_RE = re.compile(r'^(?P<event>\w+)(?:\.s(?P<session>\w+))?(?:\.(?P<contrib>\w+))?(?:\.(?P<subcont>\w+))?$')
-
 
 def uniqueId(obj):
     from indico.modules.events.notes.models.notes import EventNote
