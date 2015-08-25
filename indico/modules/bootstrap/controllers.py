@@ -41,6 +41,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 
 
 class RHBootstrap(RH):
+    CSRF_ENABLED = True
 
     def _process_GET(self):
         if User.has_rows:

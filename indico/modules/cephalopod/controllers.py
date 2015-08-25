@@ -38,6 +38,7 @@ from MaKaC.webinterface.rh.base import RH
 
 
 class RHCephalopod(RHAdminBase):
+    CSRF_ENABLED = True
 
     def _process_GET(self):
         defaults = FormDefaults(**settings.get_all())
