@@ -56,3 +56,6 @@
 [submodule "ext_modules/chartist.js"]
 	path = ext_modules/chartist.js
 	url = git://github.com/gionkunz/chartist-js.git
+[submodule "ext_modules/chartist-plugin-axistitle"]
+	path = ext_modules/chartist-plugin-axistitle
+	url = git://github.com/alexstanbury/chartist-plugin-axistitle.git
