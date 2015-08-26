@@ -764,16 +764,6 @@ class UHConfModifParticipants(URLHandler):
     _endpoint = 'event_mgmt.confModifParticipants'
 
 
-class UHInternalPageDisplay(URLHandler):
-    _endpoint = 'event.internalPage'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        params = target.getLocator()
-        url = os.path.join("internalPage-%s.html" % params["pageId"])
-        return url
-
-
 class UHConfModifDisplay(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay'
 
@@ -782,64 +772,12 @@ class UHConfModifDisplayCustomization(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-custom'
 
 
-class UHConfModifDisplayMenu(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-menu'
-
-
 class UHConfModifDisplayResources(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-resources'
 
 
 class UHConfModifDisplayConfHeader(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-confHeader'
-
-
-class UHConfModifDisplayAddLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-addLink'
-
-
-class UHConfModifDisplayAddPage(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-addPage'
-
-
-class UHConfModifDisplayModifyData(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-modifyData'
-
-
-class UHConfModifDisplayModifySystemData(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-modifySystemData'
-
-
-class UHConfModifDisplayAddSpacer(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-addSpacer'
-
-
-class UHConfModifDisplayRemoveLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-removeLink'
-
-
-class UHConfModifDisplayToggleLinkStatus(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleLinkStatus'
-
-
-class UHConfModifDisplayToggleHomePage(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleHomePage'
-
-
-class UHConfModifDisplayUpLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-upLink'
-
-
-class UHConfModifDisplayDownLink(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-downLink'
-
-
-class UHConfModifDisplayToggleTimetableView(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleTimetableView'
-
-
-class UHConfModifDisplayToggleTTDefaultLayout(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleTTDefaultLayout'
 
 
 class UHConfModifFormatTitleBgColor(URLHandler):

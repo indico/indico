@@ -25,9 +25,6 @@ event.add_url_rule('/my-conference/contributions', 'myconference-myContributions
 event.add_url_rule('/my-conference/sessions', 'myconference-mySessions', conferenceDisplay.RHConfMyStuffMySessions)
 event.add_url_rule('/my-conference/tracks', 'myconference-myTracks', conferenceDisplay.RHConfMyStuffMyTracks)
 
-# Custom pages
-event.add_url_rule('/page/<pageId>', 'internalPage', conferenceDisplay.RHInternalPageDisplay)
-
 # Other views
 event.add_url_rule('/other-view', 'conferenceOtherViews', conferenceDisplay.RHConferenceOtherViews)
 

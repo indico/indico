@@ -9,7 +9,7 @@
     % if bookOfAbstractsMenuActive:
         ${ _("Users will be able to download the book from the <a href='{0}'>event home page</a>. You can disable the download from the <a href='{1}'>Layout-&gt;Menu</a> configuration page.").format(urlHandlers.UHConferenceDisplay.getURL(conf), url_for('event_layout.menu', conf))}
     % else:
-        ${ _("Note that you need to enable the book of abstracts link in <a href='%s'>Layout->Menu</a>") % urlHandlers.UHConfModifDisplayMenu.getURL(conf) }.
+        ${ _("Note that you need to enable the book of abstracts link in <a href='{0}'>Layout->Menu</a>").format(url_for('event_layout.menu', conf)) }.
     % endif
 % else:
     ${ _("Note that you need to enable abstract submission if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL(conf) }.
