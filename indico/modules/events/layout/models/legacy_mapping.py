@@ -35,17 +35,25 @@ class LegacyImageMapping(db.Model):
         db.Integer,
         db.ForeignKey('events.events.id'),
         primary_key=True,
-        index=True
+        index=True,
+        autoincrement=False
     )
     legacy_image_id = db.Column(
         db.Integer,
         primary_key=True,
-        index=True
+        index=True,
+        autoincrement=False
     )
     image_id = db.Column(
         db.Integer,
         db.ForeignKey('events.image_files.id'),
         nullable=False
+    )
+
+    image = db.relationship(
+        'ImageFile',
+        lazy=False,
+        backref=db.backref('legacy_mapping', uselist=False, lazy=True)
     )
 
     @return_ascii
