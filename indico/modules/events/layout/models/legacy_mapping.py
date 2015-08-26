@@ -59,3 +59,43 @@ class LegacyImageMapping(db.Model):
     @return_ascii
     def __repr__(self):
         return '<LegacyImageMapping({}, {})>'.format(self.legacy_image_id, self.image_id)
+
+
+class LegacyPageMapping(db.Model):
+    """Legacy page id mapping
+
+    Legacy pages had event-unique numeric ids. Using this
+    mapping we can resolve old ones to their new id.
+    """
+
+    __tablename__ = 'legacy_page_id_map'
+    __table_args__ = {'schema': 'events'}
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        primary_key=True,
+        index=True,
+        autoincrement=False
+    )
+    legacy_page_id = db.Column(
+        db.Integer,
+        primary_key=True,
+        index=True,
+        autoincrement=False
+    )
+    page_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.menu_pages.id'),
+        nullable=False
+    )
+
+    page = db.relationship(
+        'MenuPage',
+        lazy=False,
+        backref=db.backref('legacy_mapping', uselist=False, lazy=True)
+    )
+
+    @return_ascii
+    def __repr__(self):
+        return '<LegacyPageMapping({}, {})>'.format(self.legacy_page_id, self.image_id)

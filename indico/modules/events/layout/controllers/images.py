@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import mimetypes
 
-from flask import flash, redirect, request, session, render_template
+from flask import flash, request, session, render_template
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
@@ -26,12 +26,10 @@ from indico.core.db import db
 from indico.modules.events.layout import logger
 from indico.modules.events.layout.forms import AddImagesForm
 from indico.modules.events.layout.models.images import ImageFile
-from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
 from indico.modules.events.layout.util import get_images_for_event
 from indico.modules.events.layout.views import WPImages
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
-from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -100,18 +98,3 @@ class RHImageDisplay(RHConferenceBaseDisplay):
 
     def _process(self):
         return self.image.send()
-
-
-class RHImageLegacyDisplay(RHConferenceBaseDisplay):
-    EVENT_FEATURE = 'images'
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self.pic_id = request.view_args['pic_id']
-
-    def _process(self):
-        legacy_image = LegacyImageMapping.find_first(event_id=self._conf.id, legacy_image_id=self.pic_id)
-        if legacy_image:
-            return redirect(url_for('event_images.image_display', legacy_image.image), 301)
-        else:
-            raise NotFound

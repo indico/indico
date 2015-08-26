@@ -21,6 +21,7 @@ from operator import attrgetter
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout.models.legacy_mapping import LegacyPageMapping
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
 from indico.util.console import verbose_iterator, cformat
 from indico.util.struct.iterables import committing_iterator
@@ -190,6 +191,7 @@ class EventMenuImporter(Importer):
                 data['type'] = MenuEntryType.page
                 data['title'] = strip_tags(convert_to_unicode(item._caption)).strip()
                 data['page'] = MenuPage(html=item._page._content)
+                data['page'].legacy_mapping = LegacyPageMapping(event_id=event.id, legacy_page_id=item._page._id)
                 if item._page._isHome:
                     Event.get(event.id).default_page = data['page']
             else:

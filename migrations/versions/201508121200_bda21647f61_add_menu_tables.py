@@ -25,6 +25,16 @@ def upgrade():
         schema='events'
     )
     op.create_table(
+        'legacy_page_id_map',
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
+        sa.Column('legacy_page_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
+        sa.Column('page_id', sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.ForeignKeyConstraint(['page_id'], ['events.menu_pages.id']),
+        sa.PrimaryKeyConstraint('event_id', 'legacy_page_id'),
+        schema='events'
+    )
+    op.create_table(
         'menu_entries',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
@@ -66,4 +76,5 @@ def downgrade():
     op.drop_column('events', 'default_page_id', schema='events')
     op.drop_constraint('fk_menu_entries_page_id_menu_pages', 'menu_entries', schema='events')
     op.drop_table('menu_entries', schema='events')
+    op.drop_table('legacy_page_id_map', schema='events')
     op.drop_table('menu_pages', schema='events')

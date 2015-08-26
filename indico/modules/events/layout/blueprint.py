@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.controllers.images import (RHImageDelete, RHImageDisplay, RHImageLegacyDisplay,
-                                                             RHImageUpload, RHImages)
+from indico.modules.events.layout.compat import compat_page, compat_image
+from indico.modules.events.layout.controllers.images import RHImageDelete, RHImageDisplay, RHImageUpload, RHImages
 from indico.modules.events.layout.controllers.layout import (RHLayoutEdit, RHLayoutCSSUpload, RHLayoutCSSDelete,
                                                              RHLayoutLogoUpload, RHLayoutLogoDelete, RHLogoDisplay,
                                                              RHLayoutCSSSaveTheme, RHLayoutCSSDisplay,
@@ -58,10 +58,13 @@ _bp_images = IndicoBlueprint('event_images', __name__, template_folder='template
                              virtual_template_folder='events/layout', url_prefix='/event/<confId>')
 _bp_images.add_url_rule('/logo-<slug>', 'logo_display', RHLogoDisplay)
 _bp_images.add_url_rule('/images/<int:image_id>', 'image_display', RHImageDisplay)
-_bp_images.add_url_rule('/picture/<int:pic_id>.<pic_ext>', 'image_legacy_display', RHImageLegacyDisplay)
-_bp_images.add_url_rule('/picture/<int:pic_id>', 'image_legacy_display', RHImageLegacyDisplay)
 
 
 _bp_pages = IndicoBlueprint('event_pages', __name__, template_folder='templates',
                             virtual_template_folder='events/layout', url_prefix='/event/<confId>')
 _bp_pages.add_url_rule('/page/<int:page_id>-<slug>', 'page_display', RHPageDisplay)
+
+_compat_bp = IndicoBlueprint('compat_layout', __name__, url_prefix='/event/<event_id>')
+_compat_bp.add_url_rule('/page/<int:legacy_page_id>', 'page', compat_page)
+_compat_bp.add_url_rule('/picture/<int:legacy_image_id>.<image_ext>', 'image', compat_image)
+_compat_bp.add_url_rule('/picture/<int:legacy_image_id>', 'image', compat_image)
