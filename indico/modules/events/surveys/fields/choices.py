@@ -76,6 +76,8 @@ class SingleChoiceField(SurveyField):
         return self._make_wtforms_field(field_class, choices=choices, **field_options)
 
     def get_summary(self, include_empty=False):
+        if not self.question.answers:
+            return
         counter = Counter()
         for answer in self.question.answers:
             if answer.data is not None or include_empty:
@@ -156,6 +158,8 @@ class MultiSelectField(SurveyField):
                 'coerce': lambda x: x}
 
     def get_summary(self):
+        if not self.question.answers:
+            return
         counter = Counter()
         for answer in self.question.answers:
             counter.update(answer.data)

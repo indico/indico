@@ -18,14 +18,20 @@
                     </div>
                 </div>
                 <div class="i-box-content">
-                    {% if question.field_type == 'text' %}
-                        {{ text_answer(question) }}
-                    {% elif question.field_type == 'number' %}
-                        {{ number_answer(question) }}
-                    {% elif question.field_type in ('bool', 'single_choice') %}
-                        {{ single_choice_answer(question) }}
-                    {% elif question.field_type == 'multiselect' %}
-                        {{ multiple_choice_answer(question) }}
+                    {% if question.answers %}
+                        {% if question.field_type == 'text' %}
+                            {{ text_answer(question) }}
+                        {% elif question.field_type == 'number' %}
+                            {{ number_answer(question) }}
+                        {% elif question.field_type in ('bool', 'single_choice') %}
+                            {{ single_choice_answer(question) }}
+                        {% elif question.field_type == 'multiselect' %}
+                            {{ multiple_choice_answer(question) }}
+                        {% endif %}
+                    {% else %}
+                        <div class="empty">
+                            {% trans %}No answer has been recorded for this question.{% endtrans %}
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -43,23 +49,21 @@
 
 {% macro number_answer(question) %}
     {% set summary = question.get_summary() %}
-    {% if summary %}
-        <div class="chart-answer">
-            <div class="chart-option-details">
-                <strong>{% trans %}Average:{% endtrans %}</strong> {{ '%0.2f'|format(summary.average) }}
-            </div>
-            <div class="chart-option-details">
-                <strong>{% trans %}Min:{% endtrans %}</strong> {{ summary.min }}
-            </div>
-            <div class="chart-option-details">
-                <strong>{% trans %}Max:{% endtrans %}</strong> {{ summary.max }}
-            </div>
-            <div class="chart-option-details">
-                <strong>{% trans %}Total:{% endtrans %}</strong> {{ summary.total }}
-            </div>
+    <div class="chart-answer">
+        <div class="chart-option-details">
+            <strong>{% trans %}Average:{% endtrans %}</strong> {{ '%0.2f'|format(summary.average) }}
         </div>
-        {{ _chart('bar', summary) }}
-    {% endif %}
+        <div class="chart-option-details">
+            <strong>{% trans %}Min:{% endtrans %}</strong> {{ summary.min }}
+        </div>
+        <div class="chart-option-details">
+            <strong>{% trans %}Max:{% endtrans %}</strong> {{ summary.max }}
+        </div>
+        <div class="chart-option-details">
+            <strong>{% trans %}Total:{% endtrans %}</strong> {{ summary.total }}
+        </div>
+    </div>
+    {{ _chart('bar', summary) }}
 {% endmacro %}
 
 
