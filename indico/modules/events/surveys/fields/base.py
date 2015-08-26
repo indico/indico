@@ -57,6 +57,11 @@ class SurveyField(object):
     required_validator = DataRequired
     #: the validator to use if the field is not required
     not_required_validator = Optional
+    #: whether this field is actually a section marker. this should not
+    #: set in any field but StaticText field. setting it affects both
+    #: rendering of the form and ignores this field whenever data is
+    #: processed/displayed
+    is_section = False
 
     def __init__(self, question):
         self.question = question
