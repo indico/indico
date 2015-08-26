@@ -79,8 +79,12 @@ class ScheduleSurveyForm(IndicoForm):
                                    description=_("Moment when the survey will open for submissions"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
                                  description=_("Moment when the survey will close"))
+    resend_start_notification = BooleanField(_('Resend start notification'), widget=SwitchWidget(),
+                                             description=_("Resend the survey start notification."))
 
     def __init__(self, *args, **kwargs):
         self.survey = kwargs.pop('survey', None)
         self.timezone = self.survey.event.getTimezone()
         super(IndicoForm, self).__init__(*args, **kwargs)
+        if not self.survey.start_notification_sent:
+            del self.resend_start_notification

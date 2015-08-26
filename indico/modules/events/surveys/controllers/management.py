@@ -140,6 +140,8 @@ class RHScheduleSurvey(RHManageSurvey):
         if form.validate_on_submit():
             if allow_reschedule_start:
                 self.survey.start_dt = form.start_dt.data
+                if getattr(form, 'resend_start_notification', False):
+                    self.survey.start_notification_sent = not form.resend_start_notification.data
             self.survey.end_dt = form.end_dt.data
             flash(_('Survey was scheduled'), 'success')
             logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
@@ -164,6 +166,7 @@ class RHOpenSurvey(RHManageSurvey):
     def _process(self):
         if self.survey.state == SurveyState.finished:
             self.survey.end_dt = None
+            self.survey.start_notification_sent = False
         else:
             self.survey.open()
         self.survey.send_start_notification()
@@ -178,7 +181,6 @@ class RHManageSurveyQuestionnaire(RHManageSurvey):
     def _process(self):
         field_types = get_field_types()
         preview_form = make_survey_form(self.survey.questions)()
-
         return WPManageSurvey.render_template('manage_questionnaire.html', self.event, survey=self.survey,
                                               field_types=field_types, preview_form=preview_form)
 
