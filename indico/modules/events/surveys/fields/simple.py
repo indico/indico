@@ -137,10 +137,10 @@ class StaticTextConfigForm(FieldConfigForm):
                                                      'format the text.'))
 
 
-class StaticTextField(SurveyField):
+class SectionField(SurveyField):
     name = 'static_text'
-    friendly_name = _('Static text')
-    wtf_field_class = IndicoStaticTextField
+    friendly_name = _('Section')
+    is_section = True
 
     @classmethod
     def config_form(cls, *args, **kwargs):
@@ -148,6 +148,5 @@ class StaticTextField(SurveyField):
         del form.description, form.is_required
         return form
 
-    @property
-    def wtf_field_kwargs(self):
-        return {'text': self.question.field_data['text']}
+    def create_wtf_field(self):
+        raise RuntimeError('Section field cannot be rendered as a field')

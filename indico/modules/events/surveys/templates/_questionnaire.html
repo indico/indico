@@ -10,8 +10,19 @@
                             <div class="question-row">
                                 <div class="question-data position-element" style="width: 5%;">{{ loop.index }}.</div>
                                 <div class="question-data">
-                                    {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true,
+                                    {% if question.field.is_section %}
+                                        <div class="form-group horizontal">
+                                            <div class="form-label form-block">
+                                                <label>{{ question.title }}</label>
+                                            </div>
+                                            <div class="form-field form-block static-text-widget">
+                                                {{- question.field_data.text|markdown -}}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true,
                                                     orientation='horizontal') }}
+                                    {% endif %}
                                 </div>
                                 <div class="action-buttons">
                                     <a data-href="{{ url_for('.delete_question', question) }}"

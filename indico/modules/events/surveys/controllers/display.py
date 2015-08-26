@@ -21,7 +21,6 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
-from indico.modules.events.surveys.fields.simple import StaticTextField
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
@@ -115,7 +114,7 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
         if not survey.anonymous:
             submission.user = session.user
         for question in survey.questions:
-            if isinstance(question.field, StaticTextField):
+            if question.field.is_section:
                 continue
             answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
             submission.answers.append(answer)

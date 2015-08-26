@@ -23,7 +23,6 @@ from io import BytesIO
 from flask import session
 
 from indico.modules.events.surveys.models.submissions import SurveySubmission
-from indico.modules.events.surveys.fields.simple import StaticTextField
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
 from indico.web.forms.base import IndicoForm
@@ -40,13 +39,20 @@ def make_survey_form(questions):
     :return: An `IndicoForm` subclass.
     """
     form_class = type(b'SurveyForm', (IndicoForm,), {})
+    sections = [{'title': None, 'description': None, 'fields': []}]
+
     for question in questions:
-        name = 'question_{}'.format(question.id)
         field_impl = question.field
         if field_impl is None:
             # field definition is not available anymore
             continue
+        if field_impl.is_section:
+            sections.append({'title': question.title, 'description': question.field_data['text'], 'fields': []})
+            continue
+        name = 'question_{}'.format(question.id)
         setattr(form_class, name, field_impl.create_wtf_field())
+        sections[-1]['fields'].append(name)
+    form_class._sections = sections
     return form_class
 
 
@@ -75,7 +81,7 @@ def generate_csv_from_survey(survey, submission_ids):
     """
     field_names = {'submitter', 'submission_date'}
     field_names |= {'{}_{}'.format(question.title, question.id) for question in survey.questions
-                    if not isinstance(question.field, StaticTextField)}
+                    if not question.field.is_section}
 
     buf = BytesIO()
     submissions = _filter_submissions(survey, submission_ids)
