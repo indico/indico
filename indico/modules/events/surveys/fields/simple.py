@@ -19,11 +19,12 @@ from __future__ import unicode_literals, division
 from collections import Counter, OrderedDict
 
 from wtforms.fields import IntegerField, BooleanField, StringField, TextAreaField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
+from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired, DataRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
-from indico.web.forms.fields import IndicoStaticTextField, IndicoRadioField
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -132,21 +133,17 @@ class BoolField(SurveyField):
         return _('Yes') if answer else _('No')
 
 
-class StaticTextConfigForm(FieldConfigForm):
-    text = TextAreaField(_('Content'), description=_('Static text that will be shown to users. You can use Markdown to '
-                                                     'format the text.'))
+class SectionConfigForm(IndicoForm):
+    _common_fields = {'title'}
+    title = StringField(_('Title'), [DataRequired()], description=_("The title of the section."))
+    text = TextAreaField(_('Content'), description=_('Text that will be displayed inside the section.'))
 
 
 class SectionField(SurveyField):
     name = 'static_text'
     friendly_name = _('Section')
     is_section = True
-
-    @classmethod
-    def config_form(cls, *args, **kwargs):
-        form = StaticTextConfigForm(*args, **kwargs)
-        del form.description, form.is_required
-        return form
+    config_form = SectionConfigForm
 
     def create_wtf_field(self):
         raise RuntimeError('Section field cannot be rendered as a field')

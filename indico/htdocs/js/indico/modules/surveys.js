@@ -88,7 +88,7 @@
             });
         });
 
-        $('.js-add-question-dropdown').dropdown();
+        $('.js-add-question-dropdown').parent().dropdown({selector: '.js-add-question-dropdown'});
     }
 
     global.setupSubmissionButtons = function setupSubmissionButtons() {
