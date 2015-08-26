@@ -13,9 +13,11 @@
 
 {% block now_button %}
     <div class="group">
-        <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST"
-           data-confirm="{% trans %}The survey finished already. Do you want to open it again for submissions?{% endtrans %}"
-           class="i-button">
+        <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST" class="i-button"
+           data-confirm="{% trans %}The survey finished already. Do you want to open it again for submissions?{% endtrans %}
+           {%- if survey.notifications_enabled -%}
+               {%- trans %} This will result in resending the survey start notification.{% endtrans %}
+           {%- endif %}">
             {% trans %}Reopen now{% endtrans %}
         </a>
     </div>
