@@ -104,7 +104,7 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
             back_button_endpoint = 'event.conferenceDisplay'
         else:
             back_button_endpoint = None
-        return self.view_class.render_template('display/survey_submission.html', self.event, form=form,
+        return self.view_class.render_template('display/survey_questionnaire.html', self.event, form=form,
                                                event=self.event, survey=self.survey,
                                                back_button_endpoint=back_button_endpoint)
 
