@@ -32,6 +32,11 @@
                                title="{% trans %}Survey already filled out{% endtrans %}">
                                 {% trans %}Fill out{% endtrans %}
                             </a>
+                        {% elif not survey.is_active %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Survey is closed{% endtrans %}">
+                                {% trans %}Fill out{% endtrans %}
+                            </a>
                         {% else %}
                             <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight">
                                 {% trans %}Fill out{% endtrans %}
