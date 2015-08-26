@@ -50,14 +50,14 @@ _bp.add_url_rule('/logo', 'upload_logo', RHLayoutLogoUpload, methods=('POST',))
 _bp.add_url_rule('/logo', 'delete_logo', RHLayoutLogoDelete, methods=('DELETE',))
 _bp.add_url_rule('/images/', 'images', RHImages)
 _bp.add_url_rule('/images/upload', 'images_upload', RHImageUpload, methods=('POST',))
-_bp.add_url_rule('/images/<int:image_id>', 'image_delete', RHImageDelete, methods=('DELETE',))
+_bp.add_url_rule('/images/<int:image_id>-<filename>', 'image_delete', RHImageDelete, methods=('DELETE',))
 _bp.add_url_rule('!/event/<confId>/<slug>.css', 'css_display', RHLayoutCSSDisplay)
 
 
 _bp_images = IndicoBlueprint('event_images', __name__, template_folder='templates',
                              virtual_template_folder='events/layout', url_prefix='/event/<confId>')
 _bp_images.add_url_rule('/logo-<slug>', 'logo_display', RHLogoDisplay)
-_bp_images.add_url_rule('/images/<int:image_id>', 'image_display', RHImageDisplay)
+_bp_images.add_url_rule('/images/<int:image_id>-<filename>', 'image_display', RHImageDisplay)
 
 
 _bp_pages = IndicoBlueprint('event_pages', __name__, template_folder='templates',
