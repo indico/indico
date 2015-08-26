@@ -61,7 +61,6 @@ class WebFactory(WebFactory):
         webPageWithSideMenu._programMenuItem.setVisible(False)
         webPageWithSideMenu._timetableMenuItem.setVisible(False)
         webPageWithSideMenu._abstractMenuItem.setVisible(False)
-        webPageWithSideMenu._layoutMenuItem.setVisible(False)
         webPageWithSideMenu._contribListMenuItem.setVisible(False)
         webPageWithSideMenu._regFormMenuItem.setVisible(False)
         webPageWithSideMenu._listingsMenuItem.setVisible(False)

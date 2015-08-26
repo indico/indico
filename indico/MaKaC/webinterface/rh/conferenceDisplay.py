@@ -205,15 +205,6 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
         return p.display()
 
 
-class RHConferenceGetLogo(RHConferenceBase):
-
-    def _process(self):
-        logo = self._target.getLogo()
-        if not logo:
-            raise MaKaCError(_("This event does not have a logo"))
-        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), no_cache=False, conditional=True)
-
-
 class RHConferenceGetCSS(RHConferenceBase):
 
     """

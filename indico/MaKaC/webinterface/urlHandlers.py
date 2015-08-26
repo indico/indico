@@ -257,28 +257,12 @@ class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
 
 
-class UHConferenceLogo(URLHandler):
-    _endpoint = 'event.conferenceDisplay-getLogo'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return os.path.join(Config.getInstance().getImagesBaseURL(), "logo", str(target.getLogo()))
-
-
 class UHConferenceCSS(URLHandler):
     _endpoint = 'event.conferenceDisplay-getCSS'
 
     @classmethod
     def getStaticURL(cls, target, **params):
         return cls.getURL(target, _ignore_static=True, **params)
-
-
-class UHConferencePic(URLHandler):
-    _endpoint = 'event.conferenceDisplay-getPic'
-
-
-class UHConfModifPreviewCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-previewCSS'
 
 
 class UHCategoryIcon(URLHandler):
@@ -764,30 +748,6 @@ class UHConfModifParticipants(URLHandler):
     _endpoint = 'event_mgmt.confModifParticipants'
 
 
-class UHConfModifDisplay(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay'
-
-
-class UHConfModifDisplayCustomization(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-custom'
-
-
-class UHConfModifDisplayResources(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-resources'
-
-
-class UHConfModifDisplayConfHeader(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-confHeader'
-
-
-class UHConfModifFormatTitleBgColor(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-formatTitleBgColor'
-
-
-class UHConfModifFormatTitleTextColor(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-formatTitleTextColor'
-
-
 class UHConfDeletion(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-delete'
 
@@ -816,30 +776,6 @@ class UHConfAllSpeakersAction(URLHandler):
     _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
 
 
-class UHSaveLogo(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-saveLogo'
-
-
-class UHRemoveLogo(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-removeLogo'
-
-
-class UHSaveCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-saveCSS'
-
-
-class UHUseCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-useCSS'
-
-
-class UHRemoveCSS(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-removeCSS'
-
-
-class UHSavePic(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-savePic'
-
-
 class UHConfModifParticipantsSetup(URLHandler):
     _endpoint = 'event_mgmt.confModifParticipants-setup'
 
@@ -866,18 +802,6 @@ class UHConfParticipantsInvitation(URLHandler):
 
 class UHConfParticipantsRefusal(URLHandler):
     _endpoint = 'event.confModifParticipants-refusal'
-
-
-class UHConfModifToggleSearch(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleSearch'
-
-
-class UHConfModifToggleNavigationBar(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-toggleNavigationBar'
-
-
-class UHTickerTapeAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifDisplay-tickerTapeAction'
 
 
 class UHConfUser(URLHandler):

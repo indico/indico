@@ -33,10 +33,8 @@ from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
-from indico.modules.events.models.events import Event
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
-from indico.web.flask.util import url_for
 
 
 class WebFactory(WebFactory):
@@ -67,7 +65,6 @@ class WebFactory(WebFactory):
     def customiseSideMenu( webPageWithSideMenu ):
         webPageWithSideMenu._programMenuItem.setVisible(False)
         webPageWithSideMenu._abstractMenuItem.setVisible(False)
-        webPageWithSideMenu._layoutMenuItem.setVisible(False)
         webPageWithSideMenu._contribListMenuItem.setVisible(False)
         webPageWithSideMenu._regFormMenuItem.setVisible(False)
 

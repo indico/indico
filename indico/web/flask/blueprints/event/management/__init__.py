@@ -21,7 +21,6 @@ event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>
 import indico.web.flask.blueprints.event.management.main
 import indico.web.flask.blueprints.event.management.general
 import indico.web.flask.blueprints.event.management.tools
-import indico.web.flask.blueprints.event.management.layout
 import indico.web.flask.blueprints.event.management.protection
 import indico.web.flask.blueprints.event.management.lists
 import indico.web.flask.blueprints.event.management.evaluation

@@ -1142,23 +1142,6 @@ class PageLink(Link):
         return urlHandlers.UHInternalPageDisplay.getURL(self._page)
 
 
-class _FormatDefaultData:
-
-    def __init__(self):
-        self._data={
-            "titleBgColor":{"code":"",\
-                            "url":urlHandlers.UHConfModifFormatTitleBgColor}, \
-            "titleTextColor":{"code":"",\
-                              "url":urlHandlers.UHConfModifFormatTitleTextColor}
-            }
-
-    def getColor(self,key):
-        return self._data[key]["code"]
-
-    def getURL(self,key):
-        return self._data[key]["url"]
-
-
 class Format(Persistent):
 
     def __init__(self):
