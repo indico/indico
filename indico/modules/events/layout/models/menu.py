@@ -22,7 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.contextManager import ContextManager
 from indico.util.i18n import _
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, slugify
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 from MaKaC.conference import ConferenceHolder
@@ -74,7 +74,8 @@ class MenuEntryMixin(object):
             from indico.core.plugins import url_for_plugin
             return url_for_plugin(self.default_data.endpoint, self.event, _external=False)
         elif self.is_page:
-            return url_for('event_pages.page_display', self.event, page_id=self.page_id, _external=False)
+            return url_for('event_pages.page_display', self.event, page_id=self.page_id, slug=slugify(self.title),
+                           _external=False)
         else:
             return None
 
@@ -370,7 +371,7 @@ class MenuPage(db.Model):
 
     @property
     def locator(self):
-        return dict(self.menu_entry.event.getLocator(), page_id=self.id)
+        return dict(self.menu_entry.event.getLocator(), page_id=self.id, slug=slugify(self.menu_entry.title))
 
     @property
     def is_default(self):

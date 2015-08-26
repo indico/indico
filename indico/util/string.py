@@ -23,15 +23,12 @@ import re
 import unicodedata
 from uuid import uuid4
 
-import markdown
 import bleach
+import markdown
+import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
 from lxml import html, etree
 from speaklater import _LazyString
 
-try:
-    import translitcodec
-except ImportError:
-    translitcodec = None
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
@@ -113,11 +110,25 @@ def remove_non_alpha(text):
 def unicode_to_ascii(text):
     if not isinstance(text, unicode):
         return text
-    elif translitcodec:
-        text = text.encode('translit/long')
     else:
-        text = unicodedata.normalize('NFKD', text)
+        text = text.encode('translit/long')
     return text.encode('ascii', 'ignore')
+
+
+def slugify(value, lower=True):
+    """Converts a string to a simpler version useful for URL slugs.
+
+    - normalizes unicode to proper ascii repesentations
+    - removes non-alphanumeric characters
+    - replaces whitespace with dashes
+
+    :param lower: Whether the slug should be all-lowercase
+    """
+    value = to_unicode(value).encode('translit/long')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip())
+    if lower:
+        value = value.lower()
+    return re.sub('[-\s]+', '-', value)
 
 
 def unicode_struct_to_utf8(obj):

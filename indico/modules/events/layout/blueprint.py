@@ -64,4 +64,4 @@ _bp_images.add_url_rule('/picture/<int:pic_id>', 'image_legacy_display', RHImage
 
 _bp_pages = IndicoBlueprint('event_pages', __name__, template_folder='templates',
                             virtual_template_folder='events/layout', url_prefix='/event/<confId>')
-_bp_pages.add_url_rule('/page/<int:page_id>', 'page_display', RHPageDisplay)
+_bp_pages.add_url_rule('/page/<int:page_id>-<slug>', 'page_display', RHPageDisplay)

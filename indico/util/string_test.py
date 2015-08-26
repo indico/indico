@@ -18,7 +18,7 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import seems_html, to_unicode, make_unique_token
+from indico.util.string import seems_html, to_unicode, make_unique_token, slugify
 
 
 def test_seems_html():
@@ -53,3 +53,22 @@ def test_make_unique_token(monkeypatch):
     assert _get_token() == '2'
     assert _get_token() == '4'
     assert _get_token() == '5'
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    (b'this is a    test',    'this-is-a-test'),
+    (u'this is \xe4    test', 'this-is-ae-test'),
+    (u'12345!xxx   ',         '12345xxx'),
+))
+def test_slugify(input, output):
+    assert slugify(input) == output
+
+
+@pytest.mark.parametrize(('input', 'lower', 'output'), (
+    ('Test', True, 'test'),
+    ('Test', False, 'Test'),
+    (u'm\xd6p', False, 'mOep'),
+    (u'm\xd6p', True, 'moep')
+))
+def test_slugify_lower(input, lower, output):
+    assert slugify(input, lower=lower) == output
