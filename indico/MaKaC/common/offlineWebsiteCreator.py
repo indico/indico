@@ -237,7 +237,7 @@ class OfflineEventCreator(object):
     def _create_home(self):
         # get default/selected view
         styleMgr = HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._rh._target).getDefaultStyle()
+        view = self._rh._target.getDefaultStyle()
         # if no default view was attributed, then get the configuration default
         if view == "" or not styleMgr.existsStyle(view) or view in styleMgr.getXSLStyles():
             view = styleMgr.getDefaultStyleForEventType(self._eventType)

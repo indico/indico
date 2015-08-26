@@ -20,6 +20,7 @@ from sqlalchemy.orm import lazyload
 from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
+from indico.modules.events.layout import layout_settings
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -3744,8 +3745,9 @@ class Conference(CommonObjectBase, Locatable):
         from MaKaC.webinterface import displayMgr
         return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
 
-    def getDefaultStyle( self ):
-        return self.getDisplayMgr().getDefaultStyle()
+    def getDefaultStyle(self):
+        return (layout_settings.get(self, 'timetable_theme') or
+                HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getDefaultStyleForEventType(self.getType()))
 
     def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)

@@ -21,6 +21,7 @@ Asynchronous request handlers for conference-related data modification.
 
 # 3rd party imports
 from email.utils import formataddr
+from indico.modules.events.layout import layout_settings
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
 from indico.util.string import permissive_format
@@ -188,9 +189,7 @@ class ConferenceTypeModification(ConferenceTextModificationBase):
             wr.registerFactory(self._target, factory)
 
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-
-            dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
-            dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
+            layout_settings.set(self._conf, 'timetable_theme', styleMgr.getDefaultStyleForEventType(newType))
             signals.event.data_changed.send(self._target, attr=None, old=None, new=None)
 
     def _handleGet(self):
@@ -357,12 +356,10 @@ class ConferenceDefaultStyleModification(ConferenceTextModificationBase):
     Conference default style modification
     """
     def _handleSet(self):
-        dispManReg = displayMgr.ConfDisplayMgrRegistery()
-        dispManReg.getDisplayMgr(self._target).setDefaultStyle(self._value)
+        layout_settings.set(self._conf, 'timetable_theme', self._value)
 
     def _handleGet(self):
-        dispManReg = displayMgr.ConfDisplayMgrRegistery()
-        return dispManReg.getDisplayMgr(self._target).getDefaultStyle()
+        return layout_settings.get(self._conf, 'timetable_theme')
 
 
 class ConferenceVisibilityModification(ConferenceTextModificationBase):

@@ -47,6 +47,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.core import signals
 from indico.modules.events.api import CategoryEventHook
+from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.views import WPPage
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
@@ -109,11 +110,10 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
-            view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+            view = layout_settings.get(self._conf, 'timetable_theme')
             # if no default view was attributed, then get the configuration default
-            if view == "" or not styleMgr.existsStyle(view):
-                view =styleMgr.getDefaultStyleForEventType( type )
-                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
+            if not view or not styleMgr.existsStyle(view):
+                view = styleMgr.getDefaultStyleForEventType(type)
         isLibxml = True
         warningText = ""
         try:
@@ -187,11 +187,10 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
-            view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+            view = self._target.getDefaultStyle()
             # if no default view was attributed, then get the configuration default
             if view == "":
-                view =styleMgr.getDefaultStyleForEventType(type)
-                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle(view)
+                view = styleMgr.getDefaultStyleForEventType(type)
         # create the html factory
         if view in styleMgr.getXSLStyles() and isLibxml:
             p = conferences.WPXSLConferenceDisplay(self, self._target, view, type, self._reqParams)
@@ -326,7 +325,7 @@ class RHConferenceTimeTable(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceTimeTable
 
     def _process( self ):
-        defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
+        defStyle = self._target.getDefaultStyle()
         if defStyle in ["", "static", "parallel"]:
             p = conferences.WPConferenceTimeTable( self, self._target )
             return p.display( **self._getRequestParams() )
@@ -362,7 +361,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
             self._showSpeakerAffiliation = True
         # Keep track of the used layout for getting back after cancelling
         # the export.
-        self._view = params.get("view", displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle())
+        self._view = params.get("view", self._target.getDefaultStyle())
 
     def _reduceFontSize( self ):
         index = self.fontsizes.index(self._fontsize)

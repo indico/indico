@@ -17,7 +17,7 @@ from cStringIO import StringIO
 import re
 from datetime import timedelta, datetime
 
-from flask import request, jsonify, session
+from flask import session
 from pytz import timezone
 
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -46,6 +46,7 @@ from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.api import CategoryEventHook
+from indico.modules.events.layout import layout_settings
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.web.flask.util import send_file, endpoint_for_url
@@ -474,7 +475,7 @@ class UtilsConference:
 
         c.getSupportInfo().setEmail(emailstr)
         c.getSupportInfo().setCaption(confData.get("supportCaption","Support"))
-        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c).setDefaultStyle(confData.get("defaultStyle",""))
+        layout_settings.set(c, 'timetable_theme', confData.get('defaultStyle', ''))
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )
         curType = c.getType()
@@ -483,9 +484,8 @@ class UtilsConference:
             wr = webFactoryRegistry.WebFactoryRegistry()
             factory = wr.getFactoryById(newType)
             wr.registerFactory(c,factory)
-            dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c)
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
+            layout_settings.set(c, 'timetable_theme', styleMgr.getDefaultStyleForEventType(newType))
 
     @staticmethod
     def validateShortURL(tag, target):

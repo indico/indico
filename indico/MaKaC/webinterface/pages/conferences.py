@@ -1246,7 +1246,7 @@ class WConfModifMainData(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         type = vars["type"]
-        vars["defaultStyle"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
+        vars["defaultStyle"] = self._conf.getDefaultStyle()
         vars["visibility"] = self._conf.getVisibility()
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
         vars["addTypeURL"]=urlHandlers.UHConfAddContribType.getURL(self._conf)
@@ -1458,7 +1458,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(self._conf.getTimezone())
         styles=styleMgr.getExistingStylesForEventType(type)
         styleoptions = ""
-        defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
+        defStyle = self._conf.getDefaultStyle()
         if defStyle not in styles:
             defStyle = ""
         for styleId in styles:
