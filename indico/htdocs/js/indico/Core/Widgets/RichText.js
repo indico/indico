@@ -396,7 +396,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
             font_names: ['Sans Serif/"Liberation Sans", sans-serif',
                          'Serif/"Liberation Serif", serif',
                          'Monospace/"Liberation Mono", monospace'].join(';'),
-            contentsCss: _.union(CKEDITOR.getUrl( 'contents.css' ), Indico.Urls.fonts_sass)
+            contentsCss: _.union(CKEDITOR.getUrl( 'contents.css' ), Indico.Urls.FontSassBundle)
         };
         if (simple) {
             config.toolbar = [

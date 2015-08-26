@@ -91,7 +91,7 @@ def generate_global_file(config):
 
             'APIKeyCreate': url_for('api.key_create'),
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
-            'fonts_sass': core_env['fonts_sass'].urls()
+            'FontSassBundle': core_env['fonts_sass'].urls()
         },
 
         'Data': {
