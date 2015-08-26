@@ -1354,7 +1354,7 @@ class outputGenerator(object):
             if attachment.can_access(self.__aw.getUser().user):
                 self.resourceToXMLMarc21(attachment, out)
                 self._generateAccessList(acl=self._attachment_access_list(attachment), out=out,
-                                         objId=self._attachment_unique_id(attachment))
+                                         objId=self._attachment_unique_id(attachment, add_prefix=False))
 
     def resourceToXMLMarc21(self, res, out=None):
         if not out:
@@ -1364,8 +1364,10 @@ class outputGenerator(object):
         else:
             self.resourceLinkToXMLMarc21(res, out=out)
 
-    def _attachment_unique_id(self, attachment):
-        unique_id = "INDICO." + uniqueId(attachment.folder.linked_object)
+    def _attachment_unique_id(self, attachment, add_prefix=True):
+        unique_id = uniqueId(attachment.folder.linked_object)
+        if add_prefix:
+            unique_id = "INDICO." + unique_id
         if attachment.legacy_mapping:
             unique_id += "m{}.{}".format(attachment.legacy_mapping.material_id, attachment.legacy_mapping.resource_id)
         else:
