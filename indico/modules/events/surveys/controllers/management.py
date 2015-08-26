@@ -67,7 +67,7 @@ class RHManageSurveys(RHManageSurveysBase):
 
     def _process(self):
         surveys = Survey.find(event_id=self.event.id, is_deleted=False).order_by(db.func.lower(Survey.title)).all()
-        return WPManageSurvey.render_template('management.html', self.event, event=self.event, surveys=surveys)
+        return WPManageSurvey.render_template('manage_survey_list.html', self.event, event=self.event, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
