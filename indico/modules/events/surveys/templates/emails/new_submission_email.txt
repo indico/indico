@@ -2,20 +2,17 @@
 {% set survey = submission.survey %}
 
 {% block subject -%}
-    New survey submission in "{{ survey.event.getTitle() }}"
+    New survey submission for "{{ survey.event.getTitle() }}" on the event "{{ survey.event.title }}"
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        {%- if not submission.user -%}
-            An anonymous submission has been made in the survey "{{ survey.title }}".
-        {%- else -%}
-            A new submission has been made in the survey "{{ survey.title }}" by {{ submission.user.full_name }}.
-        {%- endif %}
+        A new submission has been made for the survey "{{ survey.title }}" on the event "{{ survey.event.title }}"
+        {%- if submission.user %} by {{ submission.user.full_name }}{% endif -%}.
 
-        You can access all the submissions by clicking the link below:
+        You can access all the submissions by clicking on the link below:
         {{ url_for('survey.manage_survey', survey, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
