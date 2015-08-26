@@ -5,10 +5,8 @@
         {% include 'events/surveys/manage_survey_state/not_ready.html' %}
     {% elif survey.state == states.ready_to_open %}
         {% include 'events/surveys/manage_survey_state/ready_to_open.html' %}
-    {% elif survey.state == states.active_and_clean %}
-        {% include 'events/surveys/manage_survey_state/active_and_clean.html' %}
-    {% elif survey.state == states.active_and_answered %}
-        {% include 'events/surveys/manage_survey_state/active_and_answered.html' %}
+    {% elif survey.state in (states.active_and_clean, states.active_and_answered) %}
+        {% include 'events/surveys/manage_survey_state/active.html' %}
     {% elif survey.state == states.finished %}
         {% include 'events/surveys/manage_survey_state/finished.html' %}
     {% endif %}
