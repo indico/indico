@@ -57,8 +57,9 @@ class RHSurveyList(RHSurveyBaseDisplay):
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
-        return self.view_class.render_template('survey_list.html', self.event, surveys=surveys, event=self.event,
-                                               states=SurveyState, was_survey_submitted=was_survey_submitted)
+        return self.view_class.render_template('display/survey_list.html', self.event, surveys=surveys,
+                                               event=self.event, states=SurveyState,
+                                               was_survey_submitted=was_survey_submitted)
 
 
 class RHSubmitSurvey(RHSurveyBaseDisplay):
@@ -104,8 +105,9 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
             back_button_endpoint = 'event.conferenceDisplay'
         else:
             back_button_endpoint = None
-        return self.view_class.render_template('survey_submission.html', self.event, form=form, event=self.event,
-                                               survey=self.survey, back_button_endpoint=back_button_endpoint)
+        return self.view_class.render_template('display/survey_submission.html', self.event, form=form,
+                                               event=self.event, survey=self.survey,
+                                               back_button_endpoint=back_button_endpoint)
 
     def _save_answers(self, form):
         survey = self.survey
