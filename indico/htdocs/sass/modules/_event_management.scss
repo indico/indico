@@ -160,11 +160,15 @@
                     cursor: move;
                 }
                 /* menu title */
-                > span:first-child {
+                > .drag-handle {
+                    display: inline-block;
+                    max-width: 4%;
+                }
+                > .title {
                     display: inline-block;
                     overflow: hidden;
 
-                    max-width: 69%;
+                    max-width: 66%;
 
                     white-space: nowrap;
                     text-overflow: ellipsis;
@@ -269,8 +273,12 @@
         border-top: 0;
         background-color: $light-gray;
         > li > .menu-entry > .i-label {
-            > span:first-child {
-                max-width: 66%;
+            > .drag-handle {
+                display: inline-block;
+                max-width: 4%;
+            }
+            > .title {
+                max-width: 61%;
             }
             > .actions {
                 max-width: 34%;
