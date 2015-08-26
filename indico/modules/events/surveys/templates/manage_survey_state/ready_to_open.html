@@ -29,7 +29,8 @@
     </div>
     <div class="group">
         <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST"
-           class="i-button highlight">
+           data-title="{% trans %}Are you sure you want to open this survey?{% endtrans %}"
+           data-confirm="{% trans %}Start notifications will be sent to users if notifications are enabled for this survey.{% endtrans %}" class="i-button highlight">
             {% trans %}Open now{% endtrans %}
         </a>
     </div>
