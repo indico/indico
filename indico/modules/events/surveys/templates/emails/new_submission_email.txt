@@ -16,7 +16,7 @@
         {%- endif %}
 
         You can access all the submissions by clicking the link below:
-        {{ url_for('survey.management', survey.event, _external=true) }}
+        {{ url_for('survey.manage_survey', survey, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
 
