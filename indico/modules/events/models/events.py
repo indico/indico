@@ -21,7 +21,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db.sqlalchemy import db
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, to_unicode
 from indico.web.flask.util import url_for
 
 
@@ -108,6 +108,10 @@ class Event(db.Model):
     @property
     def locator(self):
         return {'confId': self.id}
+
+    @property
+    def title(self):
+        return to_unicode(self.as_legacy.getTitle())
 
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
         """Creates a new log entry for the event
