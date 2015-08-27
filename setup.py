@@ -352,6 +352,7 @@ if __name__ == '__main__':
             event_images = indico_zodbimport.modules.event_images:EventImageImporter
             event_stubs = indico_zodbimport.modules.event_stubs:EventStubImporter
             event_menus = indico_zodbimport.modules.event_menus:EventMenuImporter
+            event_layout = indico_zodbimport.modules.event_layout:EventLayoutImporter
             """,
           zip_safe=False,
           packages=foundPackages,
