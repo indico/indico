@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div class="i-box-content">
-                        {% if question.answers %}
+                        {% if question.not_empty_answers %}
                             {% if question.field_type == 'text' %}
                                 {{ text_answer(question) }}
                             {% elif question.field_type == 'number' %}
