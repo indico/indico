@@ -107,6 +107,16 @@ $(document).ready(function() {
         }
     });
 
+    $('.js-dropdown').each(function() {
+        var $this = $(this);
+        var id = $this.attr('id');
+        if (id === undefined) {
+            id = uniqueId();
+            $this.attr('id', id);
+        }
+        $(this).parent().dropdown({selector: '#{0}'.format(id)});
+    });
+
     $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href])', function() {
         var $this = $(this);
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){

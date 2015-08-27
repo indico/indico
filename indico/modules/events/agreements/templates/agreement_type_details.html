@@ -119,8 +119,8 @@
         <div class="agreement-list i-box">
             {% if not_sent %}
                 <div class="toolbar">
-                    <div class="group js-dropdown">
-                        <a href="#" class="i-button icon-checkbox-checked arrow" data-toggle="dropdown"></a>
+                    <div class="group">
+                        <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                         <ul class="dropdown">
                             <li><a href="#" id="select-new">
                                 {% trans %}All{% endtrans %}
@@ -184,8 +184,8 @@
 
             {% if pending %}
                 <div class="toolbar">
-                    <div class="group js-dropdown">
-                        <a href="#" class="i-button icon-checkbox-checked js-select-pending arrow" data-toggle="dropdown"></a>
+                    <div class="group">
+                        <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                         <ul class="dropdown">
                             <li><a href="#" id="select-pending">
                                 {% trans %}All{% endtrans %}
@@ -302,8 +302,6 @@
                     location.reload();
                 }
             }
-
-            $('.js-dropdown').dropdown();
 
             $('#select-new').on('click', function() {
                 $('input.new-agreement:not([disabled])').prop('checked', true).trigger('change');
