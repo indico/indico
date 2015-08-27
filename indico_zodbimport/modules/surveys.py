@@ -20,6 +20,7 @@ from datetime import date, timedelta
 from uuid import uuid4
 
 from indico.core.db import db
+from indico.modules.events import EventSetting
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.questions import SurveyQuestion
 from indico.modules.events.surveys.models.submissions import SurveySubmission, SurveyAnswer
@@ -35,10 +36,19 @@ class SurveyImporter(Importer):
         return Survey.has_rows
 
     def migrate(self):
-        self.print_step("Migrating old event evaluations")
-        for event, evaluation in committing_iterator(self._iter_evaluations(), 10):
-            db.session.add(self.migrate_survey(evaluation, event))
+        self.migrate_surveys()
         self.update_merged_users(SurveySubmission.user, "survey submissions")
+
+    def migrate_surveys(self):
+        self.print_step("Migrating old event evaluations")
+        notification_pending = {es.event_id: es.value for es in EventSetting.find_all(module='evaluation',
+                                                                                      name='send_notification')}
+        for event, evaluation in committing_iterator(self._iter_evaluations(), 10):
+            survey = self.migrate_survey(evaluation, event)
+            if (survey.notifications_enabled and survey.start_notification_emails and
+                    not notification_pending.get(survey.event_id)):
+                survey.start_notification_sent = True
+            db.session.add(survey)
 
     def migrate_survey(self, evaluation, event):
         survey = Survey(event=event)
@@ -63,10 +73,9 @@ class SurveyImporter(Importer):
             survey.end_dt = survey.end_dt + timedelta(days=7)
 
         for kind, notification in evaluation.notifications.iteritems():
-            recipients = set(notification._toList)
-            recipients |= set(notification._ccList)
+            survey.notifications_enabled = True
+            recipients = set(notification._toList) | set(notification._ccList)
             if kind == 'evaluationStartNotify':
-                survey.notifications_enabled = True
                 survey.start_notification_emails = list(recipients)
             elif kind == 'newSubmissionNotify':
                 survey.new_submission_emails = list(recipients)
