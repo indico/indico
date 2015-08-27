@@ -76,7 +76,8 @@ def _inject_event_header(event, **kwargs):
 def _inject_survey_announcement(event, **kwargs):
     surveys = _get_active_surveys(event)
     if surveys:
-        return render_template('events/surveys/survey_announcement.html', event=event, surveys=surveys)
+        return render_template('events/surveys/survey_announcement.html', event=event, surveys=surveys,
+                               was_survey_submitted=was_survey_submitted)
 
 
 @signals.event.get_feature_definitions.connect
