@@ -22,11 +22,11 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.surveys.util import was_survey_submitted
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.displayMgr import EventMenuEntry
 
 
 logger = Logger.get('events.survey')
@@ -53,7 +53,7 @@ def _extend_event_menu(sender, **kwargs):
         return (event.has_feature('surveys') and
                 bool(Survey.find(Survey.is_visible, Survey.event_id == int(event.id)).count()))
 
-    return EventMenuEntry('survey.display_survey_list', _('Surveys'), name='surveys', visible=_visible)
+    return MenuEntryData(_('Surveys'), 'surveys', 'survey.display_survey_list', visible=_visible)
 
 
 def _get_active_surveys(event):

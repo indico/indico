@@ -1,7 +1,7 @@
 """Add survey tables
 
 Revision ID: 3fcf833adc2d
-Revises: 3778dc365e54
+Revises: 2fd1bc34a83c
 Create Date: 2015-07-27 11:14:06.639780
 """
 
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '3fcf833adc2d'
-down_revision = '3778dc365e54'
+down_revision = '2fd1bc34a83c'
 
 
 def upgrade():
