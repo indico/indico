@@ -5,6 +5,7 @@
         setupSurveyScheduleWindows();
         setupQuestionWindows();
         setupSurveyResultCharts();
+        setupSubmissionButtons();
     });
 
     function setupSurveyResultCharts() {
@@ -91,7 +92,17 @@
         $('.js-add-question-dropdown').parent().dropdown({selector: '.js-add-question-dropdown'});
     }
 
-    global.setupSubmissionButtons = function setupSubmissionButtons() {
+    function setupSubmissionButtons() {
+        $('.js-dropdown').parent().dropdown({selector: '.js-dropdown'});
+
+        $('#select-all').on('click', function() {
+            $('#submission-list input:checkbox').prop('checked', true).trigger('change');
+        });
+
+        $('#select-none').on('click', function() {
+            $('#submission-list input:checkbox').prop('checked', false).trigger('change');
+        });
+
         $('#export-submissions').on('click', function(evt) {
             var $this = $(this);
 
