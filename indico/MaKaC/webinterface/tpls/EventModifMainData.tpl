@@ -6,7 +6,6 @@
 from MaKaC.fossils.conference import IConferenceFossil
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
 from xml.sax.saxutils import escape
 
 wr = webFactoryRegistry.WebFactoryRegistry()
