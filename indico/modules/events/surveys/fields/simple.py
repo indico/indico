@@ -50,9 +50,9 @@ class TextField(SurveyField):
         return [Length(max=max_length)] if max_length else None
 
     def get_summary(self):
-        if not self.question.answers:
+        if not self.question.not_empty_answers:
             return
-        return [a.data for a in self.question.answers if a.data]
+        return [a.data for a in self.question.not_empty_answers]
 
     def is_answer_empty(self, answer):
         return not answer.data
@@ -87,12 +87,11 @@ class NumberField(SurveyField):
         return [NumberRange(min=min_value, max=max_value)]
 
     def get_summary(self):
-        if not self.question.answers:
-            return
         counter = Counter()
-        for answer in self.question.answers:
-            if answer.data:
-                counter[answer.data] += 1
+        for answer in self.question.not_empty_answers:
+            counter[answer.data] += 1
+        if not counter:
+            return
         total_answers = sum(counter.values())
         results = {'total': sum(counter.elements()),
                    'max': max(counter.elements()),
@@ -116,12 +115,11 @@ class BoolField(SurveyField):
                 'coerce': lambda x: bool(int(x))}
 
     def get_summary(self):
-        if not self.question.answers:
-            return
         counter = Counter()
-        for answer in self.question.answers:
-            if answer.data is not None:
-                counter[answer.data] += 1
+        for answer in self.question.not_empty_answers:
+            counter[answer.data] += 1
+        if not counter:
+            return
         total = sum(counter.values())
         return {'total': total,
                 'absolute': OrderedDict(((_('Yes'), counter[True]), (_('No'), counter[False]))),
