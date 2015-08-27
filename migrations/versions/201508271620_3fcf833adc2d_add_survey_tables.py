@@ -56,7 +56,7 @@ def upgrade():
     op.create_table(
         'survey_submissions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('survey_id', sa.Integer(), nullable=False),
+        sa.Column('survey_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.ForeignKeyConstraint(['survey_id'], ['events.surveys.id']),
