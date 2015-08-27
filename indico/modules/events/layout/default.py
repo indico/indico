@@ -278,25 +278,5 @@ DEFAULT_MENU_ENTRIES = [
         position=11,
         visible=_visibility_registration,
         static_site=True
-    ),
-    MenuEntryData(
-        title=N_("Evaluation"),
-        name='evaluation',
-        endpoint='event.confDisplayEvaluation',
-        position=12
-    ),
-    MenuEntryData(
-        title=N_("Evaluation Form"),
-        name='evaluation_form',
-        endpoint='event.confDisplayEvaluation-display',
-        position=0,
-        parent='evaluation'
-    ),
-    MenuEntryData(
-        title=N_("Modify my Evaluation"),
-        name='evaluation_edit',
-        endpoint='event.confDisplayEvaluation-modif',
-        position=1,
-        parent='evaluation'
     )
 ]
