@@ -83,10 +83,9 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
     new_values.update(existing_values)
     new_values.update(mixinValues)
 
-
     # We have to preserve options not currently present in the bundled indico.conf because they
     # may belong to a plugin. This functionality can lead to forget adding new options to
-    # Configuration.py so be careful my friend.
+    # config.py so be careful my friend.
 
     # We remove vars defined here that aren't options
     for k in ('new_values', 'new_conf', 'existing_conf', 'mixinValues'):

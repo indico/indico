@@ -22,13 +22,13 @@ import base64
 from qrcode import QRCode, constants
 from cStringIO import StringIO
 
+from indico.core.config import Config
 from indico.util.date_time import format_datetime, format_date
 from indico.util import json
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.web.flask.util import url_for
 
 
-from MaKaC.common.Configuration import Config
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.services.interface.rpc.common import NoReportError

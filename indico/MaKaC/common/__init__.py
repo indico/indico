@@ -24,6 +24,6 @@ if not skip_imports:
 
     __all__ = ['HelperMaKaCInfo', 'URL', 'Config']
 
-    from MaKaC.common.Configuration import Config
+    from indico.core.config import Config
     from MaKaC.common.info import HelperMaKaCInfo
     from MaKaC.common.url import URL

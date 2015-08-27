@@ -350,7 +350,7 @@ def registerHelpers(objDict):
     if not 'urlHandlers' in objDict:
         objDict['urlHandlers'] = MaKaC.webinterface.urlHandlers
     if not 'Config' in objDict:
-        objDict['Config'] = MaKaC.common.Configuration.Config
+        objDict['Config'] = Config
     if not 'jsBoolean' in objDict:
         objDict['jsBoolean'] = jsBoolean
     if not 'jsonDescriptor' in objDict:

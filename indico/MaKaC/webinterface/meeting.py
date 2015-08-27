@@ -18,7 +18,6 @@ import urllib
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
-import MaKaC.common.Configuration as Configuration
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.pages.subContributions as subContributions
@@ -41,7 +40,7 @@ class WebFactory(WebFactory):
     ##_("Meeting")
     ##_("""this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions""")
     id = "meeting"
-    iconURL = Configuration.Config.getInstance().getSystemIconURL( "meeting" )
+    iconURL = Config.getInstance().getSystemIconURL('meeting')
     name = "Meeting"
     description = """this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions"""
 

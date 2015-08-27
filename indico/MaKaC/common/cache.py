@@ -14,18 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from Configuration import Config
-from MaKaC.errors import MaKaCError
+import cPickle as pickle
+import datetime
+import hashlib
+import os
+import time
+from itertools import izip
+
+from indico.core.config import Config
 from indico.core.logger import Logger
-from MaKaC.common import timezoneUtils
-from MaKaC.common.utils import OSSpecific
-from MaKaC.common.contextManager import ContextManager
 from indico.util.fs import silentremove
 from indico.util.redis import redis
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.utils import OSSpecific
 
-import hashlib, os, shutil, datetime, time
-import cPickle as pickle
-from itertools import izip
 
 class CacheStorage(object):
     __CACHE_STORAGE_LIST = {}

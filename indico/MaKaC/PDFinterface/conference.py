@@ -13,6 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+import re
 import types
 from copy import deepcopy
 from PIL import Image
@@ -57,15 +59,14 @@ from reportlab.lib.pagesizes import landscape, A4
 from MaKaC.badgeDesignConf import BadgeDesignConfiguration
 from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.common.tools import strip_ml_tags
-import re
 from MaKaC.i18n import _
 from MaKaC.common import utils
 
+from indico.core.config import Config
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
 from indico.util.string import safe_upper, html_color_to_rgb
 from indico.util import json
-from MaKaC.common.Configuration import Config
 
 styles = getSampleStyleSheet()
 

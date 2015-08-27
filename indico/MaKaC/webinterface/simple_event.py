@@ -18,7 +18,6 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.pages.category as category
-import MaKaC.common.Configuration as Configuration
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from MaKaC.conference import EventCloner
@@ -35,7 +34,7 @@ from pytz import timezone
 
 class WebFactory(WebFactory):
     id = "simple_event"
-    iconURL = Configuration.Config.getInstance().getSystemIconURL( "lecture" )
+    iconURL = Config.getInstance().getSystemIconURL('lecture')
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
 
@@ -280,7 +279,8 @@ class WSimpleEventBaseDisplay(wcomponents.WTemplated):
         vars["contact"] = self.__getHTMLRow("Contact", "<br>".join( al ), 0 )
         vars["modifyItem"] = ""
         if self._conf.canModify( self._aw ):
-            vars["modifyItem"] = """<a href="%s"><img src="%s" border="0" alt="Jump to the modification interface"></a> """%(vars["modifyURL"], Configuration.Config.getInstance().getSystemIconURL("popupMenu") )
+            vars["modifyItem"] = ('<a href="{}"><img src="{}" border="0" alt="Jump to the modification interface"></a> '
+                                  .format(vars["modifyURL"], Config.getInstance().getSystemIconURL("popupMenu")))
         return vars
 
 

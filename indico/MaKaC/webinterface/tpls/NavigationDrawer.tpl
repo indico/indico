@@ -3,7 +3,6 @@ from MaKaC.webinterface.urlHandlers import UHHelper
 from MaKaC.conference import Category
 from MaKaC.conference import Track
 from MaKaC.review import Abstract
-from MaKaC.common import Configuration
 
 l = []
 

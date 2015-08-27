@@ -603,7 +603,7 @@ class Config:
 
         # Variables whose value is derived automatically
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
-        # Configuration.py will become fat again if you don't follow this advice.
+        # config.py will become fat again if you don't follow this advice.
         self._configVars.update({
             'TPLVars'                   : {"MaKaCHomeURL": self.getBaseURL()},
             'FileTypes'                 : FILE_TYPES,
@@ -790,7 +790,7 @@ class Config:
         """gives back the css stylesheet name used by Indico"""
         template = 'Default'
 
-        # NOTE: don't move the import outside because we need Configuration.py
+        # NOTE: don't move the import outside because we need config.py
         # to be loaded from setup.py and at that point we don't have db access
         # and therefore the import will fail.
         import MaKaC.common.info as info

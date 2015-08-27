@@ -32,7 +32,6 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
-from indico.core import config as Configuration
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
@@ -1396,7 +1395,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                         answerValues.append("%.2f" % ans.getValue())
                     rating = "%.2f" % status.getJudValue()
                     total = "%.2f" % status.getTotalJudValue()
-                    imgIcon = Configuration.Config.getInstance().getSystemIconURL("collapsd.png")
+                    imgIcon = Config.getInstance().getSystemIconURL("collapsd.png")
                     detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answerValues, rating, total)
 
                 tracks += "<tr bgcolor=\"%s\">"%color
