@@ -57,7 +57,7 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
         self.print_step('migrating event images')
         for event, picture in committing_iterator(self._iter_pictures()):
             local_file = picture._localFile
-            content_type = mimetypes.guess_type(local_file.fileName)[0]
+            content_type = mimetypes.guess_type(local_file.fileName)[0] or 'application/octet-stream'
             storage_backend, storage_path, size = self._get_local_file_info(local_file)
 
             if storage_path is None:
