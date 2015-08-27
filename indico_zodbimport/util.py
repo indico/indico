@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import errno
 import os
 import re
 import sys
@@ -255,7 +256,12 @@ class LocalFileImporterMixin(object):
                         return None, None, 0
 
             assert path
-            size = 0 if self.avoid_storage_check else os.path.getsize(path)
+            try:
+                size = 0 if self.avoid_storage_check else os.path.getsize(path)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+                return None, None, 0
             rel_path = os.path.relpath(path, archive_path)
             try:
                 rel_path = rel_path.decode('utf-8')
