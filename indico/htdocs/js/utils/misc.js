@@ -62,4 +62,8 @@
             container.append(flashed);
         }
     };
+
+    global.uniqueId = function uniqueId() {
+        return '' + Math.round(new Date().getTime() + (Math.random() * 100));
+    };
 })(window);
