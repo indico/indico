@@ -55,16 +55,28 @@ def _extend_event_menu(sender, **kwargs):
     return EventMenuEntry('survey.display_survey_list', _('Surveys'), name='surveys', visible=_visible)
 
 
+def _get_active_surveys(event):
+    if not event.has_feature('surveys'):
+        return []
+    from indico.modules.events.surveys.models.surveys import Survey
+    return (Survey.find(Survey.is_active, Survey.event_id == int(event.id))
+                  .order_by(db.func.lower(Survey.title))
+                  .all())
+
+
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    from indico.modules.events.surveys.models.surveys import Survey
-    surveys = (Survey
-               .find(Survey.is_active, Survey.event_id == int(event.id))
-               .order_by(db.func.lower(Survey.title))
-               .all())
+    surveys = _get_active_surveys(event)
     if surveys:
         return render_template('events/surveys/event_header.html', surveys=surveys,
                                was_survey_submitted=was_survey_submitted)
+
+
+@template_hook('conference-home-info')
+def _inject_survey_announcement(event, **kwargs):
+    surveys = _get_active_surveys(event)
+    if surveys:
+        return render_template('events/surveys/survey_announcement.html', event=event, surveys=surveys)
 
 
 @signals.event.get_feature_definitions.connect

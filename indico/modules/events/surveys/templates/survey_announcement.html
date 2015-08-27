@@ -1,0 +1,22 @@
+<div class="infoline announcement">
+    <span class="icon icon-clipboard"></span>
+    <div class="text">
+    <div class="label">{% trans %}Surveys{% endtrans %}</div>
+    <div>
+        {% trans count=surveys|length -%}
+            There is an open survey.
+        {%- pluralize -%}
+            There are <strong>{{ count }}</strong> open surveys.
+        {%- endtrans %}
+    </div>
+    <div class="toolbar right">
+        <a href="{{ url_for('survey.display_survey_list', event) }}" class="i-button next highlight">
+            {%- trans count=surveys|length -%}
+                Fill out the survey
+            {%- pluralize -%}
+                Fill out the surveys
+            {%- endtrans -%}
+        </a>
+    </div>
+    </div>
+</div>
