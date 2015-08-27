@@ -15,6 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+
+// -- Override browser defaults ------------------------------------------------
+
+table {
+    td {
+        color: $black;
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+
 table.i-table {
     border-collapse: collapse;
     margin-top: 1.6em;
