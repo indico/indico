@@ -48,8 +48,8 @@ class DBMgr:
 
     def __init__(self, hostname=None, port=None, max_disconnect_poll=30):
         # Please leave this import here, db.py is imported during installation process
-        from indico.core import config as Configuration
-        cfg = Configuration.Config.getInstance()
+        from indico.core.config import Config
+        cfg = Config.getInstance()
 
         if not hostname:
             hostname = cfg.getDBConnectionParams()[0]
