@@ -52,8 +52,18 @@ class EventLayoutImporter(Importer):
     def migrate_layout_settings(self):
         print cformat('%{white!}migrating layout settings, event logos and custom CSS templates')
 
-        for dmgr, event, logo, custom_css in committing_iterator(self._iter_event_layout_settings()):
-            settings = self._get_event_settings(dmgr)
+        default_styles = self.zodb_root['MaKaCInfo']['main']._styleMgr._defaultEventStylesheet
+        for event, event_type, dmgr, logo, custom_css in committing_iterator(self._iter_event_layout_data()):
+            if event_type != 'conference':
+                theme = dmgr._defaultstyle
+                if not theme or theme == default_styles[event_type]:
+                    continue
+                layout_settings.set(event, 'timetable_theme', theme)
+                if not self.quiet:
+                    self.print_success(cformat('- %{cyan}Default timetable theme: {}').format(theme), event_id=event.id)
+                continue
+
+            settings = self._get_event_settings(event, dmgr)
             layout_settings.set_multi(event, settings)
             if not self.quiet:
                 self.print_success(cformat('- %{cyan}Layout settings'), event_id=event.id)
@@ -101,25 +111,25 @@ class EventLayoutImporter(Importer):
                 if not self.quiet:
                     self.print_success(cformat('- %{cyan}[CSS] {}').format(stylesheet.fileName), event_id=event.id)
 
-    def _iter_event_layout_settings(self):
+    def _iter_event_layout_data(self):
         it = self.zodb_root['conferences'].itervalues()
         if self.quiet:
             it = verbose_iterator(it, len(self.zodb_root['conferences']), attrgetter('id'), attrgetter('title'))
         wfr = self.zodb_root['webfactoryregistry']
         dmr = self.zodb_root['displayRegistery']
         for event in self.flushing_iterator(it):
-            if wfr.get(event.id) is not None:  # meeting/lecture
-                continue
+            wf = wfr.get(event.id)
+            event_type = 'conference' if wf is None else wf.id
             dmgr = dmr[event.id]
-            style_mgr = getattr(dmgr, '_styleMngr', None)
-            custom_css = getattr(style_mgr, '_css', None)
-            yield dmgr, dmgr._conf, dmgr._conf._logo, custom_css
+            style_mgr = getattr(dmgr, '_styleMngr', None) if event_type == 'conference' else None
+            custom_css = getattr(style_mgr, '_css', None) if event_type == 'conference' else None
+            yield event, event_type, dmgr, event._logo, custom_css
 
-    def _get_event_settings(self, dmgr):
+    def _get_event_settings(self, event, dmgr):
         format_opts = getattr(dmgr, '_format', None)
         tt = getattr(dmgr, '_tickerTape', None)
         style_mgr = getattr(dmgr, '_styleMngr', None)
-        event_id = dmgr._conf.id
+        event_id = event.id
         menu = getattr(dmgr, '_menu', None)
 
         settings = {
