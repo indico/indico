@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from operator import attrgetter
 
 import binascii
@@ -23,6 +25,7 @@ import mimetypes
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.events import Event
 from indico.util.console import cformat, verbose_iterator
+from indico.util.fs import secure_filename
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import get_archived_file
@@ -85,7 +88,7 @@ class EventLayoutImporter(Importer):
                 logo_metadata = {
                     'size': len(logo_content),
                     'hash': binascii.crc32(logo_content) & 0xffffffff,
-                    'filename': logo.fileName,
+                    'filename': secure_filename(convert_to_unicode(logo.fileName), 'logo'),
                     'content_type': logo_content_type
                 }
                 e.logo = logo_content
@@ -104,7 +107,7 @@ class EventLayoutImporter(Importer):
                 e.stylesheet_metadata = {
                     'size': len(stylesheet_content),
                     'hash': binascii.crc32(stylesheet_content) & 0xffffffff,
-                    'filename': stylesheet.fileName,
+                    'filename': secure_filename(convert_to_unicode(stylesheet.fileName), 'stylesheet.css'),
                     'content_type': 'text/css'
                 }
                 e.stylesheet = stylesheet_content

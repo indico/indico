@@ -28,9 +28,10 @@ from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
 from indico.util.console import cformat
 from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
 from indico.util.struct.iterables import committing_iterator
 
-from indico_zodbimport import Importer
+from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import LocalFileImporterMixin
 
 
@@ -65,8 +66,9 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
                     local_file.id), event_id=event.id)
                 continue
 
+            filename = secure_filename(convert_to_unicode(local_file.fileName), 'image')
             image = ImageFile(event_id=event.id,
-                              filename=local_file.fileName,
+                              filename=filename,
                               content_type=content_type,
                               created_dt=now_utc(),
                               size=size,
