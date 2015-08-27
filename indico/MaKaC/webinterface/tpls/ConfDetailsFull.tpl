@@ -63,8 +63,10 @@
   </div>
   % endif
 
+  ${ template_hook('conference-home-info', event=conf) }
+
   % if registration_enabled and in_registration_period or registrant:
-    <div class="infoline registration">
+    <div class="infoline announcement">
         <span class="icon icon-ticket"></span>
         <div class="text">
             % if not registrant:
