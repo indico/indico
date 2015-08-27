@@ -50,7 +50,8 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.surveys.models.surveys import Survey
 
     def _visible(event):
-        return bool(Survey.find(Survey.is_visible, Survey.event_id == int(event.id)).count())
+        return (event.has_feature('surveys') and
+                bool(Survey.find(Survey.is_visible, Survey.event_id == int(event.id)).count()))
 
     return EventMenuEntry('survey.display_survey_list', _('Surveys'), name='surveys', visible=_visible)
 
