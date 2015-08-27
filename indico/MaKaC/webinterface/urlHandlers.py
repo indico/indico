@@ -257,14 +257,6 @@ class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
 
 
-class UHConferenceCSS(URLHandler):
-    _endpoint = 'event.conferenceDisplay-getCSS'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return cls.getURL(target, _ignore_static=True, **params)
-
-
 class UHCategoryIcon(URLHandler):
     _endpoint = 'category.categoryDisplay-getIcon'
 

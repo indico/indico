@@ -25,7 +25,6 @@ from xml.sax.saxutils import quoteattr, escape
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
@@ -303,12 +302,10 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars['menu'] = menu_entries_for_event(self._conf)
         vars['support_info'] = self._conf.getSupportInfo()
 
-        dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
         vars["bgColorCode"] = layout_settings.get(self._conf, 'header_background_color').replace("#", "")
         vars["textColorCode"] = layout_settings.get(self._conf, 'header_text_color').replace("#", "")
 
         vars["confId"] = self._conf.getId()
-        vars["dm"] = dm
         vars["conf"] = self._conf
         return vars
 
@@ -5114,7 +5111,6 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
 
         self._conf = conf
         self._cssTplsModule = ModuleHolder().getById("cssTpls")
-        self._styleMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
 
     def _applyDecoration( self, body ):
         """

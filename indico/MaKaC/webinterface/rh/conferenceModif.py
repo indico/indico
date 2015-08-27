@@ -27,8 +27,6 @@ from BTrees.OOBTree import OOBTree
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
-import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.conference as conference

@@ -26,8 +26,6 @@ from indico.modules.events.models.settings import EventSetting, EventSettingPrin
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.console import cformat, verbose_iterator
 from indico_zodbimport import Importer
-from MaKaC.webinterface.displayMgr import ConfDisplayMgrRegistery
-from MaKaC.webinterface.internalPagesMgr import InternalPagesMgrRegistery
 from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
 
 
@@ -53,25 +51,19 @@ class LegacyEventImporter(Importer):
     def migrate_legacy_events(self):
         print cformat('%{white!}migrating legacy events')
 
-        dmr = ConfDisplayMgrRegistery()._getDisplayMgrRegistery()
+        # XXX: removed display manager / internal page manager update
+        # don't forget to handle them when updating this for 2.0!
         wfr = WebFactoryRegistry()._getConfRegistry()
-        ipmr = InternalPagesMgrRegistery()._getInternalPagesMgrRegistery()
         for event in self._committing_iterator(self._get_events()):
             if not hasattr(event, '_old_id'):
                 new_id = self.gen_event_id()
                 event.unindexConf()
                 del self.zodb_root['conferences'][event.id]
-                dm = dmr.pop(event.id, None)
                 wf = wfr.pop(event.id, None)
-                ipm = ipmr.pop(event.id, None)
                 event._old_id = event.id
                 event.id = new_id
-                if dm is not None:
-                    dmr[event.id] = dm
                 if wf is not None:
                     wfr[event.id] = wf
-                if ipm is not None:
-                    ipmr[event.id] = ipm
                 self.zodb_root['conferences'][event.id] = event
                 event.indexConf()
                 IndexedEvent.find(id=event._old_id).update({IndexedEvent.id: event.id})

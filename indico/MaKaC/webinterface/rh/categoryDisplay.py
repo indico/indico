@@ -28,7 +28,6 @@ import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
-import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair

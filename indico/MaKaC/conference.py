@@ -3738,13 +3738,6 @@ class Conference(CommonObjectBase, Locatable):
             if isinstance(entry.getOwner(), SessionSlot) :
                 entry.getOwner().fit()
 
-    def getDisplayMgr(self):
-        """
-        Return the display manager for the conference
-        """
-        from MaKaC.webinterface import displayMgr
-        return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
-
     def getDefaultStyle(self):
         return (layout_settings.get(self, 'timetable_theme') or
                 HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getDefaultStyleForEventType(self.getType()))
@@ -3780,10 +3773,6 @@ class Conference(CommonObjectBase, Locatable):
         for ch in self.getChairList():
             conf.addChair(ch.clone())
         ContextManager.setdefault("clone.unique_id_map", {})[self.getUniqueId()] = conf.getUniqueId()
-        # Display Manager
-        from MaKaC.webinterface import displayMgr
-        selfDispMgr=displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
-        selfDispMgr.clone(conf)
         # Contribution Types' List (main detailes of the conference)
         for t in self.getContribTypeList() :
             conf.addContribType(t.clone(conf))

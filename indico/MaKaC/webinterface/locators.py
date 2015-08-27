@@ -88,7 +88,6 @@ class WebLocator:
         self.__resId = None
         self.__trackId = None
         self.__abstractId = None
-        self.__menuLinkId = None
         self.__contribTypeId = None
         self.__slotId = None
         self.__notifTplId = None
@@ -125,14 +124,6 @@ class WebLocator:
                 raise errors.MaKaCError( _("notificationTemplate id not set"))
         else:
             self.__notifTplId = params["notifTplId"]
-
-    def setMenuLink( self, params, mustExist=1 ):
-        self.setConference(params)
-        if not ("linkId" in params.keys()) or params["linkId"].strip=="":
-            if mustExist:
-                raise errors.MaKaCError( _("link id not set"))
-        else:
-            self.__menuLinkId = params["linkId"]
 
     def setContribType( self, params ):
         self.setConference(params)
@@ -292,9 +283,6 @@ class WebLocator:
             return obj
         if self.__trackId:
             obj = obj.getTrackById( self.__trackId )
-            return obj
-        if self.__menuLinkId:
-            obj = obj.getDisplayMgr().getMenu().getLinkById(self.__menuLinkId)
             return obj
         if self.__contribTypeId:
             obj = obj.getContribTypeById(self.__contribTypeId)

@@ -84,9 +84,6 @@ event.add_url_rule('/prev', 'conferenceDisplay-prev', conferenceDisplay.RHRelati
 event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDisplay.RHConferenceAccessKey,
                    methods=('GET', 'POST'))
 
-# Event layout
-event.add_url_rule('/style.css', 'conferenceDisplay-getCSS', conferenceDisplay.RHConferenceGetCSS)
-
 # Machine-readable formats
 event.add_url_rule('/event.ics', 'conferenceDisplay-ical', conferenceDisplay.RHConferenceToiCal)
 event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', conferenceDisplay.RHConferenceToMarcXML)

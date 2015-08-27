@@ -23,7 +23,6 @@ import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.pages.sessions as sessions
-import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.navigation as navigation
 from MaKaC.conference import EventCloner
 from indico.core.config import Config
@@ -473,9 +472,6 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
             vars["supportEmail"] =  _("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>""")%(mailto,
                                                         Config.getInstance().getSystemIconURL("mail"),
                                                         self._conf.getSupportInfo().getCaption())
-        format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
-        vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
-        vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
         return vars
 
     def getHTML( self, body, params ):

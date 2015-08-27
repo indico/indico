@@ -38,10 +38,8 @@ from MaKaC.common.url import URL
 from indico.core.config import Config
 from MaKaC.conference import Conference, Category
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
-from MaKaC.webinterface.common import contribFilters
-from MaKaC.common import filters, utils
+from MaKaC.common import utils
 from MaKaC.errors import MaKaCError
-from MaKaC.webinterface import displayMgr
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.common.TemplateExec import truncateTitle
 from MaKaC.common.fossilize import fossilize
@@ -1996,9 +1994,8 @@ class WConfModMoveContribsToSessionConfirmation(WTemplated):
 class WConfTickerTapeDrawer(WTemplated):
 
     def __init__(self,conf, tz=None):
-        self._conf=conf
+        self._conf = conf
         self._tz = tz
-        dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
 
     def getNowHappeningHTML( self, params=None ):
         if not layout_settings.get(self._conf, 'show_banner'):

@@ -24,8 +24,6 @@ import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
-import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.user as user
 import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPError404
@@ -202,36 +200,6 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
         if view == "xml" and self._reqParams.get('fr') == 'no':
             self._responseUtil.content_type = 'text/xml'
         return p.display()
-
-
-class RHConferenceGetCSS(RHConferenceBase):
-
-    """
-    CSS which is used just for a conference.
-    """
-
-    def _process(self):
-        sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        css = sm.getLocalCSS()
-        if css:
-            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', no_cache=False, conditional=True)
-        return ""
-
-
-class RHConferenceGetPic(RHConferenceBaseDisplay):
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._picId = params.get("picId", "")
-
-    def _process(self):
-        im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
-        if im.getPic(self._picId):
-            pic = im.getPic(self._picId).getLocalFile()
-            return send_file(pic.getFileName(), pic.getFilePath(), pic.getFileType())
-        else:
-            self._responseUtil.status = 404
-            return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
 class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):

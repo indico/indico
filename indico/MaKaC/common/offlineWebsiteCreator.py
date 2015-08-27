@@ -25,7 +25,6 @@ from bs4 import BeautifulSoup
 from werkzeug.utils import secure_filename
 
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface import displayMgr
 from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStaticConferenceProgram, \
     WPStaticContributionList, WPStaticInternalPageDisplay, \
     WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, \

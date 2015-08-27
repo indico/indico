@@ -14,26 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import urllib
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.pages.category as category
 import MaKaC.common.Configuration as Configuration
 import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.displayMgr as displayMgr
 from indico.core.config import Config
-from xml.sax.saxutils import quoteattr
 from MaKaC.conference import EventCloner
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
-from indico.modules.events.models.events import Event
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
-from indico.web.flask.util import url_for
 import MaKaC.common.timezoneUtils as timezoneUtils
 from pytz import timezone
 
@@ -124,46 +119,6 @@ class WebFactory(WebFactory):
 
 
 SimpleEventWebFactory = WebFactory
-
-
-class WMConfDisplayFrame(conferences.WConfDisplayFrame):
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["logo"] = ""
-        if self.event.has_logo:
-            vars["logoURL"] = self.event.logo_url
-            vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\">"%(vars["logoURL"], self._conf.getTitle())
-        vars["confTitle"] = self._conf.getTitle()
-        vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
-        tzUtil = timezoneUtils.DisplayTZ(self._aw,self._conf)
-        tz = tzUtil.getDisplayTZ()
-        adjusted_sDate = self._conf.getStartDate().astimezone(timezone(tz))
-        adjusted_eDate = self._conf.getEndDate().astimezone(timezone(tz))
-
-        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s (%s)""")%(format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'), tz)
-
-        if self._conf.getStartDate().strftime("%d%B%Y") == \
-                self._conf.getEndDate().strftime("%d%B%Y"):
-            vars["confDateInterval"] = format_date(adjusted_sDate, format='long') + " (" + tz + ")"
-        elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-            vars["confDateInterval"] = "%s-%s %s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'), tz)
-        vars["body"] = self._body
-        vars["confLocation"] = ""
-        if self._conf.getLocationList():
-            vars["confLocation"] =  self._conf.getLocationList()[0].getName()
-            vars["supportEmail"] = ""
-        if self._conf.getSupportInfo().hasEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] =  i18nformat("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email">  _("support")</a>""")%(mailto, Config.getInstance().getSystemIconURL("mail") )
-        format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
-        vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
-        vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
-        return vars
-
-    def getHTML( self, body, params ):
-        self._body = body
-        return wcomponents.WTemplated.getHTML( self, params )
 
 
 #################Conference Modification#############################

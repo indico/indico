@@ -18,7 +18,7 @@ from indico.core.signals.event import _signals
 
 
 sidemenu = _signals.signal('sidemenu', """
-Expected to return ``EventMenuEntry`` objects to be added to the event side menu.
+Expected to return ``MenuEntryData`` objects to be added to the event side menu.
 A single entry can be returned directly, multiple entries must be yielded.
 """)
 

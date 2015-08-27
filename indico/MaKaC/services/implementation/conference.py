@@ -27,7 +27,6 @@ from indico.core import signals
 from indico.util.string import permissive_format
 
 import datetime
-from pytz import timezone
 
 # legacy indico imports
 from MaKaC.i18n import _
@@ -45,7 +44,6 @@ from MaKaC.user import AvatarHolder
 from MaKaC.participant import Participant
 from MaKaC.fossils.contribution import IContributionFossil
 
-import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
@@ -54,7 +52,7 @@ import MaKaC.webinterface.pages.conferences as conferences
 
 from MaKaC.services.implementation.base import (ProtectedModificationService, ListModificationBase, ParameterManager,
                                                 ProtectedDisplayService, ServiceBase, TextModificationBase,
-                                                HTMLModificationBase, DateTimeModificationBase, ExportToICalBase)
+                                                HTMLModificationBase, ExportToICalBase)
 from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ResultWithWarning,
                                                  ServiceAccessError, ServiceError, TimingNoReportError, Warning)
 
@@ -591,23 +589,6 @@ class ContributionsReviewingFilterCrit(filters.FilterCriteria):
         contribFilters.ReviewingFilterField.getId(): contribFilters.ReviewingFilterField
     }
 
-#############################
-# Conference Modif Display  #
-#############################
-
-
-class ConferencePicDelete(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-
-        pm = ParameterManager(self._params)
-
-        self._id = pm.extract("picId", pType=str, allowEmpty=False)
-
-    def _getAnswer(self):
-        im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
-        im.removePic(self._id)
 
 #############################
 # Conference cretion        #
@@ -1214,11 +1195,6 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
         return self._target.getAccessController().getContactInfo()
 
 
-class ConferenceSocialBookmarksToggle(ConferenceModifBase):
-    def _getAnswer(self):
-        val = self._conf.getDisplayMgr().getShowSocialApps()
-        self._conf.getDisplayMgr().setShowSocialApps(not val)
-
 class ConferenceChairPersonBase(ConferenceModifBase):
 
     def _getChairPersonsList(self):
@@ -1546,8 +1522,6 @@ methodMap = {
     "contributions.listAll" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,
     "sessions.listAll" : ConferenceListSessions,
-    "pic.delete": ConferencePicDelete,
-    "social.toggle": ConferenceSocialBookmarksToggle,
     "showConcurrentEvents": ShowConcurrentEvents,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
     "participation.allowDisplay": ConferenceParticipantsDisplay,
