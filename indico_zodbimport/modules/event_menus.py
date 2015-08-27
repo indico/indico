@@ -66,9 +66,8 @@ MENU_ENTRY_NAME_MAP = {
     'abstractsBook': 'abstracts_book',
     'registrationForm': 'registration',
     'registrants': 'registrants',
-    'evaluation': 'evaluation',
-    'newEvaluation': 'evaluation_form',
-    'viewMyEvaluation': 'evaluation_edit',
+    'evaluation': 'surveys',
+    'surveys': 'surveys',  # XXX: should only happen on dev databases
     'chat-event-page': 'chatrooms',
     'vc-event-page': 'vc-event-page',
 }
@@ -115,7 +114,8 @@ DEFAULT_MENU_STRUCTURE_2 = DEFAULT_MENU_STRUCTURE + [
     ['SystemLink', 'chat-event-page', 'chat rooms', True, []]
 ]
 DEFAULT_MENU_STRUCTURES = [DEFAULT_MENU_STRUCTURE, DEFAULT_MENU_STRUCTURE_2]
-REMOVED_MENU_NAMES = {'ViewMyRegistration', 'NewRegistration', 'downloadETicket', 'collaboration', 'instantMessaging'}
+REMOVED_MENU_NAMES = {'ViewMyRegistration', 'NewRegistration', 'downloadETicket', 'newEvaluation', 'viewMyEvaluation',
+                      'collaboration', 'instantMessaging'}
 NOT_TOP_LEVEL_NAMES = {'program_my_tracks', 'evaluation_form', 'evaluation_edit'}
 
 
