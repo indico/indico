@@ -26,7 +26,7 @@ from werkzeug.utils import secure_filename
 
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStaticConferenceProgram, \
-    WPStaticContributionList, WPStaticInternalPageDisplay, \
+    WPStaticContributionList, WPStaticCustomPage, \
     WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, \
     WPStaticContributionDisplay, WPStaticConfRegistrantsList, \
     WPStaticSubContributionDisplay, \
@@ -357,7 +357,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
             self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf, legacy=True)
 
     def _get_custom_page(self, page):
-        html = WPStaticInternalPageDisplay.render_template('page.html', self._conf, page=page)
+        html = WPStaticCustomPage.render_template('page.html', self._conf, page=page)
         self._addPage(html, 'event_pages.page_display', page)
 
     def _addPage(self, html, uh_or_endpoint, target=None, **params):

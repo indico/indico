@@ -84,7 +84,7 @@ class WPStaticContributionList(WPStaticEventBase, WPContributionList):
         return wc.getHTML()
 
 
-class WPStaticInternalPageDisplay(WPStaticEventBase, WPPage):
+class WPStaticCustomPage(WPStaticEventBase, WPPage):
     pass
 
 
