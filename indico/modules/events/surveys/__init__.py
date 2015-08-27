@@ -69,7 +69,7 @@ def _get_active_surveys(event):
 def _inject_event_header(event, **kwargs):
     surveys = _get_active_surveys(event)
     if surveys:
-        return render_template('events/surveys/event_header.html', surveys=surveys,
+        return render_template('events/surveys/display/event_header.html', surveys=surveys,
                                was_survey_submitted=was_survey_submitted)
 
 
@@ -77,7 +77,7 @@ def _inject_event_header(event, **kwargs):
 def _inject_survey_announcement(event, **kwargs):
     surveys = _get_active_surveys(event)
     if surveys:
-        return render_template('events/surveys/survey_announcement.html', event=event, surveys=surveys,
+        return render_template('events/surveys/display/conference_home.html', surveys=surveys, event=event,
                                was_survey_submitted=was_survey_submitted)
 
 
