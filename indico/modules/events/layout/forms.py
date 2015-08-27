@@ -31,9 +31,7 @@ from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWi
 THEMES = [('', _('No theme selected')),
           ('orange.css', _('Orange')),
           ('brown.css', _('Brown')),
-          ('right_menu.css', _('Right menu')),
-          ('template_indico.css', _('Indico default')),
-          ('template0.css', _('Template 0'))]
+          ('right_menu.css', _('Right menu'))]
 
 
 class LayoutForm(IndicoForm):
