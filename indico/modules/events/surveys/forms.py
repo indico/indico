@@ -26,7 +26,7 @@ from indico.modules.events.surveys.models.surveys import Survey
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoDateTimeField, EmailListField
 from indico.web.forms.widgets import SwitchWidget
-from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime
+from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime, UsedIf
 from indico.util.i18n import _
 
 
@@ -75,7 +75,8 @@ class SurveyForm(IndicoForm):
 
 
 class ScheduleSurveyForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [DataRequired(), DateTimeRange(earliest='now')],
+    start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), DataRequired(),
+                                                DateTimeRange(earliest='now')],
                                    description=_("Moment when the survey will open for submissions"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
                                  description=_("Moment when the survey will close"))
@@ -83,8 +84,9 @@ class ScheduleSurveyForm(IndicoForm):
                                              description=_("Resend the survey start notification."))
 
     def __init__(self, *args, **kwargs):
-        self.survey = kwargs.pop('survey', None)
-        self.timezone = self.survey.event.getTimezone()
+        survey = kwargs.pop('survey')
+        self.allow_reschedule_start = kwargs.pop('allow_reschedule_start')
+        self.timezone = survey.event.getTimezone()
         super(IndicoForm, self).__init__(*args, **kwargs)
-        if not self.survey.start_notification_sent:
+        if not survey.start_notification_sent or not self.allow_reschedule_start:
             del self.resend_start_notification

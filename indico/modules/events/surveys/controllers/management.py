@@ -135,8 +135,10 @@ class RHScheduleSurvey(RHManageSurvey):
         return FormDefaults(self.survey)
 
     def _process(self):
-        form = ScheduleSurveyForm(obj=self._get_form_defaults(), survey=self.survey)
-        allow_reschedule_start = self.survey.state in (SurveyState.ready_to_open, SurveyState.active_and_clean)
+        allow_reschedule_start = self.survey.state in (SurveyState.ready_to_open, SurveyState.active_and_clean,
+                                                       SurveyState.finished)
+        form = ScheduleSurveyForm(obj=self._get_form_defaults(), survey=self.survey,
+                                  allow_reschedule_start=allow_reschedule_start)
         if form.validate_on_submit():
             if allow_reschedule_start:
                 self.survey.start_dt = form.start_dt.data
