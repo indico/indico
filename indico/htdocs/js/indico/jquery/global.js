@@ -108,6 +108,11 @@ $(document).ready(function() {
         }
     });
 
+    $('.js-dropdown').each(function() {
+        this.id = this.id || uniqueId();
+        $(this).parent().dropdown({selector: '#' + this.id});
+    });
+
     $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href])', function() {
         var $this = $(this);
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){

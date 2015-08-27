@@ -93,8 +93,6 @@
     }
 
     function setupSubmissionButtons() {
-        $('.js-dropdown').parent().dropdown({selector: '.js-dropdown'});
-
         $('#select-all').on('click', function() {
             $('#submission-list input:checkbox').prop('checked', true).trigger('change');
         });
