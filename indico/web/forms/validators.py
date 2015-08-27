@@ -121,6 +121,9 @@ class DateTimeRange(object):
     def __init__(self, earliest='now', latest=None):
         self.earliest = earliest
         self.latest = latest
+        # set to true in get_earliest/get_latest if applicable
+        self.earliest_now = False
+        self.latest_now = False
 
     def __call__(self, form, field):
         if field.data is None:
@@ -148,14 +151,14 @@ class DateTimeRange(object):
         earliest = self.earliest(form, field) if callable(self.earliest) else self.earliest
         if earliest == 'now':
             self.earliest_now = True
-            return now_utc()
+            return now_utc().replace(second=0, microsecond=0)
         return as_utc(earliest) if earliest else earliest
 
     def get_latest(self, form, field):
         latest = self.latest(form, field) if callable(self.latest) else self.latest
         if latest == 'now':
             self.latest_now = True
-            return now_utc()
+            return now_utc().replace(second=59, microsecond=999)
         return as_utc(latest) if latest else latest
 
 
