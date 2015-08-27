@@ -170,9 +170,6 @@ class MultiSelectField(SurveyField):
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
 
-    def is_answer_empty(self, answer):
-        return not answer.data
-
     def render_answer(self, answer):
         question_options = {option_dict['id']: option_dict['option']
                             for option_dict in self.question.field_data['options']}
