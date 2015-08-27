@@ -248,15 +248,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return next((obj for obj in self.user.get_linked_objects('registration', 'registrant')
                     if obj.getConference().id == conf_id), None)
 
-    def hasSubmittedEvaluation(self, evaluation):
-        if not self.user:
-            return False
-        for submission in evaluation.getSubmissions():
-            submitter = submission.getSubmitter()
-            if submitter and submitter.id == self.user.id:
-                return True
-        return False
-
     def containsUser(self, avatar):
         if self.user is None:
             return False

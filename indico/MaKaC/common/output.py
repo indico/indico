@@ -314,10 +314,6 @@ class outputGenerator(object):
         if conf.getParticipation().displayParticipantList() :
             out.writeTag("participants",conf.getParticipation().getPresentParticipantListText())
 
-        evaluation = conf.getEvaluation()
-        if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
-            out.writeTag("evaluationLink",urlHandlers.UHConfEvaluationDisplay.getURL(conf))
-
         out.writeTag("closed", str(conf.isClosed()))
 
         if conf.getLocationList()!=[] or conf.getRoom():

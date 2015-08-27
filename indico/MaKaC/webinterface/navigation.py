@@ -147,19 +147,6 @@ class NERegistrationFormModify( NavigationEntry ):
     _parent = NERegistrationForm
     _title = "Registration form modification"
 
-class NEEvaluationMainInformation( NavigationEntry ):
-    _url = urlHandlers.UHConfEvaluationMainInformation
-    _title = "Evaluation"
-
-class NEEvaluationDisplay( NavigationEntry ):
-    _url = urlHandlers.UHConfEvaluationDisplay
-    _parent = NEEvaluationMainInformation
-    _title = "Evaluation form display"
-
-class NEEvaluationDisplayModif( NavigationEntry ):
-    _url = urlHandlers.UHConfEvaluationDisplayModif
-    _parent = NEEvaluationMainInformation
-    _title = "Evaluation form modification"
 
 class NEAuthorDisplay( NavigationEntry ):
     _url = urlHandlers.UHContribAuthorDisplay

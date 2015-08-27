@@ -24,7 +24,6 @@ from MaKaC.conference import EventCloner
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
-from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
@@ -86,36 +85,6 @@ class WebFactory(WebFactory):
         return WPSEConfModifParticipantsNewPending(rh, conf)
     getConfModifParticipantsNewPending = staticmethod(getConfModifParticipantsNewPending)
 
-#################### Evaluation #####################################
-
-    def getEvaluationDisplay(rh, conf):
-        return WPSEEvaluationDisplay(rh, conf)
-    getEvaluationDisplay = staticmethod(getEvaluationDisplay)
-
-    def getEvaluationDisplayModif(rh, conf):
-        return WPSEEvaluationDisplayModif(rh, conf)
-    getEvaluationDisplayModif = staticmethod(getEvaluationDisplayModif)
-
-    def getEvaluationSubmitted(rh, conf, mode):
-        return WPSEEvaluationSubmitted(rh, conf, mode)
-    getEvaluationSubmitted = staticmethod(getEvaluationSubmitted)
-
-    def getEvaluationFull(rh, conf):
-        return WPSEEvaluationFull(rh, conf)
-    getEvaluationFull = staticmethod(getEvaluationFull)
-
-    def getEvaluationClosed(rh, conf):
-        return WPSEEvaluationClosed(rh, conf)
-    getEvaluationClosed = staticmethod(getEvaluationClosed)
-
-    def getEvaluationSignIn(rh, conf):
-        return WPSEEvaluationSignIn(rh, conf)
-    getEvaluationSignIn = staticmethod(getEvaluationSignIn)
-
-    def getEvaluationInactive(rh, conf):
-        return WPSEEvaluationInactive(rh, conf)
-    getEvaluationInactive = staticmethod(getEvaluationInactive)
-
 
 SimpleEventWebFactory = WebFactory
 
@@ -158,7 +127,6 @@ class WPSEConfClone(WPSEConfModifToolsBase, object):
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
             "cloneOptions": i18nformat("""
     <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1">_("Participants")</li>
-    <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1">_("Evaluation")</li>
            """)
         }
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
@@ -290,71 +258,3 @@ class WSimpleEventFullDisplay(WSimpleEventBaseDisplay):
 
 class WSimpleEventMinDisplay(WSimpleEventBaseDisplay):
     pass
-
-#################### Evaluation #####################################
-
-class WPSEEvaluationBase( WPSimpleEventDisplay ):
-    """[DisplayArea] Base class."""
-
-class WPSEEvaluationDisplay (WPSEEvaluationBase, evaluations.WPEvaluationDisplay):
-    """[Meeting] Evaluation default display."""
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-        # An hack to make sure that the background is the same as the header
-        self._extraCSS.append("body { background: #424242; } ")
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"dark":True}
-        return wc.getHTML(p)
-
-    def _getBody(self, params):
-        html = """<div class="evaluationForm">%s</div>"""
-        return html%evaluations.WPEvaluationDisplay._getBody(self, params)
-
-class WPSEEvaluationDisplayModif (WPSEEvaluationBase, evaluations.WPEvaluationDisplayModif):
-    """[Meeting] The user can modify his already submitted evaluation."""
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationDisplayModif._getBody(self, params)
-
-class WPSEEvaluationSubmitted (WPSEEvaluationBase, evaluations.WPEvaluationSubmitted):
-    """[Meeting] Submitted evaluation."""
-
-    def __init__(self, rh, conf, mode):
-        self._mode = mode
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationSubmitted._getBody(self, params)
-
-class WPSEEvaluationFull (WPSEEvaluationBase, evaluations.WPEvaluationFull):
-    """[Meeting] Evaluation is full."""
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationFull._getBody(self, params)
-
-class WPSEEvaluationClosed (WPSEEvaluationBase, evaluations.WPEvaluationClosed):
-    """[Meeting] Evaluation is closed."""
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationClosed._getBody(self, params)
-
-class WPSEEvaluationInactive (WPSEEvaluationBase, evaluations.WPEvaluationInactive):
-    """[Meeting] Inactive evaluation."""
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationInactive._getBody(self, params)

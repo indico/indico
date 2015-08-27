@@ -84,7 +84,6 @@ from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
 from MaKaC import registration
-from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
@@ -1957,8 +1956,6 @@ class Conference(CommonObjectBase, Locatable):
         self._submitterIdx=SubmitterIndex()
         self._boa=BOAConfig(self)
         self._registrationForm = registration.RegistrationForm(self)
-        self._evaluationCounter = Counter()
-        self._evaluations = [Evaluation(self)]
         self._registrants = {} #key=registrantId; value=Registrant
         self._bookings = {}
         self._registrantGenerator = Counter()
@@ -2570,8 +2567,6 @@ class Conference(CommonObjectBase, Locatable):
         ConferenceHolder().remove(self)
         for owner in self.__owners:
             owner.removeConference(self, notify=False)
-
-        self.removeAllEvaluations()
 
         # For each conference we have a list of managers. If we delete the conference but we don't delete
         # the link in every manager to the conference then, when the manager goes to his "My profile" he
@@ -3826,12 +3821,6 @@ class Conference(CommonObjectBase, Locatable):
         if options.get("registration",False) :
             conf.setRegistrationForm(self.getRegistrationForm().clone(conf))
 
-        # conference's evaluation
-        if options.get("evaluation",False) :
-            #Modify this, if you have now many evaluations.
-            #You will have to clone every evaluations of this conference.
-            conf.setEvaluations([self.getEvaluation().clone(conf)])
-
         #conference's abstracts
         if options.get("abstracts",False) :
             conf.abstractMgr = self.abstractMgr.clone(conf)
@@ -3981,52 +3970,6 @@ class Conference(CommonObjectBase, Locatable):
     def recoverRegistrationForm(self, rf):
         self.setRegistrationForm(rf)
         rf.recover()
-
-    def getEvaluation(self, id=0):
-        ############################################################################
-        #For the moment only one evaluation per conference is used.                #
-        #In the future if there are more than one evaluation, modify this function.#
-        ############################################################################
-        """ Return the evaluation given by its ID or None if nothing found.
-            Params:
-                id -- id of the wanted evaluation
-        """
-        for evaluation in self.getEvaluations():
-            if str(evaluation.getId()) == str(id) :
-                return evaluation
-        if Config.getInstance().getDebug():
-            raise Exception(_("Error with id: expected '%s', found '%s'.")%(id, self.getEvaluations()[0].getId()))
-        else:
-            return self.getEvaluations()[0]
-
-    def getEvaluations(self):
-        if not hasattr(self, "_evaluations"):
-            self._evaluations = [Evaluation(self)]
-        return self._evaluations
-
-    def setEvaluations(self, evaluationsList):
-        self._evaluations = evaluationsList
-        for evaluation in self._evaluations:
-            evaluation.setConference(self)
-
-    def removeEvaluation(self, evaluation):
-        """remove the given evaluation from its evaluations."""
-        evaluations = self.getEvaluations()
-        if evaluations.count(evaluation)>0:
-            evaluations.remove(evaluation)
-        evaluation.removeReferences()
-        self.notifyModification()
-
-    def removeAllEvaluations(self):
-        for evaluation in self.getEvaluations():
-            evaluation.removeReferences()
-        self._evaluations = []
-        self.notifyModification()
-
-    def _getEvaluationCounter(self):
-        if not hasattr(self, "_evaluationCounter"):
-            self._evaluationCounter = Counter()
-        return self._evaluationCounter
 
     ## Videoconference bookings related
     def getBookings(self):

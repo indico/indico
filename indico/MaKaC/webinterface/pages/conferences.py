@@ -593,9 +593,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                 and conf.getStartDate() > nowutc()
                 and not conf.getParticipation().isFull()):
             wvars['registrationOpen'] = True
-        evaluation = conf.getEvaluation()
-        if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions() > 0:
-            wvars['evaluationLink'] = urlHandlers.UHConfEvaluationDisplay.getURL(conf)
         wvars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
 
         wvars['types'] = self._types
@@ -1055,10 +1052,6 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
         self._generalSection.addItem( self._participantsMenuItem)
 
-        self._evaluationMenuItem = wcomponents.SideMenuItem(_("Evaluation"),
-            urlHandlers.UHConfModifEvaluation.getURL( self._conf ) )
-        self._generalSection.addItem( self._evaluationMenuItem)
-
         self.extra_menu_items = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
                                  key=lambda x: x[1]._title):
@@ -1107,7 +1100,6 @@ class WPConferenceModifBase(main.WPMainBase):
             self._listingsMenuItem.setVisible(False)
             self._ACMenuItem.setVisible(False)
             self._toolsMenuItem.setVisible(False)
-            self._evaluationMenuItem.setVisible(False)
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)

@@ -23,7 +23,6 @@ import indico.web.flask.blueprints.event.management.general
 import indico.web.flask.blueprints.event.management.tools
 import indico.web.flask.blueprints.event.management.protection
 import indico.web.flask.blueprints.event.management.lists
-import indico.web.flask.blueprints.event.management.evaluation
 import indico.web.flask.blueprints.event.management.rooms
 import indico.web.flask.blueprints.event.management.registration
 import indico.web.flask.blueprints.event.management.abstracts

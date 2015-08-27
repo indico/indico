@@ -29,7 +29,6 @@ from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
-from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
@@ -171,37 +170,6 @@ class WebFactory(WebFactory):
     def getSessionModifSchedule(rh,session):
         return WPMSessionModifSchedule(rh,session)
     getSessionModifSchedule = staticmethod(getSessionModifSchedule)
-
-
-#################### Evaluation #####################################
-
-    def getEvaluationDisplay(rh, conf):
-        return WPMEvaluationDisplay(rh, conf)
-    getEvaluationDisplay = staticmethod(getEvaluationDisplay)
-
-    def getEvaluationDisplayModif(rh, conf):
-        return WPMEvaluationDisplayModif(rh, conf)
-    getEvaluationDisplayModif = staticmethod(getEvaluationDisplayModif)
-
-    def getEvaluationSubmitted(rh, conf, mode):
-        return WPMEvaluationSubmitted(rh, conf, mode)
-    getEvaluationSubmitted = staticmethod(getEvaluationSubmitted)
-
-    def getEvaluationFull(rh, conf):
-        return WPMEvaluationFull(rh, conf)
-    getEvaluationFull = staticmethod(getEvaluationFull)
-
-    def getEvaluationClosed(rh, conf):
-        return WPMEvaluationClosed(rh, conf)
-    getEvaluationClosed = staticmethod(getEvaluationClosed)
-
-    def getEvaluationSignIn(rh, conf):
-        return WPMEvaluationSignIn(rh, conf)
-    getEvaluationSignIn = staticmethod(getEvaluationSignIn)
-
-    def getEvaluationInactive(rh, conf):
-        return WPMEvaluationInactive(rh, conf)
-    getEvaluationInactive = staticmethod(getEvaluationInactive)
 
 
 MeetingWebFactory = WebFactory
@@ -518,7 +486,6 @@ class WPMConfClone(conferences.WPConfClone):
             "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                      <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked" />_("Participants")</li>
-                     <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
                """)
         }
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
@@ -589,75 +556,6 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
         raise NotImplementedError
 
 
-#################### Evaluation #####################################
-
-class WPMEvaluationBase( WPMeetingDisplay ):
-    """[DisplayArea] Base class."""
-    pass
-
-class WPMEvaluationDisplay (WPMEvaluationBase, evaluations.WPEvaluationDisplay):
-    """[Meeting] Evaluation default display."""
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-        # An hack to make sure that the background is the same as the header
-        self._extraCSS.append("body { background: #424242; } ")
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"dark":True}
-        return wc.getHTML(p)
-
-    def _getBody(self, params):
-        html = """<div class="evaluationForm">%s</div>"""
-        return html%evaluations.WPEvaluationDisplay._getBody(self, params)
-
-class WPMEvaluationDisplayModif (WPMEvaluationBase, evaluations.WPEvaluationDisplayModif):
-    """[Meeting] The user can modify his already submitted evaluation."""
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationDisplayModif._getBody(self, params)
-
-class WPMEvaluationSubmitted (WPMEvaluationBase, evaluations.WPEvaluationSubmitted):
-    """[Meeting] Submitted evaluation."""
-
-    def __init__(self, rh, conf, mode):
-        self._mode = mode
-        WPMeetingDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationSubmitted._getBody(self, params)
-
-class WPMEvaluationFull (WPMEvaluationBase, evaluations.WPEvaluationFull):
-    """[Meeting] Evaluation is full."""
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationFull._getBody(self, params)
-
-class WPMEvaluationClosed (WPMEvaluationBase, evaluations.WPEvaluationClosed):
-    """[Meeting] Evaluation is closed."""
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationClosed._getBody(self, params)
-
-class WPMEvaluationInactive (WPMEvaluationBase, evaluations.WPEvaluationInactive):
-    """[Meeting] Inactive evaluation."""
-
-    def __init__(self, rh, conf):
-        WPMeetingDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationInactive._getBody(self, params)
-
 class WPMTimeTableCustomizePDF(WPMeetingDisplay):
 
     def __init__(self, rh, conf, view):
@@ -676,6 +574,7 @@ class WPMTimeTableCustomizePDF(WPMeetingDisplay):
     def _getBody( self, params ):
         wc = WMTimeTableCustomizePDF( self._conf, self._view )
         return wc.getHTML(params)
+
 
 class WMTimeTableCustomizePDF(wcomponents.WTemplated):
 

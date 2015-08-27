@@ -65,13 +65,6 @@
 </tr>
 % endif
 
-% if evaluationLink:
-<tr>
-    <td class="leftCol">${_("Evaluation")}</td>
-    <td><a href="${evaluationLink}">${_("Evaluate this event")}</a></td>
-</tr>
-% endif
-
 % if conf.getOrgText():
 <tr>
     <td class="leftCol">${_("Organised by")}</td>

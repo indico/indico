@@ -341,7 +341,6 @@ if __name__ == '__main__':
             api = indico_zodbimport.modules.api:APIImporter
             users = indico_zodbimport.modules.users:UserImporter
             groups = indico_zodbimport.modules.groups:GroupImporter
-            evaluation_alarms = indico_zodbimport.modules.evaluation_alarms:EvaluationAlarmImporter
             static_sites = indico_zodbimport.modules.static_sites:StaticSitesImporter
             event_alarms = indico_zodbimport.modules.event_alarms:EventAlarmImporter
             legacy_events = indico_zodbimport.modules.legacy_events:LegacyEventImporter

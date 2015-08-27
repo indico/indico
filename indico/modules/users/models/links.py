@@ -80,14 +80,9 @@ class UserLink(db.Model):
         }
 
         try:
-            if self.type == 'evaluation':
-                loc = WebLocator()
-                loc.setConference(self.data['locator'])
-                return loc.getObject().getEvaluation().getSubmissionById(self.data['locator']['submission_id'])
-            else:
-                loc = WebLocator()
-                getattr(loc, mapping[self.type])(self.data['locator'])
-                return loc.getObject()
+            loc = WebLocator()
+            getattr(loc, mapping[self.type])(self.data['locator'])
+            return loc.getObject()
         except (IndicoError, MaKaCError):
             return None
 
@@ -141,7 +136,6 @@ class UserLink(db.Model):
     @classmethod
     def _link_map(cls):
         import MaKaC.conference
-        import MaKaC.evaluation
         import MaKaC.registration
         import MaKaC.review
         import MaKaC.user
@@ -165,6 +159,4 @@ class UserLink(db.Model):
                          'roles': {'submitter'}},
             'registration': {'cls': MaKaC.registration.Registrant,
                              'roles': {'registrant'}},
-            'evaluation': {'cls': MaKaC.evaluation.Submission,
-                           'roles': {'submitter'}}
         }

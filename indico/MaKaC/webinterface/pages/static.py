@@ -53,7 +53,6 @@ class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
     def _getVariables(self, conf):
         variables = WPTPLConferenceDisplay._getVariables(self, conf)
         variables['registrationOpen'] = False
-        variables['evaluationLink'] = False
         return variables
 
 

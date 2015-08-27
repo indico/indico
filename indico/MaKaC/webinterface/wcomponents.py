@@ -471,12 +471,6 @@ class WMenuConferenceHeader( WConferenceHeader ):
         # Save to session
         vars["hideContributions"] = hideContributions;
 
-        evaluation = self._conf.getEvaluation()
-        if self._conf.hasEnabledSection("evaluation") and evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
-            vars["evaluation"] =  i18nformat("""<a href="%s"> _("Evaluation")</a>""")%urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
-        else :
-            vars["evaluation"] = ""
-
         urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
         urlCustPrint.addParam("showDate", vars.get("selectedDate", "all"))
         urlCustPrint.addParam("showSession", vars.get("selectedSession", "all"))
