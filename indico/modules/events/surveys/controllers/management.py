@@ -118,7 +118,7 @@ class RHCreateSurvey(RHManageSurveysBase):
     def _process(self):
         form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
         if form.validate_on_submit():
-            survey = Survey(event=self.event)
+            survey = Survey(event_new=self.event.as_event)
             form.populate_obj(survey)
             db.session.add(survey)
             db.session.flush()

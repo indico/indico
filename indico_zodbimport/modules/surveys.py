@@ -51,7 +51,7 @@ class SurveyImporter(Importer):
             db.session.add(survey)
 
     def migrate_survey(self, evaluation, event):
-        survey = Survey(event=event)
+        survey = Survey(event_id=int(event.id))
         survey.title = convert_to_unicode(evaluation.title) if evaluation.title else "Evaluation"
         survey.introduction = convert_to_unicode(evaluation.announcement)
         if evaluation.contactInfo:

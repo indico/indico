@@ -50,6 +50,7 @@ class Survey(db.Model):
     #: The ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
@@ -150,14 +151,20 @@ class Survey(db.Model):
         )
     )
 
+    #: The Event containing this survey
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'surveys',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(str(self.event_id), True)
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
 
     @hybrid_property
     def has_ended(self):
@@ -177,7 +184,7 @@ class Survey(db.Model):
 
     @property
     def locator(self):
-        return {'confId': self.event.id,
+        return {'confId': self.event_id,
                 'survey_id': self.id}
 
     @property

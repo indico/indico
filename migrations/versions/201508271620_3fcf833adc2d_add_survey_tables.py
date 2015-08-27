@@ -35,6 +35,7 @@ def upgrade():
         sa.Column('notify_participants', sa.Boolean(), nullable=False),
         sa.Column('start_notification_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.Column('new_submission_emails', postgresql.ARRAY(sa.String()), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )

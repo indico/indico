@@ -2,7 +2,7 @@
 {% set survey = submission.survey %}
 
 {% block subject -%}
-    New survey submission for "{{ survey.event.getTitle() }}" on the event "{{ survey.event.title }}"
+    New survey submission for "{{ survey.title }}" on the event "{{ survey.event.title }}"
 {%- endblock %}
 
 {% block header -%}{%- endblock %}

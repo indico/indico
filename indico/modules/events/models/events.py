@@ -85,6 +85,7 @@ class Event(db.Model):
     # relationship backrefs:
     # - layout_images (ImageFile.event_new)
     # - menu_entries (MenuEntry.event_new)
+    # - surveys (Survey.event_new)
 
     @property
     @memoize_request
