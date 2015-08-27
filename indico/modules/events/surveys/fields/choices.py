@@ -76,18 +76,22 @@ class SingleChoiceField(SurveyField):
                 choices = [('', _('No selection'))] + choices
         return self._make_wtforms_field(field_class, choices=choices, **field_options)
 
-    def get_summary(self, include_empty=False):
-        if not self.question.answers:
-            return
+    def get_summary(self):
         counter = Counter()
         for answer in self.question.answers:
-            if answer.data is not None or include_empty:
-                counter[answer.data] += 1
+            counter[answer.data] += 1
         total = sum(counter.values())
         options = self.question.field_data['options']
+        if counter[None]:
+            no_option = {'id': None, 'option': _("No selection")}
+            options.append(no_option)
         return {'total': total,
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
+
+    def is_answer_empty(self, answer):
+        # No selection is also a valid answer
+        return False
 
     def render_answer(self, answer):
         question_options = {option_dict['id']: option_dict['option']
@@ -159,8 +163,6 @@ class MultiSelectField(SurveyField):
                 'coerce': lambda x: x}
 
     def get_summary(self):
-        if not self.question.answers:
-            return
         counter = Counter()
         for answer in self.question.answers:
             counter.update(answer.data)
@@ -168,7 +170,7 @@ class MultiSelectField(SurveyField):
         options = self.question.field_data['options']
         return {'total': total,
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
-                'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
+                'relative': OrderedDict((opt['option'], counter[opt['id']] / total if total else 0) for opt in options)}
 
     def render_answer(self, answer):
         question_options = {option_dict['id']: option_dict['option']
