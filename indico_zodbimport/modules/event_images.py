@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from operator import attrgetter
 
 import click
 import pytz
@@ -26,7 +27,7 @@ from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping
-from indico.util.console import cformat
+from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.struct.iterables import committing_iterator
@@ -82,8 +83,9 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
 
             db.session.add(map_entry)
 
-            self.print_success(cformat('%{cyan}[{}]%{reset} -> %{blue!}{}').format(
-                local_file.id, image), event_id=event.id)
+            if not self.quiet:
+                self.print_success(cformat('%{cyan}[{}]%{reset} -> %{blue!}{}').format(local_file.id, image),
+                                   event_id=event.id)
 
     def _dt_with_tz(self, dt):
         if dt.tzinfo is not None:
@@ -92,9 +94,11 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
         return server_tz.localize(dt).astimezone(pytz.utc)
 
     def _iter_pictures(self):
-
-        for event_data in self.flushing_iterator(db.session.query(Event.id)):
-            event_id = event_data[0]
+        it = iter(db.session.query(Event.id))
+        if self.quiet:
+            it = verbose_iterator(it, Event.query.count(), attrgetter('id'),
+                                  lambda x: self.zodb_root['conferences'][str(x.id)].title, 100)
+        for event_id, in self.flushing_iterator(it):
             dmgr = self.zodb_root['displayRegistery'][str(event_id)]
             imgr = getattr(dmgr, '_imagesMngr', None)
 
