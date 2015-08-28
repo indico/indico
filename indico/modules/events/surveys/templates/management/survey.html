@@ -1,14 +1,14 @@
-{% extends 'events/surveys/manage_survey_base.html' %}
+{% extends 'events/surveys/management/_survey_base.html' %}
 
 {% block content %}
     {% if survey.state == states.not_ready %}
-        {% include 'events/surveys/manage_survey_state/not_ready.html' %}
+        {% include 'events/surveys/management/survey_actions/not_ready.html' %}
     {% elif survey.state == states.ready_to_open %}
-        {% include 'events/surveys/manage_survey_state/ready_to_open.html' %}
+        {% include 'events/surveys/management/survey_actions/ready_to_open.html' %}
     {% elif survey.state in (states.active_and_clean, states.active_and_answered) %}
-        {% include 'events/surveys/manage_survey_state/active.html' %}
+        {% include 'events/surveys/management/survey_actions/active.html' %}
     {% elif survey.state == states.finished %}
-        {% include 'events/surveys/manage_survey_state/finished.html' %}
+        {% include 'events/surveys/management/survey_actions/finished.html' %}
     {% endif %}
 
     {% if survey.state != states.not_ready %}
@@ -29,7 +29,6 @@
             </div>
         </div>
     {% endif %}
-
 
     <h2>
         {% trans %}Submissions{% endtrans %}

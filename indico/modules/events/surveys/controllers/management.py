@@ -67,21 +67,21 @@ class RHManageSurveys(RHManageSurveysBase):
 
     def _process(self):
         surveys = Survey.find(event_id=self.event.id, is_deleted=False).order_by(db.func.lower(Survey.title)).all()
-        return WPManageSurvey.render_template('manage_survey_list.html', self.event, event=self.event, surveys=surveys)
+        return WPManageSurvey.render_template('management/survey_list.html', self.event, event=self.event, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
     """Specific survey management (overview)"""
 
     def _process(self):
-        return WPManageSurvey.render_template('manage_survey.html', self.event, survey=self.survey, states=SurveyState)
+        return WPManageSurvey.render_template('management/survey.html', self.event, survey=self.survey, states=SurveyState)
 
 
 class RHSurveyResults(RHManageSurveyBase):
     """Displays summarized results of the survey"""
 
     def _process(self):
-        return WPSurveyResults.render_template('survey_results.html', self.event, survey=self.survey)
+        return WPSurveyResults.render_template('management/survey_results.html', self.event, survey=self.survey)
 
 
 class RHEditSurvey(RHManageSurveyBase):
@@ -98,7 +98,7 @@ class RHEditSurvey(RHManageSurveyBase):
             flash(_('Survey modified'), 'success')
             logger.info('Survey {} modified by {}'.format(self.survey, session.user))
             return redirect(url_for('.management', self.event))
-        return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form,
+        return WPManageSurvey.render_template('management/edit_survey.html', self.event, event=self.event, form=form,
                                               survey=self.survey)
 
 
@@ -125,7 +125,7 @@ class RHCreateSurvey(RHManageSurveysBase):
             flash(_('Survey created'), 'success')
             logger.info('Survey {} created by {}'.format(survey, session.user))
             return redirect(url_for('.manage_survey', survey))
-        return WPManageSurvey.render_template('edit_survey.html', self.event, event=self.event, form=form, survey=None)
+        return WPManageSurvey.render_template('management/edit_survey.html', self.event, event=self.event, form=form, survey=None)
 
 
 class RHScheduleSurvey(RHManageSurvey):
@@ -149,7 +149,7 @@ class RHScheduleSurvey(RHManageSurvey):
             logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
             return jsonify_data(flash=False)
         disabled_fields = ('start_dt',) if not allow_reschedule_start else ()
-        return jsonify_template('events/surveys/schedule_survey.html', form=form, disabled_fields=disabled_fields)
+        return jsonify_template('events/surveys/management/schedule_survey.html', form=form, disabled_fields=disabled_fields)
 
 
 class RHCloseSurvey(RHManageSurvey):
@@ -183,7 +183,7 @@ class RHManageSurveyQuestionnaire(RHManageSurvey):
     def _process(self):
         field_types = get_field_types()
         preview_form = make_survey_form(self.survey.questions)()
-        return WPManageSurvey.render_template('manage_questionnaire.html', self.event, survey=self.survey,
+        return WPManageSurvey.render_template('management/survey_questionnaire.html', self.event, survey=self.survey,
                                               field_types=field_types, preview_form=preview_form)
 
 
@@ -212,7 +212,7 @@ class RHAddSurveyQuestion(RHManageSurvey):
             flash(_('Question "{title}" added').format(title=question.title), 'success')
             logger.info('Survey question {} added by {}'.format(question, session.user))
             return jsonify_data(questionnaire=_render_questionnaire(self.survey))
-        return jsonify_template('events/surveys/edit_question.html', form=form)
+        return jsonify_template('events/surveys/management/edit_survey_question.html', form=form)
 
 
 class RHManageSurveyQuestionBase(RHManageSurveysBase):
@@ -240,7 +240,8 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
             flash(_('Question "{title}" updated').format(title=self.question.title), 'success')
             logger.info('Survey question {} modified by {}'.format(self.question, session.user))
             return jsonify_data(questionnaire=_render_questionnaire(self.question.survey))
-        return jsonify_template('events/surveys/edit_question.html', form=form, question=self.question)
+        return jsonify_template('events/surveys/management/edit_survey_question.html',
+                                form=form, question=self.question)
 
 
 class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
@@ -268,7 +269,7 @@ class RHSortQuestions(RHManageSurveyBase):
 
 
 def _render_questionnaire(survey):
-    tpl = get_template_module('events/surveys/_questionnaire.html')
+    tpl = get_template_module('events/surveys/management/_questionnaire.html')
     form = make_survey_form(survey.questions)()
     return tpl.render_questionnaire(survey, form)
 
@@ -324,4 +325,4 @@ class RHDisplaySubmission(RHSurveySubmissionBase):
     """Display a single submission-page"""
 
     def _process(self):
-        return WPManageSurvey.render_template('submission.html', self.event, submission=self.submission)
+        return WPManageSurvey.render_template('management/survey_submission.html', self.event, submission=self.submission)
