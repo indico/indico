@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-    {{ form_header(form, id='survey-form') }}
+    {{ form_header(form, id='survey-form, orientation='vertical') }}
     {% for fieldset in form._sections %}
         {% call form_fieldset(fieldset.title, fieldset.description|replace('\n', '<br>'|safe), render_as_fieldset=fieldset.title is not none) %}
             {{ form_rows(form, fields=fieldset.fields) }}
