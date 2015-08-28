@@ -47,11 +47,13 @@
                         e.preventDefault();
                         e.stopPropagation();
                         $button.prop('disabled', true);
-
+                        $.each(self.getRejectedFiles(), function(index, file) {
+                            self.removeFile(file);
+                        });
                         if (self.getQueuedFiles().length) {
                             $dz.find('.dz-progress').show();
                             self.processQueue();
-                        } else {
+                        } else if (options.submitIfEmpty) {
                             $form.submit();
                         }
                     });
