@@ -86,12 +86,12 @@ class LegacyPageMapping(db.Model):
     )
     page_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.menu_pages.id'),
+        db.ForeignKey('events.pages.id'),
         nullable=False
     )
 
     page = db.relationship(
-        'MenuPage',
+        'EventPage',
         lazy=False,
         backref=db.backref('legacy_mapping', uselist=False, lazy=True)
     )

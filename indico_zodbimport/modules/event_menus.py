@@ -22,7 +22,7 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.legacy_mapping import LegacyPageMapping
-from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
+from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, EventPage
 from indico.util.console import verbose_iterator, cformat
 from indico.util.struct.iterables import committing_iterator
 from indico.web.flask.templating import strip_tags
@@ -190,7 +190,7 @@ class EventMenuImporter(Importer):
             elif item_type == 'PageLink':
                 data['type'] = MenuEntryType.page
                 data['title'] = strip_tags(convert_to_unicode(item._caption)).strip()
-                data['page'] = MenuPage(html=item._page._content)
+                data['page'] = EventPage(html=item._page._content)
                 data['page'].legacy_mapping = LegacyPageMapping(event_id=event.id, legacy_page_id=item._page._id)
                 if item._page._isHome:
                     Event.get(event.id).default_page = data['page']

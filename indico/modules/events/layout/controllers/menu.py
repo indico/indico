@@ -25,7 +25,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings, logger
 from indico.modules.events.layout.forms import (MenuEntryForm, MenuLinkForm, MenuPageForm)
-from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, MenuPage
+from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, EventPage
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPMenuEdit, WPPage
 from indico.util.i18n import _
@@ -204,7 +204,7 @@ class RHMenuAddEntry(RHMenuBase):
             form.populate_obj(entry, skip={'html'})
 
             if entry.is_page:
-                entry.page = MenuPage(html=form.html.data)
+                entry.page = EventPage(html=form.html.data)
 
             db.session.add(entry)
             db.session.flush()
@@ -246,7 +246,7 @@ class RHPageDisplay(RHConferenceBaseDisplay):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self.page = MenuPage.get_one(request.view_args['page_id'])
+        self.page = EventPage.get_one(request.view_args['page_id'])
 
     def _process(self):
         return WPPage.render_template('page.html', self._conf, page=self.page)

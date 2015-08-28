@@ -18,7 +18,7 @@ down_revision = '365fe2261342'
 
 def upgrade():
     op.create_table(
-        'menu_pages',
+        'pages',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('html', sa.Text(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
@@ -30,7 +30,7 @@ def upgrade():
         sa.Column('legacy_page_id', sa.Integer(), nullable=False, index=True, autoincrement=False),
         sa.Column('page_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
-        sa.ForeignKeyConstraint(['page_id'], ['events.menu_pages.id']),
+        sa.ForeignKeyConstraint(['page_id'], ['events.pages.id']),
         sa.PrimaryKeyConstraint('event_id', 'legacy_page_id'),
         schema='events'
     )
@@ -57,7 +57,7 @@ def upgrade():
         sa.CheckConstraint('(type IN (2, 4) AND name IS NOT NULL) OR (type NOT IN (2, 4) and name IS NULL)',
                            name='valid_name'),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
-        sa.ForeignKeyConstraint(['page_id'], ['events.menu_pages.id']),
+        sa.ForeignKeyConstraint(['page_id'], ['events.pages.id']),
         sa.ForeignKeyConstraint(['parent_id'], ['events.menu_entries.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
@@ -67,14 +67,14 @@ def upgrade():
     op.add_column('events', sa.Column('default_page_id', sa.Integer(), nullable=True), schema='events')
     op.create_index(None, 'events', ['default_page_id'], unique=False, schema='events')
     op.create_foreign_key(None,
-                          'events', 'menu_pages',
+                          'events', 'pages',
                           ['default_page_id'], ['id'],
                           source_schema='events', referent_schema='events')
 
 
 def downgrade():
     op.drop_column('events', 'default_page_id', schema='events')
-    op.drop_constraint('fk_menu_entries_page_id_menu_pages', 'menu_entries', schema='events')
+    op.drop_constraint('fk_menu_entries_page_id_pages', 'menu_entries', schema='events')
     op.drop_table('menu_entries', schema='events')
     op.drop_table('legacy_page_id_map', schema='events')
-    op.drop_table('menu_pages', schema='events')
+    op.drop_table('pages', schema='events')

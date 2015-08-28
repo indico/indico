@@ -21,7 +21,7 @@ from sqlalchemy import inspect
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.models.menu import MenuEntry, MenuPage
+from indico.modules.events.layout.models.menu import MenuEntry, EventPage
 from indico.modules.events.layout.util import get_images_for_event
 from indico.modules.events.features.util import is_feature_enabled
 from indico.util.i18n import _
@@ -84,7 +84,7 @@ class LayoutCloner(EventCloner):
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
             with db.session.no_autoflush:  # menu_entry.page is lazy-loaded
-                page = MenuPage(html=menu_entry.page.html)
+                page = EventPage(html=menu_entry.page.html)
             new_menu_entry.page = page
             if menu_entry.page.is_default:
                 new_event.as_event.default_page = new_menu_entry.page

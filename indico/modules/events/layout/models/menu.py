@@ -267,7 +267,7 @@ class MenuEntry(MenuEntryMixin, db.Model):
     #: The page ID if the entry is a page
     page_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.menu_pages.id'),
+        db.ForeignKey('events.pages.id'),
         nullable=True,
         default=None
     )
@@ -288,7 +288,7 @@ class MenuEntry(MenuEntryMixin, db.Model):
     )
     #: The page of the menu entry
     page = db.relationship(
-        'MenuPage',
+        'EventPage',
         lazy=True,
         cascade='all, delete-orphan',
         single_parent=True,
@@ -352,8 +352,8 @@ class MenuEntry(MenuEntryMixin, db.Model):
         self.position = position + 1
 
 
-class MenuPage(db.Model):
-    __tablename__ = 'menu_pages'
+class EventPage(db.Model):
+    __tablename__ = 'pages'
     __table_args__ = {'schema': 'events'}
 
     #: The ID of the page
@@ -380,7 +380,7 @@ class MenuPage(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<MenuPage({}, {})>'.format(self.id, self.html)
+        return '<EventPage({}, {})>'.format(self.id, self.html)
 
 
 @listens_for(MenuEntry.children, 'append')

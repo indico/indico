@@ -68,14 +68,14 @@ class Event(db.Model):
     #: The ID of the event's default page (conferences only)
     default_page_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.menu_pages.id'),
+        db.ForeignKey('events.pages.id'),
         index=True,
         nullable=True
     )
 
     #: The event's default page (conferences only)
     default_page = db.relationship(
-        'MenuPage',
+        'EventPage',
         lazy=True,
         # don't use this backref. we just need it so SA properly NULLs
         # this column when deleting the default page
