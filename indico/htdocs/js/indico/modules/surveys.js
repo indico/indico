@@ -84,7 +84,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     updateQuestions(data);
-                    handleFlashes(data, true, $('#questionnaire'));
+                    handleFlashes(data, true, $('#questionnaire-preview'));
                 }
             });
         });
@@ -171,12 +171,12 @@
     }
 
     function updateQuestions(data) {
-        $('#questionnaire').tablesorter('destroy').html(data.questionnaire);
+        $('#questionnaire-preview').tablesorter('destroy').html(data.questionnaire);
         setupQuestionSorter();
     }
 
     global.setupQuestionSorter = function setupQuestionSorter() {
-        var container = $('#questionnaire');
+        var container = $('#questionnaire-preview');
         container.tablesorter({
             sortables: '.sortblock ul',
             sortableElements: '> li',

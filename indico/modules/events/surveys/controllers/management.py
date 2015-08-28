@@ -211,7 +211,7 @@ class RHAddSurveyQuestion(RHManageSurvey):
             db.session.flush()
             flash(_('Question "{title}" added').format(title=question.title), 'success')
             logger.info('Survey question {} added by {}'.format(question, session.user))
-            return jsonify_data(questionnaire=_render_questionnaire(self.survey))
+            return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_question.html', form=form)
 
 
@@ -240,7 +240,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=old_title), 'success')
             logger.info('Survey question {} modified by {}'.format(self.question, session.user))
-            return jsonify_data(questionnaire=_render_questionnaire(self.question.survey))
+            return jsonify_data(questionnaire=_render_questionnaire_preview(self.question.survey))
         return jsonify_template('events/surveys/management/edit_survey_question.html',
                                 form=form, question=self.question)
 
@@ -253,7 +253,7 @@ class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
         db.session.flush()
         flash(_('Question "{title}" deleted'.format(title=self.question.title)), 'success')
         logger.info('Survey question {} deleted by {}'.format(self.question, session.user))
-        return jsonify_data(questionnaire=_render_questionnaire(self.question.survey))
+        return jsonify_data(questionnaire=_render_questionnaire_preview(self.question.survey))
 
 
 class RHSortQuestions(RHManageSurveyBase):
@@ -269,10 +269,10 @@ class RHSortQuestions(RHManageSurveyBase):
         return jsonify(success=True)
 
 
-def _render_questionnaire(survey):
-    tpl = get_template_module('events/surveys/management/_questionnaire.html')
+def _render_questionnaire_preview(survey):
+    tpl = get_template_module('events/surveys/management/_questionnaire_preview.html')
     form = make_survey_form(survey.questions)()
-    return tpl.render_questionnaire(survey, form)
+    return tpl.render_questionnaire_preview(survey, form)
 
 
 class RHExportSubmissions(RHManageSurveyBase):

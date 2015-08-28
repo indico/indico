@@ -1,5 +1,5 @@
 {% extends 'events/surveys/management/_survey_base.html' %}
-{% from 'events/surveys/management/_questionnaire.html' import render_questionnaire %}
+{% from 'events/surveys/management/_questionnaire_preview.html' import render_questionnaire_preview %}
 
 {% block content %}
     <div class="flashed-messages"></div>
@@ -35,8 +35,8 @@
             </div>
         </div>
 
-        <div id="questionnaire" data-sort-url="{{ url_for('.sort_questions', survey) }}">
-            {{ render_questionnaire(survey, preview_form) }}
+        <div id="questionnaire-preview" data-sort-url="{{ url_for('.sort_questions', survey) }}">
+            {{ render_questionnaire_preview(survey, preview_form) }}
         </div>
     </div>
     <script>
