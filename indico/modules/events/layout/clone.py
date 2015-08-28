@@ -75,19 +75,20 @@ class LayoutCloner(EventCloner):
         layout_settings.set_multi(new_event, layout_settings.get_all(self.event, no_defaults=True))
         if layout_settings.get(self.event, 'use_custom_menu'):
             for menu_entry in MenuEntry.get_for_event(self.event):
-                self._copy_menu_entry(menu_entry, new_event)
+                self._copy_menu_entry(menu_entry, new_event, new_event.as_event.menu_entries)
         db.session.flush()
 
-    def _copy_menu_entry(self, menu_entry, event):
+    def _copy_menu_entry(self, menu_entry, new_event, container, include_children=True):
         base_columns = {column.key for column in inspect(MenuEntry).column_attrs} - {'id', 'event_id', 'parent_id',
                                                                                      'page_id'}
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
-            new_menu_entry.page = MenuPage(html=menu_entry.page.html)
+            with db.session.no_autoflush:  # menu_entry.page is lazy-loaded
+                page = MenuPage(html=menu_entry.page.html)
+            new_menu_entry.page = page
             if menu_entry.page.is_default:
-                event.as_event.default_page = new_menu_entry.page
-        event.as_event.menu_entries.append(new_menu_entry)
-        if menu_entry.children:
-            for children in menu_entry.children:
-                child_entry = MenuEntry(event_id=event.id, **{col: getattr(children, col) for col in base_columns})
-                new_menu_entry.children.append(child_entry)
+                new_event.as_event.default_page = new_menu_entry.page
+        container.append(new_menu_entry)
+        if include_children:
+            for child in menu_entry.children:
+                self._copy_menu_entry(child, new_event, new_menu_entry.children, include_children=False)

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
@@ -380,3 +381,13 @@ class MenuPage(db.Model):
     @return_ascii
     def __repr__(self):
         return '<MenuPage({}, {})>'.format(self.id, self.html)
+
+
+@listens_for(MenuEntry.children, 'append')
+def _child_appended(target, value, *unused):
+    if value.event is None:
+        value.event = target.event
+    if value.event_id is None:
+        value.event_id = target.event_id
+    assert value.event_id in {target.event_id, None}
+    assert value.event in {target.event, None}
