@@ -69,7 +69,10 @@ class LayoutCloner(EventCloner):
         if 'layout' not in options:
             return
 
-        layout_settings.set_multi(new_event, layout_settings.get_all(self.event))
+        for col in ('logo_metadata', 'logo', 'stylesheet_metadata', 'stylesheet'):
+            setattr(new_event.as_event, col, getattr(self.event.as_event, col))
+
+        layout_settings.set_multi(new_event, layout_settings.get_all(self.event, no_defaults=True))
         if layout_settings.get(self.event, 'use_custom_menu'):
             for menu_entry in MenuEntry.get_for_event(self.event):
                 self._copy_menu_entry(menu_entry, new_event)
