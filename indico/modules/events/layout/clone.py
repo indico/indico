@@ -84,7 +84,7 @@ class LayoutCloner(EventCloner):
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
             with db.session.no_autoflush:  # menu_entry.page is lazy-loaded
-                page = EventPage(html=menu_entry.page.html)
+                page = EventPage(event_id=new_event.id, html=menu_entry.page.html)
             new_menu_entry.page = page
             if menu_entry.page.is_default:
                 new_event.as_event.default_page = new_menu_entry.page

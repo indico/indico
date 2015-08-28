@@ -361,10 +361,28 @@ class EventPage(db.Model):
         db.Integer,
         primary_key=True
     )
+    #: The ID of the event which contains the page
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
+    )
     #: The rendered HTML of the page
     html = db.Column(
         db.Text,
         nullable=False
+    )
+
+    #: The Event which contains the page
+    event_new = db.relationship(
+        'Event',
+        foreign_keys=[event_id],
+        lazy=True,
+        backref=db.backref(
+            'custom_pages',
+            lazy='dynamic'
+        )
     )
 
     # relationship backrefs:
@@ -384,10 +402,10 @@ class EventPage(db.Model):
 
 
 @listens_for(MenuEntry.children, 'append')
-def _child_appended(target, value, *unused):
-    if value.event is None:
-        value.event = target.event
+def _set_event_id(target, value, *unused):
+    if value.event_new is None:
+        value.event_new = target.event_new
     if value.event_id is None:
         value.event_id = target.event_id
     assert value.event_id in {target.event_id, None}
-    assert value.event in {target.event, None}
+    assert value.event_new in {target.event_new, None}

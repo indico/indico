@@ -204,7 +204,9 @@ class RHMenuAddEntry(RHMenuBase):
             form.populate_obj(entry, skip={'html'})
 
             if entry.is_page:
-                entry.page = EventPage(html=form.html.data)
+                page = EventPage(html=form.html.data)
+                self._conf.as_event.custom_pages.append(page)
+                entry.page = page
 
             db.session.add(entry)
             db.session.flush()

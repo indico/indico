@@ -77,6 +77,7 @@ class Event(db.Model):
     default_page = db.relationship(
         'EventPage',
         lazy=True,
+        foreign_keys=[default_page_id],
         # don't use this backref. we just need it so SA properly NULLs
         # this column when deleting the default page
         backref=db.backref('_default_page_of_event', lazy=True)
@@ -85,6 +86,7 @@ class Event(db.Model):
     # relationship backrefs:
     # - layout_images (ImageFile.event_new)
     # - menu_entries (MenuEntry.event_new)
+    # - custom_pages (EventPage.event_new)
     # - surveys (Survey.event_new)
 
     @property

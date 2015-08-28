@@ -20,7 +20,9 @@ def upgrade():
     op.create_table(
         'pages',
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('html', sa.Text(), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
