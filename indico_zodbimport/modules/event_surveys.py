@@ -114,8 +114,12 @@ class SurveyImporter(Importer):
         elif class_name == 'Password':
             question.field_type = 'text'
         elif class_name in ('Checkbox', 'Radio', 'Select'):
-            question.field_type = 'single_choice' if class_name == 'Radio' else 'multiselect'
             question.field_data['options'] = []
+            question.field_type = 'single_choice' if class_name in ('Radio', 'Select') else 'multiselect'
+            if question.field_type == 'single_choice':
+                question.field_data['display_type'] = class_name.lower()
+            if class_name == 'Radio':
+                question.field_data['radio_display_type'] = 'vertical'
             for option in old_question.choiceItems:
                 question.field_data['options'].append({'option': option, 'id': unicode(uuid4())})
         self.print_success(" - Question: {}".format(question.title))
