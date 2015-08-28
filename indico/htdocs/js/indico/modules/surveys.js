@@ -84,7 +84,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     updateQuestions(data);
-                    handleFlashes(data, true, $('#questionnaire-preview'));
+                    handleFlashes(data, true, $('#survey-questionnaire-preview'));
                 }
             });
         });
@@ -171,12 +171,12 @@
     }
 
     function updateQuestions(data) {
-        $('#questionnaire-preview').tablesorter('destroy').html(data.questionnaire);
+        $('#survey-questionnaire-preview').tablesorter('destroy').html(data.questionnaire);
         setupQuestionSorter();
     }
 
     global.setupQuestionSorter = function setupQuestionSorter() {
-        var container = $('#questionnaire-preview');
+        var container = $('#survey-questionnaire-preview');
         container.tablesorter({
             sortables: '.sortblock ul',
             sortableElements: '> li',

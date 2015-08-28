@@ -39,7 +39,7 @@
 {% macro _render_answer(answer) %}
     {%- set answer_data = answer.answer_data -%}
     {%- if answer_data is sequence and answer_data is not string -%}
-        <ul class="answer-preview">
+        <ul class="answer-data">
             {% for item in answer_data %}
                 <li>{{ item }}</li>
             {% endfor -%}

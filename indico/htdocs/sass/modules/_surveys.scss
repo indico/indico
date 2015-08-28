@@ -20,65 +20,74 @@
 @import 'compass';
 
 
-.questions-handle {
-    width: 100%;
-    display: table;
-    word-wrap: break-word;
-}
-
-.position-element {
-    text-align: center;
-    font-weight: bold;
-    vertical-align: middle;
-}
-
-.question-list {
-    display: table-row-group;
-}
-
-.question-row {
-    display: table-row;
-    width: 100%;
-}
-
-.question-data {
-    display: table-cell;
-    cursor: move;
-}
-
-.action-buttons {
-    width: 11%;
-    vertical-align: top;
-    display: table-cell;
-}
-
-.survey-question-form .multiple-items-widget {
-    width: 400px;
-}
-
-#survey-form {
-    .form-group + .form-group {
-        margin-top: 1.5em;
-    }
-
-    .radio-item-0:not(.inline-vcentered) input:not([required]) + label {
-        color: $gray;
-        font-style: italic;
-    }
-}
-
-#survey-table {
-    .survey-actions {
-        text-align: right;
-    }
-}
-
 %survey-results-text-box {
     @include border-radius();
     background: $light-gray;
     color: $light-black;
     margin: 1em 0;
     padding: 1em;
+}
+
+#survey-list {
+    .survey-actions {
+        text-align: right;
+    }
+}
+
+#survey-questionnaire {
+    .form-group + .form-group {
+        margin-top: 1.5em;
+    }
+
+    // "No selection" option
+    .radio-item-0:not(.inline-vcentered) input:not([required]) + label {
+        color: $gray;
+        font-style: italic;
+    }
+}
+
+#survey-questionnaire-preview {
+    .sortblock {
+        width: 100%;
+    }
+
+    .action-buttons {
+        width: 11%;
+        vertical-align: top;
+        display: table-cell;
+    }
+
+    .position-element {
+        text-align: center;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    .questions-handle {
+        width: 100%;
+        display: table;
+        word-wrap: break-word;
+    }
+
+    .question-list {
+        display: table-row-group;
+    }
+
+    .question-row {
+        display: table-row;
+        width: 100%;
+    }
+
+    .question-data {
+        display: table-cell;
+        cursor: move;
+    }
+}
+
+#survey-question-form {
+    .multiple-items-widget {
+        width: 400px;
+    }
 }
 
 #survey-results {
@@ -126,8 +135,10 @@
     }
 }
 
-.answer-preview {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+#survey-submission {
+    .answer-data {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
 }
