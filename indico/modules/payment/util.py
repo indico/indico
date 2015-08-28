@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import re
 
-from flask import session, request
+from flask import request
 
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
@@ -67,9 +67,14 @@ def register_transaction(registrant, amount, currency, action, provider=None, da
 
 
 def get_registrant_params():
-    """Returns a dict containing the URL params for a registrant without an Indico account"""
-    if session.user:
+    """Returns a dict containing the URL params for a registrant.
+
+    If a registrant id and authkey are currently present in the request
+    data, we preserve it in case the user is not logged in or logged in
+    but registered without being logged in (in that case the registration
+    is not tied to his Indico user).
+    """
+    try:
+        return {'registrantId': request.values['registrantId'], 'authkey': request.values['authkey']}
+    except KeyError:
         return {}
-    registrant_id = request.values['registrantId']
-    authkey = request.values['authkey']
-    return {'registrantId': registrant_id, 'authkey': authkey}
