@@ -16,8 +16,12 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import inspect
+
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout.models.menu import MenuEntry, MenuPage
 from indico.modules.events.layout.util import get_images_for_event
 from indico.modules.events.features.util import is_feature_enabled
 from indico.util.i18n import _
@@ -53,3 +57,34 @@ class ImageCloner(EventCloner):
             db.session.add(new_image)
             db.session.flush()
             logger.info('Added image during event cloning: {}'.format(new_image))
+
+
+class LayoutCloner(EventCloner):
+    def get_options(self):
+        if self.event.getType() != 'conference':
+            return {}
+        return {'layout': (_('Layout settings and menu customization'), True, False)}
+
+    def clone(self, new_event, options):
+        if 'layout' not in options:
+            return
+
+        layout_settings.set_multi(new_event, layout_settings.get_all(self.event))
+        if layout_settings.get(self.event, 'use_custom_menu'):
+            for menu_entry in MenuEntry.get_for_event(self.event):
+                self._copy_menu_entry(menu_entry, new_event)
+        db.session.flush()
+
+    def _copy_menu_entry(self, menu_entry, event):
+        base_columns = {column.key for column in inspect(MenuEntry).column_attrs} - {'id', 'event_id', 'parent_id',
+                                                                                     'page_id'}
+        new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
+        if menu_entry.is_page:
+            new_menu_entry.page = MenuPage(html=menu_entry.page.html)
+            if menu_entry.page.is_default:
+                event.as_event.default_page = new_menu_entry.page
+        event.as_event.menu_entries.append(new_menu_entry)
+        if menu_entry.children:
+            for children in menu_entry.children:
+                child_entry = MenuEntry(event_id=event.id, **{col: getattr(children, col) for col in base_columns})
+                new_menu_entry.children.append(child_entry)
