@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# python stdlib imports
 import itertools
 
 from flask import jsonify, session
 
-# indico imports
+from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.modules.oauth import oauth
 from indico.modules.users.util import get_related_categories
 from indico.util.redis import client as redis_client
@@ -29,7 +28,6 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 
-# indico legacy imports
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder
 from MaKaC.user import AvatarHolder
@@ -100,6 +98,9 @@ class UserEventHook(HTTPAPIHook):
             raise HTTPAPIError('This API is only available when using Redis')
         self._checkProtection(aw)
         links = avatar_links.get_links(self._avatar.user, self._fromDT, self._toDT)
+
+        for event_id in get_events_with_submitted_surveys(self._avatar.user):
+            links.setdefault(str(event_id), set()).add('survey_submitter')
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
     def export_categ_events(self, aw):

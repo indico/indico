@@ -23,7 +23,6 @@ from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
-from indico.modules.events.surveys.util import was_survey_submitted
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -67,6 +66,7 @@ def _get_active_surveys(event):
 
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
+    from indico.modules.events.surveys.util import was_survey_submitted
     surveys = _get_active_surveys(event)
     if surveys:
         return render_template('events/surveys/display/event_header.html', surveys=surveys,
@@ -75,6 +75,7 @@ def _inject_event_header(event, **kwargs):
 
 @template_hook('conference-home-info')
 def _inject_survey_announcement(event, **kwargs):
+    from indico.modules.events.surveys.util import was_survey_submitted
     surveys = _get_active_surveys(event)
     if surveys:
         return render_template('events/surveys/display/conference_home.html', surveys=surveys, event=event,

@@ -23,6 +23,7 @@ from operator import methodcaller
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.timezoneUtils import nowutc, utc2server
 from MaKaC.conference import ConferenceHolder
+from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.util.redis import avatar_links
 
 
@@ -133,8 +134,10 @@ def _get_category_score(user, categ, attended_events, debug=False):
 
 def get_category_scores(user, debug=False):
     attendance_roles = {'conference_participant', 'contribution_submission', 'abstract_submitter',
-                        'registration_registrant', 'evaluation_submitter'}
+                        'registration_registrant', 'survey_submitter'}
     links = avatar_links.get_links(user)
+    for event_id in get_events_with_submitted_surveys(user):
+        links.setdefault(str(event_id), set()).add('survey_submitter')
     ch = ConferenceHolder()
     attended = filter(None, (ch.getById(eid, True) for eid, roles in links.iteritems() if attendance_roles & roles))
     categ_events = defaultdict(list)
