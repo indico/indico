@@ -235,9 +235,10 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
     def _process(self):
         form = self.question.field.config_form(obj=FormDefaults(self.question, **self.question.field_data))
         if form.validate_on_submit():
+            old_title = self.question.title
             self.question.field.save_config(form)
             db.session.flush()
-            flash(_('Question "{title}" updated').format(title=self.question.title), 'success')
+            flash(_('Question "{title}" updated').format(title=old_title), 'success')
             logger.info('Survey question {} modified by {}'.format(self.question, session.user))
             return jsonify_data(questionnaire=_render_questionnaire(self.question.survey))
         return jsonify_template('events/surveys/management/edit_survey_question.html',
