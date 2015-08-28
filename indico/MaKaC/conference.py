@@ -21,6 +21,7 @@ from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.features import event_settings as features_event_settings
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -3846,7 +3847,10 @@ class Conference(CommonObjectBase, Locatable):
             self.getParticipation().clone(conf, options, eventManager)
         conf.notifyModification()
 
-        #we inform the plugins in case they want to add anything to the new conference
+        # Copy the list of enabled features
+        features_event_settings.set_multi(conf, features_event_settings.get_all(self))
+
+        # Run the new modular cloning system
         EventCloner.clone_event(self, conf)
         return conf
 
