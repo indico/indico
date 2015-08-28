@@ -35,6 +35,8 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
 
     def _process(self):
         from_preview = request.args.get('from_preview') == '1'
+        force_download = request.args.get('download') == '1'
+
         signals.attachments.attachment_accessed.send(self.attachment, user=session.user, from_preview=from_preview)
         if request.values.get('preview') == '1':
             if self.attachment.type != AttachmentType.file:
@@ -49,4 +51,4 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
             if self.attachment.type == AttachmentType.link:
                 return redirect(self.attachment.link_url)
             else:
-                return self.attachment.file.send(inline=not from_preview)
+                return self.attachment.file.send(inline=not force_download)

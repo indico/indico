@@ -97,7 +97,7 @@
                     popup.canvas.find('.attachment-download').on('click', function() {
                         var $this = $(this);
                         var href = $this.attr('href');
-                        $this.attr('href', build_url(href, {from_preview: '1'}));
+                        $this.attr('href', build_url(href, {from_preview: '1', download: '1'}));
                         _.defer(function() {
                             $this.attr('href', href);
                         });
