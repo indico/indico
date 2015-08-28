@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
-import mimetypes
+import shutil
+from io import BytesIO
 
 from flask import flash, request, session, render_template
+from PIL import Image
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
@@ -54,12 +56,22 @@ class RHImages(RHManageImagesBase):
 class RHImageUpload(RHManageImagesBase):
     def _process(self):
         files = request.files.getlist('file')
-
         for f in files:
             filename = secure_filename(f.filename, 'image')
-            content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+            data = BytesIO()
+            shutil.copyfileobj(f, data)
+            data.seek(0)
+            try:
+                image_type = Image.open(data).format.lower()
+            except IOError:
+                # Invalid image data
+                continue
+            data.seek(0)
+            if image_type not in {'jpeg', 'gif', 'png'}:
+                continue
+            content_type = 'image/' + image_type
             image = ImageFile(event_id=self._conf.id, filename=filename, content_type=content_type)
-            image.save(f.file)
+            image.save(data)
             db.session.add(image)
             db.session.flush()
             logger.info('Image {} uploaded by {}'.format(image, session.user))

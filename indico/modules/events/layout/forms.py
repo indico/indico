@@ -115,7 +115,8 @@ class MenuPageForm(MenuUserEntry):
 
 
 class AddImagesForm(IndicoForm):
-    image = JSONField("Image", widget=DropzoneWidget(accepted_file_types='image/*'))
+    image = JSONField("Image", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                                                     submit_if_empty=False))
 
 
 class CSSSelectionForm(IndicoForm):
