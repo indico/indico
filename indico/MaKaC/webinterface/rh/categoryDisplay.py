@@ -474,17 +474,24 @@ class UtilsConference:
 
         c.getSupportInfo().setEmail(emailstr)
         c.getSupportInfo().setCaption(confData.get("supportCaption","Support"))
-        layout_settings.set(c, 'timetable_theme', confData.get('defaultStyle', ''))
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        theme = confData.get('defaultStyle', '')
         curType = c.getType()
-        newType = confData.get("eventType","")
+        newType = confData.get('eventType', '')
         if newType != "" and newType != curType:
             wr = webFactoryRegistry.WebFactoryRegistry()
             factory = wr.getFactoryById(newType)
             wr.registerFactory(c,factory)
-            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            layout_settings.set(c, 'timetable_theme', styleMgr.getDefaultStyleForEventType(newType))
+            # type changed. always revert to the default theme
+            layout_settings.delete(c, 'timetable_theme')
+        elif not theme or theme == styleMgr.getDefaultStyleForEventType(newType):
+            # if it's the default theme or nothing was set (does this ever happen?!), we don't store it
+            layout_settings.delete(c, 'timetable_theme')
+        else:
+            # set the new theme
+            layout_settings.set(c, 'timetable_theme', theme)
 
     @staticmethod
     def validateShortURL(tag, target):

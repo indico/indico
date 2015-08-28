@@ -32,7 +32,7 @@ import datetime
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, info, filters, timezoneUtils
+from MaKaC.common import indexes, info, filters, timezoneUtils, HelperMaKaCInfo
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -185,9 +185,8 @@ class ConferenceTypeModification(ConferenceTextModificationBase):
             wr = webFactoryRegistry.WebFactoryRegistry()
             factory = wr.getFactoryById(newType)
             wr.registerFactory(self._target, factory)
-
-            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            layout_settings.set(self._conf, 'timetable_theme', styleMgr.getDefaultStyleForEventType(newType))
+            # revert to the default theme for the event type
+            layout_settings.delete(self._conf, 'timetable_theme')
             signals.event.data_changed.send(self._target, attr=None, old=None, new=None)
 
     def _handleGet(self):
@@ -354,7 +353,11 @@ class ConferenceDefaultStyleModification(ConferenceTextModificationBase):
     Conference default style modification
     """
     def _handleSet(self):
-        layout_settings.set(self._conf, 'timetable_theme', self._value)
+        styleMgr = HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        if self._value == styleMgr.getDefaultStyleForEventType(self._conf.getType()):
+            layout_settings.delete(self._conf, 'timetable_theme')
+        else:
+            layout_settings.set(self._conf, 'timetable_theme', self._value)
 
     def _handleGet(self):
         return layout_settings.get(self._conf, 'timetable_theme')
