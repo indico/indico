@@ -104,3 +104,9 @@ class ImagesFeature(EventFeature):
     @classmethod
     def is_default_for_event(cls, event):
         return event.getType() == 'conference'
+
+
+@signals.event_management.clone.connect
+def _get_layout_cloner(event, **kwargs):
+    from indico.modules.events.layout.clone import LayoutCloner
+    return LayoutCloner(event)
