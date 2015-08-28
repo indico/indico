@@ -403,9 +403,9 @@ class EventPage(db.Model):
 
 @listens_for(MenuEntry.children, 'append')
 def _set_event_id(target, value, *unused):
-    if value.event_new is None:
+    if value.event_new is None and target.event_new is not None:
         value.event_new = target.event_new
-    if value.event_id is None:
+    if value.event_id is None and target.event_id is not None:
         value.event_id = target.event_id
     assert value.event_id in {target.event_id, None}
     assert value.event_new in {target.event_new, None}
