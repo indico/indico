@@ -181,7 +181,7 @@
             sortables: '.sortblock ul',
             sortableElements: '> li',
             placeholderElement: '<li></li>',
-            handle: '.question-data',
+            handle: '.handle',
             onReorder: function() {
                 var questionIds = $('[data-question-id]').map(function() {
                     return $(this).data('question-id');

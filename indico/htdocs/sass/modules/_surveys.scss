@@ -60,7 +60,7 @@
     .position-element {
         text-align: center;
         font-weight: bold;
-        vertical-align: middle;
+        vertical-align: top;
     }
 
     .questions-handle {
@@ -76,11 +76,22 @@
     .question-row {
         display: table-row;
         width: 100%;
+
+
+        .handle {
+            @include icon-before('icon-grid2');
+            color: lighten($gray, 10%);
+            text-align: right;
+            line-height: 2em;
+            vertical-align: top;
+            display: table-cell;
+            width: 25px;
+            cursor: move;
+        }
     }
 
     .question-data {
         display: table-cell;
-        cursor: move;
     }
 }
 
