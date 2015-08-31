@@ -81,7 +81,7 @@ class AttachmentImporter(LocalFileImporterMixin, Importer):
         self.janitor_user_id = kwargs.pop('janitor_user_id')
         self.default_group_provider = kwargs.pop('default_group_provider')
 
-        kwargs = super(AttachmentImporter, self)._set_config_options(**kwargs)
+        kwargs = self._set_config_options(**kwargs)
         super(AttachmentImporter, self).__init__(**kwargs)
 
     @staticmethod

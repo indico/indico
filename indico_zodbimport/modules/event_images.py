@@ -39,7 +39,7 @@ from indico_zodbimport.util import LocalFileImporterMixin
 class EventImageImporter(LocalFileImporterMixin, Importer):
     def __init__(self, **kwargs):
         self.silence_old_events = kwargs.pop('silence_old_events')
-        kwargs = super(EventImageImporter, self)._set_config_options(**kwargs)
+        kwargs = self._set_config_options(**kwargs)
         super(EventImageImporter, self).__init__(**kwargs)
 
     @staticmethod
