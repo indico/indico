@@ -1,18 +1,18 @@
 {% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_rows %}
 
 {% block title %}
     {%- trans %}Surveys{% endtrans -%}
 {% endblock %}
 
+{% block description %}
+    {% trans -%}
+        Surveys can be used to make questionnaires for the event and collect people's answers.
+    {%- endtrans %}
+{% endblock %}
+
 {% block content %}
-    <div class="toolbar">
-        <div class="group">
-            <a href="{{ url_for('survey.create', event) }}" class="i-button">
-                {% trans %}Create{% endtrans %}
-            </a>
-        </div>
-    </div>
     {% for survey in surveys %}
         <div class="action-box">
             <div class="section">
@@ -41,5 +41,16 @@
                 </div>
             </div>
         </div>
+    {% else %}
+        {%- call message_box('info', fixed_width=true) -%}
+            {% trans %}There are no surveys yet.{% endtrans %}
+        {%- endcall %}
     {% endfor %}
+    <div class="toolbar">
+        <div class="group right">
+            <a href="{{ url_for('survey.create', event) }}" class="i-button">
+                {% trans %}Create survey{% endtrans %}
+            </a>
+        </div>
+    </div>
 {% endblock %}
