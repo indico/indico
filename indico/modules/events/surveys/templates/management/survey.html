@@ -1,13 +1,13 @@
 {% extends 'events/surveys/management/_survey_base.html' %}
 
 {% block content %}
-    {% if survey.state == states.not_ready %}
+    {% if survey.state.name == 'not_ready' %}
         {% include 'events/surveys/management/survey_actions/not_ready.html' %}
-    {% elif survey.state == states.ready_to_open %}
+    {% elif survey.state.name == 'ready_to_open' %}
         {% include 'events/surveys/management/survey_actions/ready_to_open.html' %}
-    {% elif survey.state in (states.active_and_clean, states.active_and_answered) %}
+    {% elif survey.state.name in ('active_and_clean', 'active_and_answered') %}
         {% include 'events/surveys/management/survey_actions/active.html' %}
-    {% elif survey.state == states.finished %}
+    {% elif survey.state.name == 'finished' %}
         {% include 'events/surveys/management/survey_actions/finished.html' %}
     {% endif %}
 
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    {% if survey.state != states.not_ready %}
+    {% if survey.state.name != 'not_ready' %}
         <div class="action-box">
             <div class="section">
                 <div class="icon icon-clipboard"></div>
