@@ -22,9 +22,6 @@
                 </div>
                 <div class="toolbar right">
                     <div class="group">
-                        <a href="{{ url_for('.edit_survey', survey) }}" class="i-button icon-edit">
-                            {% trans %}Edit{% endtrans %}
-                        </a>
                         <a href="#" class="i-button icon-remove"
                            data-href="{{ url_for('.delete_survey', survey) }}"
                            data-method="POST"

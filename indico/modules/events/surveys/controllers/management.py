@@ -97,7 +97,7 @@ class RHEditSurvey(RHManageSurveyBase):
             db.session.flush()
             flash(_('Survey modified'), 'success')
             logger.info('Survey {} modified by {}'.format(self.survey, session.user))
-            return redirect(url_for('.management', self.event))
+            return redirect(url_for('.manage_survey', self.survey))
         return WPManageSurvey.render_template('management/edit_survey.html', self.event, event=self.event, form=form,
                                               survey=self.survey)
 

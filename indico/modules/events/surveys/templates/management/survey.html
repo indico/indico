@@ -11,6 +11,23 @@
         {% include 'events/surveys/management/survey_actions/finished.html' %}
     {% endif %}
 
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}General settings{% endtrans %}
+                </div>
+                {% trans %}Edit settings for this survey.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('.edit_survey', survey) }}" class="i-button icon-edit">
+                    {% trans %}Edit{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+
     {% if survey.state != states.not_ready %}
         <div class="action-box">
             <div class="section">
@@ -19,7 +36,7 @@
                     <div class="label">
                         {% trans %}Questionnaire{% endtrans %}
                     </div>
-                    {% trans %}Add, remove or modify questions{% endtrans %}
+                    {% trans %}Add, remove or modify questions.{% endtrans %}
                 </div>
                 <div class="toolbar right">
                     <a href="{{ url_for('.manage_questionnaire', survey) }}" class="i-button icon-settings">
