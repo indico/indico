@@ -65,7 +65,8 @@ class SurveyForm(IndicoForm):
     def validate_title(self, field):
         query = Survey.find(Survey.event_id == self.event.id,
                             db.func.lower(Survey.title) == field.data.lower(),
-                            Survey.title != field.object_data)
+                            Survey.title != field.object_data,
+                            ~Survey.is_deleted)
         if query.count():
             raise ValidationError(_("There is already an survey named \"{}\" on this event".format(escape(field.data))))
 
