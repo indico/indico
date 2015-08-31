@@ -17,11 +17,12 @@
 from __future__ import unicode_literals
 
 import binascii
-import mimetypes
+import os
 from io import BytesIO
 
 from flask import flash, redirect, request, session
 from indico.util.string import to_unicode
+from PIL import Image
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -95,14 +96,24 @@ class RHLayoutEdit(RHLayoutBase):
 class RHLayoutLogoUpload(RHLayoutBase):
     def _process(self):
         f = request.files['file']
-        content = f.read()
+        try:
+            img = Image.open(f)
+        except IOError:
+            flash(_('You cannot upload this file as a logo.', 'error'))
+            return jsonify_data(content={})
+        if img.format.lower() not in {'jpeg', 'png', 'gif'}:
+            flash(_('The file has an invalid format ({format})'.format(format=img.format)), 'error')
+            return jsonify_data(content={})
+        image_bytes = BytesIO()
+        img.save(image_bytes, 'PNG')
+        image_bytes.seek(0)
+        content = image_bytes.read()
         self.event.logo = content
-        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         self.event.logo_metadata = {
             'hash': binascii.crc32(content) & 0xffffffff,
             'size': len(content),
-            'filename': f.filename,
-            'content_type': content_type
+            'filename': os.path.splitext(secure_filename(f.filename, 'logo'))[0] + '.png',
+            'content_type': 'image/png'
         }
         flash(_('New logo saved'), 'success')
         logger.info("New logo '{}' uploaded by {} ({})".format(f.filename, session.user, self.event))

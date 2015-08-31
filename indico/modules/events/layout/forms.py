@@ -79,7 +79,8 @@ class LayoutForm(IndicoForm):
 
 
 class LogoForm(IndicoForm):
-    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/*', max_files=1, submit_form=False,
+    logo = JSONField("Logo", widget=DropzoneWidget(accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                                                   max_files=1, submit_form=False, submit_if_empty=False,
                                                    add_remove_links=False, handle_flashes=True),
                      description=_("Logo to be displayed next to the event's title"))
 
