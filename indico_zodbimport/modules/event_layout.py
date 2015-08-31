@@ -91,6 +91,11 @@ class EventLayoutImporter(Importer):
                     logo_image = None
 
                 if logo_image:
+                    if logo_image.mode == 'CMYK':
+                        self.print_warning("Logo is a CMYK {}; converting to RGB".format(logo_image.format),
+                                           event_id=event.id)
+                        # this may result in wrong colors, but there's not much we can do...
+                        logo_image = logo_image.convert('RGB')
                     logo_bytes = BytesIO()
                     logo_image.save(logo_bytes, 'PNG')
                     logo_bytes.seek(0)

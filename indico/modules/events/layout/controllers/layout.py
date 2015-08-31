@@ -104,6 +104,10 @@ class RHLayoutLogoUpload(RHLayoutBase):
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:
             flash(_('The file has an invalid format ({format})').format(format=img.format), 'error')
             return jsonify_data(content=None)
+        if img.mode == 'CMYK':
+            flash(_('The logo you uploaded is using the CMYK colorspace and has been converted to RGB. Please check if '
+                    'the colors are correct and convert it manually if necessary.'), 'warning')
+            img = img.convert('RGB')
         image_bytes = BytesIO()
         img.save(image_bytes, 'PNG')
         image_bytes.seek(0)
