@@ -8,7 +8,10 @@
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
             {%- if not entry.is_enabled %} striped{% endif %}">
             <i class="entry-{{ entry.type.name }} drag-handle"></i>
-            <span class="title">{{ entry.localized_title }}{% if config.DEBUG %} ({{ entry.position}}){% endif %}</span>
+            <span class="title">
+                {% if config.DEBUG %}<span class="position">{{ entry.position}}</span>{% endif %}
+                {{ entry.localized_title }}
+            </span>
             <span class="right actions">
                 {% if entry.type.name == 'page' %}
                     <a class="{% if not entry.page.is_default %}not-{% endif %}default" href="#"

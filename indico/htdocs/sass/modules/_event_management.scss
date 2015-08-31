@@ -172,6 +172,12 @@
 
                     white-space: nowrap;
                     text-overflow: ellipsis;
+
+                    .position {
+                        margin-left: 0.2em;
+                        margin-right: 0.2em;
+                        color: $gray;
+                    }
                 }
                 > .actions {
                     max-width: 31%;
