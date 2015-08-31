@@ -14,9 +14,13 @@
                     <a href="#" data-href="{{ url_for('.add_question', survey, type='static_text') }}"
                        class="i-button js-question-dialog"
                        data-title="{% trans %}Add section{% endtrans %}">
-                        {% trans %}Add new section{% endtrans %}
+                        {% trans %}Add section{% endtrans %}
                     </a>
-                    <a class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">{% trans %}Add new question{% endtrans %}</a>
+                </div>
+                <div class="group">
+                    <a class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">
+                        {% trans %}Add question{% endtrans %}
+                    </a>
                     <ul class="dropdown">
                         {% for field_type in field_types.values()|sort(attribute='friendly_name') if not field_type.is_section %}
                             <li>
