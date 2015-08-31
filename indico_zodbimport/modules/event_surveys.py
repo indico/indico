@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import date, timedelta
+from operator import attrgetter
 from uuid import uuid4
 
 from indico.core.db import db
@@ -25,7 +26,7 @@ from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.questions import SurveyQuestion
 from indico.modules.events.surveys.models.submissions import SurveySubmission, SurveyAnswer
 from indico.modules.users import User
-from indico.util.console import cformat
+from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import localize_as_utc
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer, convert_to_unicode
@@ -80,7 +81,7 @@ class SurveyImporter(Importer):
             elif kind == 'newSubmissionNotify':
                 survey.new_submission_emails = list(recipients)
 
-        self.print_success(cformat('%{cyan}{}%{reset}').format(survey), event_id=event.id, always=True)
+        self.print_success(cformat('%{cyan}{}%{reset}').format(survey), always=True, event_id=event.id)
 
         question_map = {}
         for position, old_question in enumerate(evaluation._questions):
@@ -151,7 +152,10 @@ class SurveyImporter(Importer):
         return answer
 
     def _iter_evaluations(self):
-        for event in self.flushing_iterator(self.zodb_root['conferences'].itervalues()):
+        it = self.zodb_root['conferences'].itervalues()
+        if self.quiet:
+            it = verbose_iterator(it, len(self.zodb_root['conferences']), attrgetter('id'), attrgetter('title'))
+        for event in self.flushing_iterator(it):
             for evaluation in event._evaluations:
                 if evaluation._questions:
                     yield event, evaluation
