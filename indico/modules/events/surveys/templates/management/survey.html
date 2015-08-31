@@ -96,28 +96,28 @@
 {% endblock %}
 
 {% macro _render_submission_row(submission) %}
-<tr>
-    <td>
-        <input type="checkbox" class="inline-vcentered submission-ids" value="{{ submission.id }}">
-    </td>
-    <td>
-        <a href="{{ url_for('.display_submission', submission) }}">{{ submission.id }}</a>
-    </td>
-    <td>{{ submission.submitted_dt|format_datetime }}</td>
-    <td>
-        {% if submission.user %}
-            {{ submission.user.full_name }}
-        {% else %}
-            <em>{% trans %}Anonymous{% endtrans %}</em>
-        {% endif %}
-    </td>
-    <td>
-        <a href="#" class="icon-remove right js-delete-submission"
-           data-href="{{ url_for('.delete_submissions', survey) }}"
-           data-method="DELETE"
-           data-title="{% trans %}Remove submission?{% endtrans %}"
-           data-confirm="{% trans %}Are you sure you want to remove this submission?{% endtrans %}"
-           data-submission-id="{{ submission.id }}"></a>
-    </td>
-</tr>
+    <tr>
+        <td>
+            <input type="checkbox" class="inline-vcentered submission-ids" value="{{ submission.id }}">
+        </td>
+        <td>
+            <a href="{{ url_for('.display_submission', submission) }}">{{ submission.id }}</a>
+        </td>
+        <td>{{ submission.submitted_dt|format_datetime }}</td>
+        <td>
+            {% if submission.user %}
+                {{ submission.user.full_name }}
+            {% else %}
+                <em>{% trans %}Anonymous{% endtrans %}</em>
+            {% endif %}
+        </td>
+        <td>
+            <a href="#" class="icon-remove right js-delete-submission"
+               data-href="{{ url_for('.delete_submissions', survey) }}"
+               data-method="DELETE"
+               data-title="{% trans %}Remove submission?{% endtrans %}"
+               data-confirm="{% trans %}Are you sure you want to remove this submission?{% endtrans %}"
+               data-submission-id="{{ submission.id }}"></a>
+        </td>
+    </tr>
 {% endmacro %}
