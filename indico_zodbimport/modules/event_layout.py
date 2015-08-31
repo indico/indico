@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
+import binascii
+import os
+from io import BytesIO
 from operator import attrgetter
 
-import binascii
 import click
-import mimetypes
+from PIL import Image
 
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.events import Event
@@ -82,19 +84,30 @@ class EventLayoutImporter(Importer):
                     self.print_error(cformat('%{red!}{} logo not found on disk; skipping it').format(event),
                                      event_id=event.id)
                     continue
-                with open(path, 'rb') as f:
-                    logo_content = f.read()
-                logo_content_type = mimetypes.guess_type(logo.fileName)[0]
-                logo_metadata = {
-                    'size': len(logo_content),
-                    'hash': binascii.crc32(logo_content) & 0xffffffff,
-                    'filename': secure_filename(convert_to_unicode(logo.fileName), 'logo'),
-                    'content_type': logo_content_type
-                }
-                e.logo = logo_content
-                e.logo_metadata = logo_metadata
-                if not self.quiet:
-                    self.print_success(cformat('- %{cyan}[Logo] {}').format(logo.fileName), event_id=event.id)
+                try:
+                    logo_image = Image.open(path)
+                except IOError as e:
+                    self.print_warning('Cannot open the file. The file probably is not an image.')
+                    self.print_warning("Cannot open {}: {}".format(path, e))
+                    logo_image = None
+
+                if logo_image:
+                    logo_bytes = BytesIO()
+                    logo_image.save(logo_bytes, 'PNG')
+                    logo_bytes.seek(0)
+                    logo_content = logo_bytes.read()
+                    logo_filename = secure_filename(convert_to_unicode(logo.fileName), 'logo')
+                    logo_filename = os.path.splitext(logo_filename)[0] + '.png'
+                    logo_metadata = {
+                        'size': len(logo_content),
+                        'hash': binascii.crc32(logo_content) & 0xffffffff,
+                        'filename': logo_filename,
+                        'content_type': 'image/png'
+                    }
+                    e.logo = logo_content
+                    e.logo_metadata = logo_metadata
+                    if not self.quiet:
+                        self.print_success(cformat('- %{cyan}[Logo] {}').format(logo.fileName), event_id=event.id)
             if custom_css:
                 stylesheet = custom_css._localFile
                 path = get_archived_file(stylesheet, self.archive_dirs)[1]
