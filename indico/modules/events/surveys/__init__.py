@@ -40,7 +40,7 @@ def _merge_users(target, source, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'surveys', SideMenuItem(_('Surveys'), url_for('survey.management', event),
+    return 'surveys', SideMenuItem(_('Surveys'), url_for('survey.manage_survey_list', event),
                                    visible=event.canModify(session.user), event_feature='surveys')
 
 

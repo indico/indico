@@ -35,7 +35,7 @@ _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)
 _bp.add_url_rule('/surveys/<int:survey_id>', 'display_survey_form', RHSubmitSurvey, methods=('GET', 'POST'))
 
 # surveys management
-_bp.add_url_rule('/manage/surveys/', 'management', RHManageSurveys)
+_bp.add_url_rule('/manage/surveys/', 'manage_survey_list', RHManageSurveys)
 _bp.add_url_rule('/manage/surveys/create', 'create', RHCreateSurvey, methods=('GET', 'POST'))
 
 # Single survey management

@@ -111,7 +111,7 @@ class RHDeleteSurvey(RHManageSurveyBase):
         self.survey.is_deleted = True
         flash(_('Survey deleted'), 'success')
         logger.info('Survey {} deleted by {}'.format(self.survey, session.user))
-        return redirect(url_for('.management', self.event))
+        return redirect(url_for('.manage_survey_list', self.event))
 
 
 class RHCreateSurvey(RHManageSurveysBase):
