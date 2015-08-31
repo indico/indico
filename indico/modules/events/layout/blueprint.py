@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.modules.events.layout.compat import compat_page, compat_image
 from indico.modules.events.layout.controllers.images import RHImageDelete, RHImageDisplay, RHImageUpload, RHImages
@@ -65,6 +66,9 @@ _bp_pages = IndicoBlueprint('event_pages', __name__, template_folder='templates'
 _bp_pages.add_url_rule('/page/<int:page_id>-<slug>', 'page_display', RHPageDisplay)
 
 _compat_bp = IndicoBlueprint('compat_layout', __name__, url_prefix='/event/<event_id>')
+_compat_bp.add_url_rule('!/internalPage.py', 'page_modpython',
+                        make_compat_redirect_func(_compat_bp, 'page', view_args_conv={'confId': 'event_id',
+                                                                                      'pageId': 'legacy_page_id'}))
 _compat_bp.add_url_rule('/page/<int:legacy_page_id>', 'page', compat_page)
 _compat_bp.add_url_rule('/picture/<int:legacy_image_id>.<image_ext>', 'image', compat_image)
 _compat_bp.add_url_rule('/picture/<int:legacy_image_id>', 'image', compat_image)
