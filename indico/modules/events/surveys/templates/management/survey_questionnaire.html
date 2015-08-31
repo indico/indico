@@ -11,9 +11,6 @@
             </div>
             <div class="i-box-buttons toolbar right">
                 <div class="group">
-                    <a href="{{ url_for('.manage_survey', survey) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
-                </div>
-                <div class="group">
                     <a href="#" data-href="{{ url_for('.add_question', survey, type='static_text') }}"
                        class="i-button js-question-dialog"
                        data-title="{% trans %}Add section{% endtrans %}">
@@ -34,11 +31,16 @@
                 </div>
             </div>
         </div>
-
         <div id="survey-questionnaire-preview" data-sort-url="{{ url_for('.sort_questions', survey) }}">
             {{ render_questionnaire_preview(survey, preview_form) }}
         </div>
     </div>
+    <div class="toolbar">
+        <a href="{{ url_for('.manage_survey', survey) }}" class="i-button big">
+            {% trans %}Back{% endtrans %}
+        </a>
+    </div>
+
     <script>
         setupQuestionSorter();
     </script>
