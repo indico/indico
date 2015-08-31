@@ -218,6 +218,8 @@
                     }
                     > .drag-handle {
                         @include icon-before('icon-grid2');
+                        margin-left: 1em;
+                        color: #cacaca;
                     }
                 }
                 &:hover > .actions > .not-default {
