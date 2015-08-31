@@ -38,7 +38,7 @@ class SurveyForm(IndicoForm):
     introduction = TextAreaField(_("Introduction"), description=_("An introduction to be displayed before the survey"))
     anonymous = BooleanField(_("Anonymous submissions"), widget=SwitchWidget(),
                              description=_("User information will not be attached to submissions"))
-    require_user = BooleanField(_("Only logged users"), [HiddenUnless('anonymous')], widget=SwitchWidget(),
+    require_user = BooleanField(_("Only logged-in users"), [HiddenUnless('anonymous')], widget=SwitchWidget(),
                                 description=_("Still require users to be logged in for submitting the survey"))
     limit_submissions = BooleanField(_("Limit submissions"), widget=SwitchWidget(),
                                      description=_("Whether there is a submission cap"))
