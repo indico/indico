@@ -156,7 +156,7 @@ class SurveyImporter(Importer):
         if self.quiet:
             it = verbose_iterator(it, len(self.zodb_root['conferences']), attrgetter('id'), attrgetter('title'))
         for event in self.flushing_iterator(it):
-            for evaluation in event._evaluations:
+            for evaluation in getattr(event, '_evaluations', []):
                 if evaluation._questions:
                     yield event, evaluation
 
