@@ -16,7 +16,7 @@
             </thead>
             <tbody></tbody>
         </table>
-        <a href="#" class="js-add-row i-button icon-plus i-form-button">{% trans %}Add{% endtrans %}</a>
+        <button id="{{ field.id }}-add-button" class="js-add-row i-button icon-plus i-form-button">{% trans %}Add{% endtrans %}</button>
     </div>
 {% endblock %}
 
@@ -32,6 +32,7 @@
             var widgetBody = widget.children('table').children('tbody');
             var field = $('#{{ field.id }}');
             var data = JSON.parse(field.val());
+            var addButton = $('#{{ field.id }}-add-button');
             var deleteButton = $('<a>', {'class': 'action-icon icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
             var saveButton = $('<a>', {'class': 'action-icon icon-floppy js-save-row', 'href': '#', 'title': $T('Save')});
             var editButton = $('<a>', {'class': 'action-icon icon-edit js-edit-row', 'href': '#', 'title': $T('Edit')});
@@ -91,6 +92,10 @@
                 }
             });
 
+            function updateAddButton() {
+                addButton.prop('disabled', !!widget.find('.table-input').length);
+            }
+
             function makeColData(item, col, forceEditable) {
                 return (item && !forceEditable) ? {
                     text: item[col[0]]
@@ -119,6 +124,7 @@
                 }).appendTo(row);
                 widgetBody.append(row);
                 repositionTooltips();
+                updateAddButton();
             }
 
             function updateRow(row, editMode) {
@@ -130,6 +136,7 @@
                 } else {
                     row.children('.js-action-col').html(deleteButton.clone().add(editButton.clone()));
                 }
+                updateAddButton();
             }
 
             function removeRow(row) {
@@ -139,6 +146,7 @@
                 }
                 row.remove();
                 repositionTooltips();
+                updateAddButton();
             }
 
             function updateField() {
