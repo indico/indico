@@ -67,14 +67,16 @@ class RHManageSurveys(RHManageSurveysBase):
 
     def _process(self):
         surveys = Survey.find(event_id=self.event.id, is_deleted=False).order_by(db.func.lower(Survey.title)).all()
-        return WPManageSurvey.render_template('management/survey_list.html', self.event, event=self.event, surveys=surveys)
+        return WPManageSurvey.render_template('management/survey_list.html',
+                                              self.event, event=self.event, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
     """Specific survey management (overview)"""
 
     def _process(self):
-        return WPManageSurvey.render_template('management/survey.html', self.event, survey=self.survey, states=SurveyState)
+        return WPManageSurvey.render_template('management/survey.html',
+                                              self.event, survey=self.survey, states=SurveyState)
 
 
 class RHSurveyResults(RHManageSurveyBase):
@@ -125,7 +127,8 @@ class RHCreateSurvey(RHManageSurveysBase):
             flash(_('Survey created'), 'success')
             logger.info('Survey {} created by {}'.format(survey, session.user))
             return redirect(url_for('.manage_survey', survey))
-        return WPManageSurvey.render_template('management/edit_survey.html', self.event, event=self.event, form=form, survey=None)
+        return WPManageSurvey.render_template('management/edit_survey.html',
+                                              self.event, event=self.event, form=form, survey=None)
 
 
 class RHScheduleSurvey(RHManageSurvey):
@@ -149,7 +152,8 @@ class RHScheduleSurvey(RHManageSurvey):
             logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
             return jsonify_data(flash=False)
         disabled_fields = ('start_dt',) if not allow_reschedule_start else ()
-        return jsonify_template('events/surveys/management/schedule_survey.html', form=form, disabled_fields=disabled_fields)
+        return jsonify_template('events/surveys/management/schedule_survey.html',
+                                form=form, disabled_fields=disabled_fields)
 
 
 class RHCloseSurvey(RHManageSurvey):
@@ -326,4 +330,5 @@ class RHDisplaySubmission(RHSurveySubmissionBase):
     """Display a single submission-page"""
 
     def _process(self):
-        return WPManageSurvey.render_template('management/survey_submission.html', self.event, submission=self.submission)
+        return WPManageSurvey.render_template('management/survey_submission.html',
+                                              self.event, submission=self.submission)
