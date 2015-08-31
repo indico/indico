@@ -139,7 +139,7 @@ class EventLayoutImporter(Importer):
             try:
                 dmgr = dmr[event.id]
             except KeyError:
-                self.print_error('Skipping event with no displaymgr', event_id=event_id)
+                self.print_error('Skipping event with no displaymgr', event_id=event.id)
                 continue
             style_mgr = getattr(dmgr, '_styleMngr', None) if event_type == 'conference' else None
             custom_css = getattr(style_mgr, '_css', None) if event_type == 'conference' else None
