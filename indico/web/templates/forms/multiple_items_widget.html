@@ -8,6 +8,9 @@
         <table class="i-table-widget">
             <thead data-tooltip-anchor>
                 <tr>
+                    {% if field.sortable %}
+                        <th class="small-column"></th>
+                    {% endif %}
                     {% for _, title in field.fields -%}
                         <th>{{ title }}</th>
                     {% endfor -%}
@@ -28,6 +31,7 @@
 
             var uuidField = {{ field.uuid_field | tojson }};
             var columns = {{ field.fields | tojson }};
+            var sortable = {{ field.sortable | tojson }};
             var widget = $('#{{ field.id }}-widget');
             var widgetBody = widget.children('table').children('tbody');
             var field = $('#{{ field.id }}');
@@ -37,6 +41,7 @@
             var saveButton = $('<a>', {'class': 'action-icon icon-floppy js-save-row', 'href': '#', 'title': $T('Save')});
             var editButton = $('<a>', {'class': 'action-icon icon-edit js-edit-row', 'href': '#', 'title': $T('Edit')});
             var cancelButton = $('<a>', {'class': 'action-icon icon-close js-cancel-edit', 'href': '#', 'title': $T('Cancel')});
+            var initialIndex;
 
             if (!data.length) {
                 createRow();
@@ -45,6 +50,37 @@
             data.forEach(function(item) {
                 createRow(item);
             });
+
+            if (sortable) {
+                fixWidths();
+
+                widget.find('tbody').sortable({
+                    axis: 'y',
+                    containment: 'parent',
+                    cursor: 'move',
+                    distance: 10,
+                    handle: '.sort-handle',
+                    items: '> tr',
+                    tolerance: 'pointer',
+                    forceHelperSize: true,
+                    forcePlaceholderSize: true,
+                    helper: function(e, item) {
+                        var originals = item.children();
+                        var helper = item.clone();
+                        helper.children().each(function(i) {
+                            $(this).width(originals.eq(i).width());
+                        });
+                        return helper;
+                    },
+                    start: function(e, ui) {
+                        initialIndex = ui.item.index();
+                    },
+                    update: function(e, ui) {
+                        _.move(data, initialIndex, ui.item.index());
+                        updateField();
+                    }
+                });
+            }
 
             widget.on('click', '.js-remove-row', function(e) {
                 e.preventDefault();
@@ -92,8 +128,27 @@
                 }
             });
 
-            function updateAddButton() {
+            function fixWidths() {
+                if (!sortable) {
+                    return;
+                }
+                widget.find('tbody > tr > td, tbody > tr, tbody').each(function() {
+                    // remove the fixed width to allow regular table sizing
+                    $(this).width('');
+                }).each(function() {
+                    // fix the iwdth to avoid ugly changes during sorting
+                    var $this = $(this);
+                    $this.width($this.width());
+                });
+            }
+
+            function rowsChanged() {
+                if (sortable) {
+                    widget.find('tbody.ui-sortable').sortable('refresh');
+                }
+                fixWidths();
                 addButton.prop('disabled', !!widget.find('.table-input').length);
+                repositionTooltips();
             }
 
             function makeColData(item, col, forceEditable) {
@@ -115,6 +170,9 @@
                 if (uuidField && item) {
                     row.data('uuid', item[uuidField]);
                 }
+                if (sortable) {
+                    $('<td>', {'class': 'sort-handle'}).appendTo(row);
+                }
                 columns.forEach(function(col) {
                     $('<td>', makeColData(item, col)).appendTo(row);
                 });
@@ -123,12 +181,11 @@
                     'class': 'js-action-col'
                 }).appendTo(row);
                 widgetBody.append(row);
-                repositionTooltips();
-                updateAddButton();
+                rowsChanged();
             }
 
             function updateRow(row, editMode) {
-                row.children('td:not(.js-action-col)').each(function(i) {
+                row.children('td:not(.sort-handle):not(.js-action-col)').each(function(i) {
                     $(this).replaceWith($('<td>', makeColData(data[row.index()], columns[i], editMode)));
                 });
                 if (editMode) {
@@ -136,7 +193,7 @@
                 } else {
                     row.children('.js-action-col').html(deleteButton.clone().add(editButton.clone()));
                 }
-                updateAddButton();
+                rowsChanged();
             }
 
             function removeRow(row) {
@@ -145,8 +202,7 @@
                     updateField();
                 }
                 row.remove();
-                repositionTooltips();
-                updateAddButton();
+                rowsChanged();
             }
 
             function updateField() {

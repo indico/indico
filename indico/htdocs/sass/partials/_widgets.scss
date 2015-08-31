@@ -147,3 +147,13 @@ i.info-helper {
         margin-top: 0;
     }
 }
+
+.multiple-items-widget {
+    .sort-handle {
+        cursor: move;
+        @include icon-before('icon-grid2');
+    }
+    .ui-sortable-helper {
+        display: table;
+    }
+}

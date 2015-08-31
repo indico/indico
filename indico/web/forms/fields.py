@@ -232,6 +232,7 @@ class MultipleItemsField(HiddenField):
                        specified here may not be in `fields`.
     :param unique_field: The name of a field in `fields` that needs
                          to be unique.
+    :param sortable: Whether items should be sortable.
     """
     widget = JinjaWidget('forms/multiple_items_widget.html')
 
@@ -239,6 +240,7 @@ class MultipleItemsField(HiddenField):
         self.fields = kwargs.pop('fields')
         self.uuid_field = kwargs.pop('uuid_field', None)
         self.unique_field = kwargs.pop('unique_field', None)
+        self.sortable = kwargs.pop('sortable', False)
         if self.uuid_field:
             assert self.uuid_field != self.unique_field
             assert self.uuid_field not in self.fields
