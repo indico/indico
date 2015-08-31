@@ -29,14 +29,15 @@ from indico.web.forms.validators import HiddenUnless
 
 class SingleChoiceConfigForm(FieldConfigForm):
     display_type = IndicoRadioField(_('Display type'), [DataRequired()],
-                                    description=_('Show the question either as radio button or select'),
-                                    choices=[('radio', _('Show as radio button')),
-                                             ('select', _('Show as select field'))],
+                                    description=_('Widget that will be used to render the available options'),
+                                    choices=[('radio', _('Radio buttons')),
+                                             ('select', _('Drop-down list'))],
                                     default='radio')
-    radio_display_type = IndicoRadioField(_('Arrangement of available options'),
+    radio_display_type = IndicoRadioField(_('Alignment'),
                                           [DataRequired(), HiddenUnless('display_type', 'radio')],
-                                          choices=[('vertical', _('Vertical alignment')),
-                                                   ('horizontal', _('Horizontal alignment'))])
+                                          description=_('The arrangement of the options'),
+                                          choices=[('vertical', _('Vertical')),
+                                                   ('horizontal', _('Horizontal'))])
     options = MultipleItemsField(_('Options'), [DataRequired()],
                                  fields=[('option', _('Option'))], unique_field='option', uuid_field='id',
                                  description=_('Specify the answers the user can choose from'))
