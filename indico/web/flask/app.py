@@ -28,6 +28,7 @@ from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
@@ -117,6 +118,8 @@ def configure_app(app, set_path=False):
             app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
         else:
             raise ValueError('Invalid static file method: %s' % method)
+    if Config.getInstance().getUseProxy():
+        app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
 def configure_multipass(app):

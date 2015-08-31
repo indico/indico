@@ -38,13 +38,6 @@ class IndicoRequest(Request):
     parameter_storage_class = ImmutableOrderedMultiDict
 
     @cached_property
-    def remote_addr(self):
-        """The remote address of the client."""
-        if Config.getInstance().getUseProxy() and self.access_route:
-            return self.access_route[0]
-        return super(IndicoRequest, self).remote_addr
-
-    @cached_property
     def id(self):
         return '{0:012x}'.format(id(self))
 

@@ -25,6 +25,7 @@ import sys
 import werkzeug.serving
 from flask import current_app
 from flask_script import Command, Option
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
 from werkzeug.serving import WSGIRequestHandler
@@ -171,6 +172,11 @@ class WerkzeugServer(object):
         app = self.app
         if self.use_debugger:
             app = DebuggedIndico(app, self.evalex_whitelist)
+            if Config.getInstance().getUseProxy():
+                # this applies ProxyFix a second time (it's also done in configure_app),
+                # but the debugger MUST receive the proper ip address or evalex ip restrictions
+                # might not work as expected
+                app = ProxyFix(app)
         self._server = werkzeug.serving.make_server(self.host, self.port, app, threaded=True,
                                                     request_handler=QuietWSGIRequestHandler if self.quiet else None,
                                                     ssl_context=self.ssl_context)
