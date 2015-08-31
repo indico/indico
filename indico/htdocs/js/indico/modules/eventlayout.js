@@ -74,7 +74,7 @@
             },
             stop: function(evt, ui) {
                 // mandatory clean-up
-                $('menu-entries').removeClass('hide-placeholder');
+                $('.menu-entries').removeClass('hide-placeholder');
                 if (ui.item.hasClass('nestable')) {
                     $('.menu-entries > .allow-nested > .menu-entry > .menu-entries.empty').removeClass('expand')
                         .parent('.menu-entry')
