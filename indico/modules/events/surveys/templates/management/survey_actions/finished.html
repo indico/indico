@@ -4,6 +4,10 @@
     {% trans %}Survey finished{% endtrans %}
 {% endblock %}
 
+{% block survey_icon_classes -%}
+    survey-finished
+{%- endblock %}
+
 {% block text %}
     {% set tz = survey.event.tz %}
     {% trans date=survey.end_dt|format_date(timezone=tz), time=survey.end_dt|format_time(timezone=tz) -%}

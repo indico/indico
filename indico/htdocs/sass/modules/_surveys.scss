@@ -153,3 +153,11 @@
         margin: 0;
     }
 }
+
+.survey-active {
+    color: $blue !important;
+}
+
+.survey-finished {
+    color: $green !important;
+}

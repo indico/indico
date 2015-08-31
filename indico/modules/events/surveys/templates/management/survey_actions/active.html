@@ -4,6 +4,10 @@
     {% trans %}Survey is live{% endtrans %}
 {% endblock %}
 
+{% block survey_icon_classes -%}
+    survey-active
+{%- endblock %}
+
 {% block text %}
     {% if not survey.end_dt %}
         {% trans %}Close now or schedule the deadline{% endtrans %}

@@ -16,9 +16,24 @@
     {% for survey in surveys %}
         <div class="action-box">
             <div class="section">
-                <div class="icon icon-file-check"></div>
+                <div class="icon icon-file-check
+                            {% if survey.is_active %}survey-active{% endif %}
+                            {% if survey.has_ended %}survey-finished{% endif %}"></div>
                 <div class="text">
                     <div class="label">{{ survey.title }}</div>
+                    {% if survey.is_active %}
+                        {% trans %}
+                            The survey is live.
+                        {% endtrans %}
+                    {% elif survey.has_ended %}
+                        {% trans %}
+                            The survey finished.
+                        {% endtrans %}
+                    {% else %}
+                        {% trans %}
+                            The survey is not running.
+                        {% endtrans %}
+                    {% endif %}
                 </div>
                 <div class="toolbar right">
                     <div class="group">
