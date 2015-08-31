@@ -87,8 +87,7 @@ class EventLayoutImporter(Importer):
                 try:
                     logo_image = Image.open(path)
                 except IOError as e:
-                    self.print_warning('Cannot open the file. The file probably is not an image.')
-                    self.print_warning("Cannot open {}: {}".format(path, e))
+                    self.print_warning("Cannot open {}: {}".format(path, e), event_id=event.id)
                     logo_image = None
 
                 if logo_image:
