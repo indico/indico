@@ -99,7 +99,11 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
             it = verbose_iterator(it, Event.query.count(), attrgetter('id'),
                                   lambda x: self.zodb_root['conferences'][str(x.id)].title, 100)
         for event_id, in self.flushing_iterator(it):
-            dmgr = self.zodb_root['displayRegistery'][str(event_id)]
+            try:
+                dmgr = self.zodb_root['displayRegistery'][str(event_id)]
+            except KeyError:
+                self.print_error('Skipping event with no displaymgr', event_id=event_id)
+                continue
             imgr = getattr(dmgr, '_imagesMngr', None)
 
             if imgr:

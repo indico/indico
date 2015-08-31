@@ -123,7 +123,11 @@ class EventLayoutImporter(Importer):
         for event in self.flushing_iterator(it):
             wf = wfr.get(event.id)
             event_type = 'conference' if wf is None else wf.id
-            dmgr = dmr[event.id]
+            try:
+                dmgr = dmr[event.id]
+            except KeyError:
+                self.print_error('Skipping event with no displaymgr', event_id=event_id)
+                continue
             style_mgr = getattr(dmgr, '_styleMngr', None) if event_type == 'conference' else None
             custom_css = getattr(style_mgr, '_css', None) if event_type == 'conference' else None
             yield event, event_type, dmgr, event._logo, custom_css

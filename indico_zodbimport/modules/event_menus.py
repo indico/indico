@@ -215,4 +215,8 @@ class EventMenuImporter(Importer):
         dmr = self.zodb_root['displayRegistery']
         for event in self.flushing_iterator(it):
             if wfr.get(event.id) is None:  # only conferences
-                yield event, dmr[event.id]
+                try:
+                    yield event, dmr[event.id]
+                except KeyError:
+                    # only happens on a dev db for events created after the removal of displaymgr
+                    self.print_error('Skipping event with no displaymgr', event_id=event.id)
