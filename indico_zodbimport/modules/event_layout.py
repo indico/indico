@@ -54,8 +54,60 @@ class EventLayoutImporter(Importer):
     def migrate(self):
         self.migrate_layout_settings()
 
+    def _process_logo(self, logo, event):
+        path = get_archived_file(logo, self.archive_dirs)[1]
+        if path is None:
+            self.print_error(cformat('%{red!}Logo not found on disk; skipping it'), event_id=event.id)
+            return
+
+        try:
+            logo_image = Image.open(path)
+        except IOError as e:
+            self.print_warning("Cannot open {}: {}".format(path, e), event_id=event.id)
+            return
+
+        if logo_image.mode == 'CMYK':
+            self.print_warning("Logo is a CMYK {}; converting to RGB".format(logo_image.format),
+                               event_id=event.id)
+            # this may result in wrong colors, but there's not much we can do...
+            logo_image = logo_image.convert('RGB')
+
+        logo_bytes = BytesIO()
+        logo_image.save(logo_bytes, 'PNG')
+        logo_bytes.seek(0)
+        logo_content = logo_bytes.read()
+        logo_filename = secure_filename(convert_to_unicode(logo.fileName), 'logo')
+        logo_filename = os.path.splitext(logo_filename)[0] + '.png'
+        event.logo_metadata = {
+            'size': len(logo_content),
+            'hash': binascii.crc32(logo_content) & 0xffffffff,
+            'filename': logo_filename,
+            'content_type': 'image/png'
+        }
+        event.logo = logo_content
+        if not self.quiet:
+            self.print_success(cformat('- %{cyan}[Logo] {}').format(logo.fileName), event_id=event.id)
+
+    def _process_css(self, css, event):
+        stylesheet = css._localFile
+        path = get_archived_file(stylesheet, self.archive_dirs)[1]
+        if path is None:
+            self.print_error(cformat('%{red!}CSS file not found on disk; skipping it'), event_id=event.id)
+            return
+        with open(path, 'rb') as f:
+            stylesheet_content = convert_to_unicode(f.read())
+        event.stylesheet_metadata = {
+            'size': len(stylesheet_content),
+            'hash': binascii.crc32(stylesheet_content) & 0xffffffff,
+            'filename': secure_filename(convert_to_unicode(stylesheet.fileName), 'stylesheet.css'),
+            'content_type': 'text/css'
+        }
+        event.stylesheet = stylesheet_content
+        if not self.quiet:
+            self.print_success(cformat('- %{cyan}[CSS] {}').format(stylesheet.fileName), event_id=event.id)
+
     def migrate_layout_settings(self):
-        print cformat('%{white!}migrating layout settings, event logos and custom CSS templates')
+        print cformat('%{white!}migrating layout settings, event logos and custom stylesheets')
 
         default_styles = self.zodb_root['MaKaCInfo']['main']._styleMgr._defaultEventStylesheet
         for event, event_type, dmgr, logo, custom_css in committing_iterator(self._iter_event_layout_data()):
@@ -73,63 +125,15 @@ class EventLayoutImporter(Importer):
             if not self.quiet:
                 self.print_success(cformat('- %{cyan}Layout settings'), event_id=event.id)
             if logo or custom_css:
-                e = Event.get(event.id)
-                if not e:
+                sa_event = Event.get(event.id)
+                if not sa_event:
                     self.print_warning('Event does not exist (anymore)! Logo and/or CSS file not saved!',
                                        event_id=event.id)
                     continue
             if logo:
-                path = get_archived_file(logo, self.archive_dirs)[1]
-                if path is None:
-                    self.print_error(cformat('%{red!}{} logo not found on disk; skipping it').format(event),
-                                     event_id=event.id)
-                    continue
-                try:
-                    logo_image = Image.open(path)
-                except IOError as e:
-                    self.print_warning("Cannot open {}: {}".format(path, e), event_id=event.id)
-                    logo_image = None
-
-                if logo_image:
-                    if logo_image.mode == 'CMYK':
-                        self.print_warning("Logo is a CMYK {}; converting to RGB".format(logo_image.format),
-                                           event_id=event.id)
-                        # this may result in wrong colors, but there's not much we can do...
-                        logo_image = logo_image.convert('RGB')
-                    logo_bytes = BytesIO()
-                    logo_image.save(logo_bytes, 'PNG')
-                    logo_bytes.seek(0)
-                    logo_content = logo_bytes.read()
-                    logo_filename = secure_filename(convert_to_unicode(logo.fileName), 'logo')
-                    logo_filename = os.path.splitext(logo_filename)[0] + '.png'
-                    logo_metadata = {
-                        'size': len(logo_content),
-                        'hash': binascii.crc32(logo_content) & 0xffffffff,
-                        'filename': logo_filename,
-                        'content_type': 'image/png'
-                    }
-                    e.logo = logo_content
-                    e.logo_metadata = logo_metadata
-                    if not self.quiet:
-                        self.print_success(cformat('- %{cyan}[Logo] {}').format(logo.fileName), event_id=event.id)
+                self._process_logo(logo, sa_event)
             if custom_css:
-                stylesheet = custom_css._localFile
-                path = get_archived_file(stylesheet, self.archive_dirs)[1]
-                if path is None:
-                    self.print_error(cformat('%{red!}{} CSS file not found on disk; skipping it').format(event),
-                                     event_id=event.id)
-                    continue
-                with open(path, 'rb') as f:
-                    stylesheet_content = convert_to_unicode(f.read())
-                e.stylesheet_metadata = {
-                    'size': len(stylesheet_content),
-                    'hash': binascii.crc32(stylesheet_content) & 0xffffffff,
-                    'filename': secure_filename(convert_to_unicode(stylesheet.fileName), 'stylesheet.css'),
-                    'content_type': 'text/css'
-                }
-                e.stylesheet = stylesheet_content
-                if not self.quiet:
-                    self.print_success(cformat('- %{cyan}[CSS] {}').format(stylesheet.fileName), event_id=event.id)
+                self._process_css(custom_css, sa_event)
 
     def _iter_event_layout_data(self):
         it = self.zodb_root['conferences'].itervalues()
