@@ -18,7 +18,8 @@ from __future__ import unicode_literals, division
 
 from collections import Counter, OrderedDict
 
-from wtforms.fields import SelectField, IntegerField
+from wtforms.fields import SelectField
+from wtforms.fields.html5 import IntegerField
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError, Length
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
