@@ -1,6 +1,12 @@
 {% extends 'events/surveys/management/_survey_base.html' %}
 {% from 'events/surveys/management/_questionnaire_preview.html' import render_questionnaire_preview %}
 
+{% block subtitle %}
+    {% trans title=survey.title-%}
+        Questionnaire for "{{ title }}"
+    {%- endtrans %}
+{% endblock %}
+
 {% block content %}
     <div class="flashed-messages"></div>
 
