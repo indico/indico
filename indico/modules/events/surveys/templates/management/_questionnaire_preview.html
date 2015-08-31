@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_row %}
 
 {% macro render_questionnaire_preview(survey, preview_form) %}
-    <div class="sortblock i-box-content">
+    <div class="sortblock">
         <ul class="group-list no-content-before">
             {% for question in survey.questions %}
                 <li>
@@ -41,8 +41,6 @@
                         </div>
                     </div>
                 </li>
-            {% else %}
-                <li>{% trans %}No questions defined{% endtrans %}
             {% endfor %}
         </ul>
     </div>

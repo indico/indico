@@ -41,8 +41,16 @@
                 </div>
             </div>
         </div>
-        <div id="survey-questionnaire-preview" data-sort-url="{{ url_for('.sort_questions', survey) }}">
-            {{ render_questionnaire_preview(survey, preview_form) }}
+        <div id="survey-questionnaire-preview" class="i-box-content"
+             data-sort-url="{{ url_for('.sort_questions', survey) }}">
+            {% if survey.questions %}
+                {{ render_questionnaire_preview(survey, preview_form) }}
+            {% else %}
+                <div class="empty">
+                    {% trans %}No questions have been added yet.{% endtrans %}
+                </div>
+            {% endif %}
+
         </div>
     </div>
     <div class="toolbar right">
