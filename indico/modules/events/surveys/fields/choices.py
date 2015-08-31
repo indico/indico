@@ -103,32 +103,28 @@ class MultiSelectConfigForm(FieldConfigForm):
     options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
                                  unique_field='option', uuid_field='id', sortable=True,
                                  description=_('Specify the answers the user can select'))
-    min_choices = IntegerField(_('Min options'), [Optional(), NumberRange(min=0)],
-                               description=_('The minimum number of options the user has to select. '
-                                             'If the field is not marked as required, selecting zero options is always '
-                                             'allowed and this check only applies if some options are selected.'))
-    max_choices = IntegerField(_('Max options'), [Optional(), NumberRange(min=1)],
-                               description=_('The maximum number of options the user may select.'))
+    min_choices = IntegerField(_("Minimum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=0)],
+                               description=_("The minimum amount of options the user has to choose."))
+    max_choices = IntegerField(_("Maximum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=1)],
+                               description=_("The maximum amount of options the user may choose."))
 
     def _validate_min_max_choices(self):
         if (self.min_choices.data is not None and self.max_choices.data is not None and
                 self.min_choices.data > self.max_choices.data):
-            raise ValidationError(_('The min number of options must be less or equal than the max number of options.'))
+            raise ValidationError(_('Maximum choices must be greater than minimum choices.'))
 
     def validate_min_choices(self, field):
         if field.data is None:
             return
-        self._validate_min_max_choices()
         if field.data >= len(self.options.data):
-            raise ValidationError(_('The min number of options must be less than the total number of options.'))
+            raise ValidationError(_("Minimum choices must be fewer than the total number of options."))
 
     def validate_max_choices(self, field):
         if field.data is None:
             return
         self._validate_min_max_choices()
         if field.data > len(self.options.data):
-            raise ValidationError(_('The max number of options must be less or equal than the total number of '
-                                    'options.'))
+            raise ValidationError(_("Maximum choices must be fewer or equal than the total number of options."))
 
 
 class MultiSelectField(SurveyField):
