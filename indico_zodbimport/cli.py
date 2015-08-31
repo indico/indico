@@ -240,7 +240,7 @@ class Importer(object):
         """Prints a prefixed message to the console."""
         parts = [
             cformat('%%{%s}{}%%{reset}' % prefix_color).format(prefix),
-            cformat('%{white!}{:>6s}%{reset}').format(event_id) if event_id is not None else None,
+            cformat('%{white!}{:>6s}%{reset}').format(unicode(event_id)) if event_id is not None else None,
             msg
         ]
         self.print_msg(' '.join(filter(None, parts)), always)
