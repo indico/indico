@@ -38,8 +38,8 @@ class SingleChoiceConfigForm(FieldConfigForm):
                                           description=_('The arrangement of the options'),
                                           choices=[('vertical', _('Vertical')),
                                                    ('horizontal', _('Horizontal'))])
-    options = MultipleItemsField(_('Options'), [DataRequired()],
-                                 fields=[('option', _('Option'))], unique_field='option', uuid_field='id',
+    options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
+                                 unique_field='option', uuid_field='id', sortable=True,
                                  description=_('Specify the answers the user can choose from'))
 
 
@@ -101,7 +101,7 @@ class SingleChoiceField(SurveyField):
 
 class MultiSelectConfigForm(FieldConfigForm):
     options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
-                                 unique_field='option', uuid_field='id',
+                                 unique_field='option', uuid_field='id', sortable=True,
                                  description=_('Specify the answers the user can select'))
     min_choices = IntegerField(_('Min options'), [Optional(), NumberRange(min=0)],
                                description=_('The minimum number of options the user has to select. '
