@@ -248,7 +248,12 @@ class LocalFileImporterMixin(object):
                         break
                 else:
                     parent_path = os.path.dirname(path)
-                    candidates = os.listdir(parent_path)
+                    try:
+                        candidates = os.listdir(parent_path)
+                    except OSError as e:
+                        if e.errno != errno.ENOENT:
+                            raise
+                        return None, None, 0
                     if len(candidates) != 1:
                         return None, None, 0
                     path = os.path.join(parent_path, candidates[0])
