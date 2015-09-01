@@ -20,11 +20,10 @@ from collections import Counter, OrderedDict
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired, DataRequired
+from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.widgets import SwitchWidget
 
@@ -130,19 +129,3 @@ class BoolField(SurveyField):
         if answer is None:
             return ''
         return _('Yes') if answer else _('No')
-
-
-class SectionConfigForm(IndicoForm):
-    _common_fields = {'title'}
-    title = StringField(_('Title'), [DataRequired()], description=_("The title of the section."))
-    text = TextAreaField(_('Content'), description=_('Text that will be displayed inside the section.'))
-
-
-class SectionField(SurveyField):
-    name = 'static_text'
-    friendly_name = _('Section')
-    is_section = True
-    config_form = SectionConfigForm
-
-    def create_wtf_field(self):
-        raise RuntimeError('Section field cannot be rendered as a field')

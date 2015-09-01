@@ -20,8 +20,11 @@ from indico.modules.events.surveys.controllers.management import (RHManageSurvey
                                                                   RHDeleteSurvey, RHEditSurvey, RHScheduleSurvey,
                                                                   RHCloseSurvey, RHOpenSurvey,
                                                                   RHManageSurveyQuestionnaire, RHAddSurveyQuestion,
+                                                                  RHAddSurveySection, RHEditSurveySection,
+                                                                  RHDeleteSurveySection, RHEditSurveyText,
+                                                                  RHAddSurveyText, RHDeleteSurveyText,
                                                                   RHEditSurveyQuestion, RHDeleteSurveyQuestion,
-                                                                  RHSortQuestions, RHSurveyResults, RHExportSubmissions,
+                                                                  RHSortItems, RHSurveyResults, RHExportSubmissions,
                                                                   RHDeleteSubmissions, RHDisplaySubmission)
 from indico.modules.events.surveys.controllers.display import RHSurveyList, RHSubmitSurvey
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -54,13 +57,28 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions', 'delete_submissi
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>', 'display_submission',
                  RHDisplaySubmission)
 
-# Survey question management
+# Survey questionnaire management
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/add/<type>', 'add_question', RHAddSurveyQuestion,
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort', 'sort_items', RHSortItems,
+                 methods=('POST',))
+# sections
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/add-section', 'add_section', RHAddSurveySection,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id>/', 'edit_question',
-                 RHEditSurveyQuestion, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:question_id>/', 'delete_question',
-                 RHDeleteSurveyQuestion, methods=('DELETE',))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort-questions', 'sort_questions',
-                 RHSortQuestions, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/', 'edit_section', RHEditSurveySection,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/', 'delete_section',
+                 RHDeleteSurveySection, methods=('DELETE',))
+# text
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/text/add', 'add_text',
+                 RHAddSurveyText, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/text/<int:text_id>', 'edit_text',
+                 RHEditSurveyText, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/text/<int:text_id>', 'delete_text',
+                 RHDeleteSurveyText, methods=('DELETE',))
+# questions
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/question/add-<type>', 'add_question',
+                 RHAddSurveyQuestion, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/question/<int:question_id>',
+                 'edit_question', RHEditSurveyQuestion, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/<int:section_id>/question/<int:question_id>',
+                 'delete_question', RHDeleteSurveyQuestion, methods=('DELETE',))

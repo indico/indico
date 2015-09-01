@@ -1,5 +1,5 @@
 {% extends 'layout/event_page_base.html' %}
-{% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_rows %}
+{% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_row, form_row_static %}
 
 {% block title %}
     {%- trans %}Survey{% endtrans -%}
@@ -18,9 +18,18 @@
 
 {% block content %}
     {{ form_header(form, id='survey-questionnaire', orientation='vertical') }}
-    {% for fieldset in form._sections %}
-        {% call form_fieldset(fieldset.title, fieldset.description|replace('\n', '<br>'|safe), render_as_fieldset=fieldset.title is not none) %}
-            {{ form_rows(form, fields=fieldset.fields) }}
+    {% for section in survey.sections if section.children %}
+        {% call form_fieldset(section.title, section.description|replace('\n', '<br>'|safe),
+                              render_as_fieldset=not section.is_implicit) %}
+            {% for item in section.children %}
+                {% if item.type.name == 'question' %}
+                    {{ form_row(form['question_{}'.format(item.id)]) }}
+                {% elif item.type.name == 'text' %}
+                    {% call form_row_static(single_row=false, skip_label=true) %}
+                        {{ item.description|replace('\n', '<br>'|safe) }}
+                    {% endcall %}
+                {% endif %}
+            {% endfor %}
         {% endcall %}
     {% endfor %}
     {% call form_footer(form) %}

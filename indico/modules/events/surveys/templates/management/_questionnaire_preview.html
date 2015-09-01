@@ -1,47 +1,136 @@
 {% from 'forms/_form.html' import form_row %}
 
-{% macro render_questionnaire_preview(survey, preview_form) %}
-    <div class="sortblock">
-        <ul class="group-list no-content-before">
-            {% for question in survey.questions %}
-                <li>
-                    <div class="questions-handle i-form">
-                        <div class="question-list">
-                            <div class="question-row">
-                                <div class="question-data position-element" style="width: 5%;">{{ loop.index }}.</div>
-                                <div class="question-data">
-                                    {% if question.field.is_section %}
-                                        <div class="form-group horizontal">
-                                            <div class="form-label form-block">
-                                                <label>{{ question.title }}</label>
-                                            </div>
-                                            <div class="form-field form-block static-text-widget">
-                                                {{- question.field_data.text|markdown -}}
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true,
-                                                    orientation='horizontal') }}
-                                    {% endif %}
-                                </div>
-                                <div class="action-buttons">
-                                    <a data-href="{{ url_for('.delete_question', question) }}"
-                                       data-method="DELETE"
-                                       data-title="{% trans %}Delete question{% endtrans %}"
-                                       data-confirm="{% trans %}Are you sure you want to delete this question?{% endtrans %}"
-                                       class="i-button icon-remove js-delete-question"></a>
-                                    <a href="#" data-href="{{ url_for('.edit_question', question) }}"
-                                       data-title="{% trans %}Edit question{% endtrans %}"
-                                       data-question-id="{{ question.id }}"
-                                       class="i-button js-question-dialog icon-edit"></a>
-                                </div>
-                                <div class="handle">
-                                </div>
-                            </div>
-                        </div>
+{% macro render_questionnaire_preview(survey, preview_form, field_types) %}
+    {% for section in survey.sections %}
+        <div class="i-box titled js-sortable-survey-section" data-section-id="{{ section.id }}">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {% if section.title %}
+                        {{ section.title }}
+                    {% else %}
+                        <em title="{% trans %}This section will not be displayed as a section but its contents will show up standalone.{% endtrans %}">
+                            {%- trans %}Unnamed section{% endtrans -%}
+                        </em>
+                    {% endif %}
+                </div>
+                <div class="i-box-buttons toolbar right">
+                    <div class="group">
+                        <a href="#" data-href="{{ url_for('.edit_section', section) }}"
+                           class="i-button js-survey-item-dialog icon-edit"
+                           data-title="{% trans %}Edit section{% endtrans %}"></a>
+                        <a href="#" class="i-button js-delete-item icon-remove"
+                           data-href="{{ url_for('.delete_section', section) }}"
+                           data-method="DELETE"
+                           data-confirm="{% trans %}Are you sure you want to delete this section and all questions inside it?{% endtrans %}"
+                           data-title="{% trans %}Delete section{% endtrans %}"></a>
                     </div>
-                </li>
-            {% endfor %}
-        </ul>
+                    <div class="group">
+                        <a href="#" data-href="{{ url_for('.add_text', section) }}"
+                           class="i-button js-survey-item-dialog"
+                           data-title="{% trans %}Add text item{% endtrans %}">
+                            {% trans %}Add text item{% endtrans %}
+                        </a>
+                        <a class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">
+                            {% trans %}Add question{% endtrans %}
+                        </a>
+                        <ul class="dropdown">
+                            {% for field_type in field_types.values()|sort(attribute='friendly_name') %}
+                                <li>
+                                    <a href="#" data-href="{{ url_for('.add_question', section, type=field_type.name) }}"
+                                       data-title="{% trans %}Add question{% endtrans %}"
+                                       class="js-survey-item-dialog">
+                                        {{ field_type.friendly_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="group">
+                        <div class="handle js-section-handle"></div>
+                    </div>
+                </div>
+                {% if section.description %}
+                    <div class="i-box-description">
+                        {{ section.description }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="i-box-content">
+                <ul class="group-list no-content-before js-sortable-survey-items
+                          {% if not section.children %}empty{% endif %}">
+                    <li class="empty-msg">
+                        {%- trans -%}
+                            No items have been added yet so this section will not be displayed.
+                        {%- endtrans -%}
+                    </li>
+                    {% for item in section.children %}
+                        <li class="js-sortable-survey-item" data-item-id="{{ item.id }}">
+                            {% if item.type.name == 'question' %}
+                                {{ _render_question(item, preview_form) }}
+                            {% elif item.type.name == 'text' %}
+                                {{ _render_text(item) }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+
+{% macro _render_item() %}
+    <div class="questions-handle i-form">
+        <div class="question-list">
+            <div class="question-row">
+                {{ caller() }}
+                <div class="handle js-item-handle"></div>
+            </div>
+        </div>
     </div>
+{% endmacro %}
+
+
+{% macro _render_question(question, preview_form) %}
+    {% call _render_item() %}
+        <div class="question-data">
+            {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true,
+                        orientation='horizontal') }}
+        </div>
+        <div class="action-buttons">
+            <a data-href="{{ url_for('.delete_question', question) }}"
+               data-method="DELETE"
+               data-title="{% trans %}Delete question{% endtrans %}"
+               data-confirm="{% trans %}Are you sure you want to delete this question?{% endtrans %}"
+               class="i-button icon-remove js-delete-item"></a>
+            <a href="#" data-href="{{ url_for('.edit_question', question) }}"
+               data-title="{% trans %}Edit question{% endtrans %}"
+               data-question-id="{{ question.id }}"
+               class="i-button js-survey-item-dialog icon-edit"></a>
+        </div>
+    {% endcall %}
+{% endmacro %}
+
+
+{% macro _render_text(text) %}
+    {% call _render_item() %}
+        <div class="question-data">
+            <div class="form-group">
+                <div class="form-field form-block static-text-widget">
+                    {{- text.description|replace('\n', '<br>'|safe) -}}
+                </div>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <a data-href="{{ url_for('.delete_text', text) }}"
+               data-method="DELETE"
+               data-title="{% trans %}Delete text{% endtrans %}"
+               data-confirm="{% trans %}Are you sure you want to delete this text item?{% endtrans %}"
+               class="i-button icon-remove js-delete-item"></a>
+            <a href="#" data-href="{{ url_for('.edit_text', text) }}"
+               data-title="{% trans %}Edit text item{% endtrans %}"
+               data-text-id="{{ text.id }}"
+               class="i-button js-survey-item-dialog icon-edit"></a>
+        </div>
+    {% endcall %}
 {% endmacro %}

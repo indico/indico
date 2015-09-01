@@ -2,7 +2,7 @@
 {% from 'events/surveys/management/_questionnaire_preview.html' import render_questionnaire_preview %}
 
 {% block subtitle %}
-    {% trans title=survey.title-%}
+    {% trans title=survey.title -%}
         Questionnaire for "{{ title }}"
     {%- endtrans %}
 {% endblock %}
@@ -10,49 +10,29 @@
 {% block content %}
     <div class="flashed-messages"></div>
 
-    <div class="i-box titled">
-        <div class="i-box-header">
-            <div class="i-box-title">
-                {% trans %}Questionnaire{% endtrans %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-list"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Sections{% endtrans %}
+                </div>
+                {% trans %}The questionnaire consists of one or more sections.{% endtrans %}
             </div>
-            <div class="i-box-buttons toolbar right">
-                <div class="group">
-                    <a href="#" data-href="{{ url_for('.add_question', survey, type='static_text') }}"
-                       class="i-button js-question-dialog"
-                       data-title="{% trans %}Add section{% endtrans %}">
-                        {% trans %}Add section{% endtrans %}
-                    </a>
-                </div>
-                <div class="group">
-                    <a class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">
-                        {% trans %}Add question{% endtrans %}
-                    </a>
-                    <ul class="dropdown">
-                        {% for field_type in field_types.values()|sort(attribute='friendly_name') if not field_type.is_section %}
-                            <li>
-                                <a href="#" data-href="{{ url_for('.add_question', survey, type=field_type.name) }}"
-                                   data-title="{% trans %}Add question{% endtrans %}"
-                                   class="js-question-dialog">
-                                    {{ field_type.friendly_name }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+            <div class="toolbar right">
+                <a href="#" data-href="{{ url_for('.add_section', survey) }}"
+                   class="i-button js-survey-item-dialog icon-plus"
+                   data-title="{% trans %}Add section{% endtrans %}">
+                    {% trans %}Add section{% endtrans %}
+                </a>
             </div>
-        </div>
-        <div id="survey-questionnaire-preview" class="i-box-content"
-             data-sort-url="{{ url_for('.sort_questions', survey) }}">
-            {% if survey.questions %}
-                {{ render_questionnaire_preview(survey, preview_form) }}
-            {% else %}
-                <div class="empty">
-                    {% trans %}No questions have been added yet.{% endtrans %}
-                </div>
-            {% endif %}
-
         </div>
     </div>
+
+    <div id="survey-questionnaire-preview" class="i-box-group vert" data-sort-url="{{ url_for('.sort_items', survey) }}">
+        {{ render_questionnaire_preview(survey, preview_form, field_types) }}
+    </div>
+
     <div class="toolbar right">
         <a href="{{ url_for('.manage_survey', survey) }}" class="i-button big">
             {% trans %}Back{% endtrans %}
@@ -60,6 +40,7 @@
     </div>
 
     <script>
-        setupQuestionSorter();
+        setupQuestionnaireWindows();
+        setupQuestionnaireSorter();
     </script>
 {% endblock %}

@@ -35,7 +35,7 @@
 }
 
 #survey-questionnaire {
-    .form-group + .form-group {
+    .form-group + .form-group, .form-group + fieldset, fieldset + fieldset {
         margin-top: 1.5em;
     }
 
@@ -57,12 +57,6 @@
         display: table-cell;
     }
 
-    .position-element {
-        text-align: center;
-        font-weight: bold;
-        vertical-align: top;
-    }
-
     .questions-handle {
         width: 100%;
         display: table;
@@ -76,22 +70,29 @@
     .question-row {
         display: table-row;
         width: 100%;
-
-
-        .handle {
-            @include icon-before('icon-grid2');
-            color: lighten($gray, 10%);
-            text-align: right;
-            line-height: 2em;
-            vertical-align: top;
-            display: table-cell;
-            width: 25px;
-            cursor: move;
-        }
     }
 
     .question-data {
         display: table-cell;
+    }
+
+    .handle {
+        @include icon-before('icon-grid2');
+        color: lighten($gray, $color-variation);
+        text-align: right;
+        line-height: 2em;
+        vertical-align: top;
+        display: table-cell;
+        width: 25px;
+        cursor: move;
+    }
+
+    .empty-msg {
+        display: none;
+    }
+
+    .empty > .empty-msg {
+        display: block;
     }
 }
 

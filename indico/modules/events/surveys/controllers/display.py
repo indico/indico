@@ -17,10 +17,12 @@
 from __future__ import unicode_literals
 
 from flask import redirect, flash, session, request
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
@@ -78,8 +80,11 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
 
     def _checkParams(self, params):
         RHSurveyBaseDisplay._checkParams(self, params)
-        self.survey = Survey.find_one(Survey.id == request.view_args['survey_id'], Survey.is_visible,
-                                      _eager=(Survey.questions, Survey.submissions))
+        self.survey = (Survey
+                       .find(Survey.id == request.view_args['survey_id'], Survey.is_visible)
+                       .options(joinedload(Survey.submissions))
+                       .options(joinedload(Survey.sections).joinedload(SurveySection.children))
+                       .one())
 
         if not self.survey.is_active:
             flash(_('This survey is not active'), 'error')
@@ -89,7 +94,7 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
             return redirect(url_for('.display_survey_list', self.event))
 
     def _process(self):
-        form = make_survey_form(self.survey.questions)()
+        form = make_survey_form(self.survey)()
         if form.validate_on_submit():
             submission = self._save_answers(form)
             save_submitted_survey_to_session(submission)
@@ -114,8 +119,6 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
         if not survey.anonymous:
             submission.user = session.user
         for question in survey.questions:
-            if question.field.is_section:
-                continue
             answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
             submission.answers.append(answer)
         db.session.flush()

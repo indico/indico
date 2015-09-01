@@ -6,10 +6,11 @@
 
 {% block content %}
     <div id="survey-results" class="i-box-group vert">
-        {% for question in survey.questions %}
-            {% if question.field_type == 'static_text' %}
-                <h4>{{ question.title }}</h4>
-            {% else %}
+        {% for section in survey.sections if section.children %}
+            {% if not section.is_implicit %}
+                <h4>{{ section.title }}</h4>
+            {% endif %}
+            {% for question in section.children if question.type.name == 'question' %}
                 <div class="i-box titled">
                     <div class="i-box-header">
                         <div class="i-box-title">
@@ -38,7 +39,7 @@
                         {% endif %}
                     </div>
                 </div>
-            {% endif %}
+            {% endfor %}
         {% endfor %}
     </div>
 {% endblock %}

@@ -23,7 +23,7 @@ from uuid import uuid4
 from indico.core.db import db
 from indico.modules.events import EventSetting
 from indico.modules.events.surveys.models.surveys import Survey
-from indico.modules.events.surveys.models.questions import SurveyQuestion
+from indico.modules.events.surveys.models.items import SurveyQuestion, SurveySection
 from indico.modules.events.surveys.models.submissions import SurveySubmission, SurveyAnswer
 from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
@@ -84,10 +84,11 @@ class SurveyImporter(Importer):
         self.print_success(cformat('%{cyan}{}%{reset}').format(survey), always=True, event_id=event.id)
 
         question_map = {}
+        section = SurveySection(survey=survey, title='')
         for position, old_question in enumerate(evaluation._questions):
             question = self.migrate_question(old_question, position)
             question_map[old_question] = question
-            survey.questions.append(question)
+            section.children.append(question)
 
         for old_submission in evaluation._submissions:
             submission = self.migrate_submission(old_submission, question_map, event.tz)

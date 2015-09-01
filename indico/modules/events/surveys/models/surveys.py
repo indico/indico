@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -24,6 +25,7 @@ from indico.core.errors import IndicoError
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.modules.events.surveys import logger
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.surveys.models.items import SurveyItem
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
@@ -140,18 +142,29 @@ class Survey(db.Model):
         )
     )
 
-    #: The list of questions
-    questions = db.relationship(
-        'SurveyQuestion',
+    #: The list of items
+    items = db.relationship(
+        'SurveyItem',
         cascade='all, delete-orphan',
         lazy=True,
-        order_by='SurveyQuestion.position',
         backref=db.backref(
             'survey',
             lazy=True
         )
     )
-
+    #: The list of sections
+    sections = db.relationship(
+        'SurveySection',
+        lazy=True,
+        viewonly=True,
+        order_by='SurveySection.position'
+    )
+    #: The list of questions
+    questions = db.relationship(
+        'SurveyQuestion',
+        lazy=True,
+        viewonly=True
+    )
     #: The Event containing this survey
     event_new = db.relationship(
         'Event',
@@ -268,3 +281,11 @@ class Survey(db.Model):
         email = make_email(bcc_list=self.new_submission_emails, template=template_module)
         send_email(email, event=self.event, module='Surveys')
         logger.info('Sending submission notification for survey {}'.format(self))
+
+
+@listens_for(Survey.questions, 'append')
+@listens_for(Survey.questions, 'remove')
+@listens_for(Survey.sections, 'append')
+@listens_for(Survey.sections, 'remove')
+def _wrong_collection_modified(target, value, *unused):
+    raise Exception('This collection is view-only. Use `items` for write operations!')

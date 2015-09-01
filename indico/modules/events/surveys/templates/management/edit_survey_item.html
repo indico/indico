@@ -1,0 +1,4 @@
+{% from 'forms/_form.html' import simple_form %}
+
+{{ simple_form(form, back=_('Cancel'), disabled_until_change=disabled_until_change|default(true),
+               form_header_kwargs={'id': 'survey-question-form'}) }}

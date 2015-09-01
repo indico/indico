@@ -9,8 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-from indico.core.db.sqlalchemy import UTCDateTime
-
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.events.surveys.models.items import SurveyItemType
 
 # revision identifiers, used by Alembic.
 revision = '3fcf833adc2d'
@@ -40,16 +40,28 @@ def upgrade():
         schema='events'
     )
     op.create_table(
-        'survey_questions',
+        'survey_items',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('survey_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
-        sa.Column('title', sa.String(), nullable=False),
+        sa.Column('type', PyIntEnum(SurveyItemType), nullable=False),
+        sa.Column('title', sa.String(), nullable=True),
         sa.Column('description', sa.Text(), nullable=False),
-        sa.Column('is_required', sa.Boolean(), nullable=False),
-        sa.Column('field_type', sa.String(), nullable=False),
+        sa.Column('is_required', sa.Boolean(), nullable=True),
+        sa.Column('field_type', sa.String(), nullable=True),
         sa.Column('field_data', postgresql.JSON(), nullable=False),
+        sa.CheckConstraint("type != 1 OR (title IS NOT NULL AND is_required IS NOT NULL AND field_type IS NOT NULL AND "
+                           "parent_id IS NOT NULL)",
+                           name='valid_question'),
+        sa.CheckConstraint("type != 2 OR (title IS NOT NULL AND is_required IS NULL AND field_type IS NULL AND "
+                           "field_data::text = '{}' AND parent_id IS NULL)",
+                           name='valid_section'),
+        sa.CheckConstraint("type != 3 OR (title IS NULL AND is_required IS NULL AND field_type IS NULL "
+                           "AND field_data::text = '{}')",
+                           name='valid_text'),
         sa.ForeignKeyConstraint(['survey_id'], ['events.surveys.id']),
+        sa.ForeignKeyConstraint(['parent_id'], ['events.survey_items.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
@@ -69,7 +81,7 @@ def upgrade():
         sa.Column('submission_id', sa.Integer(), nullable=False),
         sa.Column('question_id', sa.Integer(), nullable=False),
         sa.Column('data', postgresql.JSON(), nullable=False),
-        sa.ForeignKeyConstraint(['question_id'], ['events.survey_questions.id']),
+        sa.ForeignKeyConstraint(['question_id'], ['events.survey_items.id']),
         sa.ForeignKeyConstraint(['submission_id'], ['events.survey_submissions.id']),
         sa.PrimaryKeyConstraint('submission_id', 'question_id'),
         schema='events'
@@ -78,8 +90,8 @@ def upgrade():
 
 def downgrade():
     op.drop_constraint('fk_survey_submissions_survey_id_surveys', 'survey_submissions', schema='events')
-    op.drop_constraint('fk_survey_questions_survey_id_surveys', 'survey_questions', schema='events')
+    op.drop_constraint('fk_survey_items_survey_id_surveys', 'survey_items', schema='events')
     op.drop_table('surveys', schema='events')
     op.drop_table('survey_answers', schema='events')
     op.drop_table('survey_submissions', schema='events')
-    op.drop_table('survey_questions', schema='events')
+    op.drop_table('survey_items', schema='events')

@@ -100,7 +100,7 @@ class SurveyAnswer(db.Model):
     #: The ID of the question
     question_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.survey_questions.id'),
+        db.ForeignKey('events.survey_items.id'),
         primary_key=True
     )
     #: The user's answer (no, not 42!) to the question

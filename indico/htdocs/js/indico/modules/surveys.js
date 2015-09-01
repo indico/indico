@@ -3,7 +3,6 @@
 
     $(document).ready(function() {
         setupSurveyScheduleWindows();
-        setupQuestionWindows();
         setupSurveyResultCharts();
         setupSubmissionButtons();
     });
@@ -60,8 +59,8 @@
         });
     }
 
-    function setupQuestionWindows() {
-        $('.page-content').on('click', '.js-question-dialog', function(evt) {
+    global.setupQuestionnaireWindows = function setupQuestionnaireWindows() {
+        $('.page-content').on('click', '.js-survey-item-dialog', function(evt) {
             evt.preventDefault();
             ajaxDialog({
                 trigger: this,
@@ -73,7 +72,7 @@
                     }
                 }
             });
-        }).on('indico:confirmed', '.js-delete-question', function(e) {
+        }).on('indico:confirmed', '.js-delete-item', function(e) {
             e.preventDefault();
 
             var $this = $(this);
@@ -90,7 +89,7 @@
         });
 
         $('.js-add-question-dropdown').parent().dropdown({selector: '.js-add-question-dropdown'});
-    }
+    };
 
     function setupSubmissionButtons() {
         $('#select-all').on('click', function() {
@@ -171,36 +170,72 @@
     }
 
     function updateQuestions(data) {
-        $('#survey-questionnaire-preview').tablesorter('destroy').html(data.questionnaire);
-        setupQuestionSorter();
+        $('#survey-questionnaire-preview').sortable('destroy').html(data.questionnaire);
+        $('.js-add-question-dropdown').parent().dropdown({selector: '.js-add-question-dropdown'});
+        setupQuestionnaireSorter();
     }
 
-    global.setupQuestionSorter = function setupQuestionSorter() {
+    global.setupQuestionnaireSorter = function setupQuestionnaireSorter() {
+        function _save(mode, data) {
+            $.ajax({
+                url: container.data('sort-url'),
+                method: 'POST',
+                data: $.extend({mode: mode}, data),
+                traditional: true,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError
+            });
+        }
+
         var container = $('#survey-questionnaire-preview');
-        container.tablesorter({
-            sortables: '.sortblock ul',
-            sortableElements: '> li',
-            placeholderElement: '<li></li>',
-            handle: '.handle',
-            onReorder: function() {
-                var questionIds = $('[data-question-id]').map(function() {
-                    return $(this).data('question-id');
+        // sort sections
+        container.sortable({
+            items: '.js-sortable-survey-section',
+            handle: '.js-section-handle',
+            distance: 10,
+            axis: 'y',
+            update: function(e, ui) {
+                var sectionIds = container.find('.js-sortable-survey-section').map(function() {
+                    return $(this).data('sectionId');
                 }).get();
-
-                $('.position-element').each(function(index, obj) {
-                    $(obj).text((index + 1) + '.');
+                _save('sections', {
+                    section_ids: sectionIds
                 });
-
-                $.ajax({
-                    url: container.data('sort-url'),
-                    method: 'POST',
-                    data: {
-                        question_ids: questionIds
-                    },
-                    traditional: true,
-                    complete: IndicoUI.Dialogs.Util.progress(),
-                    error: handleAjaxError
+            }
+        });
+        container.find('.js-sortable-survey-items').sortable({
+            items: '.js-sortable-survey-item',
+            handle: '.js-item-handle',
+            connectWith: '#survey-questionnaire-preview .js-sortable-survey-items',
+            distance: 10,
+            axis: 'y',
+            start: function() {
+                var $this = $(this);
+                $this.css('min-height', $this.height());
+            },
+            stop: function() {
+                $(this).css('min-height', '');
+            },
+            update: function(evt, ui) {
+                var $this = $(this);
+                // ignore update from the source list
+                if (this !== ui.item.parent()[0]) {
+                    return;
+                }
+                var itemIds = $this.find('.js-sortable-survey-item').map(function() {
+                    return $(this).data('itemId');
+                }).get();
+                _save('items', {
+                    item_ids: itemIds,
+                    section_id: $this.closest('[data-section-id]').data('sectionId')
                 });
+            },
+            receive: function() {
+                $(this).removeClass('empty');
+            },
+            remove: function() {
+                var $this = $(this);
+                $this.toggleClass('empty', !$this.find('li:not(.empty-msg)').length);
             }
         });
     };
