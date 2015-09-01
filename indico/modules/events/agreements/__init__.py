@@ -23,6 +23,7 @@ from indico.core.logger import Logger
 from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase, EmailPlaceholderBase
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.util import get_agreement_definitions
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
@@ -40,8 +41,9 @@ def _check_agreement_definitions(app, **kwargs):
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
-    return 'agreements', SideMenuItem('Agreements', url_for('agreements.event_agreements', event),
-                                      visible=bool(get_agreement_definitions()) and event.canModify(session.user))
+    return 'agreements', SideMenuItem(_('Agreements'), url_for('agreements.event_agreements', event),
+                                      visible=bool(get_agreement_definitions()) and event.canModify(session.user),
+                                      section='organization')
 
 
 @signals.users.merged.connect

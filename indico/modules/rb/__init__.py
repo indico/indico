@@ -49,7 +49,7 @@ def _import_tasks(sender, **kwargs):
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'))
+    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'), section='general')
 
 
 @signals.users.merged.connect

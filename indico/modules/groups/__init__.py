@@ -28,7 +28,7 @@ __all__ = ('GroupProxy',)
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'))
+    return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'), section='user_management')
 
 
 @signals.users.merged.connect

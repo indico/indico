@@ -32,7 +32,7 @@
                                     <% liClass = "active" %>
                                 % endif
                             % else:
-                                <% liClass = "sideMenu_disabled " + item.getErrorMessage() %>
+                                <% liClass = "sideMenu_disabled" %>
                             % endif
                             % if menu.event and item.event_feature:
                                 <% liClass = '{} js-event-feature-{}'.format(liClass, item.event_feature) %>

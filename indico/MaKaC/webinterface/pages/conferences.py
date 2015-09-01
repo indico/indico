@@ -1014,74 +1014,91 @@ class WPConferenceModifBase(main.WPMainBase):
         self._sideMenu = wcomponents.ManagementSideMenu(event=self._conf)
 
         # The main section containing most menu items
-        self._generalSection = wcomponents.SideMenuSection()
+        self._generalSection = wcomponents.SideMenuSection(id='general', icon='icon-settings')
+        self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"), id='advanced',
+                                                                   icon='icon-lamp')
+        self._organizationSection = wcomponents.SideMenuSection(_("Organization"), id='organization', icon='icon-time')
+        self._toolsSection = wcomponents.SideMenuSection(_("Tools"), id='tools', icon='icon-wrench')
+        self._customizationSection = wcomponents.SideMenuSection(_("Customization"), id='customization',
+                                                                 icon='icon-image')
 
-        self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
-            urlHandlers.UHConferenceModification.getURL( self._conf ))
-        self._generalSection.addItem( self._generalSettingsMenuItem)
+        self._sideMenu.addSection(self._generalSection)
+        self._sideMenu.addSection(self._organizationSection)
+        self._sideMenu.addSection(self._advancedOptionsSection)
+        self._sideMenu.addSection(self._toolsSection)
+        self._sideMenu.addSection(self._customizationSection)
 
-        self._timetableMenuItem = wcomponents.SideMenuItem(_("Timetable"),
-            urlHandlers.UHConfModifSchedule.getURL( self._conf ))
-        self._generalSection.addItem( self._timetableMenuItem)
+        self._generalSettingsMenuItem = wcomponents.SideMenuItem(
+            _("General settings"),
+            urlHandlers.UHConferenceModification.getURL(self._conf), section='general')
+        self._sideMenu.addItem(self._generalSettingsMenuItem)
 
-        self._roomBookingMenuItem = wcomponents.SideMenuItem(_("Room booking"),
-                                                             url_for('event_mgmt.rooms_booking_list', self._conf))
-        self._generalSection.addItem( self._roomBookingMenuItem)
+        self._timetableMenuItem = wcomponents.SideMenuItem(
+            _("Timetable"),
+            urlHandlers.UHConfModifSchedule.getURL(self._conf), section='organization')
+        self._sideMenu.addItem(self._timetableMenuItem)
 
-        self._programMenuItem = wcomponents.SideMenuItem(_("Programme"),
-            urlHandlers.UHConfModifProgram.getURL( self._conf ))
-        self._generalSection.addItem( self._programMenuItem)
+        self._roomBookingMenuItem = wcomponents.SideMenuItem(
+            _("Room booking"),
+            url_for('event_mgmt.rooms_booking_list', self._conf), section='organization')
+        self._sideMenu.addItem(self._roomBookingMenuItem)
 
-        self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
-            urlHandlers.UHConfModifRegForm.getURL( self._conf ))
-        self._generalSection.addItem( self._regFormMenuItem)
+        self._programMenuItem = wcomponents.SideMenuItem(
+            _("Programme"),
+            urlHandlers.UHConfModifProgram.getURL(self._conf), section='organization')
+        self._sideMenu.addItem(self._programMenuItem)
 
-        self._abstractMenuItem = wcomponents.SideMenuItem(_("Abstracts"),
-            urlHandlers.UHConfModifCFA.getURL( self._conf ))
-        self._generalSection.addItem( self._abstractMenuItem)
+        self._regFormMenuItem = wcomponents.SideMenuItem(
+            _("Registration"),
+            urlHandlers.UHConfModifRegForm.getURL(self._conf), section='organization')
+        self._sideMenu.addItem(self._regFormMenuItem)
 
-        self._contribListMenuItem = wcomponents.SideMenuItem(_("Contributions"),
-            urlHandlers.UHConfModifContribList.getURL( self._conf ))
-        self._generalSection.addItem( self._contribListMenuItem)
+        self._abstractMenuItem = wcomponents.SideMenuItem(
+            _("Abstracts"),
+            urlHandlers.UHConfModifCFA.getURL(self._conf), section='organization')
+        self._sideMenu.addItem(self._abstractMenuItem)
 
-        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Paper Reviewing"),
-            urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
-        self._generalSection.addItem( self._reviewingMenuItem)
+        self._contribListMenuItem = wcomponents.SideMenuItem(
+            _("Contributions"),
+            urlHandlers.UHConfModifContribList.getURL(self._conf), section='organization')
+        self._sideMenu.addItem(self._contribListMenuItem)
 
-        self._participantsMenuItem = wcomponents.SideMenuItem(_("Participants"),
-            urlHandlers.UHConfModifParticipants.getURL( self._conf ) )
-        self._generalSection.addItem( self._participantsMenuItem)
+        self._reviewingMenuItem = wcomponents.SideMenuItem(
+            _("Paper Reviewing"),
+            urlHandlers.UHConfModifReviewingAccess.getURL(target=self._conf), section='organization')
+        self._sideMenu.addItem(self._reviewingMenuItem)
+
+        self._participantsMenuItem = wcomponents.SideMenuItem(
+            _("Participants"),
+            urlHandlers.UHConfModifParticipants.getURL(self._conf), section='organization')
+        self._sideMenu.addItem(self._participantsMenuItem)
 
         self.extra_menu_items = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
                                  key=lambda x: x[1]._title):
             self.extra_menu_items[name] = item
-            self._generalSection.addItem(item)
+            self._sideMenu.addItem(item)
 
-        self._sideMenu.addSection(self._generalSection)
+        self._listingsMenuItem = wcomponents.SideMenuItem(
+            _("Lists"),
+            urlHandlers.UHConfAllSpeakers.getURL(self._conf), section='tools')
+        self._advancedOptionsSection.addItem(self._listingsMenuItem)
 
-        # The section containing all advanced options
-        self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"))
+        self._ACMenuItem = wcomponents.SideMenuItem(
+            _("Protection"),
+            urlHandlers.UHConfModifAC.getURL(self._conf), section='advanced')
+        self._advancedOptionsSection.addItem(self._ACMenuItem)
 
-        self._listingsMenuItem = wcomponents.SideMenuItem(_("Lists"),
-            urlHandlers.UHConfAllSpeakers.getURL( self._conf ) )
-        self._advancedOptionsSection.addItem( self._listingsMenuItem)
-
-        self._ACMenuItem = wcomponents.SideMenuItem(_("Protection"),
-            urlHandlers.UHConfModifAC.getURL( self._conf ) )
-        self._advancedOptionsSection.addItem( self._ACMenuItem)
-
-        self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
-            urlHandlers.UHConfModifTools.getURL( self._conf ) )
-        self._advancedOptionsSection.addItem( self._toolsMenuItem)
+        self._toolsMenuItem = wcomponents.SideMenuItem(
+            _("Tools"),
+            urlHandlers.UHConfModifTools.getURL(self._conf), section='advanced')
+        self._advancedOptionsSection.addItem(self._toolsMenuItem)
 
         self.extra_menu_items_advanced = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu_advanced.send(self._conf)),
                                  key=lambda x: x[1]._title):
             self.extra_menu_items_advanced[name] = item
-            self._advancedOptionsSection.addItem(item)
-
-        self._sideMenu.addSection(self._advancedOptionsSection)
+            self._sideMenu.addItem(item)
 
         #we decide which side menu item appear and which don't
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReviewingStaff

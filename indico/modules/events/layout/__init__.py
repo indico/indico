@@ -53,10 +53,12 @@ def _extend_event_management_menu_layout(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     can_modify = event.canModify(session.user)
     if event.getType() == 'conference':
-        yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), visible=can_modify)
-        yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=can_modify)
+        yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), visible=can_modify,
+                                     section='customization')
+        yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=can_modify,
+                                   section='customization')
     yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), visible=can_modify,
-                                 event_feature='images')
+                                 event_feature='images', section='customization')
 
 
 @signals.event.sidemenu.connect

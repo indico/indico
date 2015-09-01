@@ -69,7 +69,7 @@ def _merge_users(target, source, **kwargs):
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'api', SideMenuItem(_("API"), url_for('api.admin_settings'))
+    return 'api', SideMenuItem(_("API"), url_for('api.admin_settings'), section='integration')
 
 
 @signals.users.profile_sidemenu.connect

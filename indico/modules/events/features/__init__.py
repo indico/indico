@@ -34,7 +34,7 @@ event_settings = EventSettingsProxy('features', {
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'features', SideMenuItem('Features', url_for('event_features.index', event),
-                                    visible=event.canModify(session.user))
+                                    visible=event.canModify(session.user), section='advanced')
 
 
 @signals.app_created.connect

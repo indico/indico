@@ -44,7 +44,7 @@ logger = Logger.get('oauth')
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'applications', SideMenuItem('Applications', url_for('oauth.apps'))
+    return 'applications', SideMenuItem('Applications', url_for('oauth.apps'), section='security')
 
 
 @signals.users.profile_sidemenu.connect

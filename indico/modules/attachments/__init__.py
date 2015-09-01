@@ -48,7 +48,7 @@ def _merge_users(target, source, **kwargs):
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', event),
-                                       visible=event.canModify(session.user))
+                                       visible=event.canModify(session.user), section='organization')
 
 
 @signals.category.management_sidemenu.connect

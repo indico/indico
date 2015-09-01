@@ -43,7 +43,7 @@ user_settings = UserSettingsProxy('users', {
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'users', SideMenuItem(_("Users"), url_for('users.users_admin'))
+    return 'users', SideMenuItem(_("Users"), url_for('users.users_admin'), section='user_management')
 
 
 @signals.category.deleted.connect

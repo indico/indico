@@ -38,4 +38,4 @@ settings = SettingsProxy('cephalopod', {
 
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
-    return 'cephalopod', SideMenuItem(_("Community Hub"), url_for('cephalopod.index'))
+    return 'cephalopod', SideMenuItem(_("Community Hub"), url_for('cephalopod.index'), section='integration')

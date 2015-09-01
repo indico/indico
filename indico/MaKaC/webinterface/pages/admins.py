@@ -74,43 +74,60 @@ class WPAdminsBase(WPMainBase):
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
 
-        mainSection = wcomponents.SideMenuSection()
+        mainSection = wcomponents.SideMenuSection(id='general')
+        securitySection = wcomponents.SideMenuSection(_('Security'), id='security')
+        userManagementSection = wcomponents.SideMenuSection(_('User management'), id='user_management')
+        pluginsSection = wcomponents.SideMenuSection(_('Plugins'), id='plugins')
+        customizationSection = wcomponents.SideMenuSection(_('Customization'), id='customization')
+        integrationSection = wcomponents.SideMenuSection(_('Integration'), id='integration')
 
-        self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
-            urlHandlers.UHAdminArea.getURL())
-        mainSection.addItem( self._generalSettingsMenuItem)
+        self._sideMenu.addSection(mainSection)
+        self._sideMenu.addSection(securitySection)
+        self._sideMenu.addSection(userManagementSection)
+        self._sideMenu.addSection(pluginsSection)
+        self._sideMenu.addSection(customizationSection)
+        self._sideMenu.addSection(integrationSection)
 
-        self._domainsMenuItem = wcomponents.SideMenuItem(_("IP Domains"),
-            urlHandlers.UHDomains.getURL())
-        mainSection.addItem( self._domainsMenuItem)
+        self._generalSettingsMenuItem = wcomponents.SideMenuItem(
+            _("General settings"),
+            urlHandlers.UHAdminArea.getURL(), section='general')
+        self._sideMenu.addItem(self._generalSettingsMenuItem)
 
-        self._templatesMenuItem = wcomponents.SideMenuItem(_("Layout (old)"),
-            urlHandlers.UHAdminLayoutGeneral.getURL())
-        mainSection.addItem( self._templatesMenuItem)
+        self._domainsMenuItem = wcomponents.SideMenuItem(
+            _("IP Domains"),
+            urlHandlers.UHDomains.getURL(), section='security')
+        self._sideMenu.addItem(self._domainsMenuItem)
 
-        self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"), urlHandlers.UHIPBasedACL.getURL())
-        mainSection.addItem(self._servicesMenuItem)
+        self._templatesMenuItem = wcomponents.SideMenuItem(
+            _("Layout"),
+            urlHandlers.UHAdminLayoutGeneral.getURL(), section='customization')
+        self._sideMenu.addItem(self._templatesMenuItem)
 
-        self._homepageMenuItem = wcomponents.SideMenuItem(_("Homepage"),
-            urlHandlers.UHUpdateNews.getURL())
-        mainSection.addItem( self._homepageMenuItem)
+        self._ipProtectionMenuItem = wcomponents.SideMenuItem(
+            _("IP-based Protection"),
+            urlHandlers.UHIPBasedACL.getURL(), section='security')
+        self._sideMenu.addItem(self._ipProtectionMenuItem)
 
-        self._systemMenuItem = wcomponents.SideMenuItem(_("System"),
-            urlHandlers.UHAdminsSystem.getURL())
-        mainSection.addItem( self._systemMenuItem)
+        self._homepageMenuItem = wcomponents.SideMenuItem(
+            _("Homepage"),
+            urlHandlers.UHUpdateNews.getURL(), section='customization')
+        self._sideMenu.addItem(self._homepageMenuItem)
 
-        self._protectionMenuItem = wcomponents.SideMenuItem(_("Protection"),
-            urlHandlers.UHAdminsProtection.getURL())
-        mainSection.addItem( self._protectionMenuItem)
+        self._systemMenuItem = wcomponents.SideMenuItem(
+            _("System"),
+            urlHandlers.UHAdminsSystem.getURL(), section='general')
+        self._sideMenu.addItem(self._systemMenuItem)
+
+        self._protectionMenuItem = wcomponents.SideMenuItem(
+            _("Protection"),
+            urlHandlers.UHAdminsProtection.getURL(), section='security')
+        self._sideMenu.addItem(self._protectionMenuItem)
 
         self.extra_menu_items = {}
         for name, item in sorted(values_from_signal(signals.admin_sidemenu.send()),
                                  key=lambda x: x[1]._title):
             self.extra_menu_items[name] = item
-            mainSection.addItem(item)
-
-        self._sideMenu.addSection(mainSection)
-
+            self._sideMenu.addItem(item)
 
     def _getBody( self, params ):
         self._createSideMenu()
@@ -330,7 +347,7 @@ class WAnnouncementModif(wcomponents.WTemplated):
 class WPServicesCommon(WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
-        self._servicesMenuItem.setActive()
+        self._ipProtectionMenuItem.setActive()
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
