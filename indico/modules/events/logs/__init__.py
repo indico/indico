@@ -28,7 +28,8 @@ from indico.web.flask.util import url_for
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), visible=event.canModify(session.user))
+    return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), visible=event.canModify(session.user),
+                                section='tools')
 
 
 @signals.event.deleted.connect

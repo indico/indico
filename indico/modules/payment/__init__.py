@@ -55,4 +55,4 @@ event_settings = EventSettingsProxy('payment', {
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'payment', SideMenuItem(_("Payment"), url_for('payment.admin_settings'))
+    return 'payment', SideMenuItem(_("Payment"), url_for('payment.admin_settings'), section='general')

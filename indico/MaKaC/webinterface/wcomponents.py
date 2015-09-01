@@ -20,6 +20,8 @@ import exceptions
 import urllib
 import pkg_resources
 import binascii
+import uuid
+from collections import OrderedDict
 from flask import session
 from lxml import etree
 from pytz import timezone
@@ -1155,18 +1157,24 @@ class SideMenu(object):
         """ Constructor
             userStatus: a boolean that is True if the user is logged in, False otherwise
         """
-        self._sections = []
+        self._sections = OrderedDict()
         self._userStatus = userStatus
         self.event = event
 
     def addSection(self, section, top=False):
         if top:
-            self._sections.insert(0, section)
+            sections = OrderedDict()
+            sections[section.id] = section
+            for key, section in self._sections.iteritems():
+                sections[key] = section
         else:
-            self._sections.append(section)
+            self._sections[section.id] = section
+
+    def addItem(self, item):
+        self._sections[item.section].addItem(item)
 
     def getSections(self):
-        return self._sections
+        return self._sections.values()
 
 
 class ManagementSideMenu(SideMenu):
@@ -1185,7 +1193,7 @@ class SideMenuSection:
     """ class coment
     """
 
-    def __init__(self, title=None, active=False, currentPage = None, visible=True):
+    def __init__(self, title=None, active=False, currentPage=None, visible=True, id=None, icon=None):
         """ -title is the words that will be displayed int he side menu.
             -active is True if ...
             -currentPage stores information about in which page we are seeing the Side Menu. For example,
@@ -1196,12 +1204,14 @@ class SideMenuSection:
         self._currentPage = currentPage
         self._items = []
         self._visible = visible
+        self.id = str(uuid.uuid4()) if id is None else id
+        self.icon = icon
 
     def getTitle(self):
         return self._title
 
     def getItems(self):
-        return self._items
+        return sorted(self._items, key=lambda x: x._title)
 
     def addItem(self, item):
         self._items.append(item)
@@ -1240,25 +1250,24 @@ class SideMenuSection:
                 return True
         return False
 
+
 class SideMenuItem:
 
     def __init__(self, title, url, active=False, enabled=True, errorMessage="msgNoPermissions", visible=True,
-                 event_feature=None):
-        """ errorMessage: one of the error messages in SideMenu.wohl
-        """
+                 event_feature=None, section=None):
         self._title = title
         self._url = url
         self._active = active
         self._enabled = enabled
-        self._errorMessage = errorMessage
         self._visible = visible
         self.event_feature = event_feature
+        self.section = section
 
     def getTitle(self):
-        return self._title;
+        return self._title
 
     def setSection(self, section):
-        self._section = section
+        self.section = section
 
     def getURL(self):
         return self._url
@@ -1272,18 +1281,12 @@ class SideMenuItem:
     def isEnabled(self):
         return self._enabled
 
-    def getErrorMessage(self):
-        return self._errorMessage
-
     def setActive(self, val=True):
         self._active = val
-        self._section.checkActive()
+        self.section.checkActive()
 
     def setEnabled(self, val):
         self._enabled = val
-
-    def setErrorMessage(self, val):
-        self._errorMessage = val
 
     def isVisible(self):
         return self._visible

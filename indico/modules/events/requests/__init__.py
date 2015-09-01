@@ -22,6 +22,7 @@ from indico.core import signals
 from indico.modules.events.requests.util import get_request_definitions, is_request_manager
 from indico.modules.events.requests.base import RequestDefinitionBase, RequestFormBase
 from indico.modules.events.requests.models.requests import Request, RequestState
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
@@ -39,7 +40,8 @@ def _check_request_definitions(app, **kwargs):
 def _extend_event_management_menu(event, **kwargs):
     visible = bool(get_request_definitions()) and (event.canModify(session.user) or
                                                    is_request_manager(session.user))
-    return 'requests', SideMenuItem('Services', url_for('requests.event_requests', event), visible=visible)
+    return 'requests', SideMenuItem(_('Services'), url_for('requests.event_requests', event), visible=visible,
+                                    section='organization')
 
 
 @signals.users.merged.connect

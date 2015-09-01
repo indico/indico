@@ -44,4 +44,4 @@ def _import_modules(*args, **kwargs):
 @signals.admin_sidemenu.connect
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'))
+    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'), section='general')

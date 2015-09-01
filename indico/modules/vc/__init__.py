@@ -57,7 +57,7 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     return 'vc', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
-                              visible=bool(get_vc_plugins()) and event.canModify(session.user))
+                              visible=bool(get_vc_plugins()) and event.canModify(session.user), section='organization')
 
 
 @signals.event.sidemenu.connect
