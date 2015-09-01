@@ -18,7 +18,7 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import seems_html, to_unicode, make_unique_token, slugify
+from indico.util.string import seems_html, to_unicode, make_unique_token, slugify, text_to_repr
 
 
 def test_seems_html():
@@ -72,3 +72,16 @@ def test_slugify(input, output):
 ))
 def test_slugify_lower(input, lower, output):
     assert slugify(input, lower=lower) == output
+
+
+@pytest.mark.parametrize(('input', 'html', 'max_length', 'output'), (
+    ('Hello\n  \tWorld',  False, None, 'Hello World'),
+    ('Hello<b>World</b>', False, None, 'Hello<b>World</b>'),
+    ('Hello<b>World</b>', True,  None, 'HelloWorld'),
+    ('Hi <b>a</b> <br>',  True,  None, 'Hi a'),
+    ('x' * 60,            False, None, 'x' * 60),
+    ('x' * 60,            False, 50,   'x' * 50 + '...'),
+    ('x' * 50,            False, 50,   'x' * 50)
+))
+def test_text_to_repr(input, html, max_length, output):
+    assert text_to_repr(input, html=html, max_length=max_length) == output

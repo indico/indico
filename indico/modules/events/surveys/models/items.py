@@ -22,7 +22,7 @@ from sqlalchemy.event import listens_for
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.surveys.fields import get_field_types
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, text_to_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -204,10 +204,7 @@ class SurveyText(SurveyItem):
 
     @return_ascii
     def __repr__(self):
-        # TODO: add generic function to format text nicely in a repr (see EventNoteRevision.__repr__)
-        desc = self.description.replace('\n', ' ')
-        if len(desc) > 50:
-            desc = desc[:50] + '...'
+        desc = text_to_repr(self.description)
         return '<SurveyText({}, {}): "{}")>'.format(self.id, self.survey_id, desc)
 
 

@@ -16,10 +16,8 @@
 
 from __future__ import unicode_literals
 
-import re
 from functools import partial
 
-import bleach
 from flask import g
 from sqlalchemy.event import listens_for, listen
 from sqlalchemy.ext.declarative import declared_attr
@@ -29,7 +27,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii, to_unicode, render_markdown
+from indico.util.string import return_ascii, render_markdown, text_to_repr
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -222,10 +220,7 @@ class EventNoteRevision(db.Model):
     @return_ascii
     def __repr__(self):
         render_mode = self.render_mode.name if self.render_mode is not None else None
-        source = bleach.clean(self.source, tags=[], strip=True).strip()
-        source = re.sub(r'\s+', ' ', source)
-        if len(source) > 50:
-            source = source[:50] + '...'
+        source = text_to_repr(self.source, html=True)
         return '<EventNoteRevision({}, {}, {}, {}): "{}">'.format(self.id, self.note_id, render_mode, self.created_dt,
                                                                   source)
 

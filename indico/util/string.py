@@ -348,3 +348,20 @@ def is_legacy_id(id_):
     with the same numeric id.
     """
     return not isinstance(id_, (int, long)) and (not id_.isdigit() or str(int(id_)) != id_)
+
+
+def text_to_repr(text, html=False, max_length=50):
+    """Converts text to a suitable string for a repr
+
+    :param text: A string which might contain html and/or linebreaks
+    :param html: If True, HTML tags are stripped.
+    :param max_length: The maximum length before the string is
+                       truncated.  Use ``None`` to disable.
+    :return: A string that contains no linebreaks or HTML tags.
+    """
+    if html:
+        text = bleach.clean(text, tags=[], strip=True)
+    text = re.sub(ur'\s+', u' ', text)
+    if max_length is not None and len(text) > max_length:
+        text = text[:max_length] + u'...'
+    return text.strip()
