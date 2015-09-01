@@ -13,13 +13,15 @@
         {% endif %}
 {%- endmacro %}
 
-{% macro form_row_static(label='', content=none, single_row=true) -%}
+{% macro form_row_static(label='', content=none, single_row=true, skip_label=false) -%}
     <div class="form-group">
-        <div class="form-label form-block {%- if single_row %} form-label-middle{% endif %}">
-            {% if label %}
-                <label>{{ label }}</label>
-            {% endif %}
-        </div>
+        {% if not skip_label %}
+            <div class="form-label form-block {%- if single_row %} form-label-middle{% endif %}">
+                {% if label %}
+                    <label>{{ label }}</label>
+                {% endif %}
+            </div>
+        {% endif %}
         <div class="form-field form-block">
             <div class="static-text">
                 {{ content or caller() }}
