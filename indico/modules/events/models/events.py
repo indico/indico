@@ -134,6 +134,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - reservations (Reservation.event_new)
     # - notes (EventNote.event_new)
     # - attachment_folders (AttachmentFolders.event_new)
+    # - registration_forms (RegistrationForm.event_new)
 
     @property
     @memoize_request
