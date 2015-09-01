@@ -88,6 +88,7 @@ class Event(db.Model):
     # - menu_entries (MenuEntry.event_new)
     # - custom_pages (EventPage.event_new)
     # - surveys (Survey.event_new)
+    # - registration_forms (RegistrationForm.event_new)
 
     @property
     @memoize_request
