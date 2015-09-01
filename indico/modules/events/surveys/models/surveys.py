@@ -77,6 +77,7 @@ class Survey(db.Model):
         nullable=False,
         default=True
     )
+    #: Maximum number of submissions allowed
     submission_limit = db.Column(
         db.Integer,
         nullable=True
