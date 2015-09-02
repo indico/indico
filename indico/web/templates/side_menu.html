@@ -1,0 +1,61 @@
+{% macro _side_menu_item(item, classes='', icon='') %}
+    {% if item.isVisible() %}
+        {% if item.isEnabled() %}
+            {% if item.isActive() %}
+                {% set classes = classes + ' active' %}
+            {% endif %}
+        {% else %}
+            {% set classes = classes + 'disabled' %}
+        {% endif %}
+        {% if menu.event and item.event_feature %}
+            {% set classes = classes + ' js-event-feature-{}'.format(item.event_feature) %}
+            {% if not menu.event.has_feature(item.event_feature) %}
+                {% set classes = classes + ' weak-hidden' %}
+            {% endif %}
+        {% endif %}
+        <li class="section-item {{ classes }}">
+        {% if item.isEnabled() %}
+            <a class="title {{ icon }}" href="{{ item.getURL() }}">{{ item.getTitle() }}</a>
+        {% else %}
+            <span class="title">{{ item.getTitle() }}</span>
+        {% endif %}
+        </li>
+    {% endif %}
+{% endmacro %}
+
+{% macro _side_menu_section(section) %}
+    {% if section.getItems() and section.isVisible() %}
+        {% if section.getItems() | length == 1 %}
+            {{ _side_menu_item(section.getItems()[0], classes="section top-level-item", icon=section.icon) }}
+        {% elif section.getTitle() is none %}
+            {% for item in section.getItems() %}
+                {{ _side_menu_item(item, classes="section section-title top-level-item", icon="no-icon") }}
+            {% endfor %}
+        {% else %}
+            <li class="section expandable {{ 'collapsed' if not section.isActive() }}">
+                <div class="section-title">
+                    <span class="title {{ section.icon }}">{{ section.getTitle() }}</span>
+                </div>
+                <ul>
+                    {% for item in section.getItems() %}
+                        {{ _side_menu_item(item) }}
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+<ul>
+    {% for section in menu.getSections() %}
+        {{ _side_menu_section(section) }}
+    {% endfor %}
+</ul>
+
+<script>
+    $('.section-title').on('click', function() {
+        $(this)
+        .next('ul').slideToggle(300)
+        .parent().toggleClass('collapsed');
+    });
+</script>
