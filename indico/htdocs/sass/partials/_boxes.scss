@@ -85,7 +85,7 @@
         @extend %i-box-empty;
     }
 
-    .i-box-sortable-handler {
+    .i-box-sortable-handle {
         @include icon-before('icon-handle');
         @include transition(
             background-color $default-transition-duration $default-transition-function,
