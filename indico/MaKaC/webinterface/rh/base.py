@@ -285,13 +285,6 @@ class RH(RequestHandlerBase):
     def _processError(self, e):
         raise
 
-    def _legacy_check(self):
-        """
-        This method can be overridden to check if you are dealing with
-        legacy data not supported by the RH. It is called before
-        `checkParams` and should raise an exception if necessary.
-        """
-
     def normalize_url(self):
         """Performs URL normalization.
 
@@ -569,8 +562,6 @@ class RH(RequestHandlerBase):
     def _process_retry_do(self, profile):
         profile_name, res = '', ''
         try:
-            self._legacy_check()
-
             # old code gets parameters from call
             # new code utilizes of flask.request
             if len(inspect.getargspec(self._checkParams).args) < 2:

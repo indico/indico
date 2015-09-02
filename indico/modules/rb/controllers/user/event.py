@@ -73,8 +73,6 @@ def _assign_room(obj, room, flash_message=True):
 
 
 class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
-    ALLOW_LEGACY_IDS = False
-
     def _checkProtection(self):
         RHConferenceModifBase._checkProtection(self)
         RHRoomBookingBase._checkProtection(self)

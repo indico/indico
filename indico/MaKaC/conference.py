@@ -1987,16 +1987,6 @@ class Conference(CommonObjectBase, Locatable):
         return '<Conference({0}, {1}, {2})>'.format(self.getId(), self.getTitle(), self.getStartDate())
 
     @property
-    def has_legacy_id(self):
-        """Returns True if the event has a broken legacy ID.
-
-        These IDs are not compatible with new code since they are not
-        numeric or have a leading zero, resulting in different events
-        with the same numeric event id.
-        """
-        return is_legacy_id(self.id)
-
-    @property
     def all_manager_emails(self):
         """Returns the emails of all managers, including the creator"""
         emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}

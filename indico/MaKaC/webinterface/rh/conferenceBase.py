@@ -53,15 +53,6 @@ class RHCustomizable(RH):
 
 
 class RHConferenceSite(RHCustomizable):
-    ALLOW_LEGACY_IDS = True
-
-    def _legacy_check(self):
-        if self.ALLOW_LEGACY_IDS:
-            return
-        event_id = request.view_args.get('confId') or request.values.get('confId')
-        if event_id is not None and is_legacy_id(event_id):
-            raise IndicoError('This page is not available for legacy events.')
-
     def _checkParams(self, params):
         l = locators.WebLocator()
         l.setConference( params )

@@ -26,8 +26,6 @@ logger = Logger.get('events.static')
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    if event.has_legacy_id:
-        return
     for static_site in StaticSite.find(event_id=int(event.id)):
         db.session.delete(static_site)
 

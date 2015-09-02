@@ -64,8 +64,6 @@ def _merge_users(target, source, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, user, **kwargs):
-    if event.has_legacy_id:
-        return
     reservations = Reservation.find(Reservation.event_id == int(event.id),
                                     ~Reservation.is_cancelled,
                                     ~Reservation.is_rejected)

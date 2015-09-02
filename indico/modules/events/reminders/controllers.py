@@ -34,7 +34,6 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHRemindersBase(RHConferenceModifBase):
-    ALLOW_LEGACY_IDS = False
     CSRF_ENABLED = True
 
     def _checkParams(self, params):

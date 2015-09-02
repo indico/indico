@@ -25,6 +25,7 @@ from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.console import cformat, verbose_iterator
+from indico.util.string import is_legacy_id
 from indico_zodbimport import Importer
 from MaKaC.webinterface.webFactoryRegistry import WebFactoryRegistry
 
@@ -89,7 +90,7 @@ class LegacyEventImporter(Importer):
         # we modify the conferences dict so we can't iterate over it while doing so
         events = self.flushing_iterator(self.zodb_root['conferences'].itervalues())
         events = verbose_iterator(events, len(self.zodb_root['conferences']), attrgetter('id'), attrgetter('title'))
-        return [event for event in events if event.has_legacy_id or hasattr(event, '_old_id')]
+        return [event for event in events if is_legacy_id(event.id) or hasattr(event, '_old_id')]
 
     def _committing_iterator(self, iterable):
         for i, data in enumerate(iterable, 1):

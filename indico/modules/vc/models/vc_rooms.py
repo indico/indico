@@ -200,9 +200,6 @@ class VCRoomEventAssociation(db.Model):
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
         :param kwargs: extra kwargs to pass to ``find()``
         """
-        if event.has_legacy_id:
-            # legacy event -> no VC rooms
-            return cls.find(False)
         if only_linked_to_event:
             kwargs['link_type'] = int(VCRoomLinkType.event)
         query = cls.find(event_id=int(event.id), **kwargs)

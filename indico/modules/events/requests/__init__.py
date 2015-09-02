@@ -50,8 +50,6 @@ def _merge_users(target, source, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    if event.has_legacy_id:
-        return
     event_id = int(event.id)
     requests = Request.find(event_id=event_id)
     for req in requests.filter(Request.state.in_((RequestState.accepted, RequestState.pending))):

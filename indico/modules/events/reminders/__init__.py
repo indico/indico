@@ -37,8 +37,6 @@ def _import_tasks(sender, **kwargs):
 @signals.event.data_changed.connect
 def _event_data_changed(event, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
-    if event.has_legacy_id:
-        return
     query = EventReminder.find(EventReminder.event_id == int(event.id),
                                EventReminder.is_relative,
                                ~EventReminder.is_sent)
@@ -52,8 +50,6 @@ def _event_data_changed(event, **kwargs):
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
-    if event.has_legacy_id:
-        return
     EventReminder.find(event_id=int(event.id)).delete()
 
 
@@ -74,7 +70,7 @@ class ReminderCloner(EventCloner):
         return EventReminder.find(EventReminder.is_relative, EventReminder.event_id == int(self.event.id))
 
     def get_options(self):
-        enabled = not self.event.has_legacy_id and bool(self.find_reminders().count())
+        enabled = bool(self.find_reminders().count())
         return {'reminders': (_('Reminders'), enabled, True)}
 
     def clone(self, new_event, options):

@@ -31,7 +31,7 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHStaticSiteBase(RHConferenceModifBase):
-    ALLOW_LEGACY_IDS = False
+    pass
 
 
 class RHStaticSiteList(RHStaticSiteBase):

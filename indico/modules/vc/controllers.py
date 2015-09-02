@@ -81,8 +81,6 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
 
 class RHVCManageEventBase(RHConferenceModifBase):
-    ALLOW_LEGACY_IDS = False
-
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event_id = int(self._conf.id)
