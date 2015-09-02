@@ -50,7 +50,7 @@ class SurveyItem(db.Model):
                                          "title IS NOT NULL AND "
                                          "is_required IS NOT NULL AND "
                                          "field_type IS NOT NULL AND "
-                                         "parent_id IS NOT NULL AND"
+                                         "parent_id IS NOT NULL AND "
                                          "display_as_section IS NULL)"
                                          .format(type=SurveyItemType.question), 'valid_question'),
                       db.CheckConstraint("type != {type} OR ("
@@ -58,7 +58,7 @@ class SurveyItem(db.Model):
                                          "is_required IS NULL AND "
                                          "field_type IS NULL AND "
                                          "field_data::text = '{{}}' AND "
-                                         "parent_id IS NULL AND"
+                                         "parent_id IS NULL AND "
                                          "display_as_section IS NOT NULL)"
                                          .format(type=SurveyItemType.section), 'valid_section'),
                       db.CheckConstraint("type != {type} OR ("
