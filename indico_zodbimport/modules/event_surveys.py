@@ -73,8 +73,8 @@ class SurveyImporter(Importer):
             survey.introduction += "\n\n{}".format(contact_text) if survey.introduction else contact_text
         survey.submission_limit = evaluation.submissionsLimit if evaluation.submissionsLimit else None
         survey.anonymous = evaluation.anonymous
-        # Guest users can only submit if survey is not anonymous
-        survey.require_user = not survey.anonymous and not evaluation.mandatoryAccount
+        # Require the user to login if the survey is not anonymous or if logging in was required before
+        survey.require_user = not survey.anonymous or evaluation.mandatoryAccount
 
         if evaluation.startDate.date() == date.min or evaluation.endDate.date() == date.min:
             survey.start_dt = event.endDate

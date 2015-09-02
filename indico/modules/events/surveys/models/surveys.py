@@ -41,7 +41,8 @@ class SurveyState(IndicoEnum):
 
 class Survey(db.Model):
     __tablename__ = 'surveys'
-    __table_args__ = {'schema': 'event_surveys'}
+    __table_args__ = (db.CheckConstraint("anonymous OR require_user", 'valid_anonymous_user'),
+                      {'schema': 'event_surveys'})
 
     #: The ID of the submission
     id = db.Column(
