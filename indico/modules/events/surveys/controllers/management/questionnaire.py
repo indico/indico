@@ -109,8 +109,7 @@ class RHAddSurveySection(RHManageSurveyBase):
             flash(_('Section "{title}" added').format(title=section.title), 'success')
             logger.info('Survey section {} added by {}'.format(section, session.user))
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form,
-                                disabled_until_change=False)
+        return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
 
 class RHEditSurveySection(RHManageSurveySectionBase):
