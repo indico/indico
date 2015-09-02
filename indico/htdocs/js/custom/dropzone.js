@@ -77,14 +77,11 @@
                     });
 
                     self.on('removedfile', function(file) {
-
                         $button.prop('disabled', false);
-                        // force change in form, so that we can process
-                        // the 'change' event
-                        $form.find('.change-trigger').val('no-file');
-                        $form.trigger('change');
-
                         if (self.files.length === 0) {
+                            // force change in form, so that we can process the 'change' event
+                            $form.find('.change-trigger').val('no-file');
+                            $form.trigger('change');
                             $dz.find('.dz-message').show();
                         }
                     });
