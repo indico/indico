@@ -63,8 +63,8 @@ def _extend_event_management_menu_layout(event, **kwargs):
 
 @signals.event.sidemenu.connect
 def _get_default_menu_entries(sender, **kwargs):
-    from indico.modules.events.layout.default import DEFAULT_MENU_ENTRIES
-    for entry in DEFAULT_MENU_ENTRIES:
+    from indico.modules.events.layout.default import get_default_menu_entries
+    for entry in get_default_menu_entries():
         yield entry
 
 

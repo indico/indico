@@ -24,7 +24,7 @@ from werkzeug.exceptions import BadRequest, NotFound, Forbidden
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import (MenuEntryForm, MenuLinkForm, MenuPageForm)
+from indico.modules.events.layout.forms import (MenuLinkForm, MenuPageForm, MenuBuiltinEntryForm)
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, EventPage
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPMenuEdit, WPPage
@@ -102,15 +102,19 @@ class RHMenuEntryEditBase(RHMenuBase):
 class RHMenuEntryEdit(RHMenuEntryEditBase):
     def _process(self):
         defaults = FormDefaults(self.entry)
-        form_cls = MenuEntryForm
         if self.entry.is_user_link:
             form_cls = MenuLinkForm
         elif self.entry.is_page:
             form_cls = MenuPageForm
             defaults['html'] = self.entry.page.html
-        form = form_cls(linked_object=self.entry, obj=defaults)
+        else:
+            form_cls = MenuBuiltinEntryForm
+            defaults = FormDefaults(self.entry, skip_attrs={'title'},
+                                    title=self.entry.title or self.entry.default_data.title,
+                                    custom_title=self.entry.title is not None)
+        form = form_cls(entry=self.entry, obj=defaults)
         if form.validate_on_submit():
-            form.populate_obj(self.entry, skip={'html'})
+            form.populate_obj(self.entry, skip={'html', 'custom_title'})
             if self.entry.is_page:
                 self.entry.page.html = form.html.data
             return jsonify_data(entry=_render_menu_entry(self.entry))
@@ -133,17 +137,17 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
 
         if parent_id != self.entry.parent_id:
             if self.entry.type not in {MenuEntryType.user_link, MenuEntryType.page}:
-                raise BadRequest('Menu entry "{0.title}" cannot be moved to another menu: Invalid type "{0.type.name}".'
+                raise BadRequest('Menu entry "{0}" cannot be moved to another menu: Invalid type "{0.type.name}".'
                                  .format(self.entry))
             if self.entry.is_root and self.entry.children:
-                raise BadRequest('Menu entry "{0.title}" cannot be moved to another menu: Entry has nested entries.'
+                raise BadRequest('Menu entry "{0}" cannot be moved to another menu: Entry has nested entries.'
                                  .format(self.entry))
 
             if parent_id is not None:
                 parent_entry = MenuEntry.find_first(MenuEntry.type.in_({MenuEntryType.user_link, MenuEntryType.page}),
                                                     id=parent_id, parent_id=None, event_id=self.entry.event_id)
                 if not parent_entry:
-                    raise BadRequest('New parent entry not found for Menu entry "{0.title}".'.format(self.entry))
+                    raise BadRequest('New parent entry not found for Menu entry "{0}".'.format(self.entry))
 
             self.entry.insert(parent_id, position)
 

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField, HiddenField
-from wtforms.validators import InputRequired, DataRequired, Optional, ValidationError
+from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import Config
 from indico.util.i18n import _
@@ -98,20 +98,34 @@ class CSSForm(IndicoForm):
                                       .format(base_url=Config.getInstance().getCssConfTemplateBaseURL()))
 
 
-class MenuEntryForm(IndicoForm):
-    title = StringField(_("Title"), [InputRequired()])
+class MenuBuiltinEntryForm(IndicoForm):
+    custom_title = BooleanField(_("Custom title"), widget=SwitchWidget())
+    title = StringField(_("Title"), [HiddenUnless('custom_title'), DataRequired()])
     is_enabled = BooleanField(_("Show"), widget=SwitchWidget())
 
+    def __init__(self, *args, **kwargs):
+        entry = kwargs.pop('entry')
+        super(MenuBuiltinEntryForm, self).__init__(*args, **kwargs)
+        self.custom_title.description = _("If you customize the title, that title is used regardless of the user's "
+                                          "language preference.  The default title <strong>{title}</strong> is "
+                                          "displayed in the user's language.").format(title=entry.default_data.title)
 
-class MenuUserEntry(MenuEntryForm):
+    def post_validate(self):
+        if not self.custom_title.data:
+            self.title.data = None
+
+
+class MenuUserEntryFormBase(IndicoForm):
+    title = StringField(_("Title"), [DataRequired()])
+    is_enabled = BooleanField(_("Show"), widget=SwitchWidget())
     new_tab = BooleanField(_("Open in a new tab"), widget=SwitchWidget())
 
 
-class MenuLinkForm(MenuUserEntry):
+class MenuLinkForm(MenuUserEntryFormBase):
     link_url = URLField(_("URL"), [DataRequired()])
 
 
-class MenuPageForm(MenuUserEntry):
+class MenuPageForm(MenuUserEntryFormBase):
     html = TextAreaField(_("Content"), [DataRequired()], widget=CKEditorWidget())
 
 

@@ -134,11 +134,14 @@ class MenuEntryMixin(object):
         if self.is_separator:
             return ''
 
-        defaults = self.default_data
-        if defaults is not None and defaults.title == self.title:
-            return _(self.title)
+        if self.title is not None:
+            return self.title
 
-        return self.title
+        defaults = self.default_data
+        if defaults is not None:
+            return defaults.title
+
+        raise RuntimeError('Tried to get localized title for orphaned menu item')
 
     @property
     def locator(self):
@@ -156,10 +159,10 @@ class MenuEntryMixin(object):
 
 
 class TransientMenuEntry(MenuEntryMixin):
-    def __init__(self, event_id, is_enabled, title, name, position, children):
+    def __init__(self, event_id, is_enabled, name, position, children):
         self.event_id = event_id
         self.is_enabled = is_enabled
-        self.title = title
+        self.title = None
         self.name = name
         self.position = position
         self.children = children
@@ -198,8 +201,13 @@ class MenuEntry(MenuEntryMixin, db.Model):
             'valid_plugin'),
         db.CheckConstraint(
             '(type = {type.separator.value} AND title IS NULL) OR'
-            ' (type != {type.separator.value} AND title IS NOT NULL)'.format(type=MenuEntryType),
+            ' (type IN ({type.user_link.value}, {type.page.value}) AND title IS NOT NULL) OR'
+            ' (type NOT IN ({type.separator.value}, {type.user_link.value}, {type.page.value}))'
+            .format(type=MenuEntryType),
             'valid_title'),
+        db.CheckConstraint(
+            "title != ''",
+            'title_not_empty'),
         db.Index(None, 'event_id', 'name', unique=True,
                  postgresql_where=db.text('(type = {type.internal_link.value} OR type = {type.plugin_link.value})'
                                           .format(type=MenuEntryType))),

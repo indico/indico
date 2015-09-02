@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.modules.events.layout.util import MenuEntryData
-from indico.util.i18n import N_
+from indico.util.i18n import _
 from MaKaC.paperReviewing import ConferencePaperReview
 
 
@@ -90,193 +90,194 @@ def _visibility_paper_assign(event):
     return _visibility_paper_review_managment(event) and _visibility_judge(event)
 
 
-DEFAULT_MENU_ENTRIES = [
-    MenuEntryData(
-        title=N_("Overview"),
-        name='overview',
-        endpoint='event.conferenceDisplay-overview',
-        position=0,
-        static_site=True
-    ),
-    MenuEntryData(
-        title=N_("Scientific Programme"),
-        name='program',
-        endpoint='event.conferenceProgram',
-        position=1,
-        static_site=True
-    ),
-    MenuEntryData(
-        title=N_("Manage my Tracks"),
-        name='program_my_tracks',
-        visible=_visibility_my_tracks,
-        endpoint='event.myconference-myTracks',
-        parent='program',
-    ),
-    MenuEntryData(
-        title=N_("Call for Abstracts"),
-        name='call_for_abstracts',
-        endpoint='event.conferenceCFA',
-        position=2,
-        visible=_visibility_call_for_abstracts,
-    ),
-    MenuEntryData(
-        title=N_("View my Abstracts"),
-        name='user_abstracts',
-        endpoint='event.userAbstracts',
-        position=0,
-        parent='call_for_abstracts'
-    ),
-    MenuEntryData(
-        title=N_("Submit Abstract"),
-        name='abstract_submission',
-        endpoint='event.abstractSubmission',
-        position=1,
-        parent='call_for_abstracts'
-    ),
-    MenuEntryData(
-        title=N_("Timetable"),
-        name='timetable',
-        endpoint='event.conferenceTimeTable',
-        position=3,
-        static_site=True
-    ),
-    MenuEntryData(
-        title=N_("Contribution List"),
-        name='contributions',
-        endpoint='event.contributionListDisplay',
-        position=4,
-        static_site=True
-    ),
-    MenuEntryData(
-        title=N_("Author List"),
-        name='author_index',
-        endpoint='event.confAuthorIndex',
-        position=5,
-        is_enabled=False,
-        static_site=True
-    ),
-    MenuEntryData(
-        title=N_("Speaker List"),
-        name='speaker_index',
-        endpoint='event.confSpeakerIndex',
-        position=6,
-        is_enabled=False,
-        static_site=True
-    ),
-    MenuEntryData(
-        title=N_("My Conference"),
-        name='my_conference',
-        endpoint='event.myconference',
-        position=7,
-        visible=_visibility_my_conference
-    ),
-    MenuEntryData(
-        title=N_("My Tracks"),
-        endpoint='event.myconference-myTracks',
-        name='my_tracks',
-        visible=_visibility_my_tracks,
-        position=0,
-        parent='my_conference'
-    ),
-    MenuEntryData(
-        title=N_("My Sessions"),
-        name='my_sessions',
-        endpoint='event.myconference-mySessions',
-        position=1,
-        parent='my_conference'
-    ),
-    MenuEntryData(
-        title=N_("My Contributions"),
-        name='my_contributions',
-        visible=_visibility_my_contributions,
-        endpoint='event.myconference-myContributions',
-        position=2,
-        parent='my_conference'
-    ),
-    MenuEntryData(
-        title=N_("Paper Reviewing"),
-        name='paper_reviewing',
-        endpoint='event.paperReviewingDisplay',
-        position=8,
-        visible=_visibility_paper_review
-    ),
-    MenuEntryData(
-        title=N_("Manage Paper Reviewing"),
-        name='paper_setup',
-        endpoint='event_mgmt.confModifReviewing-paperSetup',
-        visible=_visibility_paper_review_managment,
-        position=0,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Assign Papers"),
-        name='paper_assign',
-        endpoint='event_mgmt.assignContributions',
-        visible=_visibility_paper_assign,
-        position=1,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Referee Area"),
-        name='contributions_to_judge',
-        endpoint='event_mgmt.confListContribToJudge',
-        visible=_visibility_judge,
-        position=2,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Content Reviewer Area"),
-        name='contributions_as_reviewer',
-        endpoint='event_mgmt.confListContribToJudge-asReviewer',
-        visible=_visibility_contributions_as_reviewer,
-        position=3,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Layout Reviewer Area"),
-        name='contributions_as_editor',
-        endpoint='event_mgmt.confListContribToJudge-asEditor',
-        visible=_visibility_contributions_as_editor,
-        position=4,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Upload Paper"),
-        name='paper_upload',
-        endpoint='event.paperReviewingDisplay-uploadPaper',
-        visible=_visibility_paper_review_transfer,
-        position=5,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Download Template"),
-        name='download_template',
-        endpoint='event.paperReviewingDisplay-downloadTemplate',
-        visible=_visibility_paper_review_transfer,
-        position=6,
-        parent='paper_reviewing'
-    ),
-    MenuEntryData(
-        title=N_("Book of Abstracts"),
-        name='abstracts_book',
-        endpoint='event.conferenceDisplay-abstractBook',
-        position=9,
-        visible=_visibility_abstracts_book,
-        static_site='files/generatedPdf/BookOfAbstracts.pdf'
-    ),
-    MenuEntryData(
-        title=N_("Registration"),
-        name='registration',
-        endpoint='event.confRegistrationFormDisplay',
-        position=10,
-        visible=_visibility_registration
-    ),
-    MenuEntryData(
-        title=N_("Participant List"),
-        name='registrants',
-        endpoint='event.confRegistrantsDisplay-list',
-        position=11,
-        visible=_visibility_registration,
-        static_site=True
-    )
-]
+def get_default_menu_entries():
+    return [
+        MenuEntryData(
+            title=_("Overview"),
+            name='overview',
+            endpoint='event.conferenceDisplay-overview',
+            position=0,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("Scientific Programme"),
+            name='program',
+            endpoint='event.conferenceProgram',
+            position=1,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("Manage my Tracks"),
+            name='program_my_tracks',
+            visible=_visibility_my_tracks,
+            endpoint='event.myconference-myTracks',
+            parent='program',
+        ),
+        MenuEntryData(
+            title=_("Call for Abstracts"),
+            name='call_for_abstracts',
+            endpoint='event.conferenceCFA',
+            position=2,
+            visible=_visibility_call_for_abstracts,
+        ),
+        MenuEntryData(
+            title=_("View my Abstracts"),
+            name='user_abstracts',
+            endpoint='event.userAbstracts',
+            position=0,
+            parent='call_for_abstracts'
+        ),
+        MenuEntryData(
+            title=_("Submit Abstract"),
+            name='abstract_submission',
+            endpoint='event.abstractSubmission',
+            position=1,
+            parent='call_for_abstracts'
+        ),
+        MenuEntryData(
+            title=_("Timetable"),
+            name='timetable',
+            endpoint='event.conferenceTimeTable',
+            position=3,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("Contribution List"),
+            name='contributions',
+            endpoint='event.contributionListDisplay',
+            position=4,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("Author List"),
+            name='author_index',
+            endpoint='event.confAuthorIndex',
+            position=5,
+            is_enabled=False,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("Speaker List"),
+            name='speaker_index',
+            endpoint='event.confSpeakerIndex',
+            position=6,
+            is_enabled=False,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("My Conference"),
+            name='my_conference',
+            endpoint='event.myconference',
+            position=7,
+            visible=_visibility_my_conference
+        ),
+        MenuEntryData(
+            title=_("My Tracks"),
+            endpoint='event.myconference-myTracks',
+            name='my_tracks',
+            visible=_visibility_my_tracks,
+            position=0,
+            parent='my_conference'
+        ),
+        MenuEntryData(
+            title=_("My Sessions"),
+            name='my_sessions',
+            endpoint='event.myconference-mySessions',
+            position=1,
+            parent='my_conference'
+        ),
+        MenuEntryData(
+            title=_("My Contributions"),
+            name='my_contributions',
+            visible=_visibility_my_contributions,
+            endpoint='event.myconference-myContributions',
+            position=2,
+            parent='my_conference'
+        ),
+        MenuEntryData(
+            title=_("Paper Reviewing"),
+            name='paper_reviewing',
+            endpoint='event.paperReviewingDisplay',
+            position=8,
+            visible=_visibility_paper_review
+        ),
+        MenuEntryData(
+            title=_("Manage Paper Reviewing"),
+            name='paper_setup',
+            endpoint='event_mgmt.confModifReviewing-paperSetup',
+            visible=_visibility_paper_review_managment,
+            position=0,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Assign Papers"),
+            name='paper_assign',
+            endpoint='event_mgmt.assignContributions',
+            visible=_visibility_paper_assign,
+            position=1,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Referee Area"),
+            name='contributions_to_judge',
+            endpoint='event_mgmt.confListContribToJudge',
+            visible=_visibility_judge,
+            position=2,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Content Reviewer Area"),
+            name='contributions_as_reviewer',
+            endpoint='event_mgmt.confListContribToJudge-asReviewer',
+            visible=_visibility_contributions_as_reviewer,
+            position=3,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Layout Reviewer Area"),
+            name='contributions_as_editor',
+            endpoint='event_mgmt.confListContribToJudge-asEditor',
+            visible=_visibility_contributions_as_editor,
+            position=4,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Upload Paper"),
+            name='paper_upload',
+            endpoint='event.paperReviewingDisplay-uploadPaper',
+            visible=_visibility_paper_review_transfer,
+            position=5,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Download Template"),
+            name='download_template',
+            endpoint='event.paperReviewingDisplay-downloadTemplate',
+            visible=_visibility_paper_review_transfer,
+            position=6,
+            parent='paper_reviewing'
+        ),
+        MenuEntryData(
+            title=_("Book of Abstracts"),
+            name='abstracts_book',
+            endpoint='event.conferenceDisplay-abstractBook',
+            position=9,
+            visible=_visibility_abstracts_book,
+            static_site='files/generatedPdf/BookOfAbstracts.pdf'
+        ),
+        MenuEntryData(
+            title=_("Registration"),
+            name='registration',
+            endpoint='event.confRegistrationFormDisplay',
+            position=10,
+            visible=_visibility_registration
+        ),
+        MenuEntryData(
+            title=_("Participant List"),
+            name='registrants',
+            endpoint='event.confRegistrantsDisplay-list',
+            position=11,
+            visible=_visibility_registration,
+            static_site=True
+        )
+    ]

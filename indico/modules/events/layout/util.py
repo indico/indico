@@ -68,8 +68,9 @@ class MenuEntryData(object):
     to build the side menu of an event.
 
     :param title: str -- The title of the menu, displayed to the user.
-        The title must be marked for translation, but not directly
-        translated, using `N_(...)` from `indico.util.i18n`.
+        The title should be translated using the normal gettext
+        function, i.e. ``_('...')``, or the plugin's bound gettext
+        function.
     :param name: str -- Name used to refer to the entry internally.
         This is never shown to the user. The name must be unique,
         names from plugins are automatically prefixed with the plugin
@@ -170,7 +171,6 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None)
     entry = entry_cls(
         event_id=event.getId(),
         is_enabled=data.is_enabled,
-        title=data.title,
         name=data.name,
         position=position,
         children=[_build_menu_entry(event, custom_menu_enabled, entry_data, i)
