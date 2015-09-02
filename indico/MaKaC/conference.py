@@ -2441,7 +2441,7 @@ class Conference(CommonObjectBase, Locatable):
         """
         self.setModificationDate()
 
-        if raiseEvent:
+        if raiseEvent and self.id:
             signals.event.data_changed.send(self, attr=None, old=None, new=None)
 
         self.cleanCache()
