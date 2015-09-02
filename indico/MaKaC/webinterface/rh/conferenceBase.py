@@ -22,18 +22,16 @@ import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.paperReviewing import reviewing_factory_get, reviewing_factory_create
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.errors import MaKaCError
 from indico.core.config import Config
 from MaKaC.conference import LocalFile, Category
 from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
 
-from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 
 from indico.util import json
 from indico.util.contextManager import ContextManager
-from indico.util.string import is_legacy_id
 from indico.util.user import principal_from_fossil
 
 BYTES_1MB = 1024 * 1024
