@@ -761,7 +761,7 @@ class WPRegistrantBase( WPConferenceModifBase ):
 
 
 class WPRegistrantModifBase( WPRegistrantBase ):
-    sidemenu_option = 'registration'
+    sidemenu_option = 'registration_old'
 
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": True}

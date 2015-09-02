@@ -16,10 +16,28 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.roles import ManagementRole
 from indico.modules.events import Event
+from indico.modules.events.features.base import EventFeature
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    if not event.has_feature('registration') or not event.can_manage(session.user, 'registration', allow_key=True):
+        return
+    return SideMenuItem('registration', _('Registration'), url_for('event_registration.manage_regform_list', event),
+                        section='organization')
+
+
+@signals.event.get_feature_definitions.connect
+def _get_feature_definitions(sender, **kwargs):
+    return RegistrationFeature
 
 
 @signals.acl.get_management_roles.connect_via(Event)
@@ -27,13 +45,17 @@ def _get_management_roles(sender, **kwargs):
     return RegistrationRole
 
 
+class RegistrationFeature(EventFeature):
+    name = 'registration'
+    friendly_name = _('Registration')
+    description = _('Gives event managers the opportunity to handle registrations within the event.')
+
+    @classmethod
+    def is_default_for_event(cls, event):
+        return event.getType() == 'conference'
+
+
 class RegistrationRole(ManagementRole):
     name = 'registration'
     friendly_name = _('Registration')
-    description = _('Grants management access to the registration form..')
-
-
-# TODO: In the new registration module, being able to manage forms and
-# being able to see registrants should probably use different roles.  That
-# way you can hand out read access to the full registrant list without the
-# risk of someone changing data or the form itself.
+    description = _('Grants management access to the registration form.')

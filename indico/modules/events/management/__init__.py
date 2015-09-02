@@ -82,7 +82,7 @@ def _sidemenu_items(sender, event, **kwargs):
                                url_for('event_mgmt.confModifProgram', event),
                                section='organization')
         if reg_form_enabled and can_manage_registration:
-            yield SideMenuItem('registration', _('Registration'),
+            yield SideMenuItem('registration_old', _('Registration (old)'),
                                url_for('event_mgmt.confModifRegistrationForm', event),
                                section='organization')
         if can_modify and cfa_enabled:
