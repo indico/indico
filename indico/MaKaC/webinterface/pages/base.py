@@ -115,7 +115,6 @@ class WPBase():
 
         #store page specific CSS and JS
         self._extraCSS = []
-        self._extraJS = []
 
     def _getBaseURL(self):
         if request.is_secure and Config.getInstance().getBaseSecureURL():
@@ -186,7 +185,6 @@ class WPBase():
             "page": self,
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
-            "extraJS": self._extraJS,
             "language": session.lang or info.getLang(),
             "social": info.getSocialAppConfig(),
             "assets": self._asset_env
@@ -219,12 +217,6 @@ class WPBase():
                             self._display( params ), \
                             self._getHTMLFooter() )
 
-
-    def addExtraJSFile(self, filename):
-        self._extraJSFiles.append(filename)
-
-    def addExtraJS(self, jsCode):
-        self._extraJS.append(jsCode)
 
     # auxiliar functions
     def _escapeChars(self, text):

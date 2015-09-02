@@ -43,11 +43,6 @@
             <link rel="stylesheet" type="text/css" href="${cssFile}">
         % endfor
 
-        <!-- page-specific, directly inserted Javascript -->
-        <script>
-            ${ "\n\n".join(extraJS) }
-        </script>
-
         <!-- global JS variables -->
         <script>
         % if user:
