@@ -1015,18 +1015,24 @@ class WPConferenceModifBase(main.WPMainBase):
 
         # The main section containing most menu items
         self._generalSection = wcomponents.SideMenuSection(id='general', icon='icon-settings')
+        self._timetableSection = wcomponents.SideMenuSection(id='timetable', icon='icon-calendar')
+        self._materialsSection = wcomponents.SideMenuSection(id='materials', icon='icon-upload')
+        self._roomBookingSection = wcomponents.SideMenuSection(id='room_booking', icon='icon-location')
         self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"), id='advanced',
                                                                    icon='icon-lamp')
-        self._organizationSection = wcomponents.SideMenuSection(_("Organization"), id='organization', icon='icon-time',
+        self._organizationSection = wcomponents.SideMenuSection(_("Organization"), id='organization', icon='icon-list',
                                                                 active=True)
-        self._toolsSection = wcomponents.SideMenuSection(_("Tools"), id='tools', icon='icon-wrench')
         self._customizationSection = wcomponents.SideMenuSection(_("Customization"), id='customization',
                                                                  icon='icon-image')
+        self._protectionSection = wcomponents.SideMenuSection(id='protection', icon='icon-shield')
 
         self._sideMenu.addSection(self._generalSection)
+        self._sideMenu.addSection(self._timetableSection)
+        self._sideMenu.addSection(self._materialsSection)
+        self._sideMenu.addSection(self._roomBookingSection)
         self._sideMenu.addSection(self._organizationSection)
         self._sideMenu.addSection(self._advancedOptionsSection)
-        self._sideMenu.addSection(self._toolsSection)
+        self._sideMenu.addSection(self._protectionSection)
         self._sideMenu.addSection(self._customizationSection)
 
         self._generalSettingsMenuItem = wcomponents.SideMenuItem(
@@ -1036,12 +1042,12 @@ class WPConferenceModifBase(main.WPMainBase):
 
         self._timetableMenuItem = wcomponents.SideMenuItem(
             _("Timetable"),
-            urlHandlers.UHConfModifSchedule.getURL(self._conf), section='organization')
+            urlHandlers.UHConfModifSchedule.getURL(self._conf), section='timetable')
         self._sideMenu.addItem(self._timetableMenuItem)
 
         self._roomBookingMenuItem = wcomponents.SideMenuItem(
             _("Room booking"),
-            url_for('event_mgmt.rooms_booking_list', self._conf), section='organization')
+            url_for('event_mgmt.rooms_booking_list', self._conf), section='room_booking')
         self._sideMenu.addItem(self._roomBookingMenuItem)
 
         self._programMenuItem = wcomponents.SideMenuItem(
@@ -1082,17 +1088,17 @@ class WPConferenceModifBase(main.WPMainBase):
 
         self._listingsMenuItem = wcomponents.SideMenuItem(
             _("Lists"),
-            urlHandlers.UHConfAllSpeakers.getURL(self._conf), section='tools')
+            urlHandlers.UHConfAllSpeakers.getURL(self._conf), section='advanced')
         self._sideMenu.addItem(self._listingsMenuItem)
 
         self._ACMenuItem = wcomponents.SideMenuItem(
             _("Protection"),
-            urlHandlers.UHConfModifAC.getURL(self._conf), section='advanced')
+            urlHandlers.UHConfModifAC.getURL(self._conf), section='protection')
         self._sideMenu.addItem(self._ACMenuItem)
 
         self._toolsMenuItem = wcomponents.SideMenuItem(
             _("Utilities"),
-            urlHandlers.UHConfModifTools.getURL(self._conf), section='tools')
+            urlHandlers.UHConfModifTools.getURL(self._conf), section='advanced')
         self._sideMenu.addItem(self._toolsMenuItem)
 
         self.extra_menu_items_advanced = {}
