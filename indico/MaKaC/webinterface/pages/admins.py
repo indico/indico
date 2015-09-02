@@ -29,7 +29,7 @@ import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC import domain
-from MaKaC.common import timezoneUtils, utils
+from MaKaC.common import timezoneUtils
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
@@ -44,7 +44,6 @@ from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.users import User
 from indico.util.i18n import _, i18nformat, get_all_locales
 from indico.util.signals import values_from_signal
-from indico.web.flask.util import url_for
 
 
 class WPAdminsBase(WPMainBase):
