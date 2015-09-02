@@ -1,0 +1,18 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {%- trans %}Registration Form{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% if regform %}
+        {% trans title=regform.title -%}Edit "{{ title }}"{%- endtrans %}
+    {% else %}
+        {%- trans %}Create registration form{% endtrans -%}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, back_url=url_for('.manage_regform_list', event)) }}
+{% endblock %}
