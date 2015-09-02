@@ -17,10 +17,16 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
+from indico.modules.events.registration.controllers import RHRegistrationForms, RHRegistrationFormCreate
 from indico.web.flask.wrappers import IndicoBlueprint
 
-_bp = IndicoBlueprint('event_registration', __name__, template_folder='templates',
-                      virtual_template_folder='events/registration')
+_bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
+                      virtual_template_folder='events/registration', event_feature='surveys')
+
+
+# Management
+_bp.add_url_rule('/manage/registration/', 'manage_regform_list', RHRegistrationForms)
+_bp.add_url_rule('/manage/registration/create', 'create_regform', RHRegistrationFormCreate)
 
 
 # API
