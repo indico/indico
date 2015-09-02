@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import date, timedelta
+from HTMLParser import HTMLParser
 from operator import attrgetter
 from uuid import uuid4
 
@@ -29,7 +30,12 @@ from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import localize_as_utc
 from indico.util.struct.iterables import committing_iterator
+from indico.web.flask.templating import strip_tags
 from indico_zodbimport import Importer, convert_to_unicode
+
+
+def _sanitize(title):
+    return HTMLParser().unescape(strip_tags(convert_to_unicode(title))).strip()
 
 
 class SurveyImporter(Importer):
@@ -53,11 +59,10 @@ class SurveyImporter(Importer):
 
     def migrate_survey(self, evaluation, event):
         survey = Survey(event_id=int(event.id))
-        survey.title = convert_to_unicode(evaluation.title) if evaluation.title else "Evaluation"
-        survey.introduction = convert_to_unicode(evaluation.announcement)
+        survey.title = _sanitize(evaluation.title) if evaluation.title else "Evaluation"
+        survey.introduction = _sanitize(evaluation.announcement)
         if evaluation.contactInfo:
-            contact = convert_to_unicode(evaluation.contactInfo)
-            contact_text = "Contact: ".format(contact)
+            contact_text = "Contact: ".format(_sanitize(evaluation.contactInfo))
             survey.introduction += "\n\n{}".format(contact_text) if survey.introduction else contact_text
         survey.submission_limit = evaluation.submissionsLimit if evaluation.submissionsLimit else None
         survey.anonymous = evaluation.anonymous
@@ -99,10 +104,10 @@ class SurveyImporter(Importer):
     def migrate_question(self, old_question, position):
         question = SurveyQuestion()
         question.position = position
-        question.title = convert_to_unicode(old_question.questionValue)
-        question.description = convert_to_unicode(old_question.description)
+        question.title = _sanitize(old_question.questionValue)
+        question.description = _sanitize(old_question.description)
         if old_question.help:
-            help_text = convert_to_unicode(old_question.help)
+            help_text = _sanitize(old_question.help)
             question.description += "\n\nHelp: {}".format(help_text) if question.description else help_text
         question.is_required = old_question.required
         question.field_data = {}
@@ -152,7 +157,7 @@ class SurveyImporter(Importer):
             if old_answer._answerValue:
                 answer.data = self._get_option_id(question, old_answer._answerValue)
         else:
-            answer.data = convert_to_unicode(old_answer._answerValue)
+            answer.data = _sanitize(old_answer._answerValue)
         self.print_success("   - Answer: {}".format(answer.data))
         return answer
 
