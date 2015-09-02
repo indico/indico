@@ -27,8 +27,10 @@
                                 {{ text_answer(question) }}
                             {% elif question.field_type == 'number' %}
                                 {{ number_answer(question) }}
-                            {% elif question.field_type in ('bool', 'single_choice') %}
+                            {% elif question.field_type == 'single_choice' %}
                                 {{ single_choice_answer(question) }}
+                            {% elif question.field_type == 'bool' %}
+                                {{ single_choice_answer(question, short_labels=false) }}
                             {% elif question.field_type == 'multiselect' %}
                                 {{ multiple_choice_answer(question) }}
                             {% endif %}
@@ -72,33 +74,33 @@
 {% endmacro %}
 
 
-{% macro single_choice_answer(question) %}
-    {{ _choice_answer(question, 'pie') }}
+{% macro single_choice_answer(question, short_labels=true) %}
+    {{ _choice_answer(question, 'pie', short_labels=short_labels) }}
 {% endmacro %}
 
 
 {% macro multiple_choice_answer(question) %}
-    {{ _choice_answer(question, 'bar') }}
+    {{ _choice_answer(question, 'bar', short_labels=true) }}
 {% endmacro %}
 
 
-{% macro _choice_answer(question, chart_type) %}
+{% macro _choice_answer(question, chart_type, short_labels=false) %}
     {% set summary = question.get_summary() %}
     <div class="chart-answer">
         {% for label, value in summary.relative.iteritems() %}
             <div class="chart-option-details">
-                <strong>{{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
+                <strong>{{ loop.index0|alpha_enum|upper }}. {{ label }}</strong>: {{ summary.absolute[label] }} ({{ '%0.2f'|format(value * 100) }}%)
             </div>
         {% endfor %}
     </div>
-    {{ _chart(chart_type, summary) }}
+    {{ _chart(chart_type, summary, short_labels=short_labels) }}
 {% endmacro %}
 
 
-{% macro _chart(chart_type, summary) %}
+{% macro _chart(chart_type, summary, short_labels=false) %}
     <div class="chart-answer">
         <div class="survey-{{ chart_type }}-chart"
-            data-labels="{{ summary.absolute.keys()|tojson|forceescape }}"
+            data-labels="{{ (summary.labels if short_labels else summary.absolute.keys())|tojson|forceescape }}"
             data-series-absolute="{{ summary.absolute.values() }}"
             data-series-relative="{{ summary.relative.values() }}"></div>
     </div>

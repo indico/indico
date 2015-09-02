@@ -22,6 +22,7 @@ from __future__ import absolute_import
 
 import functools
 import re
+import string
 import unicodedata
 from uuid import uuid4
 
@@ -367,3 +368,9 @@ def text_to_repr(text, html=False, max_length=50):
     if max_length is not None and len(text) > max_length:
         text = text[:max_length] + u'...'
     return text.strip()
+
+
+def alpha_enum(value):
+    """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
+    max_len = len(string.ascii_lowercase)
+    return unicode(string.ascii_lowercase[value % max_len] * (value / max_len + 1))

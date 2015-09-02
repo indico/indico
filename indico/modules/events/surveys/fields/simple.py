@@ -98,7 +98,7 @@ class NumberField(SurveyField):
                    'min': min(counter.elements()),
                    'absolute': OrderedDict(sorted(counter.iteritems())),
                    'relative': OrderedDict((k, v / total_answers) for k, v in sorted(counter.iteritems()))}
-        results['average'] = (results['max'] + results['min']) / len(list(counter.elements()))
+        results['average'] = results['total'] / len(list(counter.elements()))
         return results
 
 

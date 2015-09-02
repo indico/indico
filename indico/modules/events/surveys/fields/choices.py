@@ -24,6 +24,7 @@ from wtforms.validators import DataRequired, Optional, NumberRange, ValidationEr
 
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _, ngettext
+from indico.util.string import alpha_enum
 from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import HiddenUnless
 
@@ -87,6 +88,7 @@ class SingleChoiceField(SurveyField):
             no_option = {'id': None, 'option': _("No selection")}
             options.append(no_option)
         return {'total': total,
+                'labels': [alpha_enum(val).upper() for val in xrange(len(options))],
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total) for opt in options)}
 
@@ -166,6 +168,7 @@ class MultiSelectField(SurveyField):
         total = sum(counter.values())
         options = self.question.field_data['options']
         return {'total': total,
+                'labels': [alpha_enum(val).upper() for val in xrange(len(options))],
                 'absolute': OrderedDict((opt['option'], counter[opt['id']]) for opt in options),
                 'relative': OrderedDict((opt['option'], counter[opt['id']] / total if total else 0) for opt in options)}
 
