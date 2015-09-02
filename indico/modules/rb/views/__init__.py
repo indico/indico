@@ -55,7 +55,7 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
         user_is_admin = session.user is not None and rb_is_admin(session.user)
 
-        self._roomsBookingOpt = SideMenuSection(currentPage=url_for('rooms.book'))
+        self._roomsBookingOpt = SideMenuSection()
 
         self._bookRoomNewOpt = SideMenuItem(
             _('Book a Room'),

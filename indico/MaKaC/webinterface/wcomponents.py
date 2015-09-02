@@ -1171,7 +1171,7 @@ class SideMenu(object):
             self._sections[section.id] = section
 
     def addItem(self, item):
-        self._sections[item.section].addItem(item)
+        self._sections[item.section_id].addItem(item)
 
     def getSections(self):
         return self._sections.values()
@@ -1189,19 +1189,19 @@ class BasicSideMenu(SideMenu):
         return WSideMenu(self, self._userStatus, type="basic").getHTML()
 
 
-class SideMenuSection:
-    """ class coment
-    """
+class SideMenuSection(object):
 
-    def __init__(self, title=None, active=False, currentPage=None, visible=True, id=None, icon=None):
-        """ -title is the words that will be displayed int he side menu.
-            -active is True if ...
-            -currentPage stores information about in which page we are seeing the Side Menu. For example,
-            its values can be "category" or "admin".
+    def __init__(self, title=None, active=False, visible=True, id=None, icon=None):
+        """A section of the side menu. Has a title and icon.
+
+        :param title: Title that will be visible
+        :param active: Whether the menu section is active (expanded)
+        :param visible: Whether the section is visible at all
+        :param id:  A string id for the section (can be referenced by items)
+        :param icon: The icon that will be rendered next to the title
         """
         self._title = title
         self._active = active
-        self._currentPage = currentPage
         self._items = []
         self._visible = visible
         self.id = str(uuid.uuid4()) if id is None else id
@@ -1224,19 +1224,7 @@ class SideMenuSection:
         self._active = val
 
     def checkActive(self):
-
-        self._active = False
-
-        for item in self._items:
-            if item.isActive():
-                self._active = True
-                break
-
-    def getCurrentPage(self):
-        return self._currentPage
-
-    def setCurrentPage(self, currentPage):
-        self._currentPage = currentPage
+        self._active = any(item.isActive() for item in self._items)
 
     def isVisible(self):
         return self._visible
@@ -1261,7 +1249,7 @@ class SideMenuItem:
         self._enabled = enabled
         self._visible = visible
         self.event_feature = event_feature
-        self.section = section
+        self.section_id = section
 
     def getTitle(self):
         return self._title
