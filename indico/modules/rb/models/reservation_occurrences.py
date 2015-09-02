@@ -20,6 +20,7 @@ from math import ceil
 from dateutil import rrule
 from sqlalchemy import Date, or_, func
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.orm import defaultload
 from sqlalchemy.sql import cast
 
 from indico.core.db import db
@@ -38,6 +39,13 @@ class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
     __table_args__ = {'schema': 'roombooking'}
     __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), 'is_cancelled', 'is_rejected')
+
+    #: A relationship loading strategy that will avoid loading the
+    #: users linked to a reservation.  You want to use this in pretty
+    #: much all cases where you eager-load the `reservation` relationship.
+    NO_RESERVATION_USER_STRATEGY = defaultload('reservation')
+    NO_RESERVATION_USER_STRATEGY.noload('created_by_user')
+    NO_RESERVATION_USER_STRATEGY.noload('booked_for_user')
 
     reservation_id = db.Column(
         db.Integer,
@@ -157,25 +165,28 @@ class ReservationOccurrence(db.Model, Serializer):
         return or_(db_dates_overlap(ReservationOccurrence, 'start_dt', occ.start_dt, 'end_dt', occ.end_dt)
                    for occ in occurrences)
 
-    @staticmethod
-    def find_overlapping_with(room, occurrences, skip_reservation_id=None):
+    @classmethod
+    def find_overlapping_with(cls, room, occurrences, skip_reservation_id=None):
         from indico.modules.rb.models.reservations import Reservation
 
-        return ReservationOccurrence.find(Reservation.room == room,
-                                          Reservation.id != skip_reservation_id,
-                                          ReservationOccurrence.is_valid,
-                                          ReservationOccurrence.filter_overlap(occurrences),
-                                          _eager=ReservationOccurrence.reservation,
-                                          _join=ReservationOccurrence.reservation)
+        return (ReservationOccurrence
+                .find(Reservation.room == room,
+                      Reservation.id != skip_reservation_id,
+                      ReservationOccurrence.is_valid,
+                      ReservationOccurrence.filter_overlap(occurrences),
+                      _eager=ReservationOccurrence.reservation,
+                      _join=ReservationOccurrence.reservation)
+                .options(cls.NO_RESERVATION_USER_STRATEGY))
 
-    @staticmethod
-    def find_with_filters(filters, user=None):
+    @classmethod
+    def find_with_filters(cls, filters, user=None):
         from indico.modules.rb.models.rooms import Room
         from indico.modules.rb.models.reservations import Reservation
 
-        q = ReservationOccurrence.find(Room.is_active,
-                                       _join=[ReservationOccurrence.reservation, Room],
-                                       _eager=ReservationOccurrence.reservation)
+        q = (ReservationOccurrence
+             .find(Room.is_active,
+                   _join=[ReservationOccurrence.reservation, Room], _eager=ReservationOccurrence.reservation)
+             .options(cls.NO_RESERVATION_USER_STRATEGY))
 
         if 'start_dt' in filters and 'end_dt' in filters:
             start_dt = filters['start_dt']

@@ -20,7 +20,6 @@ from collections import defaultdict
 import dateutil
 import transaction
 from flask import request, session, jsonify, flash
-from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import Forbidden
 
@@ -314,7 +313,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         flexible_start_dt = day_start_dt - timedelta(days=flexible_days)
         flexible_end_dt = day_end_dt + timedelta(days=flexible_days)
 
-        occurrences = ReservationOccurrence.find_all(
+        occurrences = ReservationOccurrence.find(
             Reservation.room_id.in_(room_ids),
             Reservation.id != reservation_id,
             ReservationOccurrence.start_dt >= flexible_start_dt,
@@ -322,7 +321,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             ReservationOccurrence.is_valid,
             _join=ReservationOccurrence.reservation,
             _eager=ReservationOccurrence.reservation
-        )
+        ).options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY).all()
 
         candidates = {}
         for days in xrange(-flexible_days, flexible_days + 1):
@@ -661,17 +660,14 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
             occurrences = []
         else:
             rooms = Room.find_all(is_active=True)
-            # avoid loading users we don't need anyway
-            reservation_strategy = joinedload('reservation')
-            reservation_strategy.noload('created_by_user')
-            reservation_strategy.noload('booked_for_user')
             occurrences = (ReservationOccurrence
                            .find(Reservation.room_id.in_(room.id for room in rooms),
                                  ReservationOccurrence.start_dt >= self.start_dt,
                                  ReservationOccurrence.end_dt <= self.end_dt,
                                  ReservationOccurrence.is_valid,
-                                 _join=Reservation)
-                           .options(reservation_strategy)
+                                 _join=ReservationOccurrence.reservation,
+                                 _eager=ReservationOccurrence.reservation)
+                           .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY)
                            .all())
 
         return WPRoomBookingCalendar(self, rooms=rooms, occurrences=occurrences, start_dt=self.start_dt,

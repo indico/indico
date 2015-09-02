@@ -138,14 +138,14 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
         return WPRoomBookingRoomDetails(self, **kwargs)
 
     def _process(self):
-        occurrences = ReservationOccurrence.find_all(
+        occurrences = ReservationOccurrence.find(
             Reservation.room_id == self._room.id,
             ReservationOccurrence.start_dt >= self._calendar_start,
             ReservationOccurrence.end_dt <= self._calendar_end,
             ReservationOccurrence.is_valid,
             _join=ReservationOccurrence.reservation,
             _eager=ReservationOccurrence.reservation
-        )
+        ).options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY).all()
 
         return self._get_view(room=self._room, start_dt=self._calendar_start, end_dt=self._calendar_end,
                               occurrences=occurrences).display()

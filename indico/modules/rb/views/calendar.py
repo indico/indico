@@ -20,7 +20,7 @@ from itertools import groupby
 from operator import attrgetter
 
 from flask import session
-from sqlalchemy.orm import joinedload, contains_eager, defaultload
+from sqlalchemy.orm import defaultload
 from werkzeug.datastructures import MultiDict
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
