@@ -16,28 +16,31 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.surveys.controllers.management import (RHManageSurveys, RHCreateSurvey, RHManageSurvey,
-                                                                  RHDeleteSurvey, RHEditSurvey, RHScheduleSurvey,
-                                                                  RHCloseSurvey, RHOpenSurvey,
-                                                                  RHManageSurveyQuestionnaire, RHAddSurveyQuestion,
-                                                                  RHAddSurveySection, RHEditSurveySection,
-                                                                  RHDeleteSurveySection, RHEditSurveyText,
-                                                                  RHAddSurveyText, RHDeleteSurveyText,
-                                                                  RHEditSurveyQuestion, RHDeleteSurveyQuestion,
-                                                                  RHSortItems, RHSurveyResults, RHExportSubmissions,
-                                                                  RHDeleteSubmissions, RHDisplaySubmission)
 from indico.modules.events.surveys.controllers.display import RHSurveyList, RHSubmitSurvey
+from indico.modules.events.surveys.controllers.management.questionnaire import (RHManageSurveyQuestionnaire,
+                                                                                RHAddSurveyText, RHEditSurveyText,
+                                                                                RHDeleteSurveyText, RHAddSurveyQuestion,
+                                                                                RHEditSurveyQuestion,
+                                                                                RHDeleteSurveyQuestion,
+                                                                                RHAddSurveySection, RHEditSurveySection,
+                                                                                RHDeleteSurveySection,
+                                                                                RHSortSurveyItems)
+from indico.modules.events.surveys.controllers.management.results import (RHSurveyResults, RHExportSubmissions,
+                                                                          RHDeleteSubmissions, RHDisplaySubmission)
+from indico.modules.events.surveys.controllers.management.survey import (RHManageSurveys, RHManageSurvey, RHEditSurvey,
+                                                                         RHDeleteSurvey, RHCreateSurvey,
+                                                                         RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('survey', __name__, template_folder='templates', virtual_template_folder='events/surveys',
                       url_prefix='/event/<confId>', event_feature='surveys')
 
-# surveys display
+# survey display/submission
 _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)
 _bp.add_url_rule('/surveys/<int:survey_id>', 'display_survey_form', RHSubmitSurvey, methods=('GET', 'POST'))
 
-# surveys management
+# survey management
 _bp.add_url_rule('/manage/surveys/', 'manage_survey_list', RHManageSurveys)
 _bp.add_url_rule('/manage/surveys/create', 'create', RHCreateSurvey, methods=('GET', 'POST'))
 
@@ -59,7 +62,7 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>
 
 # Survey questionnaire management
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort', 'sort_items', RHSortItems,
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort', 'sort_items', RHSortSurveyItems,
                  methods=('POST',))
 # sections
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/add-section', 'add_section', RHAddSurveySection,
