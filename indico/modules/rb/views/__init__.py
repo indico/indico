@@ -55,7 +55,11 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
         user_is_admin = session.user is not None and rb_is_admin(session.user)
 
-        self._roomsBookingOpt = SideMenuSection()
+        self._roomsBookingOpt = SideMenuSection(active=True)
+        self._searchOpt = SideMenuSection(_('Search'), active=True, icon='icon-search')
+        self._roomsOpt = SideMenuSection(_('My Rooms'), active=True, icon='icon-user')
+        self._bookingsOpt = SideMenuSection(_('My Bookings'), active=True, icon='icon-time')
+        self._blockingsOpt = SideMenuSection(_('Room Blocking'), icon='icon-lock')
 
         self._bookRoomNewOpt = SideMenuItem(
             _('Book a Room'),
@@ -73,11 +77,6 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
             _('Calendar'),
             url_for('rooms.calendar'),
             enabled=True
-        )
-
-        self._bookingsOpt = SideMenuSection(
-            _('View My Bookings'),
-            urlHandlers.UHRoomBookingSearch4Bookings.getURL()
         )
 
         self._myBookingListOpt = SideMenuItem(
@@ -104,15 +103,11 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
             enabled=True
         )
 
-        self._blockingsOpt = SideMenuSection(_('Room Blocking'))
-
         self._usersBlockingsOpt = SideMenuItem(
             _('Blockings for my rooms'),
             url_for('rooms.blocking_my_rooms', state='pending'),
             enabled=user_has_rooms
         )
-
-        self._roomsOpt = SideMenuSection(_('View Rooms'))
 
         self._roomSearchOpt = SideMenuItem(
             _('Search rooms'),
@@ -121,7 +116,7 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         )
 
         self._myRoomListOpt = SideMenuItem(
-            _('My rooms'),
+            _('Room List'),
             url_for('rooms.search_my_rooms'),
             enabled=user_has_rooms
         )
@@ -140,7 +135,7 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         if user_is_admin:
             self._adminSect = SideMenuSection(
                 _('Administration'),
-                urlHandlers.UHRoomBookingAdmin.getURL()
+                icon='icon-user-chairperson'
             )
 
             self._adminOpt = SideMenuItem(
@@ -148,25 +143,28 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
                 urlHandlers.UHRoomBookingAdmin.getURL()
             )
 
-        self._leftMenu.addSection(self._roomsBookingOpt)
         self._roomsBookingOpt.addItem(self._bookRoomNewOpt)
         default_location = Location.default_location
         if default_location and default_location.is_map_available:
             self._roomsBookingOpt.addItem(self._roomMapOpt)
         self._roomsBookingOpt.addItem(self._bookingListCalendarOpt)
 
-        self._leftMenu.addSection(self._bookingsOpt)
+        self._searchOpt.addItem(self._roomSearchOpt)
+        self._searchOpt.addItem(self._bookingListSearchOpt)
         self._bookingsOpt.addItem(self._myBookingListOpt)
-        self._bookingsOpt.addItem(self._usersBookingsOpt)
-        self._bookingsOpt.addItem(self._usersPendingBookingsOpt)
-        self._bookingsOpt.addItem(self._bookingListSearchOpt)
-        self._leftMenu.addSection(self._blockingsOpt)
+        self._roomsOpt.addItem(self._usersBookingsOpt)
+        self._roomsOpt.addItem(self._usersPendingBookingsOpt)
+        self._roomsOpt.addItem(self._myRoomListOpt)
         self._blockingsOpt.addItem(self._blockRoomsOpt)
         self._blockingsOpt.addItem(self._blockingListOpt)
         self._blockingsOpt.addItem(self._usersBlockingsOpt)
+
+        self._leftMenu.addSection(self._roomsBookingOpt)
+        self._leftMenu.addSection(self._bookingsOpt)
+        self._leftMenu.addSection(self._searchOpt)
         self._leftMenu.addSection(self._roomsOpt)
-        self._roomsOpt.addItem(self._roomSearchOpt)
-        self._roomsOpt.addItem(self._myRoomListOpt)
+        self._leftMenu.addSection(self._blockingsOpt)
+
         if user_is_admin:
             self._leftMenu.addSection(self._adminSect)
             self._adminSect.addItem(self._adminOpt)
