@@ -60,7 +60,7 @@ def upgrade():
                            "field_data::text = '{}' AND parent_id IS NULL)",
                            name='valid_section'),
         sa.CheckConstraint("type != 3 OR (title IS NULL AND is_required IS NULL AND field_type IS NULL "
-                           "AND field_data::text = '{}')",
+                           "AND field_data::text = '{}' AND parent_id IS NOT NULL)",
                            name='valid_text'),
         sa.ForeignKeyConstraint(['survey_id'], ['event_surveys.surveys.id']),
         sa.ForeignKeyConstraint(['parent_id'], ['event_surveys.items.id']),
