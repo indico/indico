@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from operator import attrgetter
+from HTMLParser import HTMLParser
 
 from indico.core.db import db
 from indico.modules.events import Event
@@ -132,6 +133,10 @@ def _get_menu_structure(display_mgr):
     return filter(None, map(_menu_item_data, display_mgr._menu._listLink))
 
 
+def _sanitize_title(title):
+    return HTMLParser().unescape(strip_tags(convert_to_unicode(title))).strip()
+
+
 class EventMenuImporter(Importer):
     def has_data(self):
         return MenuEntry.has_rows
@@ -167,7 +172,7 @@ class EventMenuImporter(Importer):
                                      event_id=event.id)
                     continue
                 used.add(data['name'])
-                data['title'] = strip_tags(convert_to_unicode(item._caption)).strip()
+                data['title'] = _sanitize_title(item._caption)
                 if item._name == 'chatrooms':
                     data['plugin'] = 'chat'
                     data['type'] = MenuEntryType.plugin_link
@@ -177,7 +182,7 @@ class EventMenuImporter(Importer):
                 data['type'] = MenuEntryType.separator
             elif item_type == 'ExternLink':
                 data['type'] = MenuEntryType.user_link
-                data['title'] = strip_tags(convert_to_unicode(item._caption)).strip()
+                data['title'] = _sanitize_title(item._caption)
                 data['link_url'] = item._URL.strip()
                 if not data['link_url']:
                     if getattr(item, '_listLink', None):
@@ -189,7 +194,7 @@ class EventMenuImporter(Importer):
                         continue
             elif item_type == 'PageLink':
                 data['type'] = MenuEntryType.page
-                data['title'] = strip_tags(convert_to_unicode(item._caption)).strip()
+                data['title'] = _sanitize_title(item._caption)
                 data['page'] = EventPage(event_id=event.id, html=item._page._content)
                 data['page'].legacy_mapping = LegacyPageMapping(event_id=event.id, legacy_page_id=item._page._id)
                 if item._page._isHome:
