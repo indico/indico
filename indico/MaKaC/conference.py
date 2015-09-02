@@ -16,7 +16,7 @@
 
 from itertools import ifilter
 from flask_pluginengine import plugin_context
-from sqlalchemy.orm import lazyload
+from sqlalchemy.orm import lazyload, noload, load_only
 from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
@@ -54,8 +54,8 @@ from indico.util.string import safe_upper, safe_slice, fix_broken_string, return
 from MaKaC.review import AbstractFieldContent
 
 
-import re, os
-import tempfile
+import re
+import os
 import copy
 import stat
 from datetime import datetime, timedelta
@@ -96,14 +96,12 @@ from MaKaC.common import mail
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Updates
 from MaKaC.schedule import ScheduleToJson
-from MaKaC.webinterface import urlHandlers
 
 from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 import zope.interface
 
 from indico.core import signals
-from indico.util.date_time import utc_timestamp, format_datetime, format_human_timedelta
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
@@ -112,7 +110,7 @@ from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKin
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_attached_items
-from indico.util.date_time import utc_timestamp
+from indico.util.date_time import utc_timestamp, format_datetime, format_human_timedelta
 from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
 from indico.util.user import unify_user_args
@@ -1428,9 +1426,13 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = Room.find_first(Room.name == fix_broken_string(self.name, True),
-                               Location.name == fix_broken_string(location, True),
-                               _join=Room.location)
+        room = (Room
+                .find(Room.name == fix_broken_string(self.name, True),
+                      Location.name == fix_broken_string(location, True),
+                      _join=Room.location)
+                .options(load_only('name', 'building', 'floor', 'number'),
+                         noload('owner'))
+                .first())
         self.fullName = room.full_name if room else None
 
     def setFullName(self, newFullName):
