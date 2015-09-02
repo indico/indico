@@ -1090,8 +1090,8 @@ class WPConferenceModifBase(main.WPMainBase):
         self._advancedOptionsSection.addItem(self._ACMenuItem)
 
         self._toolsMenuItem = wcomponents.SideMenuItem(
-            _("Tools"),
-            urlHandlers.UHConfModifTools.getURL(self._conf), section='advanced')
+            _("Utilities"),
+            urlHandlers.UHConfModifTools.getURL(self._conf), section='tools')
         self._advancedOptionsSection.addItem(self._toolsMenuItem)
 
         self.extra_menu_items_advanced = {}
