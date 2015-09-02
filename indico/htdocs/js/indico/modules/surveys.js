@@ -191,9 +191,14 @@
         // sort sections
         container.sortable({
             items: '.js-sortable-survey-section',
-            handle: '.js-section-handle',
+            handle: '.i-box-sortable-handler',
+            placeholder: 'i-box-sortable-placeholder',
+            tolerance: 'pointer',
             distance: 10,
             axis: 'y',
+            start: function(e, ui){
+                ui.placeholder.height(ui.helper.outerHeight());
+            },
             update: function(e, ui) {
                 var sectionIds = container.find('.js-sortable-survey-section').map(function() {
                     return $(this).data('sectionId');

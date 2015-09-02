@@ -3,6 +3,7 @@
 {% macro render_questionnaire_preview(survey, preview_form, field_types) %}
     {% for section in survey.sections %}
         <div class="i-box titled js-sortable-survey-section" data-section-id="{{ section.id }}">
+            <div class="i-box-sortable-handler"></div>
             <div class="i-box-header">
                 <div class="i-box-title">
                     {% if section.display_as_section %}
@@ -46,9 +47,6 @@
                                 </li>
                             {% endfor %}
                         </ul>
-                    </div>
-                    <div class="group">
-                        <div class="handle js-section-handle"></div>
                     </div>
                 </div>
                 {% if section.description %}
