@@ -1083,17 +1083,17 @@ class WPConferenceModifBase(main.WPMainBase):
         self._listingsMenuItem = wcomponents.SideMenuItem(
             _("Lists"),
             urlHandlers.UHConfAllSpeakers.getURL(self._conf), section='tools')
-        self._advancedOptionsSection.addItem(self._listingsMenuItem)
+        self._sideMenu.addItem(self._listingsMenuItem)
 
         self._ACMenuItem = wcomponents.SideMenuItem(
             _("Protection"),
             urlHandlers.UHConfModifAC.getURL(self._conf), section='advanced')
-        self._advancedOptionsSection.addItem(self._ACMenuItem)
+        self._sideMenu.addItem(self._ACMenuItem)
 
         self._toolsMenuItem = wcomponents.SideMenuItem(
             _("Utilities"),
             urlHandlers.UHConfModifTools.getURL(self._conf), section='tools')
-        self._advancedOptionsSection.addItem(self._toolsMenuItem)
+        self._sideMenu.addItem(self._toolsMenuItem)
 
         self.extra_menu_items_advanced = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu_advanced.send(self._conf)),
