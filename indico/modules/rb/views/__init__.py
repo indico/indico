@@ -55,9 +55,11 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
         user_is_admin = session.user is not None and rb_is_admin(session.user)
 
-        self._roomsBookingOpt = SideMenuSection(active=True)
+        self._roomsBookingOpt = SideMenuSection(icon='icon-checkmark')
+        self._calendarOpt = SideMenuSection(icon='icon-calendar')
+        self._mapOpt = SideMenuSection(icon='icon-location')
         self._searchOpt = SideMenuSection(_('Search'), active=True, icon='icon-search')
-        self._roomsOpt = SideMenuSection(_('My Rooms'), active=user_has_rooms, icon='icon-user')
+        self._roomsOpt = SideMenuSection(_('My Rooms'), visible=user_has_rooms, icon='icon-user')
         self._bookingsOpt = SideMenuSection(_('My Bookings'), active=True, icon='icon-time')
         self._blockingsOpt = SideMenuSection(_('Room Blocking'), icon='icon-lock')
 
@@ -146,8 +148,8 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         self._roomsBookingOpt.addItem(self._bookRoomNewOpt)
         default_location = Location.default_location
         if default_location and default_location.is_map_available:
-            self._roomsBookingOpt.addItem(self._roomMapOpt)
-        self._roomsBookingOpt.addItem(self._bookingListCalendarOpt)
+            self._mapOpt.addItem(self._roomMapOpt)
+        self._calendarOpt.addItem(self._bookingListCalendarOpt)
 
         self._searchOpt.addItem(self._roomSearchOpt)
         self._searchOpt.addItem(self._bookingListSearchOpt)
@@ -160,6 +162,8 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         self._blockingsOpt.addItem(self._usersBlockingsOpt)
 
         self._leftMenu.addSection(self._roomsBookingOpt)
+        self._leftMenu.addSection(self._mapOpt)
+        self._leftMenu.addSection(self._calendarOpt)
         self._leftMenu.addSection(self._bookingsOpt)
         self._leftMenu.addSection(self._searchOpt)
         self._leftMenu.addSection(self._roomsOpt)

@@ -42,7 +42,7 @@ def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'surveys', SideMenuItem(_('Surveys'), url_for('surveys.manage_survey_list', event),
                                    visible=event.canModify(session.user), event_feature='surveys',
-                                   section='tools')
+                                   section='advanced')
 
 
 @signals.event.sidemenu.connect

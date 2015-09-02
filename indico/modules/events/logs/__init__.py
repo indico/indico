@@ -31,7 +31,7 @@ __all__ = ['EventLogEntry', 'EventLogKind']
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), visible=event.canModify(session.user),
-                                section='tools')
+                                section='advanced')
 
 
 @signals.event.deleted.connect
