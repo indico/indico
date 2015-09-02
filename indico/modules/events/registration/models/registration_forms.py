@@ -97,6 +97,10 @@ class RegistrationForm(db.Model):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(str(self.event_id), True)
 
+    @property
+    def locator(self):
+        return dict(self.event.getLocator(), reg_form_id=self.id)
+
     @return_ascii
     def __repr__(self):
-        return '<RegistrationForm({})>'.format(self.id)
+        return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
