@@ -18,6 +18,7 @@ from collections import defaultdict
 from datetime import date
 
 from flask import flash, request, session, redirect
+from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
@@ -170,7 +171,11 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
         elif self.timeframe == 'recent':
             criteria += [Blocking.end_date >= date.today()]
 
-        blockings = Blocking.find(*criteria, _eager_all='blocked_rooms.room').order_by(Blocking.start_date.desc()).all()
+        blockings = (Blocking
+                     .find(*criteria)
+                     .options(joinedload('blocked_rooms').joinedload('room'))
+                     .order_by(Blocking.start_date.desc())
+                     .all())
         return WPRoomBookingBlockingList(self, blockings=blockings).display()
 
 

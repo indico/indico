@@ -21,7 +21,7 @@ from importlib import import_module
 from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy import inspect
-from sqlalchemy.orm import joinedload, joinedload_all
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -34,7 +34,7 @@ class IndicoModel(Model):
 
     @classmethod
     def find(cls, *args, **kwargs):
-        special_field_names = ('join', 'eager', 'eager_all')
+        special_field_names = ('join', 'eager')
         special_fields = {}
         for key in special_field_names:
             value = kwargs.pop('_{}'.format(key), ())
@@ -43,7 +43,6 @@ class IndicoModel(Model):
             special_fields[key] = value
         options = []
         options += [joinedload(rel) for rel in special_fields['eager']]
-        options += [joinedload_all(rel) for rel in special_fields['eager_all']]
         return (cls.query
                 .filter_by(**kwargs)
                 .join(*special_fields['join'])
