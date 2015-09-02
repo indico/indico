@@ -47,6 +47,12 @@
 }
 
 #survey-questionnaire-preview {
+    .standalone-section-title {
+        color: $dark-gray;
+        font-style: italic;
+        padding-right: 0.5rem;
+    }
+
     .sortblock {
         width: 100%;
     }

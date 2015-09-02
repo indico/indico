@@ -96,7 +96,7 @@ class SurveyImporter(Importer):
         self.print_success(cformat('%{cyan}{}%{reset}').format(survey), always=True, event_id=event.id)
 
         question_map = {}
-        section = SurveySection(survey=survey, title='')
+        section = SurveySection(survey=survey, display_as_section=False)
         for position, old_question in enumerate(evaluation._questions):
             question = self.migrate_question(old_question, position)
             question_map[old_question] = question

@@ -7,7 +7,7 @@
 {% block content %}
     <div id="survey-results" class="i-box-group vert">
         {% for section in survey.sections if section.children %}
-            {% if not section.is_implicit %}
+            {% if section.display_as_section %}
                 <h4>{{ section.title }}</h4>
             {% endif %}
             {% for question in section.children if question.type.name == 'question' %}

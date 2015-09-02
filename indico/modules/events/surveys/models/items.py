@@ -34,6 +34,10 @@ def _get_next_position(context):
     return (res[0] or 0) + 1
 
 
+def _get_item_default_title(context):
+    return '' if context.current_parameters['type'] == SurveyItemType.section else None
+
+
 class SurveyItemType(int, IndicoEnum):
     question = 1
     section = 2
@@ -42,16 +46,29 @@ class SurveyItemType(int, IndicoEnum):
 
 class SurveyItem(db.Model):
     __tablename__ = 'items'
-    __table_args__ = (db.CheckConstraint("type != {} OR (title IS NOT NULL AND is_required IS NOT NULL AND "
-                                         "field_type IS NOT NULL AND parent_id IS NOT NULL)"
-                                         .format(SurveyItemType.question), 'valid_question'),
-                      db.CheckConstraint("type != {} OR (title IS NOT NULL AND is_required IS NULL AND "
-                                         "field_type IS NULL AND field_data::text = '{{}}' AND parent_id IS NULL)"
-                                         .format(SurveyItemType.section),
-                                         'valid_section'),
-                      db.CheckConstraint("type != {} OR (title IS NULL AND is_required IS NULL AND "
-                                         "field_type IS NULL AND field_data::text = '{{}}' AND parent_id IS NOT NULL)"
-                                         .format(SurveyItemType.text), 'valid_text'),
+    __table_args__ = (db.CheckConstraint("type != {type} OR ("
+                                         "title IS NOT NULL AND "
+                                         "is_required IS NOT NULL AND "
+                                         "field_type IS NOT NULL AND "
+                                         "parent_id IS NOT NULL AND"
+                                         "display_as_section IS NULL)"
+                                         .format(type=SurveyItemType.question), 'valid_question'),
+                      db.CheckConstraint("type != {type} OR ("
+                                         "title IS NOT NULL AND "
+                                         "is_required IS NULL AND "
+                                         "field_type IS NULL AND "
+                                         "field_data::text = '{{}}' AND "
+                                         "parent_id IS NULL AND"
+                                         "display_as_section IS NOT NULL)"
+                                         .format(type=SurveyItemType.section), 'valid_section'),
+                      db.CheckConstraint("type != {type} OR ("
+                                         "title IS NULL AND "
+                                         "is_required IS NULL AND "
+                                         "field_type IS NULL AND "
+                                         "field_data::text = '{{}}' AND "
+                                         "parent_id IS NOT NULL AND "
+                                         "display_as_section IS NULL)"
+                                         .format(type=SurveyItemType.text), 'valid_text'),
                       {'schema': 'event_surveys'})
     __mapper_args__ = {
         'polymorphic_on': 'type',
@@ -91,13 +108,19 @@ class SurveyItem(db.Model):
     #: The title of the item
     title = db.Column(
         db.String,
-        nullable=True
+        nullable=True,
+        default=_get_item_default_title
     )
     #: The description of the item
     description = db.Column(
         db.Text,
         nullable=False,
         default=''
+    )
+    #: If a section should be rendered as a section
+    display_as_section = db.Column(
+        db.Boolean,
+        nullable=True
     )
 
     # The following columns are only used for SurveyQuestion objects, but by
@@ -179,14 +202,6 @@ class SurveySection(SurveyItem):
     @property
     def locator(self):
         return dict(self.survey.locator, section_id=self.id)
-
-    @property
-    def is_implicit(self):
-        """
-        Returns if the section should be rendered standalone instead
-        of using an actual section/fieldset.
-        """
-        return not self.title
 
     @return_ascii
     def __repr__(self):

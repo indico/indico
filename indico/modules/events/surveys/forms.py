@@ -94,12 +94,12 @@ class ScheduleSurveyForm(IndicoForm):
 
 
 class SectionForm(IndicoForm):
-    title = StringField(_('Title'),
-                        description=_("The title of the section. If you do not specify a title, the section's content "
-                                      "will be displayed standalone."))
-    description = TextAreaField(_('Description'),
-                                description=_("The description text of the section. It is only displayed if the "
-                                              "section has a title."))
+    display_as_section = BooleanField(_("Display as section"), widget=SwitchWidget(), default=True,
+                                      description=_("Whether this is going to be displayed as a section or standalone"))
+    title = StringField(_('Title'), [HiddenUnless('display_as_section', preserve_data=True), DataRequired()],
+                        description=_("The title of the section."))
+    description = TextAreaField(_('Description'), [HiddenUnless('display_as_section', preserve_data=True)],
+                                description=_("The description text of the section."))
 
 
 class TextForm(IndicoForm):

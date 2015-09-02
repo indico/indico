@@ -20,7 +20,7 @@
     {{ form_header(form, id='survey-questionnaire', orientation='vertical') }}
     {% for section in survey.sections if section.children %}
         {% call form_fieldset(section.title, section.description|replace('\n', '<br>'|safe),
-                              render_as_fieldset=not section.is_implicit) %}
+                              render_as_fieldset=section.display_as_section) %}
             {% for item in section.children %}
                 {% if item.type.name == 'question' %}
                     {{ form_row(form['question_{}'.format(item.id)]) }}

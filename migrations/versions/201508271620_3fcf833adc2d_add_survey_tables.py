@@ -54,14 +54,15 @@ def upgrade():
         sa.Column('is_required', sa.Boolean(), nullable=True),
         sa.Column('field_type', sa.String(), nullable=True),
         sa.Column('field_data', postgresql.JSON(), nullable=False),
+        sa.Column('display_as_section', sa.Boolean(), nullable=True),
         sa.CheckConstraint("type != 1 OR (title IS NOT NULL AND is_required IS NOT NULL AND field_type IS NOT NULL AND "
-                           "parent_id IS NOT NULL)",
+                           "parent_id IS NOT NULL AND display_as_section IS NULL)",
                            name='valid_question'),
         sa.CheckConstraint("type != 2 OR (title IS NOT NULL AND is_required IS NULL AND field_type IS NULL AND "
-                           "field_data::text = '{}' AND parent_id IS NULL)",
+                           "field_data::text = '{}' AND parent_id IS NULL AND display_as_section IS NOT NULL)",
                            name='valid_section'),
         sa.CheckConstraint("type != 3 OR (title IS NULL AND is_required IS NULL AND field_type IS NULL "
-                           "AND field_data::text = '{}' AND parent_id IS NOT NULL)",
+                           "AND field_data::text = '{}' AND parent_id IS NOT NULL AND display_as_section IS NULL)",
                            name='valid_text'),
         sa.ForeignKeyConstraint(['survey_id'], ['event_surveys.surveys.id']),
         sa.ForeignKeyConstraint(['parent_id'], ['event_surveys.items.id']),

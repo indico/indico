@@ -5,12 +5,14 @@
         <div class="i-box titled js-sortable-survey-section" data-section-id="{{ section.id }}">
             <div class="i-box-header">
                 <div class="i-box-title">
-                    {% if section.title %}
+                    {% if section.display_as_section %}
                         {{ section.title }}
                     {% else %}
-                        <em title="{% trans %}This section will not be displayed as a section but its contents will show up standalone.{% endtrans %}">
-                            {%- trans %}Unnamed section{% endtrans -%}
-                        </em>
+                        <span class="standalone-section-title">
+                            {%- trans %}Standalone section{% endtrans -%}
+                        </span>
+                        <i class="info-helper"
+                           title="{% trans %}This section will not be displayed as a section but its contents will show up standalone.{% endtrans %}"></i>
                     {% endif %}
                 </div>
                 <div class="i-box-buttons toolbar right">
