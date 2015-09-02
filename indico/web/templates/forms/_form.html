@@ -46,6 +46,7 @@
 {%- endmacro %}
 
 {% macro form_row(field, widget_attrs={}, orientation='', allow_missing=false, skip_label=false, disabled=none, placeholder=false) %}
+    {% set widget_attrs = widget_attrs|default({}) %}  {#- in case someone passed an Undefined object -#}
     {% if field or not allow_missing %}
         <div id="form-group-{{ field.id }}"
              class="form-group {{ orientation }}
