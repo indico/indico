@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveysBase, RHManageSurveyBase
 from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm
+from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
@@ -81,6 +82,8 @@ class RHCreateSurvey(RHManageSurveysBase):
         form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
         if form.validate_on_submit():
             survey = Survey(event_new=self.event.as_event)
+            # add an unnamed section so people can start adding questions right away
+            survey.items.append(SurveySection(title=''))
             form.populate_obj(survey)
             db.session.add(survey)
             db.session.flush()
