@@ -85,6 +85,42 @@
         @extend %i-box-empty;
     }
 
+    .i-box-sortable-handler {
+        @include icon-before('icon-handle');
+        @include transition(
+            background-color $default-transition-duration $default-transition-function,
+            height $default-transition-duration $default-transition-function
+        );
+
+        background-color: lighten($dark-gray, $color-variation);
+        cursor: move;
+        font-size: 1.2em;
+        height: 10px;
+        margin: -10px -10px 10px -10px;
+        text-align: center;
+
+        &:hover,
+        &:active {
+            @include border-bottom();
+            background-color: white;
+            height: 20px;
+
+            &:before {
+                color: $dark-gray;
+                top: 3px;
+            }
+        }
+
+        &:before {
+            @include rotate(90deg);
+            @include single-transition(top);
+            color: $light-gray;
+            display: inline-block;
+            position: relative;
+            top: -3px;
+        }
+    }
+
     .i-box-footer {
         background-color: $light-gray;
         box-shadow: inset 0px 15px 20px -20px $dark-gray;
@@ -215,6 +251,12 @@
                 margin-bottom: 0px;
             }
         }
+    }
+
+    .i-box-sortable-placeholder {
+        @include border-all($gray, dashed);
+        background-color: $light-gray;
+        margin-bottom: $margin;
     }
 }
 
