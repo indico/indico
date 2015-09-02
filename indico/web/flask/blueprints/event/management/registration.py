@@ -20,160 +20,160 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Setup
-event_mgmt.add_url_rule('/registration/setup/', 'confModifRegistrationForm',
+event_mgmt.add_url_rule('/registration-old/setup/', 'confModifRegistrationForm',
                         registrationFormModif.RHRegistrationFormModif)
-event_mgmt.add_url_rule('/registration/setup/change-status', 'confModifRegistrationForm-changeStatus',
+event_mgmt.add_url_rule('/registration-old/setup/change-status', 'confModifRegistrationForm-changeStatus',
                         registrationFormModif.RHRegistrationFormModifChangeStatus, methods=('POST',))
-event_mgmt.add_url_rule('/registration/setup/modify', 'confModifRegistrationForm-dataModif',
+event_mgmt.add_url_rule('/registration-old/setup/modify', 'confModifRegistrationForm-dataModif',
                         registrationFormModif.RHRegistrationFormModifDataModification, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/setup/modify/save', 'confModifRegistrationForm-performDataModif',
+event_mgmt.add_url_rule('/registration-old/setup/modify/save', 'confModifRegistrationForm-performDataModif',
                         registrationFormModif.RHRegistrationFormModifPerformDataModification, methods=('POST',))
 
 # Setup - statuses
-event_mgmt.add_url_rule('/registration/setup/statuses/perform-action', 'confModifRegistrationForm-actionStatuses',
+event_mgmt.add_url_rule('/registration-old/setup/statuses/perform-action', 'confModifRegistrationForm-actionStatuses',
                         registrationFormModif.RHRegistrationFormActionStatuses, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/setup/statuses/<statusId>/modify', 'confModifRegistrationForm-modifStatus',
+event_mgmt.add_url_rule('/registration-old/setup/statuses/<statusId>/modify', 'confModifRegistrationForm-modifStatus',
                         registrationFormModif.RHRegistrationFormStatusModif)
-event_mgmt.add_url_rule('/registration/setup/statuses/<statusId>/modify',
+event_mgmt.add_url_rule('/registration-old/setup/statuses/<statusId>/modify',
                         'confModifRegistrationForm-performModifStatus',
                         registrationFormModif.RHRegistrationFormModifStatusPerformModif, methods=('POST',))
 
 # Modification
-event_mgmt.add_url_rule('/registration/modify', 'confModifRegistrationModification',
+event_mgmt.add_url_rule('/registration-old/modify', 'confModifRegistrationModification',
                         registrationFormModif.RHRegistrationModification)
 
 # Sections
-event_mgmt.add_url_rule('/registration/modify/sections',
+event_mgmt.add_url_rule('/registration-old/modify/sections',
                         'confModifRegistrationModificationSection-query',
                         registrationFormModif.RHRegistrationModificationSectionQuery,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>',
                         'confModifRegistrationModificationSection-delete',
                         registrationFormModif.RHRegistrationDeleteSection,
                         methods=('DELETE',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/enable',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/enable',
                         'confModifRegistrationModificationSection-enable',
                         registrationFormModif.RHRegistrationFormSectionEnable,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/disable',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/disable',
                         'confModifRegistrationModificationSection-disable',
                         registrationFormModif.RHRegistrationFormSectionDisable,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/move',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/move',
                         'confModifRegistrationModificationSection-move',
                         registrationFormModif.RHRegistrationFormSectionMove,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/title',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/title',
                         'confModifRegistrationModificationSection-title',
                         registrationFormModif.RHRegistrationFormSectionTitle,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/description',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/description',
                         'confModifRegistrationModificationSection-description',
                         registrationFormModif.RHRegistrationFormSectionDescription,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/accommodation',
+event_mgmt.add_url_rule('/registration-old/modify/sections/accommodation',
                         'confModifRegistrationModificationSection-accommodation-config',
                         registrationFormModif.RHRegistrationFormAccommodationSetConfig,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/furtherInformation',
+event_mgmt.add_url_rule('/registration-old/modify/sections/furtherInformation',
                         'confModifRegistrationModificationSection-furtherInformation-config',
                         registrationFormModif.RHRegistrationFormFurtherInformationSetConfig,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/socialEvents',
+event_mgmt.add_url_rule('/registration-old/modify/sections/socialEvents',
                         'confModifRegistrationModificationSection-socialEvents-config',
                         registrationFormModif.RHRegistrationFormSocialEventsSetConfig,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/sessions',
+event_mgmt.add_url_rule('/registration-old/modify/sections/sessions',
                         'confModifRegistrationModificationSection-config',
                         registrationFormModif.RHRegistrationFormSessionsSetConfig,
                         methods=('POST',))
 
 # Fields
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/fields',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/fields',
                         'confModifRegistrationModificationField-create',
                         registrationFormModif.RHRegistrationFormFieldCreate,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/fields/<fieldId>',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/fields/<fieldId>',
                         'confModifRegistrationModificationField-modify',
                         registrationFormModif.RHRegistrationFormField,
                         methods=('POST', 'DELETE'))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/fields/<fieldId>/enable',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/fields/<fieldId>/enable',
                         'confModifRegistrationModificationField-enable',
                         registrationFormModif.RHRegistrationFormFieldEnable,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/fields/<fieldId>/disable',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/fields/<fieldId>/disable',
                         'confModifRegistrationModificationField-disable',
                         registrationFormModif.RHRegistrationFormFieldDisable,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/fields/<fieldId>/move',
+event_mgmt.add_url_rule('/registration-old/modify/sections/<sectionId>/fields/<fieldId>/move',
                         'confModifRegistrationModificationField-move',
                         registrationFormModif.RHRegistrationFormFieldMove,
                         methods=('POST',))
 
 # Registrants
-event_mgmt.add_url_rule('/registration/users/', 'confModifRegistrants', registrantsModif.RHRegistrantListModif,
+event_mgmt.add_url_rule('/registration-old/users/', 'confModifRegistrants', registrantsModif.RHRegistrantListModif,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/perform-action', 'confModifRegistrants-action',
+event_mgmt.add_url_rule('/registration-old/users/perform-action', 'confModifRegistrants-action',
                         registrantsModif.RHRegistrantListModifAction, methods=('POST',))
-event_mgmt.add_url_rule('/registration/users/email/send', 'EMail-sendreg', registrantsModif.RHRegistrantSendEmail,
+event_mgmt.add_url_rule('/registration-old/users/email/send', 'EMail-sendreg', registrantsModif.RHRegistrantSendEmail,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/users/new', 'confModifRegistrants-newRegistrant',
+event_mgmt.add_url_rule('/registration-old/users/new', 'confModifRegistrants-newRegistrant',
                         registrantsModif.RHRegistrantNewForm, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/new/save', 'confModifRegistrants-newRegistrant-save',
+event_mgmt.add_url_rule('/registration-old/users/new/save', 'confModifRegistrants-newRegistrant-save',
                         registrantsModif.RHRegistrantNewFormSave, methods=('POST',))
-event_mgmt.add_url_rule('/registration/users/remove', 'confModifRegistrants-remove',
+event_mgmt.add_url_rule('/registration-old/users/remove', 'confModifRegistrants-remove',
                         registrantsModif.RHRegistrantListRemove, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/', 'confModifRegistrants-modification',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/', 'confModifRegistrants-modification',
                         registrantsModif.RHRegistrantModification)
-event_mgmt.add_url_rule('/registration/users/<registrantId>/eticket',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/eticket',
                         'confModifRegistrants-modification-eticket',
                         registrantsModif.RHRegistrantModificationEticket)
-event_mgmt.add_url_rule('/registration/users/<registrantId>/eticket/checkin',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/eticket/checkin',
                         'confModifRegistrants-modification-eticket-checkin',
                         registrantsModif.RHRegistrantModificationEticketCheckIn,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/attachments/<resId>.<fileExt>',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/attachments/<resId>.<fileExt>',
                         'confModifRegistrants-getAttachedFile', registrantsModif.RHGetAttachedFile)
 # Misc sections and personal data
-event_mgmt.add_url_rule('/registration/users/<registrantId>/misc/<miscInfoId>', 'confModifRegistrants-modifyMiscInfo',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/misc/<miscInfoId>', 'confModifRegistrants-modifyMiscInfo',
                         registrantsModif.RHRegistrantMiscInfoModify, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/misc/<miscInfoId>/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/misc/<miscInfoId>/save',
                         'confModifRegistrants-performModifyMiscInfo',
                         registrantsModif.RHRegistrantMiscInfoPerformModify, methods=('POST',))
 # Accommodation
-event_mgmt.add_url_rule('/registration/users/<registrantId>/accommodation', 'confModifRegistrants-modifyAccommodation',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/accommodation', 'confModifRegistrants-modifyAccommodation',
                         registrantsModif.RHRegistrantAccommodationModify, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/accommodation/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/accommodation/save',
                         'confModifRegistrants-performModifyAccommodation',
                         registrantsModif.RHRegistrantAccommodationPerformModify, methods=('POST',))
 # Reason for participation
-event_mgmt.add_url_rule('/registration/users/<registrantId>/reasonParticipation',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/reasonParticipation',
                         'confModifRegistrants-modifyReasonParticipation',
                         registrantsModif.RHRegistrantReasonParticipationModify, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/reasonParticipation/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/reasonParticipation/save',
                         'confModifRegistrants-performModifyReasonParticipation',
                         registrantsModif.RHRegistrantReasonParticipationPerformModify, methods=('POST',))
 # Sessions
-event_mgmt.add_url_rule('/registration/users/<registrantId>/sessions', 'confModifRegistrants-modifySessions',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/sessions', 'confModifRegistrants-modifySessions',
                         registrantsModif.RHRegistrantSessionModify, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/sessions/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/sessions/save',
                         'confModifRegistrants-performModifySessions', registrantsModif.RHRegistrantSessionPerformModify,
                         methods=('POST',))
 # Social events
-event_mgmt.add_url_rule('/registration/users/<registrantId>/socialEvents', 'confModifRegistrants-modifySocialEvents',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/socialEvents', 'confModifRegistrants-modifySocialEvents',
                         registrantsModif.RHRegistrantSocialEventsModify, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/socialEvents/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/socialEvents/save',
                         'confModifRegistrants-performModifySocialEvents',
                         registrantsModif.RHRegistrantSocialEventsPerformModify, methods=('POST',))
 # Statuses
-event_mgmt.add_url_rule('/registration/users/<registrantId>/statuses', 'confModifRegistrants-modifyStatuses',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/statuses', 'confModifRegistrants-modifyStatuses',
                         registrantsModif.RHRegistrantStatusesModify, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/users/<registrantId>/statuses/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/statuses/save',
                         'confModifRegistrants-performModifyStatuses',
                         registrantsModif.RHRegistrantStatusesPerformModify, methods=('POST',))
 # Payment
-event_mgmt.add_url_rule('/registration/users/<registrantId>/payment/save',
+event_mgmt.add_url_rule('/registration-old/users/<registrantId>/payment/save',
                         'confModifRegistrants-peformModifyTransaction',
                         registrantsModif.RHRegistrantTransactionPerformModify, methods=('POST',))
 
-event_mgmt.add_url_rule('/registration/stats', 'registration_stats', RHRegistrationStats)
+event_mgmt.add_url_rule('/registration-old/stats', 'registration_stats', RHRegistrationStats)

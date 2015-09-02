@@ -26,15 +26,15 @@ var ndRegForm = angular.module('nd.regform', [
 // ============================================================================
 
 ndRegForm.value('editionurl',
-    Indico.Urls.Base + '/event/:confId/manage/registration/modify/'
+    Indico.Urls.Base + '/event/:confId/manage/registration-old/modify/'
 );
 
 ndRegForm.value('displayurl',
-    Indico.Urls.Base + '/event/:confId/registration/sections'
+    Indico.Urls.Base + '/event/:confId/registration-old/sections'
 );
 
 ndRegForm.value('userurl',
-    Indico.Urls.Base + '/event/:confId/registration/userdata'
+    Indico.Urls.Base + '/event/:confId/registration-old/userdata'
 );
 
 ndRegForm.value('sortableoptions', {
