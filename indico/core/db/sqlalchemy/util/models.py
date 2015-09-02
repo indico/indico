@@ -21,7 +21,7 @@ from importlib import import_module
 from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy import inspect
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, contains_eager
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -41,8 +41,10 @@ class IndicoModel(Model):
             if not isinstance(value, (list, tuple)):
                 value = (value,)
             special_fields[key] = value
+        joined_eager = set(special_fields['eager']) & set(special_fields['join'])
         options = []
-        options += [joinedload(rel) for rel in special_fields['eager']]
+        options += [joinedload(rel) for rel in special_fields['eager'] if rel not in joined_eager]
+        options += [contains_eager(rel) for rel in joined_eager]
         return (cls.query
                 .filter_by(**kwargs)
                 .join(*special_fields['join'])
