@@ -17,19 +17,17 @@
 
 .sideBar {
     float: right;
-    font-size: 14px;
     width: 340px;
 
     .content {
         @include border-radius();
-        background: #ECECEC image-url('../images/grey_gradient.png') scroll repeat-x bottom left;
-        padding: 20px 20px 50px 20px;
+        background: #ECECEC;
     }
 
     h1 {
         margin: 0;
         padding: 0;
-        color: #777;
+        color: $light-black;
         font-size: 15px;
     }
 
@@ -39,21 +37,11 @@
         list-style-type: none;
     }
 
-    li {
-        margin-bottom: 10px;
-    }
-
-    a {
-        font-size: 12px;
-    }
-
     em {
-        color: #777;
+        color: $light-black;
     }
 
     a {
-        font-size: 14px;
-
         &.advanced {
             font-style: italic;
         }
@@ -63,37 +51,122 @@
             font-size: 14px;
         }
     }
-
-    .active {
-        font-weight: bold;
-    }
 }
 
 .sideMenu {
+    @extend %font-family-title;
     float: left;
     width: 200px;
     margin-right: 30px;
     margin-left: 30px;
+    font-size: 1.1em;
 
-    .separator {
-        font-weight: normal;
-        font-style: italic;
-        font-size: 12px;
-        color: #777;
-        padding: 7px 0;
-        border-bottom: 1px dotted #999;
+    a:before {
+        margin-right: 0.25rem;
     }
 
-    .separatorNoText {
-        font-size: 1px;
-        height: 1px;
-        padding: 0;
-        margin-top: 0;
-        border-bottom: 1px dotted #999;
+    li.section-item.disabled {
+        color: $dark-gray;
     }
 
     .content {
         padding-top: 10px;
+
+        > ul {
+            box-shadow: 0 2px 1px 0px $gray;
+        }
+    }
+
+    li.section-item {
+        a:hover {
+            color: $darker-blue;
+        }
+
+        &.top-level-item a {
+            padding: 10px 10px 10px 25px;
+            display: block;
+        }
+
+        a {
+            color: $dark-blue;
+        }
+
+        &.active {
+            position: relative;
+            background-color: $pastel-gray;
+
+            > a {
+                font-weight: normal;
+            }
+
+            &:before {
+                display: block;
+                content: ".";
+                color: transparent;
+                font-size: 0;
+                border-right: 2px solid $link;
+                height: 100%;
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+        }
+    }
+
+    .section {
+        border-bottom: 1px solid $gray;
+        margin: 0;
+
+        .title:before {
+            margin-right: 0.5rem;
+        }
+
+        .section-title{
+            color: $black;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        &.expandable {
+            .section-title {
+                @include icon-before('icon-arrow-down');
+
+                &:before {
+                    @include transition(transform 0.3s ease-out);
+                    -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                    display: inline-block;
+                }
+            }
+
+            &.collapsed {
+                > ul {
+                    display: none;
+                }
+
+                .section-title:before {
+                    @include rotate(-90deg);
+                }
+            }
+        }
+
+        ul {
+            /* Prevent jQuery slideToggle "jump" glitch */
+            border: 1px solid transparent;
+            @extend %font-family-title;
+            font-size: 0.95em;
+            margin: 0;
+
+            li.section-item {
+                > a, &.disabled span {
+                    padding: 5px 5px 5px 27px;
+                    display: block;
+
+                    &:last-child {
+                        padding-bottom: 10px;
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -2126,11 +2126,6 @@ ul.menuList li
     font-weight: bold;
 }
 
-li.sideMenu_disabled
-{
-    color: #999;
-}
-
 ul.menuList li.active
 {
     color: #e25300;
