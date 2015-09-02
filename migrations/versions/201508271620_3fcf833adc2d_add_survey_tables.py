@@ -89,9 +89,7 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_constraint('fk_survey_submissions_survey_id_surveys', 'survey_submissions', schema='events')
-    op.drop_constraint('fk_survey_items_survey_id_surveys', 'survey_items', schema='events')
-    op.drop_table('surveys', schema='events')
     op.drop_table('survey_answers', schema='events')
     op.drop_table('survey_submissions', schema='events')
     op.drop_table('survey_items', schema='events')
+    op.drop_table('surveys', schema='events')
