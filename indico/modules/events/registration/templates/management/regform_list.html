@@ -1,0 +1,30 @@
+{% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Registration{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {% trans -%}
+        You can create registration processes for the event and let people register their.
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% for regform in regforms %}
+        {{ regform }}
+    {% else %}
+        {%- call message_box('info', fixed_width=true) -%}
+            {% trans %}There are no registration processes yet.{% endtrans %}
+        {%- endcall %}
+    {% endfor %}
+
+    <div class="toolbar">
+        <div class="group right">
+            <a href="{{ url_for('.create_regform', event) }}" class="i-button">
+                {% trans %}Create process{% endtrans %}
+            </a>
+        </div>
+    </div>
+{% endblock %}

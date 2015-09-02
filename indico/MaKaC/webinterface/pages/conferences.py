@@ -1056,7 +1056,7 @@ class WPConferenceModifBase(main.WPMainBase):
         self._sideMenu.addItem(self._programMenuItem)
 
         self._regFormMenuItem = wcomponents.SideMenuItem(
-            _("Registration"),
+            _("Registration old"),
             urlHandlers.UHConfModifRegForm.getURL(self._conf), section='organization')
         self._sideMenu.addItem(self._regFormMenuItem)
 
