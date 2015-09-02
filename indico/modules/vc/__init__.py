@@ -64,11 +64,8 @@ def _extend_event_management_menu(event, **kwargs):
 def _extend_event_menu(sender, **kwargs):
     def _visible(event):
         return bool(get_vc_plugins()) and bool(VCRoomEventAssociation.find_for_event(event).count())
-    return MenuEntryData(endpoint='vc.event_videoconference',
-                         position=14,
-                         title='Videoconference Rooms',
-                         name='videoconference_rooms',
-                         visible=_visible)
+    return MenuEntryData(_('Videoconference Rooms'), 'videoconference_rooms', 'vc.event_videoconference',
+                         position=14, visible=_visible)
 
 
 @signals.event.session_slot_deleted.connect
