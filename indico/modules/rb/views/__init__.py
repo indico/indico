@@ -57,7 +57,7 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
 
         self._roomsBookingOpt = SideMenuSection(active=True)
         self._searchOpt = SideMenuSection(_('Search'), active=True, icon='icon-search')
-        self._roomsOpt = SideMenuSection(_('My Rooms'), active=True, icon='icon-user')
+        self._roomsOpt = SideMenuSection(_('My Rooms'), active=user_has_rooms, icon='icon-user')
         self._bookingsOpt = SideMenuSection(_('My Bookings'), active=True, icon='icon-time')
         self._blockingsOpt = SideMenuSection(_('Room Blocking'), icon='icon-lock')
 
