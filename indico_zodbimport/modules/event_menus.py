@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import re
 from operator import attrgetter
 from HTMLParser import HTMLParser
 
@@ -119,6 +120,8 @@ REMOVED_MENU_NAMES = {'ViewMyRegistration', 'NewRegistration', 'downloadETicket'
                       'collaboration', 'instantMessaging'}
 NOT_TOP_LEVEL_NAMES = {'program_my_tracks', 'evaluation_form', 'evaluation_edit'}
 
+WHITESPACE_RE = re.compile(r'\s+')
+
 
 def _menu_item_data(entry, children=True):
     if entry._name in REMOVED_MENU_NAMES:
@@ -134,7 +137,7 @@ def _get_menu_structure(display_mgr):
 
 
 def _sanitize_title(title):
-    return HTMLParser().unescape(strip_tags(convert_to_unicode(title))).strip()
+    return WHITESPACE_RE.sub(' ', HTMLParser().unescape(strip_tags(convert_to_unicode(title)))).strip()
 
 
 class EventMenuImporter(Importer):

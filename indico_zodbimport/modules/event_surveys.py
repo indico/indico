@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import re
 from datetime import date, timedelta
 from HTMLParser import HTMLParser
 from operator import attrgetter
@@ -34,8 +35,11 @@ from indico.web.flask.templating import strip_tags
 from indico_zodbimport import Importer, convert_to_unicode
 
 
+WHITESPACE_RE = re.compile(r'\s+')
+
+
 def _sanitize(title):
-    return HTMLParser().unescape(strip_tags(convert_to_unicode(title))).strip()
+    return WHITESPACE_RE.sub(' ', HTMLParser().unescape(strip_tags(convert_to_unicode(title)))).strip()
 
 
 class SurveyImporter(Importer):
