@@ -33,7 +33,7 @@ from indico.modules.events.surveys.controllers.management.survey import (RHManag
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('survey', __name__, template_folder='templates', virtual_template_folder='events/surveys',
+_bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_template_folder='events/surveys',
                       url_prefix='/event/<confId>', event_feature='surveys')
 
 # survey display/submission

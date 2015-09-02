@@ -11,7 +11,7 @@
         The survey "{{ survey.title }}" on the event "{{ survey.event.title }}" is now open.
 
         You may answer the survey by clicking the link below:
-        {{ url_for('survey.display_survey_form', survey, _external=true) }}
+        {{ url_for('surveys.display_survey_form', survey, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
 

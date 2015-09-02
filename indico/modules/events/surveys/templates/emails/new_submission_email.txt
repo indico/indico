@@ -13,7 +13,7 @@
         {%- if submission.user %} by {{ submission.user.full_name }}{% endif -%}.
 
         You can access all the submissions by clicking on the link below:
-        {{ url_for('survey.manage_survey', survey, _external=true) }}
+        {{ url_for('surveys.manage_survey', survey, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
 
