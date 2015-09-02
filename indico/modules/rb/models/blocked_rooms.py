@@ -75,7 +75,7 @@ class BlockedRoom(db.Model):
 
     @classmethod
     def find_with_filters(cls, filters):
-        q = cls.find(_eager=BlockedRoom.blocking, _join=Blocking)
+        q = cls.find(_eager=BlockedRoom.blocking, _join=BlockedRoom.blocking)
         if filters.get('room_ids'):
             q = q.filter(BlockedRoom.room_id.in_(filters['room_ids']))
         if filters.get('start_date') and filters.get('end_date'):

@@ -20,7 +20,7 @@ from datetime import date
 
 from sqlalchemy import and_, func, or_, cast, Date
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.common.Locators import Locator
@@ -617,8 +617,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def get_blocked_rooms(self, *dates, **kwargs):
         states = kwargs.get('states', (BlockedRoom.State.accepted,))
         return (self.blocked_rooms
-                .options(joinedload(BlockedRoom.blocking))
                 .join(BlockedRoom.blocking)
+                .options(contains_eager(BlockedRoom.blocking))
                 .filter(or_(Blocking.is_active_at(d) for d in dates),
                         BlockedRoom.state.in_(states))
                 .all())

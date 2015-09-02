@@ -166,14 +166,15 @@ class ReservationOccurrence(db.Model, Serializer):
                                           ReservationOccurrence.is_valid,
                                           ReservationOccurrence.filter_overlap(occurrences),
                                           _eager=ReservationOccurrence.reservation,
-                                          _join=Reservation)
+                                          _join=ReservationOccurrence.reservation)
 
     @staticmethod
     def find_with_filters(filters, user=None):
         from indico.modules.rb.models.rooms import Room
         from indico.modules.rb.models.reservations import Reservation
 
-        q = ReservationOccurrence.find(Room.is_active, _join=[Reservation, Room],
+        q = ReservationOccurrence.find(Room.is_active,
+                                       _join=[ReservationOccurrence.reservation, Room],
                                        _eager=ReservationOccurrence.reservation)
 
         if 'start_dt' in filters and 'end_dt' in filters:

@@ -59,7 +59,7 @@ class RHManageSurveySectionBase(RHManageSurveysBase):
     def _checkParams(self, params):
         RHManageSurveysBase._checkParams(self, params)
         self.section = SurveySection.find_one(SurveySection.id == request.view_args['section_id'], ~Survey.is_deleted,
-                                              _join=Survey, _eager=SurveySection.survey)
+                                              _join=SurveySection.survey, _eager=SurveySection.survey)
         self.survey = self.section.survey
 
 
@@ -75,7 +75,7 @@ class RHManageSurveyTextBase(RHManageSurveysBase):
     def _checkParams(self, params):
         RHManageSurveysBase._checkParams(self, params)
         self.text = SurveyText.find_one(SurveyText.id == request.view_args['text_id'], ~Survey.is_deleted,
-                                        _join=Survey, _eager=SurveySection.survey)
+                                        _join=SurveyText.survey, _eager=SurveyText.survey)
         self.survey = self.text.survey
 
 
@@ -91,7 +91,8 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
     def _checkParams(self, params):
         RHManageSurveysBase._checkParams(self, params)
         self.question = SurveyQuestion.find_one(SurveyQuestion.id == request.view_args['question_id'],
-                                                ~Survey.is_deleted, _join=Survey, _eager=SurveySection.survey)
+                                                ~Survey.is_deleted,
+                                                _join=SurveyQuestion.survey, _eager=SurveyQuestion.survey)
         self.survey = self.question.survey
 
 

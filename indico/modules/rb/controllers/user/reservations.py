@@ -320,7 +320,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             ReservationOccurrence.start_dt >= flexible_start_dt,
             ReservationOccurrence.end_dt <= flexible_end_dt,
             ReservationOccurrence.is_valid,
-            _join=Reservation,
+            _join=ReservationOccurrence.reservation,
             _eager=ReservationOccurrence.reservation
         )
 

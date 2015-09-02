@@ -143,7 +143,7 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
             ReservationOccurrence.start_dt >= self._calendar_start,
             ReservationOccurrence.end_dt <= self._calendar_end,
             ReservationOccurrence.is_valid,
-            _join=Reservation,
+            _join=ReservationOccurrence.reservation,
             _eager=ReservationOccurrence.reservation
         )
 

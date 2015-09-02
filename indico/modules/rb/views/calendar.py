@@ -20,7 +20,7 @@ from itertools import groupby
 from operator import attrgetter
 
 from flask import session
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, contains_eager, defaultload
 from werkzeug.datastructures import MultiDict
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -63,7 +63,7 @@ class RoomBookingCalendarWidget(object):
 
         if self.show_blockings:
             # avoid loading user data we don't care about
-            user_strategy = joinedload('blocking').defaultload('created_by_user')
+            user_strategy = defaultload('blocking').defaultload('created_by_user')
             user_strategy.noload('*')
             user_strategy.load_only('first_name', 'last_name')
             self.blocked_rooms = (BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
