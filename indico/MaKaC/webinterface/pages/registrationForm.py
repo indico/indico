@@ -37,7 +37,7 @@ from indico.web.flask.util import url_for
 
 
 class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
-    sidemenu_option = 'registration'
+    sidemenu_option = 'registration_old'
 
     def getJSFiles(self):
         return conferences.WPConferenceModifBase.getJSFiles(self) + \
