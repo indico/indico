@@ -74,11 +74,12 @@ class WPAdminsBase(WPMainBase):
         self._sideMenu = wcomponents.ManagementSideMenu()
 
         mainSection = wcomponents.SideMenuSection(id='general')
-        securitySection = wcomponents.SideMenuSection(_('Security'), id='security')
-        userManagementSection = wcomponents.SideMenuSection(_('User management'), id='user_management')
-        pluginsSection = wcomponents.SideMenuSection(_('Plugins'), id='plugins')
-        customizationSection = wcomponents.SideMenuSection(_('Customization'), id='customization')
-        integrationSection = wcomponents.SideMenuSection(_('Integration'), id='integration')
+        securitySection = wcomponents.SideMenuSection(_('Security'), id='security', icon='icon-shield')
+        userManagementSection = wcomponents.SideMenuSection(_('User management'), id='user_management',
+                                                            icon='icon-users')
+        pluginsSection = wcomponents.SideMenuSection(_('Plugins'), id='plugins', icon='icon-settings')
+        customizationSection = wcomponents.SideMenuSection(_('Customization'), id='customization', icon='icon-wrench')
+        integrationSection = wcomponents.SideMenuSection(_('Integration'), id='integration', icon='icon-earth')
 
         self._sideMenu.addSection(mainSection)
         self._sideMenu.addSection(securitySection)
@@ -103,7 +104,7 @@ class WPAdminsBase(WPMainBase):
         self._sideMenu.addItem(self._templatesMenuItem)
 
         self._ipProtectionMenuItem = wcomponents.SideMenuItem(
-            _("IP-based Protection"),
+            _("IP-based ACL"),
             urlHandlers.UHIPBasedACL.getURL(), section='security')
         self._sideMenu.addItem(self._ipProtectionMenuItem)
 
