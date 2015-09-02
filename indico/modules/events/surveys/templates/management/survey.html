@@ -26,10 +26,8 @@
                 </a>
             </div>
         </div>
-    </div>
 
-    {% if survey.state.name != 'not_ready' %}
-        <div class="action-box">
+        {% if survey.state.name != 'not_ready' %}
             <div class="section">
                 <div class="icon icon-clipboard"></div>
                 <div class="text">
@@ -44,8 +42,8 @@
                     </a>
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 
     <h2>
         {% trans %}Submissions{% endtrans %}
