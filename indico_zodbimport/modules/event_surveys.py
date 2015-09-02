@@ -59,7 +59,10 @@ class SurveyImporter(Importer):
 
     def migrate_survey(self, evaluation, event):
         survey = Survey(event_id=int(event.id))
-        survey.title = _sanitize(evaluation.title) if evaluation.title else "Evaluation"
+        if evaluation.title and not evaluation.title.startswith('Evaluation for '):
+            survey.title = _sanitize(evaluation.title)
+        if not survey.title:
+            survey.title = "Evaluation"
         survey.introduction = _sanitize(evaluation.announcement)
         if evaluation.contactInfo:
             contact_text = "Contact: ".format(_sanitize(evaluation.contactInfo))
