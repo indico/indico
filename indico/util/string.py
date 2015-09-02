@@ -18,6 +18,8 @@
 String manipulation functions
 """
 
+from __future__ import absolute_import
+
 import functools
 import re
 import unicodedata
@@ -45,19 +47,19 @@ def unicodeOrNone(s):
     return None if s is None else s.decode('utf-8')
 
 
-def safe_upper(string):
-    if isinstance(string, unicode):
-        return string.upper()
+def safe_upper(text):
+    if isinstance(text, unicode):
+        return text.upper()
     else:
-        return string.decode('utf-8').upper().encode('utf-8')
+        return text.decode('utf-8').upper().encode('utf-8')
 
 
-def safe_slice(string, start, stop=None):
+def safe_slice(text, start, stop=None):
     slice_ = slice(start, stop)
-    if isinstance(string, unicode):
-        return string[slice_]
+    if isinstance(text, unicode):
+        return text[slice_]
     else:
-        return string.decode('utf-8')[slice_].encode('utf-8')
+        return text.decode('utf-8')[slice_].encode('utf-8')
 
 
 def remove_accents(text, reencode=True):
@@ -279,12 +281,12 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower() for text in re.split(_nsre, s)]
 
 
-def seems_html(string):
-    return re.search(r'<[a-z]+?>', string) is not None
+def seems_html(text):
+    return re.search(r'<[a-z]+?>', text) is not None
 
 
-def strip_control_chars(string):
-    return re.sub(r'[\x0B-\x1F]', '', string)
+def strip_control_chars(text):
+    return re.sub(r'[\x0B-\x1F]', '', text)
 
 
 def html_color_to_rgb(hexcolor):
