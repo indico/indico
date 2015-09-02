@@ -1017,7 +1017,8 @@ class WPConferenceModifBase(main.WPMainBase):
         self._generalSection = wcomponents.SideMenuSection(id='general', icon='icon-settings')
         self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"), id='advanced',
                                                                    icon='icon-lamp')
-        self._organizationSection = wcomponents.SideMenuSection(_("Organization"), id='organization', icon='icon-time')
+        self._organizationSection = wcomponents.SideMenuSection(_("Organization"), id='organization', icon='icon-time',
+                                                                active=True)
         self._toolsSection = wcomponents.SideMenuSection(_("Tools"), id='tools', icon='icon-wrench')
         self._customizationSection = wcomponents.SideMenuSection(_("Customization"), id='customization',
                                                                  icon='icon-image')
