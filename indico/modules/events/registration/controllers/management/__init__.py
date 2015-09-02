@@ -16,16 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect
+from flask import request
 
-from indico.core.db import db
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
-from indico.modules.events.registration.views import WPManageRegistration
-from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHManageRegistrationBase(RHConferenceModifBase):
+class RHManageRegFormsBase(RHConferenceModifBase):
     """Base class for all registration management RHs"""
 
     CSRF_ENABLED = True
@@ -33,20 +30,18 @@ class RHManageRegistrationBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf
+        self.event_new = self.event.as_event
 
 
-class RHRegistrationForms(RHManageRegistrationBase):
-    """List of registration form for an event"""
+class RHManageRegFormBase(RHManageRegFormsBase):
+    """Base class for a specific registration form"""
 
-    def _process(self):
-        query = RegistrationForm.find(event_id=self.event.id, is_deleted=False)
-        regforms = query.order_by(db.func.lower(RegistrationForm.title)).all()
-        return WPManageRegistration.render_template('management/regform_list.html', self.event,
-                                                    event=self.event, regforms=regforms)
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.regform
+        }
+    }
 
-
-class RHRegistrationFormCreate(RHManageRegistrationBase):
-    "Creates a new registration form"
-
-    def _process(self):
-        return redirect(url_for('.manage_regform_list', self.event))
+    def _checkParams(self, params):
+        RHManageRegFormsBase._checkParams(self, params)
+        self.regform = RegistrationForm.find_one(id=request.view_args['reg_form_id'], is_deleted=False)
