@@ -25,8 +25,8 @@ from indico.util.string import return_ascii
 
 
 class SurveySubmission(db.Model):
-    __tablename__ = 'survey_submissions'
-    __table_args__ = {'schema': 'events'}
+    __tablename__ = 'submissions'
+    __table_args__ = {'schema': 'event_surveys'}
 
     #: The ID of the submission
     id = db.Column(
@@ -36,7 +36,7 @@ class SurveySubmission(db.Model):
     #: The ID of the survey
     survey_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.surveys.id'),
+        db.ForeignKey('event_surveys.surveys.id'),
         index=True,
         nullable=False
     )
@@ -88,19 +88,19 @@ class SurveySubmission(db.Model):
 
 
 class SurveyAnswer(db.Model):
-    __tablename__ = 'survey_answers'
-    __table_args__ = {'schema': 'events'}
+    __tablename__ = 'answers'
+    __table_args__ = {'schema': 'event_surveys'}
 
     #: The ID of the submission
     submission_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.survey_submissions.id'),
+        db.ForeignKey('event_surveys.submissions.id'),
         primary_key=True
     )
     #: The ID of the question
     question_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.survey_items.id'),
+        db.ForeignKey('event_surveys.items.id'),
         primary_key=True
     )
     #: The user's answer (no, not 42!) to the question

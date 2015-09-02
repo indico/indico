@@ -25,7 +25,6 @@ from indico.core.errors import IndicoError
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.modules.events.surveys import logger
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.surveys.models.items import SurveyItem
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
@@ -42,7 +41,7 @@ class SurveyState(IndicoEnum):
 
 class Survey(db.Model):
     __tablename__ = 'surveys'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = {'schema': 'event_surveys'}
 
     #: The ID of the submission
     id = db.Column(

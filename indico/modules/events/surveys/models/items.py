@@ -41,7 +41,7 @@ class SurveyItemType(int, IndicoEnum):
 
 
 class SurveyItem(db.Model):
-    __tablename__ = 'survey_items'
+    __tablename__ = 'items'
     __table_args__ = (db.CheckConstraint("type != {} OR (title IS NOT NULL AND is_required IS NOT NULL AND "
                                          "field_type IS NOT NULL AND parent_id IS NOT NULL)"
                                          .format(SurveyItemType.question), 'valid_question'),
@@ -52,7 +52,7 @@ class SurveyItem(db.Model):
                       db.CheckConstraint("type != {} OR (title IS NULL AND is_required IS NULL AND "
                                          "field_type IS NULL AND field_data::text = '{{}}' AND parent_id IS NOT NULL)"
                                          .format(SurveyItemType.text), 'valid_text'),
-                      {'schema': 'events'})
+                      {'schema': 'event_surveys'})
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': None
@@ -66,14 +66,14 @@ class SurveyItem(db.Model):
     #: The ID of the survey
     survey_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.surveys.id'),
+        db.ForeignKey('event_surveys.surveys.id'),
         index=True,
         nullable=False,
     )
     #: The ID of the parent section item (NULL for top-level items, i.e. sections)
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.survey_items.id'),
+        db.ForeignKey('event_surveys.items.id'),
         index=True,
         nullable=True,
     )

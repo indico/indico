@@ -8,6 +8,7 @@ Create Date: 2015-07-27 11:14:06.639780
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.surveys.models.items import SurveyItemType
@@ -18,6 +19,7 @@ down_revision = '2fd1bc34a83c'
 
 
 def upgrade():
+    op.execute(CreateSchema('event_surveys'))
     op.create_table(
         'surveys',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -37,10 +39,10 @@ def upgrade():
         sa.Column('new_submission_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
-        schema='events'
+        schema='event_surveys'
     )
     op.create_table(
-        'survey_items',
+        'items',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('survey_id', sa.Integer(), nullable=False, index=True),
         sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
@@ -60,36 +62,37 @@ def upgrade():
         sa.CheckConstraint("type != 3 OR (title IS NULL AND is_required IS NULL AND field_type IS NULL "
                            "AND field_data::text = '{}')",
                            name='valid_text'),
-        sa.ForeignKeyConstraint(['survey_id'], ['events.surveys.id']),
-        sa.ForeignKeyConstraint(['parent_id'], ['events.survey_items.id']),
+        sa.ForeignKeyConstraint(['survey_id'], ['event_surveys.surveys.id']),
+        sa.ForeignKeyConstraint(['parent_id'], ['event_surveys.items.id']),
         sa.PrimaryKeyConstraint('id'),
-        schema='events'
+        schema='event_surveys'
     )
     op.create_table(
-        'survey_submissions',
+        'submissions',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('survey_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
-        sa.ForeignKeyConstraint(['survey_id'], ['events.surveys.id']),
+        sa.ForeignKeyConstraint(['survey_id'], ['event_surveys.surveys.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
-        schema='events'
+        schema='event_surveys'
     )
     op.create_table(
-        'survey_answers',
+        'answers',
         sa.Column('submission_id', sa.Integer(), nullable=False),
         sa.Column('question_id', sa.Integer(), nullable=False),
         sa.Column('data', postgresql.JSON(), nullable=False),
-        sa.ForeignKeyConstraint(['question_id'], ['events.survey_items.id']),
-        sa.ForeignKeyConstraint(['submission_id'], ['events.survey_submissions.id']),
+        sa.ForeignKeyConstraint(['question_id'], ['event_surveys.items.id']),
+        sa.ForeignKeyConstraint(['submission_id'], ['event_surveys.submissions.id']),
         sa.PrimaryKeyConstraint('submission_id', 'question_id'),
-        schema='events'
+        schema='event_surveys'
     )
 
 
 def downgrade():
-    op.drop_table('survey_answers', schema='events')
-    op.drop_table('survey_submissions', schema='events')
-    op.drop_table('survey_items', schema='events')
-    op.drop_table('surveys', schema='events')
+    op.drop_table('answers', schema='event_surveys')
+    op.drop_table('submissions', schema='event_surveys')
+    op.drop_table('items', schema='event_surveys')
+    op.drop_table('surveys', schema='event_surveys')
+    op.execute(DropSchema('event_surveys'))
