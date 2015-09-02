@@ -73,7 +73,7 @@
         padding-top: 10px;
 
         > ul {
-            box-shadow: 0 2px 1px 0px $gray;
+            border-bottom: 1px solid $gray;
         }
     }
 
@@ -83,7 +83,7 @@
         }
 
         &.top-level-item a {
-            padding: 10px 10px 10px 25px;
+            padding: 10px 10px 10px 27px;
             display: block;
         }
 
@@ -114,7 +114,7 @@
     }
 
     .section {
-        border-bottom: 1px solid $gray;
+        border-bottom: 1px solid darken($pastel-gray, 2%);
         margin: 0;
 
         .title:before {
