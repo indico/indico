@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import binascii
 from collections import defaultdict
 from itertools import count, chain
+from sqlalchemy.exc import IntegrityError
 
 import MaKaC
 from indico.core import signals
@@ -157,8 +158,18 @@ def menu_entries_for_event(event):
         if custom_menu_enabled:
             with db.tmp_session() as sess:
                 sess.add_all(new_entries)
-                sess.commit()
-                _cache.set(cache_key, cache_version)
+                try:
+                    sess.commit()
+                except IntegrityError as e:
+                    # If there are two parallel requests trying to insert a new menu
+                    # item one of them will fail with an error due to the unique index.
+                    # If the IntegrityError involves that index, we assume it's just the
+                    # race condition and ignore it.
+                    sess.rollback()
+                    if 'ix_uq_menu_entries_event_id_name' not in unicode(e.message):
+                        raise
+                else:
+                    _cache.set(cache_key, cache_version)
             entries = MenuEntry.get_for_event(event)
         else:
             entries = new_entries
