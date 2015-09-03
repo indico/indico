@@ -55,7 +55,6 @@
         }
 
         .item-action-buttons {
-            display: table-cell;
             vertical-align: middle;
             visibility: hidden;
             width: 11%;
@@ -65,13 +64,12 @@
             @include icon-before('icon-handle');
             color: $dark-gray;
             cursor: move;
-            display: table-cell;
             vertical-align: middle;
             visibility: hidden;
             width: 15px;
         }
 
-        li.section-item:hover {
+        li.survey-item:hover {
             .item-action-buttons,
             .item-sortable-handle {
                 visibility: visible;
@@ -79,27 +77,15 @@
         }
     }
 
-    .sortblock {
-        width: 100%;
-    }
-
-    .questions-handle {
-        width: 100%;
+    .i-box-content > ul > li.survey-item {
         display: table;
-        word-wrap: break-word;
-    }
-
-    .question-list {
-        display: table-row-group;
-    }
-
-    .question-row {
-        display: table-row;
         width: 100%;
-    }
-
-    .question-data {
-        display: table-cell;
+        .item-row {
+            display: table-row;
+            > div {
+                display: table-cell;
+            }
+        }
     }
 
     .empty-msg {

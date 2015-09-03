@@ -61,7 +61,7 @@
                 <ul class="group-list no-content-before js-sortable-survey-items
                            {% if not section.children %}empty{% endif %}">
                     {% for item in section.children %}
-                        <li class="section-item js-sortable-survey-item" data-item-id="{{ item.id }}">
+                        <li class="survey-item" data-item-id="{{ item.id }}">
                             {% if item.type.name == 'question' %}
                                 {{ _render_question(item, preview_form) }}
                             {% elif item.type.name == 'text' %}
@@ -82,22 +82,17 @@
 
 
 {% macro _render_item() %}
-    <div class="questions-handle i-form">
-        <div class="question-list">
-            <div class="question-row">
-                <div class="item-sortable-handle"></div>
-                {{ caller() }}
-            </div>
-        </div>
+    <div class="item-row">
+        <div class="item-sortable-handle"></div>
+        {{ caller() }}
     </div>
 {% endmacro %}
 
 
 {% macro _render_question(question, preview_form) %}
     {% call _render_item() %}
-        <div class="question-data">
-            {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true,
-                        orientation='vertical') }}
+        <div class="i-form">
+            {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true, orientation='vertical') }}
         </div>
         <div class="item-action-buttons">
             <a data-href="{{ url_for('.delete_question', question) }}"
@@ -116,7 +111,7 @@
 
 {% macro _render_text(text) %}
     {% call _render_item() %}
-        <div class="question-data">
+        <div class="i-form">
             <div class="form-group">
                 <div class="form-field form-block static-text-widget">
                     {{- text.description|replace('\n', '<br>'|safe) -}}
