@@ -47,20 +47,40 @@
 }
 
 #survey-questionnaire-preview {
-    .standalone-section-title {
-        color: $dark-gray;
-        font-style: italic;
-        padding-right: 0.5rem;
+    .i-box {
+        .standalone-section-title {
+            color: $dark-gray;
+            font-style: italic;
+            padding-right: 0.5rem;
+        }
+
+        .item-action-buttons {
+            display: table-cell;
+            vertical-align: middle;
+            visibility: hidden;
+            width: 11%;
+        }
+
+        .item-sortable-handle {
+            @include icon-before('icon-handle');
+            color: $dark-gray;
+            cursor: move;
+            display: table-cell;
+            vertical-align: middle;
+            visibility: hidden;
+            width: 15px;
+        }
+
+        li.section-item:hover {
+            .item-action-buttons,
+            .item-sortable-handle {
+                visibility: visible;
+            }
+        }
     }
 
     .sortblock {
         width: 100%;
-    }
-
-    .action-buttons {
-        width: 11%;
-        vertical-align: top;
-        display: table-cell;
     }
 
     .questions-handle {
@@ -80,17 +100,6 @@
 
     .question-data {
         display: table-cell;
-    }
-
-    .handle {
-        @include icon-before('icon-grid2');
-        color: lighten($gray, $color-variation);
-        text-align: right;
-        line-height: 2em;
-        vertical-align: top;
-        display: table-cell;
-        width: 25px;
-        cursor: move;
     }
 
     .empty-msg {
