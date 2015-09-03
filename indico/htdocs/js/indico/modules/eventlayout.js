@@ -63,6 +63,7 @@
                         .parent('.menu-entry')
                             .removeClass('with-children');
                 }
+                ui.placeholder.height(ui.helper.outerHeight());
             },
             beforeStop: function(evt, ui) {
                 /*
