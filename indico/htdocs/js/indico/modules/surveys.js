@@ -210,7 +210,7 @@
         });
         container.find('.js-sortable-survey-items').sortable({
             items: '.survey-item',
-            handle: '.item-sortable-handle',
+            handle: '.ui-sortable-handle',
             connectWith: '#survey-questionnaire-preview .js-sortable-survey-items',
             tolerance: 'pointer',
             distance: 10,

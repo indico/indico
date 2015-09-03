@@ -60,15 +60,6 @@
             width: 11%;
         }
 
-        .item-sortable-handle {
-            @include icon-before('icon-handle');
-            color: $dark-gray;
-            cursor: move;
-            vertical-align: middle;
-            visibility: hidden;
-            width: 15px;
-        }
-
         li.survey-item:hover {
             .item-action-buttons,
             .item-sortable-handle {
@@ -78,6 +69,7 @@
     }
 
     .i-box-content > ul > li.survey-item {
+        background-color: white;
         display: table;
         width: 100%;
         .item-row {
