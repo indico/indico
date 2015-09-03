@@ -31,6 +31,7 @@
 
 .i-label {
     @extend %label;
+    background: white;
     margin: 0 5px;
 
     &.striped {
