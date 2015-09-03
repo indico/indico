@@ -168,7 +168,7 @@
                     display: inline-block;
                     overflow: hidden;
 
-                    max-width: 66%;
+                    max-width: 63%;
 
                     white-space: nowrap;
                     text-overflow: ellipsis;
@@ -180,7 +180,7 @@
                     }
                 }
                 > .actions {
-                    max-width: 31%;
+                    max-width: 33%;
                     margin-right: -5px;
                     a, a:active, a:focus {
                         outline: none;
@@ -286,10 +286,10 @@
                 max-width: 4%;
             }
             > .title {
-                max-width: 61%;
+                max-width: 59%;
             }
             > .actions {
-                max-width: 34%;
+                max-width: 37%;
             }
         }
     }
