@@ -221,10 +221,23 @@
                 &:hover > .actions > .not-default {
                     display: inline !important;
                 }
-                &.highlight > .actions > * {
-                    color: #fdfdfd;
-                    &:hover {
-                        color: $link;
+                &.disabled {
+                    .position {
+                        color: $light-black;
+                    }
+                    > .actions > * {
+                        color: $light-black;
+                    }
+                }
+                &.highlight {
+                    .position {
+                        color: white;
+                    }
+                    > .actions > * {
+                        color: white;
+                        &:hover {
+                            color: $link;
+                        }
                     }
                 }
             }

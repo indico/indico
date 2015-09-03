@@ -4,7 +4,7 @@
          data-position-url="{{ url_for('.menu_entry_position', entry) }}"
          data-entry-id="{{ entry.id }}">
         <div class="i-label drag-handle
-            {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
+            {%- if entry.type.name == 'separator' %} disabled
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
             {%- if not entry.is_enabled %} striped{% endif %}">
             <i class="entry-{{ entry.type.name }}"></i>
