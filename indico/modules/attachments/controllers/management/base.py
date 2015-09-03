@@ -134,19 +134,19 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected, skip_attrs={'file'})
-        form_cls = EditAttachmentFileForm if self.attachment.type == AttachmentType.file else EditAttachmentLinkForm
-        file_ = self.attachment.file
-
-        # file_attrs has to be manually "serialized", since it's going to be converted to JSON
-        file_attrs = {
-            'url': url_for('attachments.download', self.attachment,
-                           filename=self.attachment.file.filename, from_preview='1'),
-            'filename': file_.filename,
-            'size': file_.size,
-            'content_type': file_.content_type
-        }
-
-        form = form_cls(linked_object=self.object, obj=defaults, file=file_attrs)
+        if self.attachment.type == AttachmentType.file:
+            file_ = self.attachment.file
+            # file_attrs has to be manually "serialized", since it's going to be converted to JSON
+            file_attrs = {
+                'url': url_for('attachments.download', self.attachment, filename=self.attachment.file.filename,
+                               from_preview='1'),
+                'filename': file_.filename,
+                'size': file_.size,
+                'content_type': file_.content_type
+            }
+            form = EditAttachmentFileForm(linked_object=self.object, obj=defaults, file=file_attrs)
+        else:
+            form = EditAttachmentLinkForm(linked_object=self.object, obj=defaults)
 
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
