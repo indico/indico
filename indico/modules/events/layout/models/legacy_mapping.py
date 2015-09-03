@@ -53,7 +53,12 @@ class LegacyImageMapping(db.Model):
     image = db.relationship(
         'ImageFile',
         lazy=False,
-        backref=db.backref('legacy_mapping', uselist=False, lazy=True)
+        backref=db.backref(
+            'legacy_mapping',
+            cascade='all, delete-orphan',
+            uselist=False,
+            lazy=True
+        )
     )
 
     @return_ascii
@@ -93,7 +98,12 @@ class LegacyPageMapping(db.Model):
     page = db.relationship(
         'EventPage',
         lazy=False,
-        backref=db.backref('legacy_mapping', uselist=False, lazy=True)
+        backref=db.backref(
+            'legacy_mapping',
+            cascade='all, delete-orphan',
+            uselist=False,
+            lazy=True
+        )
     )
 
     @return_ascii
