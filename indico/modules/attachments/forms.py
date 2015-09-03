@@ -66,7 +66,7 @@ class AddAttachmentFilesForm(AttachmentFormBase):
 
 
 class EditAttachmentFileForm(EditAttachmentFormBase):
-    file = HiddenField(_("File"), widget=DropzoneWidget(max_files=1, submit_form=False),
+    file = HiddenField(_("File"), widget=DropzoneWidget(max_files=1, submit_form=False, add_remove_links=False),
                        description=_("Already uploaded file. Replace it by adding a new file."))
 
 

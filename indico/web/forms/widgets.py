@@ -221,7 +221,7 @@ class DropzoneWidget(JinjaWidget):
             'url': post_url,
             'uploadMultiple': max_files > 1,
             'maxFilesize': max_file_size,
-            'maxFiles':  max_files,
+            'maxFiles': max_files,
             'addRemoveLinks': add_remove_links,
             'acceptedFiles': accepted_file_types,
             'paramName': param_name,
