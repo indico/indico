@@ -7,22 +7,24 @@
     <div class="flashed-messages"></div>
 
     <div class="attachment-editor">
-        <div class="action-box fixed-width">
-            <div class="section">
-                <span class="icon icon-package-download"></span>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Generate a material package.{% endtrans %}
+        {% if linked_object_type != 'category' %}
+            <div class="action-box fixed-width">
+                <div class="section">
+                    <span class="icon icon-package-download"></span>
+                    <div class="text">
+                        <div class="label">
+                            {% trans %}Generate a material package.{% endtrans %}
+                        </div>
+                        <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
                     </div>
-                    <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
-                </div>
-                <div class="toolbar right">
-                    <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
-                        {%- trans %}Material Package{% endtrans -%}
-                    </a>
+                    <div class="toolbar right">
+                        <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
+                            {%- trans %}Material Package{% endtrans -%}
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         <div class="action-box fixed-width">
             <div class="section">
                 <span class="icon icon-upload"></span>
