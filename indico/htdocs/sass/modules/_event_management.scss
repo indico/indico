@@ -177,6 +177,7 @@
                 > .actions {
                     max-width: 33%;
                     margin-right: -5px;
+                    visibility: hidden;
                     a, a:active, a:focus {
                         outline: none;
                     }
@@ -218,9 +219,6 @@
                         }
                     }
                 }
-                &:hover > .actions > .not-default {
-                    display: inline !important;
-                }
                 &.disabled {
                     .position {
                         color: $light-black;
@@ -238,6 +236,12 @@
                         &:hover {
                             color: $link;
                         }
+                    }
+                }
+                &:hover > .actions {
+                    visibility: visible;
+                    > .not-default {
+                        display: inline !important;
                     }
                 }
             }
