@@ -42,7 +42,7 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHPackageEventAttachmentsManagement)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
-from indico.web.flask.util import make_view_func
+from indico.web.flask.util import make_view_func, make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
@@ -130,12 +130,25 @@ compat_attachment_rules = [
     '/material/<material_id>/<resource_id>.<ext>',
     '/session/<session_id>/material/<material_id>/<resource_id>',
     '/session/<session_id>/material/<material_id>/<resource_id>.<ext>',
+    '/session/<session_id>/contribution/<contrib_id>/material/<material_id>/<resource_id>',
     '/session/<session_id>/contribution/<contrib_id>/material/<material_id>/<resource_id>.<ext>',
+    '/session/<session_id>/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>',
     '/session/<session_id>/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>',
+    '/contribution/<contrib_id>/material/<material_id>/<resource_id>',
     '/contribution/<contrib_id>/material/<material_id>/<resource_id>.<ext>',
-    '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>',
+    '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>',
+    '/contribution/<contrib_id>/<subcontrib_id>/material/<material_id>/<resource_id>.<ext>'
 ]
 for rule in compat_folder_rules:
     _compat_bp.add_url_rule(rule, 'folder', compat_folder)
 for rule in compat_attachment_rules:
     _compat_bp.add_url_rule(rule, 'attachment', compat_attachment)
+
+_compat_bp.add_url_rule('!/getFile.py/access', 'getfile',
+                        make_compat_redirect_func(_compat_bp, 'attachment',
+                                                  view_args_conv={'confId': 'event_id',
+                                                                  'sessionId': 'session_id',
+                                                                  'contribId': 'contrib_id',
+                                                                  'subContId': 'subcontrib_id',
+                                                                  'materialId': 'material_id',
+                                                                  'resId': 'resource_id'}))
