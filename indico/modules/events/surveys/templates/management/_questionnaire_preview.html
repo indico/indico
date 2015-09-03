@@ -59,12 +59,7 @@
             </div>
             <div class="i-box-content">
                 <ul class="group-list no-content-before js-sortable-survey-items
-                          {% if not section.children %}empty{% endif %}">
-                    <li class="empty-msg">
-                        {%- trans -%}
-                            No items have been added yet so this section will not be displayed.
-                        {%- endtrans -%}
-                    </li>
+                           {% if not section.children %}empty{% endif %}">
                     {% for item in section.children %}
                         <li class="js-sortable-survey-item" data-item-id="{{ item.id }}">
                             {% if item.type.name == 'question' %}
@@ -74,6 +69,11 @@
                             {% endif %}
                         </li>
                     {% endfor %}
+                    <li class="empty-msg">
+                        {% trans -%}
+                            No items have been added yet so this section will not be displayed.
+                        {%- endtrans %}
+                    </li>
                 </ul>
             </div>
         </div>
