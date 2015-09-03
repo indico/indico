@@ -60,6 +60,7 @@
     margin-right: 30px;
     margin-left: 30px;
     font-size: 1.1em;
+    @include user-select(none);
 
     a:before {
         margin-right: 0.25rem;
