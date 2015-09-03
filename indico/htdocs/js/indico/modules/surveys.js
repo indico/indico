@@ -191,7 +191,7 @@
         // sort sections
         container.sortable({
             items: '.js-sortable-survey-section',
-            handle: '.i-box-sortable-handle',
+            handle: '.ui-i-box-sortable-handle',
             placeholder: 'i-box-sortable-placeholder',
             tolerance: 'pointer',
             distance: 10,

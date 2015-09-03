@@ -51,16 +51,32 @@
     }
 }
 
-
 %i-box-empty {
+    color: $dark-gray;
+    display: block;
     font-size: 1em;
     font-style: italic;
-
-    display: block;
-
     text-align: left;
+}
 
-    color: $dark-gray;
+%i-box-sortable-handle {
+    @include icon-before('icon-handle');
+    @include transition(background-color $default-transition-duration $default-transition-function);
+    background-color: lighten($dark-gray, $color-variation);
+    cursor: move;
+
+    &:before {
+        color: $light-gray;
+    }
+
+    &:active,
+    &:hover {
+        background-color: white;
+
+        &:before {
+            color: $dark-gray;
+        }
+    }
 }
 
 
@@ -85,15 +101,13 @@
         @extend %i-box-empty;
     }
 
-    .i-box-sortable-handle {
-        @include icon-before('icon-handle');
+    .ui-i-box-sortable-handle {
+        @extend %i-box-sortable-handle;
         @include transition(
             background-color $default-transition-duration $default-transition-function,
             height $default-transition-duration $default-transition-function
         );
 
-        background-color: lighten($dark-gray, $color-variation);
-        cursor: move;
         font-size: 1.2em;
         height: 10px;
         margin: -10px -10px 10px -10px;
@@ -102,7 +116,6 @@
         &:hover,
         &:active {
             @include border-bottom();
-            background-color: white;
             height: 20px;
 
             &:before {
@@ -114,7 +127,6 @@
         &:before {
             @include rotate(90deg);
             @include single-transition(top);
-            color: $light-gray;
             display: inline-block;
             position: relative;
             top: -3px;
@@ -277,6 +289,7 @@
         margin-left: -10px;
         margin-right: -10px;
         padding: 10px 10px;
+        position: relative;
         overflow: hidden;
     }
 
@@ -290,7 +303,7 @@
         margin-top: -20px;
 
         > li:first-child {
-            border-top: 0;
+            border-top-width: 0;
         }
     }
 
@@ -319,6 +332,43 @@
 
         .content {
             font-style: italic;
+        }
+    }
+
+    > li {
+        .ui-sortable-handle {
+            @extend %i-box-sortable-handle;
+            height: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+            visibility: hidden;
+            width: 1em;
+
+            &:before {
+                margin-top: -0.5em;
+                position: absolute;
+                top: 50%;
+            }
+
+            &:after {
+                content: '.';
+                visibility: hidden;
+            }
+
+            &:active,
+            &:hover {
+                @include border-right(lighten($gray, $color-variation));
+            }
+        }
+
+        &:hover .ui-sortable-handle {
+            visibility: visible;
+        }
+
+        &.ui-sortable-helper {
+            @include border-vert(lighten($gray, $color-variation));
+            border-top-width: 1px !important;
         }
     }
 }
