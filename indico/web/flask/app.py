@@ -66,7 +66,7 @@ from indico.web.forms.jinja_helpers import is_single_line_field, render_field, i
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
-AUTO_COMPAT_BLUEPRINTS = {'admin', 'category', 'category_mgmt', 'event', 'event_creation', 'event_mgmt', 'files',
+AUTO_COMPAT_BLUEPRINTS = {'admin', 'category', 'category_mgmt', 'event', 'event_creation', 'event_mgmt',
                           'misc', 'rooms', 'rooms_admin'}
 
 
