@@ -9,7 +9,7 @@
             {%- if not entry.is_enabled %} striped{% endif %}">
             <i class="entry-{{ entry.type.name }}"></i>
             <span class="title">
-                {% if config.DEBUG %}<span class="position">{{ entry.position}}</span>{% endif %}
+                {% if config.DEBUG %}<span class="position">{{ entry.position + 1}}</span>{% endif %}
                 {{ entry.localized_title }}
             </span>
             <span class="right actions">
