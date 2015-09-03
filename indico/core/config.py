@@ -19,6 +19,7 @@ and transparent way the system configuration (this is mainly done through the
 Config class).
 """
 
+import ast
 import copy
 import os
 import socket
@@ -560,26 +561,6 @@ class Config:
         self.__readConfigFile()
         self._shelf = None
 
-
-    def updateValues(self, newValues):
-        """The argument is a dictionary.
-        This function updates only the values provided by the dictionary"""
-        for k in newValues:
-            if k in self._configVars:
-                self._configVars[k] = newValues[k]
-
-    def forceReload(self):
-        '''Forces Config to reread indico.conf and repopulate all of its variables'''
-        # We don't use __import__ or reload because if the file changes are done too fast
-        # Python doesn't see the changes and inconsistencies appear.
-        #     __import__('MaKaC.common.MaKaCConfig') < DOESNT WORK
-        #     reload(MaKaCConfig)                    < DOESNT WORK
-        execfile(os.path.abspath(os.path.join(os.path.dirname(__file__), 'MaKaCConfig.py')))
-        new_vals = locals()
-        for k in self._configVars:
-            if k in new_vals:
-                self._configVars[k] = new_vals[k]
-
     def reset(self, custom={}):
         """
         Resets the config to the default values (ignoring indico.conf) and
@@ -598,8 +579,13 @@ class Config:
         self._deriveOptions()
 
     def _deriveOptions(self):
-
         webinterface_dir = os.path.join(os.path.dirname(MaKaC.__file__), 'webinterface')
+
+        override = os.environ.get('INDICO_CONF_OVERRIDE')
+        if override:
+            override = ast.literal_eval(override)
+            assert isinstance(override, dict)
+            self._configVars.update(override)
 
         # Variables whose value is derived automatically
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
@@ -658,7 +644,6 @@ class Config:
 
         # options that are derived automatically
         self._deriveOptions()
-
 
         self.__tplFiles = {}
 
