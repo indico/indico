@@ -138,8 +138,10 @@
             }
             > .i-label {
                 width: 100%;
-
                 text-align: left;
+                &.drag-handle {
+                    cursor: move;
+                }
                 > * {
                     line-height: 1.2em;
                     height: 1.2em;
@@ -156,14 +158,7 @@
                 > .entry-separator {
                     @include icon-before('icon-arrows-vert');
                 }
-                .drag-handle {
-                    cursor: move;
-                }
                 /* menu title */
-                > .drag-handle {
-                    display: inline-block;
-                    max-width: 4%;
-                }
                 > .title {
                     display: inline-block;
                     overflow: hidden;
@@ -222,11 +217,6 @@
                             color: $red !important;
                         }
                     }
-                    > .drag-handle {
-                        @include icon-before('icon-grid2');
-                        margin-left: 1em;
-                        color: lighten($gray, 5%);
-                    }
                 }
                 &:hover > .actions > .not-default {
                     display: inline !important;
@@ -281,10 +271,6 @@
         border-top: 0;
         background-color: $light-gray;
         > li > .menu-entry > .i-label {
-            > .drag-handle {
-                display: inline-block;
-                max-width: 4%;
-            }
             > .title {
                 max-width: 59%;
             }

@@ -3,11 +3,11 @@
          data-position="{{ entry.position }}"
          data-position-url="{{ url_for('.menu_entry_position', entry) }}"
          data-entry-id="{{ entry.id }}">
-        <div class="i-label
+        <div class="i-label drag-handle
             {%- if entry.type.name in ('internal_link', 'plugin_link') %} disabled
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
             {%- if not entry.is_enabled %} striped{% endif %}">
-            <i class="entry-{{ entry.type.name }} drag-handle"></i>
+            <i class="entry-{{ entry.type.name }}"></i>
             <span class="title">
                 {% if config.DEBUG %}<span class="position">{{ entry.position}}</span>{% endif %}
                 {{ entry.localized_title }}
@@ -42,7 +42,6 @@
                             {% endif %}">
                     </a>
                 {% endif %}
-                <i class="drag-handle"></i>
             </span>
         </div>
         {% if entry.is_root and entry.children %}
