@@ -41,6 +41,29 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from MaKaC.conference import SubContribution
 
 
+def adjust_path_length(segments):
+    """
+    Shorten the path length to < 260 chars.
+
+    Windows' built-in ZIP tool doesn't like files whose
+    total path exceeds ~260 chars. Here we progressively
+    shorten the total until it matches that constraint.
+    """
+    result = []
+    total_len = sum(len(seg) for seg in segments) + len(segments) - 1
+    excess = (total_len - 255) if total_len > 255 else 0
+
+    for seg in reversed(segments):
+        fname, ext = os.path.splitext(seg)
+        cut = min(excess, (len(fname) - 10) if len(fname) > 14 else 0)
+        if cut:
+            excess -= cut
+            fname = fname[:-cut]
+        result.append(fname + ext)
+
+    return reversed(result)
+
+
 def _get_start_dt(obj):
     if isinstance(obj, SubContribution):
         return obj.getContribution().getAdjustedStartDate()
@@ -147,11 +170,11 @@ class AttachmentPackageGeneratorMixin:
         if not attachment.folder.is_default:
             segments.append(secure_filename(attachment.folder.title, unicode(attachment.folder.id)))
         segments.append(attachment.file.filename)
-        path = os.path.join(*filter(None, segments))
+        path = os.path.join(*adjust_path_length(filter(None, segments)))
         while path in self.used:
             # prepend the id if there's a path collision
             segments[-1] = '{}-{}'.format(attachment.id, segments[-1])
-            path = os.path.join(*filter(None, segments))
+            path = os.path.join(*adjust_path_length(filter(None, segments)))
         return path
 
     def _get_base_path(self, attachment):
