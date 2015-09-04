@@ -17,11 +17,11 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
-from indico.modules.events.registration.controllers.management.regform import (RHRegistrationFormList,
-                                                                               RHRegistrationFormCreate,
-                                                                               RHRegistrationFormEdit,
-                                                                               RHRegistrationFormDelete,
-                                                                               RHRegistrationFormManage)
+from indico.modules.events.registration.controllers.management.regforms import (RHRegistrationFormList,
+                                                                                RHRegistrationFormCreate,
+                                                                                RHRegistrationFormEdit,
+                                                                                RHRegistrationFormDelete,
+                                                                                RHRegistrationFormManage)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
