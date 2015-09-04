@@ -13,7 +13,30 @@
 
 {% block content %}
     {% for regform in regforms %}
-        {{ regform }}
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-quill"></div>
+                <div class="text">
+                    <div class="label">{{ regform.title }}</div>
+                </div>
+                <div class="toolbar right">
+                    <div class="group">
+                        <a href="#" class="i-button icon-remove"
+                           data-href=""
+                           data-method="POST"
+                           data-title="{% trans %}Delete registration form?{% endtrans %}"
+                           data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}">
+                            {% trans %}Delete{% endtrans %}
+                        </a>
+                    </div>
+                    <div class="group">
+                        <a href="#" class="i-button highlight icon-settings">
+                            {% trans %}Manage{% endtrans %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% else %}
         {%- call message_box('info', fixed_width=true) -%}
             {% trans %}There are no registration processes yet.{% endtrans %}
