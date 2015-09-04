@@ -186,7 +186,7 @@ indico_jquery = rjs_bundle(
                'ajaxdialog.js',
                'clearableinput.js',
                'actioninput.js',
-               'fieldarea.js',
+               'multitextfield.js',
                'multiselect.js',
                'principalfield.js',
                'realtimefilter.js',

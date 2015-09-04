@@ -986,19 +986,21 @@ type("AddAbstractSelectionFieldDialog", ["AddAbstractFieldDialog"],
     {
         _initializeForm: function() {
             this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
-            this.fieldOptions = $("<div></div>").fieldarea({fields_caption: $T("option"),
-                                                            parameter_manager: this._parameterManager,
-                                                            ui_sortable: true});
+            this.fieldOptions = $("<div></div>").multitextfield({
+                fieldsCaption: $T("option"),
+                parameterManager: this._parameterManager,
+                sortable: true
+            });
             this._form.push([$T("Options"), this.fieldOptions]);
         },
 
         __fillForm: function(field) {
             this.AddAbstractFieldDialog.prototype.__fillForm.call(this, field);
-            this.fieldOptions.fieldarea("setInfo", field["options"]);
+            this.fieldOptions.multitextfield("setInfo", field["options"]);
         },
 
         __preSubmit: function() {
-            this.info.set("options", this.fieldOptions.fieldarea("getInfo"));
+            this.info.set("options", this.fieldOptions.multitextfield("getInfo"));
         }
     },
 

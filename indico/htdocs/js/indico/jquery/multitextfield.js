@@ -16,13 +16,13 @@
  */
 
 (function($) {
-    $.widget("ui.fieldarea", {
+    $.widget("indico.multitextfield", {
 
         options: {
-            fields_caption: "field",
-            parameter_manager: undefined,
-            parameter_type: "text",
-            ui_sortable: false,
+            fieldsCaption: "field",
+            parameterManager: undefined,
+            parameterType: "text",
+            sortable: false,
             valueField: undefined, // A (hidden) field of which the value is a dict of all input fields values
             fieldName: undefined   // String used as a key to an input field value
         },
@@ -36,7 +36,7 @@
                 this.data = this.field.val() ? JSON.parse(this.field.val()) : [];
             }
 
-            this.element.addClass("field-area");
+            this.element.addClass("multi-text-fields");
             this._createList();
             this._handleEvents();
             this._drawList();
@@ -44,7 +44,7 @@
 
         destroy: function() {
             this.element.off("focusout click keyup propertychange paste");
-            this.element.removeClass("field-area");
+            this.element.removeClass("multi-text-fields");
             this.list.remove();
         },
 
@@ -53,7 +53,7 @@
             self.list = $("<ul></ul>");
             self.element.append(self.list);
 
-            if (self.options["ui_sortable"]) {
+            if (self.options.sortable) {
                 self.list.sortable({
                     axis: "y",
                     containment: "parent",
@@ -80,7 +80,7 @@
         _handleEvents: function() {
             var self = this;
 
-            self.element.on("focusout", "input", function(e) {
+            self.element.on("focusout", "input", function() {
                 self._updateField(this);
                 self._drawNewItem();
             });
@@ -90,7 +90,7 @@
                 self._deleteItem($(this).closest("li"));
             });
 
-            self.element.on("keyup propertychange paste", "input", function(e) {
+            self.element.on("keyup propertychange paste input", "input", function(e) {
 
                 // Enter
                 if (e.type == "keyup" && e.which == 13) {
@@ -115,7 +115,7 @@
                 // ESC
                 if (e.which == 27) {
                     e.stopPropagation();
-                    value = self._getField($(this).data("id"))["value"];
+                    var value = self._getField($(this).data("id")).value;
                     $(this).val(value);
                     $(this).blur();
                     $(this).trigger("propertychange");
@@ -124,20 +124,21 @@
         },
 
         _drawList: function() {
+            var i = 0;
             var self = this;
             var list = self.list;
 
             self._reinitList();
 
             if (self.valueField) {
-                for (var i = 0; i < self.data.length; ++i) {
+                for (i = 0; i < self.data.length; ++i) {
                     var obj = {id: i, value: self.data[i][self.fieldName]};
                     list.append(self._item(obj));
                     self.info[i] = obj;
                 }
             }
             else {
-                for (var i = 0; i < self.info.length; ++i) {
+                for (i = 0; i < self.info.length; ++i) {
                     list.append(self._item(self.info[i]));
                 }
             }
@@ -225,16 +226,16 @@
         },
 
         _addFieldToPM: function(input) {
-            if (this.options["parameter_manager"] !== undefined) {
-                var parameter_type = this.options["parameter_type"];
-                this.options["parameter_manager"].remove(input);
-                this.options["parameter_manager"].add(input, parameter_type, false);
+            if (this.options.parameterManager !== undefined) {
+                var parameterType = this.options.parameterType;
+                this.options.parameterManager.remove(input);
+                this.options.parameterManager.add(input, parameterType, false);
             }
         },
 
         _removeFieldFromPM: function(input) {
-            if (this.options["parameter_manager"] !== undefined) {
-                this.options["parameter_manager"].remove(input);
+            if (this.options.parameterManager !== undefined) {
+                this.options.parameterManager.remove(input);
             }
         },
 
@@ -243,11 +244,11 @@
 
             var id = field["id"];
             var value = field["value"];
-            var placeholder = "Type to add " + this.options["fields_caption"];
+            var placeholder = $T.gettext('Type to add {0}').format(this.options.fieldsCaption);
 
             var item = $("<li></li>");
 
-            if (this.options["ui_sortable"]) {
+            if (this.options.sortable) {
                 item.append($("<span class='handle'></span>"));
             }
 

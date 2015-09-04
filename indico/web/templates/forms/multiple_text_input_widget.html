@@ -12,8 +12,8 @@
         (function() {
             'use strict';
 
-            $('#{{ field.id }}-widget').fieldarea({
-                ui_sortable: {{ field.sortable | tojson }},
+            $('#{{ field.id }}-widget').multitextfield({
+                sortable: {{ field.sortable | tojson }},
                 valueField: $('#{{ field.id }}'),
                 fieldName: {{ field.field_name | tojson }},
                 fieldsCaption: {{ field.field_caption | tojson }}
