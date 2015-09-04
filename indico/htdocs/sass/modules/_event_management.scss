@@ -139,6 +139,7 @@
             > .i-label {
                 width: 100%;
                 text-align: left;
+                font-weight: bold;
                 &.drag-handle {
                     cursor: move;
                 }
@@ -281,13 +282,15 @@
         @include border-bottom-radius();
 
         width: 333px;
-        margin: 0 5px;
-        padding-right: 15px;
-        padding-left: 20px;
+        margin: 0 20px;
+        padding-right: 10px;
+        padding-left: 10px;
 
         border-top: 0;
-        background-color: $light-gray;
+        background-color: $pastel-gray;
         > li > .menu-entry > .i-label {
+            font-weight: normal;
+            margin: 0;
             > .title {
                 max-width: 59%;
             }
