@@ -1,8 +1,8 @@
 """Add registration tables
 
 Revision ID: f9bb2a03ceb
-Revises: 3fcf833adc2d
-Create Date: 2015-09-01 16:21:03.682231
+Revises: 3b6c768b8803
+Create Date: 2015-09-04 15:15:03.682231
 """
 
 import sqlalchemy as sa
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = 'f9bb2a03ceb'
-down_revision = '3fcf833adc2d'
+down_revision = '3b6c768b8803'
 
 
 def upgrade():
