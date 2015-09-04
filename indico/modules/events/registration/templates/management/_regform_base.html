@@ -1,0 +1,9 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {% trans %}Registration{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans title=regform.title %}Manage process "{{ title }}"{% endtrans %}
+{% endblock %}
