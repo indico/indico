@@ -121,6 +121,10 @@
     color: $red !important;
 }
 
+#menu-entries > .menu-entries {
+    padding-top: 0;
+}
+
 .menu-entries {
     width: 370px;
     padding: 5px 10px 5px 5px;
