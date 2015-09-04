@@ -25,7 +25,7 @@ from wtforms.validators import DataRequired, Optional, NumberRange, ValidationEr
 from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
 from indico.util.i18n import _, ngettext
 from indico.util.string import alpha_enum
-from indico.web.forms.fields import IndicoRadioField, MultipleItemsField, IndicoSelectMultipleCheckboxField
+from indico.web.forms.fields import IndicoRadioField, MultiStringField, IndicoSelectMultipleCheckboxField
 from indico.web.forms.validators import HiddenUnless
 
 
@@ -40,9 +40,9 @@ class SingleChoiceConfigForm(FieldConfigForm):
                                           description=_('The arrangement of the options'),
                                           choices=[('vertical', _('Vertical')),
                                                    ('horizontal', _('Horizontal'))])
-    options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
-                                 unique_field='option', uuid_field='id', sortable=True,
-                                 description=_('Specify the answers the user can choose from'))
+    options = MultiStringField(_('Options'), [DataRequired()], field=('option', _('option')), unique=True,
+                               uuid_field='id', sortable=True,
+                               description=_('Specify the answers the user can choose from'))
 
 
 class _EmptyNoneSelectField(SelectField):
@@ -103,9 +103,8 @@ class SingleChoiceField(SurveyField):
 
 
 class MultiSelectConfigForm(FieldConfigForm):
-    options = MultipleItemsField(_('Options'), [DataRequired()], fields=[('option', _('Option'))],
-                                 unique_field='option', uuid_field='id', sortable=True,
-                                 description=_('Specify the answers the user can select'))
+    options = MultiStringField(_('Options'), [DataRequired()], field=('option', _('option')), unique=True,
+                               uuid_field='id', sortable=True, description=_('Specify the answers the user can select'))
     min_choices = IntegerField(_("Minimum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=0)],
                                description=_("The minimum amount of options the user has to choose."))
     max_choices = IntegerField(_("Maximum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=1)],
