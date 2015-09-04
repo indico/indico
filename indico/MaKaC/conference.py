@@ -9732,14 +9732,10 @@ class Material(CommonObjectBase):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.linkTo(self, "access")
         self._p_changed = 1
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.unlinkTo(self, "access")
         self._p_changed = 1
 
     def canView( self, aw ):
@@ -10039,13 +10035,9 @@ class Resource(CommonObjectBase):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
