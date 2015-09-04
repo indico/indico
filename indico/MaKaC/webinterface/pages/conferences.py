@@ -18,10 +18,9 @@ import collections
 from flask import session, request
 import os
 import re
-import time
 
 from datetime import timedelta, datetime
-from xml.sax.saxutils import quoteattr, escape
+from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
