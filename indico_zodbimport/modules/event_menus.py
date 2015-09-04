@@ -69,9 +69,43 @@ MENU_ENTRY_NAME_MAP = {
     'registrationForm': 'registration',
     'registrants': 'registrants',
     'evaluation': 'surveys',
-    'surveys': 'surveys',  # XXX: should only happen on dev databases
-    'chat-event-page': 'chatrooms',
-    'vc-event-page': 'vc-event-page',
+    'chat-event-page': 'chat:chatrooms',
+    'vc-event-page': 'videoconference_rooms',
+    # XXX: these should only occur in dev databases
+    'surveys': 'surveys',
+    'chat:chatrooms': 'chat:chatrooms',
+    'videoconference_rooms': 'videoconference_rooms'
+}
+
+DEFAULT_MENU_TITLES = {
+    'abstract_submission': {'submit a new abstract', 'submit abstract'},
+    'abstracts_book': {'book of abstracts'},
+    'author_index': {'author list', 'author undex'},
+    'call_for_abstracts': {'call for abstracts'},
+    'chat:chatrooms': {'chat rooms'},
+    'contributions': {'contribution list'},
+    'contributions_as_editor': {'layout reviewer area'},
+    'contributions_as_reviewer': {'content reviewer area'},
+    'contributions_to_judge': {'referee area'},
+    'download_template': {'download template'},
+    'my_conference': {'my conference'},
+    'my_contributions': {'my contributions'},
+    'my_sessions': {'my session', 'my sessions'},
+    'my_tracks': {'my tracks'},
+    'overview': {'overview'},
+    'paper_assign': {'assign papers'},
+    'paper_reviewing': {'paper reviewing'},
+    'paper_setup': {'manage paper reviewing'},
+    'paper_upload': {'upload paper'},
+    'program': {'scientific programme'},
+    'program_my_tracks': {'manage my track', 'manage my tracks'},
+    'registrants': {'list of participants', 'partecipants', 'participant list'},
+    'registration': {'registration'},
+    'speaker_index': {'speaker index', 'speaker list'},
+    'surveys': {'evaluation', 'surveys'},
+    'timetable': {'timetable'},
+    'user_abstracts': {'view my abstracts'},
+    'videoconference_rooms': {'video conference rooms', 'videoconference rooms'}
 }
 
 
@@ -176,6 +210,12 @@ class EventMenuImporter(Importer):
                     continue
                 used.add(data['name'])
                 data['title'] = _sanitize_title(item._caption)
+                if not data['title']:
+                    data['title'] = None
+                    self.print_warning(cformat('%{yellow!}Menu entry {} has no title; using default').format(
+                        data['name']), event_id=event.id)
+                elif data['title'].lower() in DEFAULT_MENU_TITLES[data['name']]:
+                    data['title'] = None
                 if item._name == 'chatrooms':
                     data['plugin'] = 'chat'
                     data['type'] = MenuEntryType.plugin_link
@@ -194,6 +234,12 @@ class EventMenuImporter(Importer):
                     else:
                         self.print_warning(cformat('%{yellow}Skipping link "{}" with no URL').format(
                             data['title']), event_id=event.id)
+                        continue
+                if not data['title']:
+                    if getattr(item, '_listLink', None):
+                        self.print_warning(cformat('%{yellow!}Link has no title but children'), event_id=event.id)
+                    else:
+                        self.print_warning(cformat('%{yellow}Skipping link with no title'), event_id=event.id)
                         continue
             elif item_type == 'PageLink':
                 data['type'] = MenuEntryType.page
