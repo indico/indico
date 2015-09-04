@@ -19,9 +19,12 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
+from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+
+logger = Logger.get('events.registration')
 
 
 @signals.event_management.sidemenu.connect
