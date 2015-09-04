@@ -22,7 +22,7 @@
                 <div class="toolbar right">
                     <div class="group">
                         <a href="#" class="i-button icon-remove"
-                           data-href=""
+                           data-href="{{ url_for('.delete_regform', regform) }}"
                            data-method="POST"
                            data-title="{% trans %}Delete registration form?{% endtrans %}"
                            data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}">
