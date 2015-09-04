@@ -20,6 +20,7 @@ from flask import redirect, flash, session
 
 from indico.core.db import db
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import RegistrationFormForm
@@ -74,3 +75,13 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
             return redirect(url_for('.manage_regform_list', self.event_new))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,
                                                     event=self.event, regform=self.regform)
+
+
+class RHRegistrationFormDelete(RHManageRegFormBase):
+    """Delete a registration form"""
+
+    def _process(self):
+        self.regform.is_deleted = True
+        flash(_("Registration form deleted"), 'success')
+        logger.info("Registration form {} deleted by {}".format(self.regform, session.user))
+        return redirect(url_for('.manage_regform_list', self.event))
