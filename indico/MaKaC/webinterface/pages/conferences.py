@@ -69,6 +69,7 @@ from indico.modules.events.layout.util import (build_menu_entry_name, get_css_ur
                                                menu_entries_for_event)
 from indico.util import json
 from indico.util.signals import values_from_signal
+from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 
 LECTURE_SERIES_RE = re.compile(r'^part\d+$')
@@ -240,7 +241,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self.event = self._conf.as_event
         self.logo_url = self.event.logo_url if self.event.has_logo else None
         body = self._applyConfDisplayDecoration( body )
-        return WPConferenceBase._applyDecoration( self, body )
+        return WPConferenceBase._applyDecoration(self, to_unicode(body))
 
 
 class WConfMetadata(wcomponents.WTemplated):
@@ -486,7 +487,7 @@ class WPXSLConferenceDisplay(WPConferenceBase):
     def _applyDecoration(self, body):
         """
         """
-        return body
+        return to_unicode(body)
 
     def _getHTMLFooter(self):
         return ""
@@ -797,7 +798,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         """
         """
         if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
-                return WPrintPageFrame().getHTML({"content":body})
+                return to_unicode(WPrintPageFrame().getHTML({"content":body}))
         return WPConferenceBase._applyDecoration(self, body)
 
     def _getHTMLFooter( self ):

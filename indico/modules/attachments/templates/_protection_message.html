@@ -27,7 +27,7 @@
                             {% trans %}Protected{% endtrans %}
                         </div>
                         <div>
-                            {% trans parent_type=parent.type, parent_title = parent.title -%}
+                            {% trans parent_type=parent.type, parent_title = parent.title|ensure_unicode -%}
                                 This object is not publicly accessible since <strong>{{ parent_title }}</strong> ({{ parent_type }}) is protected.
                             {%- endtrans %}
                         </div>
@@ -36,7 +36,7 @@
                             {% trans %}Public{% endtrans %}
                         </div>
                         <div>
-                            {% trans parent_type=parent.type, parent_title=parent.title -%}
+                            {% trans parent_type=parent.type, parent_title=parent.title|ensure_unicode -%}
                                 This object is publicly accessible since <strong>{{ parent_title }}</strong> ({{ parent_type }}) is not protected.
                             {%- endtrans %}
                         </div>

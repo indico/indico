@@ -26,6 +26,7 @@ from indico.core.config import Config
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
+from indico.util.string import to_unicode
 from indico.web.util import jsonify_template
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
@@ -255,8 +256,9 @@ class WPDecorated(WPBase):
         return wc.getHTML({ "subArea": self._getSiteArea() })
 
     def _applyDecoration(self, body):
-        return '<div class="wrapper"><div class="main">{}{}</div></div>{}'.format(self._getHeader(), str(body),
-                                                                                  self._getFooter())
+        return u'<div class="wrapper"><div class="main">{}{}</div></div>{}'.format(to_unicode(self._getHeader()),
+                                                                                   to_unicode(body),
+                                                                                   to_unicode(self._getFooter()))
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
