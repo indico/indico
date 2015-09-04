@@ -223,6 +223,50 @@ class PrincipalField(PrincipalListField):
             self.data = None if not data else data[0]
 
 
+class MultiStringField(HiddenField):
+    """A field with multiple input text fields.
+
+    :param field: A tuple ``(fieldname, title)`` where the title is used in the
+                  placeholder.
+    :param uuid_field: If set, each item will have a UUID assigned and
+                       stored in the field specified here.
+    :param unique: Whether the values should be unique.
+    :param sortable: Whether items should be sortable.
+    """
+    widget = JinjaWidget('forms/multiple_text_input_widget.html')
+    widget.single_line = True
+
+    def __init__(self, *args, **kwargs):
+        (self.field_name, self.field_caption) = kwargs.pop('field')
+        self.sortable = kwargs.pop('sortable', False)
+        self.unique = kwargs.pop('unique', False)
+        self.uuid_field = kwargs.pop('uuid_field', None)
+        super(MultiStringField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
+            if self.uuid_field:
+                for item in self.data:
+                    if self.uuid_field not in item:
+                        item[self.uuid_field] = unicode(uuid.uuid4())
+
+    def pre_validate(self, form):
+        if not all(isinstance(item, dict) for item in self.data):
+            raise ValueError(u'Invalid data. Expected list of dicts.')
+        if self.unique:
+            unique_values = {item[self.field_name] for item in self.data}
+            if len(unique_values) != len(self.data):
+                raise ValueError(u'Items must be unique')
+        if self.uuid_field:
+            unique_uuids = {uuid.UUID(item[self.uuid_field], version=4) for item in self.data}
+            if len(unique_uuids) != len(self.data):
+                raise ValueError(u'UUIDs must be unique')
+
+    def _value(self):
+        return self.data or []
+
+
 class MultipleItemsField(HiddenField):
     """A field with multiple items consisting of multiple string values.
 

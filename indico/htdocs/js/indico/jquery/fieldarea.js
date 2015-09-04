@@ -22,11 +22,19 @@
             fields_caption: "field",
             parameter_manager: undefined,
             parameter_type: "text",
-            ui_sortable: false
+            ui_sortable: false,
+            valueField: undefined, // A (hidden) field of which the value is a dict of all input fields values
+            fieldName: undefined   // String used as a key to an input field value
         },
 
         _create: function() {
             this.info = [];
+            this.valueField = this.options.valueField;
+            this.fieldName = this.options.fieldName;
+            if (this.valueField) {
+                this.field = this.valueField;
+                this.data = this.field.val() ? JSON.parse(this.field.val()) : [];
+            }
 
             this.element.addClass("field-area");
             this._createList();
@@ -60,6 +68,10 @@
                     },
                     update: function(e, ui) {
                         _.move(self.info, self.start_index, ui.item.index());
+                        if (self.valueField) {
+                            _.move(self.data, self.start_index, ui.item.index());
+                            self._updateValueField(self.data);
+                        }
                     }
                 });
             }
@@ -84,6 +96,12 @@
                 if (e.type == "keyup" && e.which == 13) {
                     $(this).blur();
                     $(this).parent().next().find("input").focus();
+                }
+
+                if (self.valueField) {
+                    var oldDataItem = self.data[$(this).parent().index()];
+                    self.data[$(this).parent().index()] = self._updateDataItem($(this).val(), oldDataItem);
+                    self._updateValueField(self.data);
                 }
 
                 if ($(this).val() === "") {
@@ -111,8 +129,17 @@
 
             self._reinitList();
 
-            for (var i=0; i<self.info.length; ++i) {
-                list.append(self._item(self.info[i]));
+            if (self.valueField) {
+                for (var i = 0; i < self.data.length; ++i) {
+                    var obj = {id: i, value: self.data[i][self.fieldName]};
+                    list.append(self._item(obj));
+                    self.info[i] = obj;
+                }
+            }
+            else {
+                for (var i = 0; i < self.info.length; ++i) {
+                    list.append(self._item(self.info[i]));
+                }
             }
 
             self._drawNewItem();
@@ -138,6 +165,10 @@
 
         _deleteNewItem: function(item) {
             if (item.next()[0] == this.new_item[0]) {
+                if (this.valueField) {
+                    this.data.splice(item.index(), 1);
+                    this._updateValueField(this.data);
+                }
                 this._deleteNewFieldInfo();
                 this.new_item.remove();
                 this.new_item = item;
@@ -148,6 +179,10 @@
 
         _deleteItem: function(item) {
             if (item[0] != this.new_item[0]) {
+                if (this.valueField) {
+                    this.data.splice(item.index(), 1);
+                    this._updateValueField(this.data);
+                }
                 var id = item.find("input").data("id");
                 var index = this._getFieldIndex(id);
                 this.info.splice(index, 1);
@@ -267,6 +302,19 @@
         setInfo: function(info) {
             this.info = info;
             this._drawList();
+        },
+
+        _updateValueField: function(newData) {
+            this.field.val(JSON.stringify(newData)).trigger('change');
+            this.data = newData;
+        },
+
+        _updateDataItem: function(value, oldDataItem) {
+            if (!oldDataItem) {
+                oldDataItem = {};
+            }
+            oldDataItem[this.fieldName] = value;
+            return oldDataItem;
         }
     });
 })(jQuery);
