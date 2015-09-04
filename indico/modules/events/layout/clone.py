@@ -66,6 +66,13 @@ class LayoutCloner(EventCloner):
         return {'layout': (_('Layout settings and menu customization'), True, False)}
 
     def clone(self, new_event, options):
+        if self.event.getType() != 'conference':
+            # for meetings/lecture we want to keep the default timetable style in all cases
+            theme = layout_settings.get(self.event, 'timetable_theme')
+            if theme is not None:
+                layout_settings.set(new_event, 'timetable_theme', theme)
+            return
+
         if 'layout' not in options:
             return
 
