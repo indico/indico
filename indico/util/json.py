@@ -38,6 +38,11 @@ class IndicoJSONEncoder(_json.JSONEncoder):
      * datetime objects
      * PersistentDict
     """
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('separators') is None:
+            kwargs['separators'] = (',', ':')
+        super(IndicoJSONEncoder, self).__init__(*args, **kwargs)
+
     def default(self, o):
         if isinstance(o, _LazyString):
             return o.value
