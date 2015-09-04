@@ -248,11 +248,14 @@
             }
         }
         &.menu-entry-placeholder {
-            height: 2em;
-            margin: 5px -5px 5px 5px;
-
-            border: 2px dashed $gray;
+            border: 1px dashed $gray;
+            margin: 4px -5px -1px 5px;
         }
+    }
+    > .ui-sortable-helper:first-child + .menu-entry-placeholder,
+    > .menu-entry-placeholder:first-child {
+        margin-top: 0;
+        margin-bottom: -2px;
     }
     &.empty,
     &.hide-placeholder > li.menu-entry-placeholder {
@@ -298,6 +301,10 @@
                 max-width: 37%;
             }
         }
+        .menu-entry-placeholder {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
     }
      > .highlight + .menu-entries {
         @include border-all(darken($pastel-blue, $light-color-variation));
@@ -338,7 +345,7 @@
             text-align: right;
             @include background-image(linear-gradient(to top, $black, rgba($black, 0)));
             @include border-radius(0 0 2px 2px);
-            box-sizing: border-box;
+            @include box-sizing(border-box);
             padding: 0.5em 1em;
             position: absolute;
             bottom: 0;
