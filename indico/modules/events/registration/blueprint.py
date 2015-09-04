@@ -20,7 +20,8 @@ from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistr
 from indico.modules.events.registration.controllers.management.regform import (RHRegistrationFormList,
                                                                                RHRegistrationFormCreate,
                                                                                RHRegistrationFormEdit,
-                                                                               RHRegistrationFormDelete)
+                                                                               RHRegistrationFormDelete,
+                                                                               RHRegistrationFormManage)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -32,6 +33,7 @@ _bp.add_url_rule('/manage/registration/', 'manage_regform_list', RHRegistrationF
 _bp.add_url_rule('/manage/registration/create', 'create_regform', RHRegistrationFormCreate, methods=('GET', 'POST'))
 
 # Single registration form management
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', RHRegistrationFormManage)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit',
                  'edit_regform', RHRegistrationFormEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete',
