@@ -25,3 +25,6 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items['registration'].setActive()
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
