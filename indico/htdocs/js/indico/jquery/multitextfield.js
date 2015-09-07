@@ -104,7 +104,7 @@
                     self._updateValueField(self.data);
                 }
 
-                if ($(this).val() === "") {
+                if ($(this).val() === "" && !$(this).prop('required')) {
                     self._deleteNewItem($(this).closest("li"));
                 }
 
@@ -132,7 +132,7 @@
 
             if (self.valueField) {
                 for (i = 0; i < self.data.length; ++i) {
-                    var obj = {id: i, value: self.data[i][self.fieldName]};
+                    var obj = {id: i, value: self.data[i][self.fieldName], required: true};
                     list.append(self._item(obj));
                     self.info[i] = obj;
                 }
@@ -244,7 +244,7 @@
 
             var id = field["id"];
             var value = field["value"];
-            var placeholder = $T.gettext('Type to add {0}').format(this.options.fieldsCaption);
+            var placeholder = field.required ? '' : $T.gettext('Type to add {0}').format(this.options.fieldsCaption);
 
             var item = $("<li></li>");
 
@@ -252,8 +252,23 @@
                 item.append($("<span class='handle'></span>"));
             }
 
-            item.append($("<input type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/>").placeholder())
-                .append($("<a class='i-button-remove' title='"+ $T("Delete") +"' href='#' tabIndex='-1'><i class='icon-remove'></i></a>"));
+            item.append($('<input>', {
+                type: 'text',
+                required: field.required,
+                data: {
+                    id: id
+                },
+                value: value
+            })
+            .attr('placeholder', placeholder)
+            .placeholder());
+
+            item.append($('<a>', {
+                class: 'i-button-remove icon-remove',
+                title: $T("Delete"),
+                href: '#',
+                tabindex: '-1'
+            }));
 
             item.find("a.i-button-remove").qtip({
                 position: {
@@ -271,7 +286,7 @@
 
         _updateField: function(input) {
             input = $(input);
-            if (input.val() === "") {
+            if (input.val() === "" && !input.prop('required')) {
                 var item = input.closest("li");
                 this._deleteItem(item);
             } else {

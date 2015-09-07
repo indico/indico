@@ -429,6 +429,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
                 .i-button-remove {
                     float: none;
+                    height: auto;
 
                     i:before {
                         cursor: pointer;
