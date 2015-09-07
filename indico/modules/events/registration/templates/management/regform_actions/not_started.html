@@ -1,0 +1,37 @@
+{% extends 'events/registration/management/regform_actions/_base.html' %}
+
+{% block label %}
+    {% trans -%}
+        Registrations are not open yet
+    {%- endtrans %}
+{% endblock %}
+
+{% block text %}
+    {% if not regform.start_dt %}
+        {% trans %}Start now or schedule opening.{% endtrans %}
+    {% else %}
+        {% set tz = regform.event.tz %}
+        {% trans date=regform.start_dt|format_date(timezone=tz), time=regform.start_dt|format_time(timezone=tz) -%}
+            Scheduled to open on <strong>{{ date }}</strong> at <strong>{{ time}}</strong> ({{ tz }}).
+        {%- endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block buttons %}
+    <div class="group">
+        <a href="#" class="i-button icon-time js-regform-schedule-dialog"
+           data-href=""
+           data-title="{% trans %}Schedule registrations{% endtrans %}">
+           {% if not regform.start_dt %}
+                {% trans %}Schedule{% endtrans %}
+            {% else %}
+                {% trans %}Reschedule{% endtrans %}
+            {% endif %}
+        </a>
+    </div>
+    <div class="group">
+        <a href="#" data-href="{{ url_for('.open_regform', regform) }}" data-method="POST" class="i-button highlight">
+            {% trans %}Start now{% endtrans %}
+        </a>
+    </div>
+{% endblock %}
