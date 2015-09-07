@@ -17,11 +17,12 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField
-from wtforms.validators import DataRequired, NumberRange
+from wtforms.validators import DataRequired, NumberRange, Optional
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.validators import HiddenUnless
+from indico.web.forms.fields import IndicoDateTimeField
+from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -36,3 +37,15 @@ class RegistrationFormForm(IndicoForm):
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
                                       description=_("Maximum number of registrations"))
+
+
+class RegistrationFormScheduleForm(IndicoForm):
+    start_dt = IndicoDateTimeField(_("Start"), [DataRequired(), DateTimeRange(earliest='now')],
+                                   description=_("Moment when the registrations will be open"))
+    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
+                                 description=_("Moment when the registrations will be closed"))
+
+    def __init__(self, *args, **kwargs):
+        regform = kwargs.pop('regform')
+        self.timezone = regform.event.tz
+        super(IndicoForm, self).__init__(*args, **kwargs)
