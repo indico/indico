@@ -33,6 +33,7 @@
                 series: [$(elem).data('series-absolute')]
             }, {
                 horizontalBars: true,
+                height: $(elem).parents('.i-box-content').outerHeight(),
                 reverseData: true,
                 axisX: {
                     onlyInteger: true,
