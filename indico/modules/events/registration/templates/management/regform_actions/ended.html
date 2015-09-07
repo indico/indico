@@ -1,0 +1,23 @@
+{% extends 'events/registration/management/regform_actions/active.html' %}
+
+{% block label %}
+    {% trans -%}
+        Registrations are closed
+    {%- endtrans %}
+{% endblock %}
+
+{% block text %}
+    {% set tz = regform.event.tz %}
+    {% trans date=regform.end_dt|format_date(timezone=tz), time=regform.end_dt|format_time(timezone=tz) -%}
+        Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
+    {%- endtrans %}
+{% endblock %}
+
+{% block now_button %}
+    <div class="group">
+        <a href="#" data-href="{{ url_for('.open_regform', regform) }}" data-method="POST" class="i-button"
+           data-confirm="{% trans %}Registrations finished already. Do you want to open them again?{% endtrans %}">
+            {% trans %}Reopen now{% endtrans %}
+        </a>
+    </div>
+{% endblock %}

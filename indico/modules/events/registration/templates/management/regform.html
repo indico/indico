@@ -1,6 +1,14 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block content %}
+    {% if not regform.has_started %}
+        {% include 'events/registration/management/regform_actions/not_started.html' %}
+    {% elif regform.is_active %}
+        {% include 'events/registration/management/regform_actions/active.html' %}
+    {% elif regform.has_ended %}
+        {% include 'events/registration/management/regform_actions/ended.html' %}
+    {% endif %}
+
     <div class="action-box">
         <div class="section">
             <div class="icon icon-settings"></div>
