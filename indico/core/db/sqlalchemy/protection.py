@@ -44,6 +44,10 @@ class ProtectionMixin(object):
     #: not make much sense in most cases to make something public even
     #: though its parent object is private (or inheriting).
     disallowed_protection_modes = frozenset({ProtectionMode.public})
+    #: Whether objects with inheriting protection may have their own
+    #: ACL entries (which will grant access even if the user cannot
+    #: access the parent object).
+    inheriting_have_acl = False
 
     @declared_attr
     def protection_mode(cls):
@@ -115,7 +119,11 @@ class ProtectionMixin(object):
             # and only check our own ACL
             return any(user in principal for principal in iter_acl(getattr(self, acl_attr)))
         elif self.protection_mode == ProtectionMode.inheriting:
-            # if it's inheriting, we only check the parent protection.
+            # if it's inheriting, we only check the parent protection
+            # unless `inheriting_have_acl` is set, in which case we
+            # might not need to check the parents at all
+            if self.inheriting_have_acl and any(user in principal for principal in iter_acl(getattr(self, acl_attr))):
+                return True
             # the parent can be either an object inheriting from this
             # mixin or a legacy object with an AccessController
             parent = self.protection_parent
