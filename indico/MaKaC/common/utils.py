@@ -235,11 +235,11 @@ def formatDate(date, showWeek=False, format=None, locale=None):
         return format_date(date, format, locale=locale)
 
 
-def formatTime(tm, format=None, locale=None, server_tz=False):
+def formatTime(tm, format=None, locale=None, server_tz=False, tz=None):
     if not format:
-        return format_time(tm, 'H:mm', locale=locale, server_tz=server_tz)
+        return format_time(tm, 'H:mm', locale=locale, timezone=tz, server_tz=server_tz)
     else:
-        return format_time(tm, format, locale=locale, server_tz=server_tz)
+        return format_time(tm, format, locale=locale, timezone=tz, server_tz=server_tz)
 
 
 def parseDate(dateStr, format='%d/%m/%Y'):

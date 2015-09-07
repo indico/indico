@@ -2309,7 +2309,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             if not self._contribs:
                 return "No contributions to print"
 
-            contrib_pdf = ContribsToPDF(self._conf, self._contribs)
+            contrib_pdf = ContribsToPDF(self._conf, self._contribs, tz)
             fpath = contrib_pdf.generate()
 
             return send_file(filename, fpath, 'PDF')
@@ -2329,7 +2329,7 @@ class RHContribsToPDF(RHConferenceModifBase):
         filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
-        pdf = ContribsToPDF(self._conf, self._contribs)
+        pdf = ContribsToPDF(self._conf, self._contribs, tz)
         return send_file(filename, pdf.generate(), 'PDF')
 
 

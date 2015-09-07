@@ -908,7 +908,7 @@ class RHContribsToPDF(RHTrackAbstractsBase):
         tz = self._conf.getTimezone()
         if not self._contribs:
             return "No contributions to print"
-        pdf = ContribsToPDF(self._conf, self._contribs)
+        pdf = ContribsToPDF(self._conf, self._contribs, tz)
         return send_file('Contributions.pdf', pdf.generate(), 'PDF')
 
 

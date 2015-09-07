@@ -402,7 +402,8 @@ class ContribsToPDF(PDFLaTeXBase):
             'conf': conf,
             'items': contribs,
             'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
-            'url': conf.getURL()
+            'url': conf.getURL(),
+            'tz': tz
         })
 
         logo = conf.getLogo()
