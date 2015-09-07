@@ -21,7 +21,6 @@ down_revision = '3b6c768b8803'
 
 def upgrade():
     op.execute(CreateSchema('event_registration'))
-
     op.create_table(
         'registration_forms',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -47,6 +46,10 @@ def upgrade():
         sa.Column('type', sa.Integer(), nullable=False),
         sa.Column('parent_id', sa.Integer(), nullable=True),
         sa.Column('position', sa.Integer(), nullable=False),
+        sa.Column('title', sa.String(), nullable=False),
+        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('is_enabled', sa.Boolean(), nullable=True),
+        sa.Column('is_deleted', sa.Boolean(), nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.registration_form_items.id']),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.registration_forms.id']),
         sa.PrimaryKeyConstraint('id'),

@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import JSON
+
 from indico.core.db import db
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.util.string import return_ascii
@@ -28,6 +30,15 @@ class RegistrationFormField(RegistrationFormItem):
 
     # relationship backrefs
     # - data (RegistrationFormFieldData.field)
+
+    @property
+    def locator(self):
+        return dict(self.parent.locator, field_id=self.id)
+
+    @property
+    def view_data(self):
+        return dict(self.data[0].data, id=self.id, caption=self.title, description=self.description,
+                    _type='GeneralField', disabled=not self.is_enabled, lock=[])
 
     @return_ascii
     def __repr__(self):
@@ -48,7 +59,11 @@ class RegistrationFormFieldData(db.Model):
         db.Integer,
         db.ForeignKey('event_registration.registration_form_items.id')
     )
-    # TODO: which data? price, limit, options, etc.
+    #: Data describing the field
+    data = db.Column(
+        JSON,
+        nullable=False
+    )
 
     field = db.relationship(
         'RegistrationFormField',
