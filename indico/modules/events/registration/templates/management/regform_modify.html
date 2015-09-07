@@ -1,0 +1,13 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+
+{% block content %}
+    <div ng-app="nd" ng-controller="AppCtrl">
+        <div nd-reg-form
+            conf-id="{{ event.id }}"
+            conf-form-id="{{ regform.id }}"
+            conf-sections="{{ sections | tojson | forceescape }}"
+            conf-currency=""
+            post-url=''
+            edit-mode="true"></div>
+    </div>
+{% endblock %}

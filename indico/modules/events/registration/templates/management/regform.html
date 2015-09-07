@@ -34,7 +34,7 @@
                 {% trans %}Add, remove or modify information registrants may fill out.{% endtrans %}
             </div>
             <div class="toolbar right">
-                <a href="" class="i-button icon-settings">
+                <a href="{{ url_for('.modify_regform', regform) }}" class="i-button icon-settings">
                     {% trans %}Manage{% endtrans %}
                 </a>
             </div>
