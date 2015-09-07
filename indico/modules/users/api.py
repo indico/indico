@@ -99,7 +99,7 @@ class UserEventHook(HTTPAPIHook):
         self._checkProtection(aw)
         links = avatar_links.get_links(self._avatar.user, self._fromDT, self._toDT)
 
-        for event_id in get_events_with_submitted_surveys(self._avatar.user):
+        for event_id in get_events_with_submitted_surveys(self._avatar.user, self._fromDT, self._toDT):
             links.setdefault(str(event_id), set()).add('survey_submitter')
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
