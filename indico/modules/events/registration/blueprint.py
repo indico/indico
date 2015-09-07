@@ -23,7 +23,8 @@ from indico.modules.events.registration.controllers.management.regforms import (
                                                                                 RHRegistrationFormDelete,
                                                                                 RHRegistrationFormManage,
                                                                                 RHRegistrationFormOpen,
-                                                                                RHRegistrationFormClose)
+                                                                                RHRegistrationFormClose,
+                                                                                RHRegistrationFormSchedule)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -44,6 +45,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/open',
                  'open_regform', RHRegistrationFormOpen, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/close',
                  'close_regform', RHRegistrationFormClose, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/schedule',
+                 'schedule_regform', RHRegistrationFormSchedule, methods=('GET', 'POST'))
 
 
 # API
