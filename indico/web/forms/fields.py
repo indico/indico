@@ -262,6 +262,8 @@ class MultiStringField(HiddenField):
             unique_uuids = {uuid.UUID(item[self.uuid_field], version=4) for item in self.data}
             if len(unique_uuids) != len(self.data):
                 raise ValueError(u'UUIDs must be unique')
+        if not all(item[self.field_name].strip() for item in self.data):
+            raise ValueError(u'Empty items are not allowed')
 
     def _value(self):
         return self.data or []

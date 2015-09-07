@@ -98,7 +98,7 @@
                     $(this).parent().next().find("input").focus();
                 }
 
-                if (self.valueField) {
+                if (self.valueField && $(this).val().trim()) {
                     var oldDataItem = self.data[$(this).parent().index()];
                     self.data[$(this).parent().index()] = self._updateDataItem($(this).val(), oldDataItem);
                     self._updateValueField(self.data);
@@ -252,7 +252,7 @@
                 item.append($("<span class='handle'></span>"));
             }
 
-            item.append($('<input>', {
+            var newInput = $('<input>', {
                 type: 'text',
                 required: field.required,
                 data: {
@@ -261,7 +261,10 @@
                 value: value
             })
             .attr('placeholder', placeholder)
-            .placeholder());
+            .placeholder();
+
+            this._validateValue(newInput);
+            item.append(newInput);
 
             item.append($('<a>', {
                 class: 'i-button-remove icon-remove',
@@ -331,6 +334,18 @@
             }
             oldDataItem[this.fieldName] = value;
             return oldDataItem;
+        },
+
+        _validateValue: function(field) {
+            if ('setCustomValidity' in field[0]) {
+                field.on('change input', function() {
+                    if (!field.val() || field.val().trim()) {
+                        field[0].setCustomValidity('');
+                    } else {
+                        field[0].setCustomValidity($T('Empty values are not allowed.'));
+                    }
+                });
+            }
         }
     });
 })(jQuery);
