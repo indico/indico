@@ -57,7 +57,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             flash(_('Registration form has been successfully created'), 'success')
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
                            'Registration form "{}" has been created'.format(regform.title), session.user)
-            return redirect(url_for('.manage_regform_list', self.event_new))
+            return redirect(url_for('.manage_regform', regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, event=self.event,
                                                     form=form)
 
