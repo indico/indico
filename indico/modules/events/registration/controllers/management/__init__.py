@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import request
 
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
+from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -26,6 +27,9 @@ class RHManageRegFormsBase(RHConferenceModifBase):
     """Base class for all registration management RHs"""
 
     CSRF_ENABLED = True
+
+    def _process(self):
+        return RH._process(self)
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
