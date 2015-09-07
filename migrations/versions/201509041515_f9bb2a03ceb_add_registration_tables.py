@@ -9,7 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.events.registration.models.registration_forms import RegistrationFormModificationMode
 
 
 # revision identifiers, used by Alembic.
@@ -26,6 +27,8 @@ def upgrade():
         sa.Column('introduction', sa.Text(), nullable=False),
         sa.Column('start_dt', UTCDateTime, nullable=True),
         sa.Column('end_dt', UTCDateTime, nullable=True),
+        sa.Column('modification_mode', PyIntEnum(RegistrationFormModificationMode), nullable=False),
+        sa.Column('modification_end_dt', UTCDateTime, nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('require_user', sa.Boolean(), nullable=False),
         sa.Column('registration_limit', sa.Integer(), nullable=True),
