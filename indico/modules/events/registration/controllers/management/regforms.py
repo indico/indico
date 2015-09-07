@@ -26,6 +26,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
 from indico.modules.events.registration.forms import RegistrationFormForm
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from indico.web.flask.util import url_for
@@ -92,3 +93,28 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
         flash(_("Registration form deleted"), 'success')
         logger.info("Registration form {} deleted by {}".format(self.regform, session.user))
         return redirect(url_for('.manage_regform_list', self.event))
+
+
+class RHRegistrationFormOpen(RHManageRegFormBase):
+    """Opens registration for a registration form"""
+
+    def _process(self):
+        if self.regform.has_ended:
+            self.regform.end_dt = None
+        else:
+            self.regform.start_dt = now_utc()
+        logger.info("Registrations for {} opened by {}".format(self.regform, session.user))
+        flash(_("Registrations for {} are now open").format(self.regform.title), 'success')
+        return redirect(url_for('.manage_regform', self.regform))
+
+
+class RHRegistrationFormClose(RHManageRegFormBase):
+    """Closes registrations for a registration form"""
+
+    def _process(self):
+        self.regform.end_dt = now_utc()
+        if not self.regform.has_started:
+            self.regform.start_dt = self.regform.end_dt
+        flash(_("Registrations for {} are now closed").format(self.regform.title), 'success')
+        logger.info("Registrations for {} closed by {}".format(self.regform, session.user))
+        return redirect(url_for('.manage_regform', self.regform))
