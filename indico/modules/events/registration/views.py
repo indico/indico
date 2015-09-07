@@ -21,10 +21,14 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
 class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
-    template_prefix = 'events/registration'
+    template_prefix = 'events/registration/'
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items['registration'].setActive()
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
+        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls() +
+                self._asset_env['indico_regform'].urls())
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registrationform_sass'].urls()
