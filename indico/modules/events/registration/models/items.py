@@ -16,11 +16,20 @@
 
 from __future__ import unicode_literals
 
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
+
+
+def _get_next_position(context):
+    """Get the next position for a form item."""
+    regform_id = context.current_parameters['registration_form_id']
+    parent_id = context.current_parameters['parent_id']
+    res = (db.session.query(db.func.max(RegistrationFormItem.position))
+           .filter_by(parent_id=parent_id, registration_form_id=regform_id, is_deleted=False)
+           .one())
+    return (res[0] or 0) + 1
 
 
 class RegistrationFormItemType(int, IndicoEnum):
@@ -61,8 +70,30 @@ class RegistrationFormItem(db.Model):
     )
     position = db.Column(
         db.Integer,
+        nullable=False,
+        default=_get_next_position
+    )
+    #: The title of this field
+    title = db.Column(
+        db.String,
         nullable=False
-        # TODO: default=_get_next_position
+    )
+    #: Description of this field
+    description = db.Column(
+        db.String,
+        nullable=True
+    )
+    #: Whether the field is enabled
+    is_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    #: Whether field has been "deleted"
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
 
     # The registration form
@@ -76,26 +107,48 @@ class RegistrationFormItem(db.Model):
         )
     )
 
-    # The parent of the item and the children backref
-    parent = db.relationship(
+    # The children of the item and the parent backref
+    children = db.relationship(
         'RegistrationFormItem',
         lazy=True,
+        order_by='RegistrationFormItem.position',
         backref=db.backref(
-            'children',
+            'parent',
             lazy=False,
             remote_side=[id]
         )
     )
 
+    @property
+    def view_data(self):
+        """Returns object with data that Angular can understand"""
+        raise NotImplementedError
+
     @return_ascii
     def __repr__(self):
-        return '<{}({}, {})>'.format(type(self).__name__, self.id)
+        return '<{}({})>'.format(type(self).__name__, self.id)
 
 
 class RegistrationFormSection(RegistrationFormItem):
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.section
     }
+
+    @property
+    def locator(self):
+        return dict(self.registration_form.locator, section_id=self.id)
+
+    @property
+    def view_data(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'items': [child.view_data for child in self.children if not child.is_deleted],
+            'enabled': self.is_enabled,
+            '_type': 'GeneralSectionForm',
+            'required': False
+        }
 
 
 class RegistrationFormText(RegistrationFormItem):
