@@ -23,9 +23,10 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
-from indico.modules.events.registration.forms import RegistrationFormForm
+from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
@@ -118,3 +119,17 @@ class RHRegistrationFormClose(RHManageRegFormBase):
         flash(_("Registrations for {} are now closed").format(self.regform.title), 'success')
         logger.info("Registrations for {} closed by {}".format(self.regform, session.user))
         return redirect(url_for('.manage_regform', self.regform))
+
+
+class RHRegistrationFormSchedule(RHManageRegFormBase):
+    """Schedules registrations for a registration form"""
+
+    def _process(self):
+        form = RegistrationFormScheduleForm(obj=FormDefaults(self.regform), regform=self.regform)
+        if form.validate_on_submit():
+            self.regform.start_dt = form.start_dt.data
+            self.regform.end_dt = form.end_dt.data
+            flash(_("Registrations for {} have been scheduled").format(self.regform.title), 'success')
+            logger.info("Registrations for {} scheduled by {}".format(self.regform, session.user))
+            return jsonify_data(flash=False)
+        return jsonify_template('events/registration/management/regform_schedule.html', form=form)
