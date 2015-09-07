@@ -38,6 +38,10 @@
         > .clearableinput input[type='text'] {
             width: 7em;
         }
+
+        .clearableinput {
+            display: inline-block;
+        }
     }
 
     > a.clear-color-btn {
