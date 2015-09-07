@@ -16,9 +16,17 @@
 
 from __future__ import unicode_literals
 
+
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.string import return_ascii
+from indico.util.struct.enum import IndicoEnum
+
+
+class RegistrationFormModificationMode(int, IndicoEnum):
+    allowed_always = 1
+    allowed_until_payment = 2
+    not_allowed = 3
 
 
 class RegistrationForm(db.Model):
@@ -55,6 +63,17 @@ class RegistrationForm(db.Model):
     )
     #: Datetime when the registration form is closed
     end_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
+    #: Whether registration modifications are allowed
+    modification_mode = db.Column(
+        PyIntEnum(RegistrationFormModificationMode),
+        nullable=False,
+        default=RegistrationFormModificationMode.not_allowed
+    )
+    #: Datetime when the modification period is over
+    modification_end_dt = db.Column(
         UTCDateTime,
         nullable=True
     )
