@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
@@ -111,6 +113,30 @@ class RegistrationForm(db.Model):
     # - registrations (Registration.registration_form)
     # - form_items (RegistrationFormItem.registration_form)
 
+    @hybrid_property
+    def has_ended(self):
+        return self.end_dt is not None and self.end_dt <= now_utc()
+
+    @has_ended.expression
+    def has_ended(cls):
+        return (cls.end_dt != None) & (cls.end_dt <= now_utc())  # noqa
+
+    @hybrid_property
+    def has_started(self):
+        return self.start_dt is not None and self.start_dt <= now_utc()
+
+    @has_started.expression
+    def has_started(cls):
+        return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
+
+    @hybrid_property
+    def is_active(self):
+        return not self.is_deleted and self.has_started and not self.has_ended
+
+    @is_active.expression
+    def is_active(cls):
+        return ~cls.is_deleted & cls.has_started & ~cls.has_ended
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
@@ -123,3 +149,6 @@ class RegistrationForm(db.Model):
     @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
+
+    def can_submit(self, user):
+        return self.is_active and (not self.require_user or user)
