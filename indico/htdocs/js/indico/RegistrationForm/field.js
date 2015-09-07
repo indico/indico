@@ -22,7 +22,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         return {
             confId: $scope.confId,
             sectionId: $scope.section.id,
-            fieldId: field.id
+            fieldId: field.id,
+            confFormId: $scope.confFormId
         };
     };
 
