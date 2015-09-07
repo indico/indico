@@ -22,7 +22,8 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
     var getRequestParams = function(section) {
         return {
             confId: $rootScope.confId,
-            sectionId: section.id
+            sectionId: section.id,
+            confFormId: $rootScope.confFormId
         };
     };
 
@@ -104,7 +105,9 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                 $scope.$apply(regFormFactory.Fields.remove(requestParams, {}, function(updatedSection) {
                     regFormFactory.processResponse(updatedSection, {
                         success: function(updatedSection) {
-                            $scope.section.items = updatedSection.items;
+                            $scope.section.items = $scope.section.items.filter(function(obj) {
+                                return obj.id !== field.id;
+                            });
                         }
                     });
                 }));
@@ -508,7 +511,6 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                     $T('Price'),
                     $T('Enabled')
                 ],
-
                 actions: [''],
                 colModel: [
                        {
