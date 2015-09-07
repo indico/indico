@@ -20,7 +20,7 @@
 {% block buttons %}
     <div class="group">
         <a href="#" class="i-button icon-time js-regform-schedule-dialog"
-           data-href=""
+           data-href="{{ url_for('.schedule_regform', regform) }}"
            data-title="{% trans %}Reschedule registrations{% endtrans %}">
             {% trans %}Reschedule{% endtrans %}
         </a>
