@@ -56,3 +56,28 @@ or fails without any further checks.  If multiple subscribers to the
 signal return contradictory results, ``False`` wins and access is
 denied.
 """)
+
+
+can_manage = _signals.signal('can-manage', """
+Called when `ProtectionMixin.can_manage` is used to determine if a
+user can manage something or not.
+
+The `sender` is the type of the object that's using the mixin.  The
+actual instance is passed as `obj`.  The `user`, `role`, `acl_attr`,
+`legacy_method`, `allow_admin`, `check_parent` and `explicit` arguments
+of `can_manage` are passed as kwargs with the same name.
+
+If the signal returns ``True`` or ``False``, the access check succeeds
+or fails without any further checks.  If multiple subscribers to the
+signal return contradictory results, ``False`` wins and access is
+denied.
+""")
+
+
+get_management_roles = _signals.signal('get-management-roles', """
+Expected to return `ManagementRole` subclasses.  The `sender` is the
+type of the object the roles may be used for.  Functions subscribing
+to this signal **MUST** check the sender by specifying it using the
+first argument of `connect_via()` or by comparing it inside the
+function.
+""")

@@ -209,14 +209,14 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
             lazy=True
         )
     )
-    _acl = db.relationship(
+    acl_entries = db.relationship(
         'AttachmentPrincipal',
         backref='attachment',
         cascade='all, delete-orphan',
         collection_class=set
     )
     #: The ACL of the folder (used for ProtectionMode.protected)
-    acl = association_proxy('_acl', 'principal', creator=lambda v: AttachmentPrincipal(principal=v))
+    acl = association_proxy('acl_entries', 'principal', creator=lambda v: AttachmentPrincipal(principal=v))
 
     @property
     def protection_parent(self):

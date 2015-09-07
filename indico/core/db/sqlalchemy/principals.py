@@ -16,11 +16,14 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
-from indico.util.decorators import strict_classproperty
+from indico.core.roles import get_available_roles
+from indico.util.decorators import strict_classproperty, classproperty
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -160,3 +163,80 @@ class PrincipalMixin(object):
             else:
                 db.session.delete(principal)
         db.session.flush()
+
+
+class PrincipalRolesMixin(PrincipalMixin):
+    #: The model for which we are a principal.  May also be a string
+    #: containing the model's class name.
+    principal_for = None
+
+    @strict_classproperty
+    @classmethod
+    def __auto_table_args(cls):
+        return db.CheckConstraint('read_access OR full_access OR array_length(roles, 1) IS NOT NULL', 'has_privs'),
+
+    read_access = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    full_access = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    roles = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
+
+    @classproperty
+    @classmethod
+    def principal_for_obj(cls):
+        if isinstance(cls.principal_for, basestring):
+            return db.Model._decl_class_registry[cls.principal_for]
+        else:
+            return cls.principal_for
+
+    @hybrid_method
+    def has_management_role(self, role=None, explicit=False):
+        """Checks whether a principal has a certain management role.
+
+        The check always succeeds if the user is a full manager; in
+        that case the list of roles is ignored.
+
+        :param role: The role to check for or 'ANY' to check for any
+                     management role.
+        :param explicit: Whether to check for the role itself even if
+                         the user has full management privileges.
+        """
+        if role is None:
+            if explicit:
+                raise ValueError('role must be specified if explicit=True')
+            return self.full_access
+        elif not explicit and self.full_access:
+            return True
+        valid_roles = get_available_roles(self.principal_for_obj).viewkeys()
+        current_roles = set(self.roles) & valid_roles
+        if role == 'ANY':
+            return bool(current_roles)
+        assert role in valid_roles, "invalid role '{}' for object '{}'".format(role, self.principal_for_obj)
+        return role in current_roles
+
+    @has_management_role.expression
+    def has_management_role(cls, role=None, explicit=False):
+        if role is None:
+            if explicit:
+                raise ValueError('role must be specified if explicit=True')
+            return cls.full_access
+        valid_roles = get_available_roles(cls.principal_for_obj).viewkeys()
+        if role == 'ANY':
+            crit = (cls.roles.op('&&')(db.func.cast(valid_roles, ARRAY(db.String))))
+        else:
+            assert role in valid_roles, "invalid role '{}' for object '{}'".format(role, cls.principal_for_obj)
+            crit = (cls.roles.op('&&')(db.func.cast([role], ARRAY(db.String))))
+        if explicit:
+            return crit
+        else:
+            return cls.full_access | crit

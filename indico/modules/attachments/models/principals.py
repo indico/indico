@@ -45,7 +45,7 @@ class AttachmentFolderPrincipal(PrincipalMixin, db.Model):
     )
 
     # relationship backrefs:
-    # - folder (AttachmentFolder._acl)
+    # - folder (AttachmentFolder.acl_entries)
 
     @return_ascii
     def __repr__(self):
@@ -73,7 +73,7 @@ class AttachmentPrincipal(PrincipalMixin, db.Model):
     )
 
     # relationship backrefs:
-    # - attachment (Attachment._acl)
+    # - attachment (Attachment.acl_entries)
 
     @return_ascii
     def __repr__(self):

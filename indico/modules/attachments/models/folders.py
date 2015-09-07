@@ -88,14 +88,14 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         default=True
     )
 
-    _acl = db.relationship(
+    acl_entries = db.relationship(
         'AttachmentFolderPrincipal',
         backref='folder',
         cascade='all, delete-orphan',
         collection_class=set
     )
     #: The ACL of the folder (used for ProtectionMode.protected)
-    acl = association_proxy('_acl', 'principal', creator=lambda v: AttachmentFolderPrincipal(principal=v))
+    acl = association_proxy('acl_entries', 'principal', creator=lambda v: AttachmentFolderPrincipal(principal=v))
 
     #: The list of attachments that are not deleted, ordered by name
     attachments = db.relationship(

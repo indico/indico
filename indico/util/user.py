@@ -30,9 +30,11 @@ def iter_acl(acl):
     than checking if two users are the same (``==``) or if a user is
     in a local group (SQL query).
 
-    :param acl: any iterable containing users/groups
+    :param acl: any iterable containing users/groups or objects which
+                contain users/groups in a `principal` attribute
     """
-    return sorted(acl, key=lambda x: (x.is_group, not getattr(x, 'is_local', None)))
+    return sorted(acl, key=lambda x: (getattr(x, 'principal', x).is_group,
+                                      not getattr(getattr(x, 'principal', x), 'is_local', None)))
 
 
 def retrieve_principals(iterable, allow_groups=True, legacy=True):
