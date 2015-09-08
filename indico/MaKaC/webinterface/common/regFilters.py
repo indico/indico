@@ -386,6 +386,14 @@ class IsPayedSF(RegistrantSortingField):
         """
         return cmp( r1.isPayedText(), r2.isPayedText() )
 
+
+class AmountToPaySF(RegistrantSortingField):
+    _id = "amountToPay"
+
+    def compare(self, r1, r2):
+        return cmp(r1.getTotal(), r2.getTotal())
+
+
 class IdPayment(RegistrantSortingField):
     _id="idpayment"
 
@@ -441,6 +449,7 @@ class SortingCriteria( filters.SortingCriteria ):
                         RegistrationDateSF.getId():RegistrationDateSF, \
                         CountrySF.getId():CountrySF, \
                         IsPayedSF.getId():IsPayedSF, \
+                        AmountToPaySF.getId():AmountToPaySF, \
                         IdPayment.getId():IdPayment, \
                         IsCheckedInSF.getId():IsCheckedInSF, \
                         CheckInDateSF.getId():CheckInDateSF}
