@@ -27,7 +27,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class RegistrationFormForm(IndicoForm):
-    title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration form"))
+    title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration process"))
     introduction = TextAreaField(_("Introduction"),
                                  description=_("An introduction to be displayed before the registration process"))
     require_user = BooleanField(_("Only logged-in users"), widget=SwitchWidget(),

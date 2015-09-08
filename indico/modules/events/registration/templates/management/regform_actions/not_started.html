@@ -8,7 +8,7 @@
 
 {% block text %}
     {% if not regform.start_dt %}
-        {% trans %}Start now or schedule opening.{% endtrans %}
+        {% trans %}Open now or schedule opening.{% endtrans %}
     {% else %}
         {% set tz = regform.event.tz %}
         {% trans date=regform.start_dt|format_date(timezone=tz), time=regform.start_dt|format_time(timezone=tz) -%}
@@ -31,7 +31,7 @@
     </div>
     <div class="group">
         <a href="#" data-href="{{ url_for('.open_regform', regform) }}" data-method="POST" class="i-button highlight">
-            {% trans %}Start now{% endtrans %}
+            {% trans %}Open now{% endtrans %}
         </a>
     </div>
 {% endblock %}

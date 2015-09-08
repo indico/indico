@@ -8,7 +8,7 @@
 
 {% block text %}
     {% if not regform.end_dt %}
-        {% trans %}Close now or schedule the deadline.{% endtrans %}
+        {% trans %}Close now or set a deadline.{% endtrans %}
     {% else %}
         {% set tz = regform.event.tz %}
         {% trans date=regform.end_dt|format_date(timezone=tz), time=regform.end_dt|format_time(timezone=tz) -%}
