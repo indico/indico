@@ -31,7 +31,7 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 class RegistrationFormItem(db.Model):
     __tablename__ = 'registration_form_items'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = {'schema': 'event_registration'}
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': None
@@ -45,7 +45,7 @@ class RegistrationFormItem(db.Model):
     #: The ID  of the registration form
     registration_form_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.registration_forms.id'),
+        db.ForeignKey('event_registration.registration_forms.id'),
         nullable=False
     )
     #: The type of the registration form item
@@ -56,7 +56,7 @@ class RegistrationFormItem(db.Model):
     #: The ID of the parent form item
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.registration_form_items.id'),
+        db.ForeignKey('event_registration.registration_form_items.id'),
         nullable=True
     )
     position = db.Column(
