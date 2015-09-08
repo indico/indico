@@ -59,6 +59,12 @@ def _event_deleted(event, **kwargs):
         LegacyEventMapping.find(legacy_event_id=event._old_id).delete()
 
 
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    from indico.modules.events.models.principals import EventPrincipal
+    EventPrincipal.merge_users(target, source, 'event_new')
+
+
 @signals.app_created.connect
 def _app_created(app, **kwargs):
     """

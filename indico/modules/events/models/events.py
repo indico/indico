@@ -17,20 +17,32 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.modules.events.logs import EventLogEntry
+from indico.modules.events.models.principals import EventPrincipal
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii, to_unicode
 from indico.web.flask.util import url_for
 
 
-class Event(db.Model):
+class Event(ProtectionManagersMixin, db.Model):
+    """An Indico event
+
+    This model contains the most basic information related to an event.
+
+    Note that the ACL is currently only used for managers but not for
+    view access!
+    """
     __tablename__ = 'events'
     __table_args__ = (db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                       db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                          'valid_stylesheet'),
                       {'schema': 'events'})
+    disallowed_protection_modes = frozenset()
+    inheriting_have_acl = True
 
     #: The ID of the event
     id = db.Column(
@@ -82,6 +94,13 @@ class Event(db.Model):
         # this column when deleting the default page
         backref=db.backref('_default_page_of_event', lazy=True)
     )
+    #: The ACL entries for the event
+    acl_entries = db.relationship(
+        'EventPrincipal',
+        backref='event_new',
+        cascade='all, delete-orphan',
+        collection_class=set
+    )
 
     # relationship backrefs:
     # - layout_images (ImageFile.event_new)
@@ -95,6 +114,10 @@ class Event(db.Model):
         """Returns a legacy `Conference` object (ZODB)"""
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(self.id, None)
+
+    @property
+    def protection_parent(self):
+        return self.as_legacy.getOwner()
 
     @property
     def has_logo(self):
@@ -142,4 +165,5 @@ class Event(db.Model):
 
     @return_ascii
     def __repr__(self):
+        # TODO: add self.protection_repr once we use it and the title once we store it here
         return '<Event({})>'.format(self.id)
