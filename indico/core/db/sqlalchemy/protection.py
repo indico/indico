@@ -24,6 +24,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db import db
 from indico.core.roles import get_available_roles
 from indico.util.i18n import _
+from indico.util.caching import memoize_request
 from indico.util.signals import values_from_signal
 from indico.util.struct.enum import TitledIntEnum
 from indico.util.user import iter_acl
@@ -80,6 +81,7 @@ class ProtectionMixin(object):
         """The parent object to consult for ProtectionMode.inheriting"""
         raise NotImplementedError
 
+    @memoize_request
     def can_access(self, user, acl_attr='acl_entries', legacy_method='canAccess', allow_admin=True):
         """Checks if the user can access the object.
 
@@ -185,6 +187,7 @@ class ProtectionMixin(object):
 
 
 class ProtectionManagersMixin(ProtectionMixin):
+    @memoize_request
     def can_manage(self, user, role=None, acl_attr='acl_entries', legacy_method='canUserModify', allow_admin=True,
                    check_parent=True, explicit=False):
         """Checks if the user can manage the object.

@@ -1995,6 +1995,10 @@ class Conference(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def as_event(self):
+        """Returns the :class:`.Event` for this object
+
+        :rtype: indico.modules.events.models.events.Event
+        """
         from indico.modules.events.models.events import Event
         return Event.get_one(int(self.id))
 
@@ -2025,7 +2029,7 @@ class Conference(CommonObjectBase, Locatable):
                      the kind of the action that was performed.
         :param module: A human-friendly string describing the module
                        related to the action.
-        :param summmary: A one-line summary describing the logged action.
+        :param summary: A one-line summary describing the logged action.
         :param user: The user who performed the action.
         :param type_: The type of the log entry. This is used for custom
                       rendering of the log message/data
