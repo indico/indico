@@ -18,7 +18,7 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import seems_html, to_unicode, make_unique_token, slugify, text_to_repr
+from indico.util.string import seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr
 
 
 def test_seems_html():
@@ -85,3 +85,22 @@ def test_slugify_lower(input, lower, output):
 ))
 def test_text_to_repr(input, html, max_length, output):
     assert text_to_repr(input, html=html, max_length=max_length) == output
+
+
+@pytest.mark.parametrize(('args', 'kwargs', 'output'), (
+    ((), {}, '<Foo()>'),
+    (('id', 'hello', 'dct'), {}, "<Foo(1, world, {'a': 'b'})>"),
+    (('id',), {}, '<Foo(1)>'),
+    (('id',), {'flag1': True, 'flag0': False}, '<Foo(1)>'),
+    (('id',), {'flag1': False, 'flag0': False}, '<Foo(1, flag1=True)>'),
+    (('id',), {'flag1': False, 'flag0': True}, '<Foo(1, flag0=False, flag1=True)>'),
+    (('id',), {'flag1': False, 'flag0': True, '_text': u'moo'}, '<Foo(1, flag0=False, flag1=True): "moo">')
+
+))
+def test_format_repr(args, kwargs, output):
+    class Foo(object):
+        def __init__(self, **kwargs):
+            self.__dict__.update(kwargs)
+
+    obj = Foo(id=1, hello='world', dct={'a': 'b'}, flag1=True, flag0=False)
+    assert format_repr(obj, *args, **kwargs) == output

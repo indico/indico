@@ -374,3 +374,35 @@ def alpha_enum(value):
     """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
     max_len = len(string.ascii_lowercase)
     return unicode(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
+
+
+def format_repr(obj, *args, **kwargs):
+    """Creates a pretty repr string from object attributes
+
+    :param obj: The object to show the repr for.
+    :param args: The names of arguments to include in the repr.
+                 The arguments are shown in order using their unicode
+                 representation.
+    :param kwargs: Each kwarg is included as a ``name=value`` string
+                   if it doesn't match the provided value.  This is
+                   mainly intended for boolean attributes such as
+                   ``is_deleted`` where you don't want them to
+                   clutter the repr unless they are set.
+    :param _text: When the keyword argument `_text` is provided and
+                  not ``None``, it will include its value as extra
+                  text in the repr inside quotes.  This is useful
+                  for objects which have one longer title or text
+                  that doesn't look well in the unquoted
+                  comma-separated argument list.
+    """
+    text_arg = kwargs.pop('_text', None)
+    obj_name = type(obj).__name__
+    formatted_args = [unicode(getattr(obj, arg)) for arg in args]
+    for name, default_value in sorted(kwargs.items()):
+        value = getattr(obj, name)
+        if value != default_value:
+            formatted_args.append(u'{}={}'.format(name, value))
+    if text_arg is None:
+        return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
+    else:
+        return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
