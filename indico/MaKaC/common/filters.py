@@ -88,7 +88,8 @@ class SortingCriteria:
 
     def compare(self, a1, a2):
         """Performs the comparison of two objects."""
-        for field in self._sortingFields:
+        fields = getattr(self, '_sortingFields', [self._sortingField])
+        for field in fields:
             rv = field.compare(a1, a2)
             if rv != 0:
                 return rv
