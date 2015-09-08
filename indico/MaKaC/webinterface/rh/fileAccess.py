@@ -18,6 +18,7 @@ from copy import copy
 
 from werkzeug.exceptions import NotFound
 
+from MaKaC.review import Abstract
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.errors import NotFoundError, AccessError
@@ -47,6 +48,9 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
         elif isinstance(self._file.getOwner(), Registrant) and \
              not self._file.getOwner().canUserModify(self.getAW().getUser()):
             raise AccessError(_("Access to this resource is forbidden."))
+
+        elif isinstance(self._file.getOwner(), Abstract):
+            RHDisplayBaseProtected._checkProtection(self)
 
         else:
             # superseded by attachments
