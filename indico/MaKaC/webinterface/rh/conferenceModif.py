@@ -2114,7 +2114,7 @@ class RHContributionList(RHContributionListBase):
         # Save the web session
         session['ContributionFilterConf%s' % self._conf.getId()] = sessionData
         self._filterCrit = self._buildFilteringCriteria(sessionData)
-        self._sortingCrit = ContribSortingCrit([sessionData.get("sortBy", "number").strip()])
+        self._sortingCrit = ContribSortingCrit([sessionData.get("sortBy", "number").strip(), 'date'])
         self._order = sessionData.get("order", "down")
         self._authSearch = sessionData.get("authSearch", "")
 
