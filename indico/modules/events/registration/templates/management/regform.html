@@ -40,4 +40,96 @@
             </div>
         </div>
     </div>
+
+    <h2>
+        {% trans %}Inscriptions{% endtrans %}
+    </h2>
+
+    {% if regform.registrations %}
+        <div>
+            <div class="toolbar left">
+                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li><a href="#" id="select-all">
+                        {% trans %}All{% endtrans %}
+                    </a></li>
+                    <li><a href="#" id="select-none">
+                        {% trans %}None{% endtrans %}
+                    </a></li>
+                </ul>
+            </div>
+            <div class="toolbar right">
+                <div class="group">
+                    <a href="" class="i-button icon-chart">
+                        {% trans %}Summary{% endtrans %}
+                    </a>
+                </div>
+                <div class="group">
+                    <button id="export-registrations" data-href=""
+                            class="i-button icon-file-excel">
+                        {% trans %}Export{% endtrans %}
+                    </button>
+                </div>
+                <div class="group">
+                    <button id="delete-registrations" data-href=""
+                            data-title="{% trans %}Remove all selected inscriptions?{% endtrans %}"
+                            data-confirm="{% trans %}Are you sure you want to remove all selected inscriptions?{% endtrans %}"
+                            data-method="DELETE" class="i-button icon-remove" disabled>
+                        {% trans %}Delete{% endtrans %}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <table id="registration-list" class="i-table-widget fixed-width">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>{% trans %}ID{% endtrans %}</th>
+                    <th>{% trans %}Submitted{% endtrans %}</th>
+                    <th>{% trans %}User{% endtrans %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in regform.registrations %}
+                    {{ _render_submission_row(registration) }}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="info-message-box">
+            <div class="message-text">
+                {% trans %}There are no inscriptions yet.{% endtrans %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
+
+
+{% macro _render_registration_row(registration) %}
+    <tr>
+        <td>
+            <input type="checkbox" class="inline-vcentered registrations-ids" value="{{ registration.id }}">
+        </td>
+        <td>
+            <a href="">{{ registration.id }}</a>
+        </td>
+        <td>{{ registration.submitted_dt|format_datetime }}</td>
+        <td>
+            {% if registration.user %}
+                {{ registration.user.full_name }}
+            {% else %}
+                {# TODO: get the name from RegistrationData? #}
+            {% endif %}
+        </td>
+        <td>
+            <a href="#" class="icon-remove right"
+               data-href=""
+               data-method="DELETE"
+               data-title="{% trans %}Remove inscription?{% endtrans %}"
+               data-confirm="{% trans %}Are you sure you want to remove this inscription?{% endtrans %}"
+               data-registration-id="{{ registration.id }}"></a>
+        </td>
+    </tr>
+{% endmacro %}
