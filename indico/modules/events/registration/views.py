@@ -29,4 +29,4 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
                 self._asset_env['indico_regform'].urls())
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registrationform_sass'].urls()
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
