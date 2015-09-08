@@ -49,6 +49,18 @@ class UnbreakingDB(DB):
             modulename = 'persistent.mapping'
         elif globalname == 'PersistentList':
             modulename = 'persistent.list'
+        elif globalname == 'Avatar':
+            modulename = 'indico.modules.users.legacy'
+            globalname = 'AvatarUserWrapper'
+        elif globalname == 'Group':
+            modulename = 'indico.modules.groups.legacy'
+            globalname = 'LocalGroupWrapper'
+        elif globalname == 'LDAPGroup':
+            modulename = 'indico.modules.groups.legacy'
+            globalname = 'LDAPGroupWrapper'
+        elif globalname == 'CERNGroup':
+            modulename = 'indico.modules.groups.legacy'
+            globalname = 'LDAPGroupWrapper'
         return find_global(modulename, globalname, Broken=NotBroken)
 
 
@@ -139,6 +151,20 @@ def get_archived_file(f, archive_paths):
     return f.fileName, None
 
 
+def convert_principal(principal):
+    """Converts a legacy principal to PrincipalMixin style"""
+    if isinstance(principal, AvatarUserWrapper):
+        return principal.user
+    elif isinstance(principal, GroupWrapper):
+        return principal.group
+    elif principal.__class__.__name__ == 'Avatar':
+        return AvatarUserWrapper(principal.id).user
+    elif principal.__class__.__name__ == 'Group':
+        return GroupProxy(principal.id)
+    elif principal.__class__.__name__ in {'CERNGroup', 'LDAPGroup', 'NiceGroup'}:
+        return GroupProxy(principal.id, multipass.default_group_provider.name)
+
+
 def protection_from_ac(target, ac, acl_attr='acl', ac_attr='allowed', allow_public=False):
     """Converts AccessController data to ProtectionMixin style
 
@@ -159,16 +185,7 @@ def protection_from_ac(target, ac, acl_attr='acl', ac_attr='allowed', allow_publ
         target.protection_mode = ProtectionMode.protected
         acl = getattr(target, acl_attr)
         for principal in getattr(ac, ac_attr):
-            if isinstance(principal, AvatarUserWrapper):
-                principal = principal.user
-            elif isinstance(principal, GroupWrapper):
-                principal = principal.group
-            elif principal.__class__.__name__ == 'Avatar':
-                principal = AvatarUserWrapper(principal.id).user
-            elif principal.__class__.__name__ == 'Group':
-                principal = GroupProxy(principal.id)
-            elif principal.__class__.__name__ in {'CERNGroup', 'LDAPGroup', 'NiceGroup'}:
-                principal = GroupProxy(principal.id, multipass.default_group_provider.name)
+            principal = convert_principal(principal)
             assert principal is not None
             acl.add(principal)
     else:
