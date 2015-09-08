@@ -26,7 +26,7 @@ from indico.util.string import return_ascii
 
 class Registration(db.Model):
     __tablename__ = 'registrations'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = {'schema': 'event_registration'}
 
     #: The ID of the object
     id = db.Column(
@@ -36,7 +36,7 @@ class Registration(db.Model):
     #: The ID of the registration form
     registration_form_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.registration_forms.id'),
+        db.ForeignKey('event_registration.registration_forms.id'),
         index=True,
         nullable=False
     )
@@ -86,18 +86,18 @@ class Registration(db.Model):
 
 class RegistrationData(db.Model):
     __tablename__ = 'registration_data'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = {'schema': 'event_registration'}
 
     #: The ID of the registration
     registration_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.registrations.id'),
+        db.ForeignKey('event_registration.registrations.id'),
         primary_key=True
     )
     #: The ID of the field data
     field_data_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.registration_form_field_data.id'),
+        db.ForeignKey('event_registration.registration_form_field_data.id'),
         primary_key=True
     )
     #: The user's data for the field
