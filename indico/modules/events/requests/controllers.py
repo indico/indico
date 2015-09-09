@@ -33,7 +33,7 @@ class EventOrRequestManagerMixin:
         self.protection_overridden = False
         if hasattr(self, 'definition'):
             # check if user can manage *that* request
-            can_manage_request = session.user and self.definition.can_be_managed(session.user)
+            can_manage_request = session.user and self.definition and self.definition.can_be_managed(session.user)
         else:
             # check if user can manage any request
             can_manage_request = session.user and is_request_manager(session.user)
@@ -55,7 +55,7 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHConferenceModifBase)
         if self.protection_overridden:
             definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.user)}
             requests = {name: req for name, req in requests.iteritems()
-                        if req.definition.can_be_managed(session.user)}
+                        if req.definition and req.definition.can_be_managed(session.user)}
         return WPRequestsEventManagement.render_template('event_requests.html', event, event=event,
                                                          definitions=definitions, requests=requests)
 
