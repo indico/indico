@@ -52,17 +52,21 @@ class RHDeleteRegFormField(RHManageRegFormFieldBase):
 class RHMoveField(RHManageRegFormFieldBase):
     def _process(self):
         new_position = request.json['endPos'] + 1
-        if new_position == self.field.position:
+        old_position = self.field.position
+        if new_position == old_position:
             return jsonify(success=True)
-        elif new_position < self.field.position:
+        elif new_position < old_position:
             def fn(field):
                 return field.position >= new_position and field.id != self.field.id and not field.is_deleted
+            start_enum = new_position + 1
         else:
             def fn(field):
-                return field.position > new_position and field.id != self.field.id and not field.is_deleted
+                return (field.position > old_position and field.position <= new_position
+                        and field.id != self.field.id and not field.is_deleted)
+            start_enum = self.field.position
         to_update = filter(fn, self.section.children)
         self.field.position = new_position
-        for pos, field in enumerate(to_update, new_position + 1):
+        for pos, field in enumerate(to_update, start_enum):
             field.position = pos
         db.session.flush()
         return jsonify(success=True)

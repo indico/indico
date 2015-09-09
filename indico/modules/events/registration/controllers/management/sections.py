@@ -83,17 +83,22 @@ class RHRegFormAddField(RHManageRegFormSectionBase):
 class RHRegFormMoveSection(RHManageRegFormSectionBase):
     def _process(self):
         new_position = request.json['endPos'] + 1
-        if new_position == self.section.position:
+        old_position = self.section.position
+        if new_position == old_position:
             return jsonify(success=True)
-        elif new_position < self.section.position:
+        elif new_position < old_position:
             def fn(section):
                 return section.position >= new_position and section.id != self.section.id
+            start_enum = new_position + 1
         else:
             def fn(section):
-                return section.position > new_position and section.id != self.section.id
-        to_update = filter(fn, RegistrationFormSection.find_all(registration_form=self.regform, is_deleted=False))
+                return (section.position > old_position and section.position <= new_position
+                        and section.id != self.section.id)
+            start_enum = self.section.position
+        to_update = filter(fn, RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
+                                                      .order_by(RegistrationFormSection.position).all())
         self.section.position = new_position
-        for pos, section in enumerate(to_update, new_position + 1):
+        for pos, section in enumerate(to_update, start_enum):
             section.position = pos
         db.session.flush()
         return jsonify(success=True)
