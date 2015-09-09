@@ -22,8 +22,6 @@ from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormSection
-from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
-                                                                                RegistrationFormFieldData)
 from indico.web.util import jsonify_data
 
 

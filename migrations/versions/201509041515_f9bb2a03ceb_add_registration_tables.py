@@ -50,6 +50,7 @@ def upgrade():
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('is_enabled', sa.Boolean(), nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=True),
+        sa.Column('current_data_id', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.registration_form_items.id']),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.registration_forms.id']),
         sa.PrimaryKeyConstraint('id'),
@@ -65,6 +66,11 @@ def upgrade():
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
+
+    op.create_foreign_key(None,
+                          'registration_form_items', 'registration_form_field_data',
+                          ['current_data_id'], ['id'],
+                          source_schema='event_registration', referent_schema='event_registration')
 
     op.create_table(
         'registrations',
@@ -91,6 +97,7 @@ def upgrade():
 
 
 def downgrade():
+    op.drop_column('registration_form_items', 'current_data_id', schema='event_registration')
     op.drop_table('registration_data', schema='event_registration')
     op.drop_table('registrations', schema='event_registration')
     op.drop_table('registration_form_field_data', schema='event_registration')

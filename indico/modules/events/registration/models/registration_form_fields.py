@@ -28,8 +28,34 @@ class RegistrationFormField(RegistrationFormItem):
         'polymorphic_identity': RegistrationFormItemType.field
     }
 
-    # relationship backrefs
-    # - data (RegistrationFormFieldData.field)
+    #: The ID of the latest data
+    current_data_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.registration_form_field_data.id', use_alter=True),
+        nullable=True
+    )
+
+    #: The latest value of the field
+    current_data = db.relationship(
+        'RegistrationFormFieldData',
+        primaryjoin=lambda: RegistrationFormField.current_data_id == RegistrationFormFieldData.id,
+        foreign_keys=current_data_id,
+        lazy=True,
+        post_update=True
+    )
+
+    #: The list of all versions of the field data
+    data_versions = db.relationship(
+        'RegistrationFormFieldData',
+        primaryjoin=lambda: RegistrationFormField.id == RegistrationFormFieldData.field_id,
+        foreign_keys=lambda: RegistrationFormFieldData.field_id,
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'field',
+            lazy=False
+        )
+    )
 
     @property
     def locator(self):
@@ -37,7 +63,7 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(self.data[0].data, id=self.id, caption=self.title, description=self.description,
+        return dict(self.current_data.data, id=self.id, caption=self.title, description=self.description,
                     _type='GeneralField', disabled=not self.is_enabled, lock=[])
 
     @return_ascii
@@ -63,17 +89,6 @@ class RegistrationFormFieldData(db.Model):
     data = db.Column(
         JSON,
         nullable=False
-    )
-
-    field = db.relationship(
-        'RegistrationFormField',
-        # XXX: do we want it lazy?
-        lazy=True,
-        backref=db.backref(
-            'data',
-            cascade='all, delete-orphan',
-            lazy=True
-        )
     )
 
     # relationship backref
