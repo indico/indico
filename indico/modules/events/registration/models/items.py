@@ -154,3 +154,8 @@ class RegistrationFormText(RegistrationFormItem):
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.text
     }
+
+    @property
+    def view_data(self):
+        return dict(id=self.id, caption=self.title, description=self.description,
+                    _type='GeneralField', disabled=not self.is_enabled, lock=[])

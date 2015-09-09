@@ -72,20 +72,6 @@ class RHRegFormModifySection(RHManageRegFormSectionBase):
         return jsonify(self.section.view_data)
 
 
-class RHRegFormAddField(RHManageRegFormSectionBase):
-    def _process(self):
-        field_data = request.json['fieldData']
-        form_field = RegistrationFormField(parent_id=self.section.id,
-                                           registration_form=self.regform)
-        form_field.data.append(RegistrationFormFieldData(data=field_data))
-        form_field.title = field_data.pop('caption')
-        form_field.description = field_data.pop('description', '')
-        form_field.is_enabled = not field_data.pop('disabled')
-        db.session.add(form_field)
-        db.session.flush()
-        return jsonify(form_field.view_data)
-
-
 class RHRegFormMoveSection(RHManageRegFormSectionBase):
     def _process(self):
         new_position = request.json['endPos'] + 1
