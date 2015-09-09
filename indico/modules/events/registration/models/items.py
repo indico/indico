@@ -146,7 +146,6 @@ class RegistrationFormSection(RegistrationFormItem):
             'description': self.description,
             'items': [child.view_data for child in self.children if not child.is_deleted],
             'enabled': self.is_enabled,
-            '_type': 'GeneralSectionForm',
             'required': False
         }
 
