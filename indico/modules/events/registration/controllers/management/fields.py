@@ -21,7 +21,9 @@ from flask import request, jsonify, session
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
-from indico.modules.events.registration.models.registration_form_fields import RegistrationFormField
+from indico.modules.events.registration.models.items import RegistrationFormText
+from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
+                                                                                RegistrationFormFieldData)
 from indico.web.util import jsonify_data
 
 
@@ -74,3 +76,21 @@ class RHMoveField(RHManageRegFormFieldBase):
             field.position = pos
         db.session.flush()
         return jsonify(success=True)
+
+
+class RHRegFormAddField(RHManageRegFormSectionBase):
+    def _process(self):
+        field_data = request.json['fieldData']
+        if field_data['input'] == 'label':
+            field_type = RegistrationFormText
+        else:
+            field_type = RegistrationFormField
+        form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
+        if isinstance(form_field, RegistrationFormField):
+            form_field.data.append(RegistrationFormFieldData(data=field_data))
+        form_field.title = field_data.pop('caption')
+        form_field.description = field_data.pop('description', '')
+        form_field.is_enabled = not field_data.pop('disabled')
+        db.session.add(form_field)
+        db.session.flush()
+        return jsonify(form_field.view_data)

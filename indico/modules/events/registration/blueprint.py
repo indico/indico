@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
 from indico.modules.events.registration.controllers.management.fields import (RHToggleFieldState, RHDeleteRegFormField,
-                                                                              RHMoveField)
+                                                                              RHMoveField, RHRegFormAddField)
 from indico.modules.events.registration.controllers.management.regforms import (RHRegistrationFormList,
                                                                                 RHRegistrationFormCreate,
                                                                                 RHRegistrationFormEdit,
@@ -29,7 +29,6 @@ from indico.modules.events.registration.controllers.management.regforms import (
                                                                                 RHRegistrationFormSchedule,
                                                                                 RHRegistrationFormModify)
 from indico.modules.events.registration.controllers.management.sections import (RHRegFormAddSection,
-                                                                                RHRegFormAddField,
                                                                                 RHRegFormModifySection,
                                                                                 RHRegFormMoveSection)
 from indico.web.flask.wrappers import IndicoBlueprint
