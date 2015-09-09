@@ -47,12 +47,22 @@ class RHToggleFieldState(RHManageRegFormFieldBase):
         return jsonify_data(**self.field.view_data)
 
 
-class RHDeleteRegFormField(RHManageRegFormFieldBase):
-    def _process(self):
+class RHRegFormModifyField(RHManageRegFormFieldBase):
+
+    def _process_DELETE(self):
         self.field.is_deleted = True
         db.session.flush()
         logger.info('Field {} deleted by {}'.format(self.field, session.user))
         return jsonify_data(success=True)
+
+    def _process_POST(self):
+        field_data = request.json['fieldData']
+        self.field.title = field_data.pop('caption')
+        self.field.description = field_data.pop('description', '')
+        self.field.is_enabled = not field_data.pop('disabled')
+        if field_data != RegistrationFormFieldData.find_one(field_id=self.field.id).data:
+            self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, data=field_data)
+        return jsonify(self.field.view_data)
 
 
 class RHMoveField(RHManageRegFormFieldBase):
@@ -86,11 +96,11 @@ class RHRegFormAddField(RHManageRegFormSectionBase):
         else:
             field_type = RegistrationFormField
         form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
-        if isinstance(form_field, RegistrationFormField):
-            form_field.data.append(RegistrationFormFieldData(data=field_data))
         form_field.title = field_data.pop('caption')
         form_field.description = field_data.pop('description', '')
         form_field.is_enabled = not field_data.pop('disabled')
         db.session.add(form_field)
         db.session.flush()
+        if isinstance(form_field, RegistrationFormField):
+            form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, data=field_data)
         return jsonify(form_field.view_data)
