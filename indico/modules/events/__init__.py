@@ -20,6 +20,7 @@ from flask import request, redirect
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
+from indico.core.roles import check_roles
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
@@ -66,7 +67,7 @@ def _merge_users(target, source, **kwargs):
 
 
 @signals.app_created.connect
-def _app_created(app, **kwargs):
+def _handle_legacy_ids(app, **kwargs):
     """
     Handles the redirect from broken legacy event ids such as a12345
     or 0123 which cannot be converted to an integer without an error
@@ -102,3 +103,8 @@ def _app_created(app, **kwargs):
 
         request.view_args[key] = unicode(mapping.event_id)
         return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
+
+
+@signals.app_created.connect
+def _check_roles(app, **kawrgs):
+    check_roles(Event)
