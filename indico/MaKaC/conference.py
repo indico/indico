@@ -3643,26 +3643,20 @@ class Conference(CommonObjectBase, Locatable):
         if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
-    @unify_user_args(legacy=True)
-    def canUserModify( self, av ):
-        if av == None:
-            return False
-        if ( av == self.getCreator()) or self.getAccessController().canModify( av ):
-            return True
-        for owner in self.getOwnerList():
-            if owner.canUserModify( av ):
-                return True
-        return False
+    @unify_user_args
+    def canUserModify(self, user, role=None):
+        return self.as_event.can_manage(user, role=role)
 
-    @unify_user_args(legacy=True)
-    def canModify(self, aw_or_user):
+    def canModify(self, aw_or_user, role=None):
         """Tells whether an access wrapper is allowed to modify the current
             conference: only if the user is granted to modify the conference and
             he is accessing from an IP address which is not restricted.
         """
         if hasattr(aw_or_user, 'getUser'):
             aw_or_user = aw_or_user.getUser()
-        return self.canUserModify(aw_or_user) or self.canKeyModify()
+        if isinstance(aw_or_user, AvatarUserWrapper):
+            aw_or_user = aw_or_user.user
+        return self.as_event.can_manage(aw_or_user, role=role, allow_key=True)
 
     def getManagerList( self ):
         return self.__ac.getModifierList()

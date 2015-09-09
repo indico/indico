@@ -139,6 +139,11 @@ class Event(ProtectionManagersMixin, db.Model):
     def title(self):
         return to_unicode(self.as_legacy.getTitle())
 
+    def can_manage(self, user, role=None, allow_key=False, *args, **kwargs):
+        # XXX: Remove this method once modification keys are gone!
+        return (super(Event, self).can_manage(user, role, *args, **kwargs) or
+                (allow_key and self.as_legacy.canKeyModify()))
+
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
         """Creates a new log entry for the event
 
