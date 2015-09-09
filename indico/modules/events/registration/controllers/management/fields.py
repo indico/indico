@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify
+from flask import request, jsonify, session
 
 from indico.core.db import db
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.models.registration_form_fields import RegistrationFormField
+from indico.web.util import jsonify_data
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
@@ -39,14 +41,16 @@ class RHToggleFieldState(RHManageRegFormFieldBase):
     def _process(self):
         self.field.is_enabled = (request.args.get('enable') == 'true')
         db.session.flush()
-        return jsonify(self.field.view_data)
+        logger.info('Field {} modified by {}'.format(self.field, session.user))
+        return jsonify_data(**self.field.view_data)
 
 
 class RHDeleteRegFormField(RHManageRegFormFieldBase):
     def _process(self):
         self.field.is_deleted = True
         db.session.flush()
-        return jsonify(success=True)
+        logger.info('Field {} deleted by {}'.format(self.field, session.user))
+        return jsonify_data(success=True)
 
 
 class RHMoveField(RHManageRegFormFieldBase):

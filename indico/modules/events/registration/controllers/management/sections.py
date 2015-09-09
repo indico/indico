@@ -16,13 +16,15 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify
+from flask import request, jsonify, session
 
 from indico.core.db import db
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
                                                                                 RegistrationFormFieldData)
+from indico.web.util import jsonify_data
 
 
 class RHManageRegFormSectionBase(RHManageRegFormBase):
@@ -44,18 +46,21 @@ class RHRegFormAddSection(RHManageRegFormBase):
         section.description = request.json.get('description')
         db.session.add(section)
         db.session.flush()
-        return jsonify(section.view_data)
+        logger.info('Section {} created by {}'.format(section, session.user))
+        return jsonify_data(**section.view_data)
 
 
 class RHRegFormModifySection(RHManageRegFormSectionBase):
     def _process_POST(self):
         self.section.is_enabled = (request.args.get('enable') == 'true')
         db.session.flush()
-        return jsonify(self.section.view_data)
+        logger.info('Section {} modified by {}'.format(self.section, session.user))
+        return jsonify_data(**self.section.view_data)
 
     def _process_DELETE(self):
         self.section.is_deleted = True
         db.session.flush()
+        logger.info('Section {} deleted by {}'.format(self.section, session.user))
         return jsonify(success=True)
 
     def _process_PATCH(self):
@@ -63,6 +68,7 @@ class RHRegFormModifySection(RHManageRegFormSectionBase):
         if modified_field in {'title', 'description'}:
             setattr(self.section, modified_field, request.json.get(modified_field))
         db.session.flush()
+        logger.info('Section {} modified by {}'.format(self.section, session.user))
         return jsonify(self.section.view_data)
 
 
