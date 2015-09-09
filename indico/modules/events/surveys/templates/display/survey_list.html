@@ -18,7 +18,7 @@
             {% for survey in surveys %}
                 <tr>
                     <td>
-                        {% if event.canModify(session.user) %}
+                        {% if event.as_event.can_manage(session.user, 'surveys', allow_key=true) %}
                             <a href="{{ url_for('.manage_survey', survey) }}">{{ survey.title }}</a>
                         {% else %}
                             {{ survey.title }}

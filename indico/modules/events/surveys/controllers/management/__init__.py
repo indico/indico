@@ -26,6 +26,7 @@ class RHManageSurveysBase(RHConferenceModifBase):
     """Base class for all survey management RHs"""
 
     CSRF_ENABLED = True
+    ROLE = 'surveys'
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)

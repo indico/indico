@@ -21,6 +21,8 @@ from flask import session, render_template
 from indico.core import signals
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.core.roles import ManagementRole
+from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.util.i18n import _
@@ -41,8 +43,8 @@ def _merge_users(target, source, **kwargs):
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'surveys', SideMenuItem(_('Surveys'), url_for('surveys.manage_survey_list', event),
-                                   visible=event.canModify(session.user), event_feature='surveys',
-                                   section='advanced')
+                                   visible=event.as_event.can_manage(session.user, 'surveys', allow_key=True),
+                                   event_feature='surveys', section='advanced')
 
 
 @signals.event.sidemenu.connect
@@ -88,6 +90,11 @@ def _get_feature_definitions(sender, **kwargs):
     return SurveysFeature
 
 
+@signals.acl.get_management_roles.connect_via(Event)
+def _get_management_roles(sender, **kwargs):
+    return SurveysRole
+
+
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.events.surveys.tasks
@@ -101,3 +108,9 @@ class SurveysFeature(EventFeature):
     @classmethod
     def is_default_for_event(cls, event):
         return True
+
+
+class SurveysRole(ManagementRole):
+    name = 'surveys'
+    friendly_name = _('Surveys')
+    description = _('Grants management access to surveys.')
