@@ -12,22 +12,7 @@
 
     <div ng-model="sections" class="regform-section-list" ui-sortable="sectionSortableOptions">
         <div ng-animate="animations.section" ng-repeat="section in sections | filter: {enabled: true}">
-            <div ng-switch="section._type">
-                <nd-section nd-general-section
-                    ng-switch-default></nd-section>
-                <nd-section nd-general-section nd-personal-data-section
-                    ng-switch-when="PersonalDataForm"></nd-section>
-                <nd-section nd-accommodation-section
-                    ng-switch-when="AccommodationForm"></nd-section>
-                <nd-section nd-further-information-section
-                    ng-switch-when="FurtherInformationForm"></nd-section>
-                <nd-section nd-reason-section
-                    ng-switch-when="ReasonParticipationForm"></nd-section>
-                <nd-section nd-sessions-section
-                    ng-switch-when="SessionsForm"></nd-section>
-                <nd-section nd-social-event-section
-                    ng-switch-when="SocialEventForm"></nd-section>
-            </div>
+            <nd-section nd-general-section></nd-section>
         </div>
     </div>
 
