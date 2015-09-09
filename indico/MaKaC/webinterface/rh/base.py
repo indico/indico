@@ -834,9 +834,13 @@ class RHDisplayBaseProtected(RHProtected):
 class RHModificationBaseProtected(RHProtected):
 
     _allowClosed = False
+    ROLE = None
 
     def _checkProtection(self):
-        if not self._target.canModify( self.getAW() ):
+        role_arg = {}
+        if self.ROLE is not None:
+            role_arg = {'role': self.ROLE}
+        if not self._target.canModify(self.getAW(), **role_arg):
             if self._target.getModifKey() != "":
                 raise ModificationError()
             if self._getUser() is None:
