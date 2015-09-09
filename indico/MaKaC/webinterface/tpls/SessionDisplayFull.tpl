@@ -6,7 +6,7 @@
 <% from pytz import timezone %>
 
 <div id="buttonBar" class="sessionButtonBar">
-    % if session.canModify(self_._aw):
+    % if session.canModify(self_._aw) or session.canCoordinate(self_._aw):
         <a href="${str(urlHandlers.UHSessionModification.getURL(session))}" style="font-weight: bold" >${_("Edit")}</a> |
     % endif
     <% pdfUrl = urlHandlers.UHConfTimeTablePDF.getURL(session.getConference()) %>
