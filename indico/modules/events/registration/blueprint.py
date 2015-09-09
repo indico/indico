@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
-from indico.modules.events.registration.controllers.management.fields import (RHToggleFieldState, RHDeleteRegFormField,
+from indico.modules.events.registration.controllers.management.fields import (RHToggleFieldState, RHRegFormModifyField,
                                                                               RHMoveField, RHRegFormAddField)
 from indico.modules.events.registration.controllers.management.regforms import (RHRegistrationFormList,
                                                                                 RHRegistrationFormCreate,
@@ -69,7 +69,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields', 'add_field',
                  RHRegFormAddField, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>',
-                 'delete_field', RHDeleteRegFormField, methods=('DELETE',))
+                 'modify_field', RHRegFormModifyField, methods=('DELETE', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/toggle',
                  'disable_field', RHToggleFieldState, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
