@@ -162,11 +162,11 @@ class ProtectionMixin(object):
         if entry is None and read_access:
             entry = principal_class(principal=principal)
             acl_rel.add(entry)
-            # TODO: trigger signal
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry)
             return entry
         elif entry is not None and not read_access:
             acl_rel.remove(entry)
-            # TODO: trigger signal
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None)
             return None
         return entry
 
@@ -182,7 +182,7 @@ class ProtectionMixin(object):
         """
         acl_rel, _, entry = _get_acl_data(self, acl_attr, principal)
         if entry is not None:
-            # TODO: trigger signal
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None)
             acl_rel.remove(entry)
 
 
@@ -313,9 +313,9 @@ class ProtectionManagersMixin(ProtectionMixin):
         # remove entry from acl if no privileges
         if not entry.read_access and not entry.full_access and not entry.roles:
             acl_rel.remove(entry)
-            # TODO: trigger signal
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None)
             return None
-        # TODO: trigger signal
+        signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry)
         return entry
 
 

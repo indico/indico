@@ -74,6 +74,16 @@ denied.
 """)
 
 
+entry_changed = _signals.signal('entry-changed', """
+Called when an ACL entry is changed.
+
+The `sender` is the type of the object that's using the mixin.  The
+actual instance is passed as `obj`.  The `User` or `GroupProxy` is
+passed as `principal` and `entry` contains the actual ACL entry (a
+`PrincipalMixin` instance) or ``None`` in case the entry was deleted.
+""")
+
+
 get_management_roles = _signals.signal('get-management-roles', """
 Expected to return `ManagementRole` subclasses.  The `sender` is the
 type of the object the roles may be used for.  Functions subscribing
