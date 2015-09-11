@@ -354,13 +354,12 @@ class CommonObjectBase(CoreObject, Fossilizable):
                 db.session.flush()
                 signals.attachments.attachment_created.send(link, user=link.user, internal=True)
 
-
     def remove_attachments(self):
         """
         Send 'deleted' signal to all attachments/folders
         """
         # TODO 2.0: do not delete them, only set is_deleted on parent
-        attachments = self.attached_items
+        attachments = get_attached_items(self)
         if attachments:
             for folder in attachments['folders']:
                 folder.is_deleted = True
