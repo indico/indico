@@ -49,14 +49,26 @@ class PrincipalMixin(object):
     #: ``in_foo_acl`` with *foo* describing the ACL where this
     #: mixin is used.
     principal_backref_name = None
+    #: The columns which should be included in the unique constraints.
+    #: If set to ``None``, no unique constraints will be added.
+    unique_columns = None
 
     @strict_classproperty
-    @staticmethod
-    def __auto_table_args():
+    @classmethod
+    def __auto_table_args(cls):
+        uniques = ()
+        if cls.unique_columns:
+            uniques = (db.Index('ix_uq_{}_user'.format(cls.__tablename__), 'user_id', *cls.unique_columns, unique=True,
+                                postgresql_where=db.text('type = {}'.format(PrincipalType.user))),
+                       db.Index('ix_uq_{}_local_group'.format(cls.__tablename__), 'local_group_id', *cls.unique_columns,
+                                unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.local_group))),
+                       db.Index('ix_uq_{}_mp_group'.format(cls.__tablename__), 'mp_group_provider', 'mp_group_name',
+                                *cls.unique_columns, unique=True,
+                                postgresql_where=db.text('type = {}'.format(PrincipalType.multipass_group))))
         return (db.Index(None, 'mp_group_provider', 'mp_group_name'),
                 _make_check(PrincipalType.user, 'user_id'),
                 _make_check(PrincipalType.local_group, 'local_group_id'),
-                _make_check(PrincipalType.multipass_group, 'mp_group_provider', 'mp_group_name'))
+                _make_check(PrincipalType.multipass_group, 'mp_group_provider', 'mp_group_name')) + uniques
 
     type = db.Column(
         PyIntEnum(PrincipalType)

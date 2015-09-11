@@ -28,6 +28,7 @@ class EventPrincipal(PrincipalRolesMixin, db.Model):
     __tablename__ = 'principals'
     principal_backref_name = 'in_event_acls'
     principal_for = 'Event'
+    unique_columns = ('event_id',)
 
     @declared_attr
     def __table_args__(cls):

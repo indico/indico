@@ -25,6 +25,7 @@ class BlockingPrincipal(PrincipalMixin, db.Model):
     __tablename__ = 'blocking_principals'
     __table_args__ = {'schema': 'roombooking'}
     principal_backref_name = 'in_blocking_acls'
+    unique_columns = ('blocking_id',)
 
     id = db.Column(
         db.Integer,

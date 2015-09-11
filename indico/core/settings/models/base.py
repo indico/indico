@@ -126,6 +126,11 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     # Additional columns used to identitfy a setting (e.g. user/event id)
     extra_key_cols = ()
 
+    @strict_classproperty
+    @classmethod
+    def unique_columns(cls):
+        return ('module', 'name') + cls.extra_key_cols
+
     @classmethod
     def get_all_acls(cls, module, **kwargs):
         rv = defaultdict(set)
