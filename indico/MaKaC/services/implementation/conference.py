@@ -573,7 +573,7 @@ class ConferenceDeleteContributions (ConferenceModifBase):
                         """is closed""").format(contrib.getId(), contrib.getSession().getTitle())
                 raise ServiceAccessError(msg)
             contrib.getParent().getSchedule().removeEntry(contrib.getSchEntry())
-            self._conf.removeContribution(contrib)
+            contrib.delete()
 
 #########################
 # Contribution filtering
