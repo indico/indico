@@ -43,7 +43,7 @@ def _ignore_non_loggable(f):
     @wraps(f)
     def wrapper(sender, **kwargs):
         folder = getattr(sender, 'folder', sender)  # sender may be a folder or attachment here
-        if folder.link_type != LinkType.category or kwargs.get('internal'):
+        if folder.link_type != LinkType.category and not kwargs.get('internal'):
             f(sender, **kwargs)
 
     return wrapper
