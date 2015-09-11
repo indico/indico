@@ -20,9 +20,11 @@ from flask import redirect, session, request
 from werkzeug.exceptions import Forbidden, BadRequest
 
 from indico.core import signals
+from indico.core.errors import NoReportError
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.preview import get_file_previewer
+from indico.util.i18n import _
 from indico.web.util import jsonify_template
 
 
@@ -43,7 +45,8 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
                 raise BadRequest
             previewer = get_file_previewer(self.attachment.file)
             if not previewer:
-                raise BadRequest
+                raise NoReportError(_('There is no preview available for this file type. Please refresh the page.'),
+                                    http_status_code=400)
             preview_content = previewer.generate_content(self.attachment)
             return jsonify_template('attachments/preview.html', attachment=self.attachment,
                                     preview_content=preview_content)

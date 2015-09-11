@@ -121,10 +121,14 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
                     request, exception.__class__.__name__, exception, tb
                 ).rstrip())
 
+            # allow e.g. NoReportError to specify a status code without possibly
+            # breaking old code that expects it with a 200 code.
+            # new variable name since python2 doesn't have `nonlocal`...
+            used_status = getattr(exception, 'http_status_code', status)
             if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
-                return create_json_error_answer(exception, status=status)
+                return create_json_error_answer(exception, status=used_status)
             else:
-                args[0]._responseUtil.status = status
+                args[0]._responseUtil.status = used_status
                 return f(*args, **kw)
         return wrapper
     if function:
