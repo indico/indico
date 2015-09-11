@@ -183,7 +183,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-        self._isRegistrar = self._target.isRegistrar( self._getUser() )
+        self._isRegistrar = self._conf.as_event.can_manage(session.user, role='registration', explicit=True)
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._requests_manager = is_request_manager(session.user)

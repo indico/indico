@@ -17,6 +17,11 @@
 from __future__ import unicode_literals
 
 from flask import request
+from sqlalchemy.orm import load_only, noload
+
+from indico.modules.events import Event
+from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.fulltextindexes.models.events import IndexedEvent
 
 
 def get_object_from_args(args=None):
@@ -58,3 +63,29 @@ def get_object_from_args(args=None):
         return object_type, event, obj
     else:
         return object_type, None, None
+
+
+def get_events_managed_by(user, from_dt=None, to_dt=None):
+    """Gets the IDs of events where the user has management privs.
+
+    :param user: A `User`
+    :param from_dt: The earliest event start time to look for
+    :param to_dt: The latest event start time to look for
+    :return: A set of event ids
+    """
+    event_date_filter = None
+    if from_dt and to_dt:
+        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
+    elif from_dt:
+        event_date_filter = IndexedEvent.start_date >= from_dt
+    elif to_dt:
+        event_date_filter = IndexedEvent.start_date <= to_dt
+    query = (user.in_event_acls
+             .join(Event)
+             .options(noload('user'), noload('local_group'), load_only('event_id'))
+             .filter(~Event.is_deleted)
+             .filter(EventPrincipal.has_management_role('ANY')))
+    if event_date_filter is not None:
+        query = query.join(IndexedEvent, IndexedEvent.id == EventPrincipal.event_id)
+        query = query.filter(event_date_filter)
+    return {principal.event_id for principal in query}

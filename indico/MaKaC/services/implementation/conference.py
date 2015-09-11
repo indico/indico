@@ -1451,12 +1451,12 @@ class ConferenceProtectionAddExistingRegistrar(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._principals = [principal_from_fossil(f, allow_pending=True)
+        self._principals = [principal_from_fossil(f, allow_pending=True, legacy=False)
                             for f in pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
         for principal in self._principals:
-            self._conf.addToRegistrars(principal)
+            self._conf.as_event.update_principal(principal, add_roles={'registration'})
         return fossilize(self._conf.getRegistrarList())
 
 
@@ -1464,10 +1464,10 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
 
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['principal'], allow_missing_groups=True)
+        self._principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True)
 
     def _getAnswer(self):
-        self._conf.removeFromRegistrars(self._principal)
+        self._conf.as_event.update_principal(self._principal, del_roles={'registration'})
         return fossilize(self._conf.getRegistrarList())
 
 

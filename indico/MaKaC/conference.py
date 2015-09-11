@@ -3661,35 +3661,16 @@ class Conference(CommonObjectBase, Locatable):
     def getManagerList( self ):
         return self.__ac.getModifierList()
 
-    def addToRegistrars(self, av):
-        self.getRegistrarList().append(av)
-        self.notifyModification()
-        if isinstance(av, AvatarUserWrapper):
-            av.linkTo(self, "registrar")
-
-    def removeFromRegistrars(self, av):
-        self.getRegistrarList().remove(av)
-        self.notifyModification()
-        if isinstance(av, AvatarUserWrapper):
-            av.unlinkTo(self, "registrar")
-
-    def isRegistrar(self, av):
-        if av is None:
-            return False
-        try:
-            return any(principal.containsUser(av) for principal in self.getRegistrarList())
-        except AttributeError:
-            return False
 
     def getRegistrarList(self):
-        try:
-            return self.__registrars
-        except AttributeError:
-            self.__registrars = []
-            return self.__registrars
+        registrars = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role('registration',
+                                                                                                     explicit=True)],
+                            key=lambda x: (not x.is_group, x.name))
+        return [x.as_legacy for x in registrars]
 
+    @unify_user_args
     def canManageRegistration(self, av):
-        return self.isRegistrar(av) or self.canUserModify(av)
+        return self.as_event.can_manage(av, role='registration', allow_key=True)
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
