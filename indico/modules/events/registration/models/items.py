@@ -150,6 +150,10 @@ class RegistrationFormText(RegistrationFormItem):
     }
 
     @property
+    def locator(self):
+        return dict(self.parent.locator, field_id=self.id)
+
+    @property
     def view_data(self):
         return dict(super(RegistrationFormText, self).view_data, input='label', disabled=not self.is_enabled,
                     caption=self.title)
