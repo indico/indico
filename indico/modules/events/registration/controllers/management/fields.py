@@ -25,6 +25,7 @@ from indico.modules.events.registration.models.items import RegistrationFormText
 from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
                                                                                 RegistrationFormFieldData)
 from indico.web.util import jsonify_data
+from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
@@ -100,6 +101,10 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
     def _process(self):
         field_data = request.json['fieldData']
+        if field_data['input'] == 'country':
+            for key, val in CountryHolder.getCountries().iteritems():
+                field_data['radioitems'].append({'caption': val, 'countryKey': key})
+
         if field_data['input'] == 'label':
             field_type = RegistrationFormText
         else:
