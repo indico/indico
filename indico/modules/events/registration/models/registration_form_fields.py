@@ -63,8 +63,8 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(self.current_data.data, id=self.id, caption=self.title, description=self.description,
-                    _type='GeneralField', disabled=not self.is_enabled, lock=[])
+        return dict(self.current_data.data, disabled=not self.is_enabled, caption=self.title,
+                    **super(RegistrationFormField, self).view_data)
 
     @return_ascii
     def __repr__(self):
