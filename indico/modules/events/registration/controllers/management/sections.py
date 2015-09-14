@@ -26,6 +26,8 @@ from indico.web.util import jsonify_data
 
 
 class RHManageRegFormSectionBase(RHManageRegFormBase):
+    """Base class for a specific registration form section"""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.section
@@ -38,6 +40,8 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
 
 
 class RHRegFormAddSection(RHManageRegFormBase):
+    """Add a section to the registration form"""
+
     def _process(self):
         section = RegistrationFormSection(registration_form=self.regform)
         section.title = request.json['title']
@@ -49,6 +53,8 @@ class RHRegFormAddSection(RHManageRegFormBase):
 
 
 class RHRegFormModifySection(RHManageRegFormSectionBase):
+    """RH comprising of methods for update and removal of a section"""
+
     def _process_POST(self):
         self.section.is_enabled = (request.args.get('enable') == 'true')
         db.session.flush()
@@ -71,6 +77,8 @@ class RHRegFormModifySection(RHManageRegFormSectionBase):
 
 
 class RHRegFormMoveSection(RHManageRegFormSectionBase):
+    """Move a section within the registration form"""
+
     def _process(self):
         new_position = request.json['endPos'] + 1
         old_position = self.section.position

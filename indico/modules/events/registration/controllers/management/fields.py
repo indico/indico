@@ -28,6 +28,8 @@ from indico.web.util import jsonify_data
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
+    """Base class for a specific field within a registration form"""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.field
@@ -40,6 +42,8 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 
 
 class RHToggleFieldState(RHManageRegFormFieldBase):
+    """Enable/Disable a field"""
+
     def _process(self):
         self.field.is_enabled = (request.args.get('enable') == 'true')
         db.session.flush()
@@ -48,6 +52,7 @@ class RHToggleFieldState(RHManageRegFormFieldBase):
 
 
 class RHRegFormModifyField(RHManageRegFormFieldBase):
+    """Remove/Modify a field"""
 
     def _process_DELETE(self):
         self.field.is_deleted = True
@@ -66,6 +71,8 @@ class RHRegFormModifyField(RHManageRegFormFieldBase):
 
 
 class RHMoveField(RHManageRegFormFieldBase):
+    """Change position of a field within the section"""
+
     def _process(self):
         new_position = request.json['endPos'] + 1
         old_position = self.field.position
@@ -89,6 +96,8 @@ class RHMoveField(RHManageRegFormFieldBase):
 
 
 class RHRegFormAddField(RHManageRegFormSectionBase):
+    """Add a field to the section"""
+
     def _process(self):
         field_data = request.json['fieldData']
         if field_data['input'] == 'label':
