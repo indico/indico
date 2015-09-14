@@ -124,9 +124,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
             disabled: false,
             input: field,
             lock: [],
-            values: {
-                inputType: type
-            }
+            inputType: type
         });
     };
 });

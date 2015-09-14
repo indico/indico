@@ -6,7 +6,7 @@
                    ng-disabled="paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
             {{ 'None' | i18n }}
         </li>
-        <li ng-repeat="item in field.values.radioitems">
+        <li ng-repeat="item in field.radioitems">
             <input type="radio"
                 id="field-{{ section.id }}-{{ field.id }}-{{ item.id }}"
                 name="{{ fieldName }}"
