@@ -122,7 +122,7 @@ class RegistrationFormItem(db.Model):
     @property
     def view_data(self):
         """Returns object with data that Angular can understand"""
-        raise NotImplementedError
+        return dict(id=self.id, description=self.description, lock=[])
 
     @return_ascii
     def __repr__(self):
@@ -140,14 +140,8 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'items': [child.view_data for child in self.children if not child.is_deleted],
-            'enabled': self.is_enabled,
-            'required': False
-        }
+        return dict(super(RegistrationFormSection, self).view_data, enabled=self.is_enabled, title=self.title,
+                    items=[child.view_data for child in self.children if not child.is_deleted])
 
 
 class RegistrationFormText(RegistrationFormItem):
@@ -157,5 +151,5 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(id=self.id, caption=self.title, description=self.description,
-                    _type='GeneralField', disabled=not self.is_enabled, lock=[])
+        return dict(super(RegistrationFormText, self).view_data, input='label', disabled=not self.is_enabled,
+                    caption=self.title)
