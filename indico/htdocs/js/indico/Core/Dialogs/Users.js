@@ -1102,6 +1102,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                         popup.open();
                         return;
                     }
+                    self.userData.set('name', '{0} {1}'.format(self.userData.get('firstName'), self.userData.get('familyName')))
                     self.action(self.userData, function() {
                     self.close();
                     });
