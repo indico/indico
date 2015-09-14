@@ -21,7 +21,7 @@ from flask import request, jsonify, session
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
-from indico.modules.events.registration.models.items import RegistrationFormText
+from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItem
 from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
                                                                                 RegistrationFormFieldData)
 from indico.web.util import jsonify_data
@@ -38,7 +38,7 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 
     def _checkParams(self, params):
         RHManageRegFormSectionBase._checkParams(self, params)
-        self.field = RegistrationFormField.get_one(request.view_args['field_id'])
+        self.field = RegistrationFormItem.get_one(request.view_args['field_id'])
 
 
 class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
