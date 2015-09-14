@@ -96,6 +96,35 @@ class RegistrationFormItem(db.Model):
         default=False
     )
 
+    #: The ID of the latest data
+    current_data_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.registration_form_field_data.id', use_alter=True),
+        nullable=True
+    )
+
+    #: The latest value of the field
+    current_data = db.relationship(
+        'RegistrationFormFieldData',
+        primaryjoin='RegistrationFormItem.current_data_id == RegistrationFormFieldData.id',
+        foreign_keys=current_data_id,
+        lazy=True,
+        post_update=True
+    )
+
+    #: The list of all versions of the field data
+    data_versions = db.relationship(
+        'RegistrationFormFieldData',
+        primaryjoin='RegistrationFormItem.id == RegistrationFormFieldData.field_id',
+        foreign_keys='RegistrationFormFieldData.field_id',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'field',
+            lazy=False
+        )
+    )
+
     # The registration form
     registration_form = db.relationship(
         'RegistrationForm',
@@ -155,5 +184,5 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(super(RegistrationFormText, self).view_data, input='label', disabled=not self.is_enabled,
-                    caption=self.title)
+        return dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
+                    caption=self.title, **self.current_data.data)

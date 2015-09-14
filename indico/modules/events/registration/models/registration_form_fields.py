@@ -23,54 +23,6 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.util.string import return_ascii
 
 
-class RegistrationFormField(RegistrationFormItem):
-    __mapper_args__ = {
-        'polymorphic_identity': RegistrationFormItemType.field
-    }
-
-    #: The ID of the latest data
-    current_data_id = db.Column(
-        db.Integer,
-        db.ForeignKey('event_registration.registration_form_field_data.id', use_alter=True),
-        nullable=True
-    )
-
-    #: The latest value of the field
-    current_data = db.relationship(
-        'RegistrationFormFieldData',
-        primaryjoin=lambda: RegistrationFormField.current_data_id == RegistrationFormFieldData.id,
-        foreign_keys=current_data_id,
-        lazy=True,
-        post_update=True
-    )
-
-    #: The list of all versions of the field data
-    data_versions = db.relationship(
-        'RegistrationFormFieldData',
-        primaryjoin=lambda: RegistrationFormField.id == RegistrationFormFieldData.field_id,
-        foreign_keys=lambda: RegistrationFormFieldData.field_id,
-        lazy=True,
-        cascade='all, delete-orphan',
-        backref=db.backref(
-            'field',
-            lazy=False
-        )
-    )
-
-    @property
-    def locator(self):
-        return dict(self.parent.locator, field_id=self.id)
-
-    @property
-    def view_data(self):
-        return dict(self.current_data.data, disabled=not self.is_enabled, caption=self.title,
-                    **super(RegistrationFormField, self).view_data)
-
-    @return_ascii
-    def __repr__(self):
-        return '<RegistrationFormField({}, {})>'.format(self.id, self.registration_form_id)
-
-
 class RegistrationFormFieldData(db.Model):
     __tablename__ = 'registration_form_field_data'
     __table_args__ = {'schema': 'event_registration'}
@@ -97,3 +49,22 @@ class RegistrationFormFieldData(db.Model):
     @return_ascii
     def __repr__(self):
         return '<RegistrationFormFieldData({}, {})>'.format(self.id, self.field_id)
+
+
+class RegistrationFormField(RegistrationFormItem):
+    __mapper_args__ = {
+        'polymorphic_identity': RegistrationFormItemType.field
+    }
+
+    @property
+    def locator(self):
+        return dict(self.parent.locator, field_id=self.id)
+
+    @property
+    def view_data(self):
+        return dict(self.current_data.data, disabled=not self.is_enabled, caption=self.title,
+                    **super(RegistrationFormField, self).view_data)
+
+    @return_ascii
+    def __repr__(self):
+        return '<RegistrationFormField({}, {})>'.format(self.id, self.registration_form_id)

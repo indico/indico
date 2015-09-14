@@ -110,6 +110,5 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         form_field.is_enabled = not field_data.pop('disabled')
         db.session.add(form_field)
         db.session.flush()
-        if isinstance(form_field, RegistrationFormField):
-            form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, data=field_data)
+        form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, data=field_data)
         return jsonify(form_field.view_data)
