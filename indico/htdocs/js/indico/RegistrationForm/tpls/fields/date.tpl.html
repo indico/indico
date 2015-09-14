@@ -1,15 +1,15 @@
 <nd-datepicker
     id="field-{{ section.id }}-{{ field.id }}"
-    date-format="{{ field.values.dateFormat }}"
+    date-format="{{ field.dateFormat }}"
     hidden-inputs="{{ dateInputs }}"
     required="{{field.mandatory}}"
-    show-time="showTime(field.values.dateFormat)"
+    show-time="showTime(field.dateFormat)"
     validation="validationStarted"
     value="userdata[fieldName]">
 </nd-datepicker>
 
 <span class="inputDescription">
-    <span ng-repeat="el in field.values.displayFormats" ng-show="el[0] == field.values.dateFormat">
+    <span ng-repeat="el in field.displayFormats" ng-show="el[0] == field.dateFormat">
         {{ el[1] }}
     </span>
 </span>
