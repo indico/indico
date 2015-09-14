@@ -72,3 +72,6 @@ _compat_bp.add_url_rule('!/internalPage.py', 'page_modpython',
 _compat_bp.add_url_rule('/page/<int:legacy_page_id>', 'page', compat_page)
 _compat_bp.add_url_rule('/picture/<int:legacy_image_id>.<image_ext>', 'image', compat_image)
 _compat_bp.add_url_rule('/picture/<int:legacy_image_id>', 'image', compat_image)
+_compat_bp.add_url_rule('!/conferenceDisplay.py/getPic', 'image_modpython',
+                        make_compat_redirect_func(_compat_bp, 'image', view_args_conv={'confId': 'event_id',
+                                                                                       'picId': 'legacy_image_id'}))
