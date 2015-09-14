@@ -3,7 +3,7 @@
         {{ 'Date format' | i18n }}
     </label>
 
-    <span ng-if="field.values.displayFormats === undefined"
+    <span ng-if="field.displayFormats === undefined"
         ng-init="formData.dateFormat='%d/%m/%Y'">
         <select name="dateFormat" required
             ng-model="formData.dateFormat"
@@ -26,12 +26,12 @@
         </select>
     </span>
 
-    <span ng-if="field.values.displayFormats !== undefined">
+    <span ng-if="field.displayFormats !== undefined">
         <select name="dateFormat" required
             ng-model="formData.dateFormat"
             ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
-            <option ng-repeat="el in field.values.displayFormats"
-                ng-selected="el[0] == field.values.dateFormat"
+            <option ng-repeat="el in field.displayFormats"
+                ng-selected="el[0] == field.dateFormat"
                 value="{{ el[0] }}">
                 {{ el[1] }}
             </option>

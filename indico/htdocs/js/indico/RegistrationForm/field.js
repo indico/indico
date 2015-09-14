@@ -317,8 +317,8 @@ ndRegForm.directive('ndDateField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Date");
             scope.settings.date = true;
-            scope.settings.formData.push(['values', 'displayFormats']);
-            scope.settings.formData.push(['values', 'dateFormat']);
+            scope.settings.formData.push('displayFormats');
+            scope.settings.formData.push('dateFormat');
             scope.dateInputs = [
                 '{0}Day'.format(scope.getName(scope.field.input)),
                 '{0}Month'.format(scope.getName(scope.field.input)),
@@ -381,8 +381,8 @@ ndRegForm.directive('ndNumberField', function(url) {
             scope.settings.number = true;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
-            scope.settings.formData.push(['values', 'minValue']);
-            scope.settings.formData.push(['values', 'length']);
+            scope.settings.formData.push('minValue');
+            scope.settings.formData.push('length');
 
             scope.updateSubtotal = function() {
                 var value = scope.userdata[scope.fieldName];
@@ -428,7 +428,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.paid) {
-                    var item = _.find(scope.field.values.radioitems, function(item) {
+                    var item = _.find(scope.field.radioitems, function(item) {
                         return item.caption == userdata[scope.getName(scope.field.input)];
                     }) || {};
 
@@ -442,7 +442,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                 var id;
 
                 if (fieldValue !== undefined) {
-                    var item = _.find(scope.field.values.radioitems, function(item) {
+                    var item = _.find(scope.field.radioitems, function(item) {
                         return item.caption == fieldValue;
                     });
 
@@ -456,20 +456,20 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.getValue = function(fieldName) {
                 if (!scope.userdata[fieldName] || scope.userdata[fieldName] === '') {
-                    return scope.field.values.defaultItem;
+                    return scope.field.defaultItem;
                 } else {
                     return scope.userdata[fieldName];
                 }
             };
 
             scope.getSelectedItem = function(itemId) {
-                return _.find(scope.field.values.radioitems, function(item) {
+                return _.find(scope.field.radioitems, function(item) {
                     return item.id == itemId;
                 });
             };
 
-            scope.settings.formData.push(['values', 'defaultItem']);
-            scope.settings.formData.push(['values', 'inputType']);
+            scope.settings.formData.push('defaultItem');
+            scope.settings.formData.push('inputType');
 
             scope.settings.editionTable = {
                 sortable: false,
@@ -542,7 +542,7 @@ ndRegForm.directive('ndTelephoneField', function(url) {
 
         link: function(scope) {
             scope.settings.fieldName = $T("Telephone");
-            scope.settings.formData.push(['values', 'length']);
+            scope.settings.formData.push('length');
         }
     };
 });
@@ -557,7 +557,7 @@ ndRegForm.directive('ndTextField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Text");
             scope.settings.size = true;
-            scope.settings.formData.push(['values', 'length']);
+            scope.settings.formData.push('length');
         }
     };
 });
@@ -572,8 +572,8 @@ ndRegForm.directive('ndTextareaField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Textarea");
             scope.settings.rowsAndColumns = true;
-            scope.settings.formData.push(['values', 'numberOfColumns']);
-            scope.settings.formData.push(['values', 'numberOfRows']);
+            scope.settings.formData.push('numberOfColumns');
+            scope.settings.formData.push('numberOfRows');
         }
     };
 });
