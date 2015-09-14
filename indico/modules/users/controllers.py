@@ -26,6 +26,7 @@ from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
+from indico.core.db import db
 from indico.core.notifications import make_email
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
@@ -250,6 +251,10 @@ class RHUserEmailsVerify(RHUserBase):
                 existing.is_pending = False
 
             self.user.secondary_emails.add(data['email'])
+            # just in case something accessed all_emails before and there's a signal handler
+            # relying on the new email address to be in there, we expire the relationship
+            db.session.expire(self.user, ['_all_emails'])
+            signals.users.email_added.send(self.user, email=data['email'])
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
 

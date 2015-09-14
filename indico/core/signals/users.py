@@ -31,6 +31,11 @@ Called when two users are merged. The *sender* is the main user while the merged
 user (i.e. the one being deleted in the merge) is passed via the *source* kwarg.
 """)
 
+email_added = _signals.signal('email-added', """
+Called when a new email address is added to a user.  The *sender* is
+the user object and the email address is passed in the `email` kwarg.
+""")
+
 profile_sidemenu = _signals.signal('profile-sidemenu', """
 Expected to return `MenuItem` instances to be added to the user profile side menu.
 The *sender* is the user whose profile is currently being displayed.
