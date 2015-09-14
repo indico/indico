@@ -17,8 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
-from indico.modules.events.registration.controllers.management.fields import (RHToggleFieldState, RHRegFormModifyField,
-                                                                              RHMoveField, RHRegFormAddField)
+from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
+                                                                              RHRegistrationFormModifyField,
+                                                                              RHRegistrationFormMoveField,
+                                                                              RHRegistrationFormAddField)
 from indico.modules.events.registration.controllers.management.regforms import (RHRegistrationFormList,
                                                                                 RHRegistrationFormCreate,
                                                                                 RHRegistrationFormEdit,
@@ -28,9 +30,9 @@ from indico.modules.events.registration.controllers.management.regforms import (
                                                                                 RHRegistrationFormClose,
                                                                                 RHRegistrationFormSchedule,
                                                                                 RHRegistrationFormModify)
-from indico.modules.events.registration.controllers.management.sections import (RHRegFormAddSection,
-                                                                                RHRegFormModifySection,
-                                                                                RHRegFormMoveSection)
+from indico.modules.events.registration.controllers.management.sections import (RHRegistrationFormAddSection,
+                                                                                RHRegistrationFormModifySection,
+                                                                                RHRegistrationFormMoveSection)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -58,22 +60,22 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated
 # Right now, Angular strips off trailing slashes, thus causing Flask to throw errors
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section', RHRegFormAddSection,
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section', RHRegistrationFormAddSection,
                  methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>', 'modify_section',
-                 RHRegFormModifySection, methods=('PATCH', 'DELETE', 'POST'))
+                 RHRegistrationFormModifySection, methods=('PATCH', 'DELETE', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/move', 'move_section',
-                 RHRegFormMoveSection, methods=('POST',))
+                 RHRegistrationFormMoveSection, methods=('POST',))
 
 # Regform edition: Fields
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields', 'add_field',
-                 RHRegFormAddField, methods=('POST',))
+                 RHRegistrationFormAddField, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>',
-                 'modify_field', RHRegFormModifyField, methods=('DELETE', 'POST'))
+                 'modify_field', RHRegistrationFormModifyField, methods=('DELETE', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/toggle',
-                 'disable_field', RHToggleFieldState, methods=('POST',))
+                 'disable_field', RHRegistrationFormToggleFieldState, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
-                 'move_field', RHMoveField, methods=('POST',))
+                 'move_field', RHRegistrationFormMoveField, methods=('POST',))
 
 
 # API
