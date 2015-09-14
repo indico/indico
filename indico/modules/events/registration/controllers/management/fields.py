@@ -41,7 +41,7 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
         self.field = RegistrationFormField.get_one(request.view_args['field_id'])
 
 
-class RHToggleFieldState(RHManageRegFormFieldBase):
+class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
     """Enable/Disable a field"""
 
     def _process(self):
@@ -51,7 +51,7 @@ class RHToggleFieldState(RHManageRegFormFieldBase):
         return jsonify_data(**self.field.view_data)
 
 
-class RHRegFormModifyField(RHManageRegFormFieldBase):
+class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     """Remove/Modify a field"""
 
     def _process_DELETE(self):
@@ -70,7 +70,7 @@ class RHRegFormModifyField(RHManageRegFormFieldBase):
         return jsonify(self.field.view_data)
 
 
-class RHMoveField(RHManageRegFormFieldBase):
+class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
     """Change position of a field within the section"""
 
     def _process(self):
@@ -95,7 +95,7 @@ class RHMoveField(RHManageRegFormFieldBase):
         return jsonify(success=True)
 
 
-class RHRegFormAddField(RHManageRegFormSectionBase):
+class RHRegistrationFormAddField(RHManageRegFormSectionBase):
     """Add a field to the section"""
 
     def _process(self):

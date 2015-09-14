@@ -39,7 +39,7 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
         self.section = RegistrationFormSection.get_one(request.view_args['section_id'])
 
 
-class RHRegFormAddSection(RHManageRegFormBase):
+class RHRegistrationFormAddSection(RHManageRegFormBase):
     """Add a section to the registration form"""
 
     def _process(self):
@@ -52,7 +52,7 @@ class RHRegFormAddSection(RHManageRegFormBase):
         return jsonify_data(**section.view_data)
 
 
-class RHRegFormModifySection(RHManageRegFormSectionBase):
+class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
     """RH comprising of methods for update and removal of a section"""
 
     def _process_POST(self):
@@ -76,7 +76,7 @@ class RHRegFormModifySection(RHManageRegFormSectionBase):
         return jsonify(self.section.view_data)
 
 
-class RHRegFormMoveSection(RHManageRegFormSectionBase):
+class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
     """Move a section within the registration form"""
 
     def _process(self):
