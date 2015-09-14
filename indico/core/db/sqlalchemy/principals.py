@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property, Comparator
 from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
@@ -128,7 +128,7 @@ class PrincipalMixin(object):
             )
         )
 
-    @property
+    @hybrid_property
     def principal(self):
         from indico.modules.groups import GroupProxy
         if self.type == PrincipalType.user:
@@ -154,6 +154,10 @@ class PrincipalMixin(object):
         else:
             self.type = PrincipalType.user
             self.user = value
+
+    @principal.comparator
+    def principal(cls):
+        return PrincipalComparator(cls)
 
     @classmethod
     def merge_users(cls, target, source, relationship_attr):
@@ -252,3 +256,27 @@ class PrincipalRolesMixin(PrincipalMixin):
             return crit
         else:
             return cls.full_access | crit
+
+
+class PrincipalComparator(Comparator):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __clause_element__(self):
+        # just in case
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        if not hasattr(other, 'is_group'):
+            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+        elif other.is_group:
+            if other.is_local:
+                return db.and_(self.cls.type == PrincipalType.local_group,
+                               self.cls.local_group_id == other.id)
+            else:
+                return db.and_(self.cls.type == PrincipalType.multipass_group,
+                               self.cls.multipass_group_provider == other.provider,
+                               self.cls.multipass_group_name == other.name)
+        else:
+            return db.and_(self.cls.type == PrincipalType.user,
+                           self.cls.user_id == other.id)
