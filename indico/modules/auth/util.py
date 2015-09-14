@@ -20,6 +20,7 @@ from flask import session, redirect, request
 from werkzeug.datastructures import MultiDict
 
 from indico.core.config import Config
+from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
 
 
@@ -72,9 +73,19 @@ def url_for_logout(next_url=None):
     return url_for('auth.logout', next=next_url)
 
 
-def url_for_register(next_url=None):
+def url_for_register(next_url=None, email=None):
+    """Returns the URL to register
+
+    :param next_url: The URL to redirect to afterwards.
+    :param email: A pre-validated email address to use when creating
+                  a new local account.  Use this argument ONLY when
+                  sending the link in an email or if the email address
+                  has already been validated using some other way.
+
+    """
     if Config.getInstance().getLocalIdentities():
-        return url_for('auth.register', next=next_url)
+        token = secure_serializer.dumps(email, salt='register-email-prevalidated') if email else None
+        return url_for('auth.register', token=token, next=next_url, _external=True, _secure=True)
 
     external_url = Config.getInstance().getExternalRegistrationURL()
     return external_url or url_for_login()

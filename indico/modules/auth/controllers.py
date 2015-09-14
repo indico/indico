@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session, redirect, request, flash, render_template, jsonify
-from itsdangerous import BadData
+from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -220,19 +220,27 @@ class RHRegister(RH):
 
     def _get_verified_email(self):
         """Checks if there is an email verification token."""
-        if 'token' not in request.args:
-            return None
-        return secure_serializer.loads(request.args['token'], max_age=3600, salt='register-email')
+        try:
+            token = request.args['token']
+        except KeyError:
+            return None, None
+        try:
+            return secure_serializer.loads(token, max_age=3600, salt='register-email'), False
+        except BadSignature:
+            return secure_serializer.loads(token, max_age=86400 * 31, salt='register-email-prevalidated'), True
 
     def _process(self):
         if session.user:
             return redirect(url_for('misc.index'))
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
-        verified_email = self._get_verified_email()
+        verified_email, prevalidated = self._get_verified_email()
         if verified_email is not None:
             handler.email_verified(verified_email)
-            flash(_('You have successfully validated your email address and can now proceeed with the registration.'),
-                  'success')
+            if prevalidated:
+                flash(_("You may change your email address after finishing the registration process."), 'info')
+            else:
+                flash(_('You have successfully validated your email address and can now proceeed with the '
+                        'registration.'), 'success')
             return redirect(url_for('.register', provider=self.provider_name))
 
         form = handler.create_form()
