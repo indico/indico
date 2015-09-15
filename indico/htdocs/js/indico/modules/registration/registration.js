@@ -4,7 +4,7 @@
     $(document).ready(function() {
         setupRegistrationFormScheduleDialogs();
         setupRegistrationFormSummaryPage();
-        colorizeSelectedRows();
+        setupRegistrationsList();
     });
 
     $(window).scroll(function(){
@@ -47,6 +47,11 @@
         $('.js-highlight-payment').on('click', function() {
             $('#payment-summary').effect('highlight', 800);
         });
+    }
+
+    function setupRegistrationsList() {
+        colorizeSelectedRows();
+        $('.registrations .toolbar').dropdown();
     }
 
     function colorizeSelectedRows() {
