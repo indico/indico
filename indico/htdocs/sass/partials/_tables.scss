@@ -55,6 +55,10 @@ td.i-table {
     & ~ td.i-table {
         border-left: none !important;
     }
+
+    &.checkbox-column {
+        width: 2.5em;
+    }
 }
 
 h3.i-table {

@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Registrations{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans title=regform.title %}List of registrations for "{{ title }}"{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if regform.registrations %}
+        <table class="i-table registrations">
+            <thead>
+                <tr class="i-table">
+                    <td class="i-table checkbox-column"></td>
+                    <td class="i-table">{% trans %}Full name{% endtrans %}</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in regform.registrations %}
+                    <tr class="i-table">
+                        <td class="i-table">
+                            <input class="select-row" type="checkbox" name="registrant" value="{{ registration.id }}"/>
+                        </td>
+                        <td class="i-table">{{ registration.user.full_name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {%- call message_box('info', fixed_width=true) -%}
+            {% trans %}There are no registrations yet.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
+{% endblock %}
