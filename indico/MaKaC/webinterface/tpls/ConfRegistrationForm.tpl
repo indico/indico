@@ -100,7 +100,7 @@
                 </div>
                 % if 'download' in actions or ('modify' in actions and registrant.getAvatar()):
                     <div class="i-box-buttons toolbar thin right">
-                        % if registrant.getAvatar():
+                        % if registrant.getAvatar() and _session.user == registrant.getAvatar().user:
                             <div class="group">
                                 <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"
                                    class="i-button icon-edit ${ 'disabled' if 'modify' not in actions else '' }"

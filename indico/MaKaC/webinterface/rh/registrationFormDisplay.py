@@ -122,15 +122,6 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
         # Check if the email matches an existing user
         user = get_user_by_email(email)
         avatar = user.as_avatar if user else None
-        if user and not self.is_manager:
-            if not session.user:
-                flash(_('The provided email ({email}) is linked to an Indico account. Please sign in with it '
-                        'first.').format(email=email), 'error')
-                return redirect(url_for('event.confRegistrationFormDisplay-creation', self._conf))
-            elif session.user != user:
-                flash(_('The provided email ({email}) is linked to another Indico account. Please sign in with it '
-                        'first.').format(email=email), 'error')
-                return redirect(url_for('event.confRegistrationFormDisplay-creation', self._conf))
 
         # Check if the user can register
         if not canManageRegistration:  # normal user registering. Managers can.
@@ -170,7 +161,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
             params = {}
             if not rp.doPay() or not payment_event_settings.get(self._conf, 'enabled'):
                 flash(_(u"Your registration has been recorded successfully."), 'success')
-            if not session.user:
+            if not session.user or session.user != user:
                 params.update(rp.getLocator(), **{'authkey': rp.getRandomId()})
             else:
                 params.update(self._conf.getLocator())
