@@ -4,6 +4,7 @@
     $(document).ready(function() {
         setupRegistrationFormScheduleDialogs();
         setupRegistrationFormSummaryPage();
+        colorizeSelectedRows();
     });
 
     $(window).scroll(function(){
@@ -45,6 +46,12 @@
 
         $('.js-highlight-payment').on('click', function() {
             $('#payment-summary').effect('highlight', 800);
+        });
+    }
+
+    function colorizeSelectedRows() {
+        $('table.i-table input.select-row').on('change', function() {
+            $(this).closest('tr').toggleClass('selected', $(this).checked);
         });
     }
 })(window);
