@@ -23,6 +23,7 @@ from indico.modules.events.registration.util import get_event_section_data
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
+from indico.modules.payment import event_settings
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -65,4 +66,5 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
 
     def _process(self):
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
-                                               sections=get_event_section_data(self.regform))
+                                               sections=get_event_section_data(self.regform), regform=self.regform,
+                                               currency=event_settings.get(self.event, 'currency'))
