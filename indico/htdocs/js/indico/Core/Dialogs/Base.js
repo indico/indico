@@ -140,7 +140,6 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
          },
 
          draw: function() {
-             var self = this;
              this.email = new WatchObject();
 
              // TODO: force unidirectional binding?

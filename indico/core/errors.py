@@ -157,9 +157,5 @@ class NotFoundError(IndicoError):
     pass
 
 
-class HtmlForbiddenTag(IndicoError):
-    pass
-
-
 class BadRefererError(IndicoError):
     pass

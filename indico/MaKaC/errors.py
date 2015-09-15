@@ -28,7 +28,7 @@ class MaKaCError(Exception, Fossilizable):
     fossilizes(IErrorReportFossil)
 
     def __init__(self, msg="", area="", explanation=None):
-        self._msg = msg
+        self._msg = self.message = msg
         self._area = area
         self._explanation = explanation
 
@@ -166,9 +166,7 @@ class NotFoundError(MaKaCError):
         super(NotFoundError, self).__init__(title, explanation=message)
 
 
-class HtmlForbiddenTag(MaKaCError):
-    """
-    """
+class HtmlForbiddenTag(NoReportError):
     pass
 
 

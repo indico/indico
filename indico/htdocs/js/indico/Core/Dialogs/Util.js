@@ -19,7 +19,7 @@ IndicoUI.Dialogs.Util = {
 
     error: function(err) {
         var dialog = null;
-        if (exists(err.type) && err.type === "noReport") {
+        if (err.type === 'noReport') {
             dialog = new NoReportErrorDialog(err);
         } else {
             dialog = new ErrorReportDialog(err);
