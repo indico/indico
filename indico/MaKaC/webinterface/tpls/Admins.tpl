@@ -83,7 +83,7 @@
                 </tr>
                 <tr>
                     <td nowrap style="width:60%; padding-top:5px;">
-                        <input type="button" onclick="adminListManager.addExistingUser();" value='${ _("Add administrator") }'></input>
+                        <button type="button" id="add-admin-button">${ _("Add administrator") }</button>
                     </td>
                     <td></td>
                 </tr>
@@ -107,6 +107,10 @@
                 favorite: true,
                 arrows  : false,
                 menu    : false }, ${ administrators | n,j}, null, null, null, false);
+
+        $('#add-admin-button').on('click', function() {
+            adminListManager.addExistingUser();
+        });
 
     % if cephalopod_data['enabled']:
         initCephalopodOnAdminPage(${ tracker_url|n,j }, ${ cephalopod_data|n,j }, ${ url_for('cephalopod.index')|n,j });
