@@ -3,7 +3,7 @@
         <div nd-reg-form
             conf-id="{{ event.id }}"
             conf-sections="{{ sections | tojson | forceescape }}"
-            conf-currency=""
+            conf-currency="{{ currency }}"
             post-url="{{ url_for('.display_regform', regform) | tojson | forceescape }}"></div>
     </div>
 {% endblock %}
