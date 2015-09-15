@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 
 
 class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
@@ -30,3 +32,33 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
+
+
+class DisplayRegistrationFormMixin(WPJinjaMixin):
+    template_prefix = 'events/registration/'
+    base_class = None
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+    def getJSFiles(self):
+        return (self.base_class.getJSFiles(self) + self._asset_env['modules_registration_js'].urls() +
+                self._asset_env['indico_regform'].urls())
+
+    def getCSSFiles(self):
+        return self.base_class.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
+
+
+class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/registration/'
+    base_class = WPConferenceDefaultDisplayBase
+
+
+class WPDisplayRegistrationFormMeeting(DisplayRegistrationFormMixin, WPMeetingDisplay):
+    template_prefix = 'events/registration/'
+    base_class = WPMeetingDisplay
+
+
+class WPDisplayRegistrationFormLecture(DisplayRegistrationFormMixin, WPSimpleEventDisplay):
+    template_prefix = 'events/registration/'
+    base_class = WPSimpleEventDisplay
