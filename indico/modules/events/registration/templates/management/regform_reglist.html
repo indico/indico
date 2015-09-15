@@ -11,24 +11,41 @@
 
 {% block content %}
     {% if regform.registrations %}
-        <table class="i-table registrations">
-            <thead>
-                <tr class="i-table">
-                    <td class="i-table checkbox-column"></td>
-                    <td class="i-table">{% trans %}Full name{% endtrans %}</td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for registration in regform.registrations %}
+        <div class="registrations">
+            <div class="toolbar">
+                <div class="group left">
+                    <a href="#" class="i-button icon-settings">{% trans %}Customize report{% endtrans %}</a>
+                    <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
+                    <a href="#" class="i-button icon-remove">{% trans %}Remove{% endtrans %}</a>
+                    <a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a>
+                    <a href="#" class="i-button icon-tag">{% trans %}Print Badges{% endtrans %}</a>
+                    <a href="#" class="i-button icon-attachment">{% trans %}Attachments{% endtrans %}</a>
+                    <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Export{% endtrans %}</a>
+                    <ul class="dropdown">
+                        <li><a href="#" class="icon-file-pdf">PDF</a></li>
+                        <li><a href="#" class="icon-file-excel">CSV</a></li>
+                    </ul>
+                </div>
+            </div>
+            <table class="i-table">
+                <thead>
                     <tr class="i-table">
-                        <td class="i-table">
-                            <input class="select-row" type="checkbox" name="registrant" value="{{ registration.id }}"/>
-                        </td>
-                        <td class="i-table">{{ registration.user.full_name }}</td>
+                        <td class="i-table checkbox-column"></td>
+                        <td class="i-table">{% trans %}Full name{% endtrans %}</td>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for registration in regform.registrations %}
+                        <tr class="i-table">
+                            <td class="i-table">
+                                <input class="select-row" type="checkbox" name="registrant" value="{{ registration.id }}"/>
+                            </td>
+                            <td class="i-table">{{ registration.user.full_name }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
         {%- call message_box('info', fixed_width=true) -%}
             {% trans %}There are no registrations yet.{% endtrans %}
