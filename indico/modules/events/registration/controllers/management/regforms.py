@@ -27,6 +27,7 @@ from indico.modules.events.registration.forms import RegistrationFormForm, Regis
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
 from indico.modules.events.registration.util import get_event_section_data
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.payment import event_settings
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -141,5 +142,5 @@ class RHRegistrationFormModify(RHManageRegFormBase):
 
     def _process(self):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event, event=self.event_new,
-                                                    sections=get_event_section_data(self.regform),
-                                                    regform=self.regform)
+                                                    sections=get_event_section_data(self.regform), regform=self.regform,
+                                                    currency=event_settings.get(self.event, 'currency'))
