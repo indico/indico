@@ -16,7 +16,7 @@
 
 from itertools import ifilter
 from flask_pluginengine import plugin_context
-from sqlalchemy.orm import lazyload, noload, load_only
+from sqlalchemy.orm import lazyload, noload, load_only, joinedload
 from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
@@ -142,6 +142,11 @@ class CoreObject(Persistent):
             return None
 
 
+@memoize_request
+def _get_room_mapping():
+    return {(r.location.name, r.name): r for r in Room.query.options(lazyload(Room.owner), joinedload(Room.location))}
+
+
 class Locatable:
     """
     Inherited by objects that imply a physical location:
@@ -163,12 +168,8 @@ class Locatable:
         if not location or not room:
             return None
 
-        return (Room.query
-                .join(Room.location)
-                .options(lazyload(Room.owner))
-                .filter(Room.name == fix_broken_string(room, True),
-                        Location.name == fix_broken_string(location, True))
-                .first())
+        key = fix_broken_string(location, True), fix_broken_string(room, True)
+        return _get_room_mapping().get(key)
 
     def getLocationParent(self):
         """
@@ -1425,14 +1426,11 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = (Room
-                .find(Room.name == fix_broken_string(self.name, True),
-                      Location.name == fix_broken_string(location, True),
-                      _join=Room.location)
-                .options(load_only('name', 'building', 'floor', 'number'),
-                         noload('owner'))
-                .first())
-        self.fullName = room.full_name if room else None
+        key = fix_broken_string(location, True), fix_broken_string(self.name, True)
+        room = _get_room_mapping().get(key)
+        full_name = room.full_name if room else None
+        if self.fullName != full_name:
+            self.fullName = full_name
 
     def setFullName(self, newFullName):
         self.fullName = newFullName

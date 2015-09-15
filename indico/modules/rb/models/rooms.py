@@ -361,6 +361,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             self.name
         )
 
+    @cached(_cache)
     def has_equipment(self, equipment_name):
         return self.available_equipment.filter_by(name=equipment_name).count() > 0
 

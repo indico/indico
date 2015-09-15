@@ -18,7 +18,7 @@ import inspect
 import itertools
 import time
 import os
-import profile as profiler
+import cProfile as profiler
 import pstats
 import sys
 import random
@@ -710,8 +710,6 @@ class RH(RequestHandlerBase):
             f.write('{} : start request\n'.format(self._startTime))
             f.write('params:{}'.format(params))
             f.write('\n'.join(textLog))
-            f.write('\n')
-            f.write('retried : {}\n'.format(10-retry))
             f.write(s)
             f.write('--------------------------------\n\n')
             f.close()

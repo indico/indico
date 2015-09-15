@@ -22,8 +22,12 @@ from sqlalchemy.orm import load_only, noload
 from indico.core.config import Config
 from indico.util.caching import memoize_request
 from MaKaC.common import filters
+from MaKaC.common.cache import GenericCache
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
+
+
+_cache = GenericCache('room-mapper')
 
 
 class RoomMapperHolder(ObjectHolder):
@@ -128,6 +132,10 @@ class RoomMapper(Persistent):
         if not roomName:
             return ''
         if Config.getInstance().getIsRoomBookingActive():
+            cache_key = 'map-url/{}'.format(roomName)
+            cached = _cache.get(cache_key)
+            if cached is not None:
+                return cached
             from indico.modules.rb.models.rooms import Room
             room = (Room.query
                     .options(load_only('building', 'floor', 'number'), noload('owner'))
@@ -135,9 +143,11 @@ class RoomMapper(Persistent):
                     .first())
             if room:
                 if all(field in self.getBaseMapURL() for field in ['{building}','{floor}','{roomNr}']):
-                    return self.getBaseMapURL().format(**{'building': str(room.building),
-                                                          'floor': room.floor,
-                                                          'roomNr': room.number})
+                    rv = self.getBaseMapURL().format(**{'building': str(room.building),
+                                                        'floor': room.floor,
+                                                        'roomNr': room.number})
+                    _cache.set(cache_key, rv, 3600)
+                    return rv
         return ""
     getCompleteMapURL = getMapURL
 
