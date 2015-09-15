@@ -34,7 +34,7 @@ from indico.web.forms.base import FormDefaults
 from indico.web.flask.util import url_for
 
 
-class RHRegistrationFormList(RHManageRegFormsBase):
+class RHManageRegistrationForms(RHManageRegFormsBase):
     """List all registrations forms for an event"""
 
     def _process(self):
