@@ -188,7 +188,6 @@
                     if (killProgress) {
                         killProgress();
                     }
-                    closeDialog();
                     handleAjaxError(xhr);
                     e.preventDefault();
                 }).on('ajaxDialog:success', function(e, data) {
@@ -196,7 +195,6 @@
                         killProgress();
                     }
                     if (handleAjaxError(data)) {
-                        closeDialog();
                         return;
                     }
 
