@@ -24,8 +24,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
-from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
+from indico.modules.events.registration.util import get_event_section_data
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
@@ -140,8 +140,6 @@ class RHRegistrationFormModify(RHManageRegFormBase):
     """Modify the form of a registration form"""
 
     def _process(self):
-        sections = (RegistrationFormSection.find(registration_form=self.regform, is_deleted=False)
-                                           .order_by(RegistrationFormSection.position).all())
-        sections_data = [s.view_data for s in sections]
         return WPManageRegistration.render_template('management/regform_modify.html', self.event, event=self.event_new,
-                                                    sections=sections_data, regform=self.regform)
+                                                    sections=get_event_section_data(self.regform),
+                                                    regform=self.regform)
