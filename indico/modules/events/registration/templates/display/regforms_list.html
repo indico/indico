@@ -1,0 +1,51 @@
+{% extends 'layout/event_page_base.html' %}
+
+{% block title %}
+    {%- trans %}Registration Forms{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <table id="survey-list" class="i-table-widget">
+        <thead>
+            <tr>
+                <th>{% trans %}Registration Form{% endtrans %}</th>
+                <th>{% trans %}Available from{% endtrans %}</th>
+                <th>{% trans %}Deadline{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for regform in regforms %}
+                <tr>
+                    <td>
+                        {% if event.canModify(session.user) %}
+                            <a href="{{ url_for('.manage_regform', regform) }}">{{ regform.title }}</a>
+                        {% else %}
+                            {{ regform.title }}
+                        {% endif %}
+                    </td>
+                    <td>{{ regform.start_dt | format_datetime if regform.start_dt else _('Not started') }}</td>
+                    <td>{{ regform.end_dt | format_datetime if regform.end_dt else _('No deadline') }}</td>
+                    <td class="survey-actions">
+                        <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
+                            {% trans %}Fill out{% endtrans %}
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">
+                        {% trans %}No registration forms available for this event{% endtrans %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if event.getType() != 'conference' %}
+        <p>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+                {%- trans %}Back to the event{% endtrans -%}
+            </a>
+        </p>
+    {% endif %}
+{% endblock %}
