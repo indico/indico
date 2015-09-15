@@ -49,3 +49,20 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         return self.view_class.render_template('display/regforms_list.html', self.event, regforms=regforms,
                                                event=self.event)
 
+
+class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
+    """Submit a registration form"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.regform
+        }
+    }
+
+    def _checkParams(self, params):
+        RHRegistrationFormDisplayBase._checkParams(self, params)
+        self.regform = RegistrationForm.find_one(id=request.view_args['reg_form_id'])
+
+    def _process(self):
+        return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
+                                               sections=get_event_section_data(self.regform))
