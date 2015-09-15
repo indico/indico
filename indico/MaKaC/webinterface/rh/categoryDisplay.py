@@ -41,6 +41,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -359,8 +360,8 @@ class UtilPersons:
     @staticmethod
     def _addChair(conf, chair, grantManager, grantSubmission):
         conf.addChair(chair)
-        if grantManager:
-            conf.grantModification(chair)
+        if grantManager and chair.getEmail():
+            conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), full_access=True)
         if grantSubmission:
             conf.getAccessController().grantSubmission(chair)
 

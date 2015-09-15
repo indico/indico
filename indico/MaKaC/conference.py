@@ -16,7 +16,8 @@
 
 from itertools import ifilter
 from flask_pluginengine import plugin_context
-from sqlalchemy.orm import lazyload, noload, load_only, joinedload
+from sqlalchemy import inspect
+from sqlalchemy.orm import lazyload, joinedload
 from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
@@ -44,7 +45,6 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
@@ -1989,8 +1989,7 @@ class Conference(CommonObjectBase, Locatable):
     @property
     def all_manager_emails(self):
         """Returns the emails of all managers, including the creator"""
-        emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
-        return {e for e in emails if e}
+        return {u.email for u in self.as_event.acl if not u.is_group}
 
     @property
     @memoize_request
@@ -2475,6 +2474,7 @@ class Conference(CommonObjectBase, Locatable):
         self.__creator = creator
 
     def linkCreator(self):
+        self.as_event.update_principal(self.__creator.user, full_access=True)
         self.__creator.linkTo(self, "creator")
 
     def getId( self ):
@@ -2562,13 +2562,6 @@ class Conference(CommonObjectBase, Locatable):
         ConferenceHolder().remove(self)
         for owner in self.__owners:
             owner.removeConference(self, notify=False)
-
-        # For each conference we have a list of managers. If we delete the conference but we don't delete
-        # the link in every manager to the conference then, when the manager goes to his "My profile" he
-        # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
-        for manager in self.getManagerList():
-            if isinstance(manager, AvatarUserWrapper):
-                manager.unlinkTo(self, "manager")
 
         creator = self.getCreator()
         creator.unlinkTo(self, "creator")
@@ -3611,38 +3604,6 @@ class Conference(CommonObjectBase, Locatable):
             return False
         return session.get('modifKeys', {}).get(self.id) == modifKey
 
-    def grantModification( self, prin, sendEmail=True ):
-        email = None
-        if isinstance(prin, ConferenceChair):
-            email = prin.getEmail()
-        elif isinstance(prin, str):
-            email = prin
-        if email != None:
-            if email == "":
-                return
-            ah = AvatarHolder()
-            results=ah.match({"email":email}, exact=1)
-            #No registered user in Indico with that email
-            if len(results) == 0:
-                self.__ac.grantModificationEmail(email)
-                self.getConference().getPendingQueuesMgr().addPendingConfManager(prin, False)
-                if sendEmail and isinstance(prin, ConferenceChair):
-                    notif = pendingQueues._PendingConfManagerNotification( [prin] )
-                    mail.GenericMailer.sendAndLog(notif, self.getConference(), 'Event')
-            #The user is registered in Indico and is activated as well
-            elif len(results) == 1 and results[0] is not None and results[0].isActivated():
-                self.__ac.grantModification(results[0])
-                results[0].linkTo(self, "manager")
-        else:
-            self.__ac.grantModification( prin )
-            if isinstance(prin, AvatarUserWrapper):
-                prin.linkTo(self, "manager")
-
-    def revokeModification( self, prin ):
-        self.__ac.revokeModification( prin )
-        if isinstance(prin, AvatarUserWrapper):
-            prin.unlinkTo(self, "manager")
-
     @unify_user_args
     def canUserModify(self, user, role=None):
         return self.as_event.can_manage(user, role=role)
@@ -3658,14 +3619,15 @@ class Conference(CommonObjectBase, Locatable):
             aw_or_user = aw_or_user.user
         return self.as_event.can_manage(aw_or_user, role=role, allow_key=True)
 
-    def getManagerList( self ):
-        return self.__ac.getModifierList()
-
+    def getManagerList(self):
+        managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
+                          key=lambda x: (not x.is_group, x.name.lower()))
+        return [x.as_legacy for x in managers]
 
     def getRegistrarList(self):
         registrars = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role('registration',
                                                                                                      explicit=True)],
-                            key=lambda x: (not x.is_group, x.name))
+                            key=lambda x: (not x.is_group, x.name.lower()))
         return [x.as_legacy for x in registrars]
 
     @unify_user_args
@@ -3721,8 +3683,8 @@ class Conference(CommonObjectBase, Locatable):
         else:
             creator = self.getCreator()
         conf = cat.newConference(creator)
-        if managing is not None :
-            conf.grantModification(managing)
+        if managing is not None:
+            conf.as_event.update_principal(managing.user, full_access=True)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -3777,11 +3739,14 @@ class Conference(CommonObjectBase, Locatable):
             conf.setAccessKey(self.getAccessKey())
             conf.setModifKey(self.getModifKey())
         # Access Control cloning
-        if options.get("access",False) :
+        if options.get("access", False):
             conf.setProtection(self.getAccessController()._getAccessProtection())
-            for mgr in self.getManagerList() :
-                conf.grantModification(mgr)
-            for user in self.getAllowedToAccessList() :
+            from indico.modules.events.models.principals import EventPrincipal
+            cols = {column.key for column in inspect(EventPrincipal).column_attrs} - {'event_id', 'id'}
+            for entry in self.as_event.acl_entries:
+                new_entry = EventPrincipal(**{col: getattr(entry, col) for col in cols})
+                conf.as_event.acl_entries.add(new_entry)
+            for user in self.getAllowedToAccessList():
                 conf.grantAccess(user)
             for right in self.getSessionCoordinatorRights():
                 conf.addSessionCoordinatorRight(right)

@@ -59,14 +59,15 @@ from indico.modules.auth.util import url_for_logout
 from MaKaC.conference import Session, Contribution
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
-from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
+from indico.modules.users.util import get_user_by_email
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
@@ -1243,16 +1244,16 @@ class WConfModifMainData(wcomponents.WTemplated):
     def _getChairPersonsList(self):
         result = fossilize(self._conf.getChairList())
         for chair in result:
-            av = AvatarHolder().match({"email": chair['email']},
-                                  searchInAuthenticators=False, exact=True)
+            user = get_user_by_email(chair['email'])
             chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
-            if not av:
+            if not user:
                 if self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(chair['email']):
                     chair['showSubmitterCB'] = False
-            elif (av[0] in self._conf.getAccessController().getSubmitterList()):
+            elif user.as_avatar in self._conf.getAccessController().getSubmitterList():
                 chair['showSubmitterCB'] = False
-            if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
+            email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
+            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user)):
                 chair['showManagerCB'] = False
         return result
 

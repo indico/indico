@@ -20,10 +20,14 @@ from flask import request, redirect
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.core.notifications import make_email, send_email
 from indico.core.roles import check_roles
+from indico.modules.auth.util import url_for_register
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.util.string import is_legacy_id
 
@@ -64,6 +68,24 @@ def _event_deleted(event, **kwargs):
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.models.principals import EventPrincipal
     EventPrincipal.merge_users(target, source, 'event_new')
+
+
+@signals.users.registered.connect
+@signals.users.email_added.connect
+def _convert_email_principals(user, **kwargs):
+    from indico.modules.events.models.principals import EventPrincipal
+    EventPrincipal.replace_email_with_user(user, 'event_new')
+
+
+@signals.acl.entry_changed.connect_via(Event)
+def _notify_pending_manager(sender, obj, principal, entry, is_new, **kwargs):
+    if not isinstance(principal, EmailPrincipal) or not is_new or entry is None or not entry.full_access:
+        return
+    event = obj
+    template = get_template_module('events/emails/pending_manager.txt', event=event, email=principal.email,
+                                   url=url_for_register(url_for('event_mgmt.conferenceModification-managementAccess',
+                                                                event), email=principal.email))
+    send_email(make_email(to_list={principal.email}, template=template), event.as_legacy, module='Protection')
 
 
 @signals.app_created.connect

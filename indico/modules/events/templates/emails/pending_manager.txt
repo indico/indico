@@ -1,0 +1,31 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    Please register
+{%- endblock %}
+
+{% block header_recipient -%}user{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        You have been added as a manager of the event "{{ event.title }}".
+
+        To access the management area of the event, you need to create a new Indico profile.
+        You can do so at the following URL:
+        {{ url }}
+
+        {% if  not indico_config.LocalIdentities and indico_config.ExternalRegistrationURL -%}
+        When creating the profile, please make sure to use the email address {{ email }}.
+
+        {% endif -%}
+        If you already have an Indico profile, simply add the email address {{ email }} to your profile.
+    {%- endfilter -%}
+{%- endblock %}
+
+{% block footer_title -%}
+    Events
+{%- endblock %}
+
+{% block footer_url -%}
+    {{ url_for('event.conferenceDisplay', event, _external=true) }}
+{%- endblock %}

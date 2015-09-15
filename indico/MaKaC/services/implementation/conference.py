@@ -32,7 +32,7 @@ import datetime
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, info, filters, timezoneUtils, HelperMaKaCInfo
+from MaKaC.common import indexes, filters, timezoneUtils, HelperMaKaCInfo
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -40,7 +40,6 @@ from MaKaC.common.contextManager import ContextManager
 from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
-from MaKaC.user import AvatarHolder
 from MaKaC.participant import Participant
 from MaKaC.fossils.contribution import IContributionFossil
 
@@ -58,7 +57,7 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 
 
 # indico imports
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil
 from indico.web.http_api.util import generate_public_auth_request
@@ -830,13 +829,8 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
 
         profileURL = urlHandlers.UHConfModifParticipants.getURL(self._conf)
 
-        toList = []
-        for manager in self._conf.getManagerList():
-            if isinstance(manager, AvatarUserWrapper):
-                toList.append(manager.getEmail())
-
         data = {}
-        data["toList"] = toList
+        data["toList"] = self._conf.all_manager_emails
         data["fromAddr"] = Config.getInstance().getSupportEmail()
         data["subject"] = "New participant joined '%s'" % self._conf.getTitle()
 
@@ -1199,20 +1193,19 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
 
 
 class ConferenceChairPersonBase(ConferenceModifBase):
-
     def _getChairPersonsList(self):
         result = fossilize(self._conf.getChairList())
         for chair in result:
-            av = AvatarHolder().match({"email": chair['email']},
-                                  searchInAuthenticators=False, exact=True)
+            user = get_user_by_email(chair['email'])
+            chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
-            if not av:
+            if not user:
                 if self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(chair['email']):
                     chair['showSubmitterCB'] = False
-            elif (av[0] in self._conf.getAccessController().getSubmitterList()):
+            elif user.as_avatar in self._conf.getAccessController().getSubmitterList():
                 chair['showSubmitterCB'] = False
-            chair['showManagerCB'] = True
-            if (av and self._conf.getAccessController().canModify(av[0])) or chair['email'] in self._conf.getAccessController().getModificationEmail():
+            email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
+            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user)):
                 chair['showManagerCB'] = False
         return result
 
@@ -1276,14 +1269,10 @@ class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
         chair.setFax(self._userData.get("fax", ""))
         self._conf.addChair(chair)
         #If the chairperson needs to be given management rights
-        if self._userData.get("manager", None):
-            avl = AvatarHolder().match({"email": self._userData.get("email", "")}, exact=True, searchInAuthenticators=False)
-            if avl:
-                av = avl[0]
-                self._conf.grantModification(av)
-            else:
-                #Apart from granting the chairman, we add it as an Indico user
-                self._conf.grantModification(chair)
+        email = self._userData.get('email')
+        if self._userData.get('manager') and email:
+            self._conf.as_event.update_principal(EmailPrincipal(email), full_access=True)
+
         #If the chairperson needs to be given submission rights
         if self._userData.get("submission", False):
             if self._userData.get("email", "") == "":
@@ -1342,15 +1331,9 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
         chair.setPhone(self._userData.get("phone", ""))
         chair.setFax(self._userData.get("fax", ""))
         #If the chairperson needs to be given management rights
-        if self._userData.get("manager", None):
-            avl = AvatarHolder().match({"email": self._userData.get("email", "")},
-                                       searchInAuthenticators=False, exact=True)
-            if avl:
-                av = avl[0]
-                self._conf.grantModification(av)
-            else:
-                #Apart from granting the chairman, we add it as an Indico user
-                self._conf.grantModification(chair)
+        email = self._userData.get('email')
+        if self._userData.get('manager') and email:
+            self._conf.as_event.update_principal(EmailPrincipal(email), full_access=True)
         #If the chairperson needs to be given submission rights because the checkbox is selected
         if self._userData.get("submission", False):
             if self._userData.get("email", "") == "":
@@ -1405,14 +1388,7 @@ class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase )
 class ConferenceManagerListBase(ConferenceModifBase):
 
     def _getManagersList(self):
-        result = fossilize(self._conf.getManagerList())
-        # get pending users
-        for email in self._conf.getAccessController().getModificationEmail():
-            pendingUser = {}
-            pendingUser["email"] = email
-            pendingUser["pending"] = True
-            result.append(pendingUser)
-        return result
+        return fossilize(self._conf.getManagerList())
 
 
 class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
@@ -1420,29 +1396,20 @@ class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._principals = (principal_from_fossil(f, allow_pending=True)
+        self._principals = (principal_from_fossil(f, allow_pending=True, legacy=False)
                             for f in pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
         for principal in self._principals:
-            self._conf.grantModification(principal)
+            self._conf.as_event.update_principal(principal, full_access=True)
         return self._getManagersList()
 
 
 class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
-
-    def _checkParams(self):
-        ConferenceManagerListBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=True, defaultValue=None)
-
     def _getAnswer(self):
-        if self._kindOfUser == "pending":
-            # remove pending email, self._submitterId is an email address
-            self._conf.getAccessController().revokeModificationEmail(self._managerId)
-        else:
-            self._conf.revokeModification(principal_from_fossil(self._params['principal'], allow_missing_groups=True))
+        principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True,
+                                          allow_emails=True)
+        self._conf.as_event.update_principal(principal, full_access=False)
         return self._getManagersList()
 
 
@@ -1464,7 +1431,8 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
 
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
-        self._principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True)
+        self._principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True,
+                                                allow_emails=True)
 
     def _getAnswer(self):
         self._conf.as_event.update_principal(self._principal, del_roles={'registration'})

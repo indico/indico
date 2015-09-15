@@ -16,18 +16,28 @@
 
 from __future__ import unicode_literals
 
+import re
 from operator import attrgetter
 
 import click
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.users import User
 from indico.util.console import verbose_iterator, cformat
+from indico.util.string import is_valid_mail
 from indico.util.struct.iterables import committing_iterator
-from indico_zodbimport import Importer
+from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import patch_default_group_provider, convert_principal
+
+
+def _sanitize_email(email):
+    if '<' not in email:
+        return email
+    m = re.search(r'<([^>]+)>', email)
+    return email if m is None else m.group(1)
 
 
 class EventManagerImporter(Importer):
@@ -82,6 +92,18 @@ class EventManagerImporter(Importer):
                                                                  full_access=True)
                     if not self.quiet:
                         self.print_msg(cformat('    - {} %{blue!}[manager]%{reset}').format(manager_principal))
+            # add email-based managers
+            emails = getattr(event._Conference__ac, 'managersEmail', None)
+            if emails:
+                emails = {_sanitize_email(convert_to_unicode(email).lower()) for email in emails}
+                emails = {email for email in emails if is_valid_mail(email, False)}
+                emails.difference_update(*(x.all_emails for x in managers if not x.is_group))
+                for email in emails:
+                    user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
+                    principal = user or EmailPrincipal(email)  # use the user if it exists
+                    managers[principal] = EventPrincipal(event_id=event.id, principal=principal, full_access=True)
+                    if not self.quiet:
+                        self.print_msg(cformat('    - {} %{green}[manager]%{reset}').format(principal))
             # add registrars
             for registrar in getattr(event, '_Conference__registrars', []):
                 registrar_principal = convert_principal(registrar)

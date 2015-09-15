@@ -33,15 +33,6 @@ def upgrade():
     op.create_index('ix_uq_folder_principals_user', 'folder_principals',
                     ['user_id', 'folder_id'], unique=True, schema='attachments',
                     postgresql_where=sa.text('type = 1'))
-    op.create_index('ix_uq_principals_local_group', 'principals',
-                    ['local_group_id', 'event_id'], unique=True, schema='events',
-                    postgresql_where=sa.text('type = 2'))
-    op.create_index('ix_uq_principals_mp_group', 'principals',
-                    ['mp_group_provider', 'mp_group_name', 'event_id'], unique=True, schema='events',
-                    postgresql_where=sa.text('type = 3'))
-    op.create_index('ix_uq_principals_user', 'principals',
-                    ['user_id', 'event_id'], unique=True, schema='events',
-                    postgresql_where=sa.text('type = 1'))
     op.create_index('ix_uq_settings_principals_local_group', 'settings_principals',
                     ['local_group_id', 'module', 'name', 'event_id'], unique=True, schema='events',
                     postgresql_where=sa.text('type = 2'))
@@ -69,9 +60,6 @@ def downgrade():
     op.drop_index('ix_uq_settings_principals_user', table_name='settings_principals', schema='events')
     op.drop_index('ix_uq_settings_principals_mp_group', table_name='settings_principals', schema='events')
     op.drop_index('ix_uq_settings_principals_local_group', table_name='settings_principals', schema='events')
-    op.drop_index('ix_uq_principals_user', table_name='principals', schema='events')
-    op.drop_index('ix_uq_principals_mp_group', table_name='principals', schema='events')
-    op.drop_index('ix_uq_principals_local_group', table_name='principals', schema='events')
     op.drop_index('ix_uq_folder_principals_user', table_name='folder_principals', schema='attachments')
     op.drop_index('ix_uq_folder_principals_mp_group', table_name='folder_principals', schema='attachments')
     op.drop_index('ix_uq_folder_principals_local_group', table_name='folder_principals', schema='attachments')

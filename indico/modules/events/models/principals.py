@@ -29,6 +29,7 @@ class EventPrincipal(PrincipalRolesMixin, db.Model):
     principal_backref_name = 'in_event_acls'
     principal_for = 'Event'
     unique_columns = ('event_id',)
+    allow_emails = True
 
     @declared_attr
     def __table_args__(cls):

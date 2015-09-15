@@ -17,12 +17,10 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.modules.events.logs import EventLogEntry
-from indico.modules.events.models.principals import EventPrincipal
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii, to_unicode
 from indico.web.flask.util import url_for

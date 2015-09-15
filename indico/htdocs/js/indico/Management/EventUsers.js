@@ -166,7 +166,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         this.rightsToShow = {submission: true, management: false, coordination: false};
         this.nameOptions = {title: false, affiliation: true, email:false};
         if (kindOfUser == "chairperson") {
-            this.rightsToShow = {submission: true, management: false, coordination: false};
+            this.rightsToShow = {submission: true, management: true, coordination: false};
             this.nameOptions = {title: true, affiliation: false, email:false};
         }
         this.ListOfUsersManager(confId, methods, params, inPlaceListElem, userCaption, elementClass, false,

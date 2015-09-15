@@ -1049,14 +1049,7 @@ class WModificationControlFrame(WTemplated):
 class WConfModificationControlFrame(WTemplated):
 
     def _getManagersList(self):
-        result = fossilize(self.__target.getManagerList())
-        # get pending users
-        for email in self.__target.getAccessController().getModificationEmail():
-            pendingUser = {}
-            pendingUser["email"] = email
-            pendingUser["pending"] = True
-            result.append(pendingUser)
-        return result
+        return fossilize(self.__target.getManagerList())
 
     def getHTML(self, target):
         self.__target = target
