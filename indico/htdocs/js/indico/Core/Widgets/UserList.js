@@ -60,15 +60,22 @@ type("ListOfUsersManager", [], {
         indicoRequest(
                 method, params,
                 function(result, error) {
-                    if (!error) {
+                    if (progress) {
+                        killProgress();
+                    }
+                    if (error) {
+                        IndicoUtil.errorReport(error);
+                        return;
+                    }
+                    if (result === 'confirm_remove_self') {
+                        var msg = $T.gettext('This is the last entry for yourself. By removing it you may lose access to the event unless you are a category manager.');
+                        confirmPrompt(msg).then(function() {
+                            params.force = '1';
+                            self._manageUserList(method, params, progress);
+                        });
+                    } else {
                         self._updateUsersList(result);
                         self._drawUserList();
-                        if (progress)
-                            killProgress();
-                    } else {
-                        if (progress)
-                            killProgress();
-                        IndicoUtil.errorReport(error);
                     }
                 }
         );

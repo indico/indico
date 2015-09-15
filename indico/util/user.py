@@ -38,6 +38,19 @@ def iter_acl(acl):
                                       not getattr(getattr(x, 'principal', x), 'is_local', None)))
 
 
+def principal_is_only_for_user(acl, user, principal):
+    """Checks if the given principal is the only one for a user.
+
+    :param acl: A list of principals.
+    :param user: The user to check for
+    :param principal: The principal to check for.
+    """
+    # if the principal doesn't apply for the user, it can't be the last one for him
+    if user not in principal:
+        return False
+    return not any(user in entry.principal for entry in iter_acl(acl) if entry.principal != principal)
+
+
 def retrieve_principals(iterable, allow_groups=True, legacy=True):
     """Retrieves principal objects from ``(type, info)`` tuples.
 

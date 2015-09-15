@@ -21,6 +21,7 @@ Asynchronous request handlers for conference-related data modification.
 
 # 3rd party imports
 from email.utils import formataddr
+from flask import session
 from indico.modules.events.layout import layout_settings
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
@@ -59,7 +60,7 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 # indico imports
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.modules.users.util import get_user_by_email
-from indico.util.user import principal_from_fossil
+from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
 
@@ -1410,7 +1411,12 @@ class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
     def _getAnswer(self):
         principal = principal_from_fossil(self._params['principal'], legacy=False, allow_missing_groups=True,
                                           allow_emails=True)
-        self._conf.as_event.update_principal(principal, full_access=False)
+        event = self._conf.as_event
+        if not self._params.get('force') and principal_is_only_for_user(event.acl_entries, session.user, principal):
+            # this is pretty ugly, but the user list manager widget is used in multiple
+            # places so like this we keep the changes to the legacy widget to a minimum
+            return 'confirm_remove_self'
+        event.update_principal(principal, full_access=False)
         return self._getManagersList()
 
 
