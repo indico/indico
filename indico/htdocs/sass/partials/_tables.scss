@@ -36,6 +36,10 @@ table.i-table {
 tr.i-table {
     border-bottom: 1px solid #E5E5E5;
     border-top: 1px solid #E5E5E5;
+
+    &.selected {
+        background-color: #CDEB8B;
+    }
 }
 
 td.i-table {
