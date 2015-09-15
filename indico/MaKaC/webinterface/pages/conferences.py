@@ -1253,7 +1253,8 @@ class WConfModifMainData(wcomponents.WTemplated):
             elif user.as_avatar in self._conf.getAccessController().getSubmitterList():
                 chair['showSubmitterCB'] = False
             email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
-            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user)):
+            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, check_parent=False,
+                                                                                            allow_admin=False)):
                 chair['showManagerCB'] = False
         return result
 
