@@ -1398,6 +1398,7 @@ class CustomRoom(Persistent):
 
     def __init__(self):
         self.name = ""
+        self.fullName = None
 
     def setValues(self, data):
         self.setName(data.get("name", ""))
@@ -1429,7 +1430,7 @@ class CustomRoom(Persistent):
         key = fix_broken_string(location, True), fix_broken_string(self.name, True)
         room = _get_room_mapping().get(key)
         full_name = room.full_name if room else None
-        if self.fullName != full_name:
+        if getattr(self, 'fullName', None) != full_name:
             self.fullName = full_name
 
     def setFullName(self, newFullName):
