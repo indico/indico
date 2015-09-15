@@ -22,6 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.roles import get_available_roles
 from indico.util.i18n import _
 from indico.util.caching import memoize_request
@@ -150,7 +151,7 @@ class ProtectionMixin(object):
     def update_principal(self, principal, read_access=None, acl_attr='acl_entries'):
         """Updates access privileges for the given principal.
 
-        :param principal: A `User` or `GroupProxy` instance.
+        :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param read_access: If the principal should have explicit read
                             access to the object.
         :param acl_attr: The name of the relationship that contains the
@@ -158,15 +159,16 @@ class ProtectionMixin(object):
         :return: The ACL entry for the given principal or ``None`` if
                  he was removed (or not added).
         """
+        principal = _resolve_principal(principal)
         acl_rel, principal_class, entry = _get_acl_data(self, acl_attr, principal)
         if entry is None and read_access:
             entry = principal_class(principal=principal)
             acl_rel.add(entry)
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=True)
             return entry
         elif entry is not None and not read_access:
             acl_rel.remove(entry)
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False)
             return None
         return entry
 
@@ -176,13 +178,14 @@ class ProtectionMixin(object):
         This method doesn't do anything if the user is not in the
         object's ACL.
 
-        :param principal: A `User` or `GroupProxy` instance.
+        :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param acl_attr: The name of the relationship that contains the
                          ACL of the object.
         """
+        principal = _resolve_principal(principal)
         acl_rel, _, entry = _get_acl_data(self, acl_attr, principal)
         if entry is not None:
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False)
             acl_rel.remove(entry)
 
 
@@ -268,7 +271,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         necessary.  If the changes remove all its privileges, it
         will be removed from the ACL.
 
-        :param principal: A `User` or `GroupProxy` instance.
+        :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param read_access: If the principal should have explicit read
                             access to the object.  This does not grant
                             any management permissions - it simply
@@ -287,13 +290,16 @@ class ProtectionManagersMixin(ProtectionMixin):
         """
         if roles is not None and (add_roles or del_roles):
             raise ValueError('add_roles/del_roles and roles are mutually exclusive')
+        principal = _resolve_principal(principal)
         acl_rel, principal_class, entry = _get_acl_data(self, acl_attr, principal)
+        new_entry = False
         if entry is None:
             if not roles and not add_roles and not full_access and not read_access:
                 # not in ACL and no permissions to add
                 return None
             entry = principal_class(principal=principal, read_access=False, full_access=False, roles=[])
             acl_rel.add(entry)
+            new_entry = True
         # update roles
         new_roles = set(entry.roles)
         if roles is not None:
@@ -313,9 +319,9 @@ class ProtectionManagersMixin(ProtectionMixin):
         # remove entry from acl if no privileges
         if not entry.read_access and not entry.full_access and not entry.roles:
             acl_rel.remove(entry)
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False)
             return None
-        signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry)
+        signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=new_entry)
         return entry
 
 
@@ -333,3 +339,13 @@ def _get_acl_data(obj, acl_attr, principal):
     principal_class = getattr(type(obj), acl_attr).prop.mapper.class_
     entry = next((x for x in acl_rel if x.principal == principal), None)
     return acl_rel, principal_class, entry
+
+
+def _resolve_principal(principal):
+    """Helper function to convert an email principal to a user if possible
+
+    :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
+    """
+    if isinstance(principal, EmailPrincipal):
+        return principal.user or principal
+    return principal

@@ -19,11 +19,13 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property, Comparator
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, noload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.roles import get_available_roles
 from indico.util.decorators import strict_classproperty, classproperty
+from indico.util.fossilize import fossilizes, Fossilizable, IFossil
+from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -31,16 +33,72 @@ class PrincipalType(int, IndicoEnum):
     user = 1
     local_group = 2
     multipass_group = 3
+    email = 4
 
 
-def _make_check(type_, *cols):
+def _make_check(type_, allow_emails, *cols):
     all_cols = {'user_id', 'local_group_id', 'mp_group_provider', 'mp_group_name'}
+    if allow_emails:
+        all_cols.add('email')
     required_cols = all_cols & set(cols)
     forbidden_cols = all_cols - required_cols
     criteria = ['{} IS NULL'.format(col) for col in forbidden_cols]
     criteria += ['{} IS NOT NULL'.format(col) for col in required_cols]
     condition = 'type != {} OR ({})'.format(type_, ' AND '.join(criteria))
     return db.CheckConstraint(condition, 'valid_{}'.format(type_.name))
+
+
+class IEmailPrincipalFossil(IFossil):
+    def getId(self):
+        pass
+    getId.produce = lambda x: x.email
+
+    def getIdentifier(self):
+        pass
+    getIdentifier.produce = lambda x: 'Email:{}'.format(x.email)
+
+    def getEmail(self):
+        pass
+    getEmail.produce = lambda x: x.email
+
+
+class EmailPrincipal(Fossilizable):
+    """Wrapper for email principals
+
+    :param email: The email address.
+    """
+
+    is_group = False
+    fossilizes(IEmailPrincipalFossil)
+
+    def __init__(self, email):
+        self.email = email.lower()
+
+    @property
+    def name(self):
+        return self.email
+
+    @property
+    def as_legacy(self):
+        return self
+
+    @property
+    def user(self):
+        from indico.modules.users import User
+        return User.find_first(~User.is_deleted, User.all_emails.contains(self.email))
+
+    def __eq__(self, other):
+        return isinstance(other, EmailPrincipal) and self.email == other.email
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __contains__(self, user):
+        return self.email in user.all_emails
+
+    @return_ascii
+    def __repr__(self):
+        return '<EmailPrincipal({})>'.format(self.email)
 
 
 class PrincipalMixin(object):
@@ -52,27 +110,37 @@ class PrincipalMixin(object):
     #: The columns which should be included in the unique constraints.
     #: If set to ``None``, no unique constraints will be added.
     unique_columns = None
+    #: Whether it should be allowed to add a user by email address.
+    #: This is useful in places where no Indico user exists yet.
+    #: Usually adding an email address to an ACL should result in
+    #: an email being sent to the user, inviting him to create an
+    #: account with that email address.
+    allow_emails = False
 
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
         uniques = ()
         if cls.unique_columns:
-            uniques = (db.Index('ix_uq_{}_user'.format(cls.__tablename__), 'user_id', *cls.unique_columns, unique=True,
+            uniques = [db.Index('ix_uq_{}_user'.format(cls.__tablename__), 'user_id', *cls.unique_columns, unique=True,
                                 postgresql_where=db.text('type = {}'.format(PrincipalType.user))),
                        db.Index('ix_uq_{}_local_group'.format(cls.__tablename__), 'local_group_id', *cls.unique_columns,
                                 unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.local_group))),
                        db.Index('ix_uq_{}_mp_group'.format(cls.__tablename__), 'mp_group_provider', 'mp_group_name',
                                 *cls.unique_columns, unique=True,
-                                postgresql_where=db.text('type = {}'.format(PrincipalType.multipass_group))))
-        return (db.Index(None, 'mp_group_provider', 'mp_group_name'),
-                _make_check(PrincipalType.user, 'user_id'),
-                _make_check(PrincipalType.local_group, 'local_group_id'),
-                _make_check(PrincipalType.multipass_group, 'mp_group_provider', 'mp_group_name')) + uniques
+                                postgresql_where=db.text('type = {}'.format(PrincipalType.multipass_group)))]
+            if cls.allow_emails:
+                uniques.append(db.Index('ix_uq_{}_email'.format(cls.__tablename__), 'email', *cls.unique_columns,
+                                        unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.email))))
+        indexes = [db.Index(None, 'mp_group_provider', 'mp_group_name')]
+        checks = [_make_check(PrincipalType.user, cls.allow_emails, 'user_id'),
+                  _make_check(PrincipalType.local_group, cls.allow_emails, 'local_group_id'),
+                  _make_check(PrincipalType.multipass_group, cls.allow_emails, 'mp_group_provider', 'mp_group_name')]
+        if cls.allow_emails:
+            checks.append(_make_check(PrincipalType.email, cls.allow_emails, 'email'))
+            checks.append(db.CheckConstraint('email IS NULL OR email = lower(email)', 'lowercase_email'))
+        return tuple(uniques + indexes + checks)
 
-    type = db.Column(
-        PyIntEnum(PrincipalType)
-    )
     multipass_group_provider = db.Column(
         'mp_group_provider',  # otherwise the index name doesn't fit in 60 chars
         db.String,
@@ -83,6 +151,13 @@ class PrincipalMixin(object):
         db.String,
         nullable=True
     )
+
+    @declared_attr
+    def type(cls):
+        exclude_values = None if cls.allow_emails else {PrincipalType.email}
+        return db.Column(
+            PyIntEnum(PrincipalType, exclude_values=exclude_values)
+        )
 
     @declared_attr
     def user_id(cls):
@@ -98,6 +173,16 @@ class PrincipalMixin(object):
         return db.Column(
             db.Integer,
             db.ForeignKey('users.groups.id'),
+            nullable=True,
+            index=True
+        )
+
+    @declared_attr
+    def email(cls):
+        if not cls.allow_emails:
+            return
+        return db.Column(
+            db.String,
             nullable=True,
             index=True
         )
@@ -137,13 +222,20 @@ class PrincipalMixin(object):
             return self.local_group.proxy
         elif self.type == PrincipalType.multipass_group:
             return GroupProxy(self.multipass_group_name, self.multipass_group_provider)
+        elif self.type == PrincipalType.email:
+            return EmailPrincipal(self.email)
 
     @principal.setter
     def principal(self, value):
+        self.email = None
         self.user = None
         self.local_group = None
         self.multipass_group_provider = self.multipass_group_name = None
-        if value.is_group:
+        if isinstance(value, EmailPrincipal):
+            assert self.allow_emails
+            self.type = PrincipalType.email
+            self.email = value.email
+        elif value.is_group:
             if value.is_local:
                 self.type = PrincipalType.local_group
                 self.local_group = value.group
@@ -158,6 +250,13 @@ class PrincipalMixin(object):
     @principal.comparator
     def principal(cls):
         return PrincipalComparator(cls)
+
+    def merge_privs(self, other):
+        """Merges the privileges of another principal
+
+        :param other: Another principal object.
+        """
+        # nothing to do here
 
     @classmethod
     def merge_users(cls, target, source, relationship_attr):
@@ -178,6 +277,36 @@ class PrincipalMixin(object):
                 principal.user_id = target.id
             else:
                 db.session.delete(principal)
+        db.session.flush()
+
+    @classmethod
+    def replace_email_with_user(cls, user, relationship_attr):
+        """
+        Replaces all email-based entries matching the user's email
+        addresses with user-based entries.
+        If the user is already in the ACL, the two entries are merged.
+
+        :param user: A User object.
+        :param relationship_attr: The name of the relationship pointing
+                                  to the object associated with the ACL
+                                  entry.
+        """
+        assert cls.allow_emails
+        backref_attr = getattr(cls, relationship_attr).property.back_populates  # object->acl relationship name
+        query = (cls
+                 .find(cls.email.in_(user.all_emails))
+                 .options(noload('user'), noload('local_group'), joinedload('event_new').load_only('id')))
+        for entry in query:
+            existing = (cls.query
+                        .with_parent(getattr(entry, relationship_attr), backref_attr)
+                        .options(noload('user'), noload('local_group'))
+                        .filter_by(principal=user)
+                        .first())
+            if existing is None:
+                entry.principal = user
+            else:
+                existing.merge_privs(entry)
+                db.session.delete(entry)
         db.session.flush()
 
 
@@ -257,6 +386,11 @@ class PrincipalRolesMixin(PrincipalMixin):
         else:
             return cls.full_access | crit
 
+    def merge_privs(self, other):
+        self.read_access = self.read_access or other.read_access
+        self.full_access = self.full_access or other.full_access
+        self.roles = sorted(set(self.roles) | set(other.roles))
+
 
 class PrincipalComparator(Comparator):
     def __init__(self, cls):
@@ -267,7 +401,10 @@ class PrincipalComparator(Comparator):
         raise NotImplementedError
 
     def __eq__(self, other):
-        if not hasattr(other, 'is_group'):
+        if isinstance(other, EmailPrincipal):
+            return db.and_(self.cls.type == PrincipalType.email,
+                           self.cls.email == other.email)
+        elif not hasattr(other, 'is_group'):
             raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
         elif other.is_group:
             if other.is_local:

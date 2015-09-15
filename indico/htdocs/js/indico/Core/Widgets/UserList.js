@@ -87,7 +87,7 @@ type("ListOfUsersManager", [], {
         if (user._type && user._type.indexOf("Group") != -1) {
             data.name = user.name;
         } else {
-            if (user.pending) {
+            if (user.pending || user._type == 'Email') {
                 data.name = user.email;
             } else {
                 data.name = user.firstName + ' ' + user.familyName;

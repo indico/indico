@@ -78,9 +78,11 @@ entry_changed = _signals.signal('entry-changed', """
 Called when an ACL entry is changed.
 
 The `sender` is the type of the object that's using the mixin.  The
-actual instance is passed as `obj`.  The `User` or `GroupProxy` is
-passed as `principal` and `entry` contains the actual ACL entry (a
-`PrincipalMixin` instance) or ``None`` in case the entry was deleted.
+actual instance is passed as `obj`.  The `User`, `GroupProxy` or
+`EmailPrincipal` is passed as `principal` and `entry` contains the
+actual ACL entry (a `PrincipalMixin` instance) or ``None`` in case
+the entry was deleted.  `is_new` is a boolean indicating whether
+the given principal was in the ACL before.
 """)
 
 

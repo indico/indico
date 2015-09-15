@@ -18,7 +18,6 @@ from functools import wraps
 from types import GeneratorType
 
 from indico.core.config import Config
-from indico.util.user import unify_user_args
 from MaKaC.common.mail import GenericMailer
 
 

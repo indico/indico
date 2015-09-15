@@ -17,6 +17,7 @@
 from functools import wraps
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.util.decorators import smart_decorator
 
 from MaKaC.common.cache import GenericCache
@@ -77,7 +78,8 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
         raise ValueError('Unexpected type: {}'.format(type_))
 
 
-def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True, allow_missing_groups=False):
+def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True, allow_missing_groups=False,
+                          allow_emails=False):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
@@ -109,14 +111,14 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
         if user is None:
             raise ValueError('User does not exist: {}'.format(id_))
         return user.as_avatar if legacy else user
-    elif not allow_groups:
-        raise ValueError('Unexpected fossil type: {}'.format(type_))
-    elif type_ in {'LocalGroupWrapper', 'LocalGroup'}:
+    elif allow_emails and type_ == 'Email':
+        return EmailPrincipal(id_)
+    elif allow_groups and type_ in {'LocalGroupWrapper', 'LocalGroup'}:
         group = GroupProxy(int(id_))
         if group.group is None:
             raise ValueError('Local group does not exist: {}'.format(id_))
         return group.as_legacy_group if legacy else group
-    elif type_ in {'LDAPGroupWrapper', 'MultipassGroup'}:
+    elif allow_groups and type_ in {'LDAPGroupWrapper', 'MultipassGroup'}:
         provider = fossil['provider']
         group = GroupProxy(id_, provider)
         if group.group is None and not allow_missing_groups:
