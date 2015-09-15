@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
-from indico.modules.events.registration.controllers.display import RHRegistrationFormList
+from indico.modules.events.registration.controllers.display import RHRegistrationFormList, RHRegistrationFormSubmit
 from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
                                                                               RHRegistrationFormModifyField,
                                                                               RHRegistrationFormMoveField,
@@ -80,7 +80,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
 
 # Display
 _bp.add_url_rule('/regforms/', 'display_regforms_list', RHRegistrationFormList)
-
+_bp.add_url_rule('/regforms/<int:reg_form_id>', 'display_regform', RHRegistrationFormSubmit, methods=('GET', 'POST'))
 
 # API
 _bp.add_url_rule('!/api/events/<event_id>/registrants/<registrant_id>', 'api_registrant',
