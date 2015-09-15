@@ -4270,9 +4270,6 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
         url.addParam("tab", "conf_submitters")
         self._tabConfSubmitters = self._tabCtrl.newTab("conf_submitters", \
                                                 _("Pending Conference Submitters"),str(url))
-        url.addParam("tab", "conf_managers")
-        self._tabConfManagers = self._tabCtrl.newTab("conf_managers", \
-                                                _("Pending Conference Managers"),str(url))
         url.addParam("tab", "submitters")
         self._tabSubmitters = self._tabCtrl.newTab("submitters", \
                                                 _("Pending Contribution Submitters"),str(url))
@@ -4307,19 +4304,6 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
 
             for key in keys:
                 list.append((key, self._pendingConfSubmitters[key][:]))
-
-        elif self._tabConfManagers.isActive():
-            # Pending conference managers
-            keys = self._conf.getPendingQueuesMgr().getPendingConfManagersKeys(True)
-
-            url = urlHandlers.UHConfModifPendingQueuesActionConfMgr.getURL(self._conf)
-            url.addParam("tab","conf_managers")
-            title = _("Pending chairpersons to become managers")
-            target = _("Conference")
-            pType = "ConfManagers"
-
-            for key in keys:
-                list.append((key, self._pendingConfManagers[key][:]))
 
         elif self._tabSubmitters.isActive():
             # Pending submitters
@@ -4383,48 +4367,6 @@ class WPConfModifPendingQueues(WPConfModifPendingQueuesBase):
     def _getTabContent(self, params):
         wc = WConfModifPendingQueues(self._conf, self._getAW(), self._activeTab)
         return wc.getHTML()
-
-
-class WPConfModifPendingQueuesRemoveConfMgrConfirm(WPConfModifPendingQueuesBase):
-
-    def __init__(self, rh, conf, pendingConfMgrs):
-        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
-        self._pendingConfMgrs = pendingConfMgrs
-
-    def _getTabContent(self,params):
-        wc = wcomponents.WConfirmation()
-        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingConfMgrs))
-
-        msg = {'challenge': _("Are you sure you want to delete the following users pending to become conference managers?"),
-               'target': "<ul>{0}</ul>".format(psubs),
-               'subtext': _("Please note that they will still remain as user"),
-               }
-
-        url = urlHandlers.UHConfModifPendingQueuesActionConfMgr.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingUsers":self._pendingConfMgrs, "remove": _("remove")})
-
-
-class WPConfModifPendingQueuesReminderConfMgrConfirm(WPConfModifPendingQueuesBase):
-
-    def __init__(self, rh, conf, pendingConfMgrs):
-        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
-        self._pendingConfMgrs = pendingConfMgrs
-
-    def _getTabContent(self,params):
-        wc = wcomponents.WConfirmation()
-        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingConfMgrs))
-
-        msg = {'challenge': _("Are you sure that you want to send these users an email with a reminder to create an account in Indico?"),
-               'target': "<ul>{0}</ul>".format(psubs)
-               }
-        url = urlHandlers.UHConfModifPendingQueuesActionConfMgr.getURL(self._conf)
-        return wc.getHTML(
-            msg,
-            url, {
-                "pendingUsers": self._pendingConfMgrs,
-                "reminder": _("reminder")
-                },
-            severity='accept')
 
 
 class WPConfModifPendingQueuesRemoveConfSubmConfirm(WPConfModifPendingQueuesBase):

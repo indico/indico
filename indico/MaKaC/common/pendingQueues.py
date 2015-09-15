@@ -329,76 +329,6 @@ class _PendingManagerNotification(_PendingNotification):
 #---END MANAGERS
 
 
-#---PENDING CONFERENCE MANAGERS
-class PendingConfManagersHolder(PendingHolder):
-
-    """ This is an index that holds all the requests to add non existing users in the
-        list of avatars with rights to manage.
-        Those participants are not Avatars yet (do not have Indico account) and that's why
-        they are in this pending queue. So once they become Indico users they will be removed
-        from the index"""
-
-    def __init__(self):
-        """Index by email of all the requests"""
-        self._id="ConfManagers"
-        self._idx = indexes.IndexesHolder().getById("pendingConfManagers") # All the pending managers
-
-    def grantRights(self, av):
-        l=self.getPendingByEmail(av.getEmail())
-        for e in l:
-            conf = e.getConference()
-            conf.grantModification(av)
-            # the ConfPendingQueuesMgr method "removePendingManager" will remove the Manager
-            # (type-ConferenceChair) objects from the conference pending manager
-            # list and from the this index (PendingManagersHolder).
-            conf.getPendingQueuesMgr().removePendingConfManager(e)
-
-    def _sendReminderEmail(self, sb):
-        from MaKaC.conference import ConferenceChair
-        if type(sb)==list:
-            # Sending email just about the participations of the list "sb" (normally
-            # they are sessions from one event)
-            notif = _PendingConfManagerNotification( sb )
-            mail.GenericMailer.send( notif )
-        elif isinstance(sb, ConferenceChair):
-            # The param "sb" is a SessionChair, so we send an email with the info
-            # about all its participations
-            psList=self.getPendingByEmail(sb.getEmail())
-            if psList != [] and psList is not None:
-                notif = _PendingConfManagerNotification( psList )
-                mail.GenericMailer.send( notif )
-
-class _PendingConfManagerNotification(_PendingNotification):
-    def getBody( self ):
-        # we go to the login page since local registration might be disabled
-        # in the future it would be nice to use a different messages depending
-        # if local identities are enabled or not
-        url = url_for_register()
-        return """
-    You have been added as manager of the following Event:%s
-    And modification rights have been granted to you.
-    Please create an account in Indico in order to use these rights. You can create your account at the following URL:
-
-    <%s>
-
-    *Note that you must use this email address %s when creating the account*
-
-    Best Regards.
-
-    --
-    Indico"""%( self._getParticipations(), url, self._psList[0].getEmail() )
-
-    def _getParticipations(self):
-        participations="\n\n"
-        for conf in self._participationsByConf.keys():
-            participations+="""\t\t\t- "Event" \"%s\":\n"""%conf.getTitle()
-            accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
-            participations+="\t\t\t- Access: %s\n" % accessURL
-        return participations
-
-
-#---END MANAGERS
-
 #---PENDING COORDINATORS
 class PendingCoordinatorsHolder(PendingHolder):
 
@@ -525,36 +455,6 @@ class ConfPendingQueuesMgr(Persistent):
             self._pendingCoordinators={}
         return self._pendingCoordinators
 
-    def getPendingConfManagersKeys(self, sort=False):
-        if sort:
-            from MaKaC.conference import ConferenceChair
-            # return keys of contribution participants sorted by name
-            keys=[]
-            vl=[]
-            # flatten the list of lists
-            for v in self.getPendingConfManagers().values()[:]:
-                vl.extend(v)
-            # sort
-            vl.sort(ConferenceChair._cmpFamilyName)
-            for v in vl:
-                email=v.getEmail().lower().strip()
-                if email not in keys:
-                    keys.append(email)
-            return keys
-        else:
-            keys=self.getPendingConfManagers().keys()
-        return keys
-
-    def getPendingConfManagersByEmail(self, email):
-        email=email.lower().strip()
-        if self.getPendingConfManagers().has_key(email):
-            return self._pendingConfManagers[email]
-        return []
-
-    def isPendingConfManager(self, cp):
-        email=cp.getEmail().lower().strip()
-        return cp in self.getPendingConfManagersByEmail(email)
-
     #----Pending queue for conference submitters-----
 
     def getPendingConfSubmittersKeys(self, sort=False):
@@ -587,28 +487,6 @@ class ConfPendingQueuesMgr(Persistent):
         from MaKaC.conference import Conference
         if isinstance(owner, Conference):
             self.removePendingConfSubmitter(ps)
-
-    def addPendingConfManager(self, ps, sendEmail=True):
-        email=ps.getEmail().lower().strip()
-        if self.getPendingConfManagers().has_key(email):
-            if not ps in self._pendingConfManagers[email]:
-                self._pendingConfManagers[email].append(ps)
-        else:
-            self._pendingConfManagers[email] = [ps]
-        pendings=PendingConfManagersHolder()
-        pendings.addPending(ps, sendEmail)
-        self.notifyModification()
-
-    def removePendingConfManager(self, ps):
-        email=ps.getEmail().lower().strip()
-        if self.getPendingConfManagers().has_key(email):
-            if ps in self._pendingConfManagers[email]:
-                self._pendingConfManagers[email].remove(ps)
-                pendings=PendingConfManagersHolder()
-                pendings.removePending(ps)
-            if self._pendingConfManagers[email] == []:
-                del self._pendingConfManagers[email]
-            self.notifyModification()
 
     def addPendingConfSubmitter(self, ps, sendEmail=True):
         email=ps.getEmail().lower().strip()

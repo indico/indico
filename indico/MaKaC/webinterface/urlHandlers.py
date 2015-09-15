@@ -1732,10 +1732,6 @@ class UHConfModifPendingQueuesActionConfSubm(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues-actionConfSubmitters'
 
 
-class UHConfModifPendingQueuesActionConfMgr(URLHandler):
-    _endpoint = 'event_mgmt.confModifPendingQueues-actionConfManagers'
-
-
 class UHConfModifPendingQueuesActionSubm(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues-actionSubmitters'
 

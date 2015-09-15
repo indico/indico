@@ -42,9 +42,6 @@ event_mgmt.add_url_rule('/lists/pending/submitters', 'confModifPendingQueues-act
 event_mgmt.add_url_rule('/lists/pending/conf-submitters', 'confModifPendingQueues-actionConfSubmitters',
                         conferenceModif.RHConfModifPendingQueuesActionConfSubm, methods=('POST',),
                         defaults={'tab': 'conf_submitters'})
-event_mgmt.add_url_rule('/lists/pending/conf-managers', 'confModifPendingQueues-actionConfManagers',
-                        conferenceModif.RHConfModifPendingQueuesActionConfMgr, methods=('POST',),
-                        defaults={'tab': 'conf_managers'})
 event_mgmt.add_url_rule('/lists/pending/managers', 'confModifPendingQueues-actionManagers',
                         conferenceModif.RHConfModifPendingQueuesActionMgr, methods=('POST',),
                         defaults={'tab': 'managers'})
