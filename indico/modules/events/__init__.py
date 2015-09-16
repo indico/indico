@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect
+from flask import request, redirect, flash
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -29,6 +29,7 @@ from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.util.i18n import ngettext
 from indico.util.string import is_legacy_id
 
 
@@ -74,7 +75,11 @@ def _merge_users(target, source, **kwargs):
 @signals.users.email_added.connect
 def _convert_email_principals(user, **kwargs):
     from indico.modules.events.models.principals import EventPrincipal
-    EventPrincipal.replace_email_with_user(user, 'event_new')
+    events = EventPrincipal.replace_email_with_user(user, 'event_new')
+    if events:
+        num = len(events)
+        flash(ngettext("You have been granted manager privileges for an event.",
+                       "You have been granted manager privileges for {} events.", num).format(num), 'info')
 
 
 @signals.acl.entry_changed.connect_via(Event)

@@ -290,15 +290,19 @@ class PrincipalMixin(object):
         :param relationship_attr: The name of the relationship pointing
                                   to the object associated with the ACL
                                   entry.
+        :return: The set of objects where the user has been added to
+                 the ACL.
         """
         assert cls.allow_emails
+        updated = set()
         backref_attr = getattr(cls, relationship_attr).property.back_populates  # object->acl relationship name
         query = (cls
                  .find(cls.email.in_(user.all_emails))
                  .options(noload('user'), noload('local_group'), joinedload('event_new').load_only('id')))
         for entry in query:
+            parent = getattr(entry, relationship_attr)
             existing = (cls.query
-                        .with_parent(getattr(entry, relationship_attr), backref_attr)
+                        .with_parent(parent, backref_attr)
                         .options(noload('user'), noload('local_group'))
                         .filter_by(principal=user)
                         .first())
@@ -307,7 +311,9 @@ class PrincipalMixin(object):
             else:
                 existing.merge_privs(entry)
                 db.session.delete(entry)
+            updated.add(parent)
         db.session.flush()
+        return updated
 
 
 class PrincipalRolesMixin(PrincipalMixin):
