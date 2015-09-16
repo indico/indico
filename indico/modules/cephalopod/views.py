@@ -22,9 +22,7 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 class WPCephalopod(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'cephalopod/'
+    sidemenu_option = 'cephalopod'
 
     def getJSFiles(self):
         return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['cephalopod'].setActive()

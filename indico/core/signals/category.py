@@ -19,11 +19,6 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-management_sidemenu = _signals.signal('management-sidemenu', """
-Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
-the category management side menu. The *sender* is the category object.
-""")
-
 moved = _signals.signal('moved', """
 Called when the parent of a category is changed. The `sender` is the category,
 the old/new parents are passed using the `old_parent` and `new_parent` kwargs.

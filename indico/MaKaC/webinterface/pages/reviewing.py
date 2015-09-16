@@ -29,6 +29,7 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     """
 
     _userData = ['favorite-user-list']
+    sidemenu_option = 'paper_reviewing'
 
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target)
@@ -81,9 +82,6 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
     def _getTabContent(self, params):
         return "nothing"
-
-    def _setActiveSideMenuItem(self):
-        self._reviewingMenuItem.setActive()
 
     def _setActiveTab(self):
         pass

@@ -22,7 +22,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.settings import EventSettingsProxy
 from indico.web.flask.util import url_for
-
+from indico.web.menu import SideMenuItem
 
 logger = Logger.get('events.features')
 event_settings = EventSettingsProxy('features', {
@@ -30,9 +30,8 @@ event_settings = EventSettingsProxy('features', {
 })
 
 
-@signals.event_management.sidemenu_advanced.connect
-def _extend_event_management_menu(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     if not event.as_event.can_manage(session.user, allow_key=True):
         return
     return 'features', SideMenuItem('Features', url_for('event_features.index', event), section='advanced')

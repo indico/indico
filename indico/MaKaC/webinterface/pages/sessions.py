@@ -122,14 +122,12 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
                self._includeJSPackage('MaterialEditor') + \
                self._includeJSPackage('Timetable')
 
-class WPSessionModifBase( WPConferenceModifBase ):
+class WPSessionModifBase(WPConferenceModifBase):
+    sidemenu_option = 'timetable'
 
     def __init__(self, rh, session, **kwargs):
         WPConferenceModifBase.__init__(self, rh, session.getConference(), **kwargs)
         self._session = session
-
-    def _setActiveSideMenuItem( self ):
-        self._timetableMenuItem.setActive()
 
     def _createTabCtrl( self ):
         type = self._session.getConference().getType()

@@ -761,6 +761,7 @@ class WPRegistrantBase( WPConferenceModifBase ):
 
 
 class WPRegistrantModifBase( WPRegistrantBase ):
+    sidemenu_option = 'registration'
 
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": True}
@@ -789,9 +790,6 @@ class WPRegistrantModifBase( WPRegistrantBase ):
     def getCSSFiles(self):
         return WPRegistrantBase.getCSSFiles(self) + \
             self._asset_env['registrationform_sass'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self._regFormMenuItem.setActive(True)
 
     def _getPageContent( self, params ):
         self._createTabCtrl()

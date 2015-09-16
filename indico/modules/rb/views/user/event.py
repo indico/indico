@@ -27,14 +27,13 @@ from MaKaC.webinterface.wcomponents import TabControl, WTabControl, WTemplated
 
 
 class WPRoomBookingEventBase(WPRoomBookingHeadContentMixin, WPConferenceModifBase):
+    sidemenu_option = 'room_booking'
+
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self._roomBookingMenuItem.setActive()
 
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()

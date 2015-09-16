@@ -26,7 +26,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import MenuItem
+from indico.web.menu import MenuItem, SideMenuItem
 
 
 class IndicoOAuth2Provider(OAuth2Provider):
@@ -41,9 +41,8 @@ oauth = IndicoOAuth2Provider()
 logger = Logger.get('oauth')
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'applications', SideMenuItem('Applications', url_for('oauth.apps'), section='security')
 
 

@@ -37,13 +37,13 @@ from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
 # indico
-from indico.core import signals
 from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.users import User
 from indico.util.i18n import _, i18nformat, get_all_locales
-from indico.util.signals import values_from_signal
+from indico.web.menu import render_sidemenu
+
 
 
 class WPAdminsBase(WPMainBase):
@@ -70,80 +70,19 @@ class WPAdminsBase(WPMainBase):
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
                              "tabControl": self._getTabControl() } )
 
-    def _createSideMenu(self):
-        self._sideMenu = wcomponents.ManagementSideMenu()
-
-        mainSection = wcomponents.SideMenuSection(id='general')
-        securitySection = wcomponents.SideMenuSection(_('Security'), id='security', icon='icon-shield')
-        userManagementSection = wcomponents.SideMenuSection(_('User management'), id='user_management',
-                                                            icon='icon-users')
-        pluginsSection = wcomponents.SideMenuSection(_('Plugins'), id='plugins', icon='icon-settings')
-        customizationSection = wcomponents.SideMenuSection(_('Customization'), id='customization', icon='icon-wrench')
-        integrationSection = wcomponents.SideMenuSection(_('Integration'), id='integration', icon='icon-earth')
-
-        self._sideMenu.addSection(mainSection)
-        self._sideMenu.addSection(securitySection)
-        self._sideMenu.addSection(userManagementSection)
-        self._sideMenu.addSection(pluginsSection)
-        self._sideMenu.addSection(customizationSection)
-        self._sideMenu.addSection(integrationSection)
-
-        self._generalSettingsMenuItem = wcomponents.SideMenuItem(
-            _("General settings"),
-            urlHandlers.UHAdminArea.getURL(), section='general')
-        self._sideMenu.addItem(self._generalSettingsMenuItem)
-
-        self._domainsMenuItem = wcomponents.SideMenuItem(
-            _("IP Domains"),
-            urlHandlers.UHDomains.getURL(), section='security')
-        self._sideMenu.addItem(self._domainsMenuItem)
-
-        self._templatesMenuItem = wcomponents.SideMenuItem(
-            _("Layout"),
-            urlHandlers.UHAdminLayoutGeneral.getURL(), section='customization')
-        self._sideMenu.addItem(self._templatesMenuItem)
-
-        self._ipProtectionMenuItem = wcomponents.SideMenuItem(
-            _("IP-based ACL"),
-            urlHandlers.UHIPBasedACL.getURL(), section='security')
-        self._sideMenu.addItem(self._ipProtectionMenuItem)
-
-        self._homepageMenuItem = wcomponents.SideMenuItem(
-            _("Homepage"),
-            urlHandlers.UHUpdateNews.getURL(), section='customization')
-        self._sideMenu.addItem(self._homepageMenuItem)
-
-        self._systemMenuItem = wcomponents.SideMenuItem(
-            _("System"),
-            urlHandlers.UHAdminsSystem.getURL(), section='general')
-        self._sideMenu.addItem(self._systemMenuItem)
-
-        self._protectionMenuItem = wcomponents.SideMenuItem(
-            _("Protection"),
-            urlHandlers.UHAdminsProtection.getURL(), section='security')
-        self._sideMenu.addItem(self._protectionMenuItem)
-
-        self.extra_menu_items = {}
-        for name, item in sorted(values_from_signal(signals.admin_sidemenu.send()),
-                                 key=lambda x: x[1]._title):
-            self.extra_menu_items[name] = item
-            self._sideMenu.addItem(item)
-
-    def _getBody( self, params ):
-        self._createSideMenu()
-        self._setActiveSideMenuItem()
-
+    def _getBody(self, params):
         self._createTabCtrl()
         self._setActiveTab()
 
         frame = WAdminFrame()
-        p = { "body": self._getPageContent( params ),
-              "sideMenu": self._sideMenu.getHTML() }
 
-        return frame.getHTML( p )
+        return frame.getHTML({
+            "body": self._getPageContent(params),
+            "sideMenu": render_sidemenu('admin-sidemenu', active_item=self.sidemenu_option, old_style=True)
+        })
 
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_("Server Admin"), urlHandlers.UHAdminArea.getURL, bgColor="white" )
+        return wcomponents.WSimpleNavigationDrawer(_("Server Admin"), urlHandlers.UHAdminArea.getURL, bgColor="white")
 
     def _createTabCtrl(self):
         pass
@@ -152,9 +91,6 @@ class WPAdminsBase(WPMainBase):
         return "nothing"
 
     def _setActiveTab(self):
-        pass
-
-    def _setActiveSideMenuItem(self):
         pass
 
     def _getPageContent(self, params):
@@ -221,13 +157,11 @@ class WAdminFrame(wcomponents.WTemplated):
 
 
 class WPAdmins(WPAdminsBase):
+    sidemenu_option = 'general'
 
     def getJSFiles(self):
         # Cephalopod is needed to check if the data is synced.
         return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self._generalSettingsMenuItem.setActive()
 
     def _getPageContent(self, params):
         wc = WAdmins()
@@ -258,8 +192,7 @@ class WPGenInfoModification(WPAdmins):
 
 
 class WPHomepageCommon( WPAdminsBase ):
-    def _setActiveSideMenuItem(self):
-        self._homepageMenuItem.setActive()
+    sidemenu_option = 'homepage'
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
@@ -345,9 +278,7 @@ class WAnnouncementModif(wcomponents.WTemplated):
 
 
 class WPServicesCommon(WPAdminsBase):
-
-    def _setActiveSideMenuItem(self):
-        self._ipProtectionMenuItem.setActive()
+    sidemenu_option = 'ip_acl'
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
@@ -360,9 +291,7 @@ class WPServicesCommon(WPAdminsBase):
 
 
 class WPTemplatesCommon( WPAdminsBase ):
-
-    def _setActiveSideMenuItem(self):
-        self._templatesMenuItem.setActive()
+    sidemenu_option = 'layout'
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
@@ -683,12 +612,11 @@ class WPosterTemplates(WBadgePosterTemplatingBase):
 
 
 class WPDomainBase( WPAdminsBase ):
+    sidemenu_option = 'ip_domains'
 
     def __init__( self, rh ):
         WPAdminsBase.__init__( self, rh )
 
-    def _setActiveSideMenuItem( self ):
-        self._domainsMenuItem.setActive()
 
 class WBrowseDomains( wcomponents.WTemplated ):
 
@@ -859,11 +787,10 @@ class WPDomainCreation( WPDomainBase ):
 
 
 class WPAdminsSystemBase(WPAdminsBase):
+    sidemenu_option = 'storage'
+
     def __init__(self, rh):
         WPAdminsBase.__init__(self, rh)
-
-    def _setActiveSideMenuItem(self):
-        self._systemMenuItem.setActive()
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
@@ -1022,9 +949,7 @@ class WIPBasedACL(wcomponents.WTemplated):
 
 
 class WPAdminProtection(WPAdminsBase):
-
-    def _setActiveSideMenuItem(self):
-        self._protectionMenuItem.setActive()
+    sidemenu_option = 'protection'
 
     def _getPageContent(self, params):
         wc = WAdminProtection()

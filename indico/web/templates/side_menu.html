@@ -1,59 +1,60 @@
 {% macro _side_menu_item(item, classes='', icon='') %}
-    {% if item.isVisible() %}
-        {% if item.isEnabled() %}
-            {% if item.isActive() %}
+    {% if item.visible %}
+        {% if item.disabled %}
+            {% set classes = classes + 'disabled' %}
+        {% else %}
+            {% if item.active %}
                 {% set classes = classes + ' active' %}
             {% endif %}
-        {% else %}
-            {% set classes = classes + 'disabled' %}
         {% endif %}
-        {% if menu.event and item.event_feature %}
+        {% if event and item.event_feature %}
             {% set classes = classes + ' js-event-feature-{}'.format(item.event_feature) %}
-            {% if not menu.event.has_feature(item.event_feature) %}
+            {% if not event.has_feature(item.event_feature) %}
                 {% set classes = classes + ' weak-hidden' %}
             {% endif %}
         {% endif %}
-        <li class="section-item {{ classes }}">
-        {% if item.isEnabled() %}
-            <a class="title {{ icon }}" href="{{ item.getURL() }}">{{ item.getTitle() }}</a>
+        <li class="item {{ classes }}">
+        {% if item.disabled %}
+            <span class="title">{{ item.title }}</span>
         {% else %}
-            <span class="title">{{ item.getTitle() }}</span>
+            <a class="title {{ icon if icon }}" href="{{ item.url }}">{{ item.title }}</a>
         {% endif %}
         </li>
     {% endif %}
 {% endmacro %}
 
 {% macro _side_menu_section(section) %}
-    {% if section.getItems() and section.isVisible() %}
-        {% if section.getItems() | length == 1 %}
-            {{ _side_menu_item(section.getItems()[0], classes="section top-level-item", icon=section.icon) }}
-        {% elif section.getTitle() is none %}
-            {% for item in section.getItems() %}
-                {{ _side_menu_item(item, classes="section section-title top-level-item", icon="no-icon") }}
-            {% endfor %}
-        {% else %}
-            <li class="section expandable {{ 'collapsed' if not section.isActive() }}">
-                <div class="section-title">
-                    <span class="title {{ section.icon }}">{{ section.getTitle() }}</span>
-                </div>
-                <ul>
-                    {% for item in section.getItems() %}
-                        {{ _side_menu_item(item) }}
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endif %}
+    {% if section.items and section.visible %}
+        <li class="section {{ 'collapsed' if not section.active }}">
+            <div class="title-wrapper">
+                <span class="title {{ section.icon }}">{{ section.title }}</span>
+            </div>
+            <ul>
+                {% for item in section.items %}
+                    {{ _side_menu_item(item) }}
+                {% endfor %}
+            </ul>
+        </li>
     {% endif %}
 {% endmacro %}
 
-<ul>
-    {% for section in menu.getSections() %}
-        {{ _side_menu_section(section) }}
-    {% endfor %}
-</ul>
+<div class="side-menu {{ 'old-style-menu' if event or old_style }}" >
+    {% if event or old_style %}
+        <div class="corner"></div>
+    {% endif %}
+    <ul class="menu-items">
+        {% for item in items %}
+            {% if item.items %}
+                {{ _side_menu_section(item) }}
+            {% else %}
+                {{ _side_menu_item(item, icon=item.icon) }}
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
 
 <script>
-    $('.section-title').on('click', function() {
+    $('.section .title-wrapper').on('click', function() {
         $(this)
         .next('ul').slideToggle(300)
         .parent().toggleClass('collapsed');

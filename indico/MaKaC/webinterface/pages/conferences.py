@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import collections
-from flask import session, request
+from flask import session, request, render_template
 import os
 import re
 
@@ -72,6 +72,7 @@ from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
+from indico.web.menu import render_sidemenu
 
 LECTURE_SERIES_RE = re.compile(r'^part\d+$')
 
@@ -164,7 +165,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                              "confId": self._conf.getId(), \
                              "dark": True} )
 
-    def _get_active_menu_entry(self):
+    @property
+    def sidemenu_option(self):
         if not self.menu_entry_name:
             return None
         name = build_menu_entry_name(self.menu_entry_name, self.menu_entry_plugin)
@@ -196,7 +198,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             "currentURL": request.url,
             "nowHappening": drawer.getNowHappeningHTML(),
             "simpleTextAnnouncement": drawer.getSimpleText(),
-            'active_menu_entry_id': self._get_active_menu_entry()
+            'active_menu_entry_id': self.sidemenu_option
         }
         if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
@@ -1012,174 +1014,25 @@ class WPConferenceModifBase(main.WPMainBase):
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
 
     def _createSideMenu(self):
-        self._sideMenu = wcomponents.ManagementSideMenu(event=self._conf)
-
-        # The main section containing most menu items
-        self._generalSection = wcomponents.SideMenuSection(id='general', icon='icon-settings')
-        self._timetableSection = wcomponents.SideMenuSection(id='timetable', icon='icon-calendar')
-        self._materialsSection = wcomponents.SideMenuSection(id='materials', icon='icon-upload')
-        self._roomBookingSection = wcomponents.SideMenuSection(id='room_booking', icon='icon-location')
-        self._advancedOptionsSection = wcomponents.SideMenuSection(_("Advanced options"), id='advanced',
-                                                                   icon='icon-lamp')
-        self._organizationSection = wcomponents.SideMenuSection(_("Organization"), id='organization', icon='icon-list',
-                                                                active=True)
-        self._customizationSection = wcomponents.SideMenuSection(_("Customization"), id='customization',
-                                                                 icon='icon-image')
-        self._protectionSection = wcomponents.SideMenuSection(id='protection', icon='icon-shield')
-
-        self._sideMenu.addSection(self._generalSection)
-        self._sideMenu.addSection(self._timetableSection)
-        self._sideMenu.addSection(self._materialsSection)
-        self._sideMenu.addSection(self._roomBookingSection)
-        self._sideMenu.addSection(self._organizationSection)
-        self._sideMenu.addSection(self._advancedOptionsSection)
-        self._sideMenu.addSection(self._protectionSection)
-        self._sideMenu.addSection(self._customizationSection)
-
-        self._generalSettingsMenuItem = wcomponents.SideMenuItem(
-            _("General settings"),
-            urlHandlers.UHConferenceModification.getURL(self._conf), section='general')
-        self._sideMenu.addItem(self._generalSettingsMenuItem)
-
-        self._timetableMenuItem = wcomponents.SideMenuItem(
-            _("Timetable"),
-            urlHandlers.UHConfModifSchedule.getURL(self._conf), section='timetable')
-        self._sideMenu.addItem(self._timetableMenuItem)
-
-        self._roomBookingMenuItem = wcomponents.SideMenuItem(
-            _("Room booking"),
-            url_for('event_mgmt.rooms_booking_list', self._conf), section='room_booking')
-        self._sideMenu.addItem(self._roomBookingMenuItem)
-
-        self._programMenuItem = wcomponents.SideMenuItem(
-            _("Programme"),
-            urlHandlers.UHConfModifProgram.getURL(self._conf), section='organization')
-        self._sideMenu.addItem(self._programMenuItem)
-
-        self._regFormMenuItem = wcomponents.SideMenuItem(
-            _("Registration"),
-            urlHandlers.UHConfModifRegForm.getURL(self._conf), section='organization')
-        self._sideMenu.addItem(self._regFormMenuItem)
-
-        self._abstractMenuItem = wcomponents.SideMenuItem(
-            _("Abstracts"),
-            urlHandlers.UHConfModifCFA.getURL(self._conf), section='organization')
-        self._sideMenu.addItem(self._abstractMenuItem)
-
-        self._contribListMenuItem = wcomponents.SideMenuItem(
-            _("Contributions"),
-            urlHandlers.UHConfModifContribList.getURL(self._conf), section='organization')
-        self._sideMenu.addItem(self._contribListMenuItem)
-
-        self._reviewingMenuItem = wcomponents.SideMenuItem(
-            _("Paper Reviewing"),
-            urlHandlers.UHConfModifReviewingAccess.getURL(target=self._conf), section='organization')
-        self._sideMenu.addItem(self._reviewingMenuItem)
-
-        self._participantsMenuItem = wcomponents.SideMenuItem(
-            _("Participants"),
-            urlHandlers.UHConfModifParticipants.getURL(self._conf), section='organization')
-        self._sideMenu.addItem(self._participantsMenuItem)
-
-        self.extra_menu_items = {}
-        for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
-                                 key=lambda x: x[1]._title):
-            self.extra_menu_items[name] = item
-            self._sideMenu.addItem(item)
-
-        self._listingsMenuItem = wcomponents.SideMenuItem(
-            _("Lists"),
-            urlHandlers.UHConfAllSpeakers.getURL(self._conf), section='advanced')
-        self._sideMenu.addItem(self._listingsMenuItem)
-
-        self._ACMenuItem = wcomponents.SideMenuItem(
-            _("Protection"),
-            urlHandlers.UHConfModifAC.getURL(self._conf), section='protection')
-        self._sideMenu.addItem(self._ACMenuItem)
-
-        self._toolsMenuItem = wcomponents.SideMenuItem(
-            _("Utilities"),
-            urlHandlers.UHConfModifTools.getURL(self._conf), section='advanced')
-        self._sideMenu.addItem(self._toolsMenuItem)
-
-        self.extra_menu_items_advanced = {}
-        for name, item in sorted(values_from_signal(signals.event_management.sidemenu_advanced.send(self._conf)),
-                                 key=lambda x: x[1]._title):
-            self.extra_menu_items_advanced[name] = item
-            self._sideMenu.addItem(item)
-
-        #we decide which side menu item appear and which don't
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReviewingStaff
-
-        canModify = self._conf.canModify(self._rh.getAW())
-        isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
-        isPRM = RCPaperReviewManager.hasRights(self._rh)
-        #isAM = RCAbstractManager.hasRights(self._rh)
-        isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
-
-        if not canModify:
-            self._generalSettingsMenuItem.setVisible(False)
-            self._timetableMenuItem.setVisible(False)
-            self._programMenuItem.setVisible(False)
-            self._participantsMenuItem.setVisible(False)
-            self._listingsMenuItem.setVisible(False)
-            self._ACMenuItem.setVisible(False)
-            self._toolsMenuItem.setVisible(False)
-
-        if not (Config.getInstance().getIsRoomBookingActive() and canModify):
-            self._roomBookingMenuItem.setVisible(False)
-
-        #if not (self._conf.hasEnabledSection("cfa") and (canModify or isAM)):
-        if not (self._conf.hasEnabledSection("cfa") and (canModify)):
-            self._abstractMenuItem.setVisible(False)
-
-        if not (canModify or isPRM):
-            self._contribListMenuItem.setVisible(False)
-
-        if not (self._conf.hasEnabledSection("regForm") and (canModify or isRegistrar)):
-            self._regFormMenuItem.setVisible(False)
-
-        if not (self._conf.getType() == "conference" and (canModify or isReviewingStaff)):
-            self._reviewingMenuItem.setVisible(False)
-        else: #reviewing tab is enabled
-            if isReviewingStaff and not canModify:
-                self._reviewingMenuItem.setVisible(True)
-        # For now we don't want the paper reviewing to be displayed
-        #self._reviewingMenuItem.setVisible(False)
-
-        #we hide the Advanced Options section if it has no items
-        if not self._advancedOptionsSection.hasVisibleItems():
-            self._advancedOptionsSection.setVisible(False)
-
-        # we disable the Participants section for events of type conference
-        if self._conf.getType() == 'conference':
-            self._participantsMenuItem.setVisible(False)
-
-        wf = self._rh.getWebFactory()
-        if wf:
-            wf.customiseSideMenu( self )
-
-    def _setActiveSideMenuItem( self ):
         pass
 
-    def _applyFrame( self, body ):
-        frame = wcomponents.WConferenceModifFrame( self._conf, self._getAW())
+    def _applyFrame(self, body):
+        frame = wcomponents.WConferenceModifFrame(self._conf, self._getAW())
 
-        sideMenu = self._sideMenu.getHTML()
+        params = {
+            "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL,
+            "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL,
+            "event": "Conference",
+            "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option, old_style=True,
+                                        event=self._conf)
+        }
 
-        p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-              "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
-              "event": "Conference",
-              "sideMenu": sideMenu }
         wf = self._rh.getWebFactory()
         if wf:
-            p["event"]=wf.getName()
-        return frame.getHTML( body, **p )
+            params["event"] = wf.getName()
+        return frame.getHTML(body, **params)
 
     def _getBody( self, params ):
-        self._createSideMenu()
-        self._setActiveSideMenuItem()
-
         return self._applyFrame( self._getPageContent( params ) )
 
     def _getTabContent( self, params ):
@@ -1188,7 +1041,10 @@ class WPConferenceModifBase(main.WPMainBase):
     def _getPageContent( self, params ):
         return "nothing"
 
+
 class WPConferenceModifAbstractBase( WPConferenceModifBase ):
+
+    sidemenu_option = 'abstracts'
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
@@ -1223,9 +1079,6 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
         self._createTabCtrl()
 
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-    def _setActiveSideMenuItem(self):
-        self._abstractMenuItem.setActive()
 
     def _getTabContent(self, params):
         return "nothing"
@@ -1357,12 +1210,11 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
 
 class WPConferenceModification( WPConferenceModifBase ):
 
+    sidemenu_option = 'general'
+
     def __init__(self, rh, target, ct=None):
         WPConferenceModifBase.__init__(self, rh, target)
         self._ct = ct
-
-    def _setActiveSideMenuItem( self ):
-        self._generalSettingsMenuItem.setActive()
 
     def _getPageContent( self, params ):
         wc = WConfModifMainData(self._conf, self._ct, self._rh)
@@ -1584,16 +1436,15 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
         return vars
 
+
 class WPConfModifScheduleGraphic( WPConferenceModifBase ):
 
+    sidemenu_option = 'timetable'
     _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._contrib = None
-
-    def _setActiveSideMenuItem( self ):
-        self._timetableMenuItem.setActive()
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('Timetable')
@@ -1702,15 +1553,14 @@ class WConfModifAC:
 
 class WPConfModifAC(WPConferenceModifBase):
 
+    sidemenu_option = 'protection'
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._eventType = "conference"
         if self._rh.getWebFactory() is not None:
             self._eventType = self._rh.getWebFactory().getId()
         self._user = self._rh._getUser()
-
-    def _setActiveSideMenuItem(self):
-        self._ACMenuItem.setActive()
 
     def _getPageContent(self, params):
         wc = WConfModifAC(self._conf, self._eventType, self._user)
@@ -1721,8 +1571,7 @@ class WPConfModifAC(WPConferenceModifBase):
 
 class WPConfModifToolsBase(WPConferenceModifBase):
 
-    def _setActiveSideMenuItem(self):
-        self._toolsMenuItem.setActive()
+    sidemenu_option = 'utilities'
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
@@ -1837,6 +1686,8 @@ class WPConfCloneConfirm(WPConfModifToolsBase):
 
 class WPConferenceModifParticipantBase(WPConferenceModifBase):
 
+    sidemenu_option = 'participants'
+
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
 
@@ -1861,9 +1712,6 @@ class WPConferenceModifParticipantBase(WPConferenceModifBase):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('Display')
-
-    def _setActiveSideMenuItem(self):
-        self._participantsMenuItem.setActive()
 
     def _getTabContent(self, params):
         return "nothing"
@@ -2123,12 +1971,11 @@ class WConfModifListings( wcomponents.WTemplated ):
 
 class WPConfModifListings(WPConferenceModifBase):
 
+    sidemenu_option = 'lists'
+
     def __init__(self, rh, conference):
         WPConferenceModifBase.__init__(self, rh, conference)
         self._createTabCtrl()
-
-    def _setActiveSideMenuItem(self):
-        self._listingsMenuItem.setActive()
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
@@ -2697,8 +2544,7 @@ class WConfModifProgram(wcomponents.WTemplated):
 
 class WPConfModifProgram( WPConferenceModifBase ):
 
-    def _setActiveSideMenuItem( self ):
-        self._programMenuItem.setActive()
+    sidemenu_option = 'program'
 
     def _getPageContent( self, params ):
         wc = WConfModifProgram( self._conf )
@@ -2719,9 +2565,6 @@ class WTrackCreation( wcomponents.WTemplated ):
 
 
 class WPConfAddTrack( WPConfModifProgram ):
-
-    def _setActiveSideMenuItem(self):
-        self._programMenuItem.setActive()
 
     def _getPageContent( self, params ):
         p = WTrackCreation( self._conf )
@@ -3446,14 +3289,12 @@ class WFilterCriterionOptionsContribs(wcomponents.WTemplated):
 
 class WPModifContribList( WPConferenceModifBase ):
 
+    sidemenu_option = 'contributions'
     _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def __init__(self, rh, conference, filterUsed=False):
         WPConferenceModifBase.__init__(self, rh, conference)
         self._filterUsed = filterUsed
-
-    def _setActiveSideMenuItem(self):
-        self._contribListMenuItem.setActive(True)
 
     def _getPageContent( self, params ):
         filterCrit=params.get("filterCrit",None)
@@ -3549,13 +3390,12 @@ class WPModMoveContribsToSessionConfirmation(WPModifContribList):
 
 class WPConfEditContribType(WPConferenceModifBase):
 
+    sidemenu_option = 'general'
+
     def __init__(self, rh, ct):
         self._conf = ct.getConference()
         self._contribType = ct
         WPConferenceModifBase.__init__(self, rh, self._conf)
-
-    def _setActiveSideMenuItem(self):
-        self._generalSettingsMenuItem.setActive(True)
 
     def _getPageContent( self, params ):
         wc = WConfEditContribType(self._contribType)
@@ -3577,8 +3417,7 @@ class WConfEditContribType(wcomponents.WTemplated):
 
 class WPConfAddContribType(WPConferenceModifBase):
 
-    def _setActiveSideMenuItem(self):
-        self._generalSettingsMenuItem.setActive(True)
+    sidemenu_option = 'general'
 
     def _getPageContent( self, params ):
         wc = WConfAddContribType()
@@ -4369,12 +4208,11 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
 
 class WPConfModifPendingQueuesBase(WPConfModifListings):
 
+    sidemenu_option = 'lists'
+
     def __init__(self, rh, conf, activeTab=""):
         WPConfModifListings.__init__(self, rh, conf)
         self._activeTab = activeTab
-
-    def _setActiveSideMenuItem(self):
-        self._listingsMenuItem.setActive(True)
 
 
 class WPConfModifPendingQueues(WPConfModifPendingQueuesBase):

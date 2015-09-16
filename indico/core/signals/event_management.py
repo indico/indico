@@ -19,17 +19,6 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-sidemenu = _signals.signal('sidemenu', """
-Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
-the event management side menu. The *sender* is the event object.
-""")
-
-sidemenu_advanced = _signals.signal('sidemenu-advanced', """
-Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to
-be added to the "advanced" area of the event management side menu.
-The *sender* is the event object.
-""")
-
 clone = _signals.signal('clone', """
 Expected to return an instance of a ``EventCloner`` subclass implementing
 the cloning behavior. The *sender* is the event object.

@@ -16,16 +16,10 @@
 
 import os
 
-from flask import session
-
-from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import rb_is_admin
+
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
+from indico.web.menu import render_sidemenu
 
 
 class WPRoomBookingHeadContentMixin:
@@ -41,6 +35,7 @@ class WPRoomBookingHeadContentMixin:
 
 
 class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
+
     def _getTitle(self):
         return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
 
@@ -51,128 +46,7 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         return WPMainBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
 
     def _getSideMenu(self):
-        self._leftMenu = BasicSideMenu(session.user is not None)
-        user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
-        user_is_admin = session.user is not None and rb_is_admin(session.user)
-
-        self._roomsBookingOpt = SideMenuSection(icon='icon-checkmark')
-        self._calendarOpt = SideMenuSection(icon='icon-calendar')
-        self._mapOpt = SideMenuSection(icon='icon-location')
-        self._searchOpt = SideMenuSection(_('Search'), active=True, icon='icon-search')
-        self._roomsOpt = SideMenuSection(_('My Rooms'), visible=user_has_rooms, icon='icon-user')
-        self._bookingsOpt = SideMenuSection(_('My Bookings'), active=True, icon='icon-time')
-        self._blockingsOpt = SideMenuSection(_('Room Blocking'), icon='icon-lock')
-
-        self._bookRoomNewOpt = SideMenuItem(
-            _('Book a Room'),
-            url_for('rooms.book'),
-            enabled=True
-        )
-
-        self._roomMapOpt = SideMenuItem(
-            _('Map of rooms'),
-            urlHandlers.UHRoomBookingMapOfRooms.getURL(),
-            enabled=True
-        )
-
-        self._bookingListCalendarOpt = SideMenuItem(
-            _('Calendar'),
-            url_for('rooms.calendar'),
-            enabled=True
-        )
-
-        self._myBookingListOpt = SideMenuItem(
-            _('My bookings'),
-            url_for('rooms.my_bookings'),
-            enabled=True
-        )
-
-        self._usersBookingsOpt = SideMenuItem(
-            _('Bookings in my rooms'),
-            url_for('rooms.bookings_my_rooms'),
-            enabled=user_has_rooms
-        )
-
-        self._usersPendingBookingsOpt = SideMenuItem(
-            _('Pre-bookings in my rooms'),
-            url_for('rooms.pending_bookings_my_rooms'),
-            enabled=user_has_rooms
-        )
-
-        self._bookingListSearchOpt = SideMenuItem(
-            _('Search bookings'),
-            urlHandlers.UHRoomBookingSearch4Bookings.getURL(),
-            enabled=True
-        )
-
-        self._usersBlockingsOpt = SideMenuItem(
-            _('Blockings for my rooms'),
-            url_for('rooms.blocking_my_rooms', state='pending'),
-            enabled=user_has_rooms
-        )
-
-        self._roomSearchOpt = SideMenuItem(
-            _('Search rooms'),
-            url_for('rooms.search_rooms'),
-            enabled=True
-        )
-
-        self._myRoomListOpt = SideMenuItem(
-            _('Room List'),
-            url_for('rooms.search_my_rooms'),
-            enabled=user_has_rooms
-        )
-
-        self._blockingListOpt = SideMenuItem(
-            _('Blockings'),
-            url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
-            enabled=True
-        )
-
-        self._blockRoomsOpt = SideMenuItem(
-            _('Block rooms'),
-            url_for('rooms.create_blocking')
-        )
-
-        if user_is_admin:
-            self._adminSect = SideMenuSection(
-                _('Administration'),
-                icon='icon-user-chairperson'
-            )
-
-            self._adminOpt = SideMenuItem(
-                _('Administration'),
-                urlHandlers.UHRoomBookingAdmin.getURL()
-            )
-
-        self._roomsBookingOpt.addItem(self._bookRoomNewOpt)
-        default_location = Location.default_location
-        if default_location and default_location.is_map_available:
-            self._mapOpt.addItem(self._roomMapOpt)
-        self._calendarOpt.addItem(self._bookingListCalendarOpt)
-
-        self._searchOpt.addItem(self._roomSearchOpt)
-        self._searchOpt.addItem(self._bookingListSearchOpt)
-        self._bookingsOpt.addItem(self._myBookingListOpt)
-        self._roomsOpt.addItem(self._usersBookingsOpt)
-        self._roomsOpt.addItem(self._usersPendingBookingsOpt)
-        self._roomsOpt.addItem(self._myRoomListOpt)
-        self._blockingsOpt.addItem(self._blockRoomsOpt)
-        self._blockingsOpt.addItem(self._blockingListOpt)
-        self._blockingsOpt.addItem(self._usersBlockingsOpt)
-
-        self._leftMenu.addSection(self._roomsBookingOpt)
-        self._leftMenu.addSection(self._mapOpt)
-        self._leftMenu.addSection(self._calendarOpt)
-        self._leftMenu.addSection(self._bookingsOpt)
-        self._leftMenu.addSection(self._searchOpt)
-        self._leftMenu.addSection(self._roomsOpt)
-        self._leftMenu.addSection(self._blockingsOpt)
-
-        if user_is_admin:
-            self._leftMenu.addSection(self._adminSect)
-            self._adminSect.addItem(self._adminOpt)
-        return self._leftMenu
+        return render_sidemenu('rb-sidemenu', active_item=self.sidemenu_option)
 
     def _isRoomBooking(self):
         return True

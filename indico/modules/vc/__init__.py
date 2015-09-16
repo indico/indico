@@ -29,10 +29,9 @@ from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.util import get_vc_plugins, get_managed_vc_plugins
 from indico.web.flask.templating import get_overridable_template_name, template_hook
 from indico.web.flask.util import url_for
-from indico.web.menu import HeaderMenuEntry
+from indico.web.menu import HeaderMenuEntry, SideMenuItem
 from indico.util.i18n import _
 from MaKaC.conference import EventCloner
-from MaKaC.webinterface.wcomponents import SideMenuItem
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 
@@ -54,13 +53,14 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
         return render_template(name, event=event, event_vc_room=event_vc_room, **kwargs)
 
 
-@signals.event_management.sidemenu.connect
-def _extend_event_management_menu(event, **kwargs):
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     if not get_vc_plugins():
         return
     if not event.as_event.can_manage(session.user, allow_key=True):
         return
-    return 'vc', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event), section='organization')
+    return 'videoconference', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
+                                           section='organization')
 
 
 @signals.event.sidemenu.connect

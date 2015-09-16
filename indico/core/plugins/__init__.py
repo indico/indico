@@ -42,6 +42,7 @@ from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
+from indico.web.menu import SideMenuItem
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 
@@ -370,10 +371,9 @@ class WPJinjaMixinPlugin(WPJinjaMixin):
     render_template_func = staticmethod(render_plugin_template)
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'plugins', SideMenuItem(_("Plugins"), url_for('plugins.index'), section='plugins')
+    return 'plugins', SideMenuItem(_("Plugins"), url_for('plugins.index'), 80, icon='puzzle')
 
 
 plugin_engine = IndicoPluginEngine()

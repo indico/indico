@@ -27,6 +27,7 @@ from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.layout')
@@ -48,9 +49,8 @@ layout_settings = EventSettingsProxy('layout', {
 }, preload=True)
 
 
-@signals.event_management.sidemenu_advanced.connect
-def _extend_event_management_menu_layout(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu_layout(sender, event, **kwargs):
     if not event.as_event.can_manage(session.user, allow_key=True):
         return
     if event.getType() == 'conference':

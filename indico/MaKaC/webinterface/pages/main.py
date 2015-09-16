@@ -25,16 +25,10 @@ from MaKaC.conference import Category, Conference
 
 
 class WPMainBase(base.WPDecorated):
-
-    def _createMenu( self ):
-        self._showAdmin = self._isAdmin or self._isCategoryManager
-
-    def _setCurrentMenuItem( self ):
-        return
+    sidemenu_option = None
 
     def _display( self, params ):
         sideMenu = self._getSideMenu()
-        self._setCurrentMenuItem()
 
         # Check if user is administrator
         self._isAdmin = session.user and session.user.is_admin
@@ -75,7 +69,10 @@ class WMainBase(wcomponents.WTemplated):
 
         vars["sideMenu"] = None
         if self._sideMenu:
-            vars["sideMenu"] = self._sideMenu.getHTML()
+            if isinstance(self._sideMenu, basestring):
+                vars["sideMenu"] = self._sideMenu
+            else:
+                vars["sideMenu"] = self._sideMenu.getHTML()
 
         vars["navigation"] = ""
         if self._navigation:

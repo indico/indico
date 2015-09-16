@@ -70,7 +70,5 @@ class WPUserDashboard(WPUser):
 
 
 class WPUsersAdmin(WPJinjaMixin, WPAdminsBase):
+    sidemenu_option = 'users'
     template_prefix = 'users/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['users'].setActive()

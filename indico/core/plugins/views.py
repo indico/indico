@@ -22,6 +22,4 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 class WPPlugins(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'plugins/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['plugins'].setActive()
+    sidemenu_option = 'plugins'
