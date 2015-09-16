@@ -17,9 +17,25 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.models.items import RegistrationFormSection
+from indico.web.forms.base import IndicoForm
 
 
 def get_event_section_data(regform):
     sections = (RegistrationFormSection.find(registration_form=regform, is_deleted=False)
                                        .order_by(RegistrationFormSection.position))
     return [s.view_data for s in sections]
+
+
+def make_registration_form(regform):
+    """Creates a WTForm based on registration form fields"""
+
+    form_class = type(b'RegistrationFormWTForm', (IndicoForm,), {})
+    form_items = [field for field in regform.form_items if field.parent_id and not field.is_deleted
+                  and field.is_enabled and not field.parent.is_deleted and field.parent.is_enabled]
+    for form_item in form_items:
+        field_impl = form_item.wtf_field
+        if field_impl is None:
+            continue
+        name = '*genfield*{}-{}'.format(form_item.parent_id, form_item.id)
+        setattr(form_class, name, field_impl.create_wtf_field())
+    return form_class
