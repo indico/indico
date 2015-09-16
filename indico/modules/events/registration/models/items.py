@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.events.registration.fields import get_field_types
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
@@ -152,6 +153,10 @@ class RegistrationFormItem(db.Model):
     def view_data(self):
         """Returns object with data that Angular can understand"""
         return dict(id=self.id, description=self.description, lock=[])
+
+    @property
+    def wtf_field(self):
+        return get_field_types()[self.current_data.data['input']](self)
 
     @return_ascii
     def __repr__(self):
