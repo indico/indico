@@ -24,7 +24,7 @@ from indico.modules.events.logs.renderers import SimpleRenderer, EmailRenderer
 from indico.modules.events.logs.util import get_log_renderers
 from indico.web.flask.util import url_for
 
-__all__ = ['EventLogEntry', 'EventLogKind']
+__all__ = ['EventLogEntry', 'EventLogKind', 'EventLogRealm']
 
 
 @signals.event_management.sidemenu_advanced.connect
