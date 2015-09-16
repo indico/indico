@@ -21,7 +21,6 @@ from email.mime.text import MIMEText
 from email import charset
 
 from indico.core.config import Config
-from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.string import to_unicode
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
@@ -146,6 +145,7 @@ class GenericMailer:
 
     @classmethod
     def sendAndLog(cls, notification, conference, module=None, user=None, skipQueue=False):
+        from indico.modules.events.logs import EventLogRealm, EventLogKind
         if isinstance(notification, dict):
             # Wrap a raw dictionary in a notification class
             from MaKaC.webinterface.mail import GenericNotification
