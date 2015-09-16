@@ -17,7 +17,7 @@
 from itertools import ifilter
 from flask_pluginengine import plugin_context
 from sqlalchemy import inspect
-from sqlalchemy.orm import lazyload, joinedload
+from sqlalchemy.orm import lazyload, joinedload, noload
 from werkzeug.urls import url_parse
 
 from indico.modules.rb.models.reservations import Reservation
@@ -2131,9 +2131,10 @@ class Conference(CommonObjectBase, Locatable):
     def getRoomBookingList(self):
         """Returns list of bookings for this conference."""
         # In case anyone wonders why this method is still here: Various fossils expect/use it.
-        if not self.getId().isdigit():
-            return []
-        return Reservation.find_all(event_id=int(self.getId()))
+        return (Reservation
+                .find(event_id=int(self.getId()))
+                .options(noload('created_by_user'), noload('booked_for_user'))
+                .all())
 
     # ========================================================================
 

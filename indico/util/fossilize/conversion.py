@@ -179,7 +179,9 @@ class Conversion(object):
     def reservationsList(cls, resvs):
         res = defaultdict(list)
         for resv in resvs:
-            occurrences = resv.occurrences.filter(ReservationOccurrence.is_valid)
+            occurrences = (resv.occurrences
+                           .filter(ReservationOccurrence.is_valid)
+                           .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY))
             res[resv.room.full_name] += [{'startDateTime': cls.datetime(occ.start_dt),
                                           'endDateTime': cls.datetime(occ.end_dt)}
                                          for occ in occurrences]
