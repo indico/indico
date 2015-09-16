@@ -309,6 +309,9 @@ class ProtectionManagersMixin(ProtectionMixin):
                 new_roles |= add_roles
             if del_roles:
                 new_roles -= del_roles
+        invalid_roles = new_roles - get_available_roles(type(self)).viewkeys()
+        if invalid_roles:
+            raise ValueError('Invalid roles: {}'.format(', '.join(invalid_roles)))
         entry.roles = sorted(new_roles)
         # update read privs
         if read_access is not None:
