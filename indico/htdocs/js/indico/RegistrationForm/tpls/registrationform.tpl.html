@@ -23,6 +23,7 @@
             <span>{{ ' are mandantory' | i18n }})</span>
         </div>
         <div ng-switch="updateMode">
+            <input type="hidden" value="{{ csrfToken }}" name="csrf_token">
             <input type="submit" id="regformSubmit"
                  ng-switch-default class="i-button highlight" value="{{ 'Register' | i18n }}">
             <input type="submit" id="regformSubmit"

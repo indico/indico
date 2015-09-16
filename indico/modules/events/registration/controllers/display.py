@@ -28,6 +28,9 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
+
+    CSRF_ENABLED = True
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.event = self._conf
