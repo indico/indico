@@ -23,7 +23,7 @@ from indico.modules.api.models.keys import APIKey
 from indico.util.i18n import _
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
-from indico.web.menu import MenuItem
+from indico.web.menu import MenuItem, SideMenuItem
 
 
 __all__ = ('settings',)
@@ -66,9 +66,8 @@ def _merge_users(target, source, **kwargs):
             ak_merged.user = target
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'api', SideMenuItem(_("API"), url_for('api.admin_settings'), section='integration')
 
 

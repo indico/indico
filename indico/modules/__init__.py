@@ -15,4 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.base import ModuleHolder, Module
-import indico.modules.categories  # TODO: remove this import once it's imported from somewhere else
+
+# TODO: remove imports below once they're imported from somewhere else:
+import indico.modules.admin
+import indico.modules.categories

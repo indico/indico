@@ -28,6 +28,7 @@ from indico.modules.events.layout.util import MenuEntryData
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.survey')
@@ -39,9 +40,8 @@ def _merge_users(target, source, **kwargs):
     SurveySubmission.find(user_id=source.id).update({SurveySubmission.user_id: target.id})
 
 
-@signals.event_management.sidemenu.connect
-def _extend_event_management_menu(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     return 'surveys', SideMenuItem(_('Surveys'), url_for('surveys.manage_survey_list', event),
                                    visible=event.as_event.can_manage(session.user, 'surveys', allow_key=True),
                                    event_feature='surveys', section='advanced')

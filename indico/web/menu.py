@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals, absolute_import
 
-from flask import request
+from flask import render_template, request
 from operator import attrgetter
 
+from indico.core import signals
+from indico.util.signals import values_from_signal
 from indico.util.struct.iterables import group_list
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
@@ -84,3 +86,106 @@ class MenuItem(object):
     @property
     def active(self):
         return request.endpoint in self.endpoints
+
+
+class SideMenuSection(object):
+    """Defines a side menu section (item set).
+
+    :param title: the title of the section (displayed)
+    :param weight: the "weight" (higher means it shows up first)
+    :param active: whether the section should be shown expanded by default
+    :param visible: whether the section should be shown at all
+    :param event_feature: associated feature (id), section will be hidden
+                          if feature is disabled
+    :param icon: icon that will be displayed next to the section title.
+    """
+
+    def __init__(self, title, weight=-1, active=False, visible=True, event_feature=None, icon=None):
+        self.title = title
+        self._active = active
+        self._visible = visible
+        self.event_feature = event_feature
+        self._items = set()
+        self.icon = 'icon-' + icon
+        self.weight = weight
+
+    def add_item(self, item):
+        self._items.add(item)
+
+    @property
+    def items(self):
+        return sorted((item for item in self._items if item.visible),
+                      key=lambda x: (-x.weight, x.title))
+
+    @property
+    def active(self):
+        return self._active or any(item.active for item in self._items)
+
+    @property
+    def visible(self):
+        return self._visible and any(item.visible for item in self._items)
+
+
+class SideMenuItem(object):
+    """Defines a side menu item.
+
+    :param title: the title of the menu item (displayed)
+    :param url: the URL that the link will point to
+    :param weight: the "weight" (higher means it shows up first)
+    :param active: whether the item will be shown as active by default
+    :param disabled: if `True`, the item will be displayed as disabled
+    :param visible: whether the item should be shown at all
+    :param event_feature: associated feature (id), the item will be hidden
+                          if feature is disabled
+    :param section: section the item will be put in
+    :param icon: icon that will be displayed next to the item
+    """
+
+    def __init__(self, title, url, weight=-1, active=False, disabled=False, visible=True, event_feature=None,
+                 section=None, icon=None):
+        self.title = title
+        self.url = url
+        self.active = active
+        self.disabled = disabled
+        self.visible = visible
+        self.event_feature = event_feature
+        self.section = section
+        self.weight = weight
+        self.icon = ('icon-' + icon) if icon else None
+
+
+def build_menu_structure(menu_id, active_item=None, **kwargs):
+    """
+    Build a menu (list of entries) with sections/items.
+
+    Information is provided by specific signals and filtered
+    by menu id.
+    This can be used as a very thin framework for menu
+    handling across the app.
+
+    :param menu_id: menu_id used to filter out signal calls
+    :param active_item: ID of currently active menu item
+    :param kwargs: extra arguments passed to the signals
+    :returns: properly sorted list (taking weights into account)
+    """
+    top_level = set()
+    sections = {}
+
+    for id_, section in values_from_signal(signals.menu.sections.send(menu_id, **kwargs)):
+        sections[id_] = section
+        top_level.add(section)
+
+    for id_, item in values_from_signal(signals.menu.items.send(menu_id, **kwargs)):
+        if id_ == active_item:
+            item.active = True
+        if item.section is None:
+            top_level.add(item)
+        else:
+            sections[item.section].add_item(item)
+
+    return sorted(top_level, key=lambda x: (-x.weight, x.title))
+
+
+def render_sidemenu(menu_id, active_item=None, old_style=False, **kwargs):
+    items = build_menu_structure(menu_id, active_item=active_item, **kwargs)
+    return render_template('side_menu.html', items=items, old_style=old_style)

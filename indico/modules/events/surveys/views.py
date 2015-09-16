@@ -24,9 +24,7 @@ from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 
 class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/surveys/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['surveys'].setActive()
+    sidemenu_option = 'surveys'
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()

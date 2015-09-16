@@ -20,14 +20,14 @@ from indico.core import signals
 from indico.modules.groups.core import GroupProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('GroupProxy',)
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'), section='user_management')
 
 

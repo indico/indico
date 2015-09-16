@@ -21,7 +21,7 @@ from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.wcomponents import SideMenuItem
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('logger', 'settings')
@@ -36,6 +36,6 @@ settings = SettingsProxy('cephalopod', {
 })
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     return 'cephalopod', SideMenuItem(_("Community Hub"), url_for('cephalopod.index'), section='integration')

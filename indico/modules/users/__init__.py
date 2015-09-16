@@ -24,6 +24,7 @@ from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('ExtraUserPreferences', 'User', 'UserSetting', 'UserSettingsProxy', 'user_settings')
@@ -40,9 +41,8 @@ user_settings = UserSettingsProxy('users', {
 })
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'users', SideMenuItem(_("Users"), url_for('users.users_admin'), section='user_management')
 
 

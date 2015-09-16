@@ -22,6 +22,4 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 class WPFeatures(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/features/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items_advanced['features'].setActive()
+    sidemenu_option = 'features'

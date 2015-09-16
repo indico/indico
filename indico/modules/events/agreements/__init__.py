@@ -25,7 +25,7 @@ from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.wcomponents import SideMenuItem
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase', 'EmailPlaceholderBase')
@@ -39,14 +39,14 @@ def _check_agreement_definitions(app, **kwargs):
     get_agreement_definitions()
 
 
-@signals.event_management.sidemenu.connect
-def _extend_event_management_menu(event, **kwargs):
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     if not get_agreement_definitions():
         return
     if not event.as_event.can_manage(session.user, allow_key=True):
         return
     return 'agreements', SideMenuItem(_('Agreements'), url_for('agreements.event_agreements', event),
-                                      section='organization')
+                                      section='services')
 
 
 @signals.users.merged.connect

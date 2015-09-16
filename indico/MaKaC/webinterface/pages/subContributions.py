@@ -145,11 +145,9 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
 
         return banner + body
 
-    def _setActiveSideMenuItem(self):
-        if self._contrib.isScheduled():
-            self._timetableMenuItem.setActive(True)
-        else:
-            self._contribListMenuItem.setActive(True)
+    @property
+    def sidemenu_option(self):
+        return 'timetable' if self._contrib.isScheduled() else 'contributions'
 
     def _getTabContent( self, params ):
         return "nothing"

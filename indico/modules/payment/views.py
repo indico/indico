@@ -25,8 +25,7 @@ class WPPaymentJinjaMixin(WPJinjaMixin):
 
 
 class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdminsBase):
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['payment'].setActive()
+    sidemenu_option = 'payment'
 
 
 class WPPaymentEventManagement(WPConfModifRegFormBase, WPPaymentJinjaMixin):

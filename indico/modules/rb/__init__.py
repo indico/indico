@@ -23,10 +23,13 @@ from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_is_admin
 from indico.web.flask.util import url_for
 from indico.util.i18n import _
+from indico.web.menu import SideMenuSection, SideMenuItem
 
 
 logger = Logger.get('rb')
@@ -46,10 +49,9 @@ def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'), section='general')
+    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'), 30, icon='location')
 
 
 @signals.users.merged.connect
@@ -69,3 +71,45 @@ def _event_deleted(event, user, **kwargs):
                                     ~Reservation.is_rejected)
     for resv in reservations:
         resv.cancel(user or session.user, 'Associated event was deleted')
+
+
+@signals.menu.sections.connect_via('rb-sidemenu')
+def _sidemenu_sections(sender, **kwargs):
+    user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
+
+    yield 'search', SideMenuSection(_("Search"), 40, icon='search', active=True)
+    yield 'my_rooms', SideMenuSection(_("My Rooms"), 30, icon='user', visible=user_has_rooms)
+    yield 'blocking', SideMenuSection(_("Room Blocking"), 20, icon='lock')
+
+
+@signals.menu.items.connect_via('rb-sidemenu')
+def _sidemenu_items(sender, **kwargs):
+    user_is_admin = session.user is not None and rb_is_admin(session.user)
+    map_available = Location.default_location is not None and Location.default_location.is_map_available
+
+    yield 'book_room', SideMenuItem(_('Book a Room'), url_for('rooms.book'), 80, icon='checkmark')
+    yield 'map', SideMenuItem(_('Map of Rooms'), url_for('rooms.roomBooking-mapOfRooms'),
+                              70, icon='location', visible=map_available)
+    yield 'calendar', SideMenuItem(_('Calendar'), url_for('rooms.calendar'), 60, icon='calendar')
+    yield 'my_bookings', SideMenuItem(_('My Bookings'), url_for('rooms.my_bookings'), 50, icon='time')
+    yield 'search_bookings', SideMenuItem(_('Search bookings'), url_for('rooms.roomBooking-search4Bookings'),
+                                          section='search')
+    yield 'search_rooms', SideMenuItem(_('Search rooms'), url_for('rooms.search_rooms'),
+                                       section='search')
+    yield 'bookings_in_my_rooms', SideMenuItem(_('Bookings in my rooms'), url_for('rooms.bookings_my_rooms'),
+                                               section='my_rooms')
+    yield 'prebookings_in_my_rooms', SideMenuItem(_('Pre-bookings in my rooms'),
+                                                  url_for('rooms.pending_bookings_my_rooms'),
+                                                  section='my_rooms')
+    yield 'room_list', SideMenuItem(_('Room list'), url_for('rooms.search_my_rooms'),
+                                    section='my_rooms')
+    yield 'my_blockings', SideMenuItem(_('My Blockings'),
+                                       url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
+                                       section='blocking')
+    yield 'blockings_my_rooms', SideMenuItem(_('Blockings for my rooms'),
+                                             url_for('rooms.blocking_my_rooms'),
+                                             section='blocking')
+    yield 'blocking_create', SideMenuItem(_('Block rooms'), url_for('rooms.create_blocking'),
+                                          section='blocking')
+    yield 'admin', SideMenuItem(_('Administration'), url_for('rooms_admin.roomBooking-admin'),
+                                10, icon='user-chairperson', visible=user_is_admin)

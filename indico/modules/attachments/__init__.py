@@ -27,7 +27,7 @@ from indico.modules.attachments.logging import connect_log_signals
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import can_manage_attachments
-
+from indico.web.menu import SideMenuItem
 
 logger = Logger.get('attachments')
 connect_log_signals()
@@ -45,11 +45,10 @@ def _merge_users(target, source, **kwargs):
     AttachmentFolderPrincipal.merge_users(target, source, 'folder')
 
 
-@signals.event_management.sidemenu.connect
-def _extend_event_management_menu(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', event),
-                                       visible=can_manage_attachments(event, session.user), section='organization')
+                                       80, visible=can_manage_attachments(event, session.user), section='organization')
 
 
 @signals.event_management.management_url.connect
@@ -58,10 +57,9 @@ def _get_event_management_url(event, **kwargs):
         return url_for('attachments.management', event)
 
 
-@signals.category.management_sidemenu.connect
-def _extend_category_management_menu(category, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', category))
+@signals.menu.items.connect_via('category-management-sidemenu')
+def _extend_category_management_menu(sender, category, **kwargs):
+    return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', category), icon='upload')
 
 
 @signals.event_management.clone.connect

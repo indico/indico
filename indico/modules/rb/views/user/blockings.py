@@ -19,32 +19,28 @@ from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._blockRoomsOpt.setActive(True)
+    sidemenu_option = 'blocking_create'
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingDetails').getHTML(params)
 
 
 class WPRoomBookingBlockingForm(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._blockRoomsOpt.setActive(True)
+    sidemenu_option = 'blocking_create'
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingForm').getHTML(params)
 
 
 class WPRoomBookingBlockingList(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._blockingListOpt.setActive(True)
+    sidemenu_option = 'my_blockings'
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingList').getHTML(params)
 
 
 class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._usersBlockingsOpt.setActive(True)
+    sidemenu_option = 'blockings_my_rooms'
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingsForMyRooms').getHTML(params)

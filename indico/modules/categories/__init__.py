@@ -22,8 +22,10 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
+from indico.util.i18n import _
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('categories')
@@ -64,3 +66,15 @@ def _app_created(app, **kwargs):
 
         request.view_args['categId'] = unicode(mapping.category_id)
         return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **request.view_args)), 301)
+
+
+@signals.menu.items.connect_via('category-management-sidemenu')
+def _sidemenu_items(sender, category, **kwargs):
+    yield 'view', SideMenuItem(_('View category'), url_for('category.categoryDisplay', category),
+                               100, icon='eye')
+    yield 'general', SideMenuItem(_('General Settings'), url_for('category_mgmt.categoryModification', category),
+                                  90, icon='settings')
+    yield 'protection', SideMenuItem(_('Protection'), url_for('category_mgmt.categoryAC', category),
+                                     70, icon='shield')
+    yield 'tools', SideMenuItem(_('Tools'), url_for('category_mgmt.categoryTools', category),
+                                60, icon='wrench')

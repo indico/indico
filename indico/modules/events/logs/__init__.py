@@ -23,13 +23,13 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 from indico.modules.events.logs.renderers import SimpleRenderer, EmailRenderer
 from indico.modules.events.logs.util import get_log_renderers
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 __all__ = ['EventLogEntry', 'EventLogKind', 'EventLogRealm']
 
 
-@signals.event_management.sidemenu_advanced.connect
-def _extend_event_management_menu(event, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     if not event.as_event.can_manage(session.user, allow_key=True):
         return
     return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), section='advanced')

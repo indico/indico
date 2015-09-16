@@ -161,7 +161,7 @@ class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
-    menu_item = 'bookingListSearch'
+    menu_item = 'search_bookings'
     show_blockings = True
 
     def _get_form_data(self):
@@ -234,21 +234,21 @@ class _MyRoomsMixin:
 
 
 class RHRoomBookingSearchMyBookings(_RoomsWithBookingsMixin, RHRoomBookingSearchBookingsShortcutBase):
-    menu_item = 'myBookingList'
+    menu_item = 'my_bookings'
     search_criteria = {
         'is_only_mine': True
     }
 
 
 class RHRoomBookingSearchBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSearchBookingsShortcutBase):
-    menu_item = 'usersBookings'
+    menu_item = 'bookings_in_my_rooms'
     search_criteria = {
         'is_only_my_rooms': True
     }
 
 
 class RHRoomBookingSearchPendingBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSearchBookingsShortcutBase):
-    menu_item = 'usersPendingBookings'
+    menu_item = 'prebookings_in_my_rooms'
     search_criteria = {
         'is_only_my_rooms': True,
         'is_only_pending_bookings': True

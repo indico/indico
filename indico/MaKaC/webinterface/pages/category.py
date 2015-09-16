@@ -46,11 +46,10 @@ from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
 
-from indico.core import signals
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
-from indico.util.signals import values_from_signal
+from indico.web.menu import render_sidemenu
 
 
 class WPCategoryBase (main.WPMainBase):
@@ -1101,70 +1100,24 @@ class WPCategoryModifBase( WPCategoryBase ):
         pars = {"target": self._target , "isModif" : True}
         return wcomponents.WNavigationDrawer( pars, bgColor = "white" )
 
-    def _createSideMenu( self ):
-        self._sideMenu = wcomponents.ManagementSideMenu()
-
-        viewSection = wcomponents.SideMenuSection()
-
-        self._viewMenuItem = wcomponents.SideMenuItem(_("View category"),
-            urlHandlers.UHCategoryDisplay.getURL( self._target ))
-        viewSection.addItem( self._viewMenuItem)
-
-        self._sideMenu.addSection(viewSection)
-
-
-        mainSection = wcomponents.SideMenuSection()
-
-        self._generalSettingsMenuItem = wcomponents.SideMenuItem(_("General settings"),
-            urlHandlers.UHCategoryModification.getURL( self._target ))
-        mainSection.addItem( self._generalSettingsMenuItem)
-
-        self._ACMenuItem = wcomponents.SideMenuItem(_("Protection"),
-            urlHandlers.UHCategModifAC.getURL( self._target ))
-        mainSection.addItem( self._ACMenuItem)
-
-        self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
-            urlHandlers.UHCategModifTools.getURL( self._target ))
-        mainSection.addItem( self._toolsMenuItem)
-
-        self._tasksMenuItem = wcomponents.SideMenuItem(_("Tasks"),
-            urlHandlers.UHCategModifTasks.getURL( self._target ))
-        mainSection.addItem( self._tasksMenuItem)
-        if not self._target.tasksAllowed() :
-            self._tasksMenuItem.setVisible(False)
-
-        self.extra_menu_items = {}
-        for name, item in sorted(values_from_signal(signals.category.management_sidemenu.send(self._target)),
-                                 key=lambda x: x[1]._title):
-            self.extra_menu_items[name] = item
-            mainSection.addItem(item)
-
-        self._sideMenu.addSection(mainSection)
-
     def _createTabCtrl( self ):
         pass
 
     def _setActiveTab( self ):
         pass
 
-    def _setActiveSideMenuItem( self ):
-        pass
-
-    def _getBody( self, params ):
-        self._createSideMenu()
-        self._setActiveSideMenuItem()
-
+    def _getBody(self, params):
         self._createTabCtrl()
         self._setActiveTab()
 
-        sideMenu = self._sideMenu.getHTML()
-
         frame = WCategoryModifFrame()
-        p = { "category": self._target,
-              "body": self._getPageContent( params ),
-              "sideMenu": self._sideMenu.getHTML() }
 
-        return frame.getHTML( p )
+        return frame.getHTML({
+            "category": self._target,
+            "body": self._getPageContent(params),
+            "sideMenu": render_sidemenu('category-management-sidemenu', active_item=self.sidemenu_option,
+                                        category=self._target, old_style=True)
+        })
 
     def _getTabContent( self, params ):
         return "nothing"
@@ -1186,9 +1139,7 @@ class WCategoryModifFrame(wcomponents.WTemplated):
         return vars
 
 class WPCategModifMain( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._generalSettingsMenuItem.setActive()
+    sidemenu_option = 'general'
 
 
 class WCategModifMain(wcomponents.WTemplated):
@@ -1719,9 +1670,7 @@ class WCategModifAC(wcomponents.WTemplated):
         return vars
 
 class WPCategModifAC( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._ACMenuItem.setActive()
+    sidemenu_option = 'protection'
 
     def _getPageContent(self, params):
         wc = WCategModifAC(self._target)
@@ -1748,9 +1697,7 @@ class WCategModifTools(wcomponents.WTemplated):
 
 
 class WPCategModifTools( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._toolsMenuItem.setActive()
+    sidemenu_option = 'tools'
 
     def _getPageContent( self, params ):
         wc = WCategModifTools( self._target )
@@ -1909,9 +1856,6 @@ class WCategModifTasks(wcomponents.WTemplated):
         return out
 
 class WPCategModifTasks( WPCategoryModifBase ):
-
-    def _setActiveSideMenuItem( self ):
-        self._tasksMenuItem.setActive()
 
     def _getPageContent( self, params ):
         wc = WCategModifTasks( self._target )

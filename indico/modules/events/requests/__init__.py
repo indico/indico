@@ -24,7 +24,7 @@ from indico.modules.events.requests.base import RequestDefinitionBase, RequestFo
 from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.wcomponents import SideMenuItem
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('RequestDefinitionBase', 'RequestFormBase')
@@ -36,8 +36,8 @@ def _check_request_definitions(app, **kwargs):
     get_request_definitions()
 
 
-@signals.event_management.sidemenu.connect
-def _extend_event_management_menu(event, **kwargs):
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
     if not get_request_definitions():
         return
     if not event.as_event.can_manage(session.user, allow_key=True) and not is_request_manager(session.user):

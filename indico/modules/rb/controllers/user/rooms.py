@@ -78,7 +78,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
 
 class RHRoomBookingSearchRooms(RHRoomBookingBase):
-    menu_item = 'roomSearch'
+    menu_item = 'search_rooms'
 
     def _get_form_data(self):
         return request.form
@@ -115,7 +115,7 @@ class RHRoomBookingSearchRoomsShortcutBase(RHRoomBookingSearchRooms):
 
 
 class RHRoomBookingSearchMyRooms(RHRoomBookingSearchRoomsShortcutBase):
-    menu_item = 'myRoomList'
+    menu_item = 'room_list'
     search_criteria = {
         'is_only_my_rooms': True,
         'location': None
