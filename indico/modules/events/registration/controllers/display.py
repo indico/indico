@@ -16,14 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import request, session, redirect
 
+from indico.core.db import db
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
-from indico.modules.events.registration.util import get_event_section_data
+from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.util import get_event_section_data, make_registration_form
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
 from indico.modules.payment import event_settings
+from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -68,6 +71,18 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
         self.regform = RegistrationForm.find_one(id=request.view_args['reg_form_id'])
 
     def _process(self):
+        form = make_registration_form(self.regform)()
+        if form.validate_on_submit():
+            self._save_registration(form.data)
+            return redirect(url_for('.display_regforms_list', self.regform))
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                currency=event_settings.get(self.event, 'currency'))
+
+    def _save_registration(self, data):
+        registration = Registration(user=session.user, registration_form=self.regform)
+        db.session.add(registration)
+        for form_item in [f for f in self.regform.form_items if f.parent_id]:
+            value = data.get('*genfield*{0}-{1}'.format(form_item.parent_id, form_item.id), None)
+            form_item.wtf_field.save_data(registration, value)
+        db.session.flush()
