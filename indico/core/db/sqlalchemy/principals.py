@@ -270,12 +270,14 @@ class PrincipalMixin(object):
         """
         relationship = getattr(cls, relationship_attr)
         source_principals = set(getattr(source, cls.principal_backref_name).options(joinedload(relationship)))
-        target_objects = {getattr(x, relationship_attr)
+        target_objects = {getattr(x, relationship_attr): x
                           for x in getattr(target, cls.principal_backref_name).options(joinedload(relationship))}
         for principal in source_principals:
-            if getattr(principal, relationship_attr) not in target_objects:
+            existing = target_objects.get(getattr(principal, relationship_attr))
+            if existing is None:
                 principal.user_id = target.id
             else:
+                existing.merge_privs(principal)
                 db.session.delete(principal)
         db.session.flush()
 
