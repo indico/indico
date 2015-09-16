@@ -71,7 +71,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
     if (!enabled) {
         defer.resolve({
             'title'   : $T('Disabled'),
-            'subtitle': $T('Your are not part of the community.'),
+            'subtitle': $T('This server is not registered as part of the community.'),
             'class'   : 'disabled',
             'icon'    : 'icon-close'
         });
@@ -88,7 +88,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
         if (synced) {
             defer.resolve({
                 'title'   : $T('Synchronized'),
-                'subtitle': $T('You are part of the community and your Indico server is up to date.'),
+                'subtitle': $T('This server is registered as part of the community and is up to date.'),
                 'class'   : 'highlight',
                 'icon'    : 'icon-checkmark'
             });
