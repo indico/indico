@@ -25,12 +25,9 @@ from sqlalchemy.exc import IntegrityError
 from indico.modules.events.notes.models.notes import EventNote, RenderMode, EventNoteRevision
 
 
-@pytest.yield_fixture
-def note(db, dummy_event):
-    note = EventNote(linked_object=dummy_event)
-    yield note
-    if inspect(note).persistent:
-        db.session.delete(note)
+@pytest.fixture
+def note(dummy_event):
+    return EventNote(linked_object=dummy_event)
 
 
 @pytest.mark.parametrize('deleted', (True, False))

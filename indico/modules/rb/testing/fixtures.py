@@ -51,11 +51,9 @@ def dummy_location(db, create_location):
     return loc
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def create_reservation(db, dummy_room, dummy_avatar):
     """Returns a callable which lets you create reservations"""
-    _reservations = set()
-
     def _create_reservation(**params):
         params.setdefault('start_dt', date.today() + relativedelta(hour=8, minute=30))
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
@@ -71,15 +69,9 @@ def create_reservation(db, dummy_room, dummy_avatar):
         reservation.create_occurrences(skip_conflicts=False)
         db.session.add(reservation)
         db.session.flush()
-        _reservations.add(reservation)
         return reservation
 
-    yield _create_reservation
-
-    for reservation in _reservations:
-        if inspect(reservation).persistent:  # avoid error if session was rolled back
-            db.session.delete(reservation)
-    db.session.flush()
+    return _create_reservation
 
 
 @pytest.fixture
@@ -111,11 +103,9 @@ def dummy_occurrence(create_occurrence):
     return create_occurrence()
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def create_room(db, dummy_location, dummy_avatar):
     """Returns a callable which lets you create rooms"""
-    _rooms = set()
-
     def _create_room(**params):
         params.setdefault('building', u'1')
         params.setdefault('floor', u'2')
@@ -127,15 +117,9 @@ def create_room(db, dummy_location, dummy_avatar):
         room.update_name()
         db.session.add(room)
         db.session.flush()
-        _rooms.add(room)
         return room
 
-    yield _create_room
-
-    for room in _rooms:
-        if inspect(room).persistent:  # avoid error if session was rolled back
-            db.session.delete(room)
-    db.session.flush()
+    return _create_room
 
 
 @pytest.fixture
@@ -174,11 +158,9 @@ def create_equipment_type(db, dummy_location):
     return _create_equipment_type
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def create_blocking(db, dummy_room, dummy_avatar):
     """Returns a callable which lets you create blockings"""
-    _blockings = set()
-
     def _create_blocking(**params):
         room = params.pop('room', dummy_room)
         state = params.pop('state', BlockedRoom.State.pending)
@@ -193,15 +175,9 @@ def create_blocking(db, dummy_room, dummy_avatar):
                 br.approve(notify_blocker=False)
         db.session.add(blocking)
         db.session.flush()
-        _blockings.add(blocking)
         return blocking
 
-    yield _create_blocking
-
-    for blocking in _blockings:
-        if inspect(blocking).persistent:  # avoid error if session was rolled back
-            db.session.delete(blocking)
-    db.session.flush()
+    return _create_blocking
 
 
 @pytest.fixture

@@ -22,11 +22,9 @@ from indico.modules.rb import settings as rb_settings
 from indico.modules.users import User
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def create_user(db):
     """Returns a callable which lets you create dummy users"""
-    _users = set()
-
     def _create_user(id_, first_name=u'Guinea', last_name=u'Pig', rb_admin=False, admin=False, email=None, groups=None,
                      legacy=False):
         user = User.get(id_)
@@ -44,14 +42,9 @@ def create_user(db):
         if rb_admin:
             rb_settings.acls.add_principal('admin_principals', user)
         db.session.flush()
-        _users.add(user)
         return user.as_avatar if legacy else user
 
-    yield _create_user
-
-    for user in _users:
-        if inspect(user).persistent:  # avoid error if session was rolled back
-            db.session.delete(user)
+    return _create_user
 
 
 @pytest.fixture
@@ -66,25 +59,18 @@ def dummy_avatar(dummy_user):
     return dummy_user.as_avatar
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def create_group(db):
     """Returns a callable which lets you create dummy groups"""
-    _groups = set()
-
     def _create_group(id_):
         group = LocalGroup()
         group.id = id_
         group.name = u'dummy-{}'.format(id_)
         db.session.add(group)
         db.session.flush()
-        _groups.add(group)
         return group.proxy
 
-    yield _create_group
-
-    for group in _groups:
-        if inspect(group).persistent:  # avoid error if session was rolled back
-            db.session.delete(group)
+    return _create_group
 
 
 @pytest.fixture
