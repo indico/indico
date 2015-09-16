@@ -115,6 +115,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             confSections: '@',
             confSdate: '@',
             confEdate: '@',
+            csrfToken: '&',
             editMode: '=',
             updateMode: '=',
             postUrl: '='
@@ -129,6 +130,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $rootScope.confEdate = $scope.confEdate;
             $rootScope.editMode = $scope.editMode;
 
+            $scope.csrfToken = $('#csrf-token').attr('content');
             $scope.dialogs = {
                 addsection: false,
                 management: false,
