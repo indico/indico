@@ -32,6 +32,8 @@ from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 
 
+__all__ = ('Event',)
+
 #: URL prefixes for the various event objects (public area)
 #: All prefixes are expected to be used inside the '/event/<confId>'
 #: url space.
