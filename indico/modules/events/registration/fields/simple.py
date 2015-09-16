@@ -16,10 +16,15 @@
 
 from __future__ import unicode_literals
 
+import binascii
+import mimetypes
+
 from wtforms import StringField, HiddenField, FileField, IntegerField
 from wtforms.validators import NumberRange
 
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
+from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.util.fs import secure_filename
 
 
 class FreeTextField(RegistrationFormFieldBase):
@@ -90,4 +95,14 @@ class FileField(RegistrationFormFieldBase):
     wtf_field_class = FileField
 
     def save_data(self, registration, value):
-        pass
+        f = value.file
+        content = f.read()
+        metadata = {
+            'hash': binascii.crc32(content) & 0xffffffff,
+            'size': len(content),
+            'filename': secure_filename(value.filename, 'registration_form_file'),
+            'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'
+        }
+
+        registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, file=content,
+                                                  file_metadata=metadata))

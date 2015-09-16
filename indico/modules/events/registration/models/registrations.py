@@ -105,6 +105,16 @@ class RegistrationData(db.Model):
         JSON,
         nullable=False
     )
+    #: file contents for a file field
+    file = db.Column(
+        db.LargeBinary,
+        nullable=True
+    )
+    #: metadata of the uploaded file
+    file_metadata = db.Column(
+        JSON,
+        nullable=False
+    )
 
     #: The registration this data is associated with
     registration = db.relationship(
