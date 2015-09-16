@@ -25,7 +25,7 @@ from indico.web.flask.util import url_for
 @email_sender
 def notify_double_payment(registrant):
     event = registrant.getConference()
-    to = event.getCreator().getEmail()
+    to = event.as_event.creator.email
     body = render_template('payment/emails/double_payment_email_to_manager.txt', event=event, registrant=registrant)
     return make_email(to, subject='Double payment detected', body=body)
 
@@ -34,7 +34,7 @@ def notify_double_payment(registrant):
 def notify_amount_inconsistency(registrant, amount):
     event = registrant.getConference()
     currency = payment_event_settings.get(event, 'currency')
-    to = event.getCreator().getEmail()
+    to = event.as_event.creator.email
     body = render_template('payment/emails/payment_inconsistency_email_to_manager.txt', event=event,
                            registrant=registrant, amount=amount, currency=currency)
     return make_email(to, subject='Payment inconsistency', body=body)

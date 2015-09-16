@@ -74,7 +74,7 @@ class ReminderForm(IndicoForm):
         # User
         emails = {session.user.email: session.user.full_name}
         # Creator
-        emails[self.event.getCreator().getEmail()] = self.event.getCreator().getStraightFullName(upper=False)
+        emails[self.event.as_event.creator.email] = self.event.as_event.creator.full_name
         # Support
         support = self.event.getSupportInfo()
         emails[support.getEmail()] = support.getCaption() or support.getEmail()

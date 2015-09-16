@@ -224,6 +224,7 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFoss
 
     def getCreator(self):
         pass
+    getCreator.produce = lambda x: x.as_event.creator.as_avatar
     getCreator.result = IConferenceChairMetadataFossil
 
     def getCreationDate(self):

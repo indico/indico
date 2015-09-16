@@ -142,7 +142,7 @@ class UserLink(db.Model):
             'category': {'cls': MaKaC.conference.Category,
                          'roles': {'access', 'creator', 'manager'}},
             'conference': {'cls': MaKaC.conference.Conference,
-                           'roles': {'abstractSubmitter', 'access', 'chair', 'creator', 'editor',
+                           'roles': {'abstractSubmitter', 'access', 'chair', 'editor',
                                      'paperReviewManager', 'participant', 'referee', 'reviewer'}},
             'session': {'cls': MaKaC.conference.Session,
                         'roles': {'access', 'coordinator', 'manager'}},

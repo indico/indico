@@ -257,6 +257,7 @@ class User(db.Model):
     # - attachments (Attachment.user)
     # - attachment_files (AttachmentFile.user)
     # - survey_submissions (SurveySubmission.user)
+    # - created_events (Event.creator)
 
     @property
     def as_principal(self):

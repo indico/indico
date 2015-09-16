@@ -279,9 +279,7 @@ class outputGenerator(object):
             out.writeTag("organiser", conf.getOrgText())
 
         out.openTag("announcer")
-        chair = conf.getCreator()
-        if chair != None:
-            self._userToXML(conf, chair, out)
+        self._userToXML(conf, conf.as_event.creator.as_avatar, out)
         out.closeTag("announcer")
 
         sinfo = conf.getSupportInfo()

@@ -102,10 +102,11 @@ from MaKaC.common.contextManager import ContextManager
 import zope.interface
 
 from indico.core import signals
-from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.config import Config
+from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -990,10 +991,9 @@ class Category(CommonObjectBase):
         conf.unindexConf()
 
     def newConference(self, creator):
-        conf = Conference(creator)
-        ConferenceHolder().add(conf)
+        conf = Conference()
+        ConferenceHolder().add(conf, creator)
         self._addConference(conf)
-        conf.linkCreator()
 
         signals.event.created.send(conf, parent=self)
 
@@ -1882,17 +1882,13 @@ class Conference(CommonObjectBase, Locatable):
 
     fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
 
-    def __init__(self, creator, id="", creationDate = None, modificationDate = None):
+    def __init__(self, creator=None, id='', creationDate=None, modificationDate=None):
         """Class constructor. Initialise the class attributes to the default
             values.
            Params:
             confData -- (Dict) Contains the data the conference object has to
                 be initialised to.
         """
-        #IndexedObject.__init__(self)
-        if creator == None:
-            raise MaKaCError( _("A creator must be specified when creating a new Event"), _("Event"))
-        self.__creator = creator
         self.id = id
         self.title = ""
         self.description = ""
@@ -1988,8 +1984,9 @@ class Conference(CommonObjectBase, Locatable):
 
     @property
     def all_manager_emails(self):
-        """Returns the emails of all managers, including the creator"""
-        return {u.email for u in self.as_event.acl if not u.is_group}
+        """Returns the emails of all managers"""
+        # We ignore email principals here. They never signed up in indico anyway...
+        return {p.principal.email for p in self.as_event.acl_entries if p.type == PrincipalType.user}
 
     @property
     @memoize_request
@@ -2464,19 +2461,6 @@ class Conference(CommonObjectBase, Locatable):
         """Returns the date in which the conference was created"""
         return self._creationDS.astimezone(timezone(tz))
 
-    def getCreator( self ):
-        return self.__creator
-
-    def setCreator( self, creator):
-        if self.__creator:
-            self.__creator.unlinkTo(self, "creator")
-        creator.linkTo(self, "creator")
-        self.__creator = creator
-
-    def linkCreator(self):
-        self.as_event.update_principal(self.__creator.user, full_access=True)
-        self.__creator.linkTo(self, "creator")
-
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
         return self.id
@@ -2562,9 +2546,6 @@ class Conference(CommonObjectBase, Locatable):
         ConferenceHolder().remove(self)
         for owner in self.__owners:
             owner.removeConference(self, notify=False)
-
-        creator = self.getCreator()
-        creator.unlinkTo(self, "creator")
 
         # Remove all links in redis
         if redis_write_client:
@@ -3681,7 +3662,7 @@ class Conference(CommonObjectBase, Locatable):
         if managing is not None:
             creator = managing
         else:
-            creator = self.getCreator()
+            creator = self.as_event.creator
         conf = cat.newConference(creator)
         if managing is not None:
             conf.as_event.update_principal(managing.user, full_access=True)
@@ -4234,7 +4215,7 @@ class DefaultConference(Conference):
         if admin is None:
             raise MaKaCError(_("""There are no admin users. The "default" conference that stores the template cannot be created.
                                 Please add at least 1 user to the admin list."""))
-        Conference.__init__(self, admin.as_avatar, "default")
+        Conference.__init__(self, id="default")
 
 
 class ConferenceHolder( ObjectHolder ):
@@ -4248,9 +4229,11 @@ class ConferenceHolder( ObjectHolder ):
     def _newId(self):
         raise RuntimeError('Tried to get new event id from zodb')
 
-    def add(self, conf):
+    @unify_user_args
+    def add(self, conf, creator):
         from indico.modules.events import Event
-        event = Event()
+        event = Event(creator=creator)
+        event.update_principal(creator, full_access=True)
         db.session.add(event)
         db.session.flush()
         conf.setId(event.id)

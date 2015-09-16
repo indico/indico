@@ -53,6 +53,12 @@ class Event(ProtectionManagersMixin, db.Model):
         nullable=False,
         default=False
     )
+    #: The ID of the user who created the event
+    creator_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        nullable=False
+    )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
         JSON,
@@ -83,6 +89,15 @@ class Event(ProtectionManagersMixin, db.Model):
         nullable=True
     )
 
+    #: The user who created the event
+    creator = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'created_events',
+            lazy='dynamic'
+        )
+    )
     #: The event's default page (conferences only)
     default_page = db.relationship(
         'EventPage',

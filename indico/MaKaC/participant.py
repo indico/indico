@@ -448,16 +448,8 @@ class Participation(Persistent):
 
             profileURL = urlHandlers.UHConfModifParticipantsPending.getURL(self._conference)
 
-            toList = []
-            creator=self._conference.getCreator()
-            if isinstance(creator, AvatarUserWrapper):
-                toList.append(creator.getEmail())
-            for manager in self._conference.getAccessController().getModifierList() :
-                if isinstance(manager, AvatarUserWrapper):
-                    toList.append(manager.getEmail())
-
             data = {}
-            data["toList"] = toList
+            data["toList"] = self._conference.all_manager_emails
             data["fromAddr"] = Config.getInstance().getSupportEmail()
             data["subject"] = _("New pending participant for %s")%self._conference.getTitle()
             data["body"] = """

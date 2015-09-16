@@ -89,3 +89,25 @@ def get_events_managed_by(user, from_dt=None, to_dt=None):
         query = query.join(IndexedEvent, IndexedEvent.id == EventPrincipal.event_id)
         query = query.filter(event_date_filter)
     return {principal.event_id for principal in query}
+
+
+def get_events_created_by(user, from_dt=None, to_dt=None):
+    """Gets the IDs of events created by the user
+
+    :param user: A `User`
+    :param from_dt: The earliest event start time to look for
+    :param to_dt: The latest event start time to look for
+    :return: A set of event ids
+    """
+    event_date_filter = None
+    if from_dt and to_dt:
+        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
+    elif from_dt:
+        event_date_filter = IndexedEvent.start_date >= from_dt
+    elif to_dt:
+        event_date_filter = IndexedEvent.start_date <= to_dt
+    query = (user.created_events.filter(~Event.is_deleted))
+    if event_date_filter is not None:
+        query = query.join(IndexedEvent, IndexedEvent.id == Event.id)
+        query = query.filter(event_date_filter)
+    return {event.id for event in query}

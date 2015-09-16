@@ -1,7 +1,7 @@
 {% extends 'emails/base.txt' %}
 
 {% set request_created_by = req.created_by_user %}
-{% set event_created_by = event.getCreator().user %}
+{% set event_created_by = event.as_event.creator %}
 
 
 {% macro user_details(user) -%}

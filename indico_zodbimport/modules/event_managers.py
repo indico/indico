@@ -20,6 +20,7 @@ import re
 from operator import attrgetter
 
 import click
+from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -43,10 +44,13 @@ def _sanitize_email(email):
 class EventManagerImporter(Importer):
     def __init__(self, **kwargs):
         self.default_group_provider = kwargs.pop('default_group_provider')
+        self.janitor_user_id = kwargs.pop('janitor_user_id')
         super(EventManagerImporter, self).__init__(**kwargs)
 
     @staticmethod
     def decorate_command(command):
+        command = click.option('--janitor-user-id', type=int, required=True,
+                               help="The ID of the Janitor user")(command)
         command = click.option('--default-group-provider', default='legacy-ldap',
                                help="Name of the default group provider")(command)
         return command
@@ -55,32 +59,53 @@ class EventManagerImporter(Importer):
         return EventPrincipal.has_rows
 
     def migrate(self):
+        self.janitor = User.get_one(self.janitor_user_id)
         # keep all users in memory to avoid extra queries.
         # the assignment is on purpose to stop the gc from throwing the dict away
         # immediately after retrieving it
-        _all_users = User.find_all()
+        _all_users = User.query.options(joinedload('_all_emails')).all()
+        self.all_users_by_email = {}
+        for user in _all_users:
+            if user.is_deleted:
+                continue
+            for email in user.all_emails:
+                self.all_users_by_email[email] = user
+
         with patch_default_group_provider(self.default_group_provider):
             with db.session.no_autoflush:
                 self.migrate_event_managers()
 
+    def convert_principal(self, old_principal):
+        principal = convert_principal(old_principal)
+        if (principal is None and old_principal.__class__.__name__ in ('Avatar', 'AvatarUserWrapper') and
+                'email' in old_principal.__dict__):
+            email = old_principal.__dict__['email'].lower()
+            principal = self.all_users_by_email.get(email)
+            if principal is not None:
+                self.print_warning('Using {} for {} (matched via {})'.format(principal, old_principal, email),
+                                   always=False)
+        return principal
+
     def migrate_event_managers(self):
-        self.print_step('migrating event managers')
+        self.print_step('migrating event managers/creators')
+        creator_updates = []
         for event in committing_iterator(self._iter_events(), 5000):
             self.print_success('', event_id=event.id)
             managers = {}
             # add creator as a manager
             creator = event._Conference__creator
-            creator_principal = convert_principal(creator)
+            creator_principal = self.convert_principal(creator)
             if creator_principal is None:
                 self.print_warning(cformat('%{yellow!}Creator does not exist: {}').format(creator), event_id=event.id)
             else:
+                creator_updates.append({'event_id': int(event.id), 'creator_id': creator_principal.id})
                 managers[creator_principal] = EventPrincipal(event_id=event.id, principal=creator_principal,
                                                              full_access=True)
                 if not self.quiet:
                     self.print_msg(cformat('    - {} %{green!}[creator]%{reset}').format(creator_principal))
             # add managers
             for manager in event._Conference__ac.managers:
-                manager_principal = convert_principal(manager)
+                manager_principal = self.convert_principal(manager)
                 if manager_principal == creator_principal:
                     continue
                 elif manager_principal is None:
@@ -106,7 +131,7 @@ class EventManagerImporter(Importer):
                         self.print_msg(cformat('    - {} %{green}[manager]%{reset}').format(principal))
             # add registrars
             for registrar in getattr(event, '_Conference__registrars', []):
-                registrar_principal = convert_principal(registrar)
+                registrar_principal = self.convert_principal(registrar)
                 if registrar_principal is None:
                     self.print_warning(cformat('%{yellow!}Registrar does not exist: {}').format(registrar),
                                        event_id=event.id)
@@ -119,6 +144,15 @@ class EventManagerImporter(Importer):
                 if not self.quiet:
                     self.print_msg(cformat('    - {} %{cyan}[registrar]%{reset}').format(registrar_principal))
             db.session.add_all(managers.itervalues())
+        # assign creators
+        self.print_step('saving event creators')
+        stmt = (Event.__table__.update()
+                .where(Event.id == db.bindparam('event_id'))
+                .values(creator_id=db.bindparam('creator_id')))
+        db.session.execute(stmt, creator_updates)
+        updated = Event.find(Event.creator_id == None).update({Event.creator_id: self.janitor.id})  # noqa
+        db.session.commit()
+        self.print_success('Set the janitor user {} for {} events'.format(self.janitor, updated), always=True)
 
     def _iter_events(self):
         it = self.zodb_root['conferences'].itervalues()

@@ -285,7 +285,8 @@ _Room_
 _Description_
 %s
 _Creator_
-%s (%s)"""%(conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(), conf.getCreator().getFullName(), conf.getCreator().getId())
+%s (%s)""" % (conf.getOwner().getTitle(), conf.getTitle(), chair, room, conf.getDescription(),
+              conf.as_event.creator.full_name.encode('utf-8'), conf.as_event.creator.id)
         if len(confs) == 1:
             text += """
 _Date_

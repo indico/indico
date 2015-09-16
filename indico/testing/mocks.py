@@ -23,7 +23,7 @@ class MockConferenceHolder:
         pass
 
     @classmethod
-    def add(cls, event):
+    def add(cls, event, creator=None):
         if event.id in cls._events:
             __tracebackhide__ = True
             raise Exception("Event '{}' already exists".format(event.id))

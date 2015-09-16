@@ -19,7 +19,7 @@ import itertools
 from flask import jsonify, session
 
 from indico.modules.events.surveys.util import get_events_with_submitted_surveys
-from indico.modules.events.util import get_events_managed_by
+from indico.modules.events.util import get_events_managed_by, get_events_created_by
 from indico.modules.oauth import oauth
 from indico.modules.users.util import get_related_categories
 from indico.util.redis import client as redis_client
@@ -104,6 +104,8 @@ class UserEventHook(HTTPAPIHook):
             links.setdefault(str(event_id), set()).add('survey_submitter')
         for event_id in get_events_managed_by(self._avatar.user, self._fromDT, self._toDT):
             links.setdefault(str(event_id), set()).add('conference_manager')
+        for event_id in get_events_created_by(self._avatar.user, self._fromDT, self._toDT):
+            links.setdefault(str(event_id), set()).add('conference_creator')
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
     def export_categ_events(self, aw):

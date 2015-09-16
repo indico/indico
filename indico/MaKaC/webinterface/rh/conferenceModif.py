@@ -264,13 +264,12 @@ class RHConferenceOpen(RHConferenceModifBase):
     def _checkProtection(self):
         RHConferenceModifBase._checkProtection(self)
 
-        user = self._getUser()
-        if user is self._conf.getCreator():
+        if session.user == self._conf.as_event.creator:
             return
         # If we are not the creator, check if we have category admin privileges
         hasAccess = False
         for owner in self._conf.getOwnerList():
-            if owner.canUserModify(user): # category or system admin
+            if owner.canUserModify(session.avatar):  # category or system admin
                 hasAccess = True
                 break
         if not hasAccess:
