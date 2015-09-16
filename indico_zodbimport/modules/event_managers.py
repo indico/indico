@@ -93,24 +93,32 @@ class EventManagerImporter(Importer):
             self.print_success('', event_id=event.id)
             managers = {}
             # add creator as a manager
-            creator = event._Conference__creator
-            creator_principal = self.convert_principal(creator)
-            if creator_principal is None:
-                self.print_warning(cformat('%{yellow!}Creator does not exist: {}').format(creator), event_id=event.id)
+            try:
+                creator = event._Conference__creator
+            except AttributeError:
+                # events created after the removal of the `self.__creator` assignment
+                # should happen only on dev machines
+                self.print_error(cformat('%{red!}Event has no creator attribute'), event_id=event.id)
+                creator_principal = None
             else:
-                creator_updates.append({'event_id': int(event.id), 'creator_id': creator_principal.id})
-                managers[creator_principal] = EventPrincipal(event_id=event.id, principal=creator_principal,
-                                                             full_access=True)
-                if not self.quiet:
-                    self.print_msg(cformat('    - {} %{green!}[creator]%{reset}').format(creator_principal))
+                creator_principal = self.convert_principal(creator)
+                if creator_principal is None:
+                    self.print_warning(cformat('%{yellow!}Creator does not exist: {}').format(creator),
+                                       event_id=event.id)
+                else:
+                    creator_updates.append({'event_id': int(event.id), 'creator_id': creator_principal.id})
+                    managers[creator_principal] = EventPrincipal(event_id=event.id, principal=creator_principal,
+                                                                 full_access=True)
+                    if not self.quiet:
+                        self.print_msg(cformat('    - {} %{green!}[creator]%{reset}').format(creator_principal))
             # add managers
             for manager in event._Conference__ac.managers:
                 manager_principal = self.convert_principal(manager)
-                if manager_principal == creator_principal:
-                    continue
-                elif manager_principal is None:
+                if manager_principal is None:
                     self.print_warning(cformat('%{yellow}Manager does not exist: {}').format(manager),
                                        event_id=event.id)
+                    continue
+                elif manager_principal == creator_principal:
                     continue
                 if manager_principal not in managers:
                     managers[manager_principal] = EventPrincipal(event_id=event.id, principal=manager_principal,
@@ -145,11 +153,12 @@ class EventManagerImporter(Importer):
                     self.print_msg(cformat('    - {} %{cyan}[registrar]%{reset}').format(registrar_principal))
             db.session.add_all(managers.itervalues())
         # assign creators
-        self.print_step('saving event creators')
-        stmt = (Event.__table__.update()
-                .where(Event.id == db.bindparam('event_id'))
-                .values(creator_id=db.bindparam('creator_id')))
-        db.session.execute(stmt, creator_updates)
+        if creator_updates:
+            self.print_step('saving event creators')
+            stmt = (Event.__table__.update()
+                    .where(Event.id == db.bindparam('event_id'))
+                    .values(creator_id=db.bindparam('creator_id')))
+            db.session.execute(stmt, creator_updates)
         updated = Event.find(Event.creator_id == None).update({Event.creator_id: self.janitor.id})  # noqa
         db.session.commit()
         self.print_success('Set the janitor user {} for {} events'.format(self.janitor, updated), always=True)
