@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
 import itertools
-from persistent import Persistent
 from functools import wraps
+
+from persistent import Persistent
 
 from indico.core import signals
 from MaKaC.common import info
@@ -73,7 +73,6 @@ class AccessController(Persistent):
             allowed to modify the related resource
         allowed -- (PList) List of recognised users or groups (Principal)
             allowed to access the related resource
-        submitters -- (PList) List of recognised chairpersons/speakers allowed to manage event materials
     """
 
     def __init__( self, owner ):
@@ -88,7 +87,6 @@ class AccessController(Persistent):
         self.accessKey = ""
         self.owner = owner
         self.contactInfo = ""
-        self.submitters = []
         self.nonInheritingChildren = set()
 
     def getOwner(self):
@@ -98,7 +96,8 @@ class AccessController(Persistent):
         self.owner = owner
 
     def unlinkAvatars(self, role):
-        for prin in itertools.chain(self.getSubmitterList(), self.managers, self.allowed):
+        # XXX: this is never called for a Conference AC, so we don't need a check to skip (old) managers
+        for prin in itertools.chain(self.managers, self.allowed):
             if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self.owner, role)
 
@@ -383,57 +382,6 @@ class AccessController(Persistent):
 
     def setContactInfo(self, info):
         self.contactInfo = info
-
-    def _grantSubmission(self, av):
-        if av not in self.getSubmitterList():
-            self.submitters.append(av)
-            self._p_changed = 1
-
-    def grantSubmission(self, sb):
-        """Grants submission privileges for the specified user
-        """
-        av = self._getAvatarByEmail(sb.getEmail())
-        if av and av.isActivated():
-            self._grantSubmission(av)
-        elif sb.getEmail():
-            self.getOwner().getConference().getPendingQueuesMgr().addSubmitter(sb, self.getOwner(), False)
-
-    def _revokeSubmission(self, av):
-        if av in self.getSubmitterList():
-            self.submitters.remove(av)
-            self._p_changed = 1
-
-    def revokeSubmission(self, sb):
-        """Removes submission privileges for the specified user
-        """
-        av = self._getAvatarByEmail(sb.getEmail())
-        self.getOwner().getConference().getPendingQueuesMgr().removeSubmitter(sb, self.getOwner())
-        self._revokeSubmission(av)
-
-    def _getAvatarByEmail(self, email):
-        from MaKaC.user import AvatarHolder
-        ah = AvatarHolder()
-        avatars = ah.match({"email": email}, exact=1, searchInAuthenticators=False)
-        if not avatars:
-            avatars = ah.match({"email": email}, exact=1)
-        for av in avatars:
-            if av.hasEmail(email):
-                return av
-        return None
-
-    def getSubmitterList(self, no_groups=False):
-        """Gives the list of users with submission privileges
-        """
-        try:
-            return self.submitters
-        except AttributeError:
-            self.submitters = []
-            return self.submitters
-
-    def canUserSubmit(self, user):
-        """Tells whether a user can submit material
-        """
-        return user in self.getSubmitterList()
 
     def addNonInheritingChildren(self, obj):
         self.nonInheritingChildren.add(obj)

@@ -81,4 +81,4 @@ def can_edit_note(obj, user):
     elif isinstance(obj, SubContribution):
         return can_edit_note(obj.getContribution(), user)
     else:
-        return obj.canModify(user.as_avatar) or obj.getAccessController().canUserSubmit(user.as_avatar)
+        return obj.canModify(user.as_avatar)
