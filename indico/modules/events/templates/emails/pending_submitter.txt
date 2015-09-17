@@ -8,9 +8,9 @@
 
 {% block body -%}
     {%- filter dedent -%}
-        You have been added as a manager of the event "{{ event.title }}".
+        You have been added with material submission privileges to the event "{{ event.title }}".
 
-        To access the management area of the event, you need to create a new Indico profile.
+        To use those privileges, you need to create a new Indico profile.
         You can do so at the following URL:
         {{ url }}
 
