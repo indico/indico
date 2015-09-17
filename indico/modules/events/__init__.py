@@ -22,14 +22,14 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.notifications import make_email, send_email
-from indico.core.roles import check_roles
+from indico.core.roles import check_roles, ManagementRole
 from indico.modules.auth.util import url_for_register
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from indico.util.i18n import ngettext
+from indico.util.i18n import _, ngettext
 from indico.util.string import is_legacy_id
 
 
@@ -135,3 +135,14 @@ def _handle_legacy_ids(app, **kwargs):
 @signals.app_created.connect
 def _check_roles(app, **kawrgs):
     check_roles(Event)
+
+
+@signals.acl.get_management_roles.connect_via(Event)
+def _get_management_roles(sender, **kwargs):
+    return SubmitterRole
+
+
+class SubmitterRole(ManagementRole):
+    name = 'submit'
+    friendly_name = _('Submission')
+    description = _('Grants access to materials and minutes.')

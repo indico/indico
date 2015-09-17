@@ -361,7 +361,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
         vars["actions"] = ''
-        vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser()) or self._conf.canModify(self._aw)
+        vars["isSubmitter"] = self._conf.as_event.can_manage(session.user, 'submit')
 
         regform = self._conf.getRegistrationForm()
         if regform:
@@ -662,22 +662,22 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                 info["minutesLink"] = True
                 info["materialLink"] = True
                 info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
-            if item.getAccessController().canUserSubmit(self._rh._aw.getUser()):
+            elif item.as_event.can_manage(session.user, 'submit'):
                 info["minutesLink"] = True
                 info["materialLink"] = True
 
         elif itemType == 'Session':
-            session = item.getSession()
-            info['parentProtection'] = session.getAccessController().isProtected()
-            if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
+            sess = item.getSession()
+            info['parentProtection'] = sess.getAccessController().isProtected()
+            if sess.canModify(self._rh._aw) or sess.canCoordinate(self._rh._aw):
                 info["modifyLink"] = urlHandlers.UHSessionModification.getURL(item)
             info['slotId'] = item.getId()
-            info['sessId'] = session.getId()
-            if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
+            info['sessId'] = sess.getId()
+            if sess.canModify(self._rh._aw) or sess.canCoordinate(self._rh._aw):
                 info["minutesLink"] = True
                 info["materialLink"] = True
-                url = urlHandlers.UHSessionModifSchedule.getURL(session)
-                ttLink = "%s#%s.s%sl%s" % (url, session.getStartDate().strftime('%Y%m%d'), session.getId(), info['slotId'])
+                url = urlHandlers.UHSessionModifSchedule.getURL(sess)
+                ttLink = "%s#%s.s%sl%s" % (url, sess.getStartDate().strftime('%Y%m%d'), sess.getId(), info['slotId'])
                 info["sessionTimetableLink"] = ttLink
 
         elif itemType == 'Contribution':
@@ -1247,10 +1247,12 @@ class WConfModifMainData(wcomponents.WTemplated):
             user = get_user_by_email(chair['email'])
             chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
-            if not user:
-                if self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(chair['email']):
-                    chair['showSubmitterCB'] = False
-            elif user.as_avatar in self._conf.getAccessController().getSubmitterList():
+            email_submitters = {x.email for x in self._conf.as_event.acl_entries
+                                if x.type == PrincipalType.email and x.has_management_role('submit', explicit=True)}
+            if chair['email'] in email_submitters or (user and self._conf.as_event.can_manage(user, 'submit',
+                                                                                              check_parent=False,
+                                                                                              allow_admin=False,
+                                                                                              explicit=True)):
                 chair['showSubmitterCB'] = False
             email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
             if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, check_parent=False,

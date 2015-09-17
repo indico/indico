@@ -363,8 +363,8 @@ class UtilPersons:
         conf.addChair(chair)
         if grantManager and chair.getEmail():
             conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), full_access=True)
-        if grantSubmission:
-            conf.getAccessController().grantSubmission(chair)
+        if grantSubmission and chair.getEmail():
+            conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), add_roles={'submit'})
 
 class UtilsConference:
 

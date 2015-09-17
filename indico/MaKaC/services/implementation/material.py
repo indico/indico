@@ -18,6 +18,7 @@
 Schedule-related services
 """
 
+from flask import session
 from indico.util.user import principal_from_fossil
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError,NoReportError
 from MaKaC.services.implementation.base import ProtectedModificationService, ProtectedDisplayService
@@ -99,7 +100,7 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         owner = self._material.getOwner()
 
         # Conference submitters have access
-        if isinstance(owner, conference.Conference) and owner.getAccessController().canUserSubmit(self._aw.getUser()):
+        if isinstance(owner, conference.Conference) and owner.as_event.can_manage(session.user, 'submit'):
             return
 
         # There are two exceptions to the normal permission scheme:

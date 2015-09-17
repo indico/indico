@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from flask import request, session
 
 import tempfile
 import os
@@ -152,7 +152,8 @@ class RHSubmitMaterialBase(object):
         if (self._getUser() is None and (isinstance(self._target, Category) or
                                          not self._target.getConference().canKeyModify())):
             self._loggedIn = False
-        elif self._getUser() and isinstance(self._target, Conference) and self._target.getAccessController().canUserSubmit(self._getUser()):
+        elif (self._getUser() and isinstance(self._target, Conference) and
+                self._target.as_event.can_manage(session.user, 'submit')):
             self._loggedIn = True
         else:
             super(RHSubmitMaterialBase, self)._checkProtection()

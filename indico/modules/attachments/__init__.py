@@ -26,6 +26,7 @@ from indico.modules.attachments.legacy import connect_legacy_signals
 from indico.modules.attachments.logging import connect_log_signals
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.attachments.util import can_manage_attachments
 
 
 logger = Logger.get('attachments')
@@ -48,7 +49,13 @@ def _merge_users(target, source, **kwargs):
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', event),
-                                       visible=event.canModify(session.user), section='organization')
+                                       visible=can_manage_attachments(event, session.user), section='organization')
+
+
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if can_manage_attachments(event, session.user):
+        return url_for('attachments.management', event)
 
 
 @signals.category.management_sidemenu.connect

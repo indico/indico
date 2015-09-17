@@ -7,7 +7,7 @@
     <div class="flashed-messages"></div>
 
     <div class="attachment-editor">
-        {% if linked_object_type != 'category' %}
+        {% if linked_object_type != 'category' and (linked_object_type != 'event' or linked_object.as_event.can_manage(session.user)) %}
             <div class="action-box fixed-width">
                 <div class="section">
                     <span class="icon icon-package-download"></span>

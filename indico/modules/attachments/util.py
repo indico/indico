@@ -97,9 +97,11 @@ def get_nested_attached_items(obj):
 
 def can_manage_attachments(obj, user):
     """Checks if a user can manage attachments for the object"""
-    from MaKaC.conference import Contribution, Session, SubContribution
+    from MaKaC.conference import Contribution, Session, SubContribution, Conference
     if not user:
         return False
+    if isinstance(obj, Conference) and obj.as_event.can_manage(user, 'submit'):
+        return True
     if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
         return True
     if isinstance(obj, Contribution) and obj.canUserSubmit(user.as_avatar):

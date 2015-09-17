@@ -1200,12 +1200,15 @@ class ConferenceChairPersonBase(ConferenceModifBase):
             user = get_user_by_email(chair['email'])
             chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
-            if not user:
-                if self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(chair['email']):
-                    chair['showSubmitterCB'] = False
-            elif user.as_avatar in self._conf.getAccessController().getSubmitterList():
+            email_submitters = {x.email for x in self._conf.as_event.acl_entries
+                                if x.type == PrincipalType.email and x.has_management_role('submit', explicit=True)}
+            if chair['email'] in email_submitters or (user and self._conf.as_event.can_manage(user, 'submit',
+                                                                                              check_parent=False,
+                                                                                              allow_admin=False,
+                                                                                              explicit=True)):
                 chair['showSubmitterCB'] = False
-            email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
+            email_managers = {x.email for x in self._conf.as_event.acl_entries
+                              if x.type == PrincipalType.email and x.has_management_role()}
             if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, check_parent=False,
                                                                                             allow_admin=False)):
                 chair['showManagerCB'] = False
@@ -1241,7 +1244,7 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
         chair.setFax(av.getFax())
         self._conf.addChair(chair)
         if self._submissionRights:
-            self._conf.getAccessController().grantSubmission(chair)
+            self._conf.as_event.update_principal(av.user, add_roles={'submit'})
 
     def _getAnswer(self):
         for person in self._userList:
@@ -1277,9 +1280,9 @@ class ConferenceAddNewChairPerson(ConferenceChairPersonBase):
 
         #If the chairperson needs to be given submission rights
         if self._userData.get("submission", False):
-            if self._userData.get("email", "") == "":
+            if not email:
                 raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
-            self._conf.getAccessController().grantSubmission(chair)
+            self._conf.as_event.update_principal(EmailPrincipal(email), add_roles={'submit'})
 
     def _getAnswer(self):
         self._newChair()
@@ -1300,7 +1303,11 @@ class ConferenceRemoveChairPerson(ConferenceChairPersonBase):
             raise NoReportError(_('Someone may have deleted this chairperson meanwhile. Please refresh the page.'))
 
         self._conf.removeChair(chair)
-        self._conf.getAccessController().revokeSubmission(chair)
+        email = chair.getEmail()
+        if email:
+            # XXX: this doesn't remove managerment permissions. probably because we don't know
+            # they were granted before or when adding him as a chairperson?
+            self._conf.as_event.update_principal(EmailPrincipal(email), del_roles={'submit'})
         return self._getChairPersonsList()
 
 
@@ -1327,7 +1334,7 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
         chair.setFamilyName(self._userData.get("familyName", ""))
         chair.setAffiliation(self._userData.get("affiliation", ""))
         if self._userData.get("email", "").lower().strip() != chair.getEmail().lower().strip():
-            self._conf.getPendingQueuesMgr().removePendingConfSubmitter(chair)
+            self._conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), del_roles={'submit'})
         chair.setEmail(self._userData.get("email", ""))
         chair.setAddress(self._userData.get("address", ""))
         chair.setPhone(self._userData.get("phone", ""))
@@ -1338,9 +1345,9 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
             self._conf.as_event.update_principal(EmailPrincipal(email), full_access=True)
         #If the chairperson needs to be given submission rights because the checkbox is selected
         if self._userData.get("submission", False):
-            if self._userData.get("email", "") == "":
+            if not email:
                 raise ServiceAccessError(_("It is necessary to enter the email of the user if you want to add him as submitter."))
-            self._conf.getAccessController().grantSubmission(chair)
+            self._conf.as_event.update_principal(EmailPrincipal(email), add_roles={'submit'})
 
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
@@ -1371,9 +1378,9 @@ class ConferenceChangeSubmissionRights(ConferenceChairPersonBase):
 
     def _getAnswer(self):
         if self._action == "grant":
-            self._conf.getAccessController().grantSubmission(self._chairperson)
+            self._conf.as_event.update_principal(EmailPrincipal(self._chairperson.getEmail()), add_roles={'submit'})
         elif self._action == "remove":
-            self._conf.getAccessController().revokeSubmission(self._chairperson)
+            self._conf.as_event.update_principal(EmailPrincipal(self._chairperson.getEmail()), del_roles={'submit'})
         return self._getChairPersonsList()
 
 class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase ):
