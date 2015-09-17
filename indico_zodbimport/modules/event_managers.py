@@ -86,13 +86,42 @@ class EventManagerImporter(Importer):
                                    always=False)
         return principal
 
+    def process_principal(self, event, principals, legacy_principal, name, color, full_access=None, roles=None):
+        if isinstance(legacy_principal, basestring):
+            user = self.all_users_by_email.get(legacy_principal)
+            principal = user or EmailPrincipal(legacy_principal)
+        else:
+            principal = self.convert_principal(legacy_principal)
+        if principal is None:
+            self.print_warning(cformat('%%{%s}{}%%{reset}%%{yellow} does not exist:%%{reset} {}' % color)
+                               .format(name, legacy_principal), event_id=event.id)
+            return
+        try:
+            entry = principals[principal]
+        except KeyError:
+            entry = EventPrincipal(event_id=event.id, principal=principal, full_access=False, roles=[])
+            principals[principal] = entry
+        if full_access:
+            entry.full_access = True
+        if roles:
+            entry.roles = sorted(set(entry.roles) | set(roles))
+        if not self.quiet:
+            self.print_msg(cformat('    - %%{%s}[{}]%%{reset} {}' % color).format(name.lower(), principal))
+        return principal
+
+    def process_emails(self, event, principals, emails, name, color, full_access=None, roles=None):
+        emails = {_sanitize_email(convert_to_unicode(email).lower()) for email in emails}
+        emails = {email for email in emails if is_valid_mail(email, False)}
+        for email in emails:
+            self.process_principal(event, principals, email, name, color, full_access, roles)
+
     def migrate_event_managers(self):
         self.print_step('migrating event managers/creators')
         creator_updates = []
         for event in committing_iterator(self._iter_events(), 5000):
             self.print_success('', event_id=event.id)
             ac = event._Conference__ac
-            managers = {}
+            entries = {}
             # add creator as a manager
             try:
                 creator = event._Conference__creator
@@ -100,88 +129,28 @@ class EventManagerImporter(Importer):
                 # events created after the removal of the `self.__creator` assignment
                 # should happen only on dev machines
                 self.print_error(cformat('%{red!}Event has no creator attribute'), event_id=event.id)
-                creator_principal = None
             else:
-                creator_principal = self.convert_principal(creator)
-                if creator_principal is None:
-                    self.print_warning(cformat('%{yellow!}Creator does not exist: {}').format(creator),
-                                       event_id=event.id)
-                else:
-                    creator_updates.append({'event_id': int(event.id), 'creator_id': creator_principal.id})
-                    managers[creator_principal] = EventPrincipal(event_id=event.id, principal=creator_principal,
-                                                                 full_access=True, roles=[])
-                    if not self.quiet:
-                        self.print_msg(cformat('    - {} %{green!}[creator]%{reset}').format(creator_principal))
+                user = self.process_principal(event, entries, creator, 'Creator', 'green!', full_access=True)
+                if user:
+                    creator_updates.append({'event_id': int(event.id), 'creator_id': user.id})
             # add managers
             for manager in ac.managers:
-                manager_principal = self.convert_principal(manager)
-                if manager_principal is None:
-                    self.print_warning(cformat('%{yellow}Manager does not exist: {}').format(manager),
-                                       event_id=event.id)
-                    continue
-                elif manager_principal == creator_principal:
-                    continue
-                if manager_principal not in managers:
-                    managers[manager_principal] = EventPrincipal(event_id=event.id, principal=manager_principal,
-                                                                 full_access=True, roles=[])
-                    if not self.quiet:
-                        self.print_msg(cformat('    - {} %{blue!}[manager]%{reset}').format(manager_principal))
+                self.process_principal(event, entries, manager, 'Manager', 'blue!', full_access=True)
             # add email-based managers
-            emails = getattr(ac, 'managersEmail', None)
-            if emails:
-                emails = {_sanitize_email(convert_to_unicode(email).lower()) for email in emails}
-                emails = {email for email in emails if is_valid_mail(email, False)}
-                emails.difference_update(*(x.all_emails for x in managers if not x.is_group))
-                for email in emails:
-                    user = self.all_users_by_email.get(email)
-                    principal = user or EmailPrincipal(email)  # use the user if it exists
-                    managers[principal] = EventPrincipal(event_id=event.id, principal=principal, full_access=True,
-                                                         roles=[])
-                    if not self.quiet:
-                        self.print_msg(cformat('    - {} %{green}[manager]%{reset}').format(principal))
+            emails = getattr(ac, 'managersEmail', [])
+            self.process_emails(event, entries, emails, 'Manager', 'green', full_access=True)
             # add registrars
             for registrar in getattr(event, '_Conference__registrars', []):
-                registrar_principal = self.convert_principal(registrar)
-                if registrar_principal is None:
-                    self.print_warning(cformat('%{yellow!}Registrar does not exist: {}').format(registrar),
-                                       event_id=event.id)
-                    continue
-                elif registrar_principal in managers:
-                    managers[registrar_principal].roles = ['registration']
-                else:
-                    managers[registrar_principal] = EventPrincipal(event_id=event.id, principal=registrar_principal,
-                                                                   roles=['registration'])
-                if not self.quiet:
-                    self.print_msg(cformat('    - {} %{cyan}[registrar]%{reset}').format(registrar_principal))
+                self.process_principal(event, entries, registrar, 'Registrar', 'cyan', roles={'registration'})
             # add submitters
             for submitter in getattr(ac, 'submitters', []):
-                submitter_principal = self.convert_principal(submitter)
-                if submitter_principal is None:
-                    self.print_warning(cformat('%{yellow!}Submitter does not exist: {}').format(submitter),
-                                       event_id=event.id)
-                    continue
-                elif submitter_principal in managers:
-                    managers[submitter_principal].roles.append('submit')
-                else:
-                    managers[submitter_principal] = EventPrincipal(event_id=event.id, principal=submitter_principal,
-                                                                   roles=['submit'])
-                if not self.quiet:
-                    self.print_msg(cformat('    - {} %{magenta!}[submitter]%{reset}').format(submitter_principal))
+                self.process_principal(event, entries, submitter, 'Submitter', 'magenta!', roles={'submit'})
             # email-based (pending) submitters
             pqm = getattr(event, '_pendingQueuesMgr', None)
             if pqm is not None:
                 emails = set(getattr(pqm, '_pendingConfSubmitters', []))
-                emails = {_sanitize_email(convert_to_unicode(email).lower()) for email in emails}
-                emails = {email for email in emails if is_valid_mail(email, False)}
-                emails.difference_update(*(x.all_emails for x in managers if not x.is_group))
-                for email in emails:
-                    user = self.all_users_by_email.get(email)
-                    principal = user or EmailPrincipal(email)  # use the user if it exists
-                    assert principal not in managers
-                    managers[principal] = EventPrincipal(event_id=event.id, principal=principal, roles=['submit'])
-                    if not self.quiet:
-                        self.print_msg(cformat('    - {} %{magenta}[submitter]%{reset}').format(principal))
-            db.session.add_all(managers.itervalues())
+                self.process_emails(event, entries, emails, 'Submitter', 'magenta', roles={'submit'})
+            db.session.add_all(entries.itervalues())
         # assign creators
         if creator_updates:
             self.print_step('saving event creators')

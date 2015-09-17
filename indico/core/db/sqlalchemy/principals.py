@@ -93,6 +93,9 @@ class EmailPrincipal(Fossilizable):
     def __ne__(self, other):
         return not (self == other)
 
+    def __hash__(self):
+        return hash(self.email)
+
     def __contains__(self, user):
         return self.email in user.all_emails
 
