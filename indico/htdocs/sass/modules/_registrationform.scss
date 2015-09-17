@@ -1145,3 +1145,73 @@ textarea.regFormDescriptionInputMgmt {
         margin-top: -1.2em;
     }
 }
+
+.reglist-filter-dialog {
+    max-width: 1200px;
+}
+
+.reglist-filter {
+    padding-bottom: 14em;
+    position: relative;
+
+        > .i-label {
+        margin: 5px;
+        padding-bottom: 0;
+        padding-left: 0;
+
+        &.reglist-column {
+            width: 12em;
+
+            > .title {
+                max-width: 90%;
+                min-width: 90%;
+                height: 100%;
+                padding-bottom: 4px;
+                padding-left: 10px;
+                box-sizing: border-box;
+
+                &:before {
+                    margin-right: 0.5em;
+                }
+            }
+
+            &:hover {
+                .title:before {
+                    color: $yellow;
+                }
+            }
+
+            > .actions {
+                max-width: 10%;
+            }
+
+            &.filter {
+                cursor: pointer;
+            }
+        }
+    }
+
+    ul.dropdown {
+        line-height: auto;
+        height: auto;
+        z-index: 1;
+        max-height: 12em;
+        overflow: auto;
+        min-width: 12em;
+        box-sizing: border-box;
+
+        > li > span {
+            color: $black;
+            margin-left: 0.5em;
+            line-height: 2;
+            height: 2em;
+            vertical-align: middle;
+        }
+    }
+
+    > .bottom-buttons {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+}

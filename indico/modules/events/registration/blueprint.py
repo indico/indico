@@ -37,7 +37,8 @@ from indico.modules.events.registration.controllers.management.sections import (
                                                                                 RHRegistrationFormModifySection,
                                                                                 RHRegistrationFormToggleSection,
                                                                                 RHRegistrationFormMoveSection)
-from indico.modules.events.registration.controllers.management.reglists import RHRegistrationsListManage
+from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationsListManage,
+                                                                                RHRegistrationsListCustomize)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -64,6 +65,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform
 
 # Registrations list actions
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrants/list', 'manage_reglist', RHRegistrationsListManage)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrants/list/customize', 'customize_reglist',
+                 RHRegistrationsListCustomize, methods=('GET', 'POST'))
 
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated
