@@ -1,5 +1,6 @@
-{% extends 'layout/base.html' %}
+{% extends 'layout/full_content_base.html' %}
 {% from 'message_box.html' import message_box %}
+{% from 'events/registration/management/_reglist.html' import render_registrations_list %}
 
 {% block title %}
     {%- trans %}Registrations{% endtrans -%}
@@ -10,45 +11,34 @@
 {% endblock %}
 
 {% block content %}
-    {% if regform.registrations %}
-        <div class="registrations">
-            <div class="toolbar">
-                <div class="group left">
-                    <a href="#" class="i-button icon-settings">{% trans %}Customize report{% endtrans %}</a>
-                    <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
-                    <a href="#" class="i-button icon-remove">{% trans %}Remove{% endtrans %}</a>
-                    <a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a>
-                    <a href="#" class="i-button icon-tag">{% trans %}Print Badges{% endtrans %}</a>
-                    <a href="#" class="i-button icon-attachment">{% trans %}Attachments{% endtrans %}</a>
-                    <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Export{% endtrans %}</a>
-                    <ul class="dropdown">
-                        <li><a href="#" class="icon-file-pdf">PDF</a></li>
-                        <li><a href="#" class="icon-file-excel">CSV</a></li>
-                    </ul>
-                </div>
+    <div class="registrations">
+        <div class="toolbar">
+            <div class="group left">
+                <a href="#" class="i-button icon-settings js-dialog-action"
+                   data-href="{{ url_for('.customize_reglist', regform) }}"
+                   data-title="{% trans %}Customize report{% endtrans %}">
+                    {% trans %}Customize report{% endtrans %}
+                </a>
             </div>
-            <table class="i-table">
-                <thead>
-                    <tr class="i-table">
-                        <td class="i-table checkbox-column"></td>
-                        <td class="i-table">{% trans %}Full name{% endtrans %}</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for registration in regform.registrations %}
-                        <tr class="i-table">
-                            <td class="i-table">
-                                <input class="select-row" type="checkbox" name="registrant" value="{{ registration.id }}"/>
-                            </td>
-                            <td class="i-table">{{ registration.user.full_name }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="group left">
+                <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
+                <a href="#" class="i-button icon-remove">{% trans %}Remove{% endtrans %}</a>
+                <a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a>
+                <a href="#" class="i-button icon-tag">{% trans %}Print Badges{% endtrans %}</a>
+                <a href="#" class="i-button icon-attachment">{% trans %}Attachments{% endtrans %}</a>
+                <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Export{% endtrans %}</a>
+                <ul class="dropdown">
+                    <li><a href="#" class="icon-file-pdf">PDF</a></li>
+                    <li><a href="#" class="icon-file-excel">CSV</a></li>
+                </ul>
+            </div>
         </div>
-    {% else %}
-        {%- call message_box('info', fixed_width=true) -%}
-            {% trans %}There are no registrations yet.{% endtrans %}
-        {%- endcall %}
-    {% endif %}
+        {% if regform.registrations %}
+            {{ render_registrations_list(regform, visible_reg_items) }}
+        {% else %}
+            {%- call message_box('info', fixed_width=true) -%}
+                {% trans %}There are no registrations yet.{% endtrans %}
+            {%- endcall %}
+        {% endif %}
+    </div>
 {% endblock %}
