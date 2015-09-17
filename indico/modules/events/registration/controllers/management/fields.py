@@ -105,6 +105,12 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
             for key, val in CountryHolder.getCountries().iteritems():
                 field_data['radioitems'].append({'caption': val, 'countryKey': key})
 
+        if field_data['input'] == 'date':
+            dateFormat = field_data['dateFormat'].split(' ')
+            field_data['dateFormat'] = dateFormat[0]
+            if len(dateFormat) == 2:
+                field_data['timeFormat'] = dateFormat[1]
+
         if field_data['input'] == 'label':
             field_type = RegistrationFormText
         else:
