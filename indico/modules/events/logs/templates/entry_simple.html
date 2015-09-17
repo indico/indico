@@ -1,7 +1,7 @@
 {% extends 'events/logs/entry_base.html' %}
 
 {% block entry_detail_rows %}
-    {% for key, value in data if value %}
+    {% for key, value in data if value not in ('', none) %}
         <tr class="i-table content">
             <td class="i-table caption log-caption">
                 {{ key }}
