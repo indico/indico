@@ -2567,6 +2567,64 @@ class RHConfModifPendingQueues( RHConferenceModifBase ):
         return p.display()
 
 
+class RHConfModifPendingQueuesActionConfMgr:
+    def process(self, params):
+        if 'remove' in params:
+            return RHConfModifPendingQueuesRemoveConfMgr().process(params)
+        elif 'reminder' in params:
+            return RHConfModifPendingQueuesReminderConfMgr().process(params)
+        return "no action to do"
+
+
+class RHConfModifPendingQueuesRemoveConfMgr(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._emails = self._normaliseListParam(params.get("pendingUsers", []))
+        self._remove = 'confirm' in params
+        self._confirmed = 'confirm' in params or 'cancel' in params
+
+    def _process(self):
+        url = urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab", "conf_managers")
+        if not self._emails:
+            self._redirect(url)
+        elif self._confirmed:
+            if self._remove:
+                for email in self._emails:
+                    self._conf.as_event.update_principal(EmailPrincipal(email), full_access=False)
+            self._redirect(url)
+        else:
+            wp = conferences.WPConfModifPendingQueuesRemoveConfMgrConfirm(self, self._conf, self._emails)
+            return wp.display()
+
+
+class RHConfModifPendingQueuesReminderConfMgr(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._emails = self._normaliseListParam(params.get("pendingUsers", []))
+        self._send = 'confirm' in params
+        self._confirmed = 'confirm' in params or 'cancel' in params
+
+    def _process(self):
+        url = urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab", "conf_managers")
+        if not self._emails:
+            self._redirect(url)
+        elif self._confirmed:
+            if self._send:
+                emails = set(self._emails)
+                entries = {entry
+                           for entry in self._conf.as_event.acl_entries
+                           if (entry.type == PrincipalType.email and entry.principal.email in emails and
+                               entry.has_management_role())}
+                for entry in entries:
+                    notify_pending(entry)
+            self._redirect(url)
+        else:
+            wp = conferences.WPConfModifPendingQueuesReminderConfMgrConfirm(self, self._conf, self._emails)
+            return wp.display()
+
+
 class RHConfModifPendingQueuesActionConfSubm:
     """
     class to select the action to do with the selected pending conference submitters
