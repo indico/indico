@@ -311,7 +311,6 @@ ndRegForm.directive('ndDateField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/date.tpl.html');
-
         },
 
         link: function(scope) {
@@ -319,14 +318,6 @@ ndRegForm.directive('ndDateField', function(url) {
             scope.settings.date = true;
             scope.settings.formData.push('displayFormats');
             scope.settings.formData.push('dateFormat');
-            scope.dateInputs = [
-                '{0}Day'.format(scope.getName(scope.field.input)),
-                '{0}Month'.format(scope.getName(scope.field.input)),
-                '{0}Year'.format(scope.getName(scope.field.input)),
-                '{0}Hour'.format(scope.getName(scope.field.input)),
-                '{0}Min'.format(scope.getName(scope.field.input))
-            ];
-
             scope.showTime = function(str) {
                 return str? str.match('H') !== null : false;
             };
