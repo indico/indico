@@ -1024,14 +1024,6 @@ class PendingSubmittersIndex( PendingQueuesUsersIndex ):
     pass
 
 
-class PendingConfManagersIndex( PendingQueuesUsersIndex ):
-    _name = "pendingConfManagers"
-    pass
-
-class PendingConfManagersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingConfManagersTasks"
-    pass
-
 class PendingSubmittersTasksIndex( PendinQueuesTasksIndex ):
     _name = "pendingSubmittersTasks"
     pass
@@ -1221,8 +1213,7 @@ class IndexesHolder(ObjectHolder):
     counterName = None
     __allowedIdxs = ["calendar", "category", "categoryDate",
                      "categoryDateAll", "categoryName", "conferenceTitle",
-                     "pendingSubmitters", "pendingConfManagers",
-                     "pendingConfManagersTasks", "pendingSubmittersTasks", "pendingManagers",
+                     "pendingSubmitters", "pendingSubmittersTasks", "pendingManagers",
                      "pendingManagersTasks", "pendingCoordinators",
                      "pendingCoordinatorsTasks"]
 
@@ -1252,10 +1243,6 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = PendingSubmittersIndex()
             elif id=="pendingSubmittersTasks":
                 Idx[str(id)] = PendingSubmittersTasksIndex()
-            elif id=="pendingConfManagers":
-                Idx[str(id)] = PendingConfManagersIndex()
-            elif id=="pendingConfManagersTasks":
-                Idx[str(id)] = PendingConfManagersTasksIndex()
             elif id=="pendingManagers":
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingManagersTasks":

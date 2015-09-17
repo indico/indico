@@ -348,21 +348,12 @@ class ConfPendingQueuesMgr(Persistent):
 
     def __init__(self, conf):
         self._conf=conf
-        self._pendingConfManagers={}
         self._pendingSubmitters={}
         self._pendingManagers={}
         self._pendingCoordinators={}
 
     def getConference(self):
         return self._conf
-
-    def getPendingConfManagers(self):
-        try:
-            if self._pendingConfManagers:
-                pass
-        except AttributeError:
-            self._pendingConfManagers={}
-        return self._pendingConfManagers
 
     def getPendingSubmitters(self):
         return self._pendingSubmitters

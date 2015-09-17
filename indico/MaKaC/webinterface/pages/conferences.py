@@ -4261,7 +4261,6 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
         self._conf = conf
         self._aw = aw
         self._activeTab = activeTab
-        self._pendingConfManagers = self._conf.getPendingQueuesMgr().getPendingConfManagers()
         self._pendingSubmitters = self._conf.getPendingQueuesMgr().getPendingSubmitters()
         self._pendingManagers = self._conf.getPendingQueuesMgr().getPendingManagers()
         self._pendingCoordinators = self._conf.getPendingQueuesMgr().getPendingCoordinators()
