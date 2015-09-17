@@ -1,0 +1,26 @@
+{% macro render_registrations_list(regform, visible_reg_items) %}
+    <table class="i-table">
+        <thead>
+            <tr class="i-table">
+                <td class="i-table checkbox-column"></td>
+                <td class="i-table">{% trans %}Full name{% endtrans %}</td>
+                {% for item in visible_reg_items %}
+                    <td class="i-table">{{ item.title }}</td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for registration in regform.registrations %}
+                <tr class="i-table">
+                    <td class="i-table">
+                        <input class="select-row" type="checkbox" name="registrant" value="{{ registration.id }}"/>
+                    </td>
+                    <td class="i-table">{{ registration.user.full_name }}</td>
+                    {% for item in visible_reg_items %}
+                        <td class="i-table">{# TODO: fill up with registration data #}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

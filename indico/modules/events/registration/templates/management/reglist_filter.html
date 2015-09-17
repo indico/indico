@@ -1,0 +1,46 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+
+{% block content -%}
+    <form class="reglist-filter" method="POST">
+        {% set visible_columns = visible_columns | tojson | forceescape %}
+        <input id="visible-columns" type="hidden" name="visible_columns" value="{{ visible_columns }}">
+        {% for item in regform.form_items %}
+            {% if item.type == RegistrationFormItemType.section %}
+                <h3>{{ item.title }}</h3>
+                {% for child_item in item.children %}
+                    {% if child_item.type == RegistrationFormItemType.field %}
+                        {% set has_dropdown = child_item.current_data.data.input in ['radio', 'country'] %}
+                        <div class="i-label reglist-column {%- if has_dropdown %} filter{% endif %}"
+                             data-id="{{ child_item.id }}">
+                            <span class="title {% if has_dropdown %}icon-filter{% endif %}"
+                                  data-toggle="dropdown">
+                                {{- child_item.title -}}
+                            </span>
+                            {% if has_dropdown %}
+                                <ul class="dropdown" style="display: none">
+                                    {% for radio_item in child_item.current_data.data.radioitems %}
+                                        <li>
+                                            <input type='checkbox' name='check1' value='{{ radio_item.caption }}'>
+                                            <span>{{ radio_item.caption }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            <span class="right actions">
+                                <a class="trigger icon-eye" href="#"></a>
+                            </span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        <div class="bottom-buttons">
+            <input class="i-button big highlight" type="submit" data-disabled-until-change
+                   value="{% trans %}Apply{% endtrans %}">
+            <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+        </div>
+    </form>
+    <script>
+        setupRegistrationsListFilter();
+    </script>
+{%- endblock %}
