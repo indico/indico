@@ -53,6 +53,7 @@ from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
+from indico.modules.events import notify_pending
 from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
@@ -61,6 +62,7 @@ from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.fossils.conference import ISessionBasicFossil
 
+from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file, url_for
@@ -2584,21 +2586,18 @@ class RHConfModifPendingQueuesRemoveConfSubm( RHConferenceModifBase ):
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
         self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
-        self._pendingConfSubms = []
-        for id in self._pendingConfSubmIds:
-            self._pendingConfSubms.extend(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(id))
         self._remove=params.has_key("confirm")
         self._confirmed=params.has_key("confirm") or params.has_key("cancel")
 
     def _process( self ):
         url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
         url.addParam("tab","conf_submitters")
-        if self._pendingConfSubms == []:
+        if not self._pendingConfSubmIds:
             self._redirect(url)
         if self._confirmed:
             if self._remove:
-                for ps in self._pendingConfSubms:
-                    self._conf.getPendingQueuesMgr().removePendingConfSubmitter(ps)
+                for email in self._pendingConfSubmIds:
+                    self._conf.as_event.update_principal(EmailPrincipal(email), del_roles={'submit'})
             self._redirect(url)
         else:
             wp = conferences.WPConfModifPendingQueuesRemoveConfSubmConfirm(self, self._conf, self._pendingConfSubmIds)
@@ -2608,10 +2607,7 @@ class RHConfModifPendingQueuesReminderConfSubm( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
-        self._pendingConfSubms = []
-        for email in self._pendingConfSubmIds:
-            self._pendingConfSubms.append(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(email))
+        self._emails = self._normaliseListParam(params.get("pendingUsers", []))
         self._send=params.has_key("confirm")
         self._confirmed=params.has_key("confirm") or params.has_key("cancel")
 
@@ -2619,16 +2615,20 @@ class RHConfModifPendingQueuesReminderConfSubm( RHConferenceModifBase ):
     def _process( self ):
         url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
         url.addParam("tab","conf_submitters")
-        if self._pendingConfSubms == []:
+        if not self._emails:
             self._redirect(url)
         if self._confirmed:
             if self._send:
-                pendings=pendingQueues.PendingConfSubmittersHolder()
-                for pss in self._pendingConfSubms:
-                    pendings._sendReminderEmail(pss)
+                emails = set(self._emails)
+                entries = {entry
+                           for entry in self._conf.as_event.acl_entries
+                           if (entry.type == PrincipalType.email and entry.principal.email in emails and
+                               entry.has_management_role('submit', explicit=True))}
+                for entry in entries:
+                    notify_pending(entry)
             self._redirect(url)
         else:
-            wp = conferences.WPConfModifPendingQueuesReminderConfSubmConfirm(self, self._conf, self._pendingConfSubmIds)
+            wp = conferences.WPConfModifPendingQueuesReminderConfSubmConfirm(self, self._conf, self._emails)
             return wp.display()
 
 class RHConfModifPendingQueuesActionSubm:

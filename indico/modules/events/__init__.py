@@ -21,13 +21,11 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
-from indico.core.notifications import make_email, send_email
 from indico.core.roles import check_roles, ManagementRole
-from indico.modules.auth.util import url_for_register
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
-from indico.web.flask.templating import get_template_module
+from indico.modules.events.util import notify_pending
 from indico.web.flask.util import url_for
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_legacy_id
@@ -78,26 +76,15 @@ def _convert_email_principals(user, **kwargs):
     events = EventPrincipal.replace_email_with_user(user, 'event_new')
     if events:
         num = len(events)
-        flash(ngettext("You have been granted manager privileges for an event.",
-                       "You have been granted manager privileges for {} events.", num).format(num), 'info')
+        flash(ngettext("You have been granted manager/submission privileges for an event.",
+                       "You have been granted manager/submission privileges for {} events.", num).format(num), 'info')
 
 
 @signals.acl.entry_changed.connect_via(Event)
 def _notify_pending(sender, obj, principal, entry, is_new, **kwargs):
-    if not isinstance(principal, EmailPrincipal) or not is_new or entry is None:
+    if entry is None or not is_new or not isinstance(principal, EmailPrincipal):
         return
-    if entry.full_access:
-        template_name = 'events/emails/pending_manager.txt'
-        endpoint = 'event_mgmt.conferenceModification-managementAccess'
-    elif entry.has_management_role('submit', explicit=True):
-        template_name = 'events/emails/pending_submitter.txt'
-        endpoint = 'event.conferenceDisplay'
-    else:
-        return
-    event = obj
-    template = get_template_module(template_name, event=event, email=principal.email,
-                                   url=url_for_register(url_for(endpoint, event), email=principal.email))
-    send_email(make_email(to_list={principal.email}, template=template), event.as_legacy, module='Protection')
+    notify_pending(entry)
 
 
 @signals.app_created.connect

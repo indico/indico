@@ -19,9 +19,14 @@ from __future__ import unicode_literals
 from flask import request
 from sqlalchemy.orm import load_only, noload
 
+from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.notifications import send_email, make_email
+from indico.modules.auth.util import url_for_register
 from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.fulltextindexes.models.events import IndexedEvent
+from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 
 
 def get_object_from_args(args=None):
@@ -111,3 +116,24 @@ def get_events_created_by(user, from_dt=None, to_dt=None):
         query = query.join(IndexedEvent, IndexedEvent.id == Event.id)
         query = query.filter(event_date_filter)
     return {event.id for event in query}
+
+
+def notify_pending(acl_entry):
+    """Sends a notification to a user with an email-based ACL entry
+
+    :param acl_entry: An email-based EventPrincipal
+    """
+    assert acl_entry.type == PrincipalType.email
+    if acl_entry.full_access:
+        template_name = 'events/emails/pending_manager.txt'
+        endpoint = 'event_mgmt.conferenceModification-managementAccess'
+    elif acl_entry.has_management_role('submit', explicit=True):
+        template_name = 'events/emails/pending_submitter.txt'
+        endpoint = 'event.conferenceDisplay'
+    else:
+        return
+    event = acl_entry.event_new
+    email = acl_entry.principal.email
+    template = get_template_module(template_name, event=event, email=email,
+                                   url=url_for_register(url_for(endpoint, event), email=email))
+    send_email(make_email(to_list={email}, template=template), event.as_legacy, module='Protection')

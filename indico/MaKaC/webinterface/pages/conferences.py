@@ -4262,7 +4262,6 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
         self._aw = aw
         self._activeTab = activeTab
         self._pendingConfManagers = self._conf.getPendingQueuesMgr().getPendingConfManagers()
-        self._pendingConfSubmitters = self._conf.getPendingQueuesMgr().getPendingConfSubmitters()
         self._pendingSubmitters = self._conf.getPendingQueuesMgr().getPendingSubmitters()
         self._pendingManagers = self._conf.getPendingQueuesMgr().getPendingManagers()
         self._pendingCoordinators = self._conf.getPendingQueuesMgr().getPendingCoordinators()
@@ -4297,16 +4296,20 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
 
         if self._tabConfSubmitters.isActive():
             # Pending conference submitters
-            keys = self._conf.getPendingQueuesMgr().getPendingConfSubmittersKeys(True)
-
             url = urlHandlers.UHConfModifPendingQueuesActionConfSubm.getURL(self._conf)
             url.addParam("tab","conf_submitters")
             title = _("Pending chairpersons/speakers to become submitters")
             target = _("Conference")
             pType = "ConfSubmitters"
 
-            for key in keys:
-                list.append((key, self._pendingConfSubmitters[key][:]))
+            emails = [x.principal.email for x in self._conf.as_event.acl_entries
+                      if x.type == PrincipalType.email and x.has_management_role('submit', explicit=True)]
+            chairs = {c.getEmail().strip().lower(): c for c in self._conf.getChairList() if c.getEmail().strip()}
+            for email in emails:
+                # XXX: this will fail if we ever have a submitter without a corresponding chairperson.
+                # i don't think this can happen unless you mess with the DB...
+                # if it does simply ignore KeyErrors here.. it's legacy code anyway!
+                list.append((email, [chairs[email]]))
 
         elif self._tabSubmitters.isActive():
             # Pending submitters
