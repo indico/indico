@@ -23,6 +23,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
@@ -146,6 +147,7 @@ class _LocalGroupProxy(GroupProxy):
     is_local = True
     supports_member_list = True
     provider = None
+    principal_type = PrincipalType.local_group
 
     @property
     def locator(self):
@@ -193,6 +195,7 @@ class _LocalGroupProxy(GroupProxy):
 
 class _MultipassGroupProxy(GroupProxy):
     is_local = False
+    principal_type = PrincipalType.multipass_group
 
     @property
     def locator(self):
@@ -219,6 +222,10 @@ class _MultipassGroupProxy(GroupProxy):
     def as_legacy_group(self):
         from indico.modules.groups.legacy import LDAPGroupWrapper
         return LDAPGroupWrapper(self.name)
+
+    @property
+    def provider_title(self):
+        return multipass.identity_providers[self.provider].title
 
     def has_member(self, user):
         if not user:

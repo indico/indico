@@ -20,7 +20,7 @@ from flask import request, redirect, flash, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
-from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.roles import check_roles, ManagementRole, get_available_roles
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
@@ -83,7 +83,7 @@ def _convert_email_principals(user, **kwargs):
 
 @signals.acl.entry_changed.connect_via(Event)
 def _notify_pending(sender, obj, principal, entry, is_new, **kwargs):
-    if entry is None or not is_new or not isinstance(principal, EmailPrincipal):
+    if entry is None or not is_new or principal.principal_type != PrincipalType.email:
         return
     notify_pending(entry)
 
@@ -98,13 +98,14 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, **kwargs):
                                 if role.name in roles))
 
     data = {}
-    # XXX: Add a mixin to those classes so we can get the type nicely?!
-    if principal.is_group:
-        data['Group'] = principal.name
-    elif isinstance(principal, EmailPrincipal):
-        data['Email'] = principal.email
-    else:
+    if principal.principal_type == PrincipalType.user:
         data['User'] = principal.full_name
+    elif principal.principal_type == PrincipalType.email:
+        data['Email'] = principal.email
+    elif principal.principal_type == PrincipalType.local_group:
+        data['Group'] = principal.name
+    elif principal.principal_type == PrincipalType.multipass_group:
+        data['Group'] = '{} ({})'.format(principal.name, principal.provider_title)
     if entry is None:
         data['Manager'] = old_data['full_access']
         data['Roles'] = _format_roles(old_data['roles'])

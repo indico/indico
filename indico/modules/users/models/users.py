@@ -29,6 +29,7 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
@@ -64,6 +65,7 @@ class User(db.Model):
 
     # Useful when dealing with both users and groups in the same code
     is_group = False
+    principal_type = PrincipalType.user
 
     __tablename__ = 'users'
     __table_args__ = (db.CheckConstraint('id != merged_into_id', 'not_merged_self'),

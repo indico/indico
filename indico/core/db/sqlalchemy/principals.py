@@ -68,6 +68,7 @@ class EmailPrincipal(Fossilizable):
     :param email: The email address.
     """
 
+    principal_type = PrincipalType.email
     is_group = False
     fossilizes(IEmailPrincipalFossil)
 
@@ -230,25 +231,23 @@ class PrincipalMixin(object):
 
     @principal.setter
     def principal(self, value):
+        self.type = value.principal_type
         self.email = None
         self.user = None
         self.local_group = None
         self.multipass_group_provider = self.multipass_group_name = None
-        if isinstance(value, EmailPrincipal):
+        if self.type == PrincipalType.email:
             assert self.allow_emails
-            self.type = PrincipalType.email
             self.email = value.email
-        elif value.is_group:
-            if value.is_local:
-                self.type = PrincipalType.local_group
-                self.local_group = value.group
-            else:
-                self.type = PrincipalType.multipass_group
-                self.multipass_group_provider = value.provider
-                self.multipass_group_name = value.name
-        else:
-            self.type = PrincipalType.user
+        elif self.type == PrincipalType.local_group:
+            self.local_group = value.group
+        elif self.type == PrincipalType.multipass_group:
+            self.multipass_group_provider = value.provider
+            self.multipass_group_name = value.name
+        elif self.type == PrincipalType.user:
             self.user = value
+        else:
+            raise ValueError('Unexpected principal type: {}'.format(self.type))
 
     @principal.comparator
     def principal(cls):
@@ -421,19 +420,15 @@ class PrincipalComparator(Comparator):
         raise NotImplementedError
 
     def __eq__(self, other):
-        if isinstance(other, EmailPrincipal):
-            return db.and_(self.cls.type == PrincipalType.email,
-                           self.cls.email == other.email)
-        elif not hasattr(other, 'is_group'):
-            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
-        elif other.is_group:
-            if other.is_local:
-                return db.and_(self.cls.type == PrincipalType.local_group,
-                               self.cls.local_group_id == other.id)
-            else:
-                return db.and_(self.cls.type == PrincipalType.multipass_group,
-                               self.cls.multipass_group_provider == other.provider,
-                               self.cls.multipass_group_name == other.name)
+        if other.principal_type == PrincipalType.email:
+            criteria = [self.cls.email == other.email]
+        elif other.principal_type == PrincipalType.local_group:
+            criteria = [self.cls.local_group_id == other.id]
+        elif other.principal_type == PrincipalType.multipass_group:
+            criteria = [self.cls.multipass_group_provider == other.provider,
+                        self.cls.multipass_group_name == other.name]
+        elif other.principal_type == PrincipalType.user:
+            criteria = [self.cls.user_id == other.id]
         else:
-            return db.and_(self.cls.type == PrincipalType.user,
-                           self.cls.user_id == other.id)
+            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
+        return db.and_(self.cls.type == other.principal_type, *criteria)
