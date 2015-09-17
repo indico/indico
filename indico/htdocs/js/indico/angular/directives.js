@@ -468,3 +468,21 @@ ndDirectives.directive('ndInitFocus', function() {
         }, 0);
     };
 });
+
+ndDirectives.directive('ndJqueryDatepicker', function() {
+    return {
+        require: 'ngModel',
+        restrict: 'A',
+        link: function(scope, element) {
+            _.defer(function() {
+                element.datepicker({
+                    dateFormat: scope.field.dateFormat,
+                    onSelect: function(date) {
+                        scope.date = date;
+                        scope.$apply();
+                    }
+                });
+            });
+        }
+    }
+});
