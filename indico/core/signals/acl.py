@@ -83,6 +83,9 @@ actual instance is passed as `obj`.  The `User`, `GroupProxy` or
 actual ACL entry (a `PrincipalMixin` instance) or ``None`` in case
 the entry was deleted.  `is_new` is a boolean indicating whether
 the given principal was in the ACL before.
+
+If the ACL uses roles, `old_data` will contain a dictionary of the
+previous roles/permissions (see `PrincipalRolesMixin.current_data`).
 """)
 
 

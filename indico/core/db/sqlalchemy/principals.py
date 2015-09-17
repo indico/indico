@@ -261,6 +261,9 @@ class PrincipalMixin(object):
         """
         # nothing to do here
 
+    def current_data(self):
+        return None
+
     @classmethod
     def merge_users(cls, target, source, relationship_attr):
         """Merges two users in the ACL.
@@ -401,6 +404,12 @@ class PrincipalRolesMixin(PrincipalMixin):
         self.read_access = self.read_access or other.read_access
         self.full_access = self.full_access or other.full_access
         self.roles = sorted(set(self.roles) | set(other.roles))
+
+    @property
+    def current_data(self):
+        return {'roles': set(self.roles),
+                'read_access': self.read_access,
+                'full_access': self.full_access}
 
 
 class PrincipalComparator(Comparator):

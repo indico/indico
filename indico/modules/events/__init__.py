@@ -16,18 +16,19 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, flash
+from flask import request, redirect, flash, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
-from indico.core.roles import check_roles, ManagementRole
+from indico.core.roles import check_roles, ManagementRole, get_available_roles
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.modules.events.util import notify_pending
 from indico.web.flask.util import url_for
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 
 
@@ -85,6 +86,53 @@ def _notify_pending(sender, obj, principal, entry, is_new, **kwargs):
     if entry is None or not is_new or not isinstance(principal, EmailPrincipal):
         return
     notify_pending(entry)
+
+
+@signals.acl.entry_changed.connect_via(Event)
+def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, **kwargs):
+    available_roles = get_available_roles(Event)
+
+    def _format_roles(roles):
+        roles = set(roles)
+        return ', '.join(sorted(orig_string(role.friendly_name) for role in available_roles.itervalues()
+                                if role.name in roles))
+
+    data = {}
+    # XXX: Add a mixin to those classes so we can get the type nicely?!
+    if principal.is_group:
+        data['Group'] = principal.name
+    elif isinstance(principal, EmailPrincipal):
+        data['Email'] = principal.email
+    else:
+        data['User'] = principal.full_name
+    if entry is None:
+        data['Manager'] = old_data['full_access']
+        data['Roles'] = _format_roles(old_data['roles'])
+        # TODO: add item for read_access once we store it in the ACL
+        obj.log(EventLogRealm.management, EventLogKind.negative, 'Protection', 'ACL entry removed', session.user,
+                data=data)
+    else:
+        if is_new:
+            # TODO: add item for read_access once we store it in the ACL
+            data['Manager'] = entry.full_access
+            if entry.roles:
+                data['Roles'] = _format_roles(entry.roles)
+            obj.log(EventLogRealm.management, EventLogKind.positive, 'Protection', 'ACL entry added', session.user,
+                    data=data)
+        else:
+            # TODO: add item for read_access once we store it in the ACL
+            data['Manager'] = entry.full_access
+            current_roles = set(entry.roles)
+            added_roles = current_roles - old_data['roles']
+            removed_roles = old_data['roles'] - current_roles
+            if added_roles:
+                data['Roles (added)'] = _format_roles(added_roles)
+            if removed_roles:
+                data['Roles (removed)'] = _format_roles(removed_roles)
+            if current_roles:
+                data['Roles'] = _format_roles(current_roles)
+            obj.log(EventLogRealm.management, EventLogKind.change, 'Protection', 'ACL entry changed', session.user,
+                    data=data)
 
 
 @signals.app_created.connect

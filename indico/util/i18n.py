@@ -85,6 +85,11 @@ def lazy_gettext(string, plugin_name=None):
     return make_lazy_string(gettext_unicode, string, plugin_name=plugin_name)
 
 
+def orig_string(lazy_string):
+    """Get the original string from a lazy string"""
+    return lazy_string._args[0] if is_lazy_string(lazy_string) else lazy_string
+
+
 def smart_func(func_name, plugin_name=None):
     def _wrap(*args, **kwargs):
         """

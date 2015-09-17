@@ -164,11 +164,13 @@ class ProtectionMixin(object):
         if entry is None and read_access:
             entry = principal_class(principal=principal)
             acl_rel.add(entry)
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=True)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=True,
+                                           old_data=None)
             return entry
         elif entry is not None and not read_access:
             acl_rel.remove(entry)
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
+                                           old_data=None)
             return None
         return entry
 
@@ -185,7 +187,8 @@ class ProtectionMixin(object):
         principal = _resolve_principal(principal)
         acl_rel, _, entry = _get_acl_data(self, acl_attr, principal)
         if entry is not None:
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
+                                           old_data=entry.current_data)
             acl_rel.remove(entry)
 
 
@@ -300,6 +303,7 @@ class ProtectionManagersMixin(ProtectionMixin):
             entry = principal_class(principal=principal, read_access=False, full_access=False, roles=[])
             acl_rel.add(entry)
             new_entry = True
+        old_data = entry.current_data
         # update roles
         new_roles = set(entry.roles)
         if roles is not None:
@@ -322,9 +326,11 @@ class ProtectionManagersMixin(ProtectionMixin):
         # remove entry from acl if no privileges
         if not entry.read_access and not entry.full_access and not entry.roles:
             acl_rel.remove(entry)
-            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False)
+            signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
+                                           old_data=old_data)
             return None
-        signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=new_entry)
+        signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=new_entry,
+                                       old_data=old_data)
         return entry
 
 
