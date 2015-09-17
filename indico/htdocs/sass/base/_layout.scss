@@ -41,6 +41,12 @@
     }
 }
 
+.full-width-content-page {
+    .management-page > .page-content {
+        max-width: 100% !important;
+    }
+}
+
 .layout-wrapper {
     .row {
         .column {
