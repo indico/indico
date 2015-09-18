@@ -82,7 +82,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
     def _save_registration(self, data):
         registration = Registration(user=session.user, registration_form=self.regform)
         db.session.add(registration)
-        for form_item in [f for f in self.regform.form_items if f.parent_id]:
+        for form_item in self.regform.active_fields:
             value = data.get('field_{0}-{1}'.format(form_item.parent_id, form_item.id), None)
             form_item.wtf_field.save_data(registration, value)
         db.session.flush()

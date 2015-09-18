@@ -30,9 +30,7 @@ def make_registration_form(regform):
     """Creates a WTForm based on registration form fields"""
 
     form_class = type(b'RegistrationFormWTForm', (IndicoForm,), {})
-    form_items = [field for field in regform.form_items if field.parent_id and not field.is_deleted
-                  and field.is_enabled and not field.parent.is_deleted and field.parent.is_enabled]
-    for form_item in form_items:
+    for form_item in regform.active_fields:
         field_impl = form_item.wtf_field
         if field_impl is None:
             continue
