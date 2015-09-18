@@ -1,38 +1,59 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
+{% macro _render_regform_item_col_selector(item) %}
+    {% if item.type == RegistrationFormItemType.section %}
+        <h3>{{ item.title }}</h3>
+        {% for child_item in item.children %}
+            {% if child_item.type == RegistrationFormItemType.field %}
+                {% set has_dropdown = child_item.current_data.data.input in ['radio', 'country'] %}
+                <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
+                     data-id="{{ child_item.id }}">
+                    <span class="title {% if has_dropdown %}icon-filter{% endif %}"
+                          data-toggle="dropdown">
+                        {{- child_item.title -}}
+                    </span>
+                    {% if has_dropdown %}
+                        <ul class="dropdown" style="display: none">
+                            {% for radio_item in child_item.current_data.data.radioitems %}
+                                <li>
+                                    <input type='checkbox' name='check1' value='{{ radio_item.caption }}'>
+                                    <span>{{ radio_item.caption }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <span class="right actions">
+                        <a class="trigger icon-eye" href="#"></a>
+                    </span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% macro _render_user_info_col_selector(item_id, item_caption) %}
+    <div class="i-label reglist-column js-user-info" data-id="{{ item_id }}">
+        <span class="title">{{ item_caption }}</span>
+        <span class="right actions">
+            <a class="trigger icon-eye" href="#"></a>
+        </span>
+    </div>
+{% endmacro %}
+
 {% block content -%}
     <form class="reglist-filter" method="POST">
-        {% set visible_columns = visible_columns | tojson | forceescape %}
-        <input id="visible-columns" type="hidden" name="visible_columns" value="{{ visible_columns }}">
+        {% set visible_cols_regform_items = visible_cols_regform_items | tojson | forceescape %}
+        {% set visible_cols_user_info = visible_cols_user_info | tojson | forceescape %}
+        <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
+               value="{{ visible_cols_regform_items }}">
+        <input id="visible-columns-user-info" type="hidden" name="visible_cols_user_info"
+               value="{{ visible_cols_user_info }}">
+        <h3>{% trans %}User information{% endtrans %}</h3>
+        {% for id, caption in user_info.iteritems() %}
+            {{ _render_user_info_col_selector(id, caption) }}
+        {% endfor %}
         {% for item in regform.form_items %}
-            {% if item.type == RegistrationFormItemType.section %}
-                <h3>{{ item.title }}</h3>
-                {% for child_item in item.children %}
-                    {% if child_item.type == RegistrationFormItemType.field %}
-                        {% set has_dropdown = child_item.current_data.data.input in ['radio', 'country'] %}
-                        <div class="i-label reglist-column {%- if has_dropdown %} filter{% endif %}"
-                             data-id="{{ child_item.id }}">
-                            <span class="title {% if has_dropdown %}icon-filter{% endif %}"
-                                  data-toggle="dropdown">
-                                {{- child_item.title -}}
-                            </span>
-                            {% if has_dropdown %}
-                                <ul class="dropdown" style="display: none">
-                                    {% for radio_item in child_item.current_data.data.radioitems %}
-                                        <li>
-                                            <input type='checkbox' name='check1' value='{{ radio_item.caption }}'>
-                                            <span>{{ radio_item.caption }}</span>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                            <span class="right actions">
-                                <a class="trigger icon-eye" href="#"></a>
-                            </span>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+            {{ _render_regform_item_col_selector(item) }}
         {% endfor %}
         <div class="bottom-buttons">
             <input class="i-button big highlight" type="submit" data-disabled-until-change
