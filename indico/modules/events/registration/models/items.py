@@ -158,6 +158,10 @@ class RegistrationFormItem(db.Model):
     def wtf_field(self):
         return get_field_types()[self.current_data.data['input']](self)
 
+    @property
+    def is_section(self):
+        return self.type == RegistrationFormItemType.section
+
     @return_ascii
     def __repr__(self):
         return '<{}({})>'.format(type(self).__name__, self.id)
