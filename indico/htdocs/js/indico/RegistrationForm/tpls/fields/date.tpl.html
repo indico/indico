@@ -1,5 +1,6 @@
 <ng-form name="nestedForm">
     <input
+        type="text"
         id="field-{{ section.id }}-{{ field.id }}"
         class="datepicker"
         name="field_{{ section.id }}-{{ field.id }}"
@@ -8,7 +9,11 @@
         value="{{ date }}"
         ng-required="{{ field.mandatory }}"
         ng-model="date"
-        nd-jquery-datepicker/>
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+        nd-jquery-datepicker>
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
 </ng-form>
 
 <span class="inputDescription">
