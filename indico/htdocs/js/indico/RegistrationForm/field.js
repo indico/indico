@@ -85,11 +85,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.getName = function(input) {
-        if (input == 'date') {
-            return '_genfield_' + $scope.section.id + '_' + $scope.field.id + '_';
-        } else {
-            return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
-        }
+        return 'field_{0}-{1}'.format($scope.section.id, $scope.field.id);
     };
 
     $scope.openFieldSettings = function() {
