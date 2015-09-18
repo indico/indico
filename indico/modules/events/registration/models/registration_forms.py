@@ -146,6 +146,11 @@ class RegistrationForm(db.Model):
     def locator(self):
         return dict(self.event.getLocator(), reg_form_id=self.id)
 
+    @property
+    def active_fields(self):
+        return [field for field in self.form_items if not field.is_section and field.parent.is_enabled
+                and not field.parent.is_deleted and field.is_enabled and not field.is_deleted]
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
