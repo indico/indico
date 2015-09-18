@@ -24,11 +24,12 @@ from flask import session, request
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.views import WPManageRegistration
-from indico.modules.events.registration.util import get_registration_field_data
+from indico.modules.events.registration.util import get_registration_field_data, get_user_info
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data
 
+# TODO: Create a better mapping
 USER_INFO = OrderedDict({
     'user_id': _('ID'),
     'user_surname': _('Surname'),
@@ -56,7 +57,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                                                     event=self.event, visible_cols_regform_items=regform_items,
                                                     visible_cols_user_info=visible_columns['user_info'],
                                                     get_registration_field_data=get_registration_field_data,
-                                                    user_info=USER_INFO)
+                                                    user_info=USER_INFO, get_user_info=get_user_info)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -82,5 +83,6 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         tpl = get_template_module('events/registration/management/_reglist.html')
         reg_list = tpl.render_registrations_list(regform=self.regform, visible_cols_regform_items=regform_items,
                                                  visible_cols_user_info=visible_user_info, user_info=USER_INFO,
-                                                 get_registration_field_data=get_registration_field_data)
+                                                 get_registration_field_data=get_registration_field_data,
+                                                 get_user_info=get_user_info)
         return jsonify_data(registrations_list=reg_list)
