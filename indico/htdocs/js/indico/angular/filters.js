@@ -19,7 +19,11 @@ var ndFilters = angular.module("ndFilters", []);
 
 ndFilters.filter("i18n", function() {
     return function(input) {
-        return $T(input);
+        var str = $T.gettext(input);
+        if (arguments.length > 1) {
+            str = str.format.apply(str, [].slice.call(arguments, 1));
+        }
+        return str;
     };
 });
 
