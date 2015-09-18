@@ -86,7 +86,7 @@ textarea {
     @extend %text-input;
 }
 
-select {
+select, ul {
     &.hasError {
         @include border-all($red);
         color: $red;
