@@ -20,11 +20,13 @@ import json
 
 from collections import OrderedDict
 from flask import session, request
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
+from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormFieldData,
+                                                                                RegistrationFormField)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import get_user_info
 from indico.util.i18n import _
@@ -49,10 +51,27 @@ USER_INFO = OrderedDict([
 ])
 
 
+def _filter_registration(query):
+    filters = {}
+    for key in request.form.iterkeys():
+        field_name = key.split('_')
+        if field_name[0] == 'radiogroup':
+            filters[int(field_name[1])] = request.form.getlist(key)
+
+    for field_id, data_list in filters.iteritems():
+        query = query.filter(
+            (RegistrationFormField.id != field_id) | (RegistrationData.data.op('#>>')('{}').in_(data_list))
+        )
+    return query.filter(RegistrationData.data != None)
+
+
 def _query_registrations(regform):
     return (Registration.query
                         .with_parent(regform)
-                        .options(joinedload('data').joinedload('field_data').joinedload('field')))
+                        .join(Registration.data)
+                        .join(RegistrationData.field_data)
+                        .join(RegistrationFormFieldData.field)
+                        .options(contains_eager('data').contains_eager('field_data').contains_eager('field')))
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
@@ -91,7 +110,8 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         session[session_key]['user_info'] = visible_user_info
         session.modified = True
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(visible_regform_items))
-        registrations = _query_registrations(self.regform).all()
+        registrations = _query_registrations(self.regform)
+        registrations = _filter_registration(registrations).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
         reg_list = tpl.render_registrations_list(registrations=registrations, visible_cols_regform_items=regform_items,
                                                  visible_cols_user_info=visible_user_info, user_info=USER_INFO,

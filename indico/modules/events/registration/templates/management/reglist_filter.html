@@ -16,8 +16,12 @@
                         <ul class="dropdown" style="display: none">
                             {% for radio_item in child_item.current_data.versioned_data.radioitems %}
                                 <li>
-                                    <input type='checkbox' name='check1' value='{{ radio_item.caption }}'>
-                                    <span>{{ radio_item.caption }}</span>
+                                    <input type='checkbox' name='radiogroup_{{ child_item.id }}'
+                                           value='{{ radio_item.id }}'
+                                           id="{{ radio_item.id }}">
+                                    <label for="{{ radio_item.id }}">
+                                        {{ radio_item.caption }}
+                                    </label>
                                 </li>
                             {% endfor %}
                         </ul>
