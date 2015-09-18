@@ -82,18 +82,23 @@
     global.setupRegistrationsListFilter = function setupRegistrationsListFilter() {
         $('.reglist-filter').dropdown({selector: '.reglist-column .title'});
 
-        var visibleColumnsField = $('#visible-columns');
-        var data = JSON.parse(visibleColumnsField.val());
+        var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
+        var visibleColumnsUserInfoField = $('#visible-columns-user-info');
+        var reg_items_data = JSON.parse(visibleColumnsRegItemsField.val());
+        var user_info_data = JSON.parse(visibleColumnsUserInfoField.val());
 
         $('.reglist-column')
         .on('click', '.trigger', function() {
             var field = $(this).closest('.reglist-column');
             var fieldId = field.data('id');
+            var data = field.hasClass('js-user-info') ? user_info_data : reg_items_data;
+            var visibleColumnsField = field.hasClass('js-user-info') ? visibleColumnsUserInfoField : visibleColumnsRegItemsField;
+
             if ($(this).hasClass('enabled')) {
-                data['items'].splice(data['items'].indexOf(fieldId), 1);
+                data.splice(data.indexOf(fieldId), 1);
             }
             else if ($(this).hasClass('not-enabled')) {
-                data['items'].push(fieldId);
+                data.push(fieldId);
             }
             $(this).toggleClass('enabled', !$(this).hasClass('enabled'));
             $(this).toggleClass('not-enabled', !$(this).hasClass('not-enabled'));
@@ -101,9 +106,11 @@
             visibleColumnsField.val(JSON.stringify(data)).trigger('change');
         })
         .each(function() {
-            var field = $(this).closest('.reglist-column');
+            var field = $(this);
             var fieldId = field.data('id');
-            if (data['items'].indexOf(fieldId) != -1) {
+            var data = field.hasClass('js-user-info') ? user_info_data : reg_items_data;
+
+            if (data.indexOf(fieldId) != -1) {
                 field.find('.trigger').addClass('enabled');
             }
             else {
