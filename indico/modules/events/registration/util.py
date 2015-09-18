@@ -36,6 +36,6 @@ def make_registration_form(regform):
         field_impl = form_item.wtf_field
         if field_impl is None:
             continue
-        name = '*genfield*{}-{}'.format(form_item.parent_id, form_item.id)
+        name = 'field_{0}-{1}'.format(form_item.parent_id, form_item.id)
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
