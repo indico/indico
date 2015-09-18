@@ -1200,12 +1200,13 @@ textarea.regFormDescriptionInputMgmt {
         min-width: 12em;
         box-sizing: border-box;
 
-        > li > span {
+        > li > label {
             color: $black;
             margin-left: 0.5em;
             line-height: 2;
             height: 2em;
             vertical-align: middle;
+            cursor: pointer;
         }
     }
 
