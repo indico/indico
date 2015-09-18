@@ -224,6 +224,8 @@
     @extend %message-tag;
     background-color: $red;
     color: $light-gray;
+    position: absolute;
+    margin-left: 5px;
 }
 
 .error-message-underline {

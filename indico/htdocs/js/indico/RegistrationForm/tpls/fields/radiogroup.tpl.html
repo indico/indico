@@ -1,5 +1,5 @@
 <ng-form name="nestedForm">
-    <ul>
+    <ul ng-class="{hasError: validationStarted && nestedForm.$invalid}">
         <li ng-if="!field.mandatory">
             <input type="radio" name="socialEvents" value=""
                    ng-model="radioValue.id"

@@ -19,6 +19,9 @@
             </span>
         </option>
     </select>
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
     <input type="hidden"
         ng-if="anyBillableItemPayed(userdata)"
         name="{{ fieldName }}"
