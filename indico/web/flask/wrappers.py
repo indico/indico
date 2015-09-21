@@ -62,6 +62,13 @@ class IndicoFlask(PluginFlaskMixin, Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
 
+    @property
+    def session_cookie_name(self):
+        name = super(IndicoFlask, self).session_cookie_name
+        if not request.is_secure:
+            name += '_http'
+        return name
+
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         from MaKaC.webinterface.rh.base import RHSimple
         # Endpoints from Flask-Multipass need to be wrapped in the RH
