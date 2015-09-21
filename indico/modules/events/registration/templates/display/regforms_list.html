@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <table id="survey-list" class="i-table-widget">
+    <table id="regforms-list" class="i-table-widget">
         <thead>
             <tr>
                 <th>{% trans %}Registration Form{% endtrans %}</th>
@@ -26,10 +26,22 @@
                     </td>
                     <td>{{ regform.start_dt | format_datetime if regform.start_dt else _('Not started') }}</td>
                     <td>{{ regform.end_dt | format_datetime if regform.end_dt else _('No deadline') }}</td>
-                    <td class="survey-actions">
-                        <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
-                            {% trans %}Fill out{% endtrans %}
-                        </a>
+                    <td class="regform-actions">
+                        {% if was_regform_submitted(regform) %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}You have already registered{% endtrans %}">
+                                {% trans %}Register{% endtrans %}
+                            </a>
+                        {% elif not regform.is_active %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Registrations are closed{% endtrans %}">
+                                {% trans %}Register{% endtrans %}
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
+                                {% trans %}Register{% endtrans %}
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% else %}

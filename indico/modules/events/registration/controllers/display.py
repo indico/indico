@@ -64,7 +64,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         if _can_redirect_to_single_regform(regforms):
             return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regforms_list.html', self.event, regforms=regforms,
-                                               event=self.event)
+                                               event=self.event, was_regform_submitted=was_regform_submitted)
 
 
 class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
