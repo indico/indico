@@ -21,7 +21,8 @@ from flask import request, session, redirect
 from indico.core.db import db
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.util import get_event_section_data, make_registration_form
+from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
+                                                     save_registration_to_session)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
@@ -86,3 +87,4 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
             value = data.get('field_{0}-{1}'.format(form_item.parent_id, form_item.id), None)
             form_item.wtf_field.save_data(registration, value)
         db.session.flush()
+        save_registration_to_session(registration)
