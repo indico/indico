@@ -137,6 +137,14 @@ class RegistrationForm(db.Model):
     def is_active(cls):
         return ~cls.is_deleted & cls.has_started & ~cls.has_ended
 
+    @hybrid_property
+    def is_visible(self):
+        return not self.is_deleted and self.form_items and self.has_started
+
+    @is_visible.expression
+    def is_visible(cls):
+        return ~cls.is_deleted & cls.form_items.any() & cls.has_started
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
