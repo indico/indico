@@ -4203,6 +4203,7 @@ class Conference(CommonObjectBase, Locatable):
     def setPosterTemplateManager(self, posterTemplateManager):
         self.__posterTemplateManager = posterTemplateManager
 
+
 class DefaultConference(Conference):
     """ 'default' conference, which stores the
      default templates for posters and badges
@@ -4211,12 +4212,11 @@ class DefaultConference(Conference):
     def indexConf(self):
         pass
 
+    def notifyModification(self, *args, **kwargs):
+        pass
+
     def __init__(self):
-        admin = User.find_first(is_admin=True)
-        if admin is None:
-            raise MaKaCError(_("""There are no admin users. The "default" conference that stores the template cannot be created.
-                                Please add at least 1 user to the admin list."""))
-        Conference.__init__(self, id="default")
+        Conference.__init__(self, id='default')
 
 
 class ConferenceHolder( ObjectHolder ):
