@@ -3572,18 +3572,14 @@ class Conference(CommonObjectBase, Locatable):
         if has_request_context() and self.__ac.isHarvesterIP(request.remote_addr):
             return True
 
-        # Managers have always access
-        if self.canModify(aw):
-            return True
-
         if self.isProtected():
-            if self.isAllowedToAccess( aw.getUser() ):
+            if self.isAllowedToAccess(aw.getUser()):
                 return True
             else:
-                return self.canKeyAccess(aw)
+                return self.canKeyAccess(aw) or self.canModify(aw)
         else:
             # Domain control is triggered just for PUBLIC events
-            return self.canIPAccess(request.remote_addr)
+            return self.canIPAccess(request.remote_addr) or self.canModify(aw)
 
     def canKeyAccess(self, aw, key=None):
         accessKey = self.getAccessKey()
