@@ -18,7 +18,6 @@ from datetime import date
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import inspect
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking

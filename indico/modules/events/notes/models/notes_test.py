@@ -130,7 +130,7 @@ def test_render_markdown(note, dummy_user):
 def test_get_for_linked_object(note, dummy_user, create_event):
     note.create_revision(RenderMode.html, 'test', dummy_user)
     assert EventNote.get_for_linked_object(note.linked_object) == note
-    assert EventNote.get_for_linked_object(create_event('123')) is None
+    assert EventNote.get_for_linked_object(create_event('123', legacy=True)) is None
 
 
 @pytest.mark.parametrize('preload', (True, False))
@@ -164,7 +164,7 @@ def test_get_or_create(db, dummy_user, dummy_event, create_event):
     assert EventNote.get_or_create(dummy_event) == note
     assert inspect(note).persistent
     # other event should create a new one
-    other = EventNote.get_or_create(create_event(123))
+    other = EventNote.get_or_create(create_event(123, legacy=True))
     other.create_revision(RenderMode.html, 'test', dummy_user)
     assert other != note
     assert not inspect(other).persistent

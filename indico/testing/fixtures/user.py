@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from sqlalchemy import inspect
 
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.rb import settings as rb_settings

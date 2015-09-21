@@ -49,3 +49,12 @@ class MockConference(object):
 
     def getConference(self):
         return self
+
+    def getOwner(self):
+        try:
+            return self.category
+        except AttributeError:
+            return None
+
+    def log(self, *args, **kwargs):
+        pass

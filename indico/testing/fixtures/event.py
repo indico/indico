@@ -16,12 +16,13 @@
 
 import pytest
 
+from indico.modules.events import Event
 from indico.testing.mocks import MockConference, MockConferenceHolder
 from MaKaC.conference import ConferenceHolder
 
 
 @pytest.yield_fixture
-def create_event(monkeypatch, monkeypatch_methods):
+def create_event(monkeypatch, monkeypatch_methods, dummy_user, db):
     """Returns a callable which lets you create dummy events"""
     monkeypatch_methods('MaKaC.conference.ConferenceHolder', MockConferenceHolder)
     monkeypatch.setattr('MaKaC.conference.Conference', MockConference)  # for some isinstance checks
@@ -29,12 +30,16 @@ def create_event(monkeypatch, monkeypatch_methods):
     _events = []
     ch = ConferenceHolder()
 
-    def _create_event(id_):
-        event = MockConference()
-        event.id = id_
-        ch.add(event)
-        _events.append(event)
-        return event
+    def _create_event(id_=None, legacy=False):
+        conf = MockConference()
+        # we specify `acl_entries` so SA doesn't load it when accessing it for
+        # the first time, which would require no_autoflush blocks in some cases
+        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set())
+        db.session.flush()
+        conf.id = str(conf.as_event.id)
+        ch.add(conf)
+        _events.append(conf)
+        return conf if legacy else conf.as_event
 
     yield _create_event
 
@@ -45,4 +50,4 @@ def create_event(monkeypatch, monkeypatch_methods):
 @pytest.fixture
 def dummy_event(create_event):
     """Creates a mocked dummy event"""
-    return create_event('0')
+    return create_event('0', legacy=True)

@@ -23,7 +23,7 @@ from indico.modules.oauth.models.tokens import OAuthToken
 
 
 @pytest.fixture
-def create_application(db, dummy_event, dummy_registrant):
+def create_application(db):
     """Returns a callable which lets you create applications"""
 
     def _create_application(name, **params):

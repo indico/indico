@@ -302,14 +302,13 @@ class PrincipalMixin(object):
         """
         assert cls.allow_emails
         updated = set()
-        backref_attr = getattr(cls, relationship_attr).property.back_populates  # object->acl relationship name
         query = (cls
                  .find(cls.email.in_(user.all_emails))
                  .options(noload('user'), noload('local_group'), joinedload('event_new').load_only('id')))
         for entry in query:
             parent = getattr(entry, relationship_attr)
             existing = (cls.query
-                        .with_parent(parent, backref_attr)
+                        .with_parent(parent, 'acl_entries')
                         .options(noload('user'), noload('local_group'))
                         .filter_by(principal=user)
                         .first())
