@@ -68,7 +68,8 @@ class RHRegistrationFormManage(RHManageRegFormBase):
     """Specific registration form management"""
 
     def _process(self):
-        return WPManageRegistration.render_template('management/regform.html', self.event, regform=self.regform)
+        return WPManageRegistration.render_template('management/regform.html', self.event, regform=self.regform,
+                                                    event=self.event)
 
 
 class RHRegistrationFormEdit(RHManageRegFormBase):
