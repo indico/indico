@@ -70,8 +70,8 @@ class Registration(db.Model):
         'User',
         lazy=True,
         backref=db.backref(
-            'registration',
-            lazy=True,
+            'registrations',
+            lazy='dynamic',
             cascade='all, delete-orphan'
         )
     )
