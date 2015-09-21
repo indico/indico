@@ -316,7 +316,7 @@ class PrincipalMixin(object):
                 entry.principal = user
             else:
                 existing.merge_privs(entry)
-                db.session.delete(entry)
+                parent.acl_entries.remove(entry)
             updated.add(parent)
         db.session.flush()
         return updated
