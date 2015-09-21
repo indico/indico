@@ -706,10 +706,10 @@ class Config:
             return False
 
     def getShortCategURL(self):
-        return '%s/c/' % self.getBaseURL()
+        return '%s/c/' % (self.getBaseSecureURL() or self.getBaseURL())
 
     def getShortEventURL(self):
-        return '%s/e/' % self.getBaseURL()
+        return '%s/e/' % (self.getBaseSecureURL() or self.getBaseURL())
 
     def getSmtpUseTLS(self):
         return self._yesOrNoVariable('SmtpUseTLS')
