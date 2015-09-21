@@ -39,5 +39,18 @@
                 </a>
             </div>
         </div>
+        <div class="section">
+            <div class="icon icon-coins"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Payment settings{% endtrans %}
+                </div>
+                {% trans %}Configure payment settings{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('payment.event_settings', event) }}" class="i-button icon-settings">
+                    {% trans %}Configure{% endtrans %}
+                </a>
+            </div>
     </div>
 {% endblock %}
