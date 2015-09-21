@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session, redirect
+from flask import request, session, redirect, flash
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -85,6 +85,13 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
         self.regform = RegistrationForm.find_one(id=request.view_args['reg_form_id'])
+
+        if not self.regform.is_active:
+            flash(_('This registration form is not active'), 'error')
+            return redirect(url_for('.display_regforms_list', self.event))
+        elif was_regform_submitted(self.regform):
+            flash(_('You have already registered with this form'), 'error')
+            return redirect(url_for('.display_regforms_list', self.event))
 
     def _process(self):
         form = make_registration_form(self.regform)()
