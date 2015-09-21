@@ -60,7 +60,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
     def _process(self):
-        regforms = RegistrationForm.find_all(event_id=int(self.event.id))
+        regforms = RegistrationForm.find_all(RegistrationForm.is_visible, event_id=int(self.event.id))
         if _can_redirect_to_single_regform(regforms):
             return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regforms_list.html', self.event, regforms=regforms,
