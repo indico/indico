@@ -18,7 +18,9 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.items import RegistrationFormSection
+from indico.util.caching import memoize_request
 from indico.web.forms.base import IndicoForm
 
 
@@ -45,3 +47,14 @@ def save_registration_to_session(registration):
     """Save a registration to the session"""
     session.setdefault('registrations', {})[registration.registration_form.id] = registration.id
     session.modified = True
+
+
+@memoize_request
+def was_regform_submitted(regform):
+    """Check whether the current user has registered to a specific regform"""
+    if session.user and session.user.registrations.filter_by(registration_form=regform).count():
+        return True
+    registration_id = session.get('registrations', {}).get(regform.id)
+    if registration_id is None:
+        return False
+    return bool(Registration.find(id=registration_id).count())
