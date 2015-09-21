@@ -47,9 +47,8 @@ Called when `ProtectionMixin.can_access` is used to determine if a
 user can access something or not.
 
 The `sender` is the type of the object that's using the mixin.  The
-actual instance is passed as `obj`.  The `user`, `acl_attr`,
-`legacy_method` and `allow_admin` arguments of `can_access` are passed
-as kwargs with the same name.
+actual instance is passed as `obj`.  The `user` and `allow_admin`
+arguments of `can_access` are passed as kwargs with the same name.
 
 If the signal returns ``True`` or ``False``, the access check succeeds
 or fails without any further checks.  If multiple subscribers to the
@@ -63,9 +62,9 @@ Called when `ProtectionMixin.can_manage` is used to determine if a
 user can manage something or not.
 
 The `sender` is the type of the object that's using the mixin.  The
-actual instance is passed as `obj`.  The `user`, `role`, `acl_attr`,
-`legacy_method`, `allow_admin`, `check_parent` and `explicit` arguments
-of `can_manage` are passed as kwargs with the same name.
+actual instance is passed as `obj`.  The `user`, `role`, `allow_admin`,
+`check_parent` and `explicit` arguments of `can_manage` are passed as
+kwargs with the same name.
 
 If the signal returns ``True`` or ``False``, the access check succeeds
 or fails without any further checks.  If multiple subscribers to the

@@ -83,25 +83,16 @@ class ProtectionMixin(object):
         raise NotImplementedError
 
     @memoize_request
-    def can_access(self, user, acl_attr='acl_entries', legacy_method='canAccess', allow_admin=True):
+    def can_access(self, user, allow_admin=True):
         """Checks if the user can access the object.
-
-        When using a custom `acl_attr` on an object that supports
-        inherited proection, ALL possible `protection_parent` objects
-        need to have an ACL with the same name too!
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
-        :param acl_attr: The name of the relationship that contains the
-                         ACL of the object.
-        :param legacy_method: The method name to use when inheriting
-                              the protection from a legacy object.
         :param allow_admin: If admin users should always have access
         """
 
         # Trigger signals for protection overrides
-        rv = values_from_signal(signals.acl.can_access.send(type(self), obj=self, user=user, acl_attr=acl_attr,
-                                                            legacy_method=legacy_method, allow_admin=allow_admin),
+        rv = values_from_signal(signals.acl.can_access.send(type(self), obj=self, user=user, allow_admin=allow_admin),
                                 single_value=True)
         if rv:
             # in case of contradictory results (shouldn't happen at all)
@@ -121,13 +112,13 @@ class ProtectionMixin(object):
         elif self.protection_mode == ProtectionMode.protected:
             # if it's protected, we also ignore the parent protection
             # and only check our own ACL
-            return user is not None and any(user in entry.principal for entry in iter_acl(getattr(self, acl_attr)))
+            return user is not None and any(user in entry.principal for entry in iter_acl(self.acl_entries))
         elif self.protection_mode == ProtectionMode.inheriting:
             # if it's inheriting, we only check the parent protection
             # unless `inheriting_have_acl` is set, in which case we
             # might not need to check the parents at all
             if (self.inheriting_have_acl and user is not None and
-                    any(user in entry.principal for entry in iter_acl(getattr(self, acl_attr)))):
+                    any(user in entry.principal for entry in iter_acl(self.acl_entries))):
                 return True
             # the parent can be either an object inheriting from this
             # mixin or a legacy object with an AccessController
@@ -138,9 +129,9 @@ class ProtectionMixin(object):
                 # ProtectionMode.inheriting as it makes no sense.
                 raise TypeError('protection_parent of {} is None'.format(self))
             elif hasattr(parent, 'can_access'):
-                return parent.can_access(user, acl_attr=acl_attr, legacy_method=legacy_method, allow_admin=allow_admin)
-            elif legacy_method is not None and hasattr(parent, legacy_method):
-                return getattr(parent, legacy_method)(AccessWrapper(user.as_avatar if user else None))
+                return parent.can_access(user, allow_admin=allow_admin)
+            elif hasattr(parent, 'canAccess'):
+                return parent.canAccess(AccessWrapper(user.as_avatar if user else None))
             else:
                 raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
         else:
@@ -148,58 +139,50 @@ class ProtectionMixin(object):
             # we better fail loudly if we have garbage
             raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
 
-    def update_principal(self, principal, read_access=None, acl_attr='acl_entries'):
+    def update_principal(self, principal, read_access=None):
         """Updates access privileges for the given principal.
 
         :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param read_access: If the principal should have explicit read
                             access to the object.
-        :param acl_attr: The name of the relationship that contains the
-                         ACL of the object.
         :return: The ACL entry for the given principal or ``None`` if
                  he was removed (or not added).
         """
         principal = _resolve_principal(principal)
-        acl_rel, principal_class, entry = _get_acl_data(self, acl_attr, principal)
+        principal_class, entry = _get_acl_data(self, principal)
         if entry is None and read_access:
             entry = principal_class(principal=principal)
-            acl_rel.add(entry)
+            self.acl_entries.add(entry)
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=True,
                                            old_data=None)
             return entry
         elif entry is not None and not read_access:
-            acl_rel.remove(entry)
+            self.acl_entries.remove(entry)
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
                                            old_data=None)
             return None
         return entry
 
-    def remove_principal(self, principal, acl_attr='acl_entries'):
+    def remove_principal(self, principal):
         """Revokes all access privileges for the given principal.
 
         This method doesn't do anything if the user is not in the
         object's ACL.
 
         :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
-        :param acl_attr: The name of the relationship that contains the
-                         ACL of the object.
         """
         principal = _resolve_principal(principal)
-        acl_rel, _, entry = _get_acl_data(self, acl_attr, principal)
+        entry = _get_acl_data(self, principal)[1]
         if entry is not None:
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
                                            old_data=entry.current_data)
-            acl_rel.remove(entry)
+            self.acl_entries.remove(entry)
 
 
 class ProtectionManagersMixin(ProtectionMixin):
     @memoize_request
-    def can_manage(self, user, role=None, acl_attr='acl_entries', legacy_method='canUserModify', allow_admin=True,
-                   check_parent=True, explicit=False):
+    def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit=False):
         """Checks if the user can manage the object.
-
-        When using a custom `acl_attr`, ALL possible `protection_parent`
-        objects need to have an ACL with the same name too!
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
@@ -210,10 +193,6 @@ class ProtectionManagersMixin(ProtectionMixin):
                       any management privileges.  Full management
                       privs always grant access even if the role is
                       not granted explicitly.
-        :param acl_attr: The name of the relationship that contains the
-                         ACL of the object.
-        :param legacy_method: The method name to use when inheriting
-                              the protection from a legacy object.
         :param allow_admin: If admin users should always have access
         :param check_parent: If the parent object should be checked.
                              In this case the role is ignored; only
@@ -231,7 +210,6 @@ class ProtectionManagersMixin(ProtectionMixin):
 
         # Trigger signals for protection overrides
         rv = values_from_signal(signals.acl.can_manage.send(type(self), obj=self, user=user, role=role,
-                                                            acl_attr=acl_attr, legacy_method=legacy_method,
                                                             allow_admin=allow_admin, check_parent=check_parent,
                                                             explicit=explicit),
                                 single_value=True)
@@ -245,7 +223,7 @@ class ProtectionManagersMixin(ProtectionMixin):
             return True
 
         if user is not None and any(user in entry.principal
-                                    for entry in iter_acl(getattr(self, acl_attr))
+                                    for entry in iter_acl(self.acl_entries)
                                     if entry.has_management_role(role, explicit=explicit)):
             return True
 
@@ -260,14 +238,14 @@ class ProtectionManagersMixin(ProtectionMixin):
             # i.e. the root category
             return False
         elif hasattr(parent, 'can_manage'):
-            return parent.can_manage(user, acl_attr=acl_attr, legacy_method=legacy_method, allow_admin=allow_admin)
-        elif legacy_method is not None and hasattr(parent, legacy_method):
-            return getattr(parent, legacy_method)(user.as_avatar if user else None)
+            return parent.can_manage(user, allow_admin=allow_admin)
+        elif hasattr(parent, 'canUserModify'):
+            return parent.canUserModify(user.as_avatar if user else None)
         else:
             raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
 
     def update_principal(self, principal, read_access=None, full_access=None, roles=None, add_roles=None,
-                         del_roles=None, acl_attr='acl_entries'):
+                         del_roles=None):
         """Updates access privileges for the given principal.
 
         If the principal is not in the ACL, it will be added if
@@ -286,22 +264,20 @@ class ProtectionManagersMixin(ProtectionMixin):
                       existing roles will be replaced.
         :param add_roles: set -- Management roles to add.
         :param del_roles: set -- Management roles to remove.
-        :param acl_attr: The name of the relationship that contains the
-                         ACL of the object.
         :return: The ACL entry for the given principal or ``None`` if
                  he was removed (or not added).
         """
         if roles is not None and (add_roles or del_roles):
             raise ValueError('add_roles/del_roles and roles are mutually exclusive')
         principal = _resolve_principal(principal)
-        acl_rel, principal_class, entry = _get_acl_data(self, acl_attr, principal)
+        principal_class, entry = _get_acl_data(self, principal)
         new_entry = False
         if entry is None:
             if not roles and not add_roles and not full_access and not read_access:
                 # not in ACL and no permissions to add
                 return None
             entry = principal_class(principal=principal, read_access=False, full_access=False, roles=[])
-            acl_rel.add(entry)
+            self.acl_entries.add(entry)
             new_entry = True
         old_data = entry.current_data
         # update roles
@@ -325,7 +301,7 @@ class ProtectionManagersMixin(ProtectionMixin):
             entry.full_access = full_access
         # remove entry from acl if no privileges
         if not entry.read_access and not entry.full_access and not entry.roles:
-            acl_rel.remove(entry)
+            self.acl_entries.remove(entry)
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
                                            old_data=old_data)
             return None
@@ -334,20 +310,17 @@ class ProtectionManagersMixin(ProtectionMixin):
         return entry
 
 
-def _get_acl_data(obj, acl_attr, principal):
+def _get_acl_data(obj, principal):
     """Helper function to get the necessary data for ACL modifications
 
     :param obj: A `ProtectionMixin` instance
-    :param acl_attr: The name of the relationship that contains the
-                     ACL of the object.
     :param principal: A User or GroupProxy uinstance
-    :return: A tuple containing the ACL relationship, the principal
-             class and the existing ACL entry for the given principal.
+    :return: A tuple containing the principal class and the existing
+             ACL entry for the given principal if it exists.
     """
-    acl_rel = getattr(obj, acl_attr)
-    principal_class = getattr(type(obj), acl_attr).prop.mapper.class_
-    entry = next((x for x in acl_rel if x.principal == principal), None)
-    return acl_rel, principal_class, entry
+    principal_class = type(obj).acl_entries.prop.mapper.class_
+    entry = next((x for x in obj.acl_entries if x.principal == principal), None)
+    return principal_class, entry
 
 
 def _resolve_principal(principal):
