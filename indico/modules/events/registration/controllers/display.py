@@ -17,8 +17,10 @@
 from __future__ import unicode_literals
 
 from flask import request, session, redirect
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
@@ -27,6 +29,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
 from indico.modules.payment import event_settings
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -72,6 +75,12 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
             lambda self: self.regform
         }
     }
+
+    def _checkProtection(self):
+        RHRegistrationFormDisplayBase._checkProtection(self)
+        if self.regform.require_user and not session.user:
+            raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
+                                                                'that requires you to be logged in')))
 
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
