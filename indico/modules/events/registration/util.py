@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.web.forms.base import IndicoForm
 
@@ -37,3 +39,9 @@ def make_registration_form(regform):
         name = 'field_{0}-{1}'.format(form_item.parent_id, form_item.id)
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
+
+
+def save_registration_to_session(registration):
+    """Save a registration to the session"""
+    session.setdefault('registrations', {})[registration.registration_form.id] = registration.id
+    session.modified = True
