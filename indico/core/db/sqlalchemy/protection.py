@@ -208,6 +208,13 @@ class ProtectionManagersMixin(ProtectionMixin):
         if role is not None and role != 'ANY' and role not in get_available_roles(type(self)):
             raise ValueError("role '{}' is not valid for '{}' objects".format(role, type(self).__name__))
 
+        if user is None:
+            # An unauthorized user is never allowed to perform management operations.
+            # Not even signals may override this since management code generally
+            # expects session.user to be not None.
+            # XXX: Legacy modification keys are checked outside
+            return False
+
         # Trigger signals for protection overrides
         rv = values_from_signal(signals.acl.can_manage.send(type(self), obj=self, user=user, role=role,
                                                             allow_admin=allow_admin, check_parent=check_parent,
@@ -219,12 +226,12 @@ class ProtectionManagersMixin(ProtectionMixin):
             return all(rv)
 
         # Usually admins can access everything, so no need for checks
-        if not explicit and allow_admin and user and user.is_admin:
+        if not explicit and allow_admin and user.is_admin:
             return True
 
-        if user is not None and any(user in entry.principal
-                                    for entry in iter_acl(self.acl_entries)
-                                    if entry.has_management_role(role, explicit=explicit)):
+        if any(user in entry.principal
+               for entry in iter_acl(self.acl_entries)
+               if entry.has_management_role(role, explicit=explicit)):
             return True
 
         if not check_parent or explicit:
@@ -240,7 +247,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         elif hasattr(parent, 'can_manage'):
             return parent.can_manage(user, allow_admin=allow_admin)
         elif hasattr(parent, 'canUserModify'):
-            return parent.canUserModify(user.as_avatar if user else None)
+            return parent.canUserModify(user.as_avatar)
         else:
             raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
 
