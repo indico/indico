@@ -22,13 +22,17 @@ from indico.core.db import db
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     save_registration_to_session)
+                                                     was_regform_submitted, save_registration_to_session)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
 from indico.modules.payment import event_settings
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+
+
+def _can_redirect_to_single_regform(regforms):
+    return len(regforms) == 1 and regforms[0].is_active and not was_regform_submitted(regforms[0])
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
@@ -53,7 +57,9 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
     def _process(self):
-        regforms = RegistrationForm.find_all(is_active=True, event_id=int(self.event.id))
+        regforms = RegistrationForm.find_all(event_id=int(self.event.id))
+        if _can_redirect_to_single_regform(regforms):
+            return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regforms_list.html', self.event, regforms=regforms,
                                                event=self.event)
 
