@@ -22,6 +22,7 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
+from indico.util.decorators import classproperty
 from indico.util.string import return_ascii, to_unicode
 from indico.web.flask.util import url_for
 
@@ -152,6 +153,12 @@ class Event(ProtectionManagersMixin, db.Model):
     def title(self):
         return to_unicode(self.as_legacy.getTitle())
 
+    def can_access(self, user, allow_admin=True):
+        if not allow_admin:
+            raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
+        from MaKaC.accessControl import AccessWrapper
+        return self.as_legacy.canAccess(AccessWrapper(user.as_avatar if user else None))
+
     def can_manage(self, user, role=None, allow_key=False, *args, **kwargs):
         # XXX: Remove this method once modification keys are gone!
         return (super(Event, self).can_manage(user, role, *args, **kwargs) or
@@ -185,3 +192,12 @@ class Event(ProtectionManagersMixin, db.Model):
     def __repr__(self):
         # TODO: add self.protection_repr once we use it and the title once we store it here
         return '<Event({})>'.format(self.id)
+
+    # TODO: Remove the next block of code once event acls (read access) are migrated
+    def _fail(self, *args, **kwargs):
+        raise NotImplementedError('These properties are not usable until event ACLs are in the new DB')
+    is_public = classproperty(classmethod(_fail))
+    is_inheriting = classproperty(classmethod(_fail))
+    is_protected = classproperty(classmethod(_fail))
+    protection_repr = property(_fail)
+    del _fail
