@@ -283,7 +283,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         # update roles
         new_roles = set(entry.roles)
         if roles is not None:
-            new_roles &= roles
+            new_roles = roles
         else:
             if add_roles:
                 new_roles |= add_roles
