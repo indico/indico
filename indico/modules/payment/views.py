@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+
+from indico.modules.events.registration.views import WPManageRegistration
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
-from MaKaC.webinterface.pages.registrationForm import WPConfModifRegFormBase
 
 
 class WPPaymentJinjaMixin(WPJinjaMixin):
@@ -28,9 +29,8 @@ class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdminsBase):
     sidemenu_option = 'payment'
 
 
-class WPPaymentEventManagement(WPConfModifRegFormBase, WPPaymentJinjaMixin):
-    def _setActiveTab(self):
-        self._tabPayment.setActive()
+class WPPaymentEventManagement(WPManageRegistration, WPPaymentJinjaMixin):
+    template_prefix = 'payment/'
 
     def _getTabContent(self, params):
         return WPPaymentJinjaMixin._getPageContent(self, params)
