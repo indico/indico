@@ -59,13 +59,6 @@ class WebFactory(WebFactory):
         return WebFactory.iconURL
 
     @staticmethod
-    def customiseSideMenu( webPageWithSideMenu ):
-        webPageWithSideMenu._programMenuItem.setVisible(False)
-        webPageWithSideMenu._abstractMenuItem.setVisible(False)
-        webPageWithSideMenu._contribListMenuItem.setVisible(False)
-        webPageWithSideMenu._regFormMenuItem.setVisible(False)
-
-    @staticmethod
     def customiseToolsTabCtrl(tabCtrl):
         tabCtrl.getTabById("clone").enable()
         tabCtrl.getTabById("delete").enable()

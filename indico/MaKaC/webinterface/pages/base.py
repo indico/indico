@@ -288,12 +288,6 @@ class WPDecorated(WPBase):
         """
         return None
 
-    def _getSideMenu(self):
-        """
-            Overload and return side menu whenever there is one
-        """
-        return None
-
 
 class WPNotDecorated(WPBase):
 
