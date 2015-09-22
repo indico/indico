@@ -90,7 +90,6 @@ def test_emails(db):
     assert user.all_emails == {'foo@bar.com'}
     user.secondary_emails.add('guinea@pig.com')
     db.session.flush()
-    db.session.expire(user)  # all_emails is only updated after expire (or commit)
     assert user.all_emails == {'foo@bar.com', 'guinea@pig.com'}
 
 

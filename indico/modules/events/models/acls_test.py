@@ -141,7 +141,6 @@ def test_convert_email_principals(db, create_event, create_user, dummy_user):
     assert not EventPrincipal.replace_email_with_user(user, 'event_new')
     assert set(event.acl_entries) == {entry, other_entry}
     user.secondary_emails.add(principal.email)
-    db.session.expire(user, ['_all_emails'])
     assert EventPrincipal.replace_email_with_user(user, 'event_new') == {event}
     assert set(event.acl_entries) == {entry, other_entry}
     assert all(x.type == PrincipalType.user for x in event.acl_entries)
@@ -162,7 +161,6 @@ def test_convert_email_principals_merge(db, create_event, create_user):
     assert not EventPrincipal.replace_email_with_user(user, 'event_new')
     assert set(event.acl_entries) == {entry1, entry2}
     user.secondary_emails.add(principal.email)
-    db.session.expire(user, ['_all_emails'])
     assert EventPrincipal.replace_email_with_user(user, 'event_new') == {event}
     assert len(event.acl_entries) == 1
     entry = list(event.acl_entries)[0]

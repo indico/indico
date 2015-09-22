@@ -23,6 +23,7 @@ from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import object_session
 from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
@@ -507,6 +508,16 @@ class User(db.Model):
 def _user_email_added(target, value, *unused):
     # Make sure that a newly added email has the same deletion state as the user itself
     value.is_user_deleted = target.is_deleted
+
+
+@listens_for(User._primary_email, 'set')
+@listens_for(User._secondary_emails, 'append')
+@listens_for(User._secondary_emails, 'remove')
+def _user_email_changed(target, value, *unused):
+    # all_emails is out of sync when changing the emails
+    sess = object_session(target)
+    if sess is not None:
+        sess.expire(target, ['_all_emails'])
 
 
 @listens_for(User.is_deleted, 'set')
