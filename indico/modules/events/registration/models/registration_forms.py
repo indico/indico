@@ -159,9 +159,13 @@ class RegistrationForm(db.Model):
         return [field for field in self.form_items if not field.is_section and field.parent.is_enabled
                 and not field.parent.is_deleted and field.is_enabled and not field.is_deleted]
 
+    @property
+    def limit_reached(self):
+        return self.registration_limit and len(self.registrations) >= self.registration_limit
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 
     def can_submit(self, user):
-        return self.is_active and (not self.require_user or user)
+        return self.is_active and (not self.require_user or user) and not self.limit_reached
