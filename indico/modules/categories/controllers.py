@@ -65,7 +65,9 @@ def _process_stats(stats, root=False):
 
 class RHCategoryStatistics(RHCategDisplayBase):
     def _process(self):
-        stats = CategoryStatistics(self._target).getStatistics().copy()
+        stats = CategoryStatistics(self._target).getStatistics()
+        if stats is not None:
+            stats = stats.copy()
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
             if stats is None:
                 stats = {'events': None, 'contributions': None, 'files': None, 'updated': None}
@@ -76,9 +78,13 @@ class RHCategoryStatistics(RHCategDisplayBase):
                 stats['updated'] = stats['updated'].isoformat()
             return jsonify(stats)
         else:
-            plots, values, updated = _process_stats(stats, root=self._target.isRoot())
+            if stats is not None:
+                plots, values, updated = _process_stats(stats, root=self._target.isRoot())
+            else:
+                plots = values = updated = None
             return WPCategoryStatistics.render_template('category_statistics.html', self._target,
                                                         cat=self._target,
                                                         plots=plots,
                                                         values=values,
-                                                        updated=updated)
+                                                        updated=updated,
+                                                        has_stats=(stats is not None))
