@@ -37,6 +37,11 @@
                                title="{% trans %}Registrations are closed{% endtrans %}">
                                 {% trans %}Register{% endtrans %}
                             </a>
+                        {% elif regform.limit_reached %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}The maximum number of registrations has been reached{% endtrans %}">
+                                {% trans %}Register{% endtrans %}
+                            </a>
                         {% else %}
                             <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
                                 {% trans %}Register{% endtrans %}
