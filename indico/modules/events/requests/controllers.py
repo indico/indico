@@ -157,7 +157,10 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
         elif 'action_save' in form and form.action_save.data:
             action = 'save'
         else:
-            raise ValueError('No action provided')
+            # This happens when the request was already processed, e.g. in another
+            # tab or if you simply click the submit button twice.  No nee to fail;
+            # just don't do anything.
+            return redirect(url_for('.event_requests_details', self.request))
         if action == 'accept':
             self.definition.accept(self.request, self.manager_form.data, session.user)
             flash(_('You have accepted this request.'), 'info')
