@@ -614,6 +614,7 @@ class outputGenerator(object):
                         if owner.canView(self.__aw):
                             if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
                                 self._contribToXML(owner,vars,1,includeMaterial, conf,out=out)
+        out.closeTag("session")
 
     def _contribToXML(self,
                       contribution,
