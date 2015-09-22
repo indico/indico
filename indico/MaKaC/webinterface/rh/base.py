@@ -34,6 +34,7 @@ from flask import request, session, g, current_app, redirect
 from itsdangerous import BadData
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden, HTTPException
+from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
@@ -334,7 +335,13 @@ class RH(RequestHandlerBase):
         new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems()}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
-                return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
+                try:
+                    return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **new_view_args)))
+                except BuildError as e:
+                    if current_app.debug:
+                        raise
+                    Logger.get('requestHandler').warn('BuildError during normalization: %s', e)
+                    raise NotFound
             else:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
