@@ -1013,9 +1013,6 @@ class WPConferenceModifBase(main.WPMainBase):
         pars = {"target": self._conf, "isModif": True }
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
 
-    def _createSideMenu(self):
-        pass
-
     def _applyFrame(self, body):
         frame = wcomponents.WConferenceModifFrame(self._conf, self._getAW())
 
