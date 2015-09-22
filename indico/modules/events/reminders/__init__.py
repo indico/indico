@@ -20,6 +20,7 @@ from sqlalchemy import inspect
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -77,8 +78,8 @@ class ReminderCloner(EventCloner):
         from indico.modules.events.reminders.models.reminders import EventReminder
         if 'reminders' not in options:
             return
-        attrs = {x.key for x in inspect(EventReminder).column_attrs} - {'id', 'event_id', 'created_dt', 'scheduled_dt',
-                                                                        'is_sent'}
+        attrs = get_simple_column_attrs(EventReminder) - {'event_id', 'created_dt', 'scheduled_dt', 'is_sent'}
+        attrs |= {'creator_id'}
         for old_reminder in self.find_reminders():
             scheduled_dt = new_event.getStartDate() - old_reminder.event_start_delta
             # Skip anything that's would have been sent on a past date.

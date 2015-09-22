@@ -16,9 +16,8 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy import inspect
-
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.logger import Logger
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, EventPage
@@ -86,8 +85,7 @@ class LayoutCloner(EventCloner):
         db.session.flush()
 
     def _copy_menu_entry(self, menu_entry, new_event, container, include_children=True):
-        base_columns = {column.key for column in inspect(MenuEntry).column_attrs} - {'id', 'event_id', 'parent_id',
-                                                                                     'page_id'}
+        base_columns = get_simple_column_attrs(MenuEntry)
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
             with db.session.no_autoflush:  # menu_entry.page is lazy-loaded

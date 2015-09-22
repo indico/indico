@@ -174,6 +174,24 @@ def get_default_values(model):
             if len(attr.columns) == 1 and attr.columns[0].default and attr.columns[0].default.is_scalar}
 
 
+def get_simple_column_attrs(model):
+    """
+    Returns a set containing all "simple" column attributes, i.e.
+    attributes which map to a table column and are neither primary
+    key nor foreign key.
+
+    This is useful if you want to get a list of attributes are are
+    usually safe to copy without extra processing when creating a
+    copy of a database object.
+
+    :param model: A SQLAlchemy model
+    :return: A set of attribute names
+    """
+    return {attr.key
+            for attr in inspect(model).column_attrs
+            if len(attr.columns) == 1 and not attr.columns[0].primary_key and not attr.columns[0].foreign_keys}
+
+
 def auto_table_args(cls, **extra_kwargs):
     """Merges SQLAlchemy ``__table_args__`` values.
 

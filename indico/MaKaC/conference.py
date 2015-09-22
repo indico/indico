@@ -16,7 +16,6 @@
 
 from itertools import ifilter
 from flask_pluginengine import plugin_context
-from sqlalchemy import inspect
 from sqlalchemy.orm import lazyload, joinedload, noload
 from werkzeug.urls import url_parse
 
@@ -104,6 +103,7 @@ from indico.core import signals
 from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.config import Config
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
@@ -3717,7 +3717,7 @@ class Conference(CommonObjectBase, Locatable):
         if options.get("access", False):
             conf.setProtection(self.getAccessController()._getAccessProtection())
             from indico.modules.events.models.principals import EventPrincipal
-            cols = {column.key for column in inspect(EventPrincipal).column_attrs} - {'event_id', 'id'}
+            cols = get_simple_column_attrs(EventPrincipal)
             for entry in self.as_event.acl_entries:
                 new_entry = EventPrincipal(**{col: getattr(entry, col) for col in cols})
                 conf.as_event.acl_entries.add(new_entry)
