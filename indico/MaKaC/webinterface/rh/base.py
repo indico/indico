@@ -43,6 +43,7 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.conference import Conference
 from MaKaC.errors import (
     AccessError,
     BadRefererError,
@@ -837,10 +838,11 @@ class RHModificationBaseProtected(RHProtected):
     ROLE = None
 
     def _checkProtection(self):
-        role_arg = {}
-        if self.ROLE is not None:
-            role_arg = {'role': self.ROLE}
-        if not self._target.canModify(self.getAW(), **role_arg):
+        if isinstance(self._target, Conference):
+            fn = partial(self._target.as_event.can_manage, session.user, role=self.ROLE, allow_key=True)
+        else:
+            fn = partial(self._target.canModify, session.avatar)
+        if not fn():
             if self._target.getModifKey() != "":
                 raise ModificationError()
             if self._getUser() is None:

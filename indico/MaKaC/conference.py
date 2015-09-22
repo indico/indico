@@ -3580,10 +3580,10 @@ class Conference(CommonObjectBase, Locatable):
         return session.get('modifKeys', {}).get(self.id) == modifKey
 
     @unify_user_args
-    def canUserModify(self, user, role=None):
-        return self.as_event.can_manage(user, role=role)
+    def canUserModify(self, user):
+        return self.as_event.can_manage(user)
 
-    def canModify(self, aw_or_user, role=None):
+    def canModify(self, aw_or_user):
         """Tells whether an access wrapper is allowed to modify the current
             conference: only if the user is granted to modify the conference and
             he is accessing from an IP address which is not restricted.
@@ -3592,7 +3592,7 @@ class Conference(CommonObjectBase, Locatable):
             aw_or_user = aw_or_user.getUser()
         if isinstance(aw_or_user, AvatarUserWrapper):
             aw_or_user = aw_or_user.user
-        return self.as_event.can_manage(aw_or_user, role=role, allow_key=True)
+        return self.as_event.can_manage(aw_or_user, allow_key=True)
 
     def getManagerList(self):
         managers = sorted([x.principal for x in self.as_event.acl_entries if x.has_management_role()],
