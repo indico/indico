@@ -1,7 +1,7 @@
 <ng-form name="nestedForm">
     <ul ng-class="{hasError: validationStarted && nestedForm.$invalid}">
         <li ng-if="!field.mandatory">
-            <input type="radio" name="socialEvents" value=""
+            <input type="radio" name="{{ fieldName }}" value=""
                    ng-model="radioValue.id"
                    ng-disabled="paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
             {{ 'None' | i18n }}
