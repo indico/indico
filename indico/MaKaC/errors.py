@@ -106,15 +106,6 @@ class ModificationError(AccessControlError):
         return _("you are not authorised to modify this %s") % self.objType
 
 
-class AdminError(AccessControlError):
-    """
-    """
-
-    @ensure_str
-    def __str__(self):
-        return _("only administrators can access this %s") % self.objType
-
-
 class TimingError(MaKaCError):
     """
     Timetable problems

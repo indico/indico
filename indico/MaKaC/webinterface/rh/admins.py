@@ -16,15 +16,15 @@
 
 from flask import session
 from persistent.dict import PersistentDict
+from werkzeug.exceptions import Forbidden
+
+from indico.util.i18n import _
 
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.info as info
-from MaKaC.errors import AdminError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
-
-from indico.web.flask.util import url_for
 
 
 class RHAdminBase(RHProtected):
@@ -37,7 +37,7 @@ class RHAdminBase(RHProtected):
         if not session.user and not self._doProcess:
             return
         if not session.user.is_admin:
-            raise AdminError("area")
+            raise Forbidden(_("Only Indico administrators may access this page."))
 
 
 class RHAdminArea(RHAdminBase):
