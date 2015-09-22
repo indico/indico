@@ -190,9 +190,9 @@ class ProtectionManagersMixin(ProtectionMixin):
                       check to succeed.  If not specified, full
                       management privs are required.  May be set to
                       the string ``'ANY'`` to check if the user has
-                      any management privileges.  Full management
-                      privs always grant access even if the role is
-                      not granted explicitly.
+                      any management privileges.  If the user has
+                      `full_access` privileges, he's assumed to have
+                      all possible roles.
         :param allow_admin: If admin users should always have access
         :param check_parent: If the parent object should be checked.
                              In this case the role is ignored; only
