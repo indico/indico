@@ -1024,16 +1024,8 @@ class PendingSubmittersIndex( PendingQueuesUsersIndex ):
     pass
 
 
-class PendingSubmittersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingSubmittersTasks"
-    pass
-
 class PendingManagersIndex( PendingQueuesUsersIndex ):
     _name = "pendingManagers"
-    pass
-
-class PendingManagersTasksIndex( PendinQueuesTasksIndex ):
-    _name = "pendingManagersTasks"
     pass
 
 
@@ -1211,11 +1203,8 @@ class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
-    __allowedIdxs = ["calendar", "category", "categoryDate",
-                     "categoryDateAll", "categoryName", "conferenceTitle",
-                     "pendingSubmitters", "pendingSubmittersTasks", "pendingManagers",
-                     "pendingManagersTasks", "pendingCoordinators",
-                     "pendingCoordinatorsTasks"]
+    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll', 'categoryName', 'conferenceTitle',
+                     'pendingSubmitters', 'pendingManagers', 'pendingCoordinators']
 
     def getIndex( self, name ):
         return self.getById(name)
@@ -1241,16 +1230,10 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
-            elif id=="pendingSubmittersTasks":
-                Idx[str(id)] = PendingSubmittersTasksIndex()
             elif id=="pendingManagers":
                 Idx[str(id)] = PendingManagersIndex()
-            elif id=="pendingManagersTasks":
-                Idx[str(id)] = PendingManagersTasksIndex()
             elif id=="pendingCoordinators":
                 Idx[str(id)] = PendingManagersIndex()
-            elif id=="pendingCoordinatorsTasks":
-                Idx[str(id)] = PendingManagersTasksIndex()
             elif id=="categoryName":
                 return CategoryTitleIndex()
             elif id=="conferenceTitle":
