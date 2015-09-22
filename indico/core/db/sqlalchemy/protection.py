@@ -181,7 +181,7 @@ class ProtectionMixin(object):
 
 class ProtectionManagersMixin(ProtectionMixin):
     @memoize_request
-    def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit=False):
+    def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
         """Checks if the user can manage the object.
 
         :param user: The :class:`.User` to check. May be None if the
@@ -198,12 +198,12 @@ class ProtectionManagersMixin(ProtectionMixin):
                              In this case the role is ignored; only
                              full management access is inherited to
                              children.
-        :param explicit: If the specified role should be checked
-                         explicitly instead of short-circuiting
-                         the check for Indico admins or managers.
-                         When this option is set to ``True``, the
-                         values of `allow_admin` and `check_parent`
-                         are ignored.
+        :param explicit_role: If the specified role should be checked
+                              explicitly instead of short-circuiting
+                              the check for Indico admins or managers.
+                              When this option is set to ``True``, the
+                              values of `allow_admin` and `check_parent`
+                              are ignored.
         """
         if role is not None and role != 'ANY' and role not in get_available_roles(type(self)):
             raise ValueError("role '{}' is not valid for '{}' objects".format(role, type(self).__name__))
@@ -218,7 +218,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         # Trigger signals for protection overrides
         rv = values_from_signal(signals.acl.can_manage.send(type(self), obj=self, user=user, role=role,
                                                             allow_admin=allow_admin, check_parent=check_parent,
-                                                            explicit=explicit),
+                                                            explicit_role=explicit_role),
                                 single_value=True)
         if rv:
             # in case of contradictory results (shouldn't happen at all)
@@ -226,15 +226,15 @@ class ProtectionManagersMixin(ProtectionMixin):
             return all(rv)
 
         # Usually admins can access everything, so no need for checks
-        if not explicit and allow_admin and user.is_admin:
+        if not explicit_role and allow_admin and user.is_admin:
             return True
 
         if any(user in entry.principal
                for entry in iter_acl(self.acl_entries)
-               if entry.has_management_role(role, explicit=explicit)):
+               if entry.has_management_role(role, explicit=explicit_role)):
             return True
 
-        if not check_parent or explicit:
+        if not check_parent or explicit_role:
             return False
 
         # the parent can be either an object inheriting from this

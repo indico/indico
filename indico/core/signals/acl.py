@@ -63,8 +63,8 @@ user can manage something or not.
 
 The `sender` is the type of the object that's using the mixin.  The
 actual instance is passed as `obj`.  The `user`, `role`, `allow_admin`,
-`check_parent` and `explicit` arguments of `can_manage` are passed as
-kwargs with the same name.
+`check_parent` and `explicit_role` arguments of `can_manage` are
+passed as kwargs with the same name.
 
 If the signal returns ``True`` or ``False``, the access check succeeds
 or fails without any further checks.  If multiple subscribers to the

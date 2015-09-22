@@ -198,7 +198,7 @@ def test_can_manage_signal_override(create_event, dummy_user, signal_rv_1, signa
 def test_can_manage_admin(create_event, create_user, is_admin, allow_admin, not_explicit, expected):
     event = create_event()
     user = create_user(123, admin=is_admin)
-    assert event.can_manage(user, allow_admin=allow_admin, explicit=not not_explicit) == expected
+    assert event.can_manage(user, allow_admin=allow_admin, explicit_role=not not_explicit) == expected
 
 
 def test_can_manage_guest(create_event):
