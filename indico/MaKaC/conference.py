@@ -35,8 +35,8 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     IConferenceEventInfoFossil, IConferenceFossil,\
     ISessionFossil, ISessionSlotFossil, IMaterialMinimalFossil,\
     IMaterialFossil, IConferenceParticipationFossil,\
-    IResourceMinimalFossil, ILinkMinimalFossil, ILocalFileMinimalFossil,\
-    IResourceFossil, ILinkFossil, ILocalFileFossil,\
+    IResourceMinimalFossil, ILocalFileMinimalFossil,\
+    IResourceFossil, ILocalFileFossil,\
     ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
     ICategoryFossil, ILocalFileAbstractMaterialFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
@@ -45,7 +45,6 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
-from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.util.caching import memoize_request
@@ -1882,13 +1881,7 @@ class Conference(CommonObjectBase, Locatable):
 
     fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
 
-    def __init__(self, creator=None, id='', creationDate=None, modificationDate=None):
-        """Class constructor. Initialise the class attributes to the default
-            values.
-           Params:
-            confData -- (Dict) Contains the data the conference object has to
-                be initialised to.
-        """
+    def __init__(self, id=''):
         self.id = id
         self.title = ""
         self.description = ""
@@ -1930,14 +1923,7 @@ class Conference(CommonObjectBase, Locatable):
         self.poster = None
         self.__schedule=None
         self.__owners = []
-        if creationDate:
-            self._creationDS = creationDate
-        else:
-            self._creationDS = nowutc() #creation timestamp
-        if modificationDate:
-            self._modificationDS = modificationDate
-        else:
-            self._modificationDS = nowutc() #modification timestamp
+        self._modificationDS = self._creationDS = nowutc()
 
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
