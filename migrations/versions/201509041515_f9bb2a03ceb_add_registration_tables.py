@@ -100,7 +100,8 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_column('registration_form_items', 'current_data_id', schema='event_registration')
+    op.drop_constraint('fk_registration_form_items_current_data_id_registration_form_field_data',
+                       'registration_form_items', schema='event_registration')
     op.drop_table('registration_data', schema='event_registration')
     op.drop_table('registrations', schema='event_registration')
     op.drop_table('registration_form_field_data', schema='event_registration')
