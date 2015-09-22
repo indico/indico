@@ -129,7 +129,30 @@ def test_update_principal_email(create_event, smtp):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_convert_email_principals(db, create_event, create_user):
+def test_convert_email_principals(db, create_event, create_user, dummy_user):
+    event = create_event()
+    user = create_user(123, email='user@example.com')
+    principal = EmailPrincipal('unknown@example.com')
+    other_entry = event.update_principal(dummy_user, full_access=True, roles={'foo', 'foobar'})
+    entry = event.update_principal(principal, read_access=True, roles={'foo', 'bar'})
+    other_entry_data = other_entry.current_data
+    entry_data = entry.current_data
+    # different emails for now -> nothing updated
+    assert not EventPrincipal.replace_email_with_user(user, 'event_new')
+    assert set(event.acl_entries) == {entry, other_entry}
+    user.secondary_emails.add(principal.email)
+    db.session.expire(user, ['_all_emails'])
+    assert EventPrincipal.replace_email_with_user(user, 'event_new') == {event}
+    assert set(event.acl_entries) == {entry, other_entry}
+    assert all(x.type == PrincipalType.user for x in event.acl_entries)
+    db.session.expire(other_entry)
+    db.session.expire(entry)
+    assert entry.current_data == entry_data
+    assert other_entry.current_data == other_entry_data
+
+
+@pytest.mark.usefixtures('request_context')
+def test_convert_email_principals_merge(db, create_event, create_user):
     event = create_event()
     user = create_user(123, email='user@example.com')
     principal = EmailPrincipal('unknown@example.com')
