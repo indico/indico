@@ -239,3 +239,107 @@ def test_can_manage_roles_invalid(create_event, dummy_user):
     event = create_event()
     with pytest.raises(ValueError):
         event.can_manage(dummy_user, 'invalid')
+
+
+def test_merge_privs():
+    p = EventPrincipal(read_access=True, roles={'foo', 'bar'})
+    p.merge_privs(EventPrincipal(roles={'bar', 'foobar'}, full_access=True))
+    assert p.read_access
+    assert p.full_access
+    assert set(p.roles) == {'foo', 'bar', 'foobar'}
+
+
+def test_has_management_role_full_access():
+    p = EventPrincipal(full_access=True, roles=[])
+    assert p.has_management_role()
+    assert p.has_management_role('foo')
+    assert p.has_management_role('ANY')
+
+
+@pytest.mark.usefixtures('request_context')
+def test_has_management_role_full_access_db(create_event, dummy_user, create_user):
+    event = create_event()
+    event.update_principal(create_user(123), roles={'bar'})
+    entry = event.update_principal(dummy_user, full_access=True)
+
+    def _find(*args):
+        return EventPrincipal.find(EventPrincipal.event_new == event, EventPrincipal.has_management_role(*args))
+
+    assert _find().one() == entry
+    assert _find('foo').one() == entry
+    assert _find('ANY').count() == 2
+
+
+def test_has_management_role_no_access():
+    p = EventPrincipal(read_access=True, roles=[])
+    assert not p.has_management_role()
+    assert not p.has_management_role('foo')
+    assert not p.has_management_role('ANY')
+
+
+@pytest.mark.usefixtures('request_context')
+def test_has_management_role_no_access_db(create_event, dummy_user):
+    event = create_event()
+    event.update_principal(dummy_user, read_access=True)
+
+    def _find(*args):
+        return EventPrincipal.find(EventPrincipal.event_new == event, EventPrincipal.has_management_role(*args))
+
+    assert not _find().count()
+    assert not _find('foo').count()
+    assert not _find('ANY').count()
+
+
+@pytest.mark.parametrize('explicit', (True, False))
+def test_has_management_role_explicit(explicit):
+    p = EventPrincipal(full_access=True, roles=['foo'])
+    assert p.has_management_role('foo', explicit=explicit)
+    assert p.has_management_role('ANY', explicit=explicit)
+    assert p.has_management_role('bar', explicit=explicit) == (not explicit)
+    assert EventPrincipal(full_access=True, roles=[]).has_management_role('ANY', explicit=explicit) == (not explicit)
+
+
+@pytest.mark.parametrize('explicit', (True, False))
+@pytest.mark.usefixtures('request_context')
+def test_has_management_role_explicit_db(create_event, dummy_user, create_user, explicit):
+    event = create_event()
+    event.update_principal(create_user(123), full_access=True)
+    event.update_principal(dummy_user, full_access=True, roles={'foo'})
+
+    def _find(role):
+        return EventPrincipal.find(EventPrincipal.event_new == event,
+                                   EventPrincipal.has_management_role(role, explicit=explicit))
+
+    assert _find('foo').count() == (1 if explicit else 2)
+    assert _find('bar').count() == (0 if explicit else 2)
+    assert _find('ANY').count() == (1 if explicit else 2)
+
+
+def test_has_management_role_explicit_fail():
+    p = EventPrincipal(roles=['foo'])
+    # no role specified
+    with pytest.raises(ValueError):
+        p.has_management_role(explicit=True)
+    with pytest.raises(ValueError):
+        EventPrincipal.has_management_role(explicit=True)
+
+
+def test_has_management_role():
+    p = EventPrincipal(roles=['foo'])
+    assert p.has_management_role('ANY')
+    assert p.has_management_role('foo')
+    assert not p.has_management_role('bar')
+
+
+@pytest.mark.usefixtures('request_context')
+def test_has_management_role_db(create_event, create_user, dummy_user):
+    event = create_event()
+    event.update_principal(create_user(123), roles={'bar'})
+    entry = event.update_principal(dummy_user, roles={'foo'})
+
+    def _find(*args):
+        return EventPrincipal.find(EventPrincipal.event_new == event, EventPrincipal.has_management_role(*args))
+
+    assert not _find().count()
+    assert _find('foo').one() == entry
+    assert _find('ANY').count() == 2
