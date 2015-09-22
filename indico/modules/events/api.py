@@ -349,9 +349,9 @@ class EventSearchFetcher(IteratedDataFetcher):
             counter = 0
 
             # Query the DB in chunks of 1000 records per query until the limit is satisfied
-            for row in query.yield_per(5):
+            for row in query.yield_per(1000):
                 event_id = row[0]
-                event = ch.getById(event_id)
+                event = ch.getById(event_id, True)
                 if event is not None and event.canAccess(self._aw):
                     counter += 1
                     # Start yielding only when the counter reaches the given offset
@@ -361,7 +361,6 @@ class EventSearchFetcher(IteratedDataFetcher):
                         if (self._limit is not None) and (counter == self._offset + self._limit):
                             break
 
-        obj_list = None
         if self._orderBy in ['start', 'id', None]:
             obj_list = _iterate_objs(query)
         else:

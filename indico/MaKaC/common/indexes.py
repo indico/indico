@@ -20,7 +20,6 @@
 
 import itertools
 from datetime import datetime, timedelta
-from operator import itemgetter
 
 from persistent import Persistent
 from pytz import timezone
@@ -34,6 +33,7 @@ from indico.core.logger import Logger
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.util.string import remove_accents
+from indico.modules.events import Event
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.fulltextindexes.models.categories import IndexedCategory
 
@@ -1203,6 +1203,8 @@ class ConferenceIndex(object):
             order = None
 
         return (db.session.query(IndexedEvent.id)
+                  .join(Event, Event.id == IndexedEvent.id)
+                  .filter(~Event.is_deleted)
                   .filter(IndexedEvent.title_vector.op('@@')(
                       func.to_tsquery('simple', preprocess_ts_string(search_string))))
                   .order_by(order))
