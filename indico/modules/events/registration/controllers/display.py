@@ -35,7 +35,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _can_redirect_to_single_regform(regforms):
-    return len(regforms) == 1 and regforms[0].is_active and not was_regform_submitted(regforms[0])
+    return len(regforms) == 1 and regforms[0].can_submit(session.user) and not was_regform_submitted(regforms[0])
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
@@ -91,6 +91,9 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
             return redirect(url_for('.display_regforms_list', self.event))
         elif was_regform_submitted(self.regform):
             flash(_('You have already registered with this form'), 'error')
+            return redirect(url_for('.display_regforms_list', self.event))
+        elif self.regform.limit_reached:
+            flash(_('The maximum number of registrations has been reached'), 'error')
             return redirect(url_for('.display_regforms_list', self.event))
 
     def _process(self):
