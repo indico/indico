@@ -40,7 +40,7 @@ def _check_request_definitions(app, **kwargs):
 def _extend_event_management_menu(event, **kwargs):
     if not get_request_definitions():
         return
-    if not event.as_event.can_manage(session.user, allow_key=True) or is_request_manager(session.user):
+    if not event.as_event.can_manage(session.user, allow_key=True) and not is_request_manager(session.user):
         return
     return 'requests', SideMenuItem(_('Services'), url_for('requests.event_requests', event), section='organization')
 
