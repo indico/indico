@@ -377,7 +377,10 @@ class RH(RequestHandlerBase):
         return method()
 
     def _checkCSRF(self):
-        token = request.headers.get('X-CSRF-Token', request.form.get('csrf_token'))
+        token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
+        if token is None:
+            # Might be a WTForm with a prefix. In that case the field name is '<prefix>-csrf_token'
+            token = next((v for k, v in request.form.iteritems() if k.endswith('-csrf_token')), None)
         if self.CSRF_ENABLED and request.method != 'GET' and token != session.csrf_token:
             msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
                     u"button, reload the page and try again.")
