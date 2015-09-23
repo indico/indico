@@ -457,6 +457,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.settings.formData.push('defaultItem');
             scope.settings.formData.push('inputType');
+            scope.settings.formData.push('withExtraSlots');
 
             scope.settings.editionTable = {
                 sortable: false,
@@ -466,22 +467,24 @@ ndRegForm.directive('ndRadioField', function(url) {
                     $T("Billable"),
                     $T("Price"),
                     $T("Places limit"),
+                    $T("Max. extra slots"),
+                    $T("Extra slots pay"),
                     $T("Enabled")],
 
                 colModel: [
-                    {name:'caption',
+                    {name: 'caption',
                      index:'caption',
                      align: 'center',
-                     width:160,
+                     width: 160,
                      editable: true,
                      edittype: "text",
                      editoptions: {
                         size: "30",
                         maxlength: "50"}},
 
-                    {name:'billable',
-                     index:'isBillable',
-                     width: 60,
+                    {name: 'billable',
+                     index: 'isBillable',
+                     width: 50,
                      editable: true,
                      align: 'center',
                      defaultVal: false,
@@ -500,16 +503,36 @@ ndRegForm.directive('ndRadioField', function(url) {
                     {name: 'placesLimit',
                      index: 'placesLimit',
                      align: 'center',
-                     width: 80,
+                     width: 50,
                      editable: true,
                      edittype: "text",
                      editoptions: {
                         size: "7",
                         maxlength: "20"}},
 
+                    {name: 'maxExtraSlots',
+                     index: 'maxExtraSlots',
+                     align: 'center',
+                     width: 50,
+                     editable: true,
+                     edittype: "text",
+                     className: 'extra-slots',
+                     editoptions: {
+                        size: "7",
+                        maxlength: "2"}},
+
+                    {name: 'extraSlotsPay',
+                     index: 'extraSlotsPay',
+                     align: 'center',
+                     width: 50,
+                     editable: true,
+                     edittype: "bool_select",
+                     className: 'extra-slots',
+                     defaultVal: false},
+
                     {name: 'isEnabled',
                      index: 'isEnabled',
-                     width: 60,
+                     width: 50,
                      editable: true,
                      align: 'center',
                      edittype: 'bool_select',
@@ -597,6 +620,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 $scope.formData.radioitems = [];
                 $scope.formData.input = $scope.field.input;
                 $scope.formData.disabled = $scope.field.disabled;
+                $scope.formData.withExtraSlots = $scope.field.withExtraSlots;
 
                 _.each($scope.settings.formData, function(item) {
                     if (Array.isArray(item) && $scope.field[item[0]] !== undefined) {
@@ -610,6 +634,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     $scope.formData.radioitems[ind] =  angular.copy(item);
                 });
 
+                $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
                 $scope.tabSelected = "tab-options";
                 $scope.parsePrice();
             };
@@ -631,6 +656,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     isEnabled: true,
                     isBillable: false
                 });
+
+                $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
             };
 
             $scope.sortItems = function() {
@@ -638,6 +665,20 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     return radioitem.caption.toLowerCase();
                 });
             };
+
+            $scope.toggleExtraSlotsColumns = function(value) {
+                if (!!value) {
+                    $('.regform-table .extra-slots').show();
+                } else {
+                    _.delay(function() {
+                        $('.regform-table .extra-slots').hide();
+                    }, 100);
+                }
+            }
+
+            $scope.$watch('formData.withExtraSlots', function(newValue) {
+                $scope.toggleExtraSlotsColumns(newValue);
+            });
         },
 
         link: function(scope) {
