@@ -31,6 +31,7 @@ from MaKaC.i18n import _
 from indico.core.logger import Logger
 
 from indico.util import json
+from indico.util.caching import memoize_request
 from indico.util.contextManager import ContextManager
 from indico.util.user import principal_from_fossil
 
@@ -56,6 +57,11 @@ class RHConferenceSite(RHCustomizable):
         l.setConference( params )
         self._conf = self._target = l.getObject()
         ContextManager.set("currentConference", self._conf)
+
+    @property
+    @memoize_request
+    def event_new(self):
+        return self._conf.as_event
 
 
 class RHConferenceBase( RHConferenceSite ):
