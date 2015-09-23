@@ -181,8 +181,11 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_remind_all.html'
 
     def _get_agreements(self):
-        return Agreement.find_all(Agreement.pending, Agreement.person_email != None,
-                                  Agreement.event_id == self._conf.getId(), Agreement.type == self.definition.name)
+        agreements = Agreement.find_all(Agreement.pending,
+                                        Agreement.person_email != None,
+                                        Agreement.event_id == self._conf.getId(),
+                                        Agreement.type == self.definition.name)
+        return [a for a in agreements if not a.is_orphan()]
 
 
 class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
