@@ -18,6 +18,10 @@
 Event-related utils
 """
 
+from functools import wraps
+
+from indico.util.decorators import smart_decorator
+
 
 def uniqueId(obj):
     from indico.modules.events.notes.models.notes import EventNote
@@ -107,3 +111,34 @@ def truncate_path(full_path, chars=30, skip_first=True):
         truncated = True
 
     return first_node, path[::-1], last_node, truncated
+
+
+@smart_decorator
+def unify_event_args(fn, legacy=False):
+    """Decorator that unifies new/legacy event arguments.
+
+    Any argument of the decorated function that contains either a
+    :class:`Conference` or a :class:`.Event` will be converted
+    to the object type specified by the `legacy` argument.
+
+    :param legacy: If True, all arguments containing events will receive
+                   a :class:`Conference`. Otherwise, they will receive
+                   a :class:`.Event`.
+    """
+    from indico.modules.events import Event
+
+    if legacy:
+        def _convert(arg):
+            return arg.as_legacy if isinstance(arg, Event) else arg
+    else:
+        def _convert(arg):
+            from MaKaC.conference import Conference
+            return arg.as_event if isinstance(arg, Conference) else arg
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        args = map(_convert, args)
+        kwargs = {k: _convert(v) for k, v in kwargs.iteritems()}
+        return fn(*args, **kwargs)
+
+    return wrapper
