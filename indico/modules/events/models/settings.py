@@ -26,6 +26,8 @@ from indico.util.string import return_ascii
 
 
 class EventSettingsMixin(object):
+    settings_backref_name = None
+
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
@@ -33,23 +35,35 @@ class EventSettingsMixin(object):
                 db.Index(None, 'event_id', 'module'),
                 {'schema': 'events'})
 
-    event_id = db.Column(
-        db.Integer,
-        index=True,
-        nullable=False
-    )
+    @declared_attr
+    def event_id(cls):
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('events.events.id'),
+            index=True,
+            nullable=False
+        )
 
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(self.event_id, True)
 
-    @classmethod
-    def delete_event(cls, event_id):
-        cls.find(event_id=event_id).delete(synchronize_session='fetch')
+    @declared_attr
+    def event_new(cls):
+        return db.relationship(
+            'Event',
+            lazy=True,
+            backref=db.backref(
+                cls.settings_backref_name,
+                lazy='dynamic'
+            )
+        )
 
 
 class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
+    settings_backref_name = 'settings'
+
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
@@ -66,6 +80,7 @@ class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
 
 class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model):
     principal_backref_name = 'in_event_settings_acls'
+    settings_backref_name = 'settings_principals'
     extra_key_cols = ('event_id',)
 
     @declared_attr

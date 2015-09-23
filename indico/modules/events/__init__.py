@@ -58,8 +58,6 @@ event_management_object_url_prefixes = {
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
     event.as_event.is_deleted = True
-    EventSetting.delete_event(int(event.id))
-    EventSettingPrincipal.delete_event(int(event.id))
     if hasattr(event, '_old_id'):
         LegacyEventMapping.find(legacy_event_id=event._old_id).delete()
 
