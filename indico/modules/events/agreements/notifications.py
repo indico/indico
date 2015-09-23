@@ -27,7 +27,7 @@ from indico.web.flask.templating import get_template_module
 def make_email_template(template, agreement, email_body=None):
     func = get_template_module if not current_plugin else get_plugin_template_module
     if not email_body:
-        email_body = agreement.definition.get_email_body_template(agreement.event).get_body()
+        email_body = agreement.definition.get_email_body_template(agreement.event_new).get_body()
     email_body = replace_placeholders(email_body, agreement.definition.get_email_placeholders(), agreement)
     return func(template, email_body=email_body)
 

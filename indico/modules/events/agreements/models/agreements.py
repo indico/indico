@@ -202,7 +202,7 @@ class Agreement(db.Model):
 
     @staticmethod
     def create_from_data(event, type_, person):
-        agreement = Agreement(event=event, type=type_, state=AgreementState.pending, uuid=str(uuid4()))
+        agreement = Agreement(event_new=event, type=type_, state=AgreementState.pending, uuid=str(uuid4()))
         agreement.identifier = person.identifier
         agreement.person_email = person.email
         agreement.person_name = person.name
@@ -244,4 +244,4 @@ class Agreement(db.Model):
         return self.identifier == person.identifier
 
     def is_orphan(self):
-        return self.definition.is_agreement_orphan(self.event, self)
+        return self.definition.is_agreement_orphan(self.event_new, self)

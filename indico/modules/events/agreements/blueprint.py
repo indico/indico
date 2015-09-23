@@ -48,7 +48,7 @@ _bp.add_url_rule('/manage/agreements/<definition>/submit/<id>', 'event_agreement
                  RHAgreementManagerDetailsSubmitAnswer, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/agreements/<definition>/submit/', 'event_agreements_details_submit_answer',
                  RHAgreementManagerDetailsSubmitAnswer, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/agreements/<definition>/download/<id>/<filename>', 'download_file',
+_bp.add_url_rule('/manage/agreements/<definition>/download/<int:id>/<filename>', 'download_file',
                  RHAgreementManagerDetailsDownloadAgreement)
 
 # Event
