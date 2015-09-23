@@ -30,7 +30,7 @@ def get_agreement_definitions():
 def send_new_agreements(event, name, people, email_body, cc_addresses, from_address):
     """Creates and send agreements for a list of people on a given event.
 
-    :param event: The `Conference` associated with the agreement
+    :param event: The `Event` associated with the agreement
     :param name: The agreement type matcing a :class:`AgreementDefinition` name
     :param people: The list of people for whom agreements will be created
     :param email_body: The body of the email

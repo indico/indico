@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from itertools import islice
 from operator import attrgetter
 
-from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
@@ -46,20 +45,20 @@ class AgreementExportHook(HTTPAPIHook):
             raise HTTPAPIError('No such event', 404)
 
     def _hasAccess(self, aw):
-        return self._definition.can_access_api(aw.getUser().user, self._event)
+        return self._definition.can_access_api(aw.getUser().user, self._event.as_event)
 
     def export_agreements(self, aw):
-        sent_agreements = {a.identifier: a for a in Agreement.find(event_id=self._event.getId(),
-                                                                   type=self._definition.name)}
-        for person in islice(sorted(self._definition.get_people(self._event).itervalues(),
+        event = self._event.as_event
+        sent_agreements = {a.identifier: a for a in event.agreements.filter_by(type=self._definition.name)}
+        for person in islice(sorted(self._definition.get_people(event).itervalues(),
                                     key=attrgetter('name', 'identifier')),
                              self._offset, self._offset + self._limit):
             agreement = sent_agreements.get(person.identifier)
             data = {
-                'event_id': int(self._event.id),
+                'event_id': event.id,
                 'identifier': person.identifier,
                 'sent': agreement is not None,
                 'accepted': None if (not agreement or agreement.pending) else agreement.accepted,
             }
-            self._definition.extend_api_data(self._event, person, agreement, data)
+            self._definition.extend_api_data(event, person, agreement, data)
             yield data

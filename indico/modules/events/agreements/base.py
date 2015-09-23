@@ -108,7 +108,7 @@ class AgreementDefinitionBase(object):
     @classmethod
     def can_access_api(cls, user, event):
         """Checks if a user can list the agreements for an event"""
-        return event.canUserModify(user)
+        return event.can_manage(user)
 
     @classmethod
     def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover
@@ -150,7 +150,7 @@ class AgreementDefinitionBase(object):
     def get_people_not_notified(cls, event):
         """Returns a dictionary of :class:`AgreementPersonInfo` yet to be notified"""
         people = cls.get_people(event)
-        sent_agreements = {a.identifier for a in Agreement.find(event_id=event.getId(), type=cls.name)}
+        sent_agreements = {a.identifier for a in event.agreements.filter_by(type=cls.name)}
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
@@ -162,9 +162,7 @@ class AgreementDefinitionBase(object):
         """
         people = cls.get_people(event)
         identifiers = [p.identifier for p in people.itervalues()]
-        query = Agreement.find(Agreement.event_id == event.getId(),
-                               Agreement.type == cls.name,
-                               Agreement.identifier.in_(identifiers))
+        query = event.agreements.filter(Agreement.type == cls.name, Agreement.identifier.in_(identifiers))
         num_accepted = query.filter(Agreement.accepted).count()
         num_rejected = query.filter(Agreement.rejected).count()
         everybody_signed = len(people) == (num_accepted + num_rejected)

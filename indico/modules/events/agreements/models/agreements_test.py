@@ -109,8 +109,8 @@ def test_locator():
 def test_create_from_data(dummy_event, dummy_person, dummy_user, person_with_user):
     type_ = 'dummy'
     dummy_person.user = dummy_user if person_with_user else None
-    agreement = Agreement.create_from_data(event=dummy_event, type_=type_, person=dummy_person)
-    assert agreement.event == dummy_event
+    agreement = Agreement.create_from_data(event=dummy_event.as_event, type_=type_, person=dummy_person)
+    assert agreement.event_new == dummy_event.as_event
     assert agreement.type == type_
     assert agreement.state == AgreementState.pending
     assert agreement.uuid
