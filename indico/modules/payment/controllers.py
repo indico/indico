@@ -114,7 +114,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
     def _checkProtection(self):
         self.protection_overridden = False
         can_modify_plugin = session.user and self.plugin.can_be_modified(session.user, self._conf)
-        can_modify_event = self._conf.canModify(self.getAW())
+        can_modify_event = self._conf.as_event.can_manage(session.user, allow_key=True)
         self.protection_overridden = can_modify_plugin and not can_modify_event
         if not can_modify_plugin and not can_modify_event:
             RHConferenceModifBase._checkProtection(self)
