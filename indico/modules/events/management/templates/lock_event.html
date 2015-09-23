@@ -1,0 +1,28 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}{% trans %}You are about to lock this event!{% endtrans %}{% endblock %}
+
+{% block content %}
+    <form method="POST" class="i-form vertical js-form-confirm-lock">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <h2>{{ event.title }}</h2>
+        <div class="form-group warning-message-box large-icon">
+            <div class="message-text">
+                {% trans %}
+                    Please note that if you lock this event, you will not be able to change it anymore.
+                    <br/>Only the event owner or an administrator will be able to unlock it.
+                {% endtrans %}
+            </div>
+        </div>
+        <div class="form-group form-group-footer">
+            <div class="form-field form-block">
+                <button id="js-button-lock" class="i-button big warning right">
+                    {% trans %}Lock event{% endtrans %}
+                </button>
+                <button id="js-button-close" class="i-button big right" data-button-back>
+                    {% trans %}I've changed my mind!{% endtrans %}
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

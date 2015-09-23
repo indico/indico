@@ -998,6 +998,9 @@ class WPConferenceModifBase(main.WPMainBase):
                self._includeJSPackage('Management') + \
                self._includeJSPackage('MaterialEditor')
 
+    def getCSSFiles(self):
+        return main.WPMainBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+
     def _getSiteArea(self):
         return "ModificationArea"
 
@@ -1575,16 +1578,10 @@ class WPConfModifToolsBase(WPConferenceModifBase):
 
         self._tabReminders = self._tabCtrl.newTab('reminders', _("Reminders"),
                                                   url_for('event_reminders.list', self._conf))
-        self._tabCloneEvent = self._tabCtrl.newTab("clone", _("Clone Event"), \
-                urlHandlers.UHConfClone.getURL(self._conf))
         self._tabPosters = self._tabCtrl.newTab("posters", _("Posters"), \
                 urlHandlers.UHConfModifPosterPrinting.getURL(self._conf))
         self._tabBadges = self._tabCtrl.newTab("badges", _("Badges/Tablesigns"), \
                 urlHandlers.UHConfModifBadgePrinting.getURL(self._conf))
-        self._tabClose = self._tabCtrl.newTab("close", _("Lock"), \
-                urlHandlers.UHConferenceClose.getURL(self._conf))
-        self._tabDelete = self._tabCtrl.newTab("delete", _("Delete"), \
-                urlHandlers.UHConfDeletion.getURL(self._conf))
 
         if Config.getInstance().getOfflineStore():
             self._tabOffline = self._tabCtrl.newTab("offline", _("Offline copy"),
@@ -1609,63 +1606,13 @@ class WPConfModifToolsBase(WPConferenceModifBase):
         return "nothing"
 
 
-class WPConfClosing(WPConfModifToolsBase):
-
-    def __init__(self, rh, conf):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._eventType = "conference"
-        if self._rh.getWebFactory() is not None:
-            self._eventType = self._rh.getWebFactory().getId()
-
-    def _setActiveTab(self):
-        self._tabClose.setActive()
-
-    def _getTabContent(self, params):
-        msg = {'challenge': _("Are you sure that you want to lock the event?"),
-               'target': self._conf.getTitle(),
-               'subtext': _("Note that if you lock the event, you will not be able to change its details any more. "
-                "Only the creator of the event or an administrator of the system / category can unlock an event."),
-               }
-
-        wc = wcomponents.WConfirmation()
-        return wc.getHTML(msg,
-                          urlHandlers.UHConferenceClose.getURL(self._conf),
-                          {},
-                          severity="warning",
-                          confirmButtonCaption=_("Yes, lock this event"),
-                          cancelButtonCaption=_("No"))
-
-
-class WPConfDeletion(WPConfModifToolsBase):
-
-    def _setActiveTab(self):
-        self._tabDelete.setActive()
-
-    def _getTabContent(self, params):
-        msg = {'challenge': _("Are you sure that you want to delete the conference?"),
-               'target': self._conf.getTitle(),
-               'subtext': _("Note that if you delete the conference, all the items below it will also be deleted")
-               }
-
-        wc = wcomponents.WConfirmation()
-        return wc.getHTML(msg,
-                          urlHandlers.UHConfDeletion.getURL(self._conf),
-                          {},
-                          severity="danger",
-                          confirmButtonCaption=_("Yes, I am sure"),
-                          cancelButtonCaption=_("No"))
-
-
-class WPConfCloneConfirm(WPConfModifToolsBase):
+class WPConfCloneConfirm(WPConferenceModifBase):
 
     def __init__(self, rh, conf, nbClones):
         WPConfModifToolsBase.__init__(self, rh, conf)
         self._nbClones = nbClones
 
-    def _setActiveTab(self):
-        self._tabCloneEvent.setActive()
-
-    def _getTabContent(self, params):
+    def _getPageContent(self, params):
 
         msg = _("This action will create {0} new events. Are you sure you want to proceed").format(self._nbClones)
 
@@ -2043,13 +1990,10 @@ class WConferenceClone(wcomponents.WTemplated):
         return vars
 
 
-class WPConfClone(WPConfModifToolsBase):
+class WPConfClone(WPConferenceModifBase):
 
-    def _setActiveTab( self ):
-        self._tabCloneEvent.setActive()
-
-    def _getTabContent( self, params ):
-        p = WConferenceClone( self._conf )
+    def _getPageContent(self, params):
+        p = WConferenceClone(self._conf)
         pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
                 "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
                 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>

@@ -239,27 +239,6 @@ class RHConferenceCloseModifKey(RHConferenceBase):
         self._redirect(url)
 
 
-class RHConferenceClose(RHConferenceModifBase):
-    _uh = urlHandlers.UHConferenceClose
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-        self._confirm = params.has_key("confirm")
-        self._cancel = params.has_key("cancel")
-
-    def _process(self):
-
-        if self._cancel:
-            url = urlHandlers.UHConferenceModification.getURL(self._conf)
-            self._redirect(url)
-        elif self._confirm:
-            self._target.setClosed(True)
-            url = urlHandlers.UHConferenceModification.getURL(self._conf)
-            self._redirect(url)
-        else:
-            return conferences.WPConfClosing(self, self._conf).display()
-
-
 class RHConferenceOpen(RHConferenceModifBase):
     _allowClosed = True
 
@@ -496,29 +475,6 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
                     ses.grantModification(convener,False)
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
 
-
-class RHConfDeletion(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfDeletion
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
-
-    def _process( self ):
-        if self._cancel:
-            self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
-        elif self._confirm:
-            parent=None
-            if self._conf.getOwnerList()!=[]:
-                parent=self._conf.getOwnerList()[0]
-            self._conf.delete(session.user)
-            if parent is not None:
-                self._redirect( urlHandlers.UHCategoryModification.getURL(parent) )
-            else:
-                self._redirect( urlHandlers.UHWelcome.getURL() )
-        else:
-            return conferences.WPConfDeletion( self, self._conf ).display()
 
 class RHConfModifParticipants( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifParticipants

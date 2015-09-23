@@ -60,12 +60,8 @@ class WebFactory(WebFactory):
 
     @staticmethod
     def customiseToolsTabCtrl(tabCtrl):
-        tabCtrl.getTabById("clone").enable()
-        tabCtrl.getTabById("delete").enable()
         tabCtrl.getTabById("badges").disable()
         tabCtrl.getTabById("posters").enable()
-        tabCtrl.getTabById("badges").disable()
-
 
     @staticmethod
     def getConfModif(rh, conf):
