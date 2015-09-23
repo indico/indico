@@ -391,3 +391,21 @@ form#upload-images.full-width .dropzone {
         display: none !important;
     }
 }
+
+// Event actions
+
+.confirm-delete-block {
+    > * {
+        vertical-align: middle;
+        font-size: 1.1em;
+    }
+
+    input[type="checkbox"] {
+        font-size: 2em;
+    }
+
+    label {
+        font-weight: normal;
+        margin-left: 0.5em;
+    }
+}

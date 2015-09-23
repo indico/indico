@@ -1,3 +1,5 @@
+${ render_template('flashed_messages.html') }
+
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
     <div id="eventsVisibilityHelp" class="tip">

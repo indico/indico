@@ -27,16 +27,6 @@ event_mgmt.add_url_rule('/tools/clone', 'confModifTools-clone', conferenceModif.
 event_mgmt.add_url_rule('/tools/clone', 'confModifTools-performCloning', conferenceModif.RHConfPerformCloning,
                         methods=('POST',))
 
-# Tools: Delete
-event_mgmt.add_url_rule('/tools/delete', 'confModifTools-delete', conferenceModif.RHConfDeletion,
-                        methods=('GET', 'POST'))
-
-# Tools: Lock
-event_mgmt.add_url_rule('/tools/lock', 'conferenceModification-close', conferenceModif.RHConferenceClose,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/unlock', 'conferenceModification-open', conferenceModif.RHConferenceOpen,
-                        methods=('GET', 'POST'))
-
 # Tools: Posters
 event_mgmt.add_url_rule('/tools/posters/', 'confModifTools-posterPrinting', conferenceModif.RHConfPosterPrinting,
                         methods=('GET', 'POST'))
