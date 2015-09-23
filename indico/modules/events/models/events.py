@@ -25,7 +25,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
-from indico.util.string import return_ascii, to_unicode
+from indico.util.string import return_ascii, to_unicode, format_repr
 from indico.web.flask.util import url_for
 
 
@@ -211,7 +211,7 @@ class Event(ProtectionManagersMixin, db.Model):
     @return_ascii
     def __repr__(self):
         # TODO: add self.protection_repr once we use it and the title once we store it here
-        return '<Event({})>'.format(self.id)
+        return format_repr(self, 'id', is_deleted=False)
 
     # TODO: Remove the next block of code once event acls (read access) are migrated
     def _fail(self, *args, **kwargs):
