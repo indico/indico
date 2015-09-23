@@ -16,7 +16,7 @@
 
 import pytest
 
-from indico.util.event import truncate_path
+from indico.util.event import truncate_path, unify_event_args
 
 
 @pytest.mark.parametrize(('full_path', 'chars', 'skip_first', 'expected'), (
@@ -46,3 +46,39 @@ from indico.util.event import truncate_path
 ))
 def test_truncate_path(full_path, chars, skip_first, expected):
     assert truncate_path(full_path, chars=chars, skip_first=skip_first) == expected
+
+
+def test_unify_event_args_new(dummy_event):
+    avatar = dummy_event
+    user = dummy_event.as_event
+
+    @unify_event_args
+    def fn(a, b, c, d, e, f):
+        # posargs
+        assert a == 'foo'
+        assert b == user
+        assert c == user
+        # kwargs
+        assert d == 'bar'
+        assert e == user
+        assert f == user
+
+    fn('foo', user, avatar, d='bar', e=user, f=avatar)
+
+
+def test_unify_event_args_legacy(dummy_event):
+    avatar = dummy_event
+    user = dummy_event.as_event
+
+    @unify_event_args(legacy=True)
+    def fn(a, b, c, d, e, f):
+        # posargs
+        assert a == 'foo'
+        assert b == avatar
+        assert c == avatar
+        # kwargs
+        assert d == 'bar'
+        assert e == avatar
+        assert f == avatar
+
+    fn('foo', user, avatar, d='bar', e=user, f=avatar)
