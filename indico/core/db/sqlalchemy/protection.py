@@ -203,7 +203,11 @@ class ProtectionManagersMixin(ProtectionMixin):
                               the check for Indico admins or managers.
                               When this option is set to ``True``, the
                               values of `allow_admin` and `check_parent`
-                              are ignored.
+                              are ignored.  This also applies if `role`
+                              is None in which case this argument being
+                              set to ``True`` is equivalent to
+                              `allow_admin` and `check_parent` being set
+                              to ``False``.
         """
         if role is not None and role != 'ANY' and role not in get_available_roles(type(self)):
             raise ValueError("role '{}' is not valid for '{}' objects".format(role, type(self).__name__))
@@ -231,7 +235,7 @@ class ProtectionManagersMixin(ProtectionMixin):
 
         if any(user in entry.principal
                for entry in iter_acl(self.acl_entries)
-               if entry.has_management_role(role, explicit=explicit_role)):
+               if entry.has_management_role(role, explicit=(explicit_role and role is not None))):
             return True
 
         if not check_parent or explicit_role:

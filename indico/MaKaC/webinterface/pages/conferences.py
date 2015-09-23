@@ -1250,13 +1250,10 @@ class WConfModifMainData(wcomponents.WTemplated):
             email_submitters = {x.email for x in self._conf.as_event.acl_entries
                                 if x.type == PrincipalType.email and x.has_management_role('submit', explicit=True)}
             if chair['email'] in email_submitters or (user and self._conf.as_event.can_manage(user, 'submit',
-                                                                                              check_parent=False,
-                                                                                              allow_admin=False,
-                                                                                              explicit=True)):
+                                                                                              explicit_role=True)):
                 chair['showSubmitterCB'] = False
             email_managers = {x.email for x in self._conf.as_event.acl_entries if x.type == PrincipalType.email}
-            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, check_parent=False,
-                                                                                            allow_admin=False)):
+            if chair['email'] in email_managers or (user and self._conf.as_event.can_manage(user, explicit_role=True)):
                 chair['showManagerCB'] = False
         return result
 
