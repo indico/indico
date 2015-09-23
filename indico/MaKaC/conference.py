@@ -1986,7 +1986,7 @@ class Conference(CommonObjectBase, Locatable):
         # this is pretty ugly, but the api sends queries in a loop and we can't
         # really avoid this for now. so let's at least not query things we
         # clearly don't need
-        if request.blueprint == 'api':
+        if has_request_context() and request.blueprint == 'api':
             acl_user_strategy = joinedload('acl_entries').defaultload('user')
             # remote group membership checks will trigger a load on _all_emails
             # but not all events use this so there's no need to eager-load them
