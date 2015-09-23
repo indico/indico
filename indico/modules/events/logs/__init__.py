@@ -30,8 +30,9 @@ __all__ = ['EventLogEntry', 'EventLogKind']
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), visible=event.canModify(session.user),
-                                section='advanced')
+    if not event.as_event.can_manage(session.user, allow_key=True):
+        return
+    return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), section='advanced')
 
 
 @signals.event.deleted.connect

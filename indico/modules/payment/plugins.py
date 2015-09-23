@@ -82,7 +82,7 @@ class PaymentPluginMixin(object):
         :param user: the :class:`.User` repesenting the user
         :param event: the :class:`Conference`
         """
-        return event.canModify(user)
+        return event.as_event.can_manage(user, allow_key=True)
 
     def get_event_management_url(self, event, **kwargs):
         # This is needed only in case a plugin overrides `can_be_modified` and grants access to users who do not have

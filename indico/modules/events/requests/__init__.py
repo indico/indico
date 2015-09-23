@@ -38,10 +38,11 @@ def _check_request_definitions(app, **kwargs):
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
-    visible = bool(get_request_definitions()) and (event.canModify(session.user) or
-                                                   is_request_manager(session.user))
-    return 'requests', SideMenuItem(_('Services'), url_for('requests.event_requests', event), visible=visible,
-                                    section='organization')
+    if not get_request_definitions():
+        return
+    if not event.as_event.can_manage(session.user, allow_key=True) or is_request_manager(session.user):
+        return
+    return 'requests', SideMenuItem(_('Services'), url_for('requests.event_requests', event), section='organization')
 
 
 @signals.users.merged.connect

@@ -33,8 +33,9 @@ event_settings = EventSettingsProxy('features', {
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'features', SideMenuItem('Features', url_for('event_features.index', event),
-                                    visible=event.canModify(session.user), section='advanced')
+    if not event.as_event.can_manage(session.user, allow_key=True):
+        return
+    return 'features', SideMenuItem('Features', url_for('event_features.index', event), section='advanced')
 
 
 @signals.app_created.connect

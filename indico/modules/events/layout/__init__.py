@@ -51,14 +51,13 @@ layout_settings = EventSettingsProxy('layout', {
 @signals.event_management.sidemenu_advanced.connect
 def _extend_event_management_menu_layout(event, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
-    can_modify = event.canModify(session.user)
+    if not event.as_event.can_manage(session.user, allow_key=True):
+        return
     if event.getType() == 'conference':
-        yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), visible=can_modify,
-                                     section='customization')
-        yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), visible=can_modify,
-                                   section='customization')
-    yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), visible=can_modify,
-                                 event_feature='images', section='customization')
+        yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), section='customization')
+        yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), section='customization')
+    yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), event_feature='images',
+                                 section='customization')
 
 
 @signals.event.sidemenu.connect
