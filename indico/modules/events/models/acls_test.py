@@ -101,6 +101,51 @@ def test_update_principal(create_event, dummy_user):
 
 
 @pytest.mark.usefixtures('request_context')
+def test_update_principal_signal(create_event, dummy_user):
+    event = create_event()
+    calls = []
+
+    def _signal_fn(sender, **kwargs):
+        assert not calls
+        calls.append(kwargs)
+
+    with signals.acl.entry_changed.connected_to(_signal_fn, sender=Event):
+        # not in acl
+        event.remove_principal(dummy_user)
+        assert not calls
+        # not added
+        event.update_principal(dummy_user)
+        assert not calls
+        # adding new entry
+        entry = event.update_principal(dummy_user, full_access=True, roles={'foo'})
+        call = calls.pop()
+        assert call['is_new']
+        assert call['obj'] is event
+        assert call['principal'] == dummy_user
+        assert call['entry'] == entry
+        assert call['old_data'] == {'read_access': False, 'full_access': False, 'roles': set()}
+        assert not call['quiet']
+        # updating entry
+        event.update_principal(dummy_user, add_roles={'bar'})
+        call = calls.pop()
+        assert not call['is_new']
+        assert call['obj'] is event
+        assert call['principal'] == dummy_user
+        assert call['entry'] == entry
+        assert call['old_data'] == {'read_access': False, 'full_access': True, 'roles': {'foo'}}
+        assert not call['quiet']
+        # removing entry + quiet
+        event.update_principal(dummy_user, full_access=False, roles=set(), quiet=True)
+        call = calls.pop()
+        assert not call['is_new']
+        assert call['obj'] is event
+        assert call['principal'] == dummy_user
+        assert call['entry'] is None
+        assert call['old_data'] == {'read_access': False, 'full_access': True, 'roles': {'foo', 'bar'}}
+        assert call['quiet']
+
+
+@pytest.mark.usefixtures('request_context')
 def test_update_principal_resolve_email(create_event, create_user, smtp):
     event = create_event()
     user = create_user(123, email='user@example.com')
@@ -210,8 +255,8 @@ def test_can_manage_signal_override(create_event, dummy_user, signal_rv_1, signa
         assert user is dummy_user
         return rv
 
-    with signals.acl.can_manage.connected_to(partial(_signal_fn, rv=signal_rv_1)):
-        with signals.acl.can_manage.connected_to(partial(_signal_fn, rv=signal_rv_2)):
+    with signals.acl.can_manage.connected_to(partial(_signal_fn, rv=signal_rv_1), sender=Event):
+        with signals.acl.can_manage.connected_to(partial(_signal_fn, rv=signal_rv_2), sender=Event):
             assert event.can_manage(dummy_user) == allowed
 
 

@@ -139,12 +139,16 @@ class ProtectionMixin(object):
             # we better fail loudly if we have garbage
             raise ValueError('Invalid protection mode: {}'.format(self.protection_mode))
 
-    def update_principal(self, principal, read_access=None):
+    def update_principal(self, principal, read_access=None, quiet=False):
         """Updates access privileges for the given principal.
 
         :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
         :param read_access: If the principal should have explicit read
                             access to the object.
+        :param quiet: Whether the ACL change should happen silently.
+                      This indicates to acl change signal handlers
+                      that the change should not be logged, trigger
+                      emails or result in similar notifications.
         :return: The ACL entry for the given principal or ``None`` if
                  he was removed (or not added).
         """
@@ -154,28 +158,32 @@ class ProtectionMixin(object):
             entry = principal_class(principal=principal)
             self.acl_entries.add(entry)
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=True,
-                                           old_data=None)
+                                           old_data=None, quiet=quiet)
             return entry
         elif entry is not None and not read_access:
             self.acl_entries.remove(entry)
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
-                                           old_data=None)
+                                           old_data=None, quiet=quiet)
             return None
         return entry
 
-    def remove_principal(self, principal):
+    def remove_principal(self, principal, quiet=False):
         """Revokes all access privileges for the given principal.
 
         This method doesn't do anything if the user is not in the
         object's ACL.
 
         :param principal: A `User`, `GroupProxy` or `EmailPrincipal` instance.
+        :param quiet: Whether the ACL change should happen silently.
+                      This indicates to acl change signal handlers
+                      that the change should not be logged, trigger
+                      emails or result in similar notifications.
         """
         principal = _resolve_principal(principal)
         entry = _get_acl_data(self, principal)[1]
         if entry is not None:
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
-                                           old_data=entry.current_data)
+                                           old_data=entry.current_data, quiet=quiet)
             self.acl_entries.remove(entry)
 
 
@@ -256,7 +264,7 @@ class ProtectionManagersMixin(ProtectionMixin):
             raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
 
     def update_principal(self, principal, read_access=None, full_access=None, roles=None, add_roles=None,
-                         del_roles=None):
+                         del_roles=None, quiet=False):
         """Updates access privileges for the given principal.
 
         If the principal is not in the ACL, it will be added if
@@ -275,6 +283,10 @@ class ProtectionManagersMixin(ProtectionMixin):
                       existing roles will be replaced.
         :param add_roles: set -- Management roles to add.
         :param del_roles: set -- Management roles to remove.
+        :param quiet: Whether the ACL change should happen silently.
+                      This indicates to acl change signal handlers
+                      that the change should not be logged, trigger
+                      emails or result in similar notifications.
         :return: The ACL entry for the given principal or ``None`` if
                  he was removed (or not added).
         """
@@ -314,10 +326,10 @@ class ProtectionManagersMixin(ProtectionMixin):
         if not entry.read_access and not entry.full_access and not entry.roles:
             self.acl_entries.remove(entry)
             signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=None, is_new=False,
-                                           old_data=old_data)
+                                           old_data=old_data, quiet=quiet)
             return None
         signals.acl.entry_changed.send(type(self), obj=self, principal=principal, entry=entry, is_new=new_entry,
-                                       old_data=old_data)
+                                       old_data=old_data, quiet=quiet)
         return entry
 
 

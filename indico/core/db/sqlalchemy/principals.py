@@ -25,7 +25,7 @@ from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.roles import get_available_roles
 from indico.util.decorators import strict_classproperty, classproperty
 from indico.util.fossilize import fossilizes, Fossilizable, IFossil
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -102,7 +102,7 @@ class EmailPrincipal(Fossilizable):
 
     @return_ascii
     def __repr__(self):
-        return '<EmailPrincipal({})>'.format(self.email)
+        return format_repr(self, 'email')
 
 
 class PrincipalMixin(object):
