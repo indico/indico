@@ -50,7 +50,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self.agreement = Agreement.find_one(id=request.view_args['id'])
+        self.agreement = Agreement.get_one(request.view_args['id'])
         if self.agreement.is_orphan():
             raise NotFound('The agreement is not active anymore')
 
@@ -107,9 +107,10 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
     def _process(self):
         event = self._conf
         people = self.definition.get_people(event)
-        agreements = Agreement.find_all(Agreement.event_id == event.getId(),
-                                        Agreement.type == self.definition.name,
-                                        Agreement.identifier.in_(people))
+        agreements = (event.as_event.agreements
+                      .filter(Agreement.type == self.definition.name,
+                              Agreement.identifier.in_(people))
+                      .all())
         return WPAgreementManager.render_template('agreement_type_details.html', event,
                                                   event=event, definition=self.definition, agreements=agreements)
 
@@ -167,7 +168,10 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
 
     def _get_agreements(self):
         ids = set(request.form.getlist('references'))
-        return Agreement.find_all(Agreement.id.in_(ids), Agreement.person_email != None)
+        return (self._conf.as_event.agreements
+                .filter(Agreement.id.in_(ids),
+                        Agreement.person_email != None)  # noqa
+                .all())
 
     def _success_handler(self, form):
         email_body = form.body.data
@@ -188,10 +192,9 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_remind_all.html'
 
     def _get_agreements(self):
-        agreements = Agreement.find_all(Agreement.pending,
-                                        Agreement.person_email != None,
-                                        Agreement.event_id == self._conf.getId(),
-                                        Agreement.type == self.definition.name)
+        agreements = self._conf.as_event.agreements.filter(Agreement.pending,
+                                                           Agreement.person_email != None,  # noqa
+                                                           Agreement.type == self.definition.name).all()
         return [a for a in agreements if not a.is_orphan()]
 
 
@@ -217,7 +220,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
     def _checkParams(self, params):
         RHAgreementManagerDetails._checkParams(self, params)
         if 'id' in request.view_args:
-            self.agreement = Agreement.find_one(id=request.view_args['id'])
+            self.agreement = Agreement.get_one(request.view_args['id'])
             if self._conf != self.agreement.event:
                 raise NotFound
             if not self.agreement.pending:

@@ -60,7 +60,9 @@ class Agreement(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
-        nullable=False
+        db.ForeignKey('events.events.id'),
+        nullable=False,
+        index=True
     )
     #: Type of agreement
     type = db.Column(
@@ -130,6 +132,15 @@ class Agreement(db.Model):
     user = db.relationship(
         'User',
         lazy=False,
+        backref=db.backref(
+            'agreements',
+            lazy='dynamic'
+        )
+    )
+    #: The Event this agreement is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
         backref=db.backref(
             'agreements',
             lazy='dynamic'

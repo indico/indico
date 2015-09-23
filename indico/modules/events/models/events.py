@@ -128,6 +128,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - log_entries (EventLogEntry.event_new)
     # - settings (EventSetting.event_new)
     # - settings_principals (EventSettingPrincipal.event_new)
+    # - agreements (Agreement.event_new)
 
     @property
     @memoize_request
