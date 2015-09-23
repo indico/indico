@@ -49,6 +49,7 @@ class Request(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
@@ -117,6 +118,15 @@ class Request(db.Model):
         foreign_keys=[processed_by_id],
         backref=db.backref(
             'requests_processed',
+            lazy='dynamic'
+        )
+    )
+    #: The Event this agreement is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'requests',
             lazy='dynamic'
         )
     )
