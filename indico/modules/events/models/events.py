@@ -126,6 +126,8 @@ class Event(ProtectionManagersMixin, db.Model):
     # - surveys (Survey.event_new)
     # - reminders (EventReminder.event_new)
     # - log_entries (EventLogEntry.event_new)
+    # - settings (EventSetting.event_new)
+    # - settings_principals (EventSettingPrincipal.event_new)
 
     @property
     @memoize_request
