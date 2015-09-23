@@ -3637,7 +3637,8 @@ class Conference(CommonObjectBase, Locatable):
             creator = self.as_event.creator
         conf = cat.newConference(creator)
         if managing is not None:
-            conf.as_event.update_principal(managing.user, full_access=True)
+            with conf.as_event.logging_disabled:
+                conf.as_event.update_principal(managing.user, full_access=True)
         conf.setTitle(self.getTitle())
         conf.setDescription(self.getDescription())
         conf.setTimezone(self.getTimezone())
@@ -3694,11 +3695,10 @@ class Conference(CommonObjectBase, Locatable):
         # Access Control cloning
         if options.get("access", False):
             conf.setProtection(self.getAccessController()._getAccessProtection())
-            from indico.modules.events.models.principals import EventPrincipal
-            cols = get_simple_column_attrs(EventPrincipal)
-            for entry in self.as_event.acl_entries:
-                new_entry = EventPrincipal(**{col: getattr(entry, col) for col in cols})
-                conf.as_event.acl_entries.add(new_entry)
+            with conf.as_event.logging_disabled:
+                for entry in self.as_event.acl_entries:
+                    conf.as_event.update_principal(entry.principal, read_access=entry.read_access,
+                                                   full_access=entry.full_access, roles=entry.roles)
             for user in self.getAllowedToAccessList():
                 conf.grantAccess(user)
             for right in self.getSessionCoordinatorRights():
