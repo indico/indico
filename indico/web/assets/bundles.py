@@ -479,7 +479,6 @@ def register_all_css(env, main_css_file):
                    'lib/jquery.typeahead.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
-                   'jquery.qtip-custom.css',
                    'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
