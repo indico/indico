@@ -2013,30 +2013,8 @@ class Conference(CommonObjectBase, Locatable):
         return DisplayTZ(conf=self).getDisplayTZ()
 
     @unify_user_args
-    def log(self, realm, kind, module, summary, user=None, type_=u'simple', data=None):
-        """Creates a new log entry for the event
-
-        :param realm: A value from :class:`.EventLogRealm` indicating
-                      the realm of the action.
-        :param kind: A value from :class:`.EventLogKind` indicating
-                     the kind of the action that was performed.
-        :param module: A human-friendly string describing the module
-                       related to the action.
-        :param summary: A one-line summary describing the logged action.
-        :param user: The user who performed the action.
-        :param type_: The type of the log entry. This is used for custom
-                      rendering of the log message/data
-        :param data: JSON-serializable data specific to the log type.
-
-        In most cases the ``simple`` log type is fine. For this type,
-        any items from data will be shown in the detailed view of the
-        log entry.  You may either use a dict (which will be sorted)
-        alphabetically or a list of ``key, value`` pairs which will
-        be displayed in the given order.
-        """
-        # XXX: If you have a new Event object, use its `log` method instead!
-        db.session.add(EventLogEntry(event_id=int(self.id), user=user, realm=realm, kind=kind, module=module,
-                                     type=type_, summary=summary, data=data or {}))
+    def log(self, *args, **kwargs):
+        self.as_event.log(*args, **kwargs)
 
     @memoize_request
     def has_feature(self, feature):
@@ -4227,7 +4205,8 @@ class ConferenceHolder( ObjectHolder ):
     def add(self, conf, creator):
         from indico.modules.events import Event
         event = Event(creator=creator)
-        event.update_principal(creator, full_access=True)
+        with event.logging_disabled:
+            event.update_principal(creator, full_access=True)
         db.session.add(event)
         db.session.flush()
         conf.setId(event.id)

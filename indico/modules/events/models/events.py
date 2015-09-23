@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
+
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db.sqlalchemy import db
@@ -42,6 +44,7 @@ class Event(ProtectionManagersMixin, db.Model):
                       {'schema': 'events'})
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+    __logging_disabled = False
 
     #: The ID of the event
     id = db.Column(
@@ -153,6 +156,21 @@ class Event(ProtectionManagersMixin, db.Model):
     def title(self):
         return to_unicode(self.as_legacy.getTitle())
 
+    @property
+    @contextmanager
+    def logging_disabled(self):
+        """Temporarily disables event logging
+
+        This is useful when performing actions e.g. during event
+        creation or at other times where adding entries to the event
+        log doesn't make sense.
+        """
+        self.__logging_disabled = True
+        try:
+            yield
+        finally:
+            self.__logging_disabled = False
+
     def can_access(self, user, allow_admin=True):
         if not allow_admin:
             raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
@@ -185,6 +203,8 @@ class Event(ProtectionManagersMixin, db.Model):
         alphabetically or a list of ``key, value`` pairs which will
         be displayed in the given order.
         """
+        if self.__logging_disabled:
+            return
         db.session.add(EventLogEntry(event_id=self.id, user=user, realm=realm, kind=kind, module=module, type=type_,
                                      summary=summary, data=data or {}))
 
