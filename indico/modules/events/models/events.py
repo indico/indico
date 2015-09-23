@@ -125,6 +125,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - custom_pages (EventPage.event_new)
     # - surveys (Survey.event_new)
     # - reminders (EventReminder.event_new)
+    # - log_entries (EventLogEntry.event_new)
 
     @property
     @memoize_request
@@ -206,8 +207,9 @@ class Event(ProtectionManagersMixin, db.Model):
         """
         if self.__logging_disabled:
             return
-        db.session.add(EventLogEntry(event_id=self.id, user=user, realm=realm, kind=kind, module=module, type=type_,
-                                     summary=summary, data=data or {}))
+        entry = EventLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
+                              data=data or {})
+        self.log_entries.append(entry)
 
     @return_ascii
     def __repr__(self):

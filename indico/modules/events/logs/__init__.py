@@ -35,11 +35,6 @@ def _extend_event_management_menu(event, **kwargs):
     return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), section='advanced')
 
 
-@signals.event.deleted.connect
-def _event_deleted(event, **kwargs):
-    EventLogEntry.find(event_id=int(event.id)).delete()
-
-
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     EventLogEntry.find(user_id=source.id).update({EventLogEntry.user_id: target.id})
