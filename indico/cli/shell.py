@@ -34,6 +34,7 @@ from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
+from indico.modules.events import Event
 from indico.util.console import strip_ansi, cformat
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
@@ -154,7 +155,8 @@ class IndicoShell(Shell):
             add_to_context(transaction, doc='transaction module', color='cyan!')
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
             add_to_context(current_app, 'app', doc='flask app')
-            add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id')
+            add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id (Conference)')
+            add_to_context(Event.get, 'EE', doc='get event by id (Event)')
             # Stuff from plugins
             signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
 
