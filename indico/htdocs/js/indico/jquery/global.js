@@ -57,7 +57,10 @@ $(document).ready(function() {
         if (!$(this).attr('title').trim()) {
             return;
         }
-        var extraOpts = $(this).data('qtipOpts') || {};
+
+        var extraOpts = $(this).data('qtipOpts') || {},
+            qtipClass = $(this).data('qtip-style');
+
         $(this).qtip($.extend(true, {}, {
             overwrite: false,
             show: {
@@ -82,6 +85,11 @@ $(document).ready(function() {
             hide: {
                 event: "mouseleave"
             },
+
+            style: {
+                classes: qtipClass ? 'qtip-' + qtipClass : null
+            },
+
             onHide: function() {
                 // If the parent element is destroyed we need to destroy the qTip too
                 $(this).qtip('destroy');
