@@ -25,6 +25,6 @@ class RHEventLogs(RHConferenceModifBase):
     """Shows the modification/action log for the event"""
 
     def _process(self):
-        entries = EventLogEntry.find(event_id=int(self._conf.id)).order_by(EventLogEntry.logged_dt.desc()).all()
+        entries = self._conf.as_event.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
         realms = {e.realm for e in entries}
         return WPEventLogs.render_template('logs.html', self._conf, entries=entries, realms=realms)

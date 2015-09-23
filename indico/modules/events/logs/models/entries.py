@@ -55,8 +55,9 @@ class EventLogEntry(db.Model):
     #: The ID of the event
     event_id = db.Column(
         db.Integer,
-        nullable=False,
-        index=True
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
     )
     #: The ID of the user associated with the entry
     user_id = db.Column(
@@ -114,15 +115,15 @@ class EventLogEntry(db.Model):
             lazy='dynamic'
         )
     )
-
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id), True)
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
+    #: The Event this log entry is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'log_entries',
+            lazy='dynamic'
+        )
+    )
 
     @property
     def logged_date(self):
