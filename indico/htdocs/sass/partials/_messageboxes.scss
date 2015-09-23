@@ -57,6 +57,18 @@
     }
 }
 
+%message-box.large-icon {
+    &:before {
+        font-size: 2.7em;
+        margin: 0 0.25em 0.1em 0;
+    }
+
+    .message-text {
+        padding-left: 0.1em;
+    }
+}
+
+
 %message-tag {
     @include border-radius();
     padding: 0 4px;
@@ -115,7 +127,7 @@
 }
 
 .info-message-box,
-.message-message-box {      // Needed for default category 'message' of flash() in flashed_messaged.html
+.message-message-box {      // Needed for default category 'message' of flash() in flashed_messages.html
     @extend %message-box;
     @include icon-before('icon-info');
 
