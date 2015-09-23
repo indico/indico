@@ -44,9 +44,15 @@ class RHRemindersBase(RHConferenceModifBase):
 class RHSpecificReminderBase(RHRemindersBase):
     """Base class for pages related to a specific reminder"""
 
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.reminder
+        }
+    }
+
     def _checkParams(self, params):
         RHRemindersBase._checkParams(self, params)
-        self.reminder = EventReminder.find_one(id=request.view_args['id'], event_id=int(self.event.id))
+        self.reminder = EventReminder.find_one(id=request.view_args['id'])
 
 
 class RHListReminders(RHRemindersBase):
