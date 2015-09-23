@@ -82,14 +82,17 @@ def _convert_email_principals(user, **kwargs):
 
 
 @signals.acl.entry_changed.connect_via(Event)
-def _notify_pending(sender, obj, principal, entry, is_new, **kwargs):
-    if entry is None or not is_new or principal.principal_type != PrincipalType.email:
+def _notify_pending(sender, obj, principal, entry, is_new, quiet, **kwargs):
+    if quiet or entry is None or not is_new or principal.principal_type != PrincipalType.email:
         return
     notify_pending(entry)
 
 
 @signals.acl.entry_changed.connect_via(Event)
-def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, **kwargs):
+def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **kwargs):
+    if quiet:
+        return
+
     available_roles = get_available_roles(Event)
 
     def _format_roles(roles):

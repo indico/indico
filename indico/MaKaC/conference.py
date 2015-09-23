@@ -3695,10 +3695,9 @@ class Conference(CommonObjectBase, Locatable):
         # Access Control cloning
         if options.get("access", False):
             conf.setProtection(self.getAccessController()._getAccessProtection())
-            with conf.as_event.logging_disabled:
-                for entry in self.as_event.acl_entries:
-                    conf.as_event.update_principal(entry.principal, read_access=entry.read_access,
-                                                   full_access=entry.full_access, roles=entry.roles)
+            for entry in self.as_event.acl_entries:
+                conf.as_event.update_principal(entry.principal, read_access=entry.read_access,
+                                               full_access=entry.full_access, roles=entry.roles, quiet=True)
             for user in self.getAllowedToAccessList():
                 conf.grantAccess(user)
             for right in self.getSessionCoordinatorRights():
