@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy import inspect
-
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
@@ -48,12 +46,6 @@ def _event_data_changed(event, **kwargs):
             reminder.scheduled_dt = new_dt
 
 
-@signals.event.deleted.connect
-def _event_deleted(event, **kwargs):
-    from indico.modules.events.reminders.models.reminders import EventReminder
-    EventReminder.find(event_id=int(event.id)).delete()
-
-
 @signals.event_management.clone.connect
 def _get_reminder_cloner(event, **kwargs):
     return ReminderCloner(event)
@@ -78,7 +70,7 @@ class ReminderCloner(EventCloner):
         from indico.modules.events.reminders.models.reminders import EventReminder
         if 'reminders' not in options:
             return
-        attrs = get_simple_column_attrs(EventReminder) - {'event_id', 'created_dt', 'scheduled_dt', 'is_sent'}
+        attrs = get_simple_column_attrs(EventReminder) - {'created_dt', 'scheduled_dt', 'is_sent'}
         attrs |= {'creator_id'}
         for old_reminder in self.find_reminders():
             scheduled_dt = new_event.getStartDate() - old_reminder.event_start_delta

@@ -42,6 +42,8 @@ class EventReminder(db.Model):
     #: The ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
         nullable=False
     )
     #: The ID of the user who created the reminder
@@ -111,6 +113,15 @@ class EventReminder(db.Model):
         lazy=True,
         backref=db.backref(
             'event_reminders',
+            lazy='dynamic'
+        )
+    )
+    #: The Event this reminder is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'reminders',
             lazy='dynamic'
         )
     )

@@ -124,6 +124,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - menu_entries (MenuEntry.event_new)
     # - custom_pages (EventPage.event_new)
     # - surveys (Survey.event_new)
+    # - reminders (EventReminder.event_new)
 
     @property
     @memoize_request
