@@ -203,6 +203,23 @@
     }
 }
 
+.danger-message-box {
+    @extend %message-box;
+    @include icon-before('icon-warning');
+
+    background-color: $light-red;
+    border: 1px solid $dark-red;
+
+    &:before {
+        color: $dark-red;
+    }
+
+    .message-box-footer {
+        background: darken($light-red, 5%);
+    }
+}
+
+
 .error-message-tag {
     @extend %message-tag;
     background-color: $red;
