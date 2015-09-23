@@ -41,6 +41,13 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 class RHAgreementForm(RHConferenceBaseDisplay):
     """Agreement form page"""
 
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.agreement
+        },
+        'preserved_args': {'uuid'}
+    }
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.agreement = Agreement.find_one(id=request.view_args['id'])
@@ -189,11 +196,19 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
 
 
 class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.agreement
+        },
+        'args': {
+            'definition': lambda self: self.agreement.type,
+            'filename': lambda self: self.agreement.attachment_filename
+        }
+    }
+
     def _checkParams(self, params):
         RHAgreementManagerDetails._checkParams(self, params)
-        self.agreement = Agreement.find_one(id=request.view_args['id'])
-        if self._conf != self.agreement.event:
-            raise NotFound
+        self.agreement = Agreement.get_one(request.view_args['id'])
 
 
 class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
