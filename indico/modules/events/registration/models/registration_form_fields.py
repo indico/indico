@@ -39,7 +39,7 @@ class RegistrationFormFieldData(db.Model):
         db.ForeignKey('event_registration.registration_form_items.id')
     )
     #: Data describing the field
-    data = db.Column(
+    versioned_data = db.Column(
         JSON,
         nullable=False
     )
@@ -70,10 +70,10 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def view_data(self):
-        base_dict = dict(self.current_data.data)
+        base_dict = dict(self.current_data.versioned_data)
         base_dict.update(disabled=not self.is_enabled, caption=self.title, mandatory=self.is_required,
                          **super(RegistrationFormField, self).view_data)
-        if self.current_data.data['input'] == 'country':
+        if self.current_data.versioned_data['input'] == 'country':
             base_dict['radioitems'] = []
             for key, val in CountryHolder.getCountries().iteritems():
                 base_dict['radioitems'].append({'caption': val, 'countryKey': key})
