@@ -62,7 +62,7 @@ def upgrade():
         'registration_form_field_data',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('field_id', sa.Integer(), nullable=False),
-        sa.Column('data', postgresql.JSON(), nullable=False),
+        sa.Column('versioned_data', postgresql.JSON(), nullable=False),
         sa.ForeignKeyConstraint(['field_id'], ['event_registration.registration_form_items.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'

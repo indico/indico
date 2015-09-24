@@ -156,7 +156,7 @@ class RegistrationFormItem(db.Model):
 
     @property
     def wtf_field(self):
-        return get_field_types()[self.current_data.data['input']](self)
+        return get_field_types()[self.current_data.versioned_data['input']](self)
 
     @property
     def is_section(self):
@@ -194,4 +194,4 @@ class RegistrationFormText(RegistrationFormItem):
     @property
     def view_data(self):
         return dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
-                    caption=self.title, **self.current_data.data)
+                    caption=self.title, **self.current_data.versioned_data)

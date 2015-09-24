@@ -65,8 +65,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         self.field.title = field_data.pop('caption')
         self.field.description = field_data.pop('description', '')
         self.field.is_enabled = not field_data.pop('disabled')
-        if field_data != self.field.current_data.data:
-            self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, data=field_data)
+        if field_data != self.field.current_data.versioned_data:
+            self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, versioned_data=field_data)
         return jsonify(self.field.view_data)
 
 
@@ -117,5 +117,5 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         form_field.is_required = field_data.pop('mandatory', False)
         db.session.add(form_field)
         db.session.flush()
-        form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, data=field_data)
+        form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, versioned_data=field_data)
         return jsonify(form_field.view_data)
