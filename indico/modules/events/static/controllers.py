@@ -38,16 +38,16 @@ class RHStaticSiteList(RHStaticSiteBase):
     def _process(self):
         if not Config.getInstance().getOfflineStore():
             raise NotFound()
-        static_sites = StaticSite.find(event_id=self._conf.id).order_by(StaticSite.requested_dt.desc()).all()
+        static_sites = self.event_new.static_sites.order_by(StaticSite.requested_dt.desc()).all()
         return WPStaticSites.render_template('static_sites.html', self._conf,
-                                             event=self._conf, static_sites=static_sites)
+                                             event=self.event_new, static_sites=static_sites)
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):
     CSRF_ENABLED = True
 
     def _process(self):
-        static_site = StaticSite(creator=session.user, event=self._conf)
+        static_site = StaticSite(creator=session.user, event_new=self.event_new)
         db.session.add(static_site)
         transaction.commit()
         build_static_site.delay(static_site)

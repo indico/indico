@@ -49,6 +49,8 @@ class StaticSite(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
         nullable=False
     )
     #: The state of the static site (a :class:`StaticSiteState` member)
@@ -85,15 +87,20 @@ class StaticSite(db.Model):
             lazy='dynamic'
         )
     )
+    #: The Event this static site is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'static_sites',
+            lazy='dynamic'
+        )
+    )
 
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(str(self.event_id))
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
 
     @property
     def locator(self):

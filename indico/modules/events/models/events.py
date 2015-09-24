@@ -130,6 +130,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - settings_principals (EventSettingPrincipal.event_new)
     # - agreements (Agreement.event_new)
     # - requests (Request.event_new)
+    # - static_sites (StaticSite.event_new)
 
     @property
     @memoize_request
