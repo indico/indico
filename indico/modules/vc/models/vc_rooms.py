@@ -25,6 +25,7 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
+from indico.util.event import unify_event_args
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from MaKaC.conference import ConferenceHolder
@@ -126,6 +127,7 @@ class VCRoomEventAssociation(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         autoincrement=False,
         nullable=False
@@ -165,6 +167,16 @@ class VCRoomEventAssociation(db.Model):
         nullable=False
     )
 
+    #: The associated Event
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'vc_room_associations',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def locator(self):
         return dict(self.event.getLocator(), service=self.vc_room.type, event_vc_room_id=self.id)
@@ -193,16 +205,19 @@ class VCRoomEventAssociation(db.Model):
         return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
 
     @classmethod
+    @unify_event_args
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
         """Returns a Query that retrieves the videoconference rooms for an event
 
-        :param event: an indico event (with a numeric ID)
+        :param event: an indico Event
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
         :param kwargs: extra kwargs to pass to ``find()``
         """
         if only_linked_to_event:
             kwargs['link_type'] = int(VCRoomLinkType.event)
-        query = cls.find(event_id=int(event.id), **kwargs)
+        query = event.vc_room_associations
+        if kwargs:
+            query = query.filter_by(**kwargs)
         if not include_hidden:
             query = query.filter(cls.show)
         if not include_deleted:
