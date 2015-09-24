@@ -17,17 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.static.models.static import StaticSite
 
 logger = Logger.get('events.static')
-
-
-@signals.event.deleted.connect
-def _event_deleted(event, **kwargs):
-    for static_site in StaticSite.find(event_id=int(event.id)):
-        db.session.delete(static_site)
 
 
 @signals.users.merged.connect
