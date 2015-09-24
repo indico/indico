@@ -114,6 +114,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         form_field.title = field_data.pop('caption')
         form_field.description = field_data.pop('description', '')
         form_field.is_enabled = not field_data.pop('disabled')
+        form_field.is_required = field_data.pop('mandatory', False)
         db.session.add(form_field)
         db.session.flush()
         form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, data=field_data)

@@ -57,6 +57,13 @@ class RegistrationFormField(RegistrationFormItem):
         'polymorphic_identity': RegistrationFormItemType.field
     }
 
+    #: determines if the field is mandatory
+    is_required = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
     @property
     def locator(self):
         return dict(self.parent.locator, field_id=self.id)
@@ -64,7 +71,7 @@ class RegistrationFormField(RegistrationFormItem):
     @property
     def view_data(self):
         base_dict = dict(self.current_data.data)
-        base_dict.update(disabled=not self.is_enabled, caption=self.title,
+        base_dict.update(disabled=not self.is_enabled, caption=self.title, mandatory=self.is_required,
                          **super(RegistrationFormField, self).view_data)
         if self.current_data.data['input'] == 'country':
             base_dict['radioitems'] = []
