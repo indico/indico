@@ -68,5 +68,4 @@ def _event_deleted(event, user, **kwargs):
                                     ~Reservation.is_cancelled,
                                     ~Reservation.is_rejected)
     for resv in reservations:
-        resv.event_id = None
         resv.cancel(user or session.user, 'Associated event was deleted')

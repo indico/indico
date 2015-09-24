@@ -131,6 +131,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - agreements (Agreement.event_new)
     # - requests (Request.event_new)
     # - static_sites (StaticSite.event_new)
+    # - reservations (Reservation.event_new)
 
     @property
     @memoize_request
