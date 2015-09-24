@@ -216,6 +216,8 @@ class Reservation(Serializer, db.Model):
     )
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
+        nullable=True,
         index=True
     )
 
@@ -258,6 +260,15 @@ class Reservation(Serializer, db.Model):
             lazy='dynamic'
         )
     )
+    #: The Event this reservation was made for
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'reservations',
+            lazy='dynamic'
+        )
+    )
 
     @hybrid_property
     def is_archived(self):
@@ -294,17 +305,6 @@ class Reservation(Serializer, db.Model):
     @property
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
-
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        if self.event_id is None:
-            return None
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId()) if event else None
 
     @property
     def location_name(self):

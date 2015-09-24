@@ -177,14 +177,6 @@ def test_details_url(dummy_reservation):
     assert dummy_reservation.details_url
 
 
-def test_event(dummy_reservation, dummy_event):
-    dummy_reservation.event = dummy_event
-    assert dummy_reservation.event.id == dummy_event.id
-    assert dummy_reservation.event == dummy_event
-    dummy_reservation.event = None
-    assert dummy_reservation.event is None
-
-
 def test_location_name(dummy_reservation, dummy_location):
     assert dummy_location.name == dummy_reservation.location_name
 
