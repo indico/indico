@@ -34,6 +34,7 @@ class LegacyAttachmentFolderMapping(LinkMixin, db.Model):
 
     __tablename__ = 'legacy_folder_id_map'
     allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
+    events_backref_name = 'legacy_attachment_folder_mappings'
 
     @declared_attr
     def __table_args__(cls):
@@ -72,6 +73,7 @@ class LegacyAttachmentMapping(LinkMixin, db.Model):
 
     __tablename__ = 'legacy_attachment_id_map'
     allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
+    events_backref_name = 'legacy_attachment_mappings'
 
     @declared_attr
     def __table_args__(cls):

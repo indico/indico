@@ -39,6 +39,7 @@ from MaKaC.accessControl import AccessWrapper
 class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     __tablename__ = 'folders'
     unique_links = 'is_default'
+    events_backref_name = 'attachment_folders'
 
     @strict_classproperty
     @staticmethod

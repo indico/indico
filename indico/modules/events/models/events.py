@@ -132,6 +132,8 @@ class Event(ProtectionManagersMixin, db.Model):
     # - requests (Request.event_new)
     # - static_sites (StaticSite.event_new)
     # - reservations (Reservation.event_new)
+    # - notes (EventNote.event_new)
+    # - attachment_folders (AttachmentFolders.event_new)
 
     @property
     @memoize_request
