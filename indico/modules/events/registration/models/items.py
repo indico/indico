@@ -96,6 +96,11 @@ class RegistrationFormItem(db.Model):
         nullable=False,
         default=False
     )
+    #: input type of this field
+    input_type = db.Column(
+        db.String,
+        nullable=True
+    )
 
     #: The ID of the latest data
     current_data_id = db.Column(
@@ -156,7 +161,7 @@ class RegistrationFormItem(db.Model):
 
     @property
     def wtf_field(self):
-        return get_field_types()[self.current_data.versioned_data['input']](self)
+        return get_field_types()[self.input_type](self)
 
     @property
     def is_section(self):
@@ -194,4 +199,4 @@ class RegistrationFormText(RegistrationFormItem):
     @property
     def view_data(self):
         return dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
-                    caption=self.title, **self.current_data.versioned_data)
+                    input=self.input_type, caption=self.title, **self.current_data.versioned_data)
