@@ -74,7 +74,7 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def view_data(self):
-        base_dict = dict(self.current_data.versioned_data)
+        base_dict = dict(self.current_data.versioned_data, **self.data)
         base_dict.update(disabled=not self.is_enabled, caption=self.title, mandatory=self.is_required,
                          input=self.input_type, **super(RegistrationFormField, self).view_data)
         if self.input_type == 'country':
