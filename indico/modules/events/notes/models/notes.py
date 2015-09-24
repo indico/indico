@@ -41,6 +41,7 @@ class EventNote(LinkMixin, db.Model):
     __tablename__ = 'notes'
     allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
     unique_links = True
+    events_backref_name = 'notes'
 
     @declared_attr
     def __table_args__(cls):

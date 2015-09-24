@@ -72,6 +72,8 @@ class LinkMixin(object):
     #: be a string containing an SQL string to specify the criterion
     #: for the unique index to be applied, e.g. ``'is_foo = true'``.
     unique_links = False
+    #: The name of the backref that's added to the Event model
+    events_backref_name = None
 
     @strict_classproperty
     @classmethod
@@ -93,11 +95,14 @@ class LinkMixin(object):
         nullable=True,
         index=True
     )
-    event_id = db.Column(
-        db.Integer,
-        nullable=True,
-        index=True
-    )
+    @declared_attr
+    def event_id(cls):
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('events.events.id'),
+            nullable=True,
+            index=True
+        )
     session_id = db.Column(
         db.String,
         nullable=True
@@ -110,6 +115,17 @@ class LinkMixin(object):
         db.String,
         nullable=True
     )
+
+    @declared_attr
+    def event_new(cls):
+        return db.relationship(
+            'Event',
+            lazy=True,
+            backref=db.backref(
+                cls.events_backref_name,
+                lazy='dynamic'
+            )
+        )
 
     @hybrid_property
     def linked_object(self):
