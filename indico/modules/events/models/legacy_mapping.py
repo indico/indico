@@ -38,8 +38,20 @@ class LegacyEventMapping(db.Model):
     )
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
         primary_key=True,
         autoincrement=False
+    )
+
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'legacy_mapping',
+            uselist=False,
+            lazy=True
+        )
     )
 
     @return_ascii
