@@ -89,7 +89,7 @@ $(document).ready(function() {
         }, extraOpts), event);
     });
 
-    // Enable colorbox for links with rel="lightbox"
+    // Enable colorbox for links with .js-lightbox
     $('body').on('click', 'a.js-lightbox', function() {
         $(this).colorbox({
             maxHeight: '90%',
