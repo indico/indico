@@ -21,6 +21,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db import db
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.util.string import return_ascii
+from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class RegistrationFormFieldData(db.Model):
@@ -62,8 +63,14 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(self.current_data.data, disabled=not self.is_enabled, caption=self.title,
-                    **super(RegistrationFormField, self).view_data)
+        base_dict = dict(self.current_data.data)
+        base_dict.update(disabled=not self.is_enabled, caption=self.title,
+                         **super(RegistrationFormField, self).view_data)
+        if self.current_data.data['input'] == 'country':
+            base_dict['radioitems'] = []
+            for key, val in CountryHolder.getCountries().iteritems():
+                base_dict['radioitems'].append({'caption': val, 'countryKey': key})
+        return base_dict
 
     @return_ascii
     def __repr__(self):
