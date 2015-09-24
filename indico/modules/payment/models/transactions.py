@@ -154,6 +154,7 @@ class PaymentTransaction(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
@@ -193,6 +194,16 @@ class PaymentTransaction(db.Model):
     data = db.Column(
         JSON,
         nullable=False
+    )
+
+    #: The Event this transaction is associated with
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'payment_transactions',
+            lazy='dynamic'
+        )
     )
 
     @property
