@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import JSON
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.registration.fields import get_field_types
@@ -99,6 +101,11 @@ class RegistrationFormItem(db.Model):
     #: input type of this field
     input_type = db.Column(
         db.String,
+        nullable=True
+    )
+    #: unversioned field data
+    data = db.Column(
+        JSON,
         nullable=True
     )
 

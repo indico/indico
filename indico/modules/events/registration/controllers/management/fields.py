@@ -26,6 +26,18 @@ from indico.modules.events.registration.models.registration_form_fields import (
                                                                                 RegistrationFormFieldData)
 from indico.web.util import jsonify_data
 
+NON_VERSIONED_DATA = {'minValue', 'length', 'numberOfColumns', 'numberOfRows', 'placesLimit', 'dateFormat',
+                      'withExtraSlots', 'inputType', 'defaultItem', 'timeFormat'}
+
+
+def _fill_form_field_with_data(field, field_data):
+    field.title = field_data.pop('caption')
+    field.description = field_data.pop('description', '')
+    field.is_enabled = not field_data.pop('disabled')
+    field.is_required = field_data.pop('mandatory', False)
+    field.input_type = field_data.pop('input')
+    field.data = {key: field_data.pop(key) for key in NON_VERSIONED_DATA if key in field_data}
+
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
     """Base class for a specific field within a registration form"""
@@ -62,9 +74,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
 
     def _process_POST(self):
         field_data = request.json['fieldData']
-        self.field.title = field_data.pop('caption')
-        self.field.description = field_data.pop('description', '')
-        self.field.is_enabled = not field_data.pop('disabled')
+        _fill_form_field_with_data(self.field, field_data)
         if field_data != self.field.current_data.versioned_data:
             self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, versioned_data=field_data)
         return jsonify(self.field.view_data)
@@ -111,11 +121,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         else:
             field_type = RegistrationFormField
         form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
-        form_field.title = field_data.pop('caption')
-        form_field.description = field_data.pop('description', '')
-        form_field.input_type = field_data.pop('input')
-        form_field.is_enabled = not field_data.pop('disabled')
-        form_field.is_required = field_data.pop('mandatory', False)
+        _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
         form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, versioned_data=field_data)
