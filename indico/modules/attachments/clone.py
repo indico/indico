@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.util.i18n import _
@@ -29,7 +30,7 @@ class AttachmentCloner(EventCloner):
                                AttachmentFolder.event_id == int(self.event.id), _join=AttachmentFolder)
 
     def find_folders(self):
-        return AttachmentFolder.find(event_id=int(self.event.id), is_deleted=False)
+        return self.event.as_event.attachment_folders.filter_by(is_deleted=False)
 
     def get_options(self):
         enabled = bool(self.find_attachments().count())
@@ -39,39 +40,22 @@ class AttachmentCloner(EventCloner):
         if 'attachments' not in options:
             return
         folder_mapping = {}
+        attrs = get_simple_column_attrs(AttachmentFolder)
         for old_folder in self.find_folders():
-            new_folder = AttachmentFolder(
-                title=old_folder.title,
-                description=old_folder.description,
-                is_default=old_folder.is_default,
-                is_always_visible=old_folder.is_always_visible,
-                protection_mode=old_folder.protection_mode,
-                link_type=old_folder.link_type,
-                event_id=new_event.id,
-                session_id=old_folder.session_id,
-                contribution_id=old_folder.contribution_id,
-                subcontribution_id=old_folder.subcontribution_id
-            )
+            new_folder = AttachmentFolder(event_id=new_event.id, **{attr: getattr(old_folder, attr) for attr in attrs})
             if new_folder.linked_object is None:
                 continue
             new_folder.acl = old_folder.acl
             db.session.add(new_folder)
             folder_mapping[old_folder] = new_folder
 
+        attrs = get_simple_column_attrs(Attachment) - {'modified_dt'}
         for old_attachment in self.find_attachments():
             folder = folder_mapping.get(old_attachment.folder)
             if not folder:
                 continue
-            new_attachment = Attachment(
-                folder=folder,
-                user_id=old_attachment.user_id,
-                title=old_attachment.title,
-                description=old_attachment.description,
-                type=old_attachment.type,
-                link_url=old_attachment.link_url,
-                protection_mode=old_attachment.protection_mode,
-                acl=old_attachment.acl
-            )
+            new_attachment = Attachment(folder=folder, user_id=old_attachment.user_id, acl=old_attachment.acl,
+                                        **{attr: getattr(old_attachment, attr) for attr in attrs})
             if new_attachment.type == AttachmentType.file:
                 old_file = old_attachment.file
                 new_attachment.file = AttachmentFile(
