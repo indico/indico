@@ -52,6 +52,7 @@ def upgrade():
         sa.Column('is_deleted', sa.Boolean(), nullable=True),
         sa.Column('is_required', sa.Boolean(), nullable=True),
         sa.Column('input_type', sa.String(), nullable=True),
+        sa.Column('data', postgresql.JSON(), nullable=False),
         sa.Column('current_data_id', sa.Integer(), nullable=True),
         sa.CheckConstraint("(input_type IS NULL) = (type = 1)", name='valid_input'),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.registration_form_items.id']),
