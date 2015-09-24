@@ -26,7 +26,11 @@ from MaKaC.webinterface.common.countries import CountryHolder
 
 class RegistrationFormFieldData(db.Model):
     __tablename__ = 'registration_form_field_data'
-    __table_args__ = {'schema': 'event_registration'}
+    __table_args__ = (
+        db.CheckConstraint("(input_type IS NULL) = (type = {type})"
+                           .format(type=RegistrationFormItemType.section), name='valid_input'),
+        {'schema': 'event_registration'}
+    )
 
     #: The ID of the object
     id = db.Column(
@@ -72,8 +76,8 @@ class RegistrationFormField(RegistrationFormItem):
     def view_data(self):
         base_dict = dict(self.current_data.versioned_data)
         base_dict.update(disabled=not self.is_enabled, caption=self.title, mandatory=self.is_required,
-                         **super(RegistrationFormField, self).view_data)
-        if self.current_data.versioned_data['input'] == 'country':
+                         input=self.input_type, **super(RegistrationFormField, self).view_data)
+        if self.input_type == 'country':
             base_dict['radioitems'] = []
             for key, val in CountryHolder.getCountries().iteritems():
                 base_dict['radioitems'].append({'caption': val, 'countryKey': key})
