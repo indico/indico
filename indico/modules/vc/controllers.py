@@ -97,7 +97,7 @@ class RHVCManageEvent(RHVCManageEventBase):
     """Lists the available videoconference rooms"""
 
     def _process(self):
-        room_event_assocs = VCRoomEventAssociation.find_for_event(self._conf, include_hidden=True,
+        room_event_assocs = VCRoomEventAssociation.find_for_event(self.event_new, include_hidden=True,
                                                                   include_deleted=True).all()
         event_vc_rooms = [event_vc_room for event_vc_room in room_event_assocs if event_vc_room.vc_room.plugin]
         return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
@@ -280,8 +280,8 @@ class RHVCEventPage(RHConferenceBaseDisplay):
     """Lists the VC rooms in an event page"""
 
     def _process(self):
-        event_vc_rooms = VCRoomEventAssociation.find_for_event(self._conf).all()
-        vc_plugins_available = True if get_vc_plugins() else False
+        event_vc_rooms = VCRoomEventAssociation.find_for_event(self.event_new).all()
+        vc_plugins_available = bool(get_vc_plugins())
         linked_to = defaultdict(lambda: defaultdict(list))
         for event_vc_room in event_vc_rooms:
             if event_vc_room.vc_room.plugin:
