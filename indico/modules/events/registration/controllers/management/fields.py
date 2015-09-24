@@ -113,6 +113,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
         form_field.title = field_data.pop('caption')
         form_field.description = field_data.pop('description', '')
+        form_field.input_type = field_data.pop('input')
         form_field.is_enabled = not field_data.pop('disabled')
         form_field.is_required = field_data.pop('mandatory', False)
         db.session.add(form_field)
