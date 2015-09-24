@@ -59,8 +59,9 @@ class PDFPreviewer(Previewer):
 
     @classmethod
     def can_preview(cls, attachment_file):
-        use_previewer = session.user.settings.get('use_previewer_pdf', False) if session.user else False
-        return (super(PDFPreviewer, cls).can_preview(attachment_file) and use_previewer)
+        if not super(PDFPreviewer, cls).can_preview(attachment_file) or not session.user:
+            return False
+        return session.user.settings.get('use_previewer_pdf', False)
 
 
 class MarkdownPreviewer(Previewer):
