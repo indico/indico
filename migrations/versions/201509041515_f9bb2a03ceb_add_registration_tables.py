@@ -50,6 +50,7 @@ def upgrade():
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('is_enabled', sa.Boolean(), nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=True),
+        sa.Column('is_required', sa.Boolean(), nullable=True),
         sa.Column('current_data_id', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.registration_form_items.id']),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.registration_forms.id']),
