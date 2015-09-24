@@ -51,7 +51,7 @@ def _import_tasks(sender, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'), 30, icon='location')
+    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'), 70, icon='location')
 
 
 @signals.users.merged.connect

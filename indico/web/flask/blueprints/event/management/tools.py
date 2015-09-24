@@ -20,7 +20,7 @@ from MaKaC.webinterface.rh import conferenceModif
 
 
 # Tools
-event_mgmt.add_url_rule('/tools/', 'confModifTools', redirect_view('event_reminders.list'))
+event_mgmt.add_url_rule('/tools/', 'confModifTools', redirect_view('event_mgmt.confModifTools-badgePrinting'))
 
 # Tools: Clone
 event_mgmt.add_url_rule('/tools/clone', 'confModifTools-clone', conferenceModif.RHConfClone)
