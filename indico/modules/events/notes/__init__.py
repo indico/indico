@@ -34,8 +34,7 @@ def _merge_users(target, source, **kwargs):
 
 class NoteCloner(EventCloner):
     def find_notes(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.find(event_id=self.event.id, is_deleted=False)
+        return self.event.as_event.notes.filter_by(is_deleted=False)
 
     def get_options(self):
         enabled = bool(self.find_notes().count())
@@ -63,13 +62,6 @@ class NoteCloner(EventCloner):
 @signals.event_management.clone.connect
 def _get_note_cloner(event, **kwargs):
     return NoteCloner(event)
-
-
-@signals.event.deleted.connect
-def _delete_event_notes(event, **kwargs):
-    from indico.modules.events.notes.models.notes import EventNote
-    EventNote.find(event_id=event.id).update({EventNote.is_deleted: True})
-    db.session.expire_all()
 
 
 @signals.event.session_deleted.connect
