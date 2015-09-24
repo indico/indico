@@ -55,8 +55,18 @@ class RHStaticSiteBuild(RHStaticSiteBase):
 
 
 class RHStaticSiteDownload(RHStaticSiteBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.static_site
+        }
+    }
+
+    def _checkParams(self, params):
+        RHStaticSiteBase._checkParams(self, params)
+        self.static_site = StaticSite.get_one(request.view_args['id'])
+
     def _process(self):
-        static_site = StaticSite.get_one(request.view_args['id'])
-        if static_site.state != StaticSiteState.success:
+        if self.static_site.state != StaticSiteState.success:
             raise NotFound()
-        return send_file('static_site_{0.event_id}.zip'.format(static_site), static_site.path, 'application/zip')
+        return send_file('static_site_{0.event_id}.zip'.format(self.static_site), self.static_site.path,
+                         'application/zip')
