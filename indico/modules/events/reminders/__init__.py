@@ -22,6 +22,9 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
+
 from MaKaC.conference import EventCloner
 
 
@@ -31,6 +34,12 @@ logger = Logger.get('events.reminders')
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.events.reminders.tasks
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    return 'reminders', SideMenuItem(_('Reminders'), url_for('event_reminders.list', event),
+                                     section='organization')
 
 
 @signals.event.data_changed.connect

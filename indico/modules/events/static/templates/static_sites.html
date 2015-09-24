@@ -1,66 +1,76 @@
-<div class="i-box-group vert fixed-width static-sites">
-    <div class="i-box titled">
-        <div class="i-box-header">
-            <div class="i-box-title">{%- trans %}New Offline Copy{% endtrans -%}</div>
-            <button class="i-button icon-wrench right" type="button"
-                    data-method="post"
-                    data-href="{{ url_for('static_site.build', event) }}"
-                    data-title="{% trans %}Build an offline copy{% endtrans %}"
-                    data-confirm="{% trans %}Are you sure you want to build an offline copy of this event?<br>Beware that it is a heavy operation, especially for large events, and it might take some time to finish.{% endtrans %}">
-                {%- trans %}Build offline copy{% endtrans -%}
-            </button>
+{% extends 'layout/base.html' %}
+
+{% block title %}{% trans %}Offline Copy{% endtrans %}{% endblock %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width static-sites">
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">{%- trans %}New Offline Copy{% endtrans -%}</div>
+                <button class="i-button icon-wrench right" type="button"
+                        data-method="post"
+                        data-href="{{ url_for('static_site.build', event) }}"
+                        data-title="{% trans %}Build an offline copy{% endtrans %}"
+                        data-confirm="{% trans %}Are you sure you want to build an offline copy of this event?<br>Beware that it is a heavy operation, especially for large events, and it might take some time to finish.{% endtrans %}">
+                    {%- trans %}Build offline copy{% endtrans -%}
+                </button>
+            </div>
+            <div class="i-box-content">
+                {% trans %}This will build an offline copy of the event. This is useful if you want to make it available where no Internet connection is available.{% endtrans %}
+            </div>
         </div>
-        <div class="i-box-content">
-            {% trans %}This will build an offline copy of the event. This is useful if you want to make it available where no Internet connection is available.{% endtrans %}
-        </div>
-    </div>
-    <div class="i-box titled no-padding">
-        <div class="i-box-header">
-            <div class="i-box-title">{%- trans %}Existing Offline Copies{% endtrans -%}</div>
-        </div>
-        <div class="i-box-content">
-            {% if static_sites %}
-                {% set label_mapping = {
-                    'success': 'accept',
-                    'failed': 'danger',
-                    'expired': 'warning',
-                    'running': 'highlight'
-                } %}
-                {% set has_downloads = static_sites|selectattr('state.name', 'equalto', 'success')|any %}
-                <table class="i-table-widget">
-                    <thead>
-                        <tr>
-                            <th>{% trans %}Requested by{% endtrans %}</th>
-                            <th>{% trans %}Requested on{% endtrans %}</th>
-                            <th>{% trans %}Status{% endtrans %}</th>
-                            {% if has_downloads %}
-                                <th>{% trans %}Download{% endtrans %}</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for site in static_sites %}
+        <div class="i-box titled no-padding">
+            <div class="i-box-header">
+                <div class="i-box-title">{%- trans %}Existing Offline Copies{% endtrans -%}</div>
+            </div>
+            <div class="i-box-content">
+                {% if static_sites %}
+                    {% set label_mapping = {
+                        'success': 'accept',
+                        'failed': 'danger',
+                        'expired': 'warning',
+                        'running': 'highlight'
+                    } %}
+                    {% set has_downloads = static_sites|selectattr('state.name', 'equalto', 'success')|any %}
+                    <table class="i-table-widget">
+                        <thead>
                             <tr>
-                                <td>{{ site.creator.full_name }}</td>
-                                <td>{{ site.requested_dt|format_datetime }}</td>
-                                <td><span class="i-label {{ label_mapping.get(site.state.name, 'disabled') }}">{{ site.state.title }}</span></td>
+                                <th>{% trans %}Requested by{% endtrans %}</th>
+                                <th>{% trans %}Requested on{% endtrans %}</th>
+                                <th>{% trans %}Status{% endtrans %}</th>
                                 {% if has_downloads %}
-                                    <td>
-                                        {% if site.state.name == 'success' %}
-                                            <a href="{{ url_for('static_site.download', site, _external=True) }}"
-                                               class="i-button icon-file-download">
-                                                {%- trans %}Download{% endtrans -%}
-                                            </a>
-                                        {% endif %}
-                                    </td>
+                                    <th>{% trans %}Download{% endtrans %}</th>
                                 {% endif %}
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <span class="empty">{% trans %}There are no offline copies of this event.{% endtrans %}</span>
-            {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for site in static_sites %}
+                                <tr>
+                                    <td>{{ site.creator.full_name }}</td>
+                                    <td>{{ site.requested_dt|format_datetime }}</td>
+                                    <td>
+                                        <span class="i-label {{ label_mapping.get(site.state.name, 'disabled') }}">
+                                            {{ site.state.title }}
+                                        </span>
+                                    </td>
+                                    {% if has_downloads %}
+                                        <td>
+                                            {% if site.state.name == 'success' %}
+                                                <a href="{{ url_for('static_site.download', site, _external=True) }}"
+                                                   class="i-button icon-file-download">
+                                                    {%- trans %}Download{% endtrans -%}
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <span class="empty">{% trans %}There are no offline copies of this event.{% endtrans %}</span>
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
+{% endblock %}

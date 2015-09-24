@@ -27,9 +27,11 @@ from indico.web.menu import SideMenuItem, SideMenuSection
 
 @signals.menu.sections.connect_via('event-management-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
-    yield 'organization', SideMenuSection(_("Organization"), 40, icon='list', active=True)
-    yield 'advanced', SideMenuSection(_("Advanced options"), 30, icon='lamp')
-    yield 'customization', SideMenuSection(_("Customization"), 10, icon='image')
+    yield 'organization', SideMenuSection(_("Organization"), 50, icon='list', active=True)
+    yield 'services', SideMenuSection(_("Services"), 40, icon='broadcast')
+    yield 'reports', SideMenuSection(_("Reports"), 30, icon='stack')
+    yield 'customization', SideMenuSection(_("Customization"), 20, icon='image')
+    yield 'advanced', SideMenuSection(_("Advanced options"), 10, icon='lamp')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
@@ -54,12 +56,12 @@ def _sidemenu_items(sender, event, **kwargs):
 
     yield 'general', SideMenuItem(_('General settings'),
                                   url_for('event_mgmt.conferenceModification', event),
-                                  70,
+                                  90,
                                   visible=can_modify,
                                   icon='settings')
     yield 'timetable', SideMenuItem(_('Timetable'),
                                     url_for('event_mgmt.confModifSchedule', event),
-                                    60,
+                                    80,
                                     icon='calendar',
                                     visible=(can_modify and not is_lecture))
     yield 'room_booking', SideMenuItem(_('Room Booking'),
@@ -96,7 +98,7 @@ def _sidemenu_items(sender, event, **kwargs):
 
     yield 'lists', SideMenuItem(_('Lists'),
                                 url_for('event_mgmt.confModifListings-allSpeakers', event),
-                                section='advanced',
+                                section='reports',
                                 visible=(can_modify and not is_lecture))
     yield 'utilities', SideMenuItem(_('Utilities'),
                                     url_for('event_mgmt.confModifTools', event),
@@ -104,6 +106,6 @@ def _sidemenu_items(sender, event, **kwargs):
                                     visible=can_modify)
     yield 'protection', SideMenuItem(_('Protection'),
                                      url_for('event_mgmt.confModifAC', event),
-                                     20,
+                                     60,
                                      icon='shield',
                                      visible=can_modify)

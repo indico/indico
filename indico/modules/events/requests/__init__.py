@@ -42,7 +42,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     if not event.as_event.can_manage(session.user, allow_key=True) and not is_request_manager(session.user):
         return
-    return 'requests', SideMenuItem(_('Services'), url_for('requests.event_requests', event), section='organization')
+    return 'requests', SideMenuItem(_('Logistics'), url_for('requests.event_requests', event), section='services')
 
 
 @signals.users.merged.connect

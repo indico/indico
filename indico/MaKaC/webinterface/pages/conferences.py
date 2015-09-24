@@ -1569,6 +1569,7 @@ class WPConfModifAC(WPConferenceModifBase):
         }
         return wc.getHTML(p)
 
+
 class WPConfModifToolsBase(WPConferenceModifBase):
 
     sidemenu_option = 'utilities'
@@ -1576,16 +1577,10 @@ class WPConfModifToolsBase(WPConferenceModifBase):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._tabReminders = self._tabCtrl.newTab('reminders', _("Reminders"),
-                                                  url_for('event_reminders.list', self._conf))
         self._tabPosters = self._tabCtrl.newTab("posters", _("Posters"), \
                 urlHandlers.UHConfModifPosterPrinting.getURL(self._conf))
         self._tabBadges = self._tabCtrl.newTab("badges", _("Badges/Tablesigns"), \
                 urlHandlers.UHConfModifBadgePrinting.getURL(self._conf))
-
-        if Config.getInstance().getOfflineStore():
-            self._tabOffline = self._tabCtrl.newTab("offline", _("Offline copy"),
-                                                    url_for('static_site.list', self._conf))
 
         self._setActiveTab()
 

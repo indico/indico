@@ -16,18 +16,16 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.pages.conferences import WPConfModifToolsBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
-class WPStaticSites(WPConfModifToolsBase, WPJinjaMixin):
+class WPStaticSites(WPConferenceModifBase, WPJinjaMixin):
     template_prefix = 'events/static/'
+    sidemenu_option = 'static'
 
     def getCSSFiles(self):
-        return WPConfModifToolsBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
-    def _setActiveTab(self):
-        self._tabOffline.setActive()
-
-    def _getTabContent(self, params):
+    def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
