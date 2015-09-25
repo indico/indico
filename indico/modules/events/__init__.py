@@ -32,7 +32,7 @@ from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 
 
-__all__ = ('Event',)
+__all__ = ('Event', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
 
 #: URL prefixes for the various event objects (public area)
 #: All prefixes are expected to be used inside the '/event/<confId>'
