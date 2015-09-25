@@ -33,8 +33,8 @@
                 </ul>
             </div>
         </div>
-        {% if regform.registrations %}
-            {{ render_registrations_list(regform, visible_cols_regform_items, visible_cols_user_info, user_info, get_registration_field_data, get_user_info) }}
+        {% if registrations %}
+            {{ render_registrations_list(registrations, visible_cols_regform_items, visible_cols_user_info, user_info,  get_user_info) }}
         {% else %}
             {%- call message_box('info', fixed_width=true) -%}
                 {% trans %}There are no registrations yet.{% endtrans %}

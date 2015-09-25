@@ -61,7 +61,6 @@
                 trigger: this,
                 url: $this.data('href'),
                 title: $this.data('title'),
-                hidePageHeader: true,
                 onClose: function(data) {
                     if (data) {
                         $('.registrations-table-wrapper').html(data.registrations_list);
@@ -84,31 +83,34 @@
 
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
         var visibleColumnsUserInfoField = $('#visible-columns-user-info');
-        var reg_items_data = JSON.parse(visibleColumnsRegItemsField.val());
-        var user_info_data = JSON.parse(visibleColumnsUserInfoField.val());
+        var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
+        var userInfoData = JSON.parse(visibleColumnsUserInfoField.val());
 
         $('.reglist-column')
         .on('click', '.trigger', function() {
-            var field = $(this).closest('.reglist-column');
+            var $this = $(this);
+            var field = $this.closest('.reglist-column');
             var fieldId = field.data('id');
-            var data = field.hasClass('js-user-info') ? user_info_data : reg_items_data;
+            var data = field.hasClass('js-user-info') ? userInfoData : regItemsData;
             var visibleColumnsField = field.hasClass('js-user-info') ? visibleColumnsUserInfoField : visibleColumnsRegItemsField;
+            var enabled = $this.hasClass('enabled');
+            var notEnabled = $this.hasClass('not-enabled');
 
-            if ($(this).hasClass('enabled')) {
+            if (enabled) {
                 data.splice(data.indexOf(fieldId), 1);
             }
-            else if ($(this).hasClass('not-enabled')) {
+            else if (!enabled) {
                 data.push(fieldId);
             }
-            $(this).toggleClass('enabled', !$(this).hasClass('enabled'));
-            $(this).toggleClass('not-enabled', !$(this).hasClass('not-enabled'));
-            field.toggleClass('striped', !$(this).hasClass('enabled'));
+            $this.toggleClass('enabled', !enabled);
+            $this.toggleClass('not-enabled', enabled);
+            field.toggleClass('striped', enabled);
             visibleColumnsField.val(JSON.stringify(data)).trigger('change');
         })
         .each(function() {
             var field = $(this);
             var fieldId = field.data('id');
-            var data = field.hasClass('js-user-info') ? user_info_data : reg_items_data;
+            var data = field.hasClass('js-user-info') ? userInfoData : regItemsData;
 
             if (data.indexOf(fieldId) != -1) {
                 field.find('.trigger').addClass('enabled');
