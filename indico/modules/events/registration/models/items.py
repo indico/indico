@@ -21,7 +21,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.registration.fields import get_field_types
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, camelize_keys
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -190,8 +190,10 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(super(RegistrationFormSection, self).view_data, enabled=self.is_enabled, title=self.title,
-                    items=[child.view_data for child in self.children if not child.is_deleted])
+        field_data = dict(super(RegistrationFormSection, self).view_data, enabled=self.is_enabled,
+                          title=self.title, items=[child.view_data for child in self.children
+                                                   if not child.is_deleted])
+        return camelize_keys(field_data)
 
 
 class RegistrationFormText(RegistrationFormItem):
@@ -205,5 +207,6 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        return dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
-                    input=self.input_type, caption=self.title, **self.current_data.versioned_data)
+        field_data = dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
+                          input=self.input_type, caption=self.title, **self.current_data.versioned_data)
+        return camelize_keys(field_data)

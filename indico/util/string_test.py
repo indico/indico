@@ -19,7 +19,7 @@ from itertools import count
 import pytest
 
 from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
-                                camelize)
+                                camelize, camelize_keys, snakify_keys)
 
 
 def test_seems_html():
@@ -130,3 +130,19 @@ def test_snakify(input, output):
 ))
 def test_camelize(input, output):
     assert camelize(input) == output
+
+
+def test_camelize_keys():
+    d = {'fooBar': 'foo', 'bar_foo': 123, 'foo_bar': {'hello_world': 'test'}}
+    orig = d.copy()
+    d2 = camelize_keys(d)
+    assert d == orig  # original dict not modified
+    assert d2 == {'fooBar': 'foo', 'barFoo': 123, 'fooBar': {'helloWorld': 'test'}}
+
+
+def test_snakify_keys():
+    d = {'sn_case': 2, 'shouldBeSnakeCase': 3, 'snake': 4, 'snake-case': 5, 'inner': {'innerDict': 2}}
+    orig = d.copy()
+    d2 = snakify_keys(d)
+    assert d == orig
+    assert d2 == {'sn_case': 2, 'should_be_snake_case': 3, 'snake': 4, 'snake-case': 5, 'inner': {'inner_dict': 2}}

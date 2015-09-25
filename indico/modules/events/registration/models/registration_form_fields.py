@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, camelize_keys
 from MaKaC.webinterface.common.countries import CountryHolder
 
 
@@ -81,7 +81,7 @@ class RegistrationFormField(RegistrationFormItem):
             base_dict['radioitems'] = []
             for key, val in CountryHolder.getCountries().iteritems():
                 base_dict['radioitems'].append({'caption': val, 'countryKey': key})
-        return base_dict
+        return camelize_keys(base_dict)
 
     @return_ascii
     def __repr__(self):

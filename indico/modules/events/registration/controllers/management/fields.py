@@ -24,10 +24,11 @@ from indico.modules.events.registration.controllers.management.sections import R
 from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItem
 from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
                                                                                 RegistrationFormFieldData)
+from indico.util.string import snakify
 from indico.web.util import jsonify_data
 
-NON_VERSIONED_DATA = {'minValue', 'length', 'numberOfColumns', 'numberOfRows', 'placesLimit', 'dateFormat',
-                      'withExtraSlots', 'inputType', 'defaultItem', 'timeFormat'}
+NON_VERSIONED_DATA = {'min_value', 'length', 'number_of_columns', 'number_of_rows', 'places_limit', 'date_format',
+                      'with_extra_slots', 'input_type', 'default_item', 'time_format'}
 
 
 def _fill_form_field_with_data(field, field_data):
@@ -109,12 +110,12 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
     """Add a field to the section"""
 
     def _process(self):
-        field_data = request.json['fieldData']
+        field_data = {snakify(name): value for name, value in request.json['fieldData'].iteritems()}
         if field_data['input'] == 'date':
-            dateFormat = field_data['dateFormat'].split(' ')
-            field_data['dateFormat'] = dateFormat[0]
-            if len(dateFormat) == 2:
-                field_data['timeFormat'] = dateFormat[1]
+            date_format = field_data['date_format'].split(' ')
+            field_data['date_format'] = date_format[0]
+            if len(date_format) == 2:
+                field_data['time_format'] = date_format[1]
 
         if field_data['input'] == 'label':
             field_type = RegistrationFormText
