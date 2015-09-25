@@ -47,8 +47,10 @@ def _merge_users(target, source, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
+    if not can_manage_attachments(event, session.user):
+        return
     return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', event),
-                                       80, visible=can_manage_attachments(event, session.user), section='organization')
+                                       80, section='organization')
 
 
 @signals.event_management.management_url.connect
