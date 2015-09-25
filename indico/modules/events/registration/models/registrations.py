@@ -154,6 +154,10 @@ class Registration(db.Model):
             loc['token'] = self.uuid
         return loc
 
+    @property
+    def data_by_field(self):
+        return {x.field_data.field_id: x for x in self.data}
+
     @return_ascii
     def __repr__(self):
         full_name = '{} {}'.format(self.first_name, self.last_name)
