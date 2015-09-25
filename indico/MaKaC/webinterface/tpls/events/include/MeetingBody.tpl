@@ -1,10 +1,5 @@
 <%page args="minutes=False"/>
 <%namespace name="common" file="include/Common.tpl"/>
-<script  type="text/javascript">
-## dict to store inline video service popup information, populated in VideoService.tpl
-var videoServiceInfo = {};
-</script>
-
 <div class="meetingEventSubHeader">
     <table class="eventDetails">
         <tbody>
@@ -30,7 +25,7 @@ var videoServiceInfo = {};
         goToDayMenuDaysKeys.sort();
 
         var goToDayMenuItems = {};
-        for(i in goToDayMenuDaysKeys){
+        for(var i in goToDayMenuDaysKeys){
             goToDayMenuItems[goToDayMenuDaysKeys[i]] = {action:"#"+goToDayMenuDaysKeys[i] , display:goToDayMenuDays.get(goToDayMenuDaysKeys[i])};
         }
 
@@ -85,65 +80,3 @@ var videoServiceInfo = {};
         % endif
     </ul>
 </div>
-<script type="text/javascript">
-
-    var tooltipMsgs = {moreinfo : $T('Click here to show / hide detailed information'),
-                       morebookings : $T('There are more bookings than is currently shown.<br /> ' +
-                                         'Click here to show / hide more information.')};
-
-    $('#collShowBookings').qtip({
-        content: tooltipMsgs["morebookings"],
-        position: {
-            my: 'bottom middle',
-            at: 'top middle'
-        },
-        style: {
-            classes: 'qtip-rounded qtip-shadow qtip-light'
-        }
-    });
-
-    $('#collShowBookings').click(function() {
-        var newText = ($(this).text() == $T("Show")) ? $T("Hide additional bookings") : $T("Show");
-        var textNode = $(this);
-        $('#collHiddenBookings').slideToggle('fast', function() {
-            textNode.text(newText);
-        });
-    });
-
-    $('.bookingLaunchLinkInline').qtip({
-        content: {
-            text: function() { return videoServiceInfo[$(this).data('id')]; }
-        },
-        position: {
-            my: 'top middle',
-            at: 'bottom middle'
-        },
-        show: {
-            solo: true
-        },
-        hide: {
-            event: 'unfocus',
-            fixed: true,
-            effect: function() {
-                $(this).fadeOut(300);
-            }
-        },
-        style: {
-            classes: 'qtip-rounded qtip-shadow qtip-popup'
-        }
-    });
-
-    $('.bookingLaunchLink').qtip({
-        content: {
-            text: function() { return videoServiceLaunchInfo[$(this).data('id')]; }
-        },
-        position: {
-            my: 'bottom middle',
-            at: 'top middle'
-        },
-        style: {
-            classes: 'qtip-rounded qtip-shadow qtip-light'
-        }
-    });
-
-</script>

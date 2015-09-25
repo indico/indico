@@ -9,7 +9,7 @@
           <td class="maincell">
             <h2 class="page-title">${ _(' Found {} rooms ').format(len(rooms)) }</h2>
             % if rooms:
-              <table width="100%" class="filesTab">
+              <table width="100%">
                 <tr>
                   <td>
                     <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">

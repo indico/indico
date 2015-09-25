@@ -1,4 +1,4 @@
-<table width="80%" class="filesTab">
+<table width="80%">
     <tr>
         <td>
             <table>
