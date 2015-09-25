@@ -422,3 +422,20 @@ def camelize(name):
         underscore = '_'
         parts = parts[1:]
     return underscore + parts[0] + ''.join(x.title() for x in parts[1:])
+
+
+def _convert_keys(dict_, convert_func):
+    d = {}
+    for key, value in dict_.iteritems():
+        d[convert_func(key)] = _convert_keys(value, convert_func) if isinstance(value, dict) else value
+    return d
+
+
+def camelize_keys(dict_):
+    """Convert the keys of a dict to camelCase"""
+    return _convert_keys(dict_, camelize)
+
+
+def snakify_keys(dict_):
+    """Convert the keys of a dict to snake_case"""
+    return _convert_keys(dict_, snakify)
