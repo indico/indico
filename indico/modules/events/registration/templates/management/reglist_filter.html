@@ -1,11 +1,11 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 {% macro _render_regform_item_col_selector(item) %}
-    {% if item.type == RegistrationFormItemType.section %}
+    {% if item.is_section %}
         <h3>{{ item.title }}</h3>
         {% for child_item in item.children %}
-            {% if child_item.type == RegistrationFormItemType.field %}
-                {% set has_dropdown = child_item.current_data.data.input in ['radio', 'country'] %}
+            {% if child_item.type.name == 'field' %}
+                {% set has_dropdown = child_item.input_type in ['radio', 'country'] %}
                 <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
                      data-id="{{ child_item.id }}">
                     <span class="title {% if has_dropdown %}icon-filter{% endif %}"
@@ -14,7 +14,7 @@
                     </span>
                     {% if has_dropdown %}
                         <ul class="dropdown" style="display: none">
-                            {% for radio_item in child_item.current_data.data.radioitems %}
+                            {% for radio_item in child_item.current_data.versioned_data.radioitems %}
                                 <li>
                                     <input type='checkbox' name='check1' value='{{ radio_item.caption }}'>
                                     <span>{{ radio_item.caption }}</span>
