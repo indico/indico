@@ -25,7 +25,7 @@ from indico.modules.events.logs.util import get_log_renderers
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
-__all__ = ['EventLogEntry', 'EventLogKind', 'EventLogRealm']
+__all__ = ('EventLogEntry', 'EventLogKind', 'EventLogRealm')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
