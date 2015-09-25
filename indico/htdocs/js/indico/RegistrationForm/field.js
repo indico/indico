@@ -650,7 +650,6 @@ ndRegForm.directive('ndFieldDialog', function(url) {
 
             $scope.addItem = function() {
                 $scope.formData.radioitems.push({
-                    id:'isNew',
                     placesLimit: 0,
                     price: 0,
                     isEnabled: true,

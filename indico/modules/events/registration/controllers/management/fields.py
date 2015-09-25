@@ -26,6 +26,7 @@ from indico.modules.events.registration.models.registration_form_fields import (
                                                                                 RegistrationFormFieldData)
 from indico.util.string import snakify
 from indico.web.util import jsonify_data
+from uuid import uuid4
 
 NON_VERSIONED_DATA = {'min_value', 'length', 'number_of_columns', 'number_of_rows', 'places_limit', 'date_format',
                       'with_extra_slots', 'input_type', 'default_item', 'time_format'}
@@ -77,6 +78,10 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         field_data = request.json['fieldData']
         _fill_form_field_with_data(self.field, field_data)
         if field_data != self.field.current_data.versioned_data:
+            if self.field.input_type == 'radio':
+                for item in field_data['radioitems']:
+                    if not item.get('id', None):
+                        item['id'] = unicode(uuid4())
             self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, versioned_data=field_data)
         return jsonify(self.field.view_data)
 
@@ -116,6 +121,10 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
             field_data['date_format'] = date_format[0]
             if len(date_format) == 2:
                 field_data['time_format'] = date_format[1]
+        elif field_data['input'] == 'radio':
+            items = field_data['radioitems']
+            for item in items:
+                item['id'] = unicode(uuid4())
 
         if field_data['input'] == 'label':
             field_type = RegistrationFormText
