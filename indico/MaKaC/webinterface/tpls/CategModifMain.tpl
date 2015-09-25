@@ -1,4 +1,4 @@
-${ render_template('flashed_messages.html') }
+${ render_template('flashed_messages.html', fixed_width=True) }
 
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
