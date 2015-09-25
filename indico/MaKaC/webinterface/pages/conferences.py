@@ -1024,7 +1024,7 @@ class WPConferenceModifBase(main.WPMainBase):
             "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL,
             "event": "Conference",
             "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option, old_style=True,
-                                        event=self._conf)
+                                        event=self._conf.as_event)
         }
 
         wf = self._rh.getWebFactory()
