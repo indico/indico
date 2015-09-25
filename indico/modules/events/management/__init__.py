@@ -41,16 +41,16 @@ def _sidemenu_items(sender, event, **kwargs):
     # Once those parts are modularized, we will be able to include them
     # conditionally from their respective modules.
 
-    can_modify = event.canModify(session.user)
+    can_modify = event.can_manage(session.user, allow_key=True)
     rb_active = Config.getInstance().getIsRoomBookingActive()
-    cfa_enabled = event.hasEnabledSection('cfa')
-    can_manage_registration = can_modify or event.canManageRegistration(session.user)
-    reg_form_enabled = event.hasEnabledSection('regForm')
+    cfa_enabled = event.as_legacy.hasEnabledSection('cfa')
+    can_manage_registration = can_modify or event.can_manage(session.user, 'registration')
+    reg_form_enabled = event.as_legacy.hasEnabledSection('regForm')
 
-    event_type = event.getType()
+    event_type = event.as_legacy.getType()
     is_lecture = event_type == 'simple_event'
     is_conference = event_type == 'conference'
-    paper_review = event.getConfPaperReview()
+    paper_review = event.as_legacy.getConfPaperReview()
     is_review_staff = paper_review.isInReviewingTeam(session.avatar)
     is_review_manager = paper_review.isPaperReviewManager(session.avatar)
 

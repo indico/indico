@@ -51,9 +51,9 @@ layout_settings = EventSettingsProxy('layout', {
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu_layout(sender, event, **kwargs):
-    if not event.as_event.can_manage(session.user, allow_key=True):
+    if not event.can_manage(session.user, allow_key=True):
         return
-    if event.getType() == 'conference':
+    if event.as_legacy.getType() == 'conference':
         yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), section='customization')
         yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), section='customization')
     yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), event_feature='images',

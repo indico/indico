@@ -43,7 +43,7 @@ def _check_agreement_definitions(app, **kwargs):
 def _extend_event_management_menu(sender, event, **kwargs):
     if not get_agreement_definitions():
         return
-    if not event.as_event.can_manage(session.user, allow_key=True):
+    if not event.can_manage(session.user, allow_key=True):
         return
     return 'agreements', SideMenuItem(_('Agreements'), url_for('agreements.event_agreements', event),
                                       section='services')

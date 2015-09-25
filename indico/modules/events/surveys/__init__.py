@@ -43,7 +43,7 @@ def _merge_users(target, source, **kwargs):
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     return 'surveys', SideMenuItem(_('Surveys'), url_for('surveys.manage_survey_list', event),
-                                   visible=event.as_event.can_manage(session.user, 'surveys', allow_key=True),
+                                   visible=event.can_manage(session.user, 'surveys', allow_key=True),
                                    event_feature='surveys', section='organization')
 
 
