@@ -18,7 +18,8 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr
+from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
+                                camelize)
 
 
 def test_seems_html():
@@ -104,3 +105,28 @@ def test_format_repr(args, kwargs, output):
 
     obj = Foo(id=1, hello='world', dct={'a': 'b'}, flag1=True, flag0=False)
     assert format_repr(obj, *args, **kwargs) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('',       ''),
+    ('FooBar', 'foo_bar'),
+    ('fooBar', 'foo_bar'),
+    ('fooBAR', 'foo_bar'),
+    ('bar',    'bar'),
+    ('Bar',    'bar'),
+    ('aaBbCc', 'aa_bb_cc'),
+))
+def test_snakify(input, output):
+    assert snakify(input) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('_',        '_'),
+    ('_foo_bar', '_fooBar'),
+    ('foo',      'foo'),
+    ('fooBar',   'fooBar'),
+    ('foo_bar',  'fooBar'),
+    ('aa_bb_cC', 'aaBbCc'),
+))
+def test_camelize(input, output):
+    assert camelize(input) == output

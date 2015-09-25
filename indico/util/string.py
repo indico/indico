@@ -33,7 +33,6 @@ from lxml import html, etree
 from speaklater import _LazyString
 
 
-
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 LATEX_MATH_PLACEHOLDER = u"\uE000"
 
@@ -406,3 +405,20 @@ def format_repr(obj, *args, **kwargs):
         return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
     else:
         return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+
+
+def snakify(name):
+    """Converts a camelCased name to snake_case"""
+    # from http://stackoverflow.com/a/1176023/298479
+    name = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower()
+
+
+def camelize(name):
+    """Converts a snake_cased name to camelCase."""
+    parts = name.split('_')
+    underscore = ''
+    if name.startswith('_'):
+        underscore = '_'
+        parts = parts[1:]
+    return underscore + parts[0] + ''.join(x.title() for x in parts[1:])
