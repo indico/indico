@@ -467,7 +467,7 @@ class WMConfModifListings (conferences.WConfModifListings):
 
 class WPMConfClone(conferences.WPConfClone):
 
-    def _getTabContent(self, params):
+    def _getPageContent(self, params):
         p = conferences.WConferenceClone(self._conf)
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),

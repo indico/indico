@@ -51,7 +51,6 @@ class WebFactory(WebFactory):
 
     @staticmethod
     def customiseToolsTabCtrl(tabCtrl):
-        tabCtrl.getTabById("clone").enable()
         tabCtrl.getTabById("posters").enable()
         tabCtrl.getTabById("badges").disable()
 
@@ -104,12 +103,8 @@ class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):
         conferences.WPConfModifToolsBase.__init__(self, rh, conf)
 
 
-class WPSEConfClone(WPSEConfModifToolsBase, object):
-
-    def _setActiveTab( self ):
-        self._tabCloneEvent.setActive()
-
-    def _getTabContent( self, params ):
+class WPSEConfClone(conferences.WPConfClone):
+    def _getPageContent(self, params):
         p = conferences.WConferenceClone( self._conf )
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
