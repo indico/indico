@@ -633,7 +633,7 @@ input.regFormTitleInputMgmt {
     font-weight: bold;
 }
 
-input[name="price"].ng-invalid-required {
+input.ng-invalid-required {
     border: 1px solid red;
 }
 
