@@ -4198,14 +4198,15 @@ class ConferenceHolder( ObjectHolder ):
     def add(self, conf, creator):
         from indico.modules.events import Event
         event = Event(creator=creator)
-        with event.logging_disabled:
-            event.update_principal(creator, full_access=True)
         db.session.add(event)
         db.session.flush()
         conf.setId(event.id)
         if conf.id in self._getIdx():
             raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
         ObjectHolder.add(self, conf)
+        with event.logging_disabled:
+            event.update_principal(creator, full_access=True)
+        db.session.flush()
 
     def getById(self, id, quiet=False):
         if id == 'default':

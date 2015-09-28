@@ -140,7 +140,7 @@ class Event(ProtectionManagersMixin, db.Model):
     def as_legacy(self):
         """Returns a legacy `Conference` object (ZODB)"""
         from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(self.id, None)
+        return ConferenceHolder().getById(self.id, True)
 
     @property
     def protection_parent(self):
