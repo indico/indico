@@ -58,7 +58,10 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
     def _process_POST(self):
         self.section.is_enabled = (request.args.get('enable') == 'true')
         db.session.flush()
-        logger.info('Section {} modified by {}'.format(self.section, session.user))
+        if self.section.is_enabled:
+            logger.info('Section {} enabled by {}'.format(self.section, session.user))
+        else:
+            logger.info('Section {} disabled by {}'.format(self.section, session.user))
         return jsonify_data(**self.section.view_data)
 
     def _process_DELETE(self):
