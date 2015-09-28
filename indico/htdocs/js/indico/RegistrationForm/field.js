@@ -141,6 +141,17 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 return false;
             }
 
+            if ($scope.settings.itemtable) {
+                var validCaptions = _.all(dialogScope.formData.radioitems, function(item) {
+                    return item.remove || !!item.caption;
+                });
+
+                if (!validCaptions) {
+                    dialogScope.$apply(dialogScope.setSelectedTab('tab-editItems'));
+                    return false;
+                }
+            }
+
             $scope.fieldApi.updateField($scope.field, dialogScope.formData);
             return true;
         },
