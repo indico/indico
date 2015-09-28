@@ -51,6 +51,15 @@
 
     function setupRegistrationsList() {
         colorizeSelectedRows();
+        $('.registrations .i-table').tablesorter({
+            cssAsc:  'header-sort-asc',
+            cssDesc: 'header-sort-desc',
+            headers: {
+                0: {
+                    sorter: false
+                }
+            }
+        });
         $('.registrations .toolbar')
         .dropdown()
         .on('click', '.js-dialog-action', function(e) {
