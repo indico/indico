@@ -418,6 +418,18 @@ def install_jquery_tablesorter():
         local('cp dist/js/jquery.tablesorter.js {0}'.format(dest_js_dir))
 
 
+@recipe('moment.js')
+def install_moment_js():
+    with lcd(os.path.join(env.ext_dir, 'moment.js')):
+        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'moment.js')
+        local('mkdir -p {0} {0}/locale'.format(dest_dir))
+
+        local('cp moment.js {0}/'.format(dest_dir))
+        local('cp locale/en-gb.js {0}/locale/'.format(dest_dir))
+        local('cp locale/fr.js {0}/locale/'.format(dest_dir))
+        local('cp locale/es.js {0}/locale/'.format(dest_dir))
+
+
 # Tasks
 
 @task

@@ -327,7 +327,8 @@ statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
 ie_compatibility = rjs_bundle('ie_compatibility', 'js/selectivizr.js')
 
 jed = rjs_bundle('jed', 'js/lib/jed.js')
-moment = rjs_bundle('moment', *namespace('js/moment', 'moment.js', 'locale/es.js', 'locale/fr.js'))
+moment = rjs_bundle('moment', *namespace('js/lib/moment.js', 'moment.js', 'locale/en-gb.js', 'locale/es.js',
+                    'locale/fr.js'))
 
 jqplot_js = rjs_bundle('jqplot',
                        *namespace('js/lib/jqplot',
