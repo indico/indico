@@ -4,7 +4,7 @@
     {% if item.is_section %}
         <h3>{{ item.title }}</h3>
         {% for child_item in item.children %}
-            {% if child_item.type.name == 'field' %}
+            {% if child_item.is_field %}
                 {% set has_dropdown = child_item.input_type in ['radio', 'country'] %}
                 <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
                      data-id="{{ child_item.id }}">

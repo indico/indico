@@ -83,6 +83,11 @@ class SelectField(RegistrationFormBillableField):
         item = next((x for x in data['radioitems'] if registration_data.data == x['id'] and x['is_billable']), None)
         return item['price'] if item else 0
 
+    def get_friendly_data(self, registration_data):
+        if registration_data.data:
+            items = registration_data.field_data.versioned_data['radioitems']
+            return next(x['caption'] for x in items if x['id'] == registration_data.data)
+
 
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'

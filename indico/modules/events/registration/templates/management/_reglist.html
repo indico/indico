@@ -26,7 +26,7 @@
                     {% for item in visible_cols_regform_items %}
                         <td class="i-table">
                             {%- if item.id in data %}
-                                {{- data[item.id].data }}
+                                {{- data[item.id].friendly_data }}
                             {%- endif %}</td>
                     {% endfor %}
                 </tr>

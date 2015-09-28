@@ -228,6 +228,10 @@ class RegistrationData(db.Model):
         )
     )
 
+    @property
+    def friendly_data(self):
+        return self.field_data.field.field_impl.get_friendly_data(self)
+
     # relationship backrefs:
     # - registration (Registration.data)
 

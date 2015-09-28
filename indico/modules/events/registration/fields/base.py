@@ -70,6 +70,9 @@ class RegistrationFormFieldBase(object):
     def view_data(self):
         return {}
 
+    def get_friendly_data(self, registration_data):
+        return registration_data.data
+
 
 class RegistrationFormBillableField(RegistrationFormFieldBase):
     def calculate_price(self, registration_data):
