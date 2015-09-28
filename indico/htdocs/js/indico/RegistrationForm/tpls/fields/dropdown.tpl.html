@@ -10,7 +10,7 @@
         ng-init="selectedItem = getSelectedItem(input) || {}"
         ng-change="selectedItem = getSelectedItem(input) || {}">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
-        <option ng-repeat="item in field.radioitems | filter: {isEnabled: true}"
+        <option ng-repeat="item in field.radioitems | filter:isVisible"
             value="{{ item.id }}"
             ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || paymentBlocked(item, userdata)"
             ng-selected="item.caption == getValue(fieldName)">
