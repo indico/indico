@@ -842,10 +842,10 @@ class RHModificationBaseProtected(RHProtected):
 
     def _checkProtection(self):
         if isinstance(self._target, Conference):
-            fn = partial(self._target.as_event.can_manage, session.user, role=self.ROLE, allow_key=True)
+            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE, allow_key=True)
         else:
-            fn = partial(self._target.canModify, session.avatar)
-        if not fn():
+            can_manage = self._target.canModify(session.avatar)
+        if not can_manage:
             if self._target.getModifKey() != "":
                 raise ModificationError()
             if self._getUser() is None:
