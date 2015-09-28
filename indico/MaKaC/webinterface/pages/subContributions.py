@@ -258,7 +258,7 @@ class WPSubContributionModificationClosed( WPSubContribModifMain ):
             message = _("The event is currently locked and you cannot modify it in this status. ")
             if self._subContrib.getOwner().getConference().canModify(self._rh.getAW()):
                 message += _("If you unlock the event, you will be able to modify its details again.")
-            url = urlHandlers.UHConferenceOpen.getURL(self._subContrib.getOwner().getConference())
+            url = url_for('event_management.unlock', self._subContrib.getOwner().getConference())
             unlockButtonCaption = _("Unlock event")
         return wcomponents.WClosed().getHTML({"message": message,
                                              "postURL":url,

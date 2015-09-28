@@ -4,7 +4,7 @@
         <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
            title="{% trans %}Clone event{% endtrans %}"></a>
         <button class="i-button icon-lock js-ajax-dialog-lock" data-href="{{ url_for('event_management.lock', event) }}"
-                title="{% trans %}Lock event{% endtrans %}"></button>
+                title="{% trans %}Lock event{% endtrans %}" {{ 'disabled' if event.isClosed() }}></button>
         <button class="i-button icon-remove js-ajax-dialog-delete danger light" data-qtip-style="error"
                 data-href="{{ url_for('event_management.delete', event) }}"
                 title="{% trans %}Delete event{% endtrans %}"></button>

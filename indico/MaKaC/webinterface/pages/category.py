@@ -49,6 +49,7 @@ from MaKaC.common.fossilize import fossilize
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
+from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
 
 
@@ -1181,11 +1182,11 @@ class WCategModifMain(wcomponents.WTemplated):
                 </table>""")%(Config.getInstance().getSystemIconURL("checkAll"), Config.getInstance().getSystemIconURL("uncheckAll"), "".join( temp ))
         return html
 
-    def __getConferenceItems( self, cl, modifURLGen, modifURLOpen ):
+    def __getConferenceItems(self, cl, modifURLGen):
         temp = []
         for conf in cl:
             if conf.isClosed():
-                textopen = i18nformat(""" <b>[ <a href="%s"> _("re-open event")</a> ]</b>""") %  modifURLOpen(conf)
+                textopen = i18nformat(""" <b>[ <a href="%s"> _("re-open event")</a> ]</b>""") % url_for('event_management.unlock', conf)
             else:
                 textopen = ""
             temp.append("""
@@ -1227,7 +1228,7 @@ class WCategModifMain(wcomponents.WTemplated):
         if not self._categ.getSubCategoryList():
             vars['containsEvents'] = True
             vars["removeItemsURL"] = vars["actionConferencesURL"]
-            vars["items"] = self.__getConferenceItems(index.itervalues(), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
+            vars["items"] = self.__getConferenceItems(index.itervalues(), vars["confModifyURLGen"])
         else:
             vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
@@ -1293,7 +1294,6 @@ class WPCategoryModification( WPCategModifMain ):
 "addSubCategoryURL": urlHandlers.UHCategoryCreation.getURL(self._target),
 "addConferenceURL": urlHandlers.UHConferenceCreation.getURL( self._target ), \
 "confModifyURLGen": urlHandlers.UHConferenceModification.getURL, \
-"confModifyURLOpen": urlHandlers.UHConferenceOpen.getURL, \
 "categModifyURLGen": urlHandlers.UHCategoryModification.getURL, \
 "actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(self._target),
 "actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL(self._target)}

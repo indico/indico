@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import collections
-from flask import session, request, render_template
+from flask import session, request
 import os
 import re
 
@@ -1203,7 +1203,7 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
         if self._conf.canModify(self._rh.getAW()):
             message += _("If you unlock the event, you will be able to modify its details again.")
         return wcomponents.WClosed().getHTML({"message": message,
-                                             "postURL": urlHandlers.UHConferenceOpen.getURL(self._conf),
+                                              "postURL": url_for('event_management.unlock', self._conf),
                                              "showUnlockButton": self._conf.canModify(self._rh.getAW()),
                                              "unlockButtonCaption": _("Unlock event")})
 
