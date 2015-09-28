@@ -22,7 +22,7 @@ from operator import attrgetter
 from indico.core import signals
 from indico.util.signals import values_from_signal
 from indico.util.struct.iterables import group_list
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_repr
 from indico.web.flask.util import url_for
 
 
@@ -95,16 +95,13 @@ class SideMenuSection(object):
     :param weight: the "weight" (higher means it shows up first)
     :param active: whether the section should be shown expanded by default
     :param visible: whether the section should be shown at all
-    :param event_feature: associated feature (id), section will be hidden
-                          if feature is disabled
     :param icon: icon that will be displayed next to the section title.
     """
 
-    def __init__(self, title, weight=-1, active=False, visible=True, event_feature=None, icon=None):
+    def __init__(self, title, weight=-1, active=False, visible=True, icon=None):
         self.title = title
         self._active = active
         self._visible = visible
-        self.event_feature = event_feature
         self._items = set()
         self.icon = 'icon-' + icon
         self.weight = weight
@@ -125,6 +122,10 @@ class SideMenuSection(object):
     def visible(self):
         return self._visible and any(item.visible for item in self._items)
 
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'title', active=None, visible=True)
+
 
 class SideMenuItem(object):
     """Defines a side menu item.
@@ -135,23 +136,23 @@ class SideMenuItem(object):
     :param active: whether the item will be shown as active by default
     :param disabled: if `True`, the item will be displayed as disabled
     :param visible: whether the item should be shown at all
-    :param event_feature: associated feature (id), the item will be hidden
-                          if feature is disabled
     :param section: section the item will be put in
     :param icon: icon that will be displayed next to the item
     """
 
-    def __init__(self, title, url, weight=-1, active=False, disabled=False, visible=True, event_feature=None,
-                 section=None, icon=None):
+    def __init__(self, title, url, weight=-1, active=False, disabled=False, visible=True, section=None, icon=None):
         self.title = title
         self.url = url
         self.active = active
         self.disabled = disabled
         self.visible = visible
-        self.event_feature = event_feature
         self.section = section
         self.weight = weight
         self.icon = ('icon-' + icon) if icon else None
+
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'title', 'url', active=None, disabled=False, visible=True)
 
 
 def build_menu_structure(menu_id, active_item=None, **kwargs):
@@ -187,5 +188,13 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
 
 
 def render_sidemenu(menu_id, active_item=None, old_style=False, **kwargs):
+    """Render a sidemenu with sections/items.
+
+    :param menu_id: The identifier of the menu.
+    :param active_item: The name of the currently-active menu item.
+    :param old_style: Whether the menu should be rendered using the
+                      "old" menu style.
+    :param kwargs: Additional arguments passed to the menu signals.
+    """
     items = build_menu_structure(menu_id, active_item=active_item, **kwargs)
     return render_template('side_menu.html', items=items, old_style=old_style)

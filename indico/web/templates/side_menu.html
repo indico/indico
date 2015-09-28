@@ -7,18 +7,12 @@
                 {% set classes = classes + ' active' %}
             {% endif %}
         {% endif %}
-        {% if event and item.event_feature %}
-            {% set classes = classes + ' js-event-feature-{}'.format(item.event_feature) %}
-            {% if not event.has_feature(item.event_feature) %}
-                {% set classes = classes + ' weak-hidden' %}
-            {% endif %}
-        {% endif %}
         <li class="item {{ classes }}">
-        {% if item.disabled %}
-            <span class="title">{{ item.title }}</span>
-        {% else %}
-            <a class="title {{ icon if icon }}" href="{{ item.url }}">{{ item.title }}</a>
-        {% endif %}
+            {%- if item.disabled %}
+                <span class="title">{{ item.title }}</span>
+            {%- else -%}
+                <a class="title {{ icon if icon }}" href="{{ item.url }}">{{ item.title }}</a>
+            {%- endif -%}
         </li>
     {% endif %}
 {% endmacro %}
@@ -38,8 +32,8 @@
     {% endif %}
 {% endmacro %}
 
-<div class="side-menu {{ 'old-style-menu' if event or old_style }}" >
-    {% if event or old_style %}
+<div class="side-menu {{ 'old-style-menu' if old_style }}">
+    {% if old_style %}
         <div class="corner"></div>
     {% endif %}
     <ul class="menu-items">

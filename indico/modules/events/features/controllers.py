@@ -27,6 +27,7 @@ from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.widgets import SwitchWidget
+from indico.web.menu import render_sidemenu
 from indico.web.util import jsonify_data
 
 from MaKaC.webinterface.rh.base import RH
@@ -66,6 +67,10 @@ class RHSwitchFeature(RHFeaturesBase):
 
     CSRF_ENABLED = True
 
+    def render_event_menu(self):
+        return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option, old_style=True,
+                               event=self.event_new)
+
     def _process_PUT(self):
         feature = get_feature_definition(request.view_args['feature'])
         if set_feature_enabled(self.event, feature.name, True):
@@ -73,7 +78,7 @@ class RHSwitchFeature(RHFeaturesBase):
             logger.info("Feature '{}' for event {} was enabled by {}".format(feature, self.event, session.user))
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
                            'Enabled {}'.format(feature.friendly_name), session.user)
-        return jsonify_data(enabled=True)
+        return jsonify_data(enabled=True, event_menu=self.render_event_menu())
 
     def _process_DELETE(self):
         feature = get_feature_definition(request.view_args['feature'])
@@ -82,4 +87,4 @@ class RHSwitchFeature(RHFeaturesBase):
             logger.info("Feature '{}' for event {} was disabled by {}".format(feature, self.event, session.user))
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
                            'Disabled {}'.format(feature.friendly_name), session.user)
-        return jsonify_data(enabled=False)
+        return jsonify_data(enabled=False, event_menu=self.render_event_menu())

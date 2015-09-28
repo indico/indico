@@ -56,8 +56,8 @@ def _extend_event_management_menu_layout(sender, event, **kwargs):
     if event.as_legacy.getType() == 'conference':
         yield 'layout', SideMenuItem(_('Layout'), url_for('event_layout.index', event), section='customization')
         yield 'menu', SideMenuItem(_('Menu'), url_for('event_layout.menu', event), section='customization')
-    yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), event_feature='images',
-                                 section='customization')
+    if event.has_feature('images'):
+        yield 'images', SideMenuItem(_('Images'), url_for('event_layout.images', event), section='customization')
 
 
 @signals.event.sidemenu.connect
