@@ -32,6 +32,9 @@ from indico.web.flask.util import url_for
 
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
+
+    sidemenu_option = 'map'
+
     def __init__(self, rh, **params):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -39,9 +42,6 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Map of rooms'))
-
-    def _setCurrentMenuItem(self):
-        self._roomMapOpt.setActive(True)
 
     def _getBody(self, params):
         return WRoomBookingMapOfRooms(**self._params).getHTML(params)
@@ -59,6 +59,8 @@ class WRoomBookingMapOfRooms(WTemplated):
 
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
+    sidemenu_option = 'map'
+
     def getCSSFiles(self):
         return WPNotDecorated.getCSSFiles(self) + ['css/mapofrooms.css']
 
@@ -68,19 +70,15 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
     def _getTitle(self):
         return '{} - {}'.format(WPNotDecorated._getTitle(self), _('Map of rooms'))
 
-    def _setCurrentMenuItem(self):
-        self._roomMapOpt.setActive(True)
-
     def _getBody(self, params):
         return WTemplated('RoomBookingMapOfRoomsWidget').getHTML(params)
 
 
 class WPRoomBookingSearchRooms(WPRoomBookingBase):
+    sidemenu_option = 'search_rooms'
+
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search for rooms'))
-
-    def _setCurrentMenuItem(self):
-        self._roomSearchOpt.setActive(True)
 
     def _getBody(self, params):
         params['startDT'] = datetime.combine(date.today(), Location.working_time_start)
@@ -92,11 +90,8 @@ class WPRoomBookingSearchRooms(WPRoomBookingBase):
 
 class WPRoomBookingSearchRoomsResults(WPRoomBookingBase):
     def __init__(self, rh, menu_item, **kwargs):
-        self._menu_item = menu_item
+        self.sidemenu_option = menu_item
         WPRoomBookingBase.__init__(self, rh, **kwargs)
-
-    def _setCurrentMenuItem(self):
-        getattr(self, '_{}Opt'.format(self._menu_item)).setActive(True)
 
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search results'))
@@ -158,9 +153,6 @@ class WRoomBookingRoomDetails(WTemplated):
 
 
 class WPRoomBookingRoomStats(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._roomSearchOpt.setActive(True)
-
     def _getBody(self, params):
         params['period_options'] = [
             ('pastmonth', _('Past month')),

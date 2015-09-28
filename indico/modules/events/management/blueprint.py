@@ -16,16 +16,17 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin
+from indico.modules.events.management.controllers import (RHDeleteEventAction, RHDeleteEventForm, RHLockEventAction,
+                                                          RHLockEventForm)
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-class WPReminders(WPConferenceModifBase, WPJinjaMixin):
-    template_prefix = 'events/reminders/'
-    sidemenu_option = 'reminders'
+_bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
+                      virtual_template_folder='events/management',
+                      url_prefix='/event/<confId>/manage')
 
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
+_bp.add_url_rule('/delete', 'delete', RHDeleteEventForm)
+_bp.add_url_rule('/delete', 'delete_action', RHDeleteEventAction, methods=('POST',))
 
-    def _getPageContent(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+_bp.add_url_rule('/lock', 'lock', RHLockEventForm)
+_bp.add_url_rule('/lock', 'lock_action', RHLockEventAction, methods=('POST',))

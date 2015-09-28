@@ -14,18 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
 
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin
+from blinker import Namespace
+
+_signals = Namespace()
 
 
-class WPReminders(WPConferenceModifBase, WPJinjaMixin):
-    template_prefix = 'events/reminders/'
-    sidemenu_option = 'reminders'
+items = _signals.signal('menu-items', """
+Expected to return `(menu_item_name, SideMenuItem)` tuples to be added to
+the side menu. The *sender* is an id string identifying the target menu.
+""")
 
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
-
-    def _getPageContent(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+sections = _signals.signal('menu-sections', """
+Expected to return `(menu_section_name, SideMenuSection)` tuples to be
+added to the side menu. The *sender* is an id string identifying the
+target menu.
+""")

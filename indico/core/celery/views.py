@@ -22,6 +22,4 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 class WPCelery(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'celery/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['celery'].setActive()
+    sidemenu_option = 'celery'

@@ -30,9 +30,7 @@ class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
 
 class WPAgreementManager(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/agreements/'
+    sidemenu_option = 'agreements'
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['agreements'].setActive()

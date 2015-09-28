@@ -26,6 +26,7 @@ class WPVCJinjaMixin(WPJinjaMixin):
 
 
 class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
+    sidemenu_option = 'videoconference'
 
     def getCSSFiles(self):
         return (WPConferenceModifBase.getCSSFiles(self) +
@@ -37,9 +38,6 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
                 self._asset_env['modules_vc_js'].urls() +
                 self._asset_env['selectize_js'].urls() +
                 self._asset_env['zero_clipboard_js'].urls())
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['vc'].setActive()
 
     def _getPageContent(self, params):
         return WPVCJinjaMixin._getPageContent(self, params)

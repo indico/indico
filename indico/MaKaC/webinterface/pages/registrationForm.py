@@ -37,6 +37,7 @@ from indico.web.flask.util import url_for
 
 
 class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
+    sidemenu_option = 'registration'
 
     def getJSFiles(self):
         return conferences.WPConferenceModifBase.getJSFiles(self) + \
@@ -72,9 +73,6 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
 
     def _getTabContent(self, params):
         return "nothing"
-
-    def _setActiveSideMenuItem(self):
-        self._regFormMenuItem.setActive()
 
     def _setActiveTab(self):
         pass

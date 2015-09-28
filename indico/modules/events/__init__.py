@@ -27,10 +27,12 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.modules.events.util import notify_pending
-from indico.web.flask.util import url_for
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
+from indico.web.flask.util import url_for
 
+
+__all__ = ('Event', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
 
 #: URL prefixes for the various event objects (public area)
 #: All prefixes are expected to be used inside the '/event/<confId>'

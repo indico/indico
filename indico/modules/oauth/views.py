@@ -26,8 +26,7 @@ class WPOAuthJinjaMixin(WPJinjaMixin):
 
 
 class WPOAuthAdmin(WPOAuthJinjaMixin, WPAdminsBase):
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['applications'].setActive()
+    sidemenu_option = 'applications'
 
 
 class WPOAuthUserProfile(WPOAuthJinjaMixin, WPUser):

@@ -47,16 +47,12 @@ class EventObjectAttachmentsMixin(AttachmentsMixin):
 
 class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
     base_wp = WPCategoryModifBase
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['attachments'].setActive()
+    sidemenu_option = 'attachments'
 
 
 class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
     base_wp = WPConferenceModifBase
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['attachments'].setActive()
+    sidemenu_option = 'attachments'
 
 
 class WPSessionAttachments(EventObjectAttachmentsMixin, WPSessionModifBase):

@@ -278,11 +278,9 @@ class WPContributionModifBase(WPConferenceModifBase):
     def _setupTabCtrl(self):
         pass
 
-    def _setActiveSideMenuItem(self):
-        if self._target.isScheduled():
-            self._timetableMenuItem.setActive(True)
-        else:
-            self._contribListMenuItem.setActive(True)
+    @property
+    def sidemenu_option(self):
+        return 'timetable' if self._target.isScheduled() else 'contributions'
 
     def _getPageContent(self, params):
         self._createTabCtrl()

@@ -33,10 +33,11 @@ from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstra
 from MaKaC.common.TemplateExec import render
 
 
-class WPTrackModifBase( WPConferenceModifBase ):
+class WPTrackModifBase(WPConferenceModifBase):
+    sidemenu_option = 'program'
 
-    def __init__( self, rh, track, subTrack=None):
-        WPConferenceModifBase.__init__( self, rh, track.getConference() )
+    def __init__(self, rh, track, subTrack=None):
+        WPConferenceModifBase.__init__(self, rh, track.getConference())
         self._track = track
         self._subTrack = subTrack
 
@@ -70,9 +71,6 @@ class WPTrackModifBase( WPConferenceModifBase ):
 
     def _setActiveTab( self ):
         pass
-
-    def _setActiveSideMenuItem( self ):
-        self._programMenuItem.setActive()
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
@@ -652,12 +650,13 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
         return wc.getHTML(pars)
 
 
-class WPTrackAbstractModifBase( WPConferenceModifBase ):
+class WPTrackAbstractModifBase(WPConferenceModifBase):
+    sidemenu_option = 'program'
 
-    def __init__( self, rh, track, abstract ):
+    def __init__(self, rh, track, abstract):
         self._abstract = abstract
         self._track = track
-        WPConferenceModifBase.__init__( self, rh, self._track.getConference() )
+        WPConferenceModifBase.__init__(self, rh, self._track.getConference())
 
     def _getNavigationDrawer(self):
         pars = {"target": self._abstract, "isModif": True, "track": self._track}
@@ -685,9 +684,6 @@ class WPTrackAbstractModifBase( WPConferenceModifBase ):
 
     def _getTabContent( self, params ):
         return _("nothing")
-
-    def _setActiveSideMenuItem(self):
-        self._programMenuItem.setActive()
 
 
 class WTrackAbstractModification( wcomponents.WTemplated ):

@@ -54,11 +54,6 @@ Expected to return `HeaderMenuEntry` objects which are then added to the
 Indico head menu.
 """)
 
-admin_sidemenu = _signals.signal('admin-sidemenu', """
-Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
-the admin side menu.
-""")
-
 get_storage_backends = _signals.signal('get-storage-backends', """
 Expected to return one or more Storage subclasses.
 """)

@@ -1,0 +1,42 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}{% trans %}You are about to delete the whole event!{% endtrans %}{% endblock %}
+
+{% block content %}
+    <form method="POST" class="i-form vertical js-form-confirm-delete">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <h2>{{ event.title }}</h2>
+        <div class="form-group danger-message-box large-icon">
+            <div class="message-text">
+                {% trans %}
+                    Please note that if you delete the event you will lose all the information contained
+                    in it. <br/><strong>This operation is irreversible!</strong>
+                {% endtrans %}
+            </div>
+            <div class="message-box-footer confirm-delete-block">
+                <input id="js-confirm-delete" type="checkbox"></input>
+                <label for="js-confirm-delete">
+                    {% trans %}
+                        I understand what this means. Please go ahead.
+                    {% endtrans %}
+                </label>
+            </div>
+        </div>
+        <div class="form-group form-group-footer">
+            <div class="form-field form-block">
+                <button id="js-button-delete" class="i-button big danger right" disabled>
+                    {% trans %}Delete event{% endtrans %}
+                </button>
+                <button id="js-button-close" class="i-button big right" data-button-back>
+                    {% trans %}I've changed my mind!{% endtrans %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        $('#js-confirm-delete').on('change', function() {
+            $('#js-button-delete').prop('disabled', !$(this).is(':checked'));
+        });
+    </script>
+{% endblock %}

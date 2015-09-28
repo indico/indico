@@ -1,3 +1,5 @@
+{% extends 'layout/base.html' %}
+
 {% macro render_reminders(reminders) %}
     <ul class="group-list with-buttons no-content-before">
         {% for reminder in reminders %}
@@ -32,30 +34,34 @@
 {% set pending_reminders = reminders|rejectattr('is_sent')|list %}
 {% set sent_reminders = reminders|selectattr('is_sent')|list %}
 
-<div class="i-box-group vert fixed-width reminders">
-    <div class="i-box titled no-padding">
-        <div class="i-box-header">
-            <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
-            <a class="i-button icon-plus right" href="{{ url_for('.add', event) }}">
-                {%- trans %}Add Reminder{% endtrans -%}
-            </a>
-        </div>
-        <div class="i-box-content">
-            {% if pending_reminders %}
-                {{ render_reminders(pending_reminders) }}
-            {% else %}
-                <span class="empty">{% trans %}There are no pending reminders.{% endtrans %}</span>
-            {% endif %}
-        </div>
-    </div>
-    {% if sent_reminders %}
+{% block title %}{% trans %}Reminders{% endtrans %}{% endblock %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width reminders">
         <div class="i-box titled no-padding">
             <div class="i-box-header">
-                <div class="i-box-title">{%- trans %}Sent Reminders{% endtrans -%}</div>
+                <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
+                <a class="i-button icon-plus right" href="{{ url_for('.add', event) }}">
+                    {%- trans %}Add Reminder{% endtrans -%}
+                </a>
             </div>
             <div class="i-box-content">
-                {{ render_reminders(sent_reminders) }}
+                {% if pending_reminders %}
+                    {{ render_reminders(pending_reminders) }}
+                {% else %}
+                    <span class="empty">{% trans %}There are no pending reminders.{% endtrans %}</span>
+                {% endif %}
             </div>
         </div>
-    {% endif %}
-</div>
+        {% if sent_reminders %}
+            <div class="i-box titled no-padding">
+                <div class="i-box-header">
+                    <div class="i-box-title">{%- trans %}Sent Reminders{% endtrans -%}</div>
+                </div>
+                <div class="i-box-content">
+                    {{ render_reminders(sent_reminders) }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

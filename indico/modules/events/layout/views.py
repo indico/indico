@@ -22,25 +22,21 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConfer
 
 class WPLayoutEdit(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
+    sidemenu_option = 'layout'
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items_advanced['layout'].setActive()
-
 
 class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
+    sidemenu_option = 'menu'
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items_advanced['menu'].setActive()
 
 
 class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
@@ -53,15 +49,14 @@ class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
-    def _get_active_menu_entry(self):
+    @property
+    def sidemenu_option(self):
         return self.page.menu_entry.id
 
 
 class WPImages(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items_advanced['images'].setActive()
+    sidemenu_option = 'images'
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()

@@ -37,9 +37,6 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
         'booking_occurrence_reject': 'rooms.roomBooking-rejectBookingOccurrence'
     }
 
-    def _setCurrentMenuItem(self):
-        self._bookRoomNewOpt.setActive(True)
-
     def _getBody(self, params):
         reservation = params['reservation']
         params['endpoints'] = self.endpoints
@@ -52,8 +49,7 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
 
 
 class WPRoomBookingCalendar(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._bookingListCalendarOpt.setActive(True)
+    sidemenu_option = 'calendar'
 
     def _getBody(self, params):
         params['calendar'] = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
@@ -62,8 +58,7 @@ class WPRoomBookingCalendar(WPRoomBookingBase):
 
 
 class WPRoomBookingSearchBookings(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._bookingListSearchOpt.setActive(True)
+    sidemenu_option = 'search_bookings'
 
     def _getBody(self, params):
         return WTemplated('RoomBookingSearchBookings').getHTML(params)
@@ -91,11 +86,8 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
     }
 
     def __init__(self, rh, menu_item, **kwargs):
-        self._menu_item = menu_item
+        self.sidemenu_option = menu_item
         WPRoomBookingBase.__init__(self, rh, **kwargs)
-
-    def _setCurrentMenuItem(self):
-        getattr(self, '_{}Opt'.format(self._menu_item)).setActive(True)
 
     def _get_criteria_summary(self, params):
         form = params['form']
@@ -119,8 +111,7 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
 
 
 class WPRoomBookingNewBookingBase(WPRoomBookingBase):
-    def _setCurrentMenuItem(self):
-        self._bookRoomNewOpt.setActive(True)
+    sidemenu_option = 'book_room'
 
 
 class WPRoomBookingNewBookingSelectRoom(WPRoomBookingNewBookingBase):

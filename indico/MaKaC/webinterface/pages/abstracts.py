@@ -507,6 +507,7 @@ class WPAbstractRecovery( WPAbstractDisplayBase ):
 
 
 class WPAbstractManagementBase( WPConferenceModifBase ):
+    sidemenu_option = 'abstracts'
 
     def __init__( self, rh, abstract ):
         self._abstract = self._target = abstract
@@ -548,9 +549,6 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
         banner = wcomponents.WAbstractBannerModif(self._abstract).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + html
-
-    def _setActiveSideMenuItem(self):
-        self._abstractMenuItem.setActive(True)
 
     def _getTabContent( self, params ):
         return "nothing"

@@ -25,8 +25,7 @@ from indico.web.flask.util import url_for
 
 
 class WPRoomsBase(WPAdminsBase):
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['rb'].setActive()
+    sidemenu_option = 'rb'
 
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()

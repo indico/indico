@@ -22,6 +22,7 @@ from indico.core import signals
 from indico.core.celery.core import IndicoCelery
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 __all__ = ('celery',)
 
@@ -41,7 +42,6 @@ def _import_modules(*args, **kwargs):
     signals.import_tasks.send()
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'), section='general')
+    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'), 20, icon='time')

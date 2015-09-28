@@ -22,6 +22,4 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 class WPGroupsAdmin(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'groups/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['groups'].setActive()
+    sidemenu_option = 'groups'

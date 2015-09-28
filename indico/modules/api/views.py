@@ -23,9 +23,7 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 class WPAPIAdmin(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'api/'
-
-    def _setActiveSideMenuItem(self):
-        self.extra_menu_items['api'].setActive()
+    sidemenu_option = 'api'
 
 
 class WPAPIUserProfile(WPUser):

@@ -4,27 +4,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
 <div class="banner">
 
-    <div style="float: right; height: 20px; line-height: 20px;padding:0px;" class="eventModifButtonBar">
-        <div style="border-bottom:1px solid #AAA;"><span class="eventActionsToolBarLabel"><strong>Event</strong> actions</span></div>
-        <div class="eventActionsToolBarButtons">
-          <a style="vertical-align: middle;" href="${ urlHandlers.UHConfClone.getURL(conf) }">
-              ${ _("Clone") }<div class="leftCorner"></div>
-          </a>
-    % if not conf.isClosed():
-          <a style="vertical-align: middle;" href="${ urlHandlers.UHConferenceClose.getURL(conf) }">
-              ${ _("Lock") }<div class="leftCorner"></div>
-          </a>
-    % else:
-          <a style="vertical-align: middle;" href="${ urlHandlers.UHConferenceOpen.getURL(conf) }">
-              ${ _("Unlock") }<div class="leftCorner"></div>
-          </a>
-    % endif
-          <div class="separator"></div>
-          <a class="eventModifSpecial" style="vertical-align: middle;" href="${ urlHandlers.UHConferenceDisplay.getURL( conf ) }">
-              ${ _("Switch to event page") }<div class="leftCorner"></div>
-          </a>
-        </div>
-    </div>
+    ${ render_template('events/management/action_menu.html', event=conf) }
 
     <a href="${ UHConferenceModification.getURL(conf) }">
         <span class="bannerTitle bannerTitle_0">

@@ -1,0 +1,37 @@
+<div class="toolbar right action-menu-toolbar">
+    <div class="group">
+        <span class="icon-wrench i-button label">{% trans %}Event actions{% endtrans %}</span>
+        <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
+           title="{% trans %}Clone event{% endtrans %}"></a>
+        <button class="i-button icon-lock js-ajax-dialog-lock" data-href="{{ url_for('event_management.lock', event) }}"
+                title="{% trans %}Lock event{% endtrans %}"></button>
+        <button class="i-button icon-remove js-ajax-dialog-delete danger light" data-qtip-style="error"
+                data-href="{{ url_for('event_management.delete', event) }}"
+                title="{% trans %}Delete event{% endtrans %}"></button>
+    </div>
+    <div class="group">
+        <a class="icon-switchon highlight i-button"
+           title="{% trans %}See the display page of the event{% endtrans %}"
+           href="{{ url_for('event.conferenceDisplay', event) }}">{% trans %}Switch to display view{% endtrans %}</a>
+    </div>
+</div>
+
+<script>
+    $('.js-ajax-dialog-delete').ajaxDialog({
+        onClose: function(data) {
+            if (data && data.url) {
+                location = data.url;
+            }
+            return true;
+        }
+    });
+
+    $('.js-ajax-dialog-lock').ajaxDialog({
+        onClose: function(data) {
+            if (data && data.url) {
+                location = data.url;
+            }
+            return true;
+        }
+    });
+</script>

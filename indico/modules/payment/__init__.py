@@ -23,6 +23,7 @@ from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSet
                                             PaymentEventSettingsFormBase)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
@@ -52,7 +53,6 @@ event_settings = EventSettingsProxy('payment', {
 })
 
 
-@signals.admin_sidemenu.connect
+@signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'payment', SideMenuItem(_("Payment"), url_for('payment.admin_settings'), section='general')
+    return 'payment', SideMenuItem(_("Payment"), url_for('payment.admin_settings'), section='customization')
