@@ -250,6 +250,10 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
             return $scope.isBillable(item) && userdata.paid;
         }
     };
+
+    $scope.isVisible = function(field) {
+        return field.isEnabled && !field.remove;
+    };
 });
 
 ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
