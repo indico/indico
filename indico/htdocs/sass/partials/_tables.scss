@@ -42,7 +42,7 @@ tr.i-table {
     }
 }
 
-td.i-table {
+td.i-table, th.i-table {
     @include box-sizing(border-box);
     border-left: 2px solid transparent;
     overflow: hidden;
