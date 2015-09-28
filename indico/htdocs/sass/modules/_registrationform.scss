@@ -1219,5 +1219,35 @@ textarea.regFormDescriptionInputMgmt {
 .registrations {
     thead {
         font-weight: bold;
+
+        th {
+            border-left: 0;
+
+            &:not(.sorter-false){
+                cursor: pointer;
+            }
+
+            &:before {
+                @include transition(transform 0.3s ease-out);
+                -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                display: inline-block;
+            }
+
+            &.header-sort-asc {
+                @include icon-before('icon-arrow-down');
+            }
+
+            &.header-sort-desc {
+                @include icon-before('icon-arrow-down');
+
+                &:before {
+                    @include rotate(-180deg);
+                }
+            }
+
+            > div {
+                display: inline-block;
+            }
+        }
     }
 }
