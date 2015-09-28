@@ -17,19 +17,10 @@
 </div>
 
 <script>
-    $('.js-ajax-dialog-delete').ajaxDialog({
+    $('.js-ajax-dialog-delete, .js-ajax-dialog-lock').ajaxDialog({
         onClose: function(data) {
             if (data && data.url) {
-                location = data.url;
-            }
-            return true;
-        }
-    });
-
-    $('.js-ajax-dialog-lock').ajaxDialog({
-        onClose: function(data) {
-            if (data && data.url) {
-                location = data.url;
+                location.href = data.url;
             }
             return true;
         }
