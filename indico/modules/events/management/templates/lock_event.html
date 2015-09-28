@@ -8,10 +8,10 @@
         <h2>{{ event.title }}</h2>
         <div class="form-group warning-message-box large-icon">
             <div class="message-text">
-                {% trans %}
-                    Please note that if you lock this event, you will not be able to change it anymore.
-                    <br/>Only the event owner or an administrator will be able to unlock it.
-                {% endtrans %}
+                {% trans -%}
+                    Please note that if you lock this event, you will not be able to change it anymore.<br>
+                    Only the event owner or an administrator will be able to unlock it.
+                {%- endtrans %}
             </div>
         </div>
         <div class="form-group form-group-footer">

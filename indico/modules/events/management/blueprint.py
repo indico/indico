@@ -16,8 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.management.controllers import (RHDeleteEventAction, RHDeleteEventForm, RHLockEventAction,
-                                                          RHLockEventForm)
+from indico.modules.events.management.controllers import RHDeleteEvent, RHLockEvent
 from indico.web.flask.wrappers import IndicoBlueprint
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceOpen
 
@@ -26,9 +25,6 @@ _bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
                       virtual_template_folder='events/management',
                       url_prefix='/event/<confId>/manage')
 
-_bp.add_url_rule('/delete', 'delete', RHDeleteEventForm)
-_bp.add_url_rule('/delete', 'delete_action', RHDeleteEventAction, methods=('POST',))
-
-_bp.add_url_rule('/lock', 'lock', RHLockEventForm)
-_bp.add_url_rule('/lock', 'lock_action', RHLockEventAction, methods=('POST',))
+_bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
+_bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', RHConferenceOpen, methods=('GET', 'POST'))

@@ -22,24 +22,23 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.util import jsonify_template
 
+from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHDeleteEventForm(RHConferenceModifBase):
-    """Delete an event."""
-
-    def _process(self):
-        return jsonify_template('events/management/delete_event.html', event=self._conf)
-
-
-class RHDeleteEventAction(RHConferenceModifBase):
+class RHDeleteEvent(RHConferenceModifBase):
     """Delete an event."""
 
     CSRF_ENABLED = True
 
     def _process(self):
-        category = self._conf.getOwner()
+        return RH._process(self)
 
+    def _process_GET(self):
+        return jsonify_template('events/management/delete_event.html', event=self._conf)
+
+    def _process_POST(self):
+        category = self._conf.getOwner()
         self._conf.delete(session.user)
         flash(_('Event "{}" successfully deleted.').format(self._conf.title), 'success')
 
@@ -51,20 +50,19 @@ class RHDeleteEventAction(RHConferenceModifBase):
         return jsonify_data(url=redirect_url, flash=False)
 
 
-class RHLockEventForm(RHConferenceModifBase):
-    """Lock an event."""
-
-    def _process(self):
-        return jsonify_template('events/management/lock_event.html', event=self._conf)
-
-
-class RHLockEventAction(RHConferenceModifBase):
+class RHLockEvent(RHConferenceModifBase):
     """Lock an event."""
 
     CSRF_ENABLED = True
 
     def _process(self):
+        return RH._process(self)
+
+    def _process_GET(self):
+        return jsonify_template('events/management/lock_event.html', event=self._conf)
+
+    def _process_POST(self):
         self._conf.setClosed(True)
-        flash(_('The event is now locked.').format(self._conf.title), 'success')
+        flash(_('The event is now locked.'), 'success')
 
         return jsonify_data(url=url_for('event_mgmt.conferenceModification', self._conf), flash=False)

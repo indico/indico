@@ -9,16 +9,14 @@
         <div class="form-group danger-message-box large-icon">
             <div class="message-text">
                 {% trans %}
-                    Please note that if you delete the event you will lose all the information contained
-                    in it. <br/><strong>This operation is irreversible!</strong>
+                    Please note that if you delete the event you will lose all the information contained in it.<br>
+                    <strong>This operation is irreversible!</strong>
                 {% endtrans %}
             </div>
             <div class="message-box-footer confirm-delete-block">
-                <input id="js-confirm-delete" type="checkbox"></input>
+                <input id="js-confirm-delete" type="checkbox">
                 <label for="js-confirm-delete">
-                    {% trans %}
-                        I understand what this means. Please go ahead.
-                    {% endtrans %}
+                    {% trans %}I understand what this means. Please go ahead.{% endtrans %}
                 </label>
             </div>
         </div>
@@ -36,7 +34,7 @@
 
     <script>
         $('#js-confirm-delete').on('change', function() {
-            $('#js-button-delete').prop('disabled', !$(this).is(':checked'));
+            $('#js-button-delete').prop('disabled', !this.checked);
         });
     </script>
 {% endblock %}
