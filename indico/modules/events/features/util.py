@@ -21,6 +21,7 @@ from werkzeug.exceptions import NotFound
 from indico.core import signals
 from indico.core.db import db, DBMgr
 from indico.modules.events.features import event_settings as features_event_settings
+from indico.util.event import unify_event_args
 from indico.util.signals import named_objects_from_signal
 
 
@@ -70,6 +71,7 @@ def set_feature_enabled(event, name, state):
     return True
 
 
+@unify_event_args(legacy=True)
 def is_feature_enabled(event, name):
     """Checks if a feature is enabled for an event.
 

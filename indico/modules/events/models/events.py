@@ -192,6 +192,12 @@ class Event(ProtectionManagersMixin, db.Model):
         return (super(Event, self).can_manage(user, role, *args, **kwargs) or
                 (allow_key and self.as_legacy.canKeyModify()))
 
+    @memoize_request
+    def has_feature(self, feature):
+        """Checks if a feature is enabled for the event"""
+        from indico.modules.events.features.util import is_feature_enabled
+        return is_feature_enabled(self, feature)
+
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
         """Creates a new log entry for the event
 
