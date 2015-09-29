@@ -17,7 +17,7 @@
 
 {% macro _side_menu_section(section) %}
     {% if section.items %}
-        <li class="section {{ 'collapsed' if not section.active }}">
+        <li class="section {{ 'collapsed' if not section.active }}" data-section-name="{{ section.name }}">
             <div class="title-wrapper">
                 <span class="title {{ section.icon }}">{{ section.title }}</span>
             </div>
@@ -30,7 +30,7 @@
     {% endif %}
 {% endmacro %}
 
-<div class="side-menu {{ 'old-style-menu' if old_style }}">
+<div class="side-menu {{ 'old-style-menu' if old_style }}" id="side-menu-{{ menu_id }}">
     {% if old_style %}
         <div class="corner"></div>
     {% endif %}
@@ -46,9 +46,32 @@
 </div>
 
 <script>
-    $('.section .title-wrapper').on('click', function() {
-        $(this)
-        .next('ul').slideToggle(300)
-        .parent().toggleClass('collapsed');
-    });
+    (function() {
+        'use strict';
+
+        var menu = $('#side-menu-{{ menu_id }}');
+        var userId = $('body').data('userId');
+
+        function getSectionKey(section) {
+            return 'side-menu-{{ menu_id }}-{0}-{1}'.format(userId, section.data('sectionName'));
+        }
+
+        menu.find('.section .title-wrapper').on('click', function() {
+            var $this = $(this);
+            var section = $this.closest('.section');
+            $this.next('ul').slideToggle(300);
+            section.toggleClass('collapsed');
+            $.jStorage.set(getSectionKey(section), section.hasClass('collapsed'));
+        });
+
+        menu.find('.section').each(function() {
+            var section = $(this);
+            var collapsed = $.jStorage.get(getSectionKey(section));
+            // if the active menu item is in the section, we don't touch it
+            if (collapsed !== null && !section.find('.active').length) {
+                section.toggleClass('collapsed', collapsed);
+                section.children('ul').toggle(!collapsed);
+            }
+        });
+    })();
 </script>

@@ -200,4 +200,4 @@ def render_sidemenu(menu_id, active_item=None, old_style=False, **kwargs):
     :param kwargs: Additional arguments passed to the menu signals.
     """
     items = build_menu_structure(menu_id, active_item=active_item, **kwargs)
-    return render_template('side_menu.html', items=items, old_style=old_style)
+    return render_template('side_menu.html', items=items, old_style=old_style, menu_id=menu_id)
