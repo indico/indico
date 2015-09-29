@@ -45,8 +45,8 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     if not event.can_manage(session.user, allow_key=True):
         return
-    return 'agreements', SideMenuItem(_('Agreements'), url_for('agreements.event_agreements', event),
-                                      section='services')
+    return SideMenuItem('agreements', _('Agreements'), url_for('agreements.event_agreements', event),
+                        section='services')
 
 
 @signals.users.merged.connect

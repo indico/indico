@@ -43,7 +43,7 @@ user_settings = UserSettingsProxy('users', {
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'users', SideMenuItem(_("Users"), url_for('users.users_admin'), section='user_management')
+    return SideMenuItem('users', _("Users"), url_for('users.users_admin'), section='user_management')
 
 
 @signals.category.deleted.connect

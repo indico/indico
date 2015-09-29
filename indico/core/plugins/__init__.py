@@ -373,7 +373,7 @@ class WPJinjaMixinPlugin(WPJinjaMixin):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'plugins', SideMenuItem(_("Plugins"), url_for('plugins.index'), 80, icon='puzzle')
+    return SideMenuItem(u'plugins', _(u"Plugins"), url_for(u'plugins.index'), 80, icon=u'puzzle')
 
 
 plugin_engine = IndicoPluginEngine()

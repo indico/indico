@@ -44,4 +44,4 @@ def _import_modules(*args, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'celery', SideMenuItem(_("Tasks"), url_for('celery.index'), 20, icon='time')
+    return SideMenuItem('celery', _("Tasks"), url_for('celery.index'), 20, icon='time')

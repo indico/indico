@@ -51,7 +51,7 @@ def _import_tasks(sender, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'rb', SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'), 70, icon='location')
+    return SideMenuItem('rb', _("Rooms"), url_for('rooms_admin.settings'), 70, icon='location')
 
 
 @signals.users.merged.connect
@@ -77,9 +77,10 @@ def _event_deleted(event, user, **kwargs):
 def _sidemenu_sections(sender, **kwargs):
     user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
 
-    yield 'search', SideMenuSection(_("Search"), 40, icon='search', active=True)
-    yield 'my_rooms', SideMenuSection(_("My Rooms"), 30, icon='user', visible=user_has_rooms)
-    yield 'blocking', SideMenuSection(_("Room Blocking"), 20, icon='lock')
+    yield SideMenuSection('search', _("Search"), 40, icon='search', active=True)
+    if user_has_rooms:
+        yield SideMenuSection('my_rooms', _("My Rooms"), 30, icon='user')
+    yield SideMenuSection('blocking', _("Room Blocking"), 20, icon='lock')
 
 
 @signals.menu.items.connect_via('rb-sidemenu')
@@ -87,29 +88,28 @@ def _sidemenu_items(sender, **kwargs):
     user_is_admin = session.user is not None and rb_is_admin(session.user)
     map_available = Location.default_location is not None and Location.default_location.is_map_available
 
-    yield 'book_room', SideMenuItem(_('Book a Room'), url_for('rooms.book'), 80, icon='checkmark')
-    yield 'map', SideMenuItem(_('Map of Rooms'), url_for('rooms.roomBooking-mapOfRooms'),
-                              70, icon='location', visible=map_available)
-    yield 'calendar', SideMenuItem(_('Calendar'), url_for('rooms.calendar'), 60, icon='calendar')
-    yield 'my_bookings', SideMenuItem(_('My Bookings'), url_for('rooms.my_bookings'), 50, icon='time')
-    yield 'search_bookings', SideMenuItem(_('Search bookings'), url_for('rooms.roomBooking-search4Bookings'),
-                                          section='search')
-    yield 'search_rooms', SideMenuItem(_('Search rooms'), url_for('rooms.search_rooms'),
-                                       section='search')
-    yield 'bookings_in_my_rooms', SideMenuItem(_('Bookings in my rooms'), url_for('rooms.bookings_my_rooms'),
-                                               section='my_rooms')
-    yield 'prebookings_in_my_rooms', SideMenuItem(_('Pre-bookings in my rooms'),
-                                                  url_for('rooms.pending_bookings_my_rooms'),
-                                                  section='my_rooms')
-    yield 'room_list', SideMenuItem(_('Room list'), url_for('rooms.search_my_rooms'),
-                                    section='my_rooms')
-    yield 'my_blockings', SideMenuItem(_('My Blockings'),
-                                       url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
-                                       section='blocking')
-    yield 'blockings_my_rooms', SideMenuItem(_('Blockings for my rooms'),
-                                             url_for('rooms.blocking_my_rooms'),
-                                             section='blocking')
-    yield 'blocking_create', SideMenuItem(_('Block rooms'), url_for('rooms.create_blocking'),
-                                          section='blocking')
-    yield 'admin', SideMenuItem(_('Administration'), url_for('rooms_admin.roomBooking-admin'),
-                                10, icon='user-chairperson', visible=user_is_admin)
+    yield SideMenuItem('book_room', _('Book a Room'), url_for('rooms.book'), 80, icon='checkmark')
+    if map_available:
+        yield SideMenuItem('map', _('Map of Rooms'), url_for('rooms.roomBooking-mapOfRooms'), 70, icon='location')
+    yield SideMenuItem('calendar', _('Calendar'), url_for('rooms.calendar'), 60, icon='calendar')
+    yield SideMenuItem('my_bookings', _('My Bookings'), url_for('rooms.my_bookings'), 50, icon='time')
+    yield SideMenuItem('search_bookings', _('Search bookings'), url_for('rooms.roomBooking-search4Bookings'),
+                       section='search')
+    yield SideMenuItem('search_rooms', _('Search rooms'), url_for('rooms.search_rooms'),
+                       section='search')
+    yield SideMenuItem('bookings_in_my_rooms', _('Bookings in my rooms'), url_for('rooms.bookings_my_rooms'),
+                       section='my_rooms')
+    yield SideMenuItem('prebookings_in_my_rooms', _('Pre-bookings in my rooms'),
+                       url_for('rooms.pending_bookings_my_rooms'),
+                       section='my_rooms')
+    yield SideMenuItem('room_list', _('Room list'), url_for('rooms.search_my_rooms'),
+                       section='my_rooms')
+    yield SideMenuItem('my_blockings', _('My Blockings'),
+                       url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
+                       section='blocking')
+    yield SideMenuItem('blockings_my_rooms', _('Blockings for my rooms'), url_for('rooms.blocking_my_rooms'),
+                       section='blocking')
+    yield SideMenuItem('blocking_create', _('Block rooms'), url_for('rooms.create_blocking'), section='blocking')
+    if user_is_admin:
+        yield SideMenuItem('admin', _('Administration'), url_for('rooms_admin.roomBooking-admin'), 10,
+                           icon='user-chairperson')

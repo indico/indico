@@ -32,7 +32,7 @@ __all__ = ('EventLogEntry', 'EventLogKind', 'EventLogRealm')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, allow_key=True):
         return
-    return 'logs', SideMenuItem('Logs', url_for('event_logs.index', event), section='reports')
+    return SideMenuItem('logs', 'Logs', url_for('event_logs.index', event), section='reports')
 
 
 @signals.users.merged.connect

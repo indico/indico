@@ -70,11 +70,11 @@ def _app_created(app, **kwargs):
 
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _sidemenu_items(sender, category, **kwargs):
-    yield 'view', SideMenuItem(_('View category'), url_for('category.categoryDisplay', category),
-                               100, icon='eye')
-    yield 'general', SideMenuItem(_('General Settings'), url_for('category_mgmt.categoryModification', category),
-                                  90, icon='settings')
-    yield 'protection', SideMenuItem(_('Protection'), url_for('category_mgmt.categoryAC', category),
-                                     70, icon='shield')
-    yield 'tools', SideMenuItem(_('Tools'), url_for('category_mgmt.categoryTools', category),
-                                60, icon='wrench')
+    yield SideMenuItem('view', _('View category'), url_for('category.categoryDisplay', category),
+                       100, icon='eye')
+    yield SideMenuItem('general', _('General Settings'), url_for('category_mgmt.categoryModification', category),
+                       90, icon='settings')
+    yield SideMenuItem('protection', _('Protection'), url_for('category_mgmt.categoryAC', category),
+                       70, icon='shield')
+    yield SideMenuItem('tools', _('Tools'), url_for('category_mgmt.categoryTools', category),
+                       60, icon='wrench')

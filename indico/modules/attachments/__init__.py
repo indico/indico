@@ -49,8 +49,8 @@ def _merge_users(target, source, **kwargs):
 def _extend_event_management_menu(sender, event, **kwargs):
     if not can_manage_attachments(event.as_legacy, session.user):
         return
-    return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', event),
-                                       80, section='organization')
+    return SideMenuItem('attachments', _('Materials'), url_for('attachments.management', event), 80,
+                        section='organization')
 
 
 @signals.event_management.management_url.connect
@@ -61,7 +61,7 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _extend_category_management_menu(sender, category, **kwargs):
-    return 'attachments', SideMenuItem(_('Materials'), url_for('attachments.management', category), icon='upload')
+    return SideMenuItem('attachments', _('Materials'), url_for('attachments.management', category), icon='upload')
 
 
 @signals.event_management.clone.connect

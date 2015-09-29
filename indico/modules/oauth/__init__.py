@@ -43,7 +43,7 @@ logger = Logger.get('oauth')
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'applications', SideMenuItem('Applications', url_for('oauth.apps'), section='security')
+    return SideMenuItem('applications', 'Applications', url_for('oauth.apps'), section='security')
 
 
 @signals.users.profile_sidemenu.connect

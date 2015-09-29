@@ -68,7 +68,7 @@ def _merge_users(target, source, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'api', SideMenuItem(_("API"), url_for('api.admin_settings'), section='integration')
+    return SideMenuItem('api', _("API"), url_for('api.admin_settings'), section='integration')
 
 
 @signals.users.profile_sidemenu.connect

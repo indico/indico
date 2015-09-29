@@ -59,8 +59,8 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     if not event.can_manage(session.user, allow_key=True):
         return
-    return 'videoconference', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
-                                           section='services')
+    return SideMenuItem('videoconference', _('Videoconference'), url_for('vc.manage_vc_rooms', event),
+                        section='services')
 
 
 @signals.event.sidemenu.connect

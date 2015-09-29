@@ -20,7 +20,7 @@ from flask import render_template, request
 from operator import attrgetter
 
 from indico.core import signals
-from indico.util.signals import values_from_signal
+from indico.util.signals import named_objects_from_signal
 from indico.util.struct.iterables import group_list
 from indico.util.string import return_ascii, format_repr
 from indico.web.flask.util import url_for
@@ -91,6 +91,7 @@ class MenuItem(object):
 class SideMenuSection(object):
     """Defines a side menu section (item set).
 
+    :param name: the unique name of the section
     :param title: the title of the section (displayed)
     :param weight: the "weight" (higher means it shows up first)
     :param active: whether the section should be shown expanded by default
@@ -98,7 +99,8 @@ class SideMenuSection(object):
     :param icon: icon that will be displayed next to the section title.
     """
 
-    def __init__(self, title, weight=-1, active=False, visible=True, icon=None):
+    def __init__(self, name, title, weight=-1, active=False, visible=True, icon=None):
+        self.name = name
         self.title = title
         self._active = active
         self._visible = visible
@@ -124,12 +126,13 @@ class SideMenuSection(object):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'title', active=None, visible=True)
+        return format_repr(self, 'name', 'title', active=None, visible=True)
 
 
 class SideMenuItem(object):
     """Defines a side menu item.
 
+    :param name: the unique name (within the menu) of the item
     :param title: the title of the menu item (displayed)
     :param url: the URL that the link will point to
     :param weight: the "weight" (higher means it shows up first)
@@ -140,7 +143,9 @@ class SideMenuItem(object):
     :param icon: icon that will be displayed next to the item
     """
 
-    def __init__(self, title, url, weight=-1, active=False, disabled=False, visible=True, section=None, icon=None):
+    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, visible=True, section=None,
+                 icon=None):
+        self.name = name
         self.title = title
         self.url = url
         self.active = active
@@ -172,11 +177,11 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
     top_level = set()
     sections = {}
 
-    for id_, section in values_from_signal(signals.menu.sections.send(menu_id, **kwargs)):
+    for id_, section in named_objects_from_signal(signals.menu.sections.send(menu_id, **kwargs)).iteritems():
         sections[id_] = section
         top_level.add(section)
 
-    for id_, item in values_from_signal(signals.menu.items.send(menu_id, **kwargs)):
+    for id_, item in named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs)).iteritems():
         if id_ == active_item:
             item.active = True
         if item.section is None:

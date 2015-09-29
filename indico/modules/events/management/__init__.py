@@ -27,11 +27,11 @@ from indico.web.menu import SideMenuItem, SideMenuSection
 
 @signals.menu.sections.connect_via('event-management-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
-    yield 'organization', SideMenuSection(_("Organization"), 50, icon='list', active=True)
-    yield 'services', SideMenuSection(_("Services"), 40, icon='broadcast')
-    yield 'reports', SideMenuSection(_("Reports"), 30, icon='stack')
-    yield 'customization', SideMenuSection(_("Customization"), 20, icon='image')
-    yield 'advanced', SideMenuSection(_("Advanced options"), 10, icon='lamp')
+    yield SideMenuSection('organization', _("Organization"), 50, icon='list', active=True)
+    yield SideMenuSection('services', _("Services"), 40, icon='broadcast')
+    yield SideMenuSection('reports', _("Reports"), 30, icon='stack')
+    yield SideMenuSection('customization', _("Customization"), 20, icon='image')
+    yield SideMenuSection('advanced', _("Advanced options"), 10, icon='lamp')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
@@ -54,58 +54,58 @@ def _sidemenu_items(sender, event, **kwargs):
     is_review_staff = paper_review.isInReviewingTeam(session.avatar)
     is_review_manager = paper_review.isPaperReviewManager(session.avatar)
 
-    yield 'general', SideMenuItem(_('General settings'),
-                                  url_for('event_mgmt.conferenceModification', event),
-                                  90,
-                                  visible=can_modify,
-                                  icon='settings')
-    yield 'timetable', SideMenuItem(_('Timetable'),
-                                    url_for('event_mgmt.confModifSchedule', event),
-                                    80,
-                                    icon='calendar',
-                                    visible=(can_modify and not is_lecture))
-    yield 'room_booking', SideMenuItem(_('Room Booking'),
-                                       url_for('event_mgmt.rooms_booking_list', event),
-                                       50,
-                                       icon='location',
-                                       visible=(rb_active and can_modify))
+    yield SideMenuItem('general', _('General settings'),
+                       url_for('event_mgmt.conferenceModification', event),
+                       90,
+                       visible=can_modify,
+                       icon='settings')
+    yield SideMenuItem('timetable', _('Timetable'),
+                       url_for('event_mgmt.confModifSchedule', event),
+                       80,
+                       icon='calendar',
+                       visible=(can_modify and not is_lecture))
+    yield SideMenuItem('room_booking', _('Room Booking'),
+                       url_for('event_mgmt.rooms_booking_list', event),
+                       50,
+                       icon='location',
+                       visible=(rb_active and can_modify))
     if is_conference:
-        yield 'program', SideMenuItem(_('Programme'),
-                                      url_for('event_mgmt.confModifProgram', event),
-                                      section='organization',
-                                      visible=can_modify)
-        yield 'registration', SideMenuItem(_('Registration'),
-                                           url_for('event_mgmt.confModifRegistrationForm', event),
-                                           section='organization',
-                                           visible=(reg_form_enabled and can_manage_registration))
-        yield 'abstracts', SideMenuItem(_('Abstracts'),
-                                        url_for('event_mgmt.confModifCFA', event),
-                                        section='organization',
-                                        visible=(cfa_enabled and can_modify))
-        yield 'contributions', SideMenuItem(_('Contributions'),
-                                            url_for('event_mgmt.confModifContribList', event),
-                                            section='organization',
-                                            visible=(can_modify or is_review_manager))
-        yield 'paper_reviewing', SideMenuItem(_('Paper Reviewing'),
-                                              url_for('event_mgmt.confModifReviewing-access', event),
-                                              section='organization',
-                                              visible=(can_modify or is_review_staff))
+        yield SideMenuItem('program', _('Programme'),
+                           url_for('event_mgmt.confModifProgram', event),
+                           section='organization',
+                           visible=can_modify)
+        yield SideMenuItem('registration', _('Registration'),
+                           url_for('event_mgmt.confModifRegistrationForm', event),
+                           section='organization',
+                           visible=(reg_form_enabled and can_manage_registration))
+        yield SideMenuItem('abstracts', _('Abstracts'),
+                           url_for('event_mgmt.confModifCFA', event),
+                           section='organization',
+                           visible=(cfa_enabled and can_modify))
+        yield SideMenuItem('contributions', _('Contributions'),
+                           url_for('event_mgmt.confModifContribList', event),
+                           section='organization',
+                           visible=(can_modify or is_review_manager))
+        yield SideMenuItem('paper_reviewing', _('Paper Reviewing'),
+                           url_for('event_mgmt.confModifReviewing-access', event),
+                           section='organization',
+                           visible=(can_modify or is_review_staff))
     else:
-        yield 'participants', SideMenuItem(_('Participants'),
-                                           url_for('event_mgmt.confModifParticipants', event),
-                                           section='organization',
-                                           visible=can_modify)
+        yield SideMenuItem('participants', _('Participants'),
+                           url_for('event_mgmt.confModifParticipants', event),
+                           section='organization',
+                           visible=can_modify)
 
-    yield 'lists', SideMenuItem(_('Lists'),
-                                url_for('event_mgmt.confModifListings-allSpeakers', event),
-                                section='reports',
-                                visible=(can_modify and not is_lecture))
-    yield 'utilities', SideMenuItem(_('Utilities'),
-                                    url_for('event_mgmt.confModifTools', event),
-                                    section='advanced',
-                                    visible=can_modify)
-    yield 'protection', SideMenuItem(_('Protection'),
-                                     url_for('event_mgmt.confModifAC', event),
-                                     60,
-                                     icon='shield',
-                                     visible=can_modify)
+    yield SideMenuItem('lists', _('Lists'),
+                       url_for('event_mgmt.confModifListings-allSpeakers', event),
+                       section='reports',
+                       visible=(can_modify and not is_lecture))
+    yield SideMenuItem('utilities', _('Utilities'),
+                       url_for('event_mgmt.confModifTools', event),
+                       section='advanced',
+                       visible=can_modify)
+    yield SideMenuItem('protection', _('Protection'),
+                       url_for('event_mgmt.confModifAC', event),
+                       60,
+                       icon='shield',
+                       visible=can_modify)

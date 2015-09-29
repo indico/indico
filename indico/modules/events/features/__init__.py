@@ -34,7 +34,7 @@ event_settings = EventSettingsProxy('features', {
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, allow_key=True):
         return
-    return 'features', SideMenuItem('Features', url_for('event_features.index', event), section='advanced')
+    return SideMenuItem('features', 'Features', url_for('event_features.index', event), section='advanced')
 
 
 @signals.app_created.connect

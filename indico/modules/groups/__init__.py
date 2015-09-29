@@ -28,7 +28,7 @@ __all__ = ('GroupProxy',)
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'), section='user_management')
+    return SideMenuItem('groups', _("Groups"), url_for('groups.groups'), section='user_management')
 
 
 @signals.users.merged.connect

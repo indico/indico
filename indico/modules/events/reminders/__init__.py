@@ -38,8 +38,7 @@ def _import_tasks(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    return 'reminders', SideMenuItem(_('Reminders'), url_for('event_reminders.list', event),
-                                     section='organization')
+    return SideMenuItem('reminders', _('Reminders'), url_for('event_reminders.list', event), section='organization')
 
 
 @signals.event.data_changed.connect
