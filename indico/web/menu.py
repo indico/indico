@@ -95,38 +95,37 @@ class SideMenuSection(object):
     :param title: the title of the section (displayed)
     :param weight: the "weight" (higher means it shows up first)
     :param active: whether the section should be shown expanded by default
-    :param visible: whether the section should be shown at all
     :param icon: icon that will be displayed next to the section title.
     """
 
-    def __init__(self, name, title, weight=-1, active=False, visible=True, icon=None):
+    is_section = True
+
+    def __init__(self, name, title, weight=-1, active=False, icon=None):
         self.name = name
         self.title = title
         self._active = active
-        self._visible = visible
         self._items = set()
         self.icon = 'icon-' + icon
         self.weight = weight
+        self._sorted_items = None
 
     def add_item(self, item):
+        self._sorted_items = None
         self._items.add(item)
 
     @property
     def items(self):
-        return sorted((item for item in self._items if item.visible),
-                      key=lambda x: (-x.weight, x.title))
+        if self._sorted_items is None:
+            self._sorted_items = sorted(self._items, key=lambda x: (-x.weight, x.title))
+        return self._sorted_items
 
     @property
     def active(self):
         return self._active or any(item.active for item in self._items)
 
-    @property
-    def visible(self):
-        return self._visible and any(item.visible for item in self._items)
-
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'name', 'title', active=None, visible=True)
+        return format_repr(self, 'name', 'title', active=False)
 
 
 class SideMenuItem(object):
@@ -138,26 +137,25 @@ class SideMenuItem(object):
     :param weight: the "weight" (higher means it shows up first)
     :param active: whether the item will be shown as active by default
     :param disabled: if `True`, the item will be displayed as disabled
-    :param visible: whether the item should be shown at all
     :param section: section the item will be put in
     :param icon: icon that will be displayed next to the item
     """
 
-    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, visible=True, section=None,
-                 icon=None):
+    is_section = False
+
+    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, section=None, icon=None):
         self.name = name
         self.title = title
         self.url = url
         self.active = active
         self.disabled = disabled
-        self.visible = visible
         self.section = section
         self.weight = weight
         self.icon = ('icon-' + icon) if icon else None
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'title', 'url', active=None, disabled=False, visible=True)
+        return format_repr(self, 'name', 'title', 'url', active=False, disabled=False)
 
 
 def build_menu_structure(menu_id, active_item=None, **kwargs):

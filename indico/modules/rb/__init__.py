@@ -86,6 +86,7 @@ def _sidemenu_sections(sender, **kwargs):
 @signals.menu.items.connect_via('rb-sidemenu')
 def _sidemenu_items(sender, **kwargs):
     user_is_admin = session.user is not None and rb_is_admin(session.user)
+    user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
     map_available = Location.default_location is not None and Location.default_location.is_map_available
 
     yield SideMenuItem('book_room', _('Book a Room'), url_for('rooms.book'), 80, icon='checkmark')
@@ -97,18 +98,20 @@ def _sidemenu_items(sender, **kwargs):
                        section='search')
     yield SideMenuItem('search_rooms', _('Search rooms'), url_for('rooms.search_rooms'),
                        section='search')
-    yield SideMenuItem('bookings_in_my_rooms', _('Bookings in my rooms'), url_for('rooms.bookings_my_rooms'),
-                       section='my_rooms')
-    yield SideMenuItem('prebookings_in_my_rooms', _('Pre-bookings in my rooms'),
-                       url_for('rooms.pending_bookings_my_rooms'),
-                       section='my_rooms')
-    yield SideMenuItem('room_list', _('Room list'), url_for('rooms.search_my_rooms'),
-                       section='my_rooms')
+    if user_has_rooms:
+        yield SideMenuItem('bookings_in_my_rooms', _('Bookings in my rooms'), url_for('rooms.bookings_my_rooms'),
+                           section='my_rooms')
+        yield SideMenuItem('prebookings_in_my_rooms', _('Pre-bookings in my rooms'),
+                           url_for('rooms.pending_bookings_my_rooms'),
+                           section='my_rooms')
+        yield SideMenuItem('room_list', _('Room list'), url_for('rooms.search_my_rooms'),
+                           section='my_rooms')
     yield SideMenuItem('my_blockings', _('My Blockings'),
                        url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
                        section='blocking')
-    yield SideMenuItem('blockings_my_rooms', _('Blockings for my rooms'), url_for('rooms.blocking_my_rooms'),
-                       section='blocking')
+    if user_has_rooms:
+        yield SideMenuItem('blockings_my_rooms', _('Blockings for my rooms'), url_for('rooms.blocking_my_rooms'),
+                           section='blocking')
     yield SideMenuItem('blocking_create', _('Block rooms'), url_for('rooms.create_blocking'), section='blocking')
     if user_is_admin:
         yield SideMenuItem('admin', _('Administration'), url_for('rooms_admin.roomBooking-admin'), 10,

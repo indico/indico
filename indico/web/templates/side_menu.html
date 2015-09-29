@@ -1,24 +1,22 @@
 {% macro _side_menu_item(item, classes='', icon='') %}
-    {% if item.visible %}
-        {% if item.disabled %}
-            {% set classes = classes + 'disabled' %}
-        {% else %}
-            {% if item.active %}
-                {% set classes = classes + ' active' %}
-            {% endif %}
+    {% if item.disabled %}
+        {% set classes = classes + 'disabled' %}
+    {% else %}
+        {% if item.active %}
+            {% set classes = classes + ' active' %}
         {% endif %}
-        <li class="item {{ classes }}">
-            {%- if item.disabled %}
-                <span class="title">{{ item.title }}</span>
-            {%- else -%}
-                <a class="title {{ icon if icon }}" href="{{ item.url }}">{{ item.title }}</a>
-            {%- endif -%}
-        </li>
     {% endif %}
+    <li class="item {{ classes }}">
+        {%- if item.disabled %}
+            <span class="title">{{ item.title }}</span>
+        {%- else -%}
+            <a class="title {{ icon }}" href="{{ item.url }}">{{ item.title }}</a>
+        {%- endif -%}
+    </li>
 {% endmacro %}
 
 {% macro _side_menu_section(section) %}
-    {% if section.items and section.visible %}
+    {% if section.items %}
         <li class="section {{ 'collapsed' if not section.active }}">
             <div class="title-wrapper">
                 <span class="title {{ section.icon }}">{{ section.title }}</span>
@@ -38,7 +36,7 @@
     {% endif %}
     <ul class="menu-items">
         {% for item in items %}
-            {% if item.items %}
+            {% if item.is_section %}
                 {{ _side_menu_section(item) }}
             {% else %}
                 {{ _side_menu_item(item, icon=item.icon) }}
