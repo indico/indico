@@ -79,10 +79,7 @@
         }
 
         &.collapsed {
-            > ul {
-                display: none;
-            }
-
+            // We do not hide the <ul> here since we use JS to animate opening/closing a section
             .title-wrapper:before {
                 @include rotate(-90deg);
             }
