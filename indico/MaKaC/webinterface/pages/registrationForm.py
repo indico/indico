@@ -81,7 +81,7 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
 
     def getCSSFiles(self):
         return conferences.WPConferenceModifBase.getCSSFiles(self) + \
-            self._asset_env['registrationform_sass'].urls()
+            self._asset_env['registration_sass'].urls()
 
 
 class WPConfModifRegFormPreview(WPConfModifRegFormBase):
@@ -338,7 +338,7 @@ class WPRegistrationForm(conferences.WPConferenceDefaultDisplayBase):
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['registrationform_sass'].urls()
+            self._asset_env['registration_sass'].urls()
 
 
 class WConfRegistrationForm(WConfDisplayBodyBase):
@@ -758,7 +758,7 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['registrationform_sass'].urls()
+            self._asset_env['registration_sass'].urls()
 
 
 class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
@@ -837,7 +837,7 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['registrationform_sass'].urls()
+            self._asset_env['registration_sass'].urls()
 
 
 class WConfRegistrationFormModify(WConfRegistrationFormDisplay):

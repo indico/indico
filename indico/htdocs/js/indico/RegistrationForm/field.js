@@ -22,7 +22,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         return {
             confId: $scope.confId,
             sectionId: $scope.section.id,
-            fieldId: field.id
+            fieldId: field.id,
+            confFormId: $scope.confFormId
         };
     };
 
@@ -84,11 +85,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.getName = function(input) {
-        if (input == 'date') {
-            return '_genfield_' + $scope.section.id + '_' + $scope.field.id + '_';
-        } else {
-            return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
-        }
+        return 'field_{0}-{1}'.format($scope.section.id, $scope.field.id);
     };
 
     $scope.openFieldSettings = function() {
@@ -142,6 +139,17 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             if ($scope.settings.itemtable && !dialogScope.hasRadioItems()) {
                 dialogScope.$apply(dialogScope.setSelectedTab('tab-editItems'));
                 return false;
+            }
+
+            if ($scope.settings.itemtable) {
+                var validCaptions = _.all(dialogScope.formData.radioitems, function(item) {
+                    return item.remove || !!item.caption;
+                });
+
+                if (!validCaptions) {
+                    dialogScope.$apply(dialogScope.setSelectedTab('tab-editItems'));
+                    return false;
+                }
             }
 
             $scope.fieldApi.updateField($scope.field, dialogScope.formData);
@@ -242,6 +250,10 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
             return $scope.isBillable(item) && userdata.paid;
         }
     };
+
+    $scope.isVisible = function(field) {
+        return field.isEnabled && !field.remove;
+    };
 });
 
 ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
@@ -310,22 +322,13 @@ ndRegForm.directive('ndDateField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/date.tpl.html');
-
         },
 
         link: function(scope) {
             scope.settings.fieldName = $T("Date");
             scope.settings.date = true;
-            scope.settings.formData.push(['values', 'displayFormats']);
-            scope.settings.formData.push(['values', 'dateFormat']);
-            scope.dateInputs = [
-                '{0}Day'.format(scope.getName(scope.field.input)),
-                '{0}Month'.format(scope.getName(scope.field.input)),
-                '{0}Year'.format(scope.getName(scope.field.input)),
-                '{0}Hour'.format(scope.getName(scope.field.input)),
-                '{0}Min'.format(scope.getName(scope.field.input))
-            ];
-
+            scope.settings.formData.push('displayFormats');
+            scope.settings.formData.push('dateFormat');
             scope.showTime = function(str) {
                 return str? str.match('H') !== null : false;
             };
@@ -380,8 +383,8 @@ ndRegForm.directive('ndNumberField', function(url) {
             scope.settings.number = true;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
-            scope.settings.formData.push(['values', 'minValue']);
-            scope.settings.formData.push(['values', 'length']);
+            scope.settings.formData.push('minValue');
+            scope.settings.formData.push('length');
 
             scope.updateSubtotal = function() {
                 var value = scope.userdata[scope.fieldName];
@@ -427,7 +430,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.paid) {
-                    var item = _.find(scope.field.values.radioitems, function(item) {
+                    var item = _.find(scope.field.radioitems, function(item) {
                         return item.caption == userdata[scope.getName(scope.field.input)];
                     }) || {};
 
@@ -441,7 +444,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                 var id;
 
                 if (fieldValue !== undefined) {
-                    var item = _.find(scope.field.values.radioitems, function(item) {
+                    var item = _.find(scope.field.radioitems, function(item) {
                         return item.caption == fieldValue;
                     });
 
@@ -455,20 +458,21 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.getValue = function(fieldName) {
                 if (!scope.userdata[fieldName] || scope.userdata[fieldName] === '') {
-                    return scope.field.values.defaultItem;
+                    return scope.field.defaultItem;
                 } else {
                     return scope.userdata[fieldName];
                 }
             };
 
             scope.getSelectedItem = function(itemId) {
-                return _.find(scope.field.values.radioitems, function(item) {
+                return _.find(scope.field.radioitems, function(item) {
                     return item.id == itemId;
                 });
             };
 
-            scope.settings.formData.push(['values', 'defaultItem']);
-            scope.settings.formData.push(['values', 'inputType']);
+            scope.settings.formData.push('defaultItem');
+            scope.settings.formData.push('inputType');
+            scope.settings.formData.push('withExtraSlots');
 
             scope.settings.editionTable = {
                 sortable: false,
@@ -478,22 +482,24 @@ ndRegForm.directive('ndRadioField', function(url) {
                     $T("Billable"),
                     $T("Price"),
                     $T("Places limit"),
+                    $T("Max. extra slots"),
+                    $T("Extra slots pay"),
                     $T("Enabled")],
 
                 colModel: [
-                    {name:'caption',
+                    {name: 'caption',
                      index:'caption',
                      align: 'center',
-                     width:160,
+                     width: 160,
                      editable: true,
                      edittype: "text",
                      editoptions: {
                         size: "30",
                         maxlength: "50"}},
 
-                    {name:'billable',
-                     index:'isBillable',
-                     width: 60,
+                    {name: 'billable',
+                     index: 'isBillable',
+                     width: 50,
                      editable: true,
                      align: 'center',
                      defaultVal: false,
@@ -512,16 +518,36 @@ ndRegForm.directive('ndRadioField', function(url) {
                     {name: 'placesLimit',
                      index: 'placesLimit',
                      align: 'center',
-                     width: 80,
+                     width: 50,
                      editable: true,
                      edittype: "text",
                      editoptions: {
                         size: "7",
                         maxlength: "20"}},
 
+                    {name: 'maxExtraSlots',
+                     index: 'maxExtraSlots',
+                     align: 'center',
+                     width: 50,
+                     editable: true,
+                     edittype: "text",
+                     className: 'extra-slots',
+                     editoptions: {
+                        size: "7",
+                        maxlength: "2"}},
+
+                    {name: 'extraSlotsPay',
+                     index: 'extraSlotsPay',
+                     align: 'center',
+                     width: 50,
+                     editable: true,
+                     edittype: "bool_select",
+                     className: 'extra-slots',
+                     defaultVal: false},
+
                     {name: 'isEnabled',
                      index: 'isEnabled',
-                     width: 60,
+                     width: 50,
                      editable: true,
                      align: 'center',
                      edittype: 'bool_select',
@@ -541,7 +567,7 @@ ndRegForm.directive('ndTelephoneField', function(url) {
 
         link: function(scope) {
             scope.settings.fieldName = $T("Telephone");
-            scope.settings.formData.push(['values', 'length']);
+            scope.settings.formData.push('length');
         }
     };
 });
@@ -556,7 +582,7 @@ ndRegForm.directive('ndTextField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Text");
             scope.settings.size = true;
-            scope.settings.formData.push(['values', 'length']);
+            scope.settings.formData.push('length');
         }
     };
 });
@@ -571,8 +597,8 @@ ndRegForm.directive('ndTextareaField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Textarea");
             scope.settings.rowsAndColumns = true;
-            scope.settings.formData.push(['values', 'numberOfColumns']);
-            scope.settings.formData.push(['values', 'numberOfRows']);
+            scope.settings.formData.push('numberOfColumns');
+            scope.settings.formData.push('numberOfRows');
         }
     };
 });
@@ -609,6 +635,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 $scope.formData.radioitems = [];
                 $scope.formData.input = $scope.field.input;
                 $scope.formData.disabled = $scope.field.disabled;
+                $scope.formData.withExtraSlots = $scope.field.withExtraSlots;
 
                 _.each($scope.settings.formData, function(item) {
                     if (Array.isArray(item) && $scope.field[item[0]] !== undefined) {
@@ -618,10 +645,11 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     }
                 });
 
-                _.each($scope.field.values.radioitems, function(item, ind) {
+                _.each($scope.field.radioitems, function(item, ind) {
                     $scope.formData.radioitems[ind] =  angular.copy(item);
                 });
 
+                $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
                 $scope.tabSelected = "tab-options";
                 $scope.parsePrice();
             };
@@ -637,12 +665,13 @@ ndRegForm.directive('ndFieldDialog', function(url) {
 
             $scope.addItem = function() {
                 $scope.formData.radioitems.push({
-                    id:'isNew',
                     placesLimit: 0,
                     price: 0,
                     isEnabled: true,
                     isBillable: false
                 });
+
+                $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
             };
 
             $scope.sortItems = function() {
@@ -650,6 +679,20 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     return radioitem.caption.toLowerCase();
                 });
             };
+
+            $scope.toggleExtraSlotsColumns = function(value) {
+                if (!!value) {
+                    $('.regform-table .extra-slots').show();
+                } else {
+                    _.delay(function() {
+                        $('.regform-table .extra-slots').hide();
+                    }, 100);
+                }
+            }
+
+            $scope.$watch('formData.withExtraSlots', function(newValue) {
+                $scope.toggleExtraSlotsColumns(newValue);
+            });
         },
 
         link: function(scope) {

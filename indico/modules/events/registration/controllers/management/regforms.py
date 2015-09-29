@@ -25,7 +25,9 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
 from indico.modules.events.registration.models.registration_forms import RegistrationForm
+from indico.modules.events.registration.util import get_event_section_data
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.payment import event_settings
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -33,7 +35,7 @@ from indico.web.forms.base import FormDefaults
 from indico.web.flask.util import url_for
 
 
-class RHRegistrationFormList(RHManageRegFormsBase):
+class RHManageRegistrationForms(RHManageRegFormsBase):
     """List all registrations forms for an event"""
 
     def _process(self):
@@ -66,7 +68,8 @@ class RHRegistrationFormManage(RHManageRegFormBase):
     """Specific registration form management"""
 
     def _process(self):
-        return WPManageRegistration.render_template('management/regform.html', self.event, regform=self.regform)
+        return WPManageRegistration.render_template('management/regform.html', self.event, regform=self.regform,
+                                                    event=self.event)
 
 
 class RHRegistrationFormEdit(RHManageRegFormBase):
@@ -133,3 +136,12 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
             logger.info("Registrations for {} scheduled by {}".format(self.regform, session.user))
             return jsonify_data(flash=False)
         return jsonify_template('events/registration/management/regform_schedule.html', form=form)
+
+
+class RHRegistrationFormModify(RHManageRegFormBase):
+    """Modify the form of a registration form"""
+
+    def _process(self):
+        return WPManageRegistration.render_template('management/regform_modify.html', self.event, event=self.event_new,
+                                                    sections=get_event_section_data(self.regform), regform=self.regform,
+                                                    currency=event_settings.get(self.event, 'currency'))

@@ -2,10 +2,14 @@
     <input type="text"
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
-        size="{{ field.values.length || 60}}"
+        size="{{ field.length || 60}}"
         ng-model="userdata[fieldName]"
         ng-required="field.mandatory"
         ng-class="{
             hasError: validationStarted && nestedForm.$invalid
         }"/>
+
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
 </ng-form>

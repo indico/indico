@@ -70,8 +70,8 @@ class Registration(db.Model):
         'User',
         lazy=True,
         backref=db.backref(
-            'registration',
-            lazy=True,
+            'registrations',
+            lazy='dynamic',
             cascade='all, delete-orphan'
         )
     )
@@ -102,6 +102,16 @@ class RegistrationData(db.Model):
     )
     #: The user's data for the field
     data = db.Column(
+        JSON,
+        nullable=False
+    )
+    #: file contents for a file field
+    file = db.Column(
+        db.LargeBinary,
+        nullable=True
+    )
+    #: metadata of the uploaded file
+    file_metadata = db.Column(
         JSON,
         nullable=False
     )

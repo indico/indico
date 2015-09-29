@@ -16,12 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, render_template
 
 from indico.core import signals
+from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.util.i18n import _
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 
 logger = Logger.get('events.registration')
@@ -36,9 +38,25 @@ def _extend_event_management_menu(event, **kwargs):
                                         event_feature='registration')
 
 
+def _get_active_regforms(event):
+    if not event.has_feature('registration'):
+        return []
+    from indico.modules.events.registration.models.registration_forms import RegistrationForm
+    return (RegistrationForm.find(RegistrationForm.is_active, RegistrationForm.event_id == int(event.id))
+                            .order_by(db.func.lower(RegistrationForm.title))
+                            .all())
+
+
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
     return RegistrationFeature
+
+
+@template_hook('conference-home-info')
+def _inject_regform_announcement(event, **kwargs):
+    regforms = _get_active_regforms(event)
+    if regforms:
+        return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event)
 
 
 class RegistrationFeature(EventFeature):

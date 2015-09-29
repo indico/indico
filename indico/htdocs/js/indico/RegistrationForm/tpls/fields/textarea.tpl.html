@@ -2,10 +2,14 @@
     <textarea
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
-        cols="{{ field.values.numberOfColumns || 60 }}"
-        rows="{{ field.values.numberOfRows || 2 }}"
+        cols="{{ field.numberOfColumns || 60 }}"
+        rows="{{ field.numberOfRows || 2 }}"
         ng-model="userdata[fieldName]"
         ng-required="field.mandatory"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}">
     </textarea>
+
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
 </ng-form>

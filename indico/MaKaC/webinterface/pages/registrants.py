@@ -788,7 +788,7 @@ class WPRegistrantModifBase( WPRegistrantBase ):
 
     def getCSSFiles(self):
         return WPRegistrantBase.getCSSFiles(self) + \
-            self._asset_env['registrationform_sass'].urls()
+            self._asset_env['registration_sass'].urls()
 
     def _setActiveSideMenuItem(self):
         self._regFormMenuItem.setActive(True)

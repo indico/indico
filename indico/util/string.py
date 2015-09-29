@@ -33,7 +33,6 @@ from lxml import html, etree
 from speaklater import _LazyString
 
 
-
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 LATEX_MATH_PLACEHOLDER = u"\uE000"
 
@@ -374,3 +373,69 @@ def alpha_enum(value):
     """Convert integer to ordinal letter code (a, b, c, ... z, aa, bb, ...)."""
     max_len = len(string.ascii_lowercase)
     return unicode(string.ascii_lowercase[value % max_len] * (value / max_len + 1))
+
+
+def format_repr(obj, *args, **kwargs):
+    """Creates a pretty repr string from object attributes
+
+    :param obj: The object to show the repr for.
+    :param args: The names of arguments to include in the repr.
+                 The arguments are shown in order using their unicode
+                 representation.
+    :param kwargs: Each kwarg is included as a ``name=value`` string
+                   if it doesn't match the provided value.  This is
+                   mainly intended for boolean attributes such as
+                   ``is_deleted`` where you don't want them to
+                   clutter the repr unless they are set.
+    :param _text: When the keyword argument `_text` is provided and
+                  not ``None``, it will include its value as extra
+                  text in the repr inside quotes.  This is useful
+                  for objects which have one longer title or text
+                  that doesn't look well in the unquoted
+                  comma-separated argument list.
+    """
+    text_arg = kwargs.pop('_text', None)
+    obj_name = type(obj).__name__
+    formatted_args = [unicode(getattr(obj, arg)) for arg in args]
+    for name, default_value in sorted(kwargs.items()):
+        value = getattr(obj, name)
+        if value != default_value:
+            formatted_args.append(u'{}={}'.format(name, value))
+    if text_arg is None:
+        return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
+    else:
+        return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+
+
+def snakify(name):
+    """Converts a camelCased name to snake_case"""
+    # from http://stackoverflow.com/a/1176023/298479
+    name = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower()
+
+
+def camelize(name):
+    """Converts a snake_cased name to camelCase."""
+    parts = name.split('_')
+    underscore = ''
+    if name.startswith('_'):
+        underscore = '_'
+        parts = parts[1:]
+    return underscore + parts[0] + ''.join(x.title() for x in parts[1:])
+
+
+def _convert_keys(dict_, convert_func):
+    d = {}
+    for key, value in dict_.iteritems():
+        d[convert_func(key)] = _convert_keys(value, convert_func) if isinstance(value, dict) else value
+    return d
+
+
+def camelize_keys(dict_):
+    """Convert the keys of a dict to camelCase"""
+    return _convert_keys(dict_, camelize)
+
+
+def snakify_keys(dict_):
+    """Convert the keys of a dict to snake_case"""
+    return _convert_keys(dict_, snakify)

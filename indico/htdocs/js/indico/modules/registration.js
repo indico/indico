@@ -5,6 +5,10 @@
         setupRegistrationFormScheduleDialogs();
     });
 
+    $(window).scroll(function(){
+        IndicoUI.Effect.followScroll();
+    });
+
     function setupRegistrationFormScheduleDialogs() {
         $('a.js-regform-schedule-dialog').on('click', function(e) {
             e.preventDefault();

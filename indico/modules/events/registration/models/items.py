@@ -16,11 +16,23 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.util.string import return_ascii
+from indico.modules.events.registration.fields import get_field_types
+from indico.util.string import return_ascii, camelize_keys
 from indico.util.struct.enum import IndicoEnum
+
+
+def _get_next_position(context):
+    """Get the next position for a form item."""
+    regform_id = context.current_parameters['registration_form_id']
+    parent_id = context.current_parameters['parent_id']
+    res = (db.session.query(db.func.max(RegistrationFormItem.position))
+           .filter_by(parent_id=parent_id, registration_form_id=regform_id, is_deleted=False)
+           .one())
+    return (res[0] or 0) + 1
 
 
 class RegistrationFormItemType(int, IndicoEnum):
@@ -61,8 +73,69 @@ class RegistrationFormItem(db.Model):
     )
     position = db.Column(
         db.Integer,
+        nullable=False,
+        default=_get_next_position
+    )
+    #: The title of this field
+    title = db.Column(
+        db.String,
         nullable=False
-        # TODO: default=_get_next_position
+    )
+    #: Description of this field
+    description = db.Column(
+        db.String,
+        nullable=True
+    )
+    #: Whether the field is enabled
+    is_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    #: Whether field has been "deleted"
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: input type of this field
+    input_type = db.Column(
+        db.String,
+        nullable=True
+    )
+    #: unversioned field data
+    data = db.Column(
+        JSON,
+        nullable=True
+    )
+
+    #: The ID of the latest data
+    current_data_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.registration_form_field_data.id', use_alter=True),
+        nullable=True
+    )
+
+    #: The latest value of the field
+    current_data = db.relationship(
+        'RegistrationFormFieldData',
+        primaryjoin='RegistrationFormItem.current_data_id == RegistrationFormFieldData.id',
+        foreign_keys=current_data_id,
+        lazy=True,
+        post_update=True
+    )
+
+    #: The list of all versions of the field data
+    data_versions = db.relationship(
+        'RegistrationFormFieldData',
+        primaryjoin='RegistrationFormItem.id == RegistrationFormFieldData.field_id',
+        foreign_keys='RegistrationFormFieldData.field_id',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'field',
+            lazy=False
+        )
     )
 
     # The registration form
@@ -76,20 +149,34 @@ class RegistrationFormItem(db.Model):
         )
     )
 
-    # The parent of the item and the children backref
-    parent = db.relationship(
+    # The children of the item and the parent backref
+    children = db.relationship(
         'RegistrationFormItem',
         lazy=True,
+        order_by='RegistrationFormItem.position',
         backref=db.backref(
-            'children',
+            'parent',
             lazy=False,
             remote_side=[id]
         )
     )
 
+    @property
+    def view_data(self):
+        """Returns object with data that Angular can understand"""
+        return dict(id=self.id, description=self.description, lock=[])
+
+    @property
+    def wtf_field(self):
+        return get_field_types()[self.input_type](self)
+
+    @property
+    def is_section(self):
+        return self.type == RegistrationFormItemType.section
+
     @return_ascii
     def __repr__(self):
-        return '<{}({}, {})>'.format(type(self).__name__, self.id)
+        return '<{}({})>'.format(type(self).__name__, self.id)
 
 
 class RegistrationFormSection(RegistrationFormItem):
@@ -97,8 +184,29 @@ class RegistrationFormSection(RegistrationFormItem):
         'polymorphic_identity': RegistrationFormItemType.section
     }
 
+    @property
+    def locator(self):
+        return dict(self.registration_form.locator, section_id=self.id)
+
+    @property
+    def view_data(self):
+        field_data = dict(super(RegistrationFormSection, self).view_data, enabled=self.is_enabled,
+                          title=self.title, items=[child.view_data for child in self.children
+                                                   if not child.is_deleted])
+        return camelize_keys(field_data)
+
 
 class RegistrationFormText(RegistrationFormItem):
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.text
     }
+
+    @property
+    def locator(self):
+        return dict(self.parent.locator, field_id=self.id)
+
+    @property
+    def view_data(self):
+        field_data = dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
+                          input=self.input_type, caption=self.title, **self.current_data.versioned_data)
+        return camelize_keys(field_data)

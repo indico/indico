@@ -25,16 +25,16 @@ var ndRegForm = angular.module('nd.regform', [
 // Initialization
 // ============================================================================
 
-ndRegForm.value('editionurl',
-    Indico.Urls.Base + '/event/:confId/manage/registration-old/modify/'
+ndRegForm.value('editionURL',
+    Indico.Urls.Base + '/event/:confId/manage/registration/:confFormId/form/'
 );
 
 ndRegForm.value('displayurl',
-    Indico.Urls.Base + '/event/:confId/registration-old/sections'
+    Indico.Urls.Base + '/event/:confId/registration/:confFormId/sections'
 );
 
 ndRegForm.value('userurl',
-    Indico.Urls.Base + '/event/:confId/registration-old/userdata'
+    Indico.Urls.Base + '/event/:confId/registration/:confFormId/userdata'
 );
 
 ndRegForm.value('sortableoptions', {
@@ -54,15 +54,16 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displayurl, userurl) {
+ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, userurl) {
     var defaults = $http.defaults.headers;
     defaults.common = defaults.common || {};
     defaults.get = defaults.get || {};
     defaults.get['Content-Type'] = defaults.common['Content-Type'] = 'application/json';
+    defaults.common['X-CSRF-Token'] = $('#csrf-token').attr('content');
 
-    var sectionurl = editionurl + 'sections/:sectionId';
-    var sessionsurl = Indico.Urls.Base + '/event/:confId/manage/sessions';
-    var fieldurl = sectionurl + '/fields/:fieldId';
+    var sectionURL = editionURL + 'sections/:sectionId';
+    var sessionsURL = Indico.Urls.Base + '/event/:confId/manage/sessions';
+    var fieldURL = sectionURL + '/fields/:fieldId';
 
     return {
         processResponse: function(data, callback) {
@@ -76,20 +77,20 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
                 callback.success(data);
             }
         },
-        Sections: $resource(sectionurl, {confId: '@confId', sectionId: "@sectionId"}, {
-            "remove": {url: sectionurl, method: 'DELETE', isArray: true},
-            "enable": {method: 'POST', url: sectionurl + "/enable"},
-            "disable": {method: 'POST', url: sectionurl + "/disable"},
-            "move": {method: 'POST', url: sectionurl + "/move"},
-            "title": {method: 'POST', url: sectionurl + "/title"},
-            "description": {method: 'POST', url: sectionurl + "/description"}
+        Sections: $resource(sectionURL, {confId: '@confId', sectionId: "@sectionId", confFormId: "@confFormId"}, {
+            "remove": {method: 'DELETE', url: sectionURL + "/", isArray: true},
+            "enable": {method: 'POST', url: sectionURL + "/", params: {enable: true}},
+            "disable": {method: 'POST', url: sectionURL + "/", params: {enable: false}},
+            "move": {method: 'POST', url: sectionURL + "/move"},
+            "title": {method: 'PATCH', url: sectionURL + "/", params: {modified: 'title'}},
+            "description": {method: 'PATCH', url: sectionURL + "/", params: {modified: 'description'}}
         }),
-        Fields: $resource(fieldurl, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"}, {
-            "enable": {method:'POST', url: fieldurl + "/enable"},
-            "disable": {method:'POST', url: fieldurl + "/disable"},
-            "move": {method:'POST', url: fieldurl + "/move"}
+        Fields: $resource(fieldURL, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId", confFormId: "@confFormId"}, {
+            "enable": {method:'POST', url: fieldURL + "/toggle", params: {enable: true}},
+            "disable": {method:'POST', url: fieldURL + "/toggle", params: {enable: false}},
+            "move": {method:'POST', url: fieldURL + "/move"}
         }),
-        Sessions: $resource(sessionsurl, {confId: '@confId'}, {
+        Sessions: $resource(sessionsURL, {confId: '@confId'}, {
             "query": {method:'GET', isArray: true, cache: false}
         }),
         UserData: $resource(userurl, {confId: '@confId'}, {
@@ -109,10 +110,12 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         scope: {
             confId: '@',
+            confFormId: '@',
             confCurrency: '@',
             confSections: '@',
             confSdate: '@',
             confEdate: '@',
+            csrfToken: '&',
             editMode: '=',
             updateMode: '=',
             postUrl: '='
@@ -122,10 +125,12 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $scope.sections = $scope.$eval($scope.confSections);
 
             $rootScope.confId = $scope.confId;
+            $rootScope.confFormId = $scope.confFormId;
             $rootScope.confSdate = $scope.confSdate;
             $rootScope.confEdate = $scope.confEdate;
             $rootScope.editMode = $scope.editMode;
 
+            $scope.csrfToken = $('#csrf-token').attr('content');
             $scope.dialogs = {
                 addsection: false,
                 management: false,
@@ -156,7 +161,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                     regFormFactory.Sections.save({
                         confId: $scope.confId,
                         title: data.newsection.title,
-                        description: data.newsection.description
+                        description: data.newsection.description,
+                        confFormId: $scope.confFormId
                     }, function(newsection) {
                         regFormFactory.processResponse(newsection, {
                             success: function(newsection)  {
@@ -174,7 +180,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                     regFormFactory.Sections.move({
                         confId: $scope.confId,
                         sectionId: section.id,
-                        endPos: position
+                        endPos: position,
+                        confFormId: $scope.confFormId
                     }, function(updatedSection) {
                         regFormFactory.processResponse(updatedSection, {
                             success: function(updatedSection)  {
@@ -186,7 +193,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 restoreSection: function(section) {
                     regFormFactory.Sections.enable({
                         confId: $rootScope.confId,
-                        sectionId: section.id
+                        sectionId: section.id,
+                        confFormId: $rootScope.confFormId
                     }, function(updatedSection) {
                         regFormFactory.processResponse(updatedSection, {
                             success: function(updatedSection)  {
@@ -205,11 +213,14 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 removeSection: function(section) {
                     regFormFactory.Sections.remove({
                         confId: $rootScope.confId,
-                        sectionId: section.id
-                    }, {}, function(updatedSections) {
-                        regFormFactory.processResponse(updatedSections, {
-                            success: function(updatedSections)  {
-                                $scope.sections = updatedSections;
+                        sectionId: section.id,
+                        confFormId: $rootScope.confFormId
+                    }, {}, function(data) {
+                        regFormFactory.processResponse(data, {
+                            success: function()  {
+                                $scope.sections = $scope.sections.filter(function(obj) {
+                                    return obj.id !== section.id;
+                                });
                             }
                         });
                     });

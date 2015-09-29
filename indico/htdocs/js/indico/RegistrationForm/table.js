@@ -50,11 +50,11 @@ ndRegForm.directive("ndTable", function(url, sortableoptions) {
             };
 
             $scope.matchFilter = function(item) {
-                if(item.remove === true) {
+                if (item.remove === true) {
                     return false;
-                } else if($scope.filter !== undefined && $scope.filterValue !== undefined) {
+                } else if ($scope.filter !== undefined && $scope.filterValue !== undefined) {
                     return item[$scope.filter] === $scope.filterValue;
-                } else if(item.id == "isNew") {
+                } else if (!item.id) {
                     return true;
                 } else {
                     return true;
