@@ -56,6 +56,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             regform = RegistrationForm(event_new=self.event_new)
             form.populate_obj(regform)
             db.session.add(regform)
+            db.session.flush()
             flash(_('Registration form has been successfully created'), 'success')
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
                            'Registration form "{}" has been created'.format(regform.title), session.user)
@@ -84,7 +85,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
             form.populate_obj(self.regform)
             db.session.flush()
             flash(_('Registration form has been successfully modified'), 'success')
-            return redirect(url_for('.manage_regform_list', self.event_new))
+            return redirect(url_for('.manage_regform', self.regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,
                                                     event=self.event, regform=self.regform)
 
