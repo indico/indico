@@ -32,7 +32,7 @@ class RegistrationFormModificationMode(int, IndicoEnum):
 
 
 class RegistrationForm(db.Model):
-    __tablename__ = 'registration_forms'
+    __tablename__ = 'forms'
     __table_args__ = {'schema': 'event_registration'}
 
     #: The ID of the object

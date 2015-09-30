@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.events.registration.models.registration_forms import RegistrationForm
+from indico.modules.events.registration.models.forms import RegistrationForm
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
