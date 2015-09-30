@@ -26,11 +26,7 @@ from MaKaC.webinterface.common.countries import CountryHolder
 
 class RegistrationFormFieldData(db.Model):
     __tablename__ = 'registration_form_field_data'
-    __table_args__ = (
-        db.CheckConstraint("(input_type IS NULL) = (type = {type})"
-                           .format(type=RegistrationFormItemType.section), name='valid_input'),
-        {'schema': 'event_registration'}
-    )
+    __table_args__ = {'schema': 'event_registration'}
 
     #: The ID of the object
     id = db.Column(

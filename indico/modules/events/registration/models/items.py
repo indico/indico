@@ -43,7 +43,9 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 class RegistrationFormItem(db.Model):
     __tablename__ = 'registration_form_items'
-    __table_args__ = {'schema': 'event_registration'}
+    __table_args__ = (db.CheckConstraint("(input_type IS NULL) = (type = {type})"
+                                         .format(type=RegistrationFormItemType.section), name='valid_input'),
+                      {'schema': 'event_registration'})
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': None
