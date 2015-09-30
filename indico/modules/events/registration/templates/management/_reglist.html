@@ -19,7 +19,11 @@
                     <td class="i-table">
                         <input class="select-row" type="checkbox" name="registrant" value="{{ registration.id }}">
                     </td>
-                    <td class="i-table">{{ registration.user.full_name }}</td>
+                    <td class="i-table">
+                        <a href="{{ url_for('.registration_details', registration) }}">
+                            {{- registration.user.full_name -}}
+                        </a>
+                    </td>
                     {% for item in visible_cols_user_info %}
                         <td class="i-table">{{ get_user_info(registration.user, item) }}</td>
                     {% endfor %}
@@ -30,7 +34,29 @@
                             {%- endif %}</td>
                     {% endfor %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for registration in registrations %}
+                    {% set data = registration.data_by_field %}
+                    <tr class="i-table">
+                        <td class="i-table">
+                            <input class="select-row" type="checkbox" name="registrant_id" value="{{ registration.id }}">
+                        </td>
+                        <td class="i-table">
+                            <a href="{{ url_for('.registration_details', registration) }}">
+                                {{- registration.first_name }} {{ registration.last_name -}}
+                            </a>
+                        </td>
+                        {% for item in visible_cols_regform_items %}
+                            <td class="i-table">
+                                {%- if item.id in data %}
+                                    {{- data[item.id].friendly_data }}
+                                {%- endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endmacro %}
