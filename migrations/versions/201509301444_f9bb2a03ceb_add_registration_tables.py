@@ -1,7 +1,7 @@
 """Add registration tables
 
 Revision ID: f9bb2a03ceb
-Revises: 3b6c768b8803
+Revises: 13480f6da0e2
 Create Date: 2015-09-04 15:15:03.682231
 """
 
@@ -16,7 +16,7 @@ from indico.modules.events.registration.models.registration_forms import Registr
 
 # revision identifiers, used by Alembic.
 revision = 'f9bb2a03ceb'
-down_revision = '3b6c768b8803'
+down_revision = '13480f6da0e2'
 
 
 def upgrade():
