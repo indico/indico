@@ -1,5 +1,11 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
+{% block subtitle %}
+    {% trans title=regform.title -%}
+        Configure questions in form "{{ title }}"
+    {%- endtrans %}
+{% endblock %}
+
 {% block content %}
     <div ng-app="nd" ng-controller="AppCtrl">
         <div nd-reg-form
