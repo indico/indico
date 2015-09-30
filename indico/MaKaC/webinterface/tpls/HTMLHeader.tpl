@@ -9,7 +9,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <meta content="${self_._rh.csrf_token}" name="csrf-token" id="csrf-token"/>
+        <meta content="${_session.csrf_token}" name="csrf-token" id="csrf-token">
 
 % if social.get('facebook', {}).get('appId', None):
         <meta property="fb:app_id" content="${social['facebook']['appId']}"/>
