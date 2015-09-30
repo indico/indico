@@ -17,11 +17,12 @@
 from __future__ import unicode_literals
 
 import json
-
 from collections import OrderedDict
-from flask import session, request
-from sqlalchemy.orm import contains_eager
 
+from flask import session, request
+from sqlalchemy.orm import joinedload
+
+from indico.core.db import db
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
@@ -32,6 +33,7 @@ from indico.modules.events.registration.util import get_user_info
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data
+
 
 # TODO: Create a better mapping
 USER_INFO = OrderedDict([
@@ -58,20 +60,26 @@ def _filter_registration(query):
         if field_name[0] == 'radiogroup':
             filters[int(field_name[1])] = request.form.getlist(key)
 
-    for field_id, data_list in filters.iteritems():
-        query = query.filter(
-            (RegistrationFormField.id != field_id) | (RegistrationData.data.op('#>>')('{}').in_(data_list))
-        )
-    return query.filter(RegistrationData.data != None)
+    if not filters:
+        return query
+
+    criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
+                        RegistrationData.data.op('#>>')('{}').in_(data_list))
+                for field_id, data_list in filters.iteritems()]
+    subquery = (RegistrationData.query
+                .with_entities(db.func.count(RegistrationData.registration_id))
+                .join(RegistrationData.field_data)
+                .filter(RegistrationData.registration_id == Registration.id)
+                .filter(db.or_(*criteria))
+                .correlate(Registration)
+                .as_scalar())
+    return query.filter(subquery == len(filters))
 
 
 def _query_registrations(regform):
     return (Registration.query
                         .with_parent(regform)
-                        .join(Registration.data)
-                        .join(RegistrationData.field_data)
-                        .join(RegistrationFormFieldData.field)
-                        .options(contains_eager('data').contains_eager('field_data').contains_eager('field')))
+                        .options(joinedload('data').joinedload('field_data').joinedload('field')))
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
