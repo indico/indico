@@ -100,7 +100,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
             self._save_registration(form.data)
-            return redirect(url_for('.display_regforms_list', self.regform))
+            return redirect(url_for('.display_regforms_list', self.event))
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                currency=event_settings.get(self.event, 'currency'))
