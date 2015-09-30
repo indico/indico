@@ -21,7 +21,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
-from indico.modules.events.registration.models.registration_forms import RegistrationForm
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      was_regform_submitted, save_registration_to_session)

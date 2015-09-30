@@ -42,7 +42,7 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 
 class RegistrationFormItem(db.Model):
-    __tablename__ = 'registration_form_items'
+    __tablename__ = 'form_items'
     __table_args__ = (db.CheckConstraint("(input_type IS NULL) = (type = {type})"
                                          .format(type=RegistrationFormItemType.section), name='valid_input'),
                       {'schema': 'event_registration'})
@@ -59,7 +59,7 @@ class RegistrationFormItem(db.Model):
     #: The ID  of the registration form
     registration_form_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_forms.id'),
+        db.ForeignKey('event_registration.forms.id'),
         index=True,
         nullable=False
     )
@@ -71,7 +71,7 @@ class RegistrationFormItem(db.Model):
     #: The ID of the parent form item
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_form_items.id'),
+        db.ForeignKey('event_registration.form_items.id'),
         index=True,
         nullable=True
     )
@@ -122,7 +122,7 @@ class RegistrationFormItem(db.Model):
     #: The ID of the latest data
     current_data_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_form_field_data.id', use_alter=True),
+        db.ForeignKey('event_registration.form_field_data.id', use_alter=True),
         index=True,
         nullable=True
     )
