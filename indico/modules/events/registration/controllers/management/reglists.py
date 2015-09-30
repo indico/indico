@@ -25,11 +25,10 @@ from flask import session, request
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.events.registration.controllers.management import RHManageRegFormBase
+from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegistrationBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
-from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormFieldData,
-                                                                                RegistrationFormField)
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormField
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import get_user_info
 from indico.util.i18n import _
@@ -133,3 +132,11 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
                                                  visible_cols_user_info=visible_user_info, user_info=USER_INFO,
                                                  get_user_info=get_user_info)
         return jsonify_data(registrations_list=reg_list)
+
+
+class RHRegistrationDetails(RHManageRegistrationBase):
+    """Displays information about a registration"""
+
+    def _process(self):
+        return WPManageRegistration.render_template('management/registration_details.html', self.event,
+                                                    registration=self.registration)

@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {%- trans %}Registration details{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <dl class="i-data-list">
+        <dt>{% trans %}Registration ID{% endtrans %}</dt>
+        <dd>{{ registration.id }}</dd>
+        <dt>{% trans %}Registration date{% endtrans %}</dt>
+        <dd>{{ registration.submitted_dt }}</dd>
+    </dl>
+
+    {% for item in registration.registration_form.form_items if item.is_section %}
+        {% set data = registration.data_by_field %}
+        <h3>{{ item.title }}</h3>
+        <dl class="i-data-list">
+        {% for child_item in item.children %}
+            {% if child_item.type.name == 'field' %}
+                <dt>{{ child_item.title }}</dt>
+                <dd>
+                    {%- if child_item.id in data %}
+                        {{- data[child_item.id].friendly_data }}
+                    {%- endif %}
+                </dd>
+            {% endif %}
+        {% endfor %}
+        </dl>
+    {% endfor %}
+    <a href="{{ url_for('.edit_registration', registration) }}" class="i-button big highlight">
+        {%- trans %}Modify{% endtrans -%}
+    </a>
+    <a href="{{ url_for('.manage_reglist', registration.registration_form) }}" class="i-button big">
+        {%- trans %}Back{% endtrans -%}
+    </a>
+{% endblock %}
