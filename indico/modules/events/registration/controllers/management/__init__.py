@@ -16,7 +16,11 @@
 
 from __future__ import unicode_literals
 
+from flask import request
+
 from indico.modules.events.registration.controllers import RegistrationFormMixin
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import Registration
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -40,3 +44,20 @@ class RHManageRegFormBase(RHManageRegFormsBase, RegistrationFormMixin):
     def _checkParams(self, params):
         RHManageRegFormsBase._checkParams(self, params)
         RegistrationFormMixin._checkParams(self)
+
+
+class RHManageRegistrationBase(RHManageRegFormBase):
+    """Base class for a specific registration"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.registration
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageRegFormBase._checkParams(self, params)
+        self.registration = Registration.find_one(Registration.id == request.view_args['registration_id'],
+                                                  ~RegistrationForm.is_deleted,
+                                                  _join=Registration.registration_form,
+                                                  _eager=Registration.registration_form)
