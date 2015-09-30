@@ -133,6 +133,10 @@
                     margin-bottom: 5px;
                 }
             }
+
+            &:last-child > ul > li:last-child {
+                margin-bottom: 0;
+            }
         }
     }
 }
