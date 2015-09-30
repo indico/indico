@@ -86,19 +86,22 @@ class Registration(db.Model):
 
 class RegistrationData(db.Model):
     __tablename__ = 'registration_data'
-    __table_args__ = {'schema': 'event_registration'}
+    __table_args__ = (db.CheckConstraint("(file IS NULL) = (file_metadata::text = 'null')", name='valid_file'),
+                      {'schema': 'event_registration'})
 
     #: The ID of the registration
     registration_id = db.Column(
         db.Integer,
         db.ForeignKey('event_registration.registrations.id'),
-        primary_key=True
+        primary_key=True,
+        autoincrement=False
     )
     #: The ID of the field data
     field_data_id = db.Column(
         db.Integer,
         db.ForeignKey('event_registration.registration_form_field_data.id'),
-        primary_key=True
+        primary_key=True,
+        autoincrement=False
     )
     #: The user's data for the field
     data = db.Column(

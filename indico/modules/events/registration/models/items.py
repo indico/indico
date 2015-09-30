@@ -60,6 +60,7 @@ class RegistrationFormItem(db.Model):
     registration_form_id = db.Column(
         db.Integer,
         db.ForeignKey('event_registration.registration_forms.id'),
+        index=True,
         nullable=False
     )
     #: The type of the registration form item
@@ -71,6 +72,7 @@ class RegistrationFormItem(db.Model):
     parent_id = db.Column(
         db.Integer,
         db.ForeignKey('event_registration.registration_form_items.id'),
+        index=True,
         nullable=True
     )
     position = db.Column(
@@ -100,6 +102,12 @@ class RegistrationFormItem(db.Model):
         nullable=False,
         default=False
     )
+    #: determines if the field is mandatory
+    is_required = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: input type of this field
     input_type = db.Column(
         db.String,
@@ -108,13 +116,14 @@ class RegistrationFormItem(db.Model):
     #: unversioned field data
     data = db.Column(
         JSON,
-        nullable=True
+        nullable=False
     )
 
     #: The ID of the latest data
     current_data_id = db.Column(
         db.Integer,
         db.ForeignKey('event_registration.registration_form_field_data.id', use_alter=True),
+        index=True,
         nullable=True
     )
 
