@@ -34,7 +34,6 @@ class RHManageRegFormsBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.event = self._conf
-        self.event_new = self.event.as_event
 
 
 class RHManageRegFormBase(RHManageRegFormsBase):
