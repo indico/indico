@@ -1183,6 +1183,9 @@ textarea.regFormDescriptionInputMgmt {
 
             > .actions {
                 max-width: 10%;
+                .trigger {
+                    cursor: pointer;
+                }
             }
 
             &.filter {
