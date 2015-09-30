@@ -29,7 +29,7 @@ from indico.web.forms.widgets import SwitchWidget
 class RegistrationFormForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration form"))
     introduction = TextAreaField(_("Introduction"),
-                                 description=_("An introduction to be displayed before the registration process"))
+                                 description=_("Introduction to be displayed when filling out the registration form"))
     require_user = BooleanField(_("Only logged-in users"), widget=SwitchWidget(),
                                 description=_("Only logged-in users can register"))
     limit_registrations = BooleanField(_("Limit registrations"), widget=SwitchWidget(),
@@ -41,9 +41,9 @@ class RegistrationFormForm(IndicoForm):
 
 class RegistrationFormScheduleForm(IndicoForm):
     start_dt = IndicoDateTimeField(_("Start"), [DataRequired(), DateTimeRange(earliest='now')],
-                                   description=_("Moment when the registrations will be open"))
+                                   description=_("Moment when registrations will be open"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
-                                 description=_("Moment when the registrations will be closed"))
+                                 description=_("Moment when registrations will be closed"))
 
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')

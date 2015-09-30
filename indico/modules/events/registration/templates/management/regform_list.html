@@ -7,7 +7,7 @@
 
 {% block description %}
     {% trans -%}
-        You can create registration processes for the event in order to allow people to register.
+        Registration forms allow people to register for the event.
     {%- endtrans %}
 {% endblock %}
 
@@ -39,14 +39,14 @@
         </div>
     {% else %}
         {%- call message_box('info', fixed_width=true) -%}
-            {% trans %}There are no registration processes yet.{% endtrans %}
+            {% trans %}There are no registration forms yet.{% endtrans %}
         {%- endcall %}
     {% endfor %}
 
     <div class="toolbar">
         <div class="group right">
             <a href="{{ url_for('.create_regform', event) }}" class="i-button">
-                {% trans %}Create process{% endtrans %}
+                {% trans %}Create form{% endtrans %}
             </a>
         </div>
     </div>
