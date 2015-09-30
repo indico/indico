@@ -22,8 +22,7 @@ from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItem
-from indico.modules.events.registration.models.registration_form_fields import (RegistrationFormField,
-                                                                                RegistrationFormFieldData)
+from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData)
 from indico.util.string import snakify
 from indico.web.util import jsonify_data
 from uuid import uuid4

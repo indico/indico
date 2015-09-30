@@ -25,7 +25,7 @@ from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class RegistrationFormFieldData(db.Model):
-    __tablename__ = 'registration_form_field_data'
+    __tablename__ = 'form_field_data'
     __table_args__ = {'schema': 'event_registration'}
 
     #: The ID of the object
@@ -36,7 +36,7 @@ class RegistrationFormFieldData(db.Model):
     #: The ID of the registration form field
     field_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_form_items.id'),
+        db.ForeignKey('event_registration.form_items.id'),
         index=True,
         nullable=False
     )

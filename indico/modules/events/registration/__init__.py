@@ -43,7 +43,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 def _get_active_regforms(event):
     if not event.has_feature('registration'):
         return []
-    from indico.modules.events.registration.models.registration_forms import RegistrationForm
+    from indico.modules.events.registration.models.forms import RegistrationForm
     return (RegistrationForm.find(RegistrationForm.is_active, RegistrationForm.event_id == int(event.id))
                             .order_by(db.func.lower(RegistrationForm.title))
                             .all())

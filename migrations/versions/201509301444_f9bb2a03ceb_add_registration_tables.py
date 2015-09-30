@@ -12,7 +12,7 @@ from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.registration.models.items import RegistrationFormItemType
-from indico.modules.events.registration.models.registration_forms import RegistrationFormModificationMode
+from indico.modules.events.registration.models.forms import RegistrationFormModificationMode
 
 
 # revision identifiers, used by Alembic.
@@ -23,7 +23,7 @@ down_revision = '13480f6da0e2'
 def upgrade():
     op.execute(CreateSchema('event_registration'))
     op.create_table(
-        'registration_forms',
+        'forms',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
@@ -41,7 +41,7 @@ def upgrade():
     )
 
     op.create_table(
-        'registration_form_items',
+        'form_items',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('type', PyIntEnum(RegistrationFormItemType), nullable=False),
@@ -56,24 +56,24 @@ def upgrade():
         sa.Column('data', postgresql.JSON(), nullable=False),
         sa.Column('current_data_id', sa.Integer(), nullable=True, index=True),
         sa.CheckConstraint("(input_type IS NULL) = (type = 1)", name='valid_input'),
-        sa.ForeignKeyConstraint(['parent_id'], ['event_registration.registration_form_items.id']),
-        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.registration_forms.id']),
+        sa.ForeignKeyConstraint(['parent_id'], ['event_registration.form_items.id']),
+        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
 
     op.create_table(
-        'registration_form_field_data',
+        'form_field_data',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('field_id', sa.Integer(), nullable=False, index=True),
         sa.Column('versioned_data', postgresql.JSON(), nullable=False),
-        sa.ForeignKeyConstraint(['field_id'], ['event_registration.registration_form_items.id']),
+        sa.ForeignKeyConstraint(['field_id'], ['event_registration.form_items.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
 
     op.create_foreign_key(None,
-                          'registration_form_items', 'registration_form_field_data',
+                          'form_items', 'form_field_data',
                           ['current_data_id'], ['id'],
                           source_schema='event_registration', referent_schema='event_registration')
 
@@ -83,7 +83,7 @@ def upgrade():
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
-        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.registration_forms.id']),
+        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
@@ -97,7 +97,7 @@ def upgrade():
         sa.Column('file', sa.LargeBinary(), nullable=True),
         sa.Column('file_metadata', postgresql.JSON(), nullable=False),
         sa.CheckConstraint("(file IS NULL) = (file_metadata::text = 'null')", name='valid_file'),
-        sa.ForeignKeyConstraint(['field_data_id'], ['event_registration.registration_form_field_data.id']),
+        sa.ForeignKeyConstraint(['field_data_id'], ['event_registration.form_field_data.id']),
         sa.ForeignKeyConstraint(['registration_id'], ['event_registration.registrations.id']),
         sa.PrimaryKeyConstraint('registration_id', 'field_data_id'),
         schema='event_registration'
@@ -105,11 +105,11 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_constraint('fk_registration_form_items_current_data_id_registration_form_field_data',
-                       'registration_form_items', schema='event_registration')
+    op.drop_constraint('fk_form_items_current_data_id_form_field_data',
+                       'form_items', schema='event_registration')
     op.drop_table('registration_data', schema='event_registration')
     op.drop_table('registrations', schema='event_registration')
-    op.drop_table('registration_form_field_data', schema='event_registration')
-    op.drop_table('registration_form_items', schema='event_registration')
-    op.drop_table('registration_forms', schema='event_registration')
+    op.drop_table('form_field_data', schema='event_registration')
+    op.drop_table('form_items', schema='event_registration')
+    op.drop_table('forms', schema='event_registration')
     op.execute(DropSchema('event_registration'))

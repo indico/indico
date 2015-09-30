@@ -24,7 +24,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
-from indico.modules.events.registration.models.registration_forms import RegistrationForm
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import get_event_section_data
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.payment import event_settings

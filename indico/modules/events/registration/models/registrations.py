@@ -36,7 +36,7 @@ class Registration(db.Model):
     #: The ID of the registration form
     registration_form_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_forms.id'),
+        db.ForeignKey('event_registration.forms.id'),
         index=True,
         nullable=False
     )
@@ -99,7 +99,7 @@ class RegistrationData(db.Model):
     #: The ID of the field data
     field_data_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_form_field_data.id'),
+        db.ForeignKey('event_registration.form_field_data.id'),
         primary_key=True,
         autoincrement=False
     )
