@@ -16,13 +16,20 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, render_template
 
 from indico.core import signals
 from indico.core.config import Config
+from indico.modules.events.management.util import can_lock
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.flask.templating import template_hook
 from indico.web.menu import SideMenuItem, SideMenuSection
+
+
+@template_hook('event-manage-header')
+def _add_action_menu(event, **kwargs):
+    return render_template('events/management/action_menu.html', event=event, can_lock=can_lock(event, session.user))
 
 
 @signals.menu.sections.connect_via('event-management-sidemenu')

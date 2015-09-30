@@ -1199,13 +1199,15 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
         WPConferenceModifBase.__init__(self, rh, target)
 
     def _getPageContent( self, params ):
-        message = _("The event is currently locked and you cannot modify it in this status. ")
-        if self._conf.canModify(self._rh.getAW()):
-            message += _("If you unlock the event, you will be able to modify its details again.")
+        from indico.modules.events.management import can_lock
+        can_unlock = can_lock(self._conf, session.user)
+        message = _("The event is currently locked so it cannot be modified.")
+        if can_unlock:
+            message += ' ' + _("If you unlock the event, you will be able to modify it again.")
         return wcomponents.WClosed().getHTML({"message": message,
                                               "postURL": url_for('event_management.unlock', self._conf),
-                                             "showUnlockButton": self._conf.canModify(self._rh.getAW()),
-                                             "unlockButtonCaption": _("Unlock event")})
+                                              "showUnlockButton": can_unlock,
+                                              "unlockButtonCaption": _("Unlock event")})
 
 
 class WPConferenceModification( WPConferenceModifBase ):

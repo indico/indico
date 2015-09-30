@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session
+from flask import flash, redirect, session
+from werkzeug.exceptions import Forbidden
 
+from indico.modules.events.management.util import can_lock
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.util import jsonify_template
@@ -55,6 +57,11 @@ class RHLockEvent(RHConferenceModifBase):
 
     CSRF_ENABLED = True
 
+    def _checkProtection(self):
+        RHConferenceModifBase._checkProtection(self)
+        if not can_lock(self._conf, session.user):
+            raise Forbidden
+
     def _process(self):
         return RH._process(self)
 
@@ -64,5 +71,19 @@ class RHLockEvent(RHConferenceModifBase):
     def _process_POST(self):
         self._conf.setClosed(True)
         flash(_('The event is now locked.'), 'success')
-
         return jsonify_data(url=url_for('event_mgmt.conferenceModification', self._conf), flash=False)
+
+
+class RHUnlockEvent(RHConferenceModifBase):
+    """Unlock an event."""
+
+    CSRF_ENABLED = True
+
+    def _checkProtection(self):
+        self._allowClosed = can_lock(self._conf, session.user)
+        RHConferenceModifBase._checkProtection(self)
+
+    def _process(self):
+        self._conf.setClosed(False)
+        flash(_('The event is now unlocked.'), 'success')
+        return redirect(url_for('event_mgmt.conferenceModification', self._conf))

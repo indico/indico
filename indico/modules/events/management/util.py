@@ -16,14 +16,19 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.management.controllers import RHDeleteEvent, RHLockEvent, RHUnlockEvent
-from indico.web.flask.wrappers import IndicoBlueprint
+from indico.util.event import unify_event_args
+from indico.util.user import unify_user_args
 
 
-_bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
-                      virtual_template_folder='events/management',
-                      url_prefix='/event/<confId>/manage')
-
-_bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
-_bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
-_bp.add_url_rule('/unlock', 'unlock', RHUnlockEvent, methods=('POST',))
+@unify_user_args
+@unify_event_args(legacy=True)
+def can_lock(event, user):
+    """Checks whether a user can lock/unlock an event."""
+    if not user:
+        return False
+    elif user.is_admin:
+        return True
+    elif user == event.as_event.creator:
+        return True
+    else:
+        return any(cat.canUserModify(user.as_avatar) for cat in event.getOwnerList())

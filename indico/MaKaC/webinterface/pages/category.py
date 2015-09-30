@@ -1185,10 +1185,6 @@ class WCategModifMain(wcomponents.WTemplated):
     def __getConferenceItems(self, cl, modifURLGen):
         temp = []
         for conf in cl:
-            if conf.isClosed():
-                textopen = i18nformat(""" <b>[ <a href="%s"> _("re-open event")</a> ]</b>""") % url_for('event_management.unlock', conf)
-            else:
-                textopen = ""
             temp.append("""
                 <tr>
                     <td width="3%%">
@@ -1196,8 +1192,8 @@ class WCategModifMain(wcomponents.WTemplated):
                     </td>
                     <td align="center" width="17%%">%s</td>
                     <td align="center" width="17%%">%s</td>
-                    <td width="100%%"><a href="%s">%s</a>%s</td>
-                </tr>"""%(conf.getId(), conf.getAdjustedStartDate().date(), conf.getAdjustedEndDate().date(),modifURLGen(conf), conf.getTitle(), textopen))
+                    <td width="100%%"><a href="%s">%s</a></td>
+                </tr>"""%(conf.getId(), conf.getAdjustedStartDate().date(), conf.getAdjustedEndDate().date(),modifURLGen(conf), conf.getTitle()))
         html = i18nformat("""<table align="left" width="100%%">
                 <tr>
                     <td width="3%%" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll(document.contentForm.selectedConf)"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll(document.contentForm.selectedConf)"></td>

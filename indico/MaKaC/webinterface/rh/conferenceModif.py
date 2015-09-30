@@ -239,35 +239,6 @@ class RHConferenceCloseModifKey(RHConferenceBase):
         self._redirect(url)
 
 
-class RHConferenceOpen(RHConferenceModifBase):
-    _allowClosed = True
-
-    def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
-
-        if session.user == self._conf.as_event.creator:
-            return
-        # If we are not the creator, check if we have category admin privileges
-        hasAccess = False
-        for owner in self._conf.getOwnerList():
-            if owner.canUserModify(session.avatar):  # category or system admin
-                hasAccess = True
-                break
-        if not hasAccess:
-            if self._conf.isClosed():
-                raise ConferenceClosedError(self._target.getConference())
-            else:
-                raise ModificationError()
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
-
-    def _process(self):
-        self._target.setClosed(False)
-        url = urlHandlers.UHConferenceModification.getURL(self._conf)
-        self._redirect(url)
-
-
 class RHConfDataModif(RHConferenceModifBase):
     _uh = urlHandlers.UHConfDataModif
 

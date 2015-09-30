@@ -4,7 +4,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
 <div class="banner">
 
-    ${ render_template('events/management/action_menu.html', event=conf) }
+    ${ template_hook('event-manage-header', event=conf) }
 
     <a href="${ UHConferenceModification.getURL(conf) }">
         <span class="bannerTitle bannerTitle_0">
