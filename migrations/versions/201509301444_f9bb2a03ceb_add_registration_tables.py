@@ -11,6 +11,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.events.registration.models.items import RegistrationFormItemType
 from indico.modules.events.registration.models.registration_forms import RegistrationFormModificationMode
 
 
@@ -42,18 +43,18 @@ def upgrade():
     op.create_table(
         'registration_form_items',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('registration_form_id', sa.Integer(), nullable=False),
-        sa.Column('type', sa.Integer(), nullable=False),
-        sa.Column('parent_id', sa.Integer(), nullable=True),
+        sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('type', PyIntEnum(RegistrationFormItemType), nullable=False),
+        sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
-        sa.Column('is_enabled', sa.Boolean(), nullable=True),
-        sa.Column('is_deleted', sa.Boolean(), nullable=True),
-        sa.Column('is_required', sa.Boolean(), nullable=True),
+        sa.Column('is_enabled', sa.Boolean(), nullable=False),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.Column('is_required', sa.Boolean(), nullable=False),
         sa.Column('input_type', sa.String(), nullable=True),
         sa.Column('data', postgresql.JSON(), nullable=False),
-        sa.Column('current_data_id', sa.Integer(), nullable=True),
+        sa.Column('current_data_id', sa.Integer(), nullable=True, index=True),
         sa.CheckConstraint("(input_type IS NULL) = (type = 1)", name='valid_input'),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.registration_form_items.id']),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.registration_forms.id']),
@@ -64,7 +65,7 @@ def upgrade():
     op.create_table(
         'registration_form_field_data',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('field_id', sa.Integer(), nullable=False),
+        sa.Column('field_id', sa.Integer(), nullable=False, index=True),
         sa.Column('versioned_data', postgresql.JSON(), nullable=False),
         sa.ForeignKeyConstraint(['field_id'], ['event_registration.registration_form_items.id']),
         sa.PrimaryKeyConstraint('id'),
