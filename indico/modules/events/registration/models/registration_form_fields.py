@@ -36,7 +36,9 @@ class RegistrationFormFieldData(db.Model):
     #: The ID of the registration form field
     field_id = db.Column(
         db.Integer,
-        db.ForeignKey('event_registration.registration_form_items.id')
+        db.ForeignKey('event_registration.registration_form_items.id'),
+        index=True,
+        nullable=False
     )
     #: Data describing the field
     versioned_data = db.Column(
@@ -56,13 +58,6 @@ class RegistrationFormField(RegistrationFormItem):
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.field
     }
-
-    #: determines if the field is mandatory
-    is_required = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
 
     @property
     def locator(self):
