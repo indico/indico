@@ -1,15 +1,19 @@
 {% extends 'layout/event_page_base.html' %}
 
 {% block title %}
-    {%- trans %}Registration Forms{% endtrans -%}
+    {%- trans %}Registration{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans %}Available forms{% endtrans %}
 {% endblock %}
 
 {% block content %}
     <table id="regforms-list" class="i-table-widget">
         <thead>
             <tr>
-                <th>{% trans %}Registration Form{% endtrans %}</th>
-                <th>{% trans %}Available from{% endtrans %}</th>
+                <th>{% trans %}Form{% endtrans %}</th>
+                <th>{% trans %}Starts{% endtrans %}</th>
                 <th>{% trans %}Deadline{% endtrans %}</th>
                 <th></th>
             </tr>

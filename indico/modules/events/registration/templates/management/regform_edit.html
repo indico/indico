@@ -1,15 +1,11 @@
-{% extends 'layout/base.html' %}
+{% extends 'events/registration/management/_regform_base.html' %}
 {% from 'forms/_form.html' import simple_form %}
-
-{% block title %}
-    {%- trans %}Registration Form{% endtrans -%}
-{% endblock %}
 
 {% block subtitle %}
     {% if regform %}
-        {% trans title=regform.title -%}Edit "{{ title }}"{%- endtrans %}
+        {% trans title=regform.title -%}Edit form "{{ title }}"{%- endtrans %}
     {% else %}
-        {%- trans %}Create registration form{% endtrans -%}
+        {%- trans %}Create form{% endtrans -%}
     {% endif %}
 {% endblock %}
 
