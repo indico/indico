@@ -392,7 +392,10 @@ module_js = {
     'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/eventlayout.js'),
     'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
     'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
-    'registration': rjs_bundle('modules_registration', 'js/indico/modules/registration.js')
+    'registration': rjs_bundle('modules_registration',
+                               'js/indico/modules/registration.js',
+                               *namespace('js/indico/RegistrationForm', 'registrationform.js', 'section.js', 'field.js',
+                                          'sectiontoolbar.js', 'table.js'))
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",

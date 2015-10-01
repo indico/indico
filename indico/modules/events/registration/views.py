@@ -27,8 +27,7 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'registration'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls() +
-                self._asset_env['indico_regform'].urls())
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
@@ -42,8 +41,7 @@ class DisplayRegistrationFormMixin(WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
     def getJSFiles(self):
-        return (self.base_class.getJSFiles(self) + self._asset_env['modules_registration_js'].urls() +
-                self._asset_env['indico_regform'].urls())
+        return self.base_class.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
 
     def getCSSFiles(self):
         return self.base_class.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
