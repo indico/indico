@@ -71,7 +71,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         self.field.is_deleted = True
         db.session.flush()
         logger.info('Field {} deleted by {}'.format(self.field, session.user))
-        return jsonify_data(success=True)
+        return jsonify_data(flash=False)
 
     def _process_POST(self):
         field_data = request.json['fieldData']
@@ -82,7 +82,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
                     if not item.get('id', None):
                         item['id'] = unicode(uuid4())
             self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, versioned_data=field_data)
-        return jsonify(self.field.view_data)
+        return jsonify_data(flash=False)
 
 
 class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
