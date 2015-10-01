@@ -22,6 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.registration.models.items import RegistrationFormItemType
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -183,6 +184,11 @@ class RegistrationForm(db.Model):
 
     def can_submit(self, user):
         return self.is_active and (not self.require_user or user) and not self.limit_reached
+
+    @memoize_request
+    def get_user_registration(self, user):
+        if user:
+            return user.registrations.filter_by(registration_form=self).first()
 
 
 @listens_for(RegistrationForm.sections, 'append')

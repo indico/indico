@@ -16,9 +16,6 @@
 
 from __future__ import unicode_literals
 
-from flask import session
-
-from indico.util.caching import memoize_request
 from indico.web.forms.base import IndicoForm
 
 
@@ -37,10 +34,3 @@ def make_registration_form(regform, management=False):
         name = 'field_{0}-{1}'.format(form_item.parent_id, form_item.id)
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
-
-
-@memoize_request
-def get_registration(regform):
-    """Get the registration for the current logged in user"""
-    if session.user:
-        return session.user.registrations.filter_by(registration_form=regform).first()

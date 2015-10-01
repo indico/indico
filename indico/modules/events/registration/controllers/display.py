@@ -23,8 +23,7 @@ from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     get_registration)
+from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
@@ -35,7 +34,8 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _can_redirect_to_single_regform(regforms):
-    return len(regforms) == 1 and regforms[0].can_submit(session.user) and not get_registration(regforms[0])
+    user = session.user
+    return len(regforms) == 1 and regforms[0].can_submit(user) and not regforms[0].get_user_registration(user)
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
@@ -62,8 +62,8 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         regforms = RegistrationForm.find_all(RegistrationForm.is_visible, event_id=int(self.event.id))
         if _can_redirect_to_single_regform(regforms):
             return redirect(url_for('.display_regform', regforms[0]))
-        return self.view_class.render_template('display/regform_list.html', self.event, regforms=regforms,
-                                               event=self.event, get_registration=get_registration)
+        return self.view_class.render_template('display/regform_list.html', self.event,
+                                               event=self.event, regforms=regforms)
 
 
 
@@ -89,7 +89,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
         if not self.regform.is_active:
             flash(_('This registration form is not active'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
-        elif get_registration(self.regform):
+        elif self.regform.get_user_registration(session.user):
             flash(_('You have already registered with this form'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
         elif self.regform.limit_reached:
