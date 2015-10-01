@@ -22,8 +22,8 @@ from indico.util.caching import memoize_request
 from indico.web.forms.base import IndicoForm
 
 
-def get_event_section_data(regform):
-    return [s.view_data for s in regform.sections if not s.is_deleted]
+def get_event_section_data(regform, management=False):
+    return [s.view_data for s in regform.sections if not s.is_deleted and (management or not s.is_manager_only)]
 
 
 def make_registration_form(regform):

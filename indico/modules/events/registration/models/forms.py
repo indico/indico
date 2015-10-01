@@ -103,7 +103,6 @@ class RegistrationForm(db.Model):
         db.Integer,
         nullable=True
     )
-    # TODO: custom statuses???????
     # TODO: notification-related columns
 
     #: The Event containing this registration form

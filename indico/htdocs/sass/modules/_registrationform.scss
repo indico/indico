@@ -121,6 +121,18 @@
             top: -3px;
         }
     }
+
+    &.manager-only {
+        .section-sortable-handle {
+            background-color: $dark-yellow;
+            &:hover {
+                background-color: white;
+            }
+        }
+        .i-box-title {
+            @include icon-before('icon-user-reading');
+        }
+    }
 }
 
 .regform-field {
