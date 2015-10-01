@@ -53,9 +53,9 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
     };
 
     $scope.sectionApi.updateTitle = function(section, data) {
-        var requestParams = angular.extend(getRequestParams(section), data);
+        var requestParams = angular.extend(getRequestParams(section), {changes: data});
 
-        regFormFactory.Sections.title(requestParams, function(updatedSection) {
+        regFormFactory.Sections.modify(requestParams, function(updatedSection) {
             regFormFactory.processResponse(updatedSection, {
                 success: function(updatedSection) {
                     $scope.section.title = updatedSection.title;
@@ -65,9 +65,9 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
     };
 
     $scope.sectionApi.updateDescription = function(section, data) {
-        var requestParams = angular.extend(getRequestParams(section), data);
+        var requestParams = angular.extend(getRequestParams(section), {changes: data});
 
-        regFormFactory.Sections.description(requestParams, function(updatedSection) {
+        regFormFactory.Sections.modify(requestParams, function(updatedSection) {
             regFormFactory.processResponse(updatedSection, {
                 success: function(updatedSection)  {
                     $scope.section.description = updatedSection.description;
