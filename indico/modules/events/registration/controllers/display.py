@@ -109,6 +109,9 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
         registration = Registration(user=session.user, registration_form=self.regform)
         db.session.add(registration)
         for form_item in self.regform.active_fields:
-            value = data.get('field_{0}-{1}'.format(form_item.parent_id, form_item.id), None)
+            if form_item.parent.is_manager_only:
+                value = form_item.wtf_field.default_value
+            else:
+                value = data.get('field_{0}-{1}'.format(form_item.parent_id, form_item.id))
             form_item.wtf_field.save_data(registration, value)
         db.session.flush()
