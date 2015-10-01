@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, jsonify, session
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.registration import logger
@@ -71,11 +72,13 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         return jsonify(success=True)
 
     def _process_PATCH(self):
-        modified_field = request.args.get('modified')
-        if modified_field in {'title', 'description'}:
-            setattr(self.section, modified_field, request.json.get(modified_field))
+        changes = request.json['changes']
+        if changes.viewkeys() > {'title', 'description'}:
+            raise BadRequest
+        for field, value in changes.iteritems():
+            setattr(self.section, field, value)
         db.session.flush()
-        logger.info('Section {} modified by {}'.format(self.section, session.user))
+        logger.info('Section {} modified by {}: {}'.format(self.section, session.user, changes))
         return jsonify(self.section.view_data)
 
 
