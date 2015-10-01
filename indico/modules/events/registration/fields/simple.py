@@ -24,7 +24,7 @@ from wtforms.validators import NumberRange
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.fs import secure_filename
-from indico.util.string import crc32
+from indico.util.string import crc32, normalize_phone_number
 from indico.web.forms.validators import IndicoEmail
 
 
@@ -85,6 +85,9 @@ class BooleanField(RegistrationFormFieldBase):
 class PhoneField(RegistrationFormFieldBase):
     name = 'telephone'
     wtf_field_class = wtforms.StringField
+
+    def save_data(self, registration, value):
+        super(PhoneField, self).save_data(registration, normalize_phone_number(value))
 
 
 class CountryField(RegistrationFormFieldBase):
