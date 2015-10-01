@@ -58,6 +58,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=''
     )
+    #: Contact information for registrants
+    contact_info = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     #: Datetime when the registration form is open
     start_dt = db.Column(
         UTCDateTime,
