@@ -1,4 +1,4 @@
-<div id="section{{ section.id }}" class="regform-section">
+<div id="section{{ section.id }}" class="regform-section {{ section.isManagerOnly ? 'manager-only' : '' }}">
     <div ng-if="editMode" class="section-sortable-handle"></div>
     <div class="i-box-header">
         <table ng-switch="editMode">

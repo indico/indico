@@ -144,5 +144,6 @@ class RHRegistrationFormModify(RHManageRegFormBase):
 
     def _process(self):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event, event=self.event_new,
-                                                    sections=get_event_section_data(self.regform), regform=self.regform,
+                                                    sections=get_event_section_data(self.regform, management=True),
+                                                    regform=self.regform,
                                                     currency=event_settings.get(self.event, 'currency'))
