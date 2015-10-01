@@ -18,7 +18,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
         </span>
     </a>
     <div class="banner_creator">
-        ${ _("Created by {name} ({email})").format(name=conf.as_event.creator.full_name, email=conf.as_event.creator.email)}
+        ${ _(u"Created by {name} ({email})").format(name=conf.as_event.creator.full_name, email=conf.as_event.creator.email)}
     </div>
 
 </div>
