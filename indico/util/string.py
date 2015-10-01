@@ -457,3 +457,8 @@ def crc32(data):
     if isinstance(data, unicode):
         data = data.encode('utf-8')
     return binascii.crc32(data) & 0xffffffff
+
+
+def normalize_phone_number(value):
+    """Normalize phone number, so it doesn't contain invalid characters"""
+    return re.sub(r'((?!^)\+)|[^0-9x+]', '', value.strip())

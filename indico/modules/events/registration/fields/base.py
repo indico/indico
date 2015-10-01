@@ -54,4 +54,4 @@ class RegistrationFormFieldBase(object):
 
     @property
     def default_value(self):
-        return None
+        return ''
