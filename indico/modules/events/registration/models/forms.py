@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
@@ -114,6 +115,13 @@ class RegistrationForm(db.Model):
             lazy='dynamic'
         )
     )
+    #: The sections of the registration form
+    sections = db.relationship(
+        'RegistrationFormSection',
+        lazy=True,
+        viewonly=True,
+        order_by='RegistrationFormSection.position'
+    )
 
     # relationship backrefs:
     # - registrations (Registration.registration_form)
@@ -175,3 +183,9 @@ class RegistrationForm(db.Model):
 
     def can_submit(self, user):
         return self.is_active and (not self.require_user or user) and not self.limit_reached
+
+
+@listens_for(RegistrationForm.sections, 'append')
+@listens_for(RegistrationForm.sections, 'remove')
+def _wrong_collection_modified(*unused):
+    raise Exception('This collection is view-only. Use `form_items` for write operations!')
