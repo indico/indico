@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import binascii
 import os
 from io import BytesIO
 from operator import attrgetter
@@ -28,6 +27,7 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.events import Event
 from indico.util.console import cformat, verbose_iterator
 from indico.util.fs import secure_filename
+from indico.util.string import crc32
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import get_archived_file
@@ -80,7 +80,7 @@ class EventLayoutImporter(Importer):
         logo_filename = os.path.splitext(logo_filename)[0] + '.png'
         event.logo_metadata = {
             'size': len(logo_content),
-            'hash': binascii.crc32(logo_content) & 0xffffffff,
+            'hash': crc32(logo_content),
             'filename': logo_filename,
             'content_type': 'image/png'
         }
@@ -98,7 +98,7 @@ class EventLayoutImporter(Importer):
             stylesheet_content = convert_to_unicode(f.read())
         event.stylesheet_metadata = {
             'size': len(stylesheet_content),
-            'hash': binascii.crc32(stylesheet_content) & 0xffffffff,
+            'hash': crc32(stylesheet_content),
             'filename': secure_filename(convert_to_unicode(stylesheet.fileName), 'stylesheet.css'),
             'content_type': 'text/css'
         }
