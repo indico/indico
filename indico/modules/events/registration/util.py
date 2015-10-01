@@ -26,14 +26,14 @@ def get_event_section_data(regform, management=False):
     return [s.view_data for s in regform.sections if not s.is_deleted and (management or not s.is_manager_only)]
 
 
-def make_registration_form(regform):
+def make_registration_form(regform, management=False):
     """Creates a WTForm based on registration form fields"""
 
     form_class = type(b'RegistrationFormWTForm', (IndicoForm,), {})
     for form_item in regform.active_fields:
-        field_impl = form_item.wtf_field
-        if field_impl is None:
+        if not management and form_item.parent.is_manager_only:
             continue
+        field_impl = form_item.wtf_field
         name = 'field_{0}-{1}'.format(form_item.parent_id, form_item.id)
         setattr(form_class, name, field_impl.create_wtf_field())
     return form_class

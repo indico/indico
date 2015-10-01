@@ -32,7 +32,7 @@ class FreeTextField(RegistrationFormFieldBase):
     wtf_field_class = HiddenField
 
     def save_data(self, registration, value):
-        return
+        pass
 
 
 class TextField(RegistrationFormFieldBase):
@@ -58,6 +58,15 @@ class TextAreaField(RegistrationFormFieldBase):
 class SelectField(RegistrationFormFieldBase):
     name = 'radio'
     wtf_field_class = StringField
+
+    @property
+    def default_value(self):
+        data = self.form_item.current_data.versioned_data
+        try:
+            default_item = data['defaultItem']
+        except KeyError:
+            return None
+        return next((x['id'] for x in data['radioitems'] if x['caption'] == default_item), None)
 
 
 class CheckboxField(RegistrationFormFieldBase):
@@ -95,6 +104,8 @@ class FileField(RegistrationFormFieldBase):
     wtf_field_class = FileField
 
     def save_data(self, registration, value):
+        if value is None:
+            return
         f = value.file
         content = f.read()
         metadata = {
