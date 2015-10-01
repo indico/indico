@@ -648,7 +648,6 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 $scope.settings = $scope.config;
 
                 $scope.formData = {};
-                $scope.formData.radioitems = [];
                 $scope.formData.input = $scope.field.input;
                 $scope.formData.disabled = $scope.field.disabled;
                 $scope.formData.withExtraSlots = $scope.field.withExtraSlots;
@@ -661,9 +660,12 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     }
                 });
 
-                _.each($scope.field.radioitems, function(item, ind) {
-                    $scope.formData.radioitems[ind] =  angular.copy(item);
-                });
+                if ($scope.field.radioitems && $scope.field.radioitems.length) {
+                    $scope.formData.radioitems = [];
+                    _.each($scope.field.radioitems, function(item, ind) {
+                        $scope.formData.radioitems[ind] = angular.copy(item);
+                    });
+                }
 
                 $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
                 $scope.tabSelected = "tab-options";
