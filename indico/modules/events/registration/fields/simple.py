@@ -85,9 +85,7 @@ class BooleanField(RegistrationFormFieldBase):
 class PhoneField(RegistrationFormFieldBase):
     name = 'telephone'
     wtf_field_class = wtforms.StringField
-
-    def save_data(self, registration, value):
-        super(PhoneField, self).save_data(registration, normalize_phone_number(value))
+    field_kwargs = {'filters': [normalize_phone_number]}
 
 
 class CountryField(RegistrationFormFieldBase):
