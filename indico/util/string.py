@@ -29,6 +29,7 @@ from uuid import uuid4
 import bleach
 import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
+from enum import Enum
 from lxml import html, etree
 from speaklater import _LazyString
 
@@ -394,13 +395,19 @@ def format_repr(obj, *args, **kwargs):
                   that doesn't look well in the unquoted
                   comma-separated argument list.
     """
+    def _format_value(value):
+        if isinstance(value, Enum):
+            return value.name
+        else:
+            return value
+
     text_arg = kwargs.pop('_text', None)
     obj_name = type(obj).__name__
-    formatted_args = [unicode(getattr(obj, arg)) for arg in args]
+    formatted_args = [unicode(_format_value(getattr(obj, arg))) for arg in args]
     for name, default_value in sorted(kwargs.items()):
         value = getattr(obj, name)
         if value != default_value:
-            formatted_args.append(u'{}={}'.format(name, value))
+            formatted_args.append(u'{}={}'.format(name, _format_value(value)))
     if text_arg is None:
         return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
     else:
