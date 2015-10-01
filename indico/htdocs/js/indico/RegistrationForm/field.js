@@ -621,6 +621,19 @@ ndRegForm.directive('ndYesnoField', function(url) {
     };
 });
 
+ndRegForm.directive('ndEmailField', function(url) {
+    return {
+        require: 'ndField',
+        controller: function($scope) {
+            $scope.tplInput = url.tpl('fields/email.tpl.html');
+        },
+        link: function(scope) {
+            scope.settings.fieldName = $T("Email address");
+            scope.settings.formData.push('address');
+        }
+    }
+});
+
 ndRegForm.directive('ndFieldDialog', function(url) {
     return {
         require: 'ndDialog',
