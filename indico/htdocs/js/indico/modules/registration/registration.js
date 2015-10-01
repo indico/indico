@@ -87,8 +87,18 @@
         });
     }
 
+    function colorizeActiveFilters() {
+        $('.reglist-filter .filter').each(function() {
+            var $this = $(this);
+            if ($this.find(':checked').length) {
+                $this.addClass('active');
+            }
+        });
+    }
+
     global.setupRegistrationsListFilter = function setupRegistrationsListFilter() {
         $('.reglist-filter').dropdown({selector: '.reglist-column .title'});
+        colorizeActiveFilters();
 
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
         var visibleColumnsUserInfoField = $('#visible-columns-user-info');
