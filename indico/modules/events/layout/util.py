@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import binascii
 from collections import defaultdict
 from itertools import count, chain
 from sqlalchemy.exc import IntegrityError
@@ -30,6 +29,7 @@ from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
+from indico.util.string import crc32
 from indico.web.flask.util import url_for
 from MaKaC.common.cache import GenericCache
 
@@ -130,7 +130,7 @@ def menu_entries_for_event(event):
     signal_entries = get_menu_entries_from_signal()
 
     cache_key = unicode(event.id)
-    plugin_hash = binascii.crc32(','.join(sorted(plugin_engine.get_active_plugins()))) & 0xffffffff
+    plugin_hash = crc32(','.join(sorted(plugin_engine.get_active_plugins())))
     cache_version = '{}:{}'.format(MaKaC.__version__, plugin_hash)
     processed = entries and _cache.get(cache_key) == cache_version
 
