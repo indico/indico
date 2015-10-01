@@ -82,8 +82,7 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
             "enable": {method: 'POST', url: sectionURL + "/", params: {enable: true}},
             "disable": {method: 'POST', url: sectionURL + "/", params: {enable: false}},
             "move": {method: 'POST', url: sectionURL + "/move"},
-            "title": {method: 'PATCH', url: sectionURL + "/", params: {modified: 'title'}},
-            "description": {method: 'PATCH', url: sectionURL + "/", params: {modified: 'description'}}
+            "modify": {method: 'PATCH', url: sectionURL + '/'}
         }),
         Fields: $resource(fieldURL, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId", confFormId: "@confFormId"}, {
             "enable": {method:'POST', url: fieldURL + "/toggle", params: {enable: true}},
