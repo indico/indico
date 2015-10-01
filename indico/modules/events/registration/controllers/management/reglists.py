@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
+import itertools
 import json
+
 from collections import OrderedDict
 
 from flask import session, request
@@ -53,13 +55,16 @@ USER_INFO = OrderedDict([
 ])
 
 
-def _filter_registration(query):
+def _get_filters_from_request():
     filters = {}
     for key in request.form.iterkeys():
         field_name = key.split('_')
         if field_name[0] == 'radiogroup':
             filters[int(field_name[1])] = request.form.getlist(key)
+    return filters
 
+
+def _filter_registration(query, filters):
     if not filters:
         return query
 
@@ -76,23 +81,24 @@ def _filter_registration(query):
     return query.filter(subquery == len(filters))
 
 
-def _query_registrations(regform):
-    return (Registration.query
-                        .with_parent(regform)
-                        .options(joinedload('data').joinedload('field_data').joinedload('field')))
+def _query_registrations(regform, filters):
+    query = (Registration.query
+             .with_parent(regform)
+             .options(joinedload('data').joinedload('field_data').joinedload('field')))
+    return _filter_registration(query, filters)
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event"""
 
     def _process(self):
-        session_key = 'reg_list_columns_{}'.format(self.regform.id)
-        visible_columns = session.get(session_key, {'items': [], 'user_info': []})
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(visible_columns['items']))
-        registrations = _query_registrations(self.regform).all()
+        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        reg_list_config = session.get(session_key, {'items': [], 'user_info': [], 'filters': {}})
+        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(reg_list_config['items']))
+        registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
-                                                    visible_cols_user_info=visible_columns['user_info'],
+                                                    visible_cols_user_info=reg_list_config['user_info'],
                                                     user_info=USER_INFO, get_user_info=get_user_info,
                                                     registrations=registrations)
 
@@ -101,25 +107,27 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event"""
 
     def _process_GET(self):
-        session_key = 'reg_list_columns_{}'.format(self.regform.id)
-        visible_columns = session.get(session_key, {'items': [], 'user_info': []})
+        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        reg_list_config = session.get(session_key, {'items': [], 'user_info': [], 'filters': {}})
+        filters = set(itertools.chain.from_iterable(reg_list_config['filters'].itervalues()))
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
-                                                    visible_cols_regform_items=visible_columns['items'],
-                                                    visible_cols_user_info=visible_columns['user_info'],
-                                                    user_info=USER_INFO)
+                                                    visible_cols_regform_items=reg_list_config['items'],
+                                                    visible_cols_user_info=reg_list_config['user_info'],
+                                                    user_info=USER_INFO, filters=filters)
 
     def _process_POST(self):
-        session_key = 'reg_list_columns_{}'.format(self.regform.id)
+        filters = _get_filters_from_request()
+        session_key = 'reg_list_config_{}'.format(self.regform.id)
         visible_regform_items = json.loads(request.values['visible_cols_regform_items'])
         visible_user_info = json.loads(request.values['visible_cols_user_info'])
-        session.setdefault(session_key, {})
-        session[session_key]['items'] = visible_regform_items
-        session[session_key]['user_info'] = visible_user_info
+        reglist_config = session.setdefault(session_key, {})
+        reglist_config['filters'] = filters
+        reglist_config['items'] = visible_regform_items
+        reglist_config['user_info'] = visible_user_info
         session.modified = True
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(visible_regform_items))
-        registrations = _query_registrations(self.regform)
-        registrations = _filter_registration(registrations).all()
+        registrations = _query_registrations(self.regform, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
         reg_list = tpl.render_registrations_list(registrations=registrations, visible_cols_regform_items=regform_items,
                                                  visible_cols_user_info=visible_user_info, user_info=USER_INFO,
