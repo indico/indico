@@ -20,6 +20,7 @@ var ndServices = angular.module('ndServices', []);
 ndServices.provider('url', function() {
     var baseUrl = Indico.Urls.Base;
     var modulePath = '';
+    var debug = $('body').data('debug') ? '?' + +Date.now() : '';
 
     return {
         setModulePath: function(path) {
@@ -33,7 +34,7 @@ ndServices.provider('url', function() {
         $get: function() {
             return {
                 tpl: function(path) {
-                    return baseUrl + modulePath + '/tpls/' + path;
+                    return baseUrl + modulePath + '/tpls/' + path + debug;
                 }
             };
         }

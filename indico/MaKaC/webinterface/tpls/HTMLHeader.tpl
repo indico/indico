@@ -59,5 +59,5 @@
 
         ${ template_hook('html-head', template=self) }
     </head>
-    <body data-user-id="${ user.getId() if user else 'null' }">
+    <body data-user-id="${ user.getId() if user else 'null' }" data-debug="${ _app.debug|n,j }">
         ${ page._getWarningMessage() }
