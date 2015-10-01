@@ -20,7 +20,7 @@ import pytest
 from enum import Enum
 
 from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
-                                camelize, camelize_keys, snakify_keys, crc32)
+                                camelize, camelize_keys, snakify_keys, crc32, normalize_phone_number)
 
 
 def test_seems_html():
@@ -158,3 +158,17 @@ def test_crc32():
     assert crc32(u'm\xf6p'.encode('utf-8')) == 2575016153
     assert crc32(b'') == 0
     assert crc32(b'hello world\0\1\2\3\4') == 140159631
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('',                ''),
+    ('+41785324567',    '+41785324567'),
+    ('++454545455',     '+454545455'),
+    ('123-456-789',     '123456789'),
+    ('0123456x0+',      '0123456x0'),
+    ('+48 785 326 691', '+48785326691'),
+    ('0048785326691',   '0048785326691'),
+    ('123-456-xxxx',    '123456xxxx')
+))
+def test_normalize_phone_number(input, output):
+    assert normalize_phone_number(input) == output
