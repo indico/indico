@@ -20,6 +20,7 @@ String manipulation functions
 
 from __future__ import absolute_import
 
+import binascii
 import functools
 import re
 import string
@@ -446,3 +447,13 @@ def camelize_keys(dict_):
 def snakify_keys(dict_):
     """Convert the keys of a dict to snake_case"""
     return _convert_keys(dict_, snakify)
+
+
+def crc32(data):
+    """Calculates a CRC32 checksum.
+
+    When a unicode object is passed, it is encoded as UTF-8.
+    """
+    if isinstance(data, unicode):
+        data = data.encode('utf-8')
+    return binascii.crc32(data) & 0xffffffff

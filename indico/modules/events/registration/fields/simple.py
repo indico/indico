@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import binascii
 import mimetypes
 
 import wtforms
@@ -25,6 +24,7 @@ from wtforms.validators import NumberRange
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.fs import secure_filename
+from indico.util.string import crc32
 
 
 class TextField(RegistrationFormFieldBase):
@@ -101,7 +101,7 @@ class FileField(RegistrationFormFieldBase):
         f = value.file
         content = f.read()
         metadata = {
-            'hash': binascii.crc32(content) & 0xffffffff,
+            'hash': crc32(content),
             'size': len(content),
             'filename': secure_filename(value.filename, 'registration_form_file'),
             'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'

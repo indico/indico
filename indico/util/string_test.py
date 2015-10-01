@@ -20,7 +20,7 @@ import pytest
 from enum import Enum
 
 from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
-                                camelize, camelize_keys, snakify_keys)
+                                camelize, camelize_keys, snakify_keys, crc32)
 
 
 def test_seems_html():
@@ -151,3 +151,10 @@ def test_snakify_keys():
     d2 = snakify_keys(d)
     assert d == orig
     assert d2 == {'sn_case': 2, 'should_be_snake_case': 3, 'snake': 4, 'snake-case': 5, 'inner': {'inner_dict': 2}}
+
+
+def test_crc32():
+    assert crc32(u'm\xf6p') == 2575016153
+    assert crc32(u'm\xf6p'.encode('utf-8')) == 2575016153
+    assert crc32(b'') == 0
+    assert crc32(b'hello world\0\1\2\3\4') == 140159631

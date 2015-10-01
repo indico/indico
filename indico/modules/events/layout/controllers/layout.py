@@ -16,12 +16,10 @@
 
 from __future__ import unicode_literals
 
-import binascii
 import os
 from io import BytesIO
 
 from flask import flash, redirect, request, session
-from indico.util.string import to_unicode
 from PIL import Image
 from werkzeug.exceptions import NotFound
 
@@ -32,6 +30,7 @@ from indico.modules.events.layout.util import get_css_url
 from indico.modules.events.layout.views import WPLayoutEdit
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.string import to_unicode, crc32
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
@@ -114,7 +113,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
         content = image_bytes.read()
         self.event.logo = content
         self.event.logo_metadata = {
-            'hash': binascii.crc32(content) & 0xffffffff,
+            'hash': crc32(content),
             'size': len(content),
             'filename': os.path.splitext(secure_filename(f.filename, 'logo'))[0] + '.png',
             'content_type': 'image/png'
@@ -138,7 +137,7 @@ class RHLayoutCSSUpload(RHLayoutBase):
         f = request.files['file']
         self.event.stylesheet = to_unicode(f.read()).strip()
         self.event.stylesheet_metadata = {
-            'hash': binascii.crc32(self.event.stylesheet) & 0xffffffff,
+            'hash': crc32(self.event.stylesheet),
             'size': len(self.event.stylesheet),
             'filename': secure_filename(f.filename, 'stylesheet.css')
         }
