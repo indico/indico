@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import binascii
 import mimetypes
 
-from wtforms import StringField, HiddenField, FileField, IntegerField
+import wtforms
 from wtforms.validators import NumberRange
 
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
@@ -29,7 +29,7 @@ from indico.util.fs import secure_filename
 
 class FreeTextField(RegistrationFormFieldBase):
     name = 'label'
-    wtf_field_class = HiddenField
+    wtf_field_class = wtforms.HiddenField
 
     def save_data(self, registration, value):
         pass
@@ -37,12 +37,12 @@ class FreeTextField(RegistrationFormFieldBase):
 
 class TextField(RegistrationFormFieldBase):
     name = 'text'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
 
 class NumberField(RegistrationFormFieldBase):
     name = 'number'
-    wtf_field_class = IntegerField
+    wtf_field_class = wtforms.IntegerField
 
     @property
     def validators(self):
@@ -52,12 +52,12 @@ class NumberField(RegistrationFormFieldBase):
 
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
 
 class SelectField(RegistrationFormFieldBase):
     name = 'radio'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
     @property
     def default_value(self):
@@ -71,7 +71,7 @@ class SelectField(RegistrationFormFieldBase):
 
 class CheckboxField(RegistrationFormFieldBase):
     name = 'checkbox'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
     def save_data(self, registration, value):
         if not value:
@@ -81,27 +81,27 @@ class CheckboxField(RegistrationFormFieldBase):
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
 
 class BooleanField(RegistrationFormFieldBase):
     name = 'yes/no'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
 
 class PhoneField(RegistrationFormFieldBase):
     name = 'telephone'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
 
 class CountryField(RegistrationFormFieldBase):
     name = 'country'
-    wtf_field_class = StringField
+    wtf_field_class = wtforms.StringField
 
 
 class FileField(RegistrationFormFieldBase):
     name = 'file'
-    wtf_field_class = FileField
+    wtf_field_class = wtforms.FileField
 
     def save_data(self, registration, value):
         if value is None:
