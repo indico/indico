@@ -43,7 +43,7 @@ def make_registration_form(regform):
 
 
 @memoize_request
-def was_regform_submitted(regform):
-    """Check whether the current user has registered to a specific regform"""
-    if session.user and session.user.registrations.filter_by(registration_form=regform).count():
-        return True
+def get_registration(regform):
+    """Get the registration for the current logged in user"""
+    if session.user:
+        return session.user.registrations.filter_by(registration_form=regform).first()
