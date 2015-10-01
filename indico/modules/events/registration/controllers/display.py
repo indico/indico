@@ -24,7 +24,7 @@ from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     was_regform_submitted, save_registration_to_session)
+                                                     was_regform_submitted)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
@@ -39,7 +39,6 @@ def _can_redirect_to_single_regform(regforms):
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
-
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
@@ -112,4 +111,3 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
             value = data.get('field_{0}-{1}'.format(form_item.parent_id, form_item.id), None)
             form_item.wtf_field.save_data(registration, value)
         db.session.flush()
-        save_registration_to_session(registration)
