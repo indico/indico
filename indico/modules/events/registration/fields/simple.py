@@ -25,6 +25,7 @@ from indico.modules.events.registration.fields.base import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.fs import secure_filename
 from indico.util.string import crc32
+from indico.web.forms.validators import IndicoEmail
 
 
 class TextField(RegistrationFormFieldBase):
@@ -109,3 +110,12 @@ class FileField(RegistrationFormFieldBase):
 
         registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, file=content,
                                                   file_metadata=metadata))
+
+
+class EmailField(RegistrationFormFieldBase):
+    name = 'email'
+    wtf_field_class = wtforms.StringField
+
+    @property
+    def validators(self):
+        return [IndicoEmail()]
