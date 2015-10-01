@@ -43,9 +43,13 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 class RegistrationFormItem(db.Model):
     __tablename__ = 'form_items'
-    __table_args__ = (db.CheckConstraint("(input_type IS NULL) = (type = {type})"
-                                         .format(type=RegistrationFormItemType.section), name='valid_input'),
-                      {'schema': 'event_registration'})
+    __table_args__ = (
+        db.CheckConstraint("(input_type IS NULL) = (type = {type})".format(type=RegistrationFormItemType.section),
+                           name='valid_input'),
+        db.CheckConstraint("NOT is_manager_only OR type = {type}".format(type=RegistrationFormItemType.section),
+                           name='valid_manager_only'),
+        {'schema': 'event_registration'}
+    )
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': None
@@ -104,6 +108,12 @@ class RegistrationFormItem(db.Model):
     )
     #: determines if the field is mandatory
     is_required = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: if the section is only accessible to managers
+    is_manager_only = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -201,9 +211,11 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @property
     def view_data(self):
-        field_data = dict(super(RegistrationFormSection, self).view_data, enabled=self.is_enabled,
-                          title=self.title, items=[child.view_data for child in self.children
-                                                   if not child.is_deleted])
+        field_data = dict(super(RegistrationFormSection, self).view_data,
+                          enabled=self.is_enabled,
+                          title=self.title,
+                          is_manager_only=self.is_manager_only,
+                          items=[child.view_data for child in self.children if not child.is_deleted])
         return camelize_keys(field_data)
 
 

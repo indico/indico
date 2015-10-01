@@ -38,9 +38,19 @@
         show="dialogs.addsection"
         heading="{{ 'New section' | i18n }}"
         ok-button="{{ 'Add' | i18n }}"
-        ok-callback="api.createSection(dialogScope)"
+        ok-callback="api.createSection(dialogScope, false)"
         validate="true"
         data="sections">
+    </nd-dialog>
+
+    <nd-dialog nd-add-section-dialog
+               ng-if="editMode"
+               show="dialogs.addsectionManagerOnly"
+               heading="{{ 'New administrative section' | i18n }}"
+               ok-button="{{ 'Add' | i18n }}"
+               ok-callback="api.createSection(dialogScope, true)"
+               validate="true"
+               data="sections">
     </nd-dialog>
 
     <nd-dialog nd-section-management-dialog

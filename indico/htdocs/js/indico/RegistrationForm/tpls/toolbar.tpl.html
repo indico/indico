@@ -1,9 +1,14 @@
 <div class="toolbar follow-scroll">
     <div class="group">
-        <a ng-click="actions.openAddSection()"
+        <a ng-click="actions.openAddSection(false)"
             class="i-button icon-plus"
             title="{{ 'Create section' | i18n }}">
             {{ 'Add section' | i18n }}
+        </a>
+        <a ng-click="actions.openAddSection(true)"
+            class="i-button icon-user-reading"
+            title="{{ 'Create a section that is only visible in the management area' | i18n }}">
+            {{ 'Add administrative section' | i18n }}
         </a>
         <a ng-click="actions.openManagement()"
             ng-if="(sections | filter:{enabled:'false'}).length > 0"

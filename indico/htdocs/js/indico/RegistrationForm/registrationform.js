@@ -133,6 +133,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $scope.dialogs = {
                 addsection: false,
                 management: false,
+                addsectionManagerOnly: false,
                 error: false
             };
 
@@ -143,8 +144,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 expandAll: function() {
                     $scope.$broadcast('collapse', false);
                 },
-                openAddSection: function() {
-                    $scope.dialogs.addsection = true;
+                openAddSection: function(managerOnly) {
+                    $scope.dialogs[managerOnly ? 'addsectionManagerOnly' : 'addsection'] = true;
                 },
                 openManagement: function() {
                     $scope.dialogs.management = true;
@@ -152,7 +153,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             };
 
             $scope.api = {
-                createSection: function(data) {
+                createSection: function(data, managerOnly) {
                     if (data.sectionCreationForm.$invalid === true){
                         return false;
                     }
@@ -161,6 +162,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         confId: $scope.confId,
                         title: data.newsection.title,
                         description: data.newsection.description,
+                        is_manager_only: managerOnly,
                         confFormId: $scope.confFormId
                     }, function(newsection) {
                         regFormFactory.processResponse(newsection, {
