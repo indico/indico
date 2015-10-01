@@ -18,7 +18,10 @@
                                 <li>
                                     <input type='checkbox' name='radiogroup_{{ child_item.id }}'
                                            value='{{ radio_item.id }}'
-                                           id="{{ radio_item.id }}">
+                                           id="{{ radio_item.id }}"
+                                           {% if radio_item.id in filters %}
+                                               checked
+                                           {% endif %}>
                                     <label for="{{ radio_item.id }}">
                                         {{ radio_item.caption }}
                                     </label>

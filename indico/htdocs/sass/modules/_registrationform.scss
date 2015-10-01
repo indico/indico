@@ -1154,7 +1154,7 @@ textarea.regFormDescriptionInputMgmt {
     padding-bottom: 14em;
     position: relative;
 
-        > .i-label {
+    > .i-label {
         margin: 5px;
         padding-bottom: 0;
         padding-left: 0;
@@ -1190,6 +1190,12 @@ textarea.regFormDescriptionInputMgmt {
 
             &.filter {
                 cursor: pointer;
+            }
+        }
+
+        &.active {
+            .title:before {
+                color: $indico-blue;
             }
         }
     }
