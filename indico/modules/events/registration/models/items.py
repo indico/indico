@@ -21,7 +21,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.registration.fields import get_field_types
-from indico.util.string import return_ascii, camelize_keys
+from indico.util.string import return_ascii, camelize_keys, format_repr
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -197,7 +197,8 @@ class RegistrationFormItem(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<{}({})>'.format(type(self).__name__, self.id)
+        return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,
+                           _text=self.title)
 
 
 class RegistrationFormSection(RegistrationFormItem):

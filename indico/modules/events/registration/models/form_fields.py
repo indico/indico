@@ -73,7 +73,3 @@ class RegistrationFormField(RegistrationFormItem):
             for key, val in CountryHolder.getCountries().iteritems():
                 base_dict['radioitems'].append({'caption': val, 'countryKey': key})
         return camelize_keys(base_dict)
-
-    @return_ascii
-    def __repr__(self):
-        return '<RegistrationFormField({}, {})>'.format(self.id, self.registration_form_id)
