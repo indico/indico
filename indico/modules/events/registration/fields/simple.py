@@ -27,14 +27,6 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.fs import secure_filename
 
 
-class FreeTextField(RegistrationFormFieldBase):
-    name = 'label'
-    wtf_field_class = wtforms.HiddenField
-
-    def save_data(self, registration, value):
-        pass
-
-
 class TextField(RegistrationFormFieldBase):
     name = 'text'
     wtf_field_class = wtforms.StringField
