@@ -68,8 +68,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.updateField = function(field, data) {
-        var postData = getRequestParams(field);
-        postData = angular.extend(postData, {fieldData: data});
+        var postData = angular.extend(getRequestParams(field), {fieldData: data});
 
         if ($scope.isNew()) {
             delete postData['fieldId'];
@@ -78,7 +77,11 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         regFormFactory.Fields.save(postData, function(response) {
             regFormFactory.processResponse(response, {
                 success: function(response) {
-                    $scope.field = angular.extend($scope.field, response);
+                    if ($scope.isNew()) {
+                        $scope.field = angular.extend($scope.field, response);
+                    } else {
+                        $scope.field = angular.extend($scope.field, postData.fieldData);
+                    }
                 }
             });
         });
