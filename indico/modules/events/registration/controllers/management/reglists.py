@@ -140,3 +140,11 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration)
+
+
+class RHRegistrationEdit(RHManageRegistrationBase):
+    """Edit the submitted information of a registration"""
+
+    def _process(self):
+        return WPManageRegistration.render_template('management/registration_modify.html', self.event,
+                                                    registration=self.registration)
