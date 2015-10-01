@@ -79,7 +79,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
                  'move_field', RHRegistrationFormMoveField, methods=('POST',))
 
 # Display
-_bp.add_url_rule('/registrations/', 'display_regforms_list', RHRegistrationFormList)
+_bp.add_url_rule('/registrations/', 'display_regform_list', RHRegistrationFormList)
 _bp.add_url_rule('/registrations/<int:reg_form_id>',
                  'display_regform', RHRegistrationFormSubmit, methods=('GET', 'POST'))
 

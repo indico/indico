@@ -63,7 +63,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         regforms = RegistrationForm.find_all(RegistrationForm.is_visible, event_id=int(self.event.id))
         if _can_redirect_to_single_regform(regforms):
             return redirect(url_for('.display_regform', regforms[0]))
-        return self.view_class.render_template('display/regforms_list.html', self.event, regforms=regforms,
+        return self.view_class.render_template('display/regform_list.html', self.event, regforms=regforms,
                                                event=self.event, was_regform_submitted=was_regform_submitted)
 
 
@@ -88,19 +88,19 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
 
         if not self.regform.is_active:
             flash(_('This registration form is not active'), 'error')
-            return redirect(url_for('.display_regforms_list', self.event))
+            return redirect(url_for('.display_regform_list', self.event))
         elif was_regform_submitted(self.regform):
             flash(_('You have already registered with this form'), 'error')
-            return redirect(url_for('.display_regforms_list', self.event))
+            return redirect(url_for('.display_regform_list', self.event))
         elif self.regform.limit_reached:
             flash(_('The maximum number of registrations has been reached'), 'error')
-            return redirect(url_for('.display_regforms_list', self.event))
+            return redirect(url_for('.display_regform_list', self.event))
 
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
             self._save_registration(form.data)
-            return redirect(url_for('.display_regforms_list', self.event))
+            return redirect(url_for('.display_regform_list', self.event))
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                currency=event_settings.get(self.event, 'currency'))

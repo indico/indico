@@ -10,7 +10,7 @@
         {%- endtrans %}
     </div>
     <div class="toolbar right">
-        <a href="{{ url_for('event_registration.display_regforms_list', event) }}" class="i-button next highlight">
+        <a href="{{ url_for('event_registration.display_regform_list', event) }}" class="i-button next highlight">
             {% if regforms|length == 1 %}
                 {%- trans %}Show the registration forms{% endtrans -%}
             {% else %}
