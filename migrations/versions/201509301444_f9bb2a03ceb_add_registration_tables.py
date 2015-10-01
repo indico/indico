@@ -28,6 +28,7 @@ def upgrade():
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('introduction', sa.Text(), nullable=False),
+        sa.Column('contact_info', sa.String(), nullable=False),
         sa.Column('start_dt', UTCDateTime, nullable=True),
         sa.Column('end_dt', UTCDateTime, nullable=True),
         sa.Column('modification_mode', PyIntEnum(RegistrationFormModificationMode), nullable=False),
