@@ -214,5 +214,12 @@ $(document).ready(function() {
 
     $('input, textarea').placeholder();
 
+    // Prevent BACK in browser with backspace when focused on a readonly field
+    $('input[readonly]').on('keydown', function(e) {
+        if (e.which == K.BACKSPACE) {
+            e.preventDefault();
+        }
+    });
+
     showFormErrors();
 });
