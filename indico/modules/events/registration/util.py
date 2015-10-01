@@ -18,15 +18,12 @@ from __future__ import unicode_literals
 
 from flask import session
 
-from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.util.caching import memoize_request
 from indico.web.forms.base import IndicoForm
 
 
 def get_event_section_data(regform):
-    sections = (RegistrationFormSection.find(registration_form=regform, is_deleted=False)
-                                       .order_by(RegistrationFormSection.position))
-    return [s.view_data for s in sections]
+    return [s.view_data for s in regform.sections if not s.is_deleted]
 
 
 def make_registration_form(regform):
