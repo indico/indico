@@ -21,36 +21,6 @@
     max-width: 800px !important;
 }
 
-.titled-rule {
-    color: $dark-gray;
-    font-size: 0.9em;
-    margin: 10px 0;
-    overflow: hidden;
-    text-align: center;
-
-    &:before,
-    &:after {
-        box-shadow: 1px 1px 1px $light-gray;
-        background-color: $gray;
-        content: "";
-        display: inline-block;
-        height: 1px;
-        position: relative;
-        vertical-align: middle;
-        width: 50%;
-    }
-
-    &:before {
-        right: 0.5em;
-        margin-left: -50%;
-    }
-
-    &:after {
-        left: 0.5em;
-        margin-right: -50%;
-    }
-}
-
 .fixed-width-page {
     margin-left: auto;
     margin-right: auto;
