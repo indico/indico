@@ -67,8 +67,7 @@ class CheckboxField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
     def save_data(self, registration, value):
-        if not value:
-            value = 'off'
+        value = True if value else False
         registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, data=value))
 
 
