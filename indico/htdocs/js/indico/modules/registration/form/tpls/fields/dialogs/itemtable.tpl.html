@@ -18,6 +18,22 @@
     form-data="formData.radioitems">
 </nd-table>
 
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Default item' | i18n }}
+    </label>
+    <select name="defaultItem" ng-model="formData.defaultItem">
+        <option value="" ng-selected="field.defaultItem == null">
+            {{ 'None' | i18n }}
+        </option>
+        <option ng-repeat="el in formData.radioitems"
+            ng-selected="field.defaultItem == el.caption"
+            value="{{ el.caption }}">
+            {{ el.caption }}
+        </option>
+    </select>
+</div>
+
 <div ng-if="validationStarted && !hasRadioItems()" class="error-message-tag">
     {{ 'Add at least one item' | i18n }}
 </div>
