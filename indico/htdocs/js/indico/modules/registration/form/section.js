@@ -117,14 +117,13 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         $scope.dialogs.removefield.open = true;
     };
 
-    $scope.actions.openAddField = function(section, field, type) {
+    $scope.actions.openAddField = function(section, fieldType) {
         $scope.dialogs.newfield = true;
         section.items.push({
             id: -1,
             disabled: false,
-            input: field,
+            input: fieldType,
             lock: [],
-            inputType: type
         });
     };
 });
