@@ -1,15 +1,20 @@
 {% block page %}
-    <div class="page-content-header">
-        <h1>{% block title %}{% endblock %}</h1>
-        {% if self.subtitle() -%}
-            <h2>{% block subtitle %}{% endblock %}</h2>
-        {% endif %}
-    </div>
-    <div class="page-content">
-        {% if self.description() -%}
-            <p class="page-content-description">{% block description %}{% endblock %}</p>
-        {% endif %}
-
-        {% block content %}{% endblock %}
+    <div class="management-page">
+        <header>
+            <div class="title">
+                <h2>{% block title %}{% endblock %}</h2>
+                {% if self.subtitle() -%}
+                    <h3>{% block subtitle %}{% endblock %}</h3>
+                {% endif %}
+            </div>
+            {% if self.description() -%}
+                <div class="description">
+                    {% block description %}{% endblock %}
+                </div>
+            {% endif %}
+        </header>
+        <div class="page-content">
+            {% block content %}{% endblock %}
+        </div>
     </div>
 {% endblock %}

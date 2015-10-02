@@ -15,13 +15,36 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/animation";
-@import "base/palette";
-@import "base/defaults";
-@import "base/layout";
-@import "base/pages";
-@import "base/reset";
-@import "base/theme";
-@import "base/typography";
-@import "base/utilities";
-@import "compass";
+
+.management-page {
+    header {
+        $separator-margin: 0.4rem;
+        margin-bottom: 2em;
+
+        h2, h3 {
+            display: inline-block;
+            margin-top: 0;
+            margin-bottom: $separator-margin;
+        }
+
+        h3 {
+            color: $light-black;
+            margin-left: 1em;
+        }
+
+        div.title {
+            border-bottom: 1px solid $separator-color;
+        }
+
+        div.description {
+            @extend %font-family-title-light;
+            color: $dark-gray;
+            font-size: 1.2em;
+            margin-top: $separator-margin;
+        }
+    }
+
+    div.page-content {
+        @extend .fixed-width;
+    }
+}
