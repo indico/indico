@@ -18,7 +18,7 @@
     <label class="regFormDialogCaption">
         {{ 'Input type' | i18n }}
     </label>
-    <select name="inputType" ng-model="formData.inputType">
+    <select name="inputType" ng-model="formData.inputType" ng-init="formData.inputType='dropdown'">
         <option value="dropdown" ng-selected="field.inputType == 'dropdown'">
             {{ 'Drop-down list' | i18n }}
         </option>
