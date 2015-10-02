@@ -114,6 +114,10 @@ class FileField(RegistrationFormFieldBase):
         registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, file=content,
                                                   file_metadata=metadata))
 
+    @property
+    def default_value(self):
+        return None
+
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
