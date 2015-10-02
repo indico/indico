@@ -3,6 +3,7 @@
 
     $(document).ready(function() {
         setupRegistrationFormScheduleDialogs();
+        foo();
     });
 
     $(window).scroll(function(){
@@ -22,5 +23,9 @@
                 }
             });
         });
+    }
+
+    function foo() {
+
     }
 })(window);
