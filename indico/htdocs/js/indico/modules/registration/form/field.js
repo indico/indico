@@ -704,7 +704,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 } else {
                     _.delay(function() {
                         $('.regform-table .extra-slots').hide();
-                    }, 100);
+                    }, 500);
                 }
             }
 
