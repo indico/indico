@@ -15,16 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
-.management-page {
+%indico-page {
     header {
         $separator-margin: 0.4rem;
         margin-bottom: 2em;
 
         h2, h3 {
             display: inline-block;
-            margin-top: 0;
             margin-bottom: $separator-margin;
+            margin-top: 0;
         }
 
         h3 {
@@ -43,8 +42,22 @@
             margin-top: $separator-margin;
         }
     }
+}
+
+.management-page {
+    @extend %indico-page;
 
     div.page-content {
         @extend .fixed-width;
+    }
+}
+
+.conference-page {
+    @extend %indico-page;
+
+    header h2 {
+        color: $orange;
+        font-size: 2em;
+        font-weight: normal;
     }
 }
