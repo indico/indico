@@ -36,7 +36,7 @@ def _fill_form_field_with_data(field, field_data):
     field.description = field_data.pop('description', '')
     field.is_enabled = not field_data.pop('disabled')
     field.is_required = field_data.pop('mandatory', False)
-    field.input_type = field_data.pop('input')
+    field.input_type = field_data.pop('input', None)
     field.data = {key: field_data.pop(key) for key in NON_VERSIONED_DATA if key in field_data}
 
 
@@ -126,6 +126,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
                 item['id'] = unicode(uuid4())
 
         if field_data['input'] == 'label':
+            del field_data['input']  # labels have no input type
             field_type = RegistrationFormText
         else:
             field_type = RegistrationFormField
