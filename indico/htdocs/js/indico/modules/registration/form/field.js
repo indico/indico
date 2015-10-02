@@ -42,7 +42,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     $scope.section.items.push($scope.field);
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.fieldApi.enableField = function(field) {
@@ -60,7 +60,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     $scope.section.items.push($scope.field);
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.fieldApi.removeField = function(field) {
@@ -84,7 +84,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     }
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.getName = function(input) {

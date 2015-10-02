@@ -37,8 +37,10 @@
                 return true;
             }
         }
-        if (data.error) {
-            IndicoUI.Dialogs.Util.error(data.error);
+        // data.data.error is only needed for angular error handlers
+        var error = data.error || (data.data && data.data.error);
+        if (error) {
+            IndicoUI.Dialogs.Util.error(error);
             return true;
         }
     };

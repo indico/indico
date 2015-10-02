@@ -35,7 +35,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                     section.enabled = updatedSection.enabled;
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.sectionApi.saveConfig = function(section, data) {
@@ -49,7 +49,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                     }
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.sectionApi.updateTitle = function(section, data) {
@@ -61,7 +61,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                     $scope.section.title = updatedSection.title;
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.sectionApi.updateDescription = function(section, data) {
@@ -73,7 +73,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                     $scope.section.description = updatedSection.description;
                 }
             });
-        });
+        }, handleAjaxError);
     };
 
     $scope.sectionApi.moveField = function(section, field, position) {
@@ -90,7 +90,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
             // if (response.error) {
             //     $scope.section.items = response.updatedSection.items;
             // }
-        });
+        }, handleAjaxError);
     };
 
     $scope.sectionApi.removeField = function(section, field) {
@@ -110,7 +110,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                             });
                         }
                     });
-                }));
+                }, handleAjaxError));
             }
         };
 
