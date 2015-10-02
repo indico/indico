@@ -57,7 +57,7 @@ def upgrade():
         sa.Column('input_type', sa.String(), nullable=True),
         sa.Column('data', postgresql.JSON(), nullable=False),
         sa.Column('current_data_id', sa.Integer(), nullable=True, index=True),
-        sa.CheckConstraint("(input_type IS NULL) = (type = 1)", name='valid_input'),
+        sa.CheckConstraint("(input_type IS NULL) = (type != 2)", name='valid_input'),
         sa.CheckConstraint("NOT is_manager_only OR type = 1", name='valid_manager_only'),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.form_items.id']),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
