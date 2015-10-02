@@ -26,6 +26,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.fs import secure_filename
 from indico.util.string import crc32, normalize_phone_number
 from indico.web.forms.validators import IndicoEmail
+from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class TextField(RegistrationFormFieldBase):
@@ -89,7 +90,11 @@ class PhoneField(RegistrationFormFieldBase):
 
 class CountryField(RegistrationFormFieldBase):
     name = 'country'
-    wtf_field_class = wtforms.StringField
+    wtf_field_class = wtforms.SelectField
+
+    @property
+    def field_kwargs(self):
+        return {'choices': CountryHolder.getCountries().items()}
 
 
 class FileField(RegistrationFormFieldBase):
