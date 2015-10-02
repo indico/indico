@@ -60,6 +60,7 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
     defaults.get = defaults.get || {};
     defaults.get['Content-Type'] = defaults.common['Content-Type'] = 'application/json';
     defaults.common['X-CSRF-Token'] = $('#csrf-token').attr('content');
+    defaults.common['X-Requested-With'] = 'XMLHttpRequest';
 
     var sectionURL = editionURL + 'sections/:sectionId';
     var sessionsURL = Indico.Urls.Base + '/event/:confId/manage/sessions';
@@ -173,7 +174,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                                 $anchorScroll();
                             }
                         });
-                    });
+                    }, handleAjaxError);
 
                     return true;
                 },
@@ -189,7 +190,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                                 section = updatedSection;
                             }
                         });
-                    });
+                    }, handleAjaxError);
                 },
                 restoreSection: function(section) {
                     regFormFactory.Sections.enable({
@@ -209,7 +210,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                                 $scope.sections.push(section);
                             }
                         });
-                    });
+                    }, handleAjaxError);
                 },
                 removeSection: function(section) {
                     regFormFactory.Sections.remove({
@@ -224,7 +225,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                                 });
                             }
                         });
-                    });
+                    }, handleAjaxError);
                 }
             };
 
