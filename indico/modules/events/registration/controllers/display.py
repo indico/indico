@@ -21,6 +21,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
@@ -55,6 +56,12 @@ class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
         return mapping[self.event.getType()]
 
 
+class RHRegistrationFormBase(RHRegistrationFormDisplayBase, RegistrationFormMixin):
+    def _checkParams(self, params):
+        RHRegistrationFormDisplayBase._checkParams(self, params)
+        RegistrationFormMixin._checkParams(self)
+
+
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
@@ -66,8 +73,17 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                event=self.event, regforms=regforms)
 
 
+class RHRegistrationFormSummary(RHRegistrationFormBase):
+    """Displays user summary for a registration form"""
 
-class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
+    def _process(self):
+        return self.view_class.render_template('display/regform_summary.html', self.event,
+                                               event=self.event, regform=self.regform,
+                                               registration=self.regform.get_user_registration(session.user),
+                                               payment_enabled=event_settings.get(self.event, 'enabled'))
+
+
+class RHRegistrationFormSubmit(RHRegistrationFormBase):
     """Submit a registration form"""
 
     normalize_url_spec = {
@@ -77,15 +93,13 @@ class RHRegistrationFormSubmit(RHRegistrationFormDisplayBase):
     }
 
     def _checkProtection(self):
-        RHRegistrationFormDisplayBase._checkProtection(self)
+        RHRegistrationFormBase._checkProtection(self)
         if self.regform.require_user and not session.user:
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))
 
     def _checkParams(self, params):
-        RHRegistrationFormDisplayBase._checkParams(self, params)
-        self.regform = RegistrationForm.find_one(id=request.view_args['reg_form_id'])
-
+        RHRegistrationFormBase._checkParams(self, params)
         if not self.regform.is_active:
             flash(_('This registration form is not active'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
