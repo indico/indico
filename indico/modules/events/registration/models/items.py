@@ -44,7 +44,7 @@ class RegistrationFormItemType(int, IndicoEnum):
 class RegistrationFormItem(db.Model):
     __tablename__ = 'form_items'
     __table_args__ = (
-        db.CheckConstraint("(input_type IS NULL) = (type = {type})".format(type=RegistrationFormItemType.section),
+        db.CheckConstraint("(input_type IS NULL) = (type != {type})".format(type=RegistrationFormItemType.field),
                            name='valid_input'),
         db.CheckConstraint("NOT is_manager_only OR type = {type}".format(type=RegistrationFormItemType.section),
                            name='valid_manager_only'),
@@ -191,10 +191,6 @@ class RegistrationFormItem(db.Model):
     def wtf_field(self):
         return get_field_types()[self.input_type](self)
 
-    @property
-    def is_section(self):
-        return self.type == RegistrationFormItemType.section
-
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,
@@ -232,5 +228,5 @@ class RegistrationFormText(RegistrationFormItem):
     @property
     def view_data(self):
         field_data = dict(super(RegistrationFormText, self).view_data, disabled=not self.is_enabled,
-                          input=self.input_type, caption=self.title, **self.current_data.versioned_data)
+                          input='label', caption=self.title, **self.current_data.versioned_data)
         return camelize_keys(field_data)
