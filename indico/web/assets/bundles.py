@@ -208,8 +208,8 @@ fonts_sass = Bundle('sass/partials/_fonts.scss',
 
 indico_regform = rjs_bundle(
     'indico_regform',
-    *namespace('js/indico/RegistrationForm',
-               'registrationform.js',
+    *namespace('js/indico/modules/registration/form',
+               'form.js',
                'section.js',
                'field.js',
                'sectiontoolbar.js',
@@ -393,8 +393,8 @@ module_js = {
     'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
     'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
     'registration': rjs_bundle('modules_registration',
-                               'js/indico/modules/registration.js',
-                               *namespace('js/indico/RegistrationForm', 'registrationform.js', 'section.js', 'field.js',
+                               'js/indico/modules/registration/registration.js',
+                               *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
                                           'sectiontoolbar.js', 'table.js'))
 }
 

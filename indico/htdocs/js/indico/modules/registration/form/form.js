@@ -51,7 +51,7 @@ ndRegForm.value('sortableoptions', {
 });
 
 ndRegForm.config(function(urlProvider) {
-    urlProvider.setModulePath('/js/indico/RegistrationForm');
+    urlProvider.setModulePath('/js/indico/modules/registration/form');
 });
 
 ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, userurl) {
