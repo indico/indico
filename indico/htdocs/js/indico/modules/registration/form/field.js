@@ -660,7 +660,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     }
                 });
 
-                if ($scope.field.radioitems && $scope.field.radioitems.length) {
+                if ($scope.field.input == 'radio') {
                     $scope.formData.radioitems = [];
                     _.each($scope.field.radioitems, function(item, ind) {
                         $scope.formData.radioitems[ind] = angular.copy(item);
