@@ -3,10 +3,10 @@
     <a class="i-button" ng-click="sortItems()">{{ 'Sort alphabetically' | i18n }}</a>
     <div class="group i-selection">
         <div class="inline-vcentered">
-            <input type="checkbox" id="withExtraSlots-{{ field.id }}" name="withExtraSlots"
-                   ng-model="formData.withExtraSlots">
+            <input type="checkbox" id="withExtraSlots-{{ field.id == -1 ? field.$$hashKey : field.id }}"
+                   name="withExtraSlots" ng-model="formData.withExtraSlots">
 
-            <label class="i-button" for="withExtraSlots-{{ field.id }}">
+            <label class="i-button" for="withExtraSlots-{{ field.id == -1 ? field.$$hashKey : field.id }}">
                 {{ 'Advanced options' | i18n }}
             </label>
         </div>
