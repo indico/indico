@@ -21,7 +21,8 @@ from flask import request, jsonify, session
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
-from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItem
+from indico.modules.events.registration.models.items import (RegistrationFormText, RegistrationFormItem,
+                                                             RegistrationFormItemType)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData)
 from indico.util.string import snakify
 from indico.web.util import jsonify_data
@@ -75,6 +76,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
 
     def _process_POST(self):
         field_data = request.json['fieldData']
+        if self.field.type == RegistrationFormItemType.text:
+            del field_data['input']  # labels have no input type
         _fill_form_field_with_data(self.field, field_data)
         if field_data != self.field.current_data.versioned_data:
             if self.field.input_type == 'radio':
