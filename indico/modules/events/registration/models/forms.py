@@ -21,6 +21,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.events.registration.models.items import RegistrationFormItemType
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -169,8 +170,8 @@ class RegistrationForm(db.Model):
 
     @property
     def active_fields(self):
-        return [field for field in self.form_items if not field.is_section and field.parent.is_enabled
-                and not field.parent.is_deleted and field.is_enabled and not field.is_deleted]
+        return [field for field in self.form_items if field.type == RegistrationFormItemType.field and
+                field.parent.is_enabled and not field.parent.is_deleted and field.is_enabled and not field.is_deleted]
 
     @property
     def limit_reached(self):
