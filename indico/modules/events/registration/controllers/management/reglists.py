@@ -18,22 +18,24 @@ from __future__ import unicode_literals
 
 import itertools
 import json
-
 from collections import OrderedDict
+from uuid import uuid4
 
-from flask import session, request
+from flask import session, request, redirect, jsonify
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegistrationBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
-from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormField
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import get_user_info
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
+from MaKaC.common.cache import GenericCache
 
 
 # TODO: Create a better mapping
@@ -52,6 +54,8 @@ USER_INFO = OrderedDict([
     ('user_payment_id', _('Payment ID')),
     ('user_payment_amount', _('Payment amount'))
 ])
+
+cache = GenericCache('reglist-config')
 
 
 def _get_filters_from_request():
@@ -92,6 +96,11 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 
     def _process(self):
         session_key = 'reg_list_config_{}'.format(self.regform.id)
+        report_config_uuid = request.args.get('config')
+        if report_config_uuid:
+            configuration = cache.get(report_config_uuid)
+            session[session_key] = configuration
+            return redirect(url_for('.manage_reglist', self.regform))
         reg_list_config = session.get(session_key, {'items': [], 'user_info': [], 'filters': {}})
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(reg_list_config['items']))
         registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
@@ -132,6 +141,20 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
                                                  visible_cols_user_info=visible_user_info, user_info=USER_INFO,
                                                  get_user_info=get_user_info)
         return jsonify_data(registrations_list=reg_list)
+
+
+class RHRegistrationListStaticURL(RHManageRegFormBase):
+    """Generate a static URL for the configuration of the registrations list"""
+
+    def _process(self):
+        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        configuration = session.get(session_key)
+        url = url_for('.manage_reglist', self.regform, _external=True)
+        if configuration:
+            uuid = unicode(uuid4())
+            url = url_for('.manage_reglist', self.regform, config=uuid, _external=True)
+            cache.set(uuid, configuration)
+        return jsonify(url=url)
 
 
 class RHRegistrationDetails(RHManageRegistrationBase):

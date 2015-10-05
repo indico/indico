@@ -32,6 +32,19 @@
                     <li><a href="#" class="icon-file-excel">CSV</a></li>
                 </ul>
             </div>
+            <div class="group left">
+                <a class="i-button icon-link js-static-url"
+                   data-href="{{ url_for('.generate_static_url', regform) }}"
+                   title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}">
+                   {%- trans %}Static URL{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="clipboard-dialog" style="display: none;">
+            <div class="dialog-message">
+                {% trans %}You can copy the URL below using CTRL + C (&#8984; + C on OSX):{% endtrans %}
+            </div>
+            <input type="text" readonly>
         </div>
         {% if registrations %}
             {{ render_registrations_list(registrations, visible_cols_regform_items, visible_cols_user_info, user_info, get_user_info) }}
