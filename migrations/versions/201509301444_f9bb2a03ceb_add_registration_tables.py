@@ -49,7 +49,7 @@ def upgrade():
         sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
-        sa.Column('description', sa.String(), nullable=True),
+        sa.Column('description', sa.String(), nullable=False),
         sa.Column('is_enabled', sa.Boolean(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('is_required', sa.Boolean(), nullable=False),
