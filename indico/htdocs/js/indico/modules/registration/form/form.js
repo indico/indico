@@ -33,10 +33,6 @@ ndRegForm.value('displayurl',
     Indico.Urls.Base + '/event/:confId/registration/:confFormId/sections'
 );
 
-ndRegForm.value('userurl',
-    Indico.Urls.Base + '/event/:confId/registration/:confFormId/userdata'
-);
-
 ndRegForm.value('sortableoptions', {
     start: function(e, ui) {
         var borderOffset = 2;
@@ -67,7 +63,7 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/modules/registration/form');
 });
 
-ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, userurl, fieldDefaults) {
+ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, fieldDefaults) {
     var defaults = $http.defaults.headers;
     defaults.common = defaults.common || {};
     defaults.get = defaults.get || {};
@@ -108,9 +104,6 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
         }),
         Sessions: $resource(sessionsURL, {confId: '@confId'}, {
             "query": {method:'GET', isArray: true, cache: false}
-        }),
-        UserData: $resource(userurl, {confId: '@confId'}, {
-            "query": {method:'GET', isArray: true, cache: false}
         })
     };
 });
@@ -131,6 +124,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             confSections: '@',
             confSdate: '@',
             confEdate: '@',
+            userInfo: '@',
             csrfToken: '&',
             editMode: '=',
             updateMode: '=',
@@ -138,7 +132,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         },
 
         controller: function($scope, $resource, $location, $anchorScroll) {
-            $scope.sections = $scope.$eval($scope.confSections);
+            $scope.sections = angular.fromJson($scope.confSections);
+            $scope.userInfo = angular.fromJson($scope.userInfo);
 
             $rootScope.confId = $scope.confId;
             $rootScope.confFormId = $scope.confFormId;
@@ -276,17 +271,11 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             if (scope.editMode) {
                 scope.userdata = {};
             } else if (!scope.updateMode) {
-                scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
-                    scope.userdata = scope.userdata.avatar || {sessionList: [{}, {}]};
-                });
+                scope.userdata = _.extend({}, scope.userInfo);
             } else {
-                scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
-                    _.each(scope.userdata.miscellaneousGroupList, function(e) {
-                        _.each(e.responseItems, function(e) {
-                            scope.userdata[e.HTMLName] = e.value;
-                        });
-                    });
-                });
+                // TODO: pass data via argument on the nd-reg-form div
+                // see userInfo/user-info for an example.
+                scope.userdata = {};
             }
 
             element.on('submit', function(e) {

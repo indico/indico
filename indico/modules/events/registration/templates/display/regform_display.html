@@ -4,6 +4,7 @@
             conf-id="{{ event.id }}"
             conf-sections="{{ sections | tojson | forceescape }}"
             conf-currency="{{ currency }}"
+            user-info="{{ user_data | tojson | forceescape }}"
             post-url="{{ url_for('.display_regform', regform) | tojson | forceescape }}"></div>
     </div>
 {% endblock %}

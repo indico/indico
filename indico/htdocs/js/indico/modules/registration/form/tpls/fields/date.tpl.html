@@ -3,7 +3,7 @@
         type="text"
         id="field-{{ section.id }}-{{ field.id }}"
         class="datepicker"
-        name="field_{{ section.id }}-{{ field.id }}"
+        name="{{ field.htmlName }}"
         show-time="showTime(field.dateFormat)"
         validation="validationStarted"
         value="{{ date }}"

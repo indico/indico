@@ -67,9 +67,31 @@ class RegistrationFormField(RegistrationFormItem):
     def view_data(self):
         base_dict = dict(self.current_data.versioned_data, **self.data)
         base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
-                         input_type=self.input_type, **super(RegistrationFormField, self).view_data)
+                         input_type=self.input_type, html_name=self.html_field_name,
+                         **super(RegistrationFormField, self).view_data)
         if self.input_type == 'country':
             base_dict['radioitems'] = []
             for key, val in CountryHolder.getCountries().iteritems():
                 base_dict['radioitems'].append({'caption': val, 'countryKey': key})
         return camelize_keys(base_dict)
+
+    @property
+    def html_field_name(self):
+        return 'field_{}'.format(self.id)
+
+
+class RegistrationFormPersonalDataField(RegistrationFormField):
+    __mapper_args__ = {
+        'polymorphic_identity': RegistrationFormItemType.field_pd
+    }
+
+    @property
+    def view_data(self):
+        data = dict(super(RegistrationFormPersonalDataField, self).view_data,
+                    field_is_required=self.personal_data_type.is_required,
+                    field_is_personal_data=True)
+        return camelize_keys(data)
+
+    @property
+    def html_field_name(self):
+        return self.personal_data_type.name
