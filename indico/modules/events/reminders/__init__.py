@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
@@ -38,6 +40,8 @@ def _import_tasks(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
+    if not event.can_manage(session.user, allow_key=True):
+        return
     return SideMenuItem('reminders', _('Reminders'), url_for('event_reminders.list', event), section='organization')
 
 
