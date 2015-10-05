@@ -39,15 +39,55 @@ class RegistrationFormItemType(int, IndicoEnum):
     section = 1
     field = 2
     text = 3
+    section_pd = 4  # personal data section
+    field_pd = 5  # personal data field
+
+
+class PersonalDataType(int, IndicoEnum):
+    email = 1
+    first_name = 2
+    last_name = 3
+    affiliation = 4
+    title = 5
+    address = 6
+    phone = 7
+
+    @property
+    def is_required(self):
+        return self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
 
 
 class RegistrationFormItem(db.Model):
     __tablename__ = 'form_items'
     __table_args__ = (
-        db.CheckConstraint("(input_type IS NULL) = (type != {type})".format(type=RegistrationFormItemType.field),
+        db.CheckConstraint("(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))"
+                           .format(t=RegistrationFormItemType),
                            name='valid_input'),
         db.CheckConstraint("NOT is_manager_only OR type = {type}".format(type=RegistrationFormItemType.section),
                            name='valid_manager_only'),
+        db.CheckConstraint("(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)"
+                           .format(t=RegistrationFormItemType),
+                           name='top_level_sections'),
+        db.CheckConstraint("(type != {type}) = (personal_data_type IS NULL)"
+                           .format(type=RegistrationFormItemType.field_pd),
+                           name='pd_field_type'),
+        db.CheckConstraint("NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))"
+                           .format(t=RegistrationFormItemType),
+                           name='pd_not_deleted'),
+        db.CheckConstraint("is_enabled OR type != {type}".format(type=RegistrationFormItemType.section_pd),
+                           name='pd_section_enabled'),
+        db.CheckConstraint("is_enabled OR type != {type} OR personal_data_type NOT IN "
+                           "({pt.email}, {pt.first_name}, {pt.last_name})"
+                           .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
+                           name='pd_field_enabled'),
+        db.CheckConstraint("is_required OR type != {type} OR personal_data_type NOT IN "
+                           "({pt.email}, {pt.first_name}, {pt.last_name})"
+                           .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
+                           name='pd_field_required'),
+        db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
+                 postgresql_where=db.text('type = {type}'.format(type=RegistrationFormItemType.section_pd))),
+        db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
+                 postgresql_where=db.text('type = {type}'.format(type=RegistrationFormItemType.field_pd))),
         {'schema': 'event_registration'}
     )
     __mapper_args__ = {
@@ -71,6 +111,11 @@ class RegistrationFormItem(db.Model):
     type = db.Column(
         PyIntEnum(RegistrationFormItemType),
         nullable=False
+    )
+    #: The type of a personal data field
+    personal_data_type = db.Column(
+        PyIntEnum(PersonalDataType),
+        nullable=True
     )
     #: The ID of the parent form item
     parent_id = db.Column(
@@ -186,7 +231,7 @@ class RegistrationFormItem(db.Model):
     @property
     def view_data(self):
         """Returns object with data that Angular can understand"""
-        return dict(id=self.id, description=self.description, lock=[])
+        return dict(id=self.id, description=self.description)
 
     @property
     def wtf_field(self):
@@ -213,7 +258,20 @@ class RegistrationFormSection(RegistrationFormItem):
                           enabled=self.is_enabled,
                           title=self.title,
                           is_manager_only=self.is_manager_only,
+                          is_personal_data=False,
                           items=[child.view_data for child in self.children if not child.is_deleted])
+        return camelize_keys(field_data)
+
+
+class RegistrationFormPersonalDataSection(RegistrationFormSection):
+    __mapper_args__ = {
+        'polymorphic_identity': RegistrationFormItemType.section_pd
+    }
+
+    @property
+    def view_data(self):
+        field_data = dict(super(RegistrationFormPersonalDataSection, self).view_data, is_personal_data=True)
+        del field_data['isPersonalData']
         return camelize_keys(field_data)
 
 

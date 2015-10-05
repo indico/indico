@@ -22,7 +22,7 @@ from werkzeug.exceptions import BadRequest
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
-from indico.modules.events.registration.models.items import RegistrationFormSection
+from indico.modules.events.registration.models.items import RegistrationFormSection, RegistrationFormItemType
 from indico.web.util import jsonify_data
 
 
@@ -58,7 +58,10 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
     """RH comprising of methods for update and removal of a section"""
 
     def _process_POST(self):
-        self.section.is_enabled = (request.args.get('enable') == 'true')
+        enabled = request.args.get('enable') == 'true'
+        if not enabled and self.section.type == RegistrationFormItemType.section_pd:
+            raise BadRequest
+        self.section.is_enabled = enabled
         db.session.flush()
         if self.section.is_enabled:
             logger.info('Section {} enabled by {}'.format(self.section, session.user))
@@ -67,6 +70,8 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         return jsonify_data(**self.section.view_data)
 
     def _process_DELETE(self):
+        if self.section.type == RegistrationFormItemType.section_pd:
+            raise BadRequest
         self.section.is_deleted = True
         db.session.flush()
         logger.info('Section {} deleted by {}'.format(self.section, session.user))

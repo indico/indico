@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
-from indico.modules.events.registration.models.items import RegistrationFormItemType
+from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.forms import RegistrationFormModificationMode
 
 
@@ -46,6 +46,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('type', PyIntEnum(RegistrationFormItemType), nullable=False),
+        sa.Column('personal_data_type', PyIntEnum(PersonalDataType), nullable=True),
         sa.Column('parent_id', sa.Integer(), nullable=True, index=True),
         sa.Column('position', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
@@ -57,8 +58,18 @@ def upgrade():
         sa.Column('input_type', sa.String(), nullable=True),
         sa.Column('data', postgresql.JSON(), nullable=False),
         sa.Column('current_data_id', sa.Integer(), nullable=True, index=True),
-        sa.CheckConstraint("(input_type IS NULL) = (type != 2)", name='valid_input'),
+        sa.CheckConstraint("(input_type IS NULL) = (type NOT IN (2, 5))", name='valid_input'),
         sa.CheckConstraint("NOT is_manager_only OR type = 1", name='valid_manager_only'),
+        sa.CheckConstraint("(type IN (1, 4)) = (parent_id IS NULL)", name='top_level_sections'),
+        sa.CheckConstraint("(type != 5) = (personal_data_type IS NULL)", name='pd_field_type'),
+        sa.CheckConstraint("NOT is_deleted OR (type NOT IN (4, 5))", name='pd_not_deleted'),
+        sa.CheckConstraint("is_enabled OR type != 4", name='pd_section_enabled'),
+        sa.CheckConstraint("is_enabled OR type != 5 OR personal_data_type NOT IN (1, 2, 3)", name='pd_field_enabled'),
+        sa.CheckConstraint("is_required OR type != 5 OR personal_data_type NOT IN (1, 2, 3)", name='pd_field_required'),
+        sa.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
+                 postgresql_where=sa.text('type = 4')),
+        sa.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
+                 postgresql_where=sa.text('type = 5')),
         sa.ForeignKeyConstraint(['parent_id'], ['event_registration.form_items.id']),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.PrimaryKeyConstraint('id'),

@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, jsonify, session
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.registration import logger
@@ -59,7 +60,11 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
     """Enable/Disable a field"""
 
     def _process(self):
-        self.field.is_enabled = (request.args.get('enable') == 'true')
+        enabled = request.args.get('enable') == 'true'
+        if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
+                self.field.personal_data_type.is_required):
+            raise BadRequest
+        self.field.is_enabled = enabled
         db.session.flush()
         logger.info('Field {} modified by {}'.format(self.field, session.user))
         return jsonify_data(**self.field.view_data)
@@ -69,6 +74,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     """Remove/Modify a field"""
 
     def _process_DELETE(self):
+        if self.field.type == RegistrationFormItemType.field_pd:
+            raise BadRequest
         self.field.is_deleted = True
         db.session.flush()
         logger.info('Field {} deleted by {}'.format(self.field, session.user))
@@ -76,8 +83,13 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
 
     def _process_POST(self):
         field_data = snakify_keys(request.json['fieldData'])
+        if (self.field.type == RegistrationFormItemType.field_pd and self.field.personal_data_type.is_required and
+                not field_data['is_required']):
+            raise BadRequest
         if self.field.type == RegistrationFormItemType.text:
             del field_data['input_type']  # labels have no input type
+        elif self.field.input_type != field_data['input_type']:
+            raise BadRequest
         _fill_form_field_with_data(self.field, field_data)
         if field_data != self.field.current_data.versioned_data:
             if self.field.input_type == 'radio':

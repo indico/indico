@@ -30,7 +30,7 @@
                         <span class="mandatory-check">
                             <input type="checkbox" name="isRequired"
                                 ng-model="formData.isRequired"
-                                ng-disabled="field.lock.indexOf('mandatory') != -1">
+                                ng-disabled="field.fieldIsRequired">
                             <span>
                                 {{ 'Mandatory' | i18n }}
                             </span>
