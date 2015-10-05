@@ -49,8 +49,52 @@
         });
     }
 
+    function setupStaticURLGeneration() {
+        $('.js-static-url').on('click', function() {
+            var $this = $(this);
+            $.ajax({
+                method: 'POST',
+                url: $this.data('href'),
+                error: handleAjaxError,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                success: function(result) {
+                    var content = $('.registrations > .clipboard-dialog').clone();
+                    content.find('input:text').val(result.url);
+
+                    $this.qtip({
+                        content: {
+                            text: content
+                        },
+                        position: {
+                            my: 'top center',
+                            at: 'bottom center'
+                        },
+                        hide: {
+                            event: 'mouseleave',
+                            fixed: true,
+                            delay: 700
+                        },
+                        show: {
+                            event: false,
+                            ready: true
+                        },
+                        events: {
+                            show: function() {
+                                var tip = $(this);
+                                _.defer(function() {
+                                    tip.find('input:text').focus().select();
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    }
+
     function setupRegistrationsList() {
         colorizeSelectedRows();
+        setupStaticURLGeneration();
         $('.registrations .i-table').tablesorter({
             cssAsc:  'header-sort-asc',
             cssDesc: 'header-sort-desc',
