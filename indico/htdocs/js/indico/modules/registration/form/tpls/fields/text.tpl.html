@@ -4,12 +4,12 @@
         name="{{ fieldName }}"
         size="{{ field.length || 60}}"
         ng-model="userdata[fieldName]"
-        ng-required="field.mandatory"
+        ng-required="field.isRequired"
         ng-class="{
             hasError: validationStarted && nestedForm.$invalid
         }"/>
 
-    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
 </ng-form>

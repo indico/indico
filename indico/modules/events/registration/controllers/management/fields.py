@@ -24,20 +24,20 @@ from indico.modules.events.registration.controllers.management.sections import R
 from indico.modules.events.registration.models.items import (RegistrationFormText, RegistrationFormItem,
                                                              RegistrationFormItemType)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData)
-from indico.util.string import snakify
+from indico.util.string import snakify_keys
 from indico.web.util import jsonify_data
 from uuid import uuid4
 
 NON_VERSIONED_DATA = {'min_value', 'length', 'number_of_columns', 'number_of_rows', 'places_limit', 'date_format',
-                      'with_extra_slots', 'input_type', 'default_item', 'time_format'}
+                      'with_extra_slots', 'item_type', 'default_item', 'time_format'}
 
 
 def _fill_form_field_with_data(field, field_data):
-    field.title = field_data.pop('caption')
+    field.title = field_data.pop('title')
     field.description = field_data.pop('description', '')
-    field.is_enabled = not field_data.pop('disabled')
-    field.is_required = field_data.pop('mandatory', False)
-    field.input_type = field_data.pop('input', None)
+    field.is_enabled = field_data.pop('is_enabled')
+    field.is_required = field_data.pop('is_required', False)
+    field.input_type = field_data.pop('input_type', None)
     field.data = {key: field_data.pop(key) for key in NON_VERSIONED_DATA if key in field_data}
 
 
@@ -75,9 +75,9 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         return jsonify_data(flash=False)
 
     def _process_POST(self):
-        field_data = request.json['fieldData']
+        field_data = snakify_keys(request.json['fieldData'])
         if self.field.type == RegistrationFormItemType.text:
-            del field_data['input']  # labels have no input type
+            del field_data['input_type']  # labels have no input type
         _fill_form_field_with_data(self.field, field_data)
         if field_data != self.field.current_data.versioned_data:
             if self.field.input_type == 'radio':
@@ -117,19 +117,19 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
     """Add a field to the section"""
 
     def _process(self):
-        field_data = {snakify(name): value for name, value in request.json['fieldData'].iteritems()}
-        if field_data['input'] == 'date':
+        field_data = snakify_keys(request.json['fieldData'])
+        if field_data['input_type'] == 'date':
             date_format = field_data['date_format'].split(' ')
             field_data['date_format'] = date_format[0]
             if len(date_format) == 2:
                 field_data['time_format'] = date_format[1]
-        elif field_data['input'] == 'radio':
+        elif field_data['input_type'] == 'radio':
             items = field_data['radioitems']
             for item in items:
                 item['id'] = unicode(uuid4())
 
-        if field_data['input'] == 'label':
-            del field_data['input']  # labels have no input type
+        if field_data['input_type'] == 'label':
+            del field_data['input_type']  # labels have no input type
             field_type = RegistrationFormText
         else:
             field_type = RegistrationFormField

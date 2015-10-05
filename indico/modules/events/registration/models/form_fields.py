@@ -66,8 +66,8 @@ class RegistrationFormField(RegistrationFormItem):
     @property
     def view_data(self):
         base_dict = dict(self.current_data.versioned_data, **self.data)
-        base_dict.update(disabled=not self.is_enabled, caption=self.title, mandatory=self.is_required,
-                         input=self.input_type, **super(RegistrationFormField, self).view_data)
+        base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
+                         input_type=self.input_type, **super(RegistrationFormField, self).view_data)
         if self.input_type == 'country':
             base_dict['radioitems'] = []
             for key, val in CountryHolder.getCountries().iteritems():

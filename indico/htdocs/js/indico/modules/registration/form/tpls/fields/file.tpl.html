@@ -5,7 +5,7 @@
                 id="field-{{ section.id }}-{{ field.id }}"
                 name="{{ fieldName }}"
                 ng-model="input"
-                ng-required="field.mandatory"
+                ng-required="field.isRequired"
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
         </div>
     </ng-form>
