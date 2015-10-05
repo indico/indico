@@ -16,13 +16,18 @@
 
 from __future__ import unicode_literals
 
+from uuid import uuid4
+
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.events.registration.fields import get_field_types
+from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii, camelize_keys, format_repr
 from indico.util.struct.enum import IndicoEnum
+
+from MaKaC.webinterface.common.person_titles import TitlesRegistry
 
 
 def _get_next_position(context):
@@ -51,6 +56,52 @@ class PersonalDataType(int, IndicoEnum):
     title = 5
     address = 6
     phone = 7
+
+    @strict_classproperty
+    @classmethod
+    def FIELD_DATA(cls):
+        title_item = {'price': 0,
+                      'is_billable': False,
+                      'places_limit': 0,
+                      'is_enabled': True}
+        return [
+            (cls.title, {
+                'title': 'Title',
+                'input_type': 'radio',
+                'data': {
+                    'input_type': 'dropdown',
+                    'with_extra_slots': False
+                },
+                'versioned_data': {
+                    'radioitems': [dict(title_item, id=unicode(uuid4()), caption=t)
+                                   for t in TitlesRegistry.getList() if t]
+                }
+            }),
+            (cls.first_name, {
+                'title': 'First Name',
+                'input_type': 'text'
+            }),
+            (cls.last_name, {
+                'title': 'Last Name',
+                'input_type': 'text'
+            }),
+            (cls.email, {
+                'title': 'Email Address',
+                'input_type': 'email'
+            }),
+            (cls.affiliation, {
+                'title': 'Affiliation',
+                'input_type': 'text'
+            }),
+            (cls.address, {
+                'title': 'Address',
+                'input_type': 'textarea'
+            }),
+            (cls.phone, {
+                'title': 'Phone Number',
+                'input_type': 'phone'
+            }),
+        ]
 
     @property
     def is_required(self):

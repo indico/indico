@@ -16,6 +16,10 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
+                                                                   RegistrationFormFieldData)
+from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
+                                                             RegistrationFormItemType, PersonalDataType)
 from indico.web.forms.base import IndicoForm
 
 
@@ -33,3 +37,24 @@ def make_registration_form(regform, management=False):
         field_impl = form_item.wtf_field
         setattr(form_class, form_item.html_field_name, field_impl.create_wtf_field())
     return form_class
+
+
+def create_personal_data_fields(regform):
+    """Creates the special section/fields for personal data."""
+    section = next((s for s in regform.sections if s.type == RegistrationFormItemType.section_pd), None)
+    if section is None:
+        section = RegistrationFormPersonalDataSection(registration_form=regform, title='Personal Data')
+        missing = set(PersonalDataType)
+    else:
+        existing = {x.personal_data_type for x in section.children if x.type == RegistrationFormItemType.field_pd}
+        missing = set(PersonalDataType) - existing
+    for pd_type, data in PersonalDataType.FIELD_DATA:
+        if pd_type not in missing:
+            continue
+        field = RegistrationFormPersonalDataField(registration_form=regform, personal_data_type=pd_type,
+                                                  is_required=pd_type.is_required)
+        field.data = data.pop('data', {})
+        field.current_data = RegistrationFormFieldData(field=field, versioned_data=data.pop('versioned_data', {}))
+        for key, value in data.iteritems():
+            setattr(field, key, value)
+        section.children.append(field)

@@ -25,7 +25,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import get_event_section_data
+from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.payment import event_settings
 from indico.web.util import jsonify_data, jsonify_template
@@ -54,6 +54,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
         form = RegistrationFormForm()
         if form.validate_on_submit():
             regform = RegistrationForm(event_new=self.event_new)
+            create_personal_data_fields(regform)
             form.populate_obj(regform)
             db.session.add(regform)
             db.session.flush()
