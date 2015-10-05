@@ -3,7 +3,7 @@
 
     $(document).ready(function() {
         setupRegistrationFormScheduleDialogs();
-        foo();
+        setupRegistrationFormSummaryDialogs();
     });
 
     $(window).scroll(function(){
@@ -14,7 +14,7 @@
         $('a.js-regform-schedule-dialog').on('click', function(e) {
             e.preventDefault();
             ajaxDialog({
-                url: build_url($(this).data('href')),
+                url: $(this).data('href'),
                 title: $(this).data('title'),
                 onClose: function(data) {
                     if (data) {
@@ -25,7 +25,13 @@
         });
     }
 
-    function foo() {
-
+    function setupRegistrationFormSummaryDialogs() {
+        $('.js-conditions-dialog').on('click', function(e) {
+            e.preventDefault();
+            ajaxDialog({
+                url: $(this).data('href'),
+                title: $(this).data('title')
+            });
+        });
     }
 })(window);
