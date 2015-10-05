@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, session, redirect, flash
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
@@ -62,6 +62,20 @@ class RHRegistrationFormBase(RHRegistrationFormDisplayBase, RegistrationFormMixi
         RegistrationFormMixin._checkParams(self)
 
 
+class RHRegistrationFormRegistration(RHRegistrationFormBase):
+    """Base for RHs handling individual registrations"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormBase._checkParams(self, params)
+        self.token = request.args.get('token')
+        if self.token:
+            self.registration = self.regform.get_registration(uuid=self.token)
+            if not self.registration:
+                raise NotFound
+        else:
+            self.registration = self.regform.get_registration(user=session.user) if session.user else None
+
+
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
@@ -73,13 +87,12 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                event=self.event, regforms=regforms)
 
 
-class RHRegistrationFormSummary(RHRegistrationFormBase):
+class RHRegistrationFormSummary(RHRegistrationFormRegistration):
     """Displays user summary for a registration form"""
 
     def _process(self):
         return self.view_class.render_template('display/regform_summary.html', self.event,
-                                               event=self.event, regform=self.regform,
-                                               registration=self.regform.get_user_registration(session.user),
+                                               event=self.event, regform=self.regform, registration=self.registration,
                                                payment_enabled=event_settings.get(self.event, 'enabled'))
 
 
