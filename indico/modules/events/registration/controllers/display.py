@@ -93,7 +93,8 @@ class RHRegistrationFormSummary(RHRegistrationFormRegistration):
     def _process(self):
         return self.view_class.render_template('display/regform_summary.html', self.event,
                                                event=self.event, regform=self.regform, registration=self.registration,
-                                               payment_enabled=event_settings.get(self.event, 'enabled'))
+                                               payment_enabled=event_settings.get(self.event, 'enabled'),
+                                               payment_conditions=bool(event_settings.get(self.event, 'conditions')))
 
 
 class RHRegistrationFormSubmit(RHRegistrationFormBase):
