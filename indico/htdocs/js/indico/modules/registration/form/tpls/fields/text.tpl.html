@@ -2,7 +2,7 @@
     <input type="text"
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
-        size="{{ field.length || 60}}"
+        size="{{ field.length || getDefaultFieldSetting('defaultTextFieldSize') }}"
         ng-model="userdata[fieldName]"
         ng-required="field.isRequired"
         ng-class="{
