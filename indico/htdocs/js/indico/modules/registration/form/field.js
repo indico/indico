@@ -17,6 +17,7 @@
 
 ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.fieldApi = {};
+    $scope.getDefaultFieldSetting = regFormFactory.getDefaultFieldSetting;
 
     var getRequestParams = function(field) {
         return {
