@@ -5,7 +5,7 @@
             ng-model="userdata[fieldName]"
             name="{{ fieldName }}"
             size="{{ field.length }}"
-            min="{{ field.minValue }}"
+            min="{{ field.minValue || getDefaultFieldSetting('defaultMinValue') }}"
             ng-required="field.isRequired"
             ng-disabled="paymentBlocked(field, userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>

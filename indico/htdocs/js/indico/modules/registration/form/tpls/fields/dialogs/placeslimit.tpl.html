@@ -4,7 +4,7 @@
     </label>
     <input type="number"
         ng-model="formData.placesLimit"
-        ng-init="formData.placesLimit = formData.placesLimit || 0"
+        ng-init="formData.placesLimit = (formData.placesLimit || getDefaultFieldSetting('defaultPlacesLimit'))"
         ng-class="{hasError: validationStarted && optionsForm.placesLimit.$invalid}"
         name="placesLimit"
         size="20"

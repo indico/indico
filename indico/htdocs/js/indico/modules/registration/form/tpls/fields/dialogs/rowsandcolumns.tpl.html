@@ -4,6 +4,7 @@
     </label>
     <input type="number" name="numberOfColumns"
         ng-model="formData.numberOfColumns"
+        ng-init="formData.numberOfColumns=getDefaultFieldSetting('defaultNumberOfColumns')"
         ng-class="{hasError: validationStarted && optionsForm.numberOfColumns.$invalid}"
         size="20"
         min="1"
@@ -16,6 +17,7 @@
         {{ 'Rows' | i18n }}
     </label>
     <input type="number" name="numberOfRows"
+        ng-init="formData.numberOfRows=getDefaultFieldSetting('defaultNumberOfRows')"
         ng-model="formData.numberOfRows"
         ng-class="{hasError: validationStarted && optionsForm.numberOfRows.$invalid}"
         size="20"
