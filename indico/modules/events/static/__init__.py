@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.static.models.static import StaticSite
@@ -33,4 +35,6 @@ def _merge_users(target, source, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
+    if not event.can_manage(session.user, allow_key=True):
+        return
     return SideMenuItem('static', _('Offline Copy'), url_for('static_site.list', event), section='advanced')
