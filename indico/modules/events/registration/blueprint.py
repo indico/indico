@@ -40,7 +40,8 @@ from indico.modules.events.registration.controllers.management.sections import (
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationsListManage,
                                                                                 RHRegistrationsListCustomize,
                                                                                 RHRegistrationDetails,
-                                                                                RHRegistrationEdit)
+                                                                                RHRegistrationEdit,
+                                                                                RHRegistrationListStaticURL)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -69,6 +70,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/', 'manage_reglist', RHRegistrationsListManage)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/customize', 'customize_reglist',
                  RHRegistrationsListCustomize, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-url',
+                 'generate_static_url', RHRegistrationListStaticURL, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
                  RHRegistrationDetails)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
