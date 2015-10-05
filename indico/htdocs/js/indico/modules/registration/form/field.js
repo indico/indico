@@ -514,6 +514,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                      width: 50,
                      editable: true,
                      edittype: "text",
+                     pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
                      editoptions: {
                         size: "7",
                         maxlength: "20"}},
