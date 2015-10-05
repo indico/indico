@@ -3,11 +3,11 @@
     <tr>
         <td class="bold" align="left" colspan="3">
             <span ng-bind-html="section.introSentence" ng-class="{'text-error': validationStarted && nestedForm.$invalid}"></span>
-            <span ng-show="section.mandatory" class="regFormMandatoryField">*</span>
+            <span ng-show="section.isRequired" class="regFormMandatoryField">*</span>
         </td>
     </tr>
 
-    <tr ng-if="section.selectionType!='multiple' && !section.mandatory">
+    <tr ng-if="section.selectionType!='multiple' && !section.isRequired">
         <td>
             <input type="radio" name="socialEvents" value=""
                 ng-model="selectedRadioInput.id"
@@ -21,12 +21,12 @@
             <input ng-switch-when="multiple"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-model="selectedInputs[item.id]"
-                ng-required="section.mandatory && !anySelected()"
+                ng-required="section.isRequired && !anySelected()"
                 ng-disabled="!hasPlacesLeft(item, getNoPlacesFromUserData(item)) || paymentBlocked(item, userdata) "/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
                 ng-model="selectedRadioInput.id"
-                ng-required="section.mandatory && selectedRadioInput.id === undefined"
+                ng-required="section.isRequired && selectedRadioInput.id === undefined"
                 ng-disabled="!hasPlacesLeft(item, getNoPlacesFromUserData(item)) || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
             {{ item.caption }}
             <span ng-if="!hasPlacesLeft(item, getNoPlacesFromUserData(item), 'socialEvent')" class="noPlacesLeft">

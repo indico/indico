@@ -3,7 +3,7 @@
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
         ng-model="userdata[fieldName]"
-        ng-required="field.mandatory"
+        ng-required="field.isRequired"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-pattern="/^.+@([^.@][^@]+)$/">
 </ng-form>

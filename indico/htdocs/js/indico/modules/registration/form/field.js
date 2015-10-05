@@ -37,7 +37,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                         return item.id == $scope.field.id;
                     });
 
-                    $scope.field.disabled = updatedField.disabled;
+                    $scope.field.isEnabled = updatedField.isEnabled;
                     $scope.section.items.splice(index, 1);
                     $scope.section.items.push($scope.field);
                 }
@@ -55,7 +55,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                         return item.id == $scope.field.id;
                     });
 
-                    $scope.field.disabled = updatedField.disabled;
+                    $scope.field.isEnabled = updatedField.isEnabled;
                     $scope.section.items.splice(index, 1);
                     $scope.section.items.push($scope.field);
                 }
@@ -113,15 +113,15 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         defaultValue: false,
         singleColumn: false,
         itemtable: false,
-        mandatory: true,
+        isRequired: true,
         number: false,
         placesLimit: false,
         rowsAndColumns: false,
         size: false,
         formData: [
-            'caption',
+            'title',
             'description',
-            'mandatory'
+            'isRequired'
         ]
     };
 
@@ -165,7 +165,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         }
     };
 
-    $scope.fieldName = $scope.getName($scope.field.input);
+    $scope.fieldName = $scope.getName($scope.field.inputType);
 });
 
 ndRegForm.controller('BillableCtrl', function($scope, $filter) {
@@ -197,10 +197,10 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
      */
     $scope.getPlacesLeft = function(item, uservalue, selectedvalue) {
         var places = item.noPlacesLeft;
-        if (item._type == 'GeneralField' && item.input == 'checkbox') {
+        if (item._type == 'GeneralField' && item.inputType == 'checkbox') {
             if (uservalue) places += 1;
             if (selectedvalue) places -= 1;
-        } else if (item._type == 'GeneralField' && item.input == 'yes/no') {
+        } else if (item._type == 'GeneralField' && item.inputType == 'yes/no') {
             if (uservalue == 'yes') places += 1;
             if (selectedvalue == 'yes') places -= 1;
         } else if (item._type == 'RadioItem' || item._type == 'AccommodationType') {
@@ -349,7 +349,7 @@ ndRegForm.directive('ndFileField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("File");
             scope.removeAttachment = function() {
-                delete scope.userdata[scope.getName(scope.field.input)];
+                delete scope.userdata[scope.getName(scope.field.inputType)];
             };
         }
     };
@@ -366,7 +366,7 @@ ndRegForm.directive('ndLabelField', function(url) {
             scope.settings.fieldName = $T("Free Text");
             scope.settings.singleColumn = true;
             scope.settings.billable = true;
-            scope.settings.mandatory = false;
+            scope.settings.isRequired = false;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
         }
@@ -427,14 +427,14 @@ ndRegForm.directive('ndRadioField', function(url) {
                 return scope.getId(scope.getValue(scope.fieldName));
             };
 
-            scope.getInputTpl = function(inputType) {
-                return url.tpl('fields/{0}.tpl.html'.format(inputType));
+            scope.getInputTpl = function(itemType) {
+                return url.tpl('fields/{0}.tpl.html'.format(itemType));
             };
 
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.paid) {
                     var item = _.find(scope.field.radioitems, function(item) {
-                        return item.caption == userdata[scope.getName(scope.field.input)];
+                        return item.caption == userdata[scope.getName(scope.field.inputType)];
                     }) || {};
 
                     return item.isBillable && item.price !== '' && item.price !== 0;
@@ -474,7 +474,7 @@ ndRegForm.directive('ndRadioField', function(url) {
             };
 
             scope.settings.formData.push('defaultItem');
-            scope.settings.formData.push('inputType');
+            scope.settings.formData.push('itemType');
             scope.settings.formData.push('withExtraSlots');
 
             scope.settings.editionTable = {
@@ -648,8 +648,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 $scope.settings = $scope.config;
 
                 $scope.formData = {};
-                $scope.formData.input = $scope.field.input;
-                $scope.formData.disabled = $scope.field.disabled;
+                $scope.formData.inputType = $scope.field.inputType;
+                $scope.formData.isEnabled = $scope.field.isEnabled;
                 $scope.formData.withExtraSlots = $scope.field.withExtraSlots;
 
                 _.each($scope.settings.formData, function(item) {
@@ -660,7 +660,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     }
                 });
 
-                if ($scope.field.input == 'radio') {
+                if ($scope.field.inputType == 'radio') {
                     $scope.formData.radioitems = [];
                     _.each($scope.field.radioitems, function(item, ind) {
                         $scope.formData.radioitems[ind] = angular.copy(item);
