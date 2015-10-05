@@ -362,7 +362,6 @@ if __name__ == '__main__':
                        'MaKaC': os.path.join('indico', 'MaKaC')},
           package_data={'indico': ['*.*']},
           include_package_data=True,
-          namespace_packages=['indico'],
           install_requires=_getInstallRequires(),
           data_files=dataFiles,
           dependency_links=DEPENDENCY_URLS)
