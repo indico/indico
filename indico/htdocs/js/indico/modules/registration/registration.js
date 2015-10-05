@@ -3,7 +3,7 @@
 
     $(document).ready(function() {
         setupRegistrationFormScheduleDialogs();
-        setupRegistrationFormSummaryDialogs();
+        setupRegistrationFormSummaryPage();
     });
 
     $(window).scroll(function(){
@@ -25,13 +25,26 @@
         });
     }
 
-    function setupRegistrationFormSummaryDialogs() {
+    function setupRegistrationFormSummaryPage() {
         $('.js-conditions-dialog').on('click', function(e) {
             e.preventDefault();
             ajaxDialog({
                 url: $(this).data('href'),
                 title: $(this).data('title')
             });
+        });
+
+        $('.js-check-conditions').on('click', function(e) {
+            var conditions = $('#conditions-accepted');
+            if (conditions.length && !conditions.prop('checked')) {
+                var msg = "Please, confirm that you have read and accepted the Terms and Conditions before proceeding.";
+                alertPopup($T.gettext(msg), $T.gettext("Terms and Conditions"));
+                e.preventDefault();
+            }
+        });
+
+        $('.js-highlight-payment').on('click', function() {
+            $('#payment-summary').effect('highlight', 800);
         });
     }
 })(window);
