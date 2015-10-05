@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.modules.payment.controllers import (RHPaymentAdminSettings, RHPaymentEventSettings,
                                                 RHPaymentEventToggle, RHPaymentEventSettingsEdit,
                                                 RHPaymentEventPluginEdit, RHPaymentEventCheckout, RHPaymentEventForm,
-                                                RHPaymentAdminPluginSettings)
+                                                RHPaymentAdminPluginSettings, RHPaymentEventConditions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('payment', __name__, template_folder='templates', virtual_template_folder='payment')
@@ -42,3 +42,5 @@ _bp.add_url_rule('/event/<confId>/manage/registration/payment/method/<method>', 
 _bp.add_url_rule('/event/<confId>/registration/payment/', 'event_payment', RHPaymentEventCheckout,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/registration/payment/form', 'event_payment_form', RHPaymentEventForm)
+_bp.add_url_rule('/event/<confId>/registration/payment/conditions',
+                 'event_payment_conditions', RHPaymentEventConditions)
