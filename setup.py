@@ -49,7 +49,7 @@ except ImportError:
     BABEL_PRESENT = False
 
 
-DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
+DEPENDENCY_URLS = ["https://github.com/indico/indico-fonts/releases/"]
 
 if sys.platform == 'linux2':
     import pwd
