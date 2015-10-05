@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from uuid import uuid4
+
+from sqlalchemy.dialects.postgresql import JSON, UUID
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -32,6 +34,14 @@ class Registration(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+    #: The unguessable ID for the object
+    uuid = db.Column(
+        UUID,
+        index=True,
+        unique=True,
+        nullable=False,
+        default=lambda: unicode(uuid4())
     )
     #: The ID of the registration form
     registration_form_id = db.Column(

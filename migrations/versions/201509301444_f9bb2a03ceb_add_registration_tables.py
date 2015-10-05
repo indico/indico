@@ -83,12 +83,14 @@ def upgrade():
     op.create_table(
         'registrations',
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('uuid', postgresql.UUID, nullable=False, index=True),
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('uuid'),
         schema='event_registration'
     )
 
