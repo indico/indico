@@ -121,8 +121,8 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         $scope.dialogs.newfield = true;
         section.items.push({
             id: -1,
-            disabled: false,
-            input: fieldType,
+            isEnabled: true,
+            inputType: fieldType,
             lock: [],
         });
     };

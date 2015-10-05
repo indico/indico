@@ -2,11 +2,11 @@
     <label class="regFormDialogCaption">
         {{ 'Input type' | i18n }}
     </label>
-    <select name="inputType" ng-model="formData.inputType" ng-init="formData.inputType='dropdown'">
-        <option value="dropdown" ng-selected="field.inputType == 'dropdown'">
+    <select name="itemType" ng-model="formData.itemType" ng-init="formData.itemType='dropdown'">
+        <option value="dropdown" ng-selected="field.itemType == 'dropdown'">
             {{ 'Drop-down list' | i18n }}
         </option>
-        <option value="radiogroup" ng-selected="field.inputType == 'radiogroup'">
+        <option value="radiogroup" ng-selected="field.itemType == 'radiogroup'">
             {{ 'Radio group' | i18n }}
         </option>
     </select>

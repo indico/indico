@@ -1,5 +1,5 @@
 <div ng-model="section.items" ui-sortable="fieldSortableOptions" class="field-list">
-    <div ng-repeat="field in filtered=(section.items | filter: {disabled: 'false'})">
+    <div ng-repeat="field in filtered=(section.items | filter: {isEnabled: 'true'})">
         <div ng-include="tplGeneralField"/>
     </div>
 </div>
@@ -20,7 +20,7 @@
         {{ "Disabled fields" | i18n }}
         <i class="info-helper" title="{{ 'These fields won\'t be displayed to registrants' | i18n }}"></i>
     </div>
-    <div ng-repeat="field in section.items | filter: {disabled: 'true'}">
+    <div ng-repeat="field in section.items | filter: {isEnabled: 'false'}">
         <div ng-include="tplGeneralField"/>
     </div>
 </div>
