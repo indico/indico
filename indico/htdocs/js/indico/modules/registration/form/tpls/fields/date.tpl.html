@@ -7,11 +7,11 @@
         show-time="showTime(field.dateFormat)"
         validation="validationStarted"
         value="{{ date }}"
-        ng-required="{{ field.mandatory }}"
+        ng-required="{{ field.isRequired }}"
         ng-model="date"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         nd-jquery-datepicker>
-    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
 </ng-form>

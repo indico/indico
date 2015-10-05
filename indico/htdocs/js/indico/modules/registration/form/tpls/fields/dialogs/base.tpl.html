@@ -5,7 +5,7 @@
                 {{ 'Options' | i18n }}
             </a>
         </li>
-        <li ng-if="field.input == 'radio'" ng-class="{active: isTabSelected('tab-editItems')}">
+        <li ng-if="field.inputType == 'radio'" ng-class="{active: isTabSelected('tab-editItems')}">
             <a ng-click="setSelectedTab('tab-editItems')">
                 {{ 'Edit items' | i18n }}
             </a>
@@ -21,15 +21,15 @@
                         <span class="regFormMandatoryField">*</span>
                     </label>
 
-                    <input type="text" name="caption" required
-                        ng-model="formData.caption"
-                        ng-class="{hasError: validationStarted && optionsForm.caption.$invalid}"
+                    <input type="text" name="title" required
+                        ng-model="formData.title"
+                        ng-class="{hasError: validationStarted && optionsForm.title.$invalid}"
                         nd-init-focus
                         class="caption-input"/>
-                    <span ng-if="settings.mandatory">
+                    <span ng-if="settings.isRequired">
                         <span class="mandatory-check">
-                            <input type="checkbox" name="mandatory"
-                                ng-model="formData.mandatory"
+                            <input type="checkbox" name="isRequired"
+                                ng-model="formData.isRequired"
                                 ng-disabled="field.lock.indexOf('mandatory') != -1">
                             <span>
                                 {{ 'Mandatory' | i18n }}

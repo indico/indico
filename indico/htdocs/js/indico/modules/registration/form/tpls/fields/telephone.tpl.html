@@ -4,7 +4,7 @@
         name="{{ fieldName }}"
         size="30"
         ng-model="userdata[fieldName]"
-        ng-required="field.mandatory"
+        ng-required="field.isRequired"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-pattern="/^(\(\+\d*\)|\+)?\s*(\d(\s*|\-))+$/">
 </ng-form>
