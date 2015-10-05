@@ -33,7 +33,7 @@ from setuptools.command import develop, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 
 
-DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
+DEPENDENCY_URLS = ["https://github.com/indico/indico-fonts/releases/"]
 
 
 class vars(object):
