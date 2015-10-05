@@ -21,6 +21,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.items import RegistrationFormItemType
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
@@ -186,9 +187,14 @@ class RegistrationForm(db.Model):
         return self.is_active and (not self.require_user or user) and not self.limit_reached
 
     @memoize_request
-    def get_user_registration(self, user):
+    def get_registration(self, user=None, uuid=None):
+        """Retrieves registrations for this registration form by user or uuid"""
+        if user and uuid:
+            raise ValueError("Both `user` and `uuid` can't be specified")
         if user:
             return user.registrations.filter_by(registration_form=self).first()
+        if uuid:
+            return Registration.query.with_parent(self).filter_by(uuid=uuid).first()
 
 
 @listens_for(RegistrationForm.sections, 'append')
