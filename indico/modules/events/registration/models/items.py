@@ -92,7 +92,8 @@ class RegistrationFormItem(db.Model):
     #: Description of this field
     description = db.Column(
         db.String,
-        nullable=True
+        nullable=False,
+        default=''
     )
     #: Whether the field is enabled
     is_enabled = db.Column(
