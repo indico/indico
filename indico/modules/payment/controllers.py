@@ -216,3 +216,9 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
             html = self.plugin.render_payment_form(self._conf, self._registrant, self._registrant.getTotal(),
                                                    event_settings.get(self._conf, 'currency'))
         return jsonify(html=html)
+
+
+class RHPaymentEventConditions(RHRegistrationFormRegistrantBase):
+    def _process(self):
+        conditions = event_settings.get(self._conf, 'conditions')
+        return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)
