@@ -21,5 +21,3 @@ register_custom_mimetypes()
 
 # monkey-patches for older Python versions
 apply_patches()
-
-__import__('pkg_resources').declare_namespace(__name__)
