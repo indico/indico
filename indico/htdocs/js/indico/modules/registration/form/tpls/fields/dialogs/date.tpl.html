@@ -6,7 +6,7 @@
     <span ng-if="field.displayFormats === undefined">
         <select name="dateFormat" required
             ng-model="formData.dateFormat"
-            ng-init="formData.dateFormat=(!!field.dateFormat) ? '{0} {1}'.format(field.dateFormat, field.timeFormat) : 'dd/mm/yy'"
+            ng-init="formData.dateFormat=field.dateFormat ? '{0} {1}'.format(field.dateFormat, field.timeFormat || '') : 'mm/dd/yy'"
             ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
             <option value="dd/mm/yy HH:mm">DD/MM/YYYY hh:mm</option>
             <option value="dd.mm.yy HH:mm">DD.MM.YYYY hh:mm</option>
