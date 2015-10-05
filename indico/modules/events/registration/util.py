@@ -31,6 +31,5 @@ def make_registration_form(regform, management=False):
         if not management and form_item.parent.is_manager_only:
             continue
         field_impl = form_item.wtf_field
-        name = 'field_{0}-{1}'.format(form_item.parent_id, form_item.id)
-        setattr(form_class, name, field_impl.create_wtf_field())
+        setattr(form_class, form_item.html_field_name, field_impl.create_wtf_field())
     return form_class

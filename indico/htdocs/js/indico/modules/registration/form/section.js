@@ -122,8 +122,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         section.items.push({
             id: -1,
             isEnabled: true,
-            inputType: fieldType,
-            lock: [],
+            inputType: fieldType
         });
     };
 });
@@ -223,7 +222,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
 
         link: function(scope) {
             scope.buttons.newfield = true;
-            scope.buttons.disable = true;
+            scope.buttons.disable = !scope.section.isPersonalData;
             scope.tplGeneralField = url.tpl('sections/generalfield.tpl.html');
 
             scope.sectionApi.removeNewField = function() {
@@ -248,6 +247,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
         }
     };
 });
+
 
 ndRegForm.directive('ndSectionDialog', function(url) {
     return {

@@ -23,6 +23,7 @@ from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
@@ -129,9 +130,11 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
         if form.validate_on_submit():
             self._save_registration(form.data)
             return redirect(url_for('.display_regform_list', self.event))
+        user_data = {t.name: getattr(session.user, t.name) if session.user else '' for t in PersonalDataType}
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
-                                               currency=event_settings.get(self.event, 'currency'))
+                                               currency=event_settings.get(self.event, 'currency'),
+                                               user_data=user_data)
 
     def _save_registration(self, data):
         registration = Registration(user=session.user, registration_form=self.regform)
@@ -140,6 +143,6 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
             if form_item.parent.is_manager_only:
                 value = form_item.wtf_field.default_value
             else:
-                value = data.get('field_{0}-{1}'.format(form_item.parent_id, form_item.id))
+                value = data.get(form_item.html_field_name)
             form_item.wtf_field.save_data(registration, value)
         db.session.flush()

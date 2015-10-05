@@ -88,20 +88,16 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         }, handleAjaxError);
     };
 
-    $scope.getName = function(input) {
-        return 'field_{0}-{1}'.format($scope.section.id, $scope.field.id);
-    };
-
     $scope.openFieldSettings = function() {
         $scope.dialog.open = true;
     };
 
     $scope.canBeDeleted = function(field) {
-        return field.lock? field.lock.indexOf('delete') == -1 : false;
+        return !field.fieldIsPersonalData;
     };
 
     $scope.canBeDisabled = function(field) {
-        return field.lock? field.lock.indexOf('disable') == -1 : false;
+        return !field.fieldIsRequired;
     };
 
     $scope.isNew = function() {
@@ -166,7 +162,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         }
     };
 
-    $scope.fieldName = $scope.getName($scope.field.inputType);
+    $scope.fieldName = $scope.field.htmlName;
 });
 
 ndRegForm.controller('BillableCtrl', function($scope, $filter) {
@@ -350,7 +346,7 @@ ndRegForm.directive('ndFileField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("File");
             scope.removeAttachment = function() {
-                delete scope.userdata[scope.getName(scope.field.inputType)];
+                delete scope.userdata[scope.field.htmlName];
             };
         }
     };
@@ -435,7 +431,7 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.paid) {
                     var item = _.find(scope.field.radioitems, function(item) {
-                        return item.caption == userdata[scope.getName(scope.field.inputType)];
+                        return item.caption == userdata[scope.field.htmlName];
                     }) || {};
 
                     return item.isBillable && item.price !== '' && item.price !== 0;

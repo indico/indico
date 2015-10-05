@@ -3,7 +3,7 @@
         <div class="checkbox-with-text">
             <input type="checkbox"
                 id="field-{{ section.id }}-{{ field.id }}"
-                name="{{ getName(field.id) }}"
+                name="{{ field.htmlName }}"
                 ng-model="checkboxValue"
                 ng-required="field.isRequired"
                 ng-disabled="!hasPlacesLeft(field, getUserdataValue()) || paymentBlocked(field, userdata)">
