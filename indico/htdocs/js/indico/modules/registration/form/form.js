@@ -50,11 +50,24 @@ ndRegForm.value('sortableoptions', {
     tolerance: 'pointer'
 });
 
+ndRegForm.value('fieldDefaults', {
+    'defaultTextFieldSize': 60,
+    'defaultNumberValue': 0,
+    'defaultRadioItemType': 'dropdown',
+    'defaultNumberOfColumns': 60,
+    'defaultNumberOfRows': 2,
+    'defaultPrice': 0,
+    'defaultMinValue': 0,
+    'defaultPlacesLimit': 0,
+    'defaultDateFormat': 'dd/mm/yy',
+    'defaultTelephoneSize': 30
+});
+
 ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/modules/registration/form');
 });
 
-ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, userurl) {
+ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, userurl, fieldDefaults) {
     var defaults = $http.defaults.headers;
     defaults.common = defaults.common || {};
     defaults.get = defaults.get || {};
@@ -77,6 +90,9 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
             } else if (callback.success) {
                 callback.success(data);
             }
+        },
+        getDefaultFieldSetting: function(setting) {
+            return fieldDefaults[setting];
         },
         Sections: $resource(sectionURL, {confId: '@confId', sectionId: "@sectionId", confFormId: "@confFormId"}, {
             "remove": {method: 'DELETE', url: sectionURL + "/", isArray: true},

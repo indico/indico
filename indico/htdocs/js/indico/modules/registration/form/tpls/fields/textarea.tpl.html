@@ -2,8 +2,8 @@
     <textarea
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
-        cols="{{ field.numberOfColumns || 60 }}"
-        rows="{{ field.numberOfRows || 2 }}"
+        cols="{{ field.numberOfColumns || getDefaultFieldSetting('defaultNumberOfColumns') }}"
+        rows="{{ field.numberOfRows || getDefaultFieldSetting('defaultNumberOfRows') }}"
         ng-model="userdata[fieldName]"
         ng-required="field.isRequired"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}">
