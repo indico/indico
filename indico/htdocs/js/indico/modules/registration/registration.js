@@ -92,11 +92,9 @@
         });
     }
 
-    function setupRegistrationsList() {
-        colorizeSelectedRows();
-        setupStaticURLGeneration();
-        $('.registrations .i-table').tablesorter({
-            cssAsc:  'header-sort-asc',
+    function setupTableSorter() {
+        $('.registrations .tablesorter').tablesorter({
+            cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
             headers: {
                 0: {
@@ -104,6 +102,13 @@
                 }
             }
         });
+    }
+
+    function setupRegistrationsList() {
+        colorizeSelectedRows();
+        setupStaticURLGeneration();
+        setupTableSorter();
+
         $('.registrations .toolbar')
         .dropdown()
         .on('click', '.js-dialog-action', function(e) {
