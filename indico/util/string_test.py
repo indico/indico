@@ -138,11 +138,13 @@ def test_camelize(input, output):
 
 
 def test_camelize_keys():
-    d = {'fooBar': 'foo', 'bar_foo': 123, 'foo_bar': {'hello_world': 'test'}}
+    d = {'fooBar': 'foo', 'bar_foo': 123, 'moo_bar': {'hello_world': 'test'},
+         'nested': [{'is_dict': True}, 'foo', ({'a_b': 'c'},)]}
     orig = d.copy()
     d2 = camelize_keys(d)
     assert d == orig  # original dict not modified
-    assert d2 == {'fooBar': 'foo', 'barFoo': 123, 'fooBar': {'helloWorld': 'test'}}
+    assert d2 == {'fooBar': 'foo', 'barFoo': 123, 'mooBar': {'helloWorld': 'test'},
+                  'nested': [{'isDict': True}, 'foo', ({'aB': 'c'},)]}
 
 
 def test_snakify_keys():
