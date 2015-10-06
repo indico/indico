@@ -123,11 +123,19 @@
                 }
             });
         });
+
+        $('#select-all').on('click', function() {
+            $('table.i-table input.select-row').prop('checked', true).trigger('change');
+        });
+
+        $('#select-none').on('click', function() {
+            $('table.i-table input.select-row').prop('checked', false).trigger('change');
+        });
     }
 
     function colorizeSelectedRows() {
         $('table.i-table input.select-row').on('change', function() {
-            $(this).closest('tr').toggleClass('selected', $(this).checked);
+            $(this).closest('tr').toggleClass('selected', this.checked);
         });
     }
 
