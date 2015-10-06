@@ -67,9 +67,6 @@ class CheckboxField(RegistrationFormFieldBase):
     name = 'checkbox'
     wtf_field_class = wtforms.BooleanField
 
-    def save_data(self, registration, value):
-        registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, data=value))
-
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
