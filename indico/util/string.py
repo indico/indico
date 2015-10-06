@@ -460,5 +460,9 @@ def crc32(data):
 
 
 def normalize_phone_number(value):
-    """Normalize phone number, so it doesn't contain invalid characters"""
-    return re.sub(r'((?!^)\+)|[^0-9x+]', '', value.strip()) if value else None
+    """Normalize phone number so it doesn't contain invalid characters
+
+    This removes all characters besides a leading +, digits and x as
+    described here: http://stackoverflow.com/a/123681/298479
+    """
+    return re.sub(r'((?!^)\+)|[^0-9x+]', '', value.strip())
