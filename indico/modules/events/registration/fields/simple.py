@@ -81,7 +81,7 @@ class BooleanField(RegistrationFormFieldBase):
 class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
     wtf_field_class = wtforms.StringField
-    field_kwargs = {'filters': [normalize_phone_number]}
+    field_kwargs = {'filters': [lambda x: normalize_phone_number(x) if x else '']}
 
 
 class CountryField(RegistrationFormFieldBase):
