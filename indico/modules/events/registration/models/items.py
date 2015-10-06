@@ -294,7 +294,7 @@ class RegistrationFormItem(db.Model):
     @property
     def view_data(self):
         """Returns object with data that Angular can understand"""
-        return dict(id=self.id, description=self.description)
+        return dict(id=self.id, description=self.description, position=self.position)
 
     @hybrid_property
     def is_section(self):
