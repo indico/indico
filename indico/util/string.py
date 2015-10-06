@@ -432,11 +432,12 @@ def camelize(name):
     return underscore + parts[0] + ''.join(x.title() for x in parts[1:])
 
 
-def _convert_keys(dict_, convert_func):
-    d = {}
-    for key, value in dict_.iteritems():
-        d[convert_func(key)] = _convert_keys(value, convert_func) if isinstance(value, dict) else value
-    return d
+def _convert_keys(value, convert_func):
+    if isinstance(value, (list, tuple)):
+        return type(value)(_convert_keys(x, convert_func) for x in value)
+    elif not isinstance(value, dict):
+        return value
+    return {convert_func(k): _convert_keys(v, convert_func) for k, v in value.iteritems()}
 
 
 def camelize_keys(dict_):
