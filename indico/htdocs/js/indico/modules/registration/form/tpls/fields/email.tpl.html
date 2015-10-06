@@ -2,8 +2,9 @@
     <input type="text"
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
+        size="{{ getDefaultFieldSetting('defaultTextFieldSize') }}"
         ng-model="userdata[fieldName]"
-        ng-required="field.mandatory"
+        ng-required="field.isRequired"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-pattern="/^.+@([^.@][^@]+)$/">
 </ng-form>

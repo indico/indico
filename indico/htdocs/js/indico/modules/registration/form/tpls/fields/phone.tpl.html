@@ -2,9 +2,9 @@
     <input type="text"
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
-        size="30"
+        size="getDefaultFieldSetting('defaultPhoneSize')"
         ng-model="userdata[fieldName]"
-        ng-required="field.mandatory"
+        ng-required="field.isRequired"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-pattern="/^(\(\+\d*\)|\+)?\s*(\d(\s*|\-))+$/">
 </ng-form>

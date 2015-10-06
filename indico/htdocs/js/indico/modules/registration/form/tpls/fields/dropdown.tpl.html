@@ -4,7 +4,7 @@
         id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
         ng-model="input"
-        ng-required="field.mandatory"
+        ng-required="field.isRequired"
         ng-disabled="anyBillableItemPayed(userdata)"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-init="selectedItem = getSelectedItem(input) || {}"
@@ -19,7 +19,7 @@
             </span>
         </option>
     </select>
-    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
     <input type="hidden"

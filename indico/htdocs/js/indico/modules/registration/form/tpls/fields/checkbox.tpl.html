@@ -5,12 +5,12 @@
                 id="field-{{ section.id }}-{{ field.id }}"
                 name="{{ getName(field.id) }}"
                 ng-model="checkboxValue"
-                ng-required="field.mandatory"
+                ng-required="field.isRequired"
                 ng-disabled="!hasPlacesLeft(field, getUserdataValue()) || paymentBlocked(field, userdata)">
             <div>
                 <label for="field-{{ section.id }}-{{ field.id }}"
-                    ng-bind-html="field.caption"></label>
-                <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
+                    ng-bind-html="field.title"></label>
+                <span ng-show="field.isRequired" class="regFormMandatoryField">*</span>
                 <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
                     {{ 'must be checked' | i18n }}
                 </span>

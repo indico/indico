@@ -134,6 +134,10 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
                 return scope.tabSelected === tab_id;
             };
 
+            scope.getDefaultFieldSetting = function(setting) {
+                return scope.$parent.getDefaultFieldSetting(setting);
+            };
+
             scope.$watch("show", function(val) {
                 if (scope.show === true) {
                     openDialog();
