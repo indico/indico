@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -293,6 +294,22 @@ class RegistrationFormItem(db.Model):
     def view_data(self):
         """Returns object with data that Angular can understand"""
         return dict(id=self.id, description=self.description)
+
+    @hybrid_property
+    def is_section(self):
+        return self.type in {RegistrationFormItemType.section, RegistrationFormItemType.section_pd}
+
+    @is_section.expression
+    def is_section(cls):
+        return cls.type.in_([RegistrationFormItemType.section, RegistrationFormItemType.section_pd])
+
+    @hybrid_property
+    def is_field(self):
+        return self.type in {RegistrationFormItemType.field, RegistrationFormItemType.field_pd}
+
+    @is_field.expression
+    def is_field(cls):
+        return cls.type.in_([RegistrationFormItemType.field, RegistrationFormItemType.field_pd])
 
     @return_ascii
     def __repr__(self):
