@@ -98,8 +98,12 @@ def upgrade():
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
+        sa.Column('email', sa.String(), nullable=False),
+        sa.Column('first_name', sa.String(), nullable=False),
+        sa.Column('last_name', sa.String(), nullable=False),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.UniqueConstraint('registration_form_id', 'email'),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )

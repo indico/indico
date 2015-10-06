@@ -107,6 +107,17 @@ class PersonalDataType(int, IndicoEnum):
     def is_required(self):
         return self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
 
+    @property
+    def column(self):
+        """
+        The Registration column in which the value is stored in
+        addition to the regular registration data entry.
+        """
+        if self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}:
+            return self.name
+        else:
+            return None
+
 
 class RegistrationFormItem(db.Model):
     __tablename__ = 'form_items'

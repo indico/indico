@@ -23,12 +23,13 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_repr
 
 
 class Registration(db.Model):
     __tablename__ = 'registrations'
-    __table_args__ = {'schema': 'event_registration'}
+    __table_args__ = (db.UniqueConstraint('registration_form_id', 'email'),
+                      {'schema': 'event_registration'})
 
     #: The ID of the object
     id = db.Column(
@@ -63,6 +64,21 @@ class Registration(db.Model):
         nullable=False,
         default=now_utc,
     )
+    #: The email of the registrant
+    email = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The first name of the registrant
+    first_name = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The last name of the registrant
+    last_name = db.Column(
+        db.String,
+        nullable=False
+    )
 
     #: The registration form this registration is attached to
     registration_form = db.relationship(
@@ -74,7 +90,6 @@ class Registration(db.Model):
             cascade='all, delete-orphan'
         )
     )
-
     # The user linked to this registration
     user = db.relationship(
         'User',
@@ -91,7 +106,8 @@ class Registration(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<Registration({}, {}, {})>'.format(self.id, self.registration_form_id, self.user_id)
+        full_name = '{} {}'.format(self.first_name, self.last_name)
+        return format_repr(self, 'id', 'registration_form_id', 'email', user_id=None, _text=full_name)
 
 
 class RegistrationData(db.Model):
