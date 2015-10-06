@@ -79,7 +79,7 @@ class BooleanField(RegistrationFormFieldBase):
 
 
 class PhoneField(RegistrationFormFieldBase):
-    name = 'telephone'
+    name = 'phone'
     wtf_field_class = wtforms.StringField
     field_kwargs = {'filters': [normalize_phone_number]}
 

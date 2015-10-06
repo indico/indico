@@ -60,7 +60,7 @@ ndRegForm.value('fieldDefaults', {
     'defaultMinValue': 0,
     'defaultPlacesLimit': 0,
     'defaultDateFormat': 'dd/mm/yy',
-    'defaultTelephoneSize': 30
+    'defaultPhoneSize': 30
 });
 
 ndRegForm.config(function(urlProvider) {

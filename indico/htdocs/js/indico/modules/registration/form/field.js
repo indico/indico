@@ -563,15 +563,15 @@ ndRegForm.directive('ndRadioField', function(url) {
     };
 });
 
-ndRegForm.directive('ndTelephoneField', function(url) {
+ndRegForm.directive('ndPhoneField', function(url) {
     return {
         require: 'ndField',
         controller: function($scope) {
-            $scope.tplInput = url.tpl('fields/telephone.tpl.html');
+            $scope.tplInput = url.tpl('fields/phone.tpl.html');
         },
 
         link: function(scope) {
-            scope.settings.fieldName = $T("Telephone");
+            scope.settings.fieldName = $T("Phone");
             scope.settings.formData.push('length');
         }
     };
