@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
+from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.util.string import return_ascii, camelize_keys
 from MaKaC.webinterface.common.countries import CountryHolder
@@ -62,6 +63,14 @@ class RegistrationFormField(RegistrationFormItem):
     @property
     def locator(self):
         return dict(self.parent.locator, field_id=self.id)
+
+    @property
+    def field_impl(self):
+        """Gets the implementation of the field.
+
+        :return: An instance of a `RegistrationFormFieldBase` subclass
+        """
+        return get_field_types()[self.input_type](self)
 
     @property
     def view_data(self):
