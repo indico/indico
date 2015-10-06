@@ -31,7 +31,7 @@
                     <td>{{ regform.start_dt | format_datetime if regform.start_dt else _('Not started') }}</td>
                     <td>{{ regform.end_dt | format_datetime if regform.end_dt else _('No deadline') }}</td>
                     <td class="regform-actions">
-                        {% if regform.get_user_registration(session.user) %}
+                        {% if regform.get_registration(user=session.user) %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}You have already registered{% endtrans %}">
                                 {% trans %}Register{% endtrans %}
