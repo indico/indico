@@ -23,7 +23,7 @@ from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
@@ -138,11 +138,12 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
 
     def _save_registration(self, data):
         registration = Registration(user=session.user, registration_form=self.regform)
-        db.session.add(registration)
         for form_item in self.regform.active_fields:
             if form_item.parent.is_manager_only:
                 value = form_item.wtf_field.default_value
             else:
                 value = data.get(form_item.html_field_name)
             form_item.wtf_field.save_data(registration, value)
+            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+                setattr(registration, form_item.personal_data_type.column, value)
         db.session.flush()

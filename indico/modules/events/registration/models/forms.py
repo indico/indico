@@ -172,8 +172,11 @@ class RegistrationForm(db.Model):
 
     @property
     def active_fields(self):
-        return [field for field in self.form_items if field.type == RegistrationFormItemType.field and
-                field.parent.is_enabled and not field.parent.is_deleted and field.is_enabled and not field.is_deleted]
+        return [field
+                for field in self.form_items
+                if (field.type in {RegistrationFormItemType.field, RegistrationFormItemType.field_pd} and
+                    field.parent.is_enabled and not field.parent.is_deleted and field.is_enabled and
+                    not field.is_deleted)]
 
     @property
     def limit_reached(self):
