@@ -140,10 +140,10 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
         registration = Registration(user=session.user, registration_form=self.regform)
         for form_item in self.regform.active_fields:
             if form_item.parent.is_manager_only:
-                value = form_item.wtf_field.default_value
+                value = form_item.field_impl.default_value
             else:
                 value = data.get(form_item.html_field_name)
-            form_item.wtf_field.save_data(registration, value)
+            form_item.field_impl.save_data(registration, value)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
         db.session.flush()
