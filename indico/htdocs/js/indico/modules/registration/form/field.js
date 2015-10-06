@@ -50,15 +50,10 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         regFormFactory.Fields.enable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
-                    var index = -1;
-                    _.find($scope.section.items, function(item) {
-                        index++;
-                        return item.id == $scope.field.id;
-                    });
-
                     $scope.field.isEnabled = updatedField.isEnabled;
-                    $scope.section.items.splice(index, 1);
-                    $scope.section.items.push($scope.field);
+                    $scope.section.items.sort(function(a, b) {
+                        return a.position - b.position;
+                    });
                 }
             });
         }, handleAjaxError);
