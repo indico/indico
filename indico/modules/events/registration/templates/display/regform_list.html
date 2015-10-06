@@ -22,7 +22,7 @@
             {% for regform in regforms %}
                 <tr>
                     <td>
-                        {% if event.canModify(session.user) %}
+                        {% if event.as_event.can_manage(session.user, 'registration') %}
                             <a href="{{ url_for('.manage_regform', regform) }}">{{ regform.title }}</a>
                         {% else %}
                             {{ regform.title }}
