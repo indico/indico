@@ -34,7 +34,7 @@ def make_registration_form(regform, management=False):
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
             continue
-        field_impl = form_item.wtf_field
+        field_impl = form_item.field_impl
         setattr(form_class, form_item.html_field_name, field_impl.create_wtf_field())
     return form_class
 
