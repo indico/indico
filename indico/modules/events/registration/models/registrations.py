@@ -22,10 +22,19 @@ from flask import has_request_context, session, request
 from sqlalchemy.dialects.postgresql import JSON, UUID
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
+from indico.util.struct.enum import IndicoEnum
+
+
+class RegistrationState(int, IndicoEnum):
+    complete = 1
+    pending = 2
+    rejected = 3
+    withdrawn = 4
+    unpaid = 5
 
 
 class Registration(db.Model):
@@ -61,6 +70,11 @@ class Registration(db.Model):
         db.ForeignKey('users.users.id'),
         index=True,
         nullable=True
+    )
+    #: The state a registration is in
+    state = db.Column(
+        PyIntEnum(RegistrationState),
+        nullable=False,
     )
     #: The date/time when the registration was recorded
     submitted_dt = db.Column(
@@ -129,7 +143,7 @@ class Registration(db.Model):
     @return_ascii
     def __repr__(self):
         full_name = '{} {}'.format(self.first_name, self.last_name)
-        return format_repr(self, 'id', 'registration_form_id', 'email', user_id=None, _text=full_name)
+        return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, _text=full_name)
 
 
 class RegistrationData(db.Model):

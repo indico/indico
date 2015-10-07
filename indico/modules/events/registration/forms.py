@@ -34,6 +34,8 @@ class RegistrationFormForm(IndicoForm):
                                  description=_("Introduction to be displayed when filling out the registration form"))
     contact_info = StringField(_("Contact info"),
                                description=_("How registrants can get in touch with somebody for extra information"))
+    moderation_enabled = BooleanField(_("Moderated"), widget=SwitchWidget(),
+                                      description=_("If enabled, registrations require manager approval"))
     require_user = BooleanField(_("Only logged-in users"), widget=SwitchWidget(),
                                 description=_("Only logged-in users can register"))
     limit_registrations = BooleanField(_("Limit registrations"), widget=SwitchWidget(),
