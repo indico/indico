@@ -34,5 +34,5 @@ class RegistrationFormMixin(object):
     def _checkParams(self):
         self.regform = (RegistrationForm
                         .find(id=request.view_args['reg_form_id'], is_deleted=False)
-                        .options(defaultload('sections').joinedload('children').joinedload('current_data'))
+                        .options(defaultload('form_items').joinedload('children').joinedload('current_data'))
                         .one())
