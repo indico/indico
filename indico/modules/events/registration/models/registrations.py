@@ -40,9 +40,11 @@ class RegistrationState(int, IndicoEnum):
 
 class Registration(db.Model):
     __tablename__ = 'registrations'
-    __table_args__ = (db.UniqueConstraint('registration_form_id', 'email'),
-                      db.UniqueConstraint('registration_form_id', 'user_id'),
-                      db.CheckConstraint('email = lower(email)', 'lowercase_email'),
+    __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
+                      db.Index(None, 'registration_form_id', 'user_id', unique=True,
+                               postgresql_where=db.text('state NOT IN (3, 4)')),
+                      db.Index(None, 'registration_form_id', 'email', unique=True,
+                               postgresql_where=db.text('state NOT IN (3, 4)')),
                       {'schema': 'event_registration'})
 
     #: The ID of the object
