@@ -21,12 +21,14 @@ from wtforms.validators import DataRequired, NumberRange, Optional
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoDateTimeField
+from indico.web.forms.fields import IndicoDateTimeField, EmailListField
 from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget
 
 
 class RegistrationFormForm(IndicoForm):
+    _notification_fields = ('notifications_enabled', 'recipients_emails')
+
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration form"))
     introduction = TextAreaField(_("Introduction"),
                                  description=_("Introduction to be displayed when filling out the registration form"))
@@ -39,6 +41,13 @@ class RegistrationFormForm(IndicoForm):
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
                                       description=_("Maximum number of registrations"))
+    notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
+                                         description=_('Send email notifications for events related to this '
+                                                       'registration form.'))
+    recipients_emails = EmailListField(_('List of recipients'),
+                                       [HiddenUnless('notifications_enabled', preserve_data=True), DataRequired()],
+                                       description=_('Email addresses to notify about events related to this '
+                                                     'registration form.'))
 
 
 class RegistrationFormScheduleForm(IndicoForm):

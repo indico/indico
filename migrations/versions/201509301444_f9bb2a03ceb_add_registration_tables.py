@@ -36,6 +36,8 @@ def upgrade():
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('require_user', sa.Boolean(), nullable=False),
         sa.Column('registration_limit', sa.Integer(), nullable=True),
+        sa.Column('notifications_enabled', sa.Boolean(), nullable=False),
+        sa.Column('recipients_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
