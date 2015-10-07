@@ -39,9 +39,17 @@ class RegistrationFormFieldBase(object):
         self.form_item = form_item
 
     @property
+    def default_value(self):
+        return ''
+
+    @property
     def validators(self):
         """Returns a list of validators for this field"""
         return None
+
+    def calculate_price(self, registration_data):
+        """Calculates the price of the field given the registration data"""
+        return 0
 
     def create_wtf_field(self):
         validators = list(self.validators) if self.validators is not None else []
@@ -53,14 +61,9 @@ class RegistrationFormFieldBase(object):
 
     def save_data(self, registration, value):
         registration.data.append(RegistrationData(field_data=self.form_item.current_data, data=value))
-
     @classmethod
     def modify_post_data(cls, post_data):
         pass
-
-    @property
-    def default_value(self):
-        return ''
 
     @property
     def view_data(self):

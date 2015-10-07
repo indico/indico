@@ -168,6 +168,9 @@ class Registration(db.Model):
         else:
             self.state = RegistrationState.complete
 
+    def price(self):
+        return sum(data.price for data in self.data)
+
 
 class RegistrationData(db.Model):
     __tablename__ = 'registration_data'
@@ -217,6 +220,10 @@ class RegistrationData(db.Model):
 
     # relationship backrefs:
     # - registration (Registration.data)
+
+    @property
+    def price(self):
+        return self.field_data.field.calculate_price(self)
 
     @return_ascii
     def __repr__(self):
