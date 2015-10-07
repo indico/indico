@@ -20,6 +20,7 @@ from uuid import uuid4
 
 from flask import has_request_context, session, request
 from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -121,6 +122,14 @@ class Registration(db.Model):
 
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
+
+    @hybrid_property
+    def is_cancelled(self):
+        return self.state in (RegistrationState.rejected, RegistrationState.withdrawn)
+
+    @is_cancelled.expression
+    def is_cancelled(self):
+        return self.state.in_((RegistrationState.rejected, RegistrationState.withdrawn))
 
     @locator_property
     def locator(self):
