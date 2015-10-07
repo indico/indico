@@ -156,6 +156,18 @@ class Registration(db.Model):
         full_name = '{} {}'.format(self.first_name, self.last_name)
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, _text=full_name)
 
+    def init_state(self):
+        """Initialize state of the object"""
+        if self.state is not None:
+            raise Exception("The registration already has a state")
+        if self.registration_form.moderation_enabled:
+            self.state = RegistrationState.pending
+        # TODO: Check if registration needs to be paid
+        elif False:
+            self.state = RegistrationState.unpaid
+        else:
+            self.state = RegistrationState.complete
+
 
 class RegistrationData(db.Model):
     __tablename__ = 'registration_data'
