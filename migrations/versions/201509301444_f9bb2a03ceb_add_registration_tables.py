@@ -13,6 +13,7 @@ from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.forms import RegistrationFormModificationMode
+from indico.modules.events.registration.models.registrations import RegistrationState
 
 
 # revision identifiers, used by Alembic.
@@ -36,6 +37,7 @@ def upgrade():
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('require_user', sa.Boolean(), nullable=False),
         sa.Column('registration_limit', sa.Integer(), nullable=True),
+        sa.Column('moderation_enabled', sa.Boolean(), nullable=False),
         sa.Column('notifications_enabled', sa.Boolean(), nullable=False),
         sa.Column('recipients_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
@@ -100,6 +102,7 @@ def upgrade():
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
+        sa.Column('state', PyIntEnum(RegistrationState), nullable=False),
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('first_name', sa.String(), nullable=False),
         sa.Column('last_name', sa.String(), nullable=False),

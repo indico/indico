@@ -107,6 +107,12 @@ class RegistrationForm(db.Model):
         db.Integer,
         nullable=True
     )
+    #: Whether registrations must be approved by a manager
+    moderation_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether the notifications for this event are enabled
     notifications_enabled = db.Column(
         db.Boolean,
