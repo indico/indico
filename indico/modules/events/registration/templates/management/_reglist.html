@@ -1,13 +1,10 @@
-{% macro render_registrations_list(registrations, visible_cols_regform_items, visible_cols_user_info, user_info, get_user_info) %}
+{% macro render_registrations_list(registrations, visible_cols_regform_items) %}
     <div class="registrations-table-wrapper">
         <table class="i-table tablesorter">
             <thead>
                 <tr class="i-table">
                     <th class="i-table checkbox-column"></th>
                     <th class="i-table">{% trans %}Full name{% endtrans %}</th>
-                    {% for item in visible_cols_user_info %}
-                        <th class="i-table">{{ user_info[item] }}</th>
-                    {% endfor %}
                     {% for item in visible_cols_regform_items %}
                         <th class="i-table">{{ item.title }}</th>
                     {% endfor %}

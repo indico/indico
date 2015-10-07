@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 import itertools
 import json
-from collections import OrderedDict
 from uuid import uuid4
 
 from flask import session, request, redirect, jsonify
@@ -30,30 +29,11 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
-from indico.modules.events.registration.util import get_user_info
-from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
 from MaKaC.common.cache import GenericCache
 
-
-# TODO: Create a better mapping
-USER_INFO = OrderedDict([
-    ('user_id', _('ID')),
-    ('user_surname', _('Surname')),
-    ('user_name', _('First name')),
-    ('user_email', _('Email')),
-    ('user_position', _('Position')),
-    ('user_institution', _('Institution')),
-    ('user_phone', _('Phone')),
-    ('user_city', _('City')),
-    ('user_country', _('Country')),
-    ('user_address', _('Address')),
-    ('user_paid', _('Paid')),
-    ('user_payment_id', _('Payment ID')),
-    ('user_payment_amount', _('Payment amount'))
-])
 
 cache = GenericCache('reglist-config')
 
@@ -101,13 +81,11 @@ class RHRegistrationsListManage(RHManageRegFormBase):
             configuration = cache.get(report_config_uuid)
             session[session_key] = configuration
             return redirect(url_for('.manage_reglist', self.regform))
-        reg_list_config = session.get(session_key, {'items': [], 'user_info': [], 'filters': {}})
+        reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(reg_list_config['items']))
         registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
-                                                    visible_cols_user_info=reg_list_config['user_info'],
-                                                    user_info=USER_INFO, get_user_info=get_user_info,
                                                     registrations=registrations)
 
 
@@ -116,30 +94,25 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_GET(self):
         session_key = 'reg_list_config_{}'.format(self.regform.id)
-        reg_list_config = session.get(session_key, {'items': [], 'user_info': [], 'filters': {}})
+        reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
         filters = set(itertools.chain.from_iterable(reg_list_config['filters'].itervalues()))
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
                                                     visible_cols_regform_items=reg_list_config['items'],
-                                                    visible_cols_user_info=reg_list_config['user_info'],
-                                                    user_info=USER_INFO, filters=filters)
+                                                    filters=filters)
 
     def _process_POST(self):
         filters = _get_filters_from_request()
         session_key = 'reg_list_config_{}'.format(self.regform.id)
         visible_regform_items = json.loads(request.values['visible_cols_regform_items'])
-        visible_user_info = json.loads(request.values['visible_cols_user_info'])
         reglist_config = session.setdefault(session_key, {})
         reglist_config['filters'] = filters
         reglist_config['items'] = visible_regform_items
-        reglist_config['user_info'] = visible_user_info
         session.modified = True
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(visible_regform_items))
         registrations = _query_registrations(self.regform, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
-        reg_list = tpl.render_registrations_list(registrations=registrations, visible_cols_regform_items=regform_items,
-                                                 visible_cols_user_info=visible_user_info, user_info=USER_INFO,
-                                                 get_user_info=get_user_info)
+        reg_list = tpl.render_registrations_list(registrations=registrations, visible_cols_regform_items=regform_items)
         return jsonify_data(registrations_list=reg_list)
 
 
