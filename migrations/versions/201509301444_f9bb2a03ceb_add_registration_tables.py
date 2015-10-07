@@ -108,9 +108,9 @@ def upgrade():
         sa.Column('last_name', sa.String(), nullable=False),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.UniqueConstraint('registration_form_id', 'email'),
-        sa.UniqueConstraint('registration_form_id', 'user_id'),
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
+        sa.Index(None, 'registration_form_id', 'user_id', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
+        sa.Index(None, 'registration_form_id', 'email', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
