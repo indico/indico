@@ -109,12 +109,13 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
                 raise ValueError("Cannot find user '{}' in cache".format(id_))
 
             data = {k: '' if v is None else v for (k, v) in data.items()}
+            email = data['email'].lower()
 
             # check if there is not already a pending user with that e-mail
-            user = User.find_first(email=data['email'], is_pending=True)
+            user = User.find_first(email=email, is_pending=True)
             if not user:
                 user = User(first_name=data.get('first_name') or '', last_name=data.get('last_name') or '',
-                            email=data['email'],
+                            email=email,
                             address=data.get('address', ''), phone=data.get('phone', ''),
                             affiliation=data.get('affiliation', ''), is_pending=True)
                 db.session.add(user)
