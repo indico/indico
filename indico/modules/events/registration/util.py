@@ -81,33 +81,3 @@ def url_rule_to_angular(endpoint):
     segments = [':' + mapping.get(data, data) if is_dynamic else data
                 for is_dynamic, data in rule._trace]
     return ''.join(segments).split('|', 1)[-1]
-
-
-# TODO: Create a better mapping
-def get_user_info(user, item):
-    if item == 'user_id':
-        return user.id
-    elif item == 'user_surname':
-        return user.last_name
-    elif item == 'user_name':
-        return user.first_name
-    elif item == 'user_email':
-        return user.email
-    elif item == 'user_position':
-        return user.affiliation  # TODO: update
-    elif item == 'user_institution':
-        return user.affiliation  # TODO: update
-    elif item == 'user_phone':
-        return user.phone
-    elif item == 'user_city':
-        return user.address  # TODO: update
-    elif item == 'user_country':
-        return user.address  # TODO: update
-    elif item == 'user_address':
-        return user.address  # TODO: update
-    elif item == 'user_paid':
-        return  # TODO: update
-    elif item == 'user_payment_id':
-        return  # TODO: update
-    elif item == 'user_payment_amount':
-        return  # TODO: update
