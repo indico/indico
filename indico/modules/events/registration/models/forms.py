@@ -117,13 +117,6 @@ class RegistrationForm(db.Model):
             lazy='dynamic'
         )
     )
-    #: The sections of the registration form
-    sections = db.relationship(
-        'RegistrationFormSection',
-        lazy=True,
-        viewonly=True,
-        order_by='RegistrationFormSection.position'
-    )
 
     # relationship backrefs:
     # - registrations (Registration.registration_form)
@@ -179,6 +172,10 @@ class RegistrationForm(db.Model):
                     field.parent.is_enabled and not field.parent.is_deleted)]
 
     @property
+    def sections(self):
+        return [x for x in self.form_items if x.is_section]
+
+    @property
     def limit_reached(self):
         return self.registration_limit and len(self.registrations) >= self.registration_limit
 
@@ -198,9 +195,3 @@ class RegistrationForm(db.Model):
             return user.registrations.filter_by(registration_form=self).first()
         if uuid:
             return Registration.query.with_parent(self).filter_by(uuid=uuid).first()
-
-
-@listens_for(RegistrationForm.sections, 'append')
-@listens_for(RegistrationForm.sections, 'remove')
-def _wrong_collection_modified(*unused):
-    raise Exception('This collection is view-only. Use `form_items` for write operations!')

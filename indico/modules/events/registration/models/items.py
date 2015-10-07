@@ -274,7 +274,8 @@ class RegistrationFormItem(db.Model):
         backref=db.backref(
             'form_items',
             lazy=True,
-            cascade='all, delete-orphan'
+            cascade='all, delete-orphan',
+            order_by=position
         )
     )
 
