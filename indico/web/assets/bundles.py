@@ -414,6 +414,7 @@ agreements_sass = sass_module_bundle('agreements')
 attachments_sass = sass_module_bundle('attachments')
 contributions_sass = sass_module_bundle('contributions')
 registration_sass = sass_module_bundle('registrationform')
+payment_sass = sass_module_bundle('payment')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
@@ -514,6 +515,7 @@ def register_all_css(env, main_css_file):
     env.register('users_sass', users_sass)
     env.register('auth_sass', auth_sass)
     env.register('fonts_sass', fonts_sass)
+    env.register('payment_sass', payment_sass)
     env.register('surveys_sass', surveys_sass)
 
 
