@@ -25,7 +25,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
@@ -161,10 +161,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
 
     def _save_registration(self, data):
         registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))
-        if self.regform.moderation_enabled:
-            registration.state = RegistrationState.complete
-        else:
-            registration.state = RegistrationState.pending
+        registration.init_state()
         for form_item in self.regform.active_fields:
             if form_item.parent.is_manager_only:
                 value = form_item.field_impl.default_value
