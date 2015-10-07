@@ -1,6 +1,12 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}{% trans %}Payment settings{% endtrans %}{% endblock %}
+{% block title %}
+    {% trans %}Payments{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans %}Settings{% endtrans %}
+{% endblock %}
 
 {% block content %}
     {% if settings.enabled and not enabled_plugins %}
