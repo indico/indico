@@ -129,7 +129,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
             self._save_registration(form.data)
-            return redirect(url_for('.display_regform_list', self.event))
+            return redirect(url_for('.display_regform_summary', self.regform))
         user_data = {t.name: getattr(session.user, t.name) if session.user else '' for t in PersonalDataType}
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
