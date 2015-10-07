@@ -66,6 +66,7 @@ from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
+from indico.util.locators import get_locator
 from indico.util.redis import RedisError
 from indico.util.string import truncate
 from indico.web.flask.util import ResponseUtil, url_for
@@ -314,14 +315,7 @@ class RH(RequestHandlerBase):
             value = getter(self)
             if value is None:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
-            try:
-                expected = value.locator
-            except AttributeError:
-                try:
-                    expected = value.getLocator()
-                except AttributeError:
-                    raise AttributeError("'{}' object has neither 'locator' nor 'getLocator'".format(type(value)))
-            new_view_args.update(expected)
+            new_view_args.update(get_locator(value))
         # Get all default values provided by the url map for the endpoint
         defaults = set(itertools.chain.from_iterable(r.defaults
                                                      for r in current_app.url_map.iter_rules(request.endpoint)
