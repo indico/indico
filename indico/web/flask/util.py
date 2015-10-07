@@ -35,6 +35,7 @@ from werkzeug.urls import url_parse
 from indico.util.caching import memoize
 from indico.util.contextManager import ContextManager
 from indico.util.fs import secure_filename
+from indico.util.locators import get_locator
 from indico.web.util import jsonify_data
 
 
@@ -249,11 +250,7 @@ def url_for(endpoint, *targets, **values):
         locator = {}
         for target in targets:
             if target:  # don't fail on None or mako's Undefined
-                try:
-                    target_locator = target.locator
-                except AttributeError:
-                    target_locator = target.getLocator()
-                locator.update(target_locator)
+                locator.update(get_locator(target))
         intersection = set(locator.iterkeys()) & set(values.iterkeys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
