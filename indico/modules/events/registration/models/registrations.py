@@ -80,16 +80,6 @@ class Registration(db.Model):
         nullable=False
     )
 
-    #: The registration form this registration is attached to
-    registration_form = db.relationship(
-        'RegistrationForm',
-        lazy=True,
-        backref=db.backref(
-            'registrations',
-            lazy=True,
-            cascade='all, delete-orphan'
-        )
-    )
     # The user linked to this registration
     user = db.relationship(
         'User',
@@ -100,9 +90,19 @@ class Registration(db.Model):
             cascade='all, delete-orphan'
         )
     )
+    #: The registration this data is associated with
+    data = db.relationship(
+        'RegistrationData',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'registration',
+            lazy=True
+        )
+    )
 
-    # relationship backref
-    # - data (RegistrationData.registration)
+    # relationship backrefs:
+    # - registration_form (RegistrationForm.registrations)
 
     @return_ascii
     def __repr__(self):
@@ -145,17 +145,6 @@ class RegistrationData(db.Model):
         nullable=False
     )
 
-    #: The registration this data is associated with
-    registration = db.relationship(
-        'Registration',
-        lazy=True,
-        backref=db.backref(
-            'data',
-            lazy=True,
-            cascade='all, delete-orphan'
-        )
-    )
-
     #: The associated field data object
     field_data = db.relationship(
         'RegistrationFormFieldData',
@@ -166,6 +155,9 @@ class RegistrationData(db.Model):
             cascade='all, delete-orphan'
         )
     )
+
+    # relationship backrefs:
+    # - registration (Registration.data)
 
     @return_ascii
     def __repr__(self):

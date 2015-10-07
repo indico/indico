@@ -267,18 +267,6 @@ class RegistrationFormItem(db.Model):
         )
     )
 
-    # The registration form
-    registration_form = db.relationship(
-        'RegistrationForm',
-        lazy=True,
-        backref=db.backref(
-            'form_items',
-            lazy=True,
-            cascade='all, delete-orphan',
-            order_by=position
-        )
-    )
-
     # The children of the item and the parent backref
     children = db.relationship(
         'RegistrationFormItem',
