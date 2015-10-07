@@ -52,7 +52,7 @@ class RegistrationFormFieldBase(object):
         return self.wtf_field_class(self.form_item.title, validators, **self.field_kwargs)
 
     def save_data(self, registration, value):
-        registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, data=value))
+        registration.data.append(RegistrationData(field_data=self.form_item.current_data, data=value))
 
     @classmethod
     def modify_post_data(cls, post_data):
