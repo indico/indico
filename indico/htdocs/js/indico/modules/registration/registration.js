@@ -158,40 +158,34 @@
         colorizeActiveFilters();
 
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
-        var visibleColumnsUserInfoField = $('#visible-columns-user-info');
         var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
-        var userInfoData = JSON.parse(visibleColumnsUserInfoField.val());
 
         $('.reglist-column')
         .on('click', '.trigger', function() {
             var $this = $(this);
             var field = $this.closest('.reglist-column');
             var fieldId = field.data('id');
-            var data = field.hasClass('js-user-info') ? userInfoData : regItemsData;
-            var visibleColumnsField = field.hasClass('js-user-info') ? visibleColumnsUserInfoField : visibleColumnsRegItemsField;
             var enabled = $this.hasClass('enabled');
             var notEnabled = $this.hasClass('not-enabled');
 
             if (enabled) {
-                data.splice(data.indexOf(fieldId), 1);
+                regItemsData.splice(regItemsData.indexOf(fieldId), 1);
+            } else {
+                regItemsData.push(fieldId);
             }
-            else if (!enabled) {
-                data.push(fieldId);
-            }
+
             $this.toggleClass('enabled', !enabled);
             $this.toggleClass('not-enabled', enabled);
             field.toggleClass('striped', enabled);
-            visibleColumnsField.val(JSON.stringify(data)).trigger('change');
+            visibleColumnsRegItemsField.val(JSON.stringify(regItemsData)).trigger('change');
         })
         .each(function() {
             var field = $(this);
             var fieldId = field.data('id');
-            var data = field.hasClass('js-user-info') ? userInfoData : regItemsData;
 
-            if (data.indexOf(fieldId) != -1) {
+            if (regItemsData.indexOf(fieldId) != -1) {
                 field.find('.trigger').addClass('enabled');
-            }
-            else {
+            } else {
                 field.addClass('striped');
                 field.find('.trigger').addClass('not-enabled');
             }
