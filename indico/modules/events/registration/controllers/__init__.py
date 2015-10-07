@@ -14,7 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask import request
+from sqlalchemy.orm import defaultload
 
 from indico.modules.events.registration.models.forms import RegistrationForm
 
@@ -29,4 +32,7 @@ class RegistrationFormMixin(object):
     }
 
     def _checkParams(self):
-        self.regform = RegistrationForm.find_one(id=request.view_args['reg_form_id'], is_deleted=False)
+        self.regform = (RegistrationForm
+                        .find(id=request.view_args['reg_form_id'], is_deleted=False)
+                        .options(defaultload('sections').joinedload('children').joinedload('current_data'))
+                        .one())
