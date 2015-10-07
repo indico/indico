@@ -38,12 +38,13 @@ from MaKaC.common.cache import GenericCache
 cache = GenericCache('reglist-config')
 
 
-def _get_filters_from_request():
+def _get_filters_from_request(regform):
     filters = {}
-    for key in request.form.iterkeys():
-        field_name = key.split('_')
-        if field_name[0] == 'radiogroup':
-            filters[int(field_name[1])] = request.form.getlist(key)
+    for field in regform.form_items:
+        if field.is_field and field.input_type in {'radio', 'country'}:
+            radioitems = request.form.getlist('radiogroup_{}'.format(field.id))
+            if radioitems:
+                filters[field.id] = radioitems
     return filters
 
 
@@ -102,7 +103,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
                                                     filters=filters)
 
     def _process_POST(self):
-        filters = _get_filters_from_request()
+        filters = _get_filters_from_request(self.regform)
         session_key = 'reg_list_config_{}'.format(self.regform.id)
         visible_regform_items = json.loads(request.values['visible_cols_regform_items'])
         reglist_config = session.setdefault(session_key, {})
