@@ -47,8 +47,9 @@ class RegistrationFormFieldData(db.Model):
         nullable=False
     )
 
-    # relationship backref
+    # relationship backrefs:
     # - registration_data (RegistrationData.field_data)
+    # - registration_form (RegistrationForm.form_items)
 
     @return_ascii
     def __repr__(self):

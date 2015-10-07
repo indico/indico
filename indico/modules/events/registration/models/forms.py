@@ -129,10 +129,27 @@ class RegistrationForm(db.Model):
             lazy='dynamic'
         )
     )
-
-    # relationship backrefs:
-    # - registrations (Registration.registration_form)
-    # - form_items (RegistrationFormItem.registration_form)
+    # The items (sections, text, fields) in the form
+    form_items = db.relationship(
+        'RegistrationFormItem',
+        lazy=True,
+        cascade='all, delete-orphan',
+        order_by='RegistrationFormItem.position',
+        backref=db.backref(
+            'registration_form',
+            lazy=True
+        )
+    )
+    #: The registrations associated with this form
+    registrations = db.relationship(
+        'Registration',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'registration_form',
+            lazy=True
+        )
+    )
 
     @hybrid_property
     def has_ended(self):
