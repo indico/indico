@@ -30,13 +30,12 @@ _bp.add_url_rule('/admin/payment/<plugin>/', 'admin_plugin_settings', RHPaymentA
                  methods=('GET', 'POST'))
 
 # Event management
-_bp.add_url_rule('/event/<confId>/manage/registration/payment/', 'event_settings', RHPaymentEventSettings)
-_bp.add_url_rule('/event/<confId>/manage/registration/payment/settings', 'event_settings_edit',
-                 RHPaymentEventSettingsEdit, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/registration/payment/toggle', 'event_toggle', RHPaymentEventToggle,
-                 methods=('POST',))
-_bp.add_url_rule('/event/<confId>/manage/registration/payment/method/<method>', 'event_plugin_edit',
-                 RHPaymentEventPluginEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/payments/', 'event_settings', RHPaymentEventSettings)
+_bp.add_url_rule('/event/<confId>/manage/payments/settings',
+                 'event_settings_edit', RHPaymentEventSettingsEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/payments/toggle', 'event_toggle', RHPaymentEventToggle, methods=('POST',))
+_bp.add_url_rule('/event/<confId>/manage/payments/method/<method>',
+                 'event_plugin_edit', RHPaymentEventPluginEdit, methods=('GET', 'POST'))
 
 # Event
 _bp.add_url_rule('/event/<confId>/registration/payment/', 'event_payment', RHPaymentEventCheckout,

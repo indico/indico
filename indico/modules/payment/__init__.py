@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.settings import SettingsProxy
 from indico.modules.events.settings import EventSettingsProxy
@@ -56,3 +58,10 @@ event_settings = EventSettingsProxy('payment', {
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     return SideMenuItem('payment', _("Payment"), url_for('payment.admin_settings'), section='customization')
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    if not event.has_feature('registration') or not event.can_manage(session.user, 'registration', allow_key=True):
+        return
+    return SideMenuItem('payment', _('Payments'), url_for('payment.event_settings', event), section='organization')
