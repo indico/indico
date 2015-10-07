@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -106,7 +107,18 @@ class RegistrationForm(db.Model):
         db.Integer,
         nullable=True
     )
-    # TODO: notification-related columns
+    #: Whether the notifications for this event are enabled
+    notifications_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: List of emails that should be notified on specific events
+    recipients_emails = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
+    )
 
     #: The Event containing this registration form
     event_new = db.relationship(

@@ -1,5 +1,5 @@
 {% extends 'events/registration/management/_regform_base.html' %}
-{% from 'forms/_form.html' import simple_form %}
+{% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows %}
 
 {% block subtitle %}
     {% if regform %}
@@ -11,5 +11,18 @@
 
 {% block content %}
     {% set back_url = url_for('.manage_regform', regform) if regform else url_for('.manage_regform_list', event) %}
-    {{ simple_form(form, back_url=back_url) }}
+    {{ form_header(form) }}
+    {% call form_fieldset(_('General settings')) %}
+        {{ form_rows(form, skip=form._notification_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_('Notifications')) %}
+        {{ form_rows(form, fields=form._notification_fields) }}
+    {% endcall %}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
+               data-disabled-until-change>
+        <a href="{{ back_url }}" class="i-button big" data-button-back>
+            {% trans %}Back{% endtrans %}
+        </a>
+    {% endcall %}
 {% endblock %}
