@@ -660,7 +660,6 @@ ndRegForm.directive('ndEmailField', function(url) {
         },
         link: function(scope) {
             scope.settings.fieldName = $T("Email address");
-            scope.settings.formData.push('address');
         }
     }
 });
