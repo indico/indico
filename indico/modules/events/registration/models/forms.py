@@ -227,8 +227,8 @@ class RegistrationForm(db.Model):
         if (bool(user) + bool(uuid) + bool(email)) != 1:
             raise ValueError("Exactly one of `user`, `uuid` and `email` must be specified")
         if user:
-            return user.registrations.filter_by(registration_form=self).first()
+            return user.registrations.filter_by(registration_form=self, is_cancelled=False).first()
         if uuid:
-            return Registration.query.with_parent(self).filter_by(uuid=uuid).first()
+            return Registration.query.with_parent(self).filter_by(uuid=uuid, is_cancelled=False).first()
         if email:
-            return Registration.query.with_parent(self).filter_by(email=email).first()
+            return Registration.query.with_parent(self).filter_by(email=email, is_cancelled=False).first()
