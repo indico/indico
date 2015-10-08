@@ -128,7 +128,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             csrfToken: '&',
             editMode: '=',
             updateMode: '=',
-            postUrl: '='
+            postUrl: '=',
+            checkEmailUrl: '='
         },
 
         controller: function($scope, $resource, $location, $anchorScroll) {
