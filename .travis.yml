@@ -3,7 +3,7 @@ language: python
 python:
   - 2.7
 addons:
-  postgresql: 9.2
+  postgresql: 9.4
 install:
   - pip install -r requirements.txt --trusted-host indico-software.org
   - python setup.py develop
