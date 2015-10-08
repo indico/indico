@@ -3,10 +3,10 @@
         {{ 'Billable' | i18n }}
     </label>
     <input type="checkbox" name="billable"
-        ng-model="formData.billable"
+        ng-model="formData.isBillable"
         ng-checked="field.billable"/>
 </div>
-<div ng-if="formData.billable" class="regFormEditLine">
+<div ng-if="formData.isBillable" class="regFormEditLine">
     <label class="regFormDialogCaption">
         {{ 'Price' | i18n }}
     </label>

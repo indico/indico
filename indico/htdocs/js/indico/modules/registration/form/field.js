@@ -100,7 +100,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.settings = {
-        billable: false,
+        isBillable: false,
         date: false,
         defaultValue: false,
         singleColumn: false,
@@ -242,7 +242,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.isBillable = function(item) {
         item = item || {};
-        return item.billable || item.isBillable;
+        return item.isBillable;
     };
 
     $scope.isDisabled = function(item, uservalue) {
@@ -316,10 +316,10 @@ ndRegForm.directive('ndCheckboxField', function(url) {
         link: function(scope) {
             scope.checkboxValue = false;
             scope.settings.fieldName = $T("Multiple choices/checkbox");
-            scope.settings.billable = true;
+            scope.settings.isBillable = true;
             scope.settings.singleColumn = true;
             scope.settings.placesLimit = true;
-            scope.settings.formData.push('billable');
+            scope.settings.formData.push('isBillable');
             scope.settings.formData.push('price');
             scope.settings.formData.push('placesLimit');
 
@@ -392,9 +392,9 @@ ndRegForm.directive('ndLabelField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Free Text");
             scope.settings.singleColumn = true;
-            scope.settings.billable = true;
+            scope.settings.isBillable = true;
             scope.settings.isRequired = false;
-            scope.settings.formData.push('billable');
+            scope.settings.formData.push('isBillable');
             scope.settings.formData.push('price');
         }
     };
@@ -409,9 +409,9 @@ ndRegForm.directive('ndNumberField', function(url) {
 
         link: function(scope) {
             scope.settings.fieldName = $T("Number");
-            scope.settings.billable = true;
+            scope.settings.isBillable = true;
             scope.settings.number = true;
-            scope.settings.formData.push('billable');
+            scope.settings.formData.push('isBillable');
             scope.settings.formData.push('price');
             scope.settings.formData.push('minValue');
             scope.settings.formData.push('length');
@@ -527,7 +527,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                         size: "30",
                         maxlength: "50"}},
 
-                    {name: 'billable',
+                    {name: 'isBillable',
                      index: 'isBillable',
                      width: 50,
                      editable: true,
@@ -643,9 +643,9 @@ ndRegForm.directive('ndYesnoField', function(url) {
 
         link: function(scope) {
             scope.settings.fieldName = $T("Yes/No");
-            scope.settings.billable = true;
+            scope.settings.isBillable = true;
             scope.settings.placesLimit = true;
-            scope.settings.formData.push('billable');
+            scope.settings.formData.push('isBillable');
             scope.settings.formData.push('price');
             scope.settings.formData.push('placesLimit');
         }
@@ -661,7 +661,7 @@ ndRegForm.directive('ndEmailField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Email address");
         }
-    }
+    };
 });
 
 ndRegForm.directive('ndFieldDialog', function(url) {
