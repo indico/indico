@@ -106,6 +106,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.UniqueConstraint('registration_form_id', 'email'),
+        sa.UniqueConstraint('registration_form_id', 'user_id'),
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'

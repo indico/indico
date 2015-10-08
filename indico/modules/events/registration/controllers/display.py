@@ -107,12 +107,14 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
     def _process(self):
         email = request.args['email'].lower().strip()
         if self.regform.get_registration(email=email):
-            return jsonify(email_used=True)
+            return jsonify(conflict='email')
         user = get_user_by_email(email)
-        if user:
-            return jsonify(email_used=False, user=user.full_name, self=(user == session.user))
+        if user and self.regform.get_registration(user=user):
+            return jsonify(conflict='user')
+        elif user:
+            return jsonify(user=user.full_name, self=(user == session.user))
         else:
-            return jsonify(email_used=False, user=None)
+            return jsonify(user=None)
 
 
 class RHRegistrationFormSubmit(RHRegistrationFormBase):
