@@ -161,10 +161,9 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.emailInfoMessage = '';
     $scope.emailInfoError = false;
     if ($scope.field.htmlName == 'email') {
-        $scope.$watch('userdata[fieldName]', _.debounce(function() {
+        $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             $scope.emailInfoMessage = '';
-            $('#regformSubmit').prop('disabled', true);
-            var email = $scope.userdata.email ? $scope.userdata.email.trim() : '';
+            var email = $(this).val().trim();
             if (email) {
                 $.ajax({
                     url: $scope.checkEmailUrl,
