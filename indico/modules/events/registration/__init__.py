@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, render_template
+from flask import session, render_template, flash
 
 from indico.core import signals
 from indico.core.db import db
@@ -24,7 +24,7 @@ from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -54,6 +54,34 @@ def _inject_regform_announcement(event, **kwargs):
     regforms = _get_active_regforms(event)
     if regforms:
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event)
+
+
+@signals.users.registered.connect
+@signals.users.email_added.connect
+def _associate_registrations(user, **kwargs):
+    from indico.modules.events.registration.models.registrations import Registration
+    reg_alias = db.aliased(Registration)
+    subquery = db.session.query(reg_alias).filter(reg_alias.user_id == user.id,
+                                                  reg_alias.registration_form_id == Registration.registration_form_id)
+    registrations = (Registration
+                     .find(Registration.user_id == None,  # noqa
+                           Registration.email.in_(user.all_emails),
+                           ~subquery.exists())
+                     .order_by(Registration.submitted_dt.desc())
+                     .all())
+    if not registrations:
+        return
+    done = set()
+    for registration in registrations:
+        if registration.registration_form_id in done:
+            continue
+        logger.info('Associating %s with %s', registration, user)
+        registration.user = user
+        done.add(registration.registration_form_id)
+    db.session.flush()
+    num = len(done)
+    flash(ngettext("A registration has been linked to your account.",
+                   "{n} registrations have been linked to your account.", num).format(n=num), 'info')
 
 
 @signals.event.get_feature_definitions.connect
