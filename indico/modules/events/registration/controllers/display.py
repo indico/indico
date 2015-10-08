@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session, redirect, flash
+from flask import request, session, redirect, flash, jsonify
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -30,6 +30,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
 from indico.modules.payment import event_settings
+from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -97,6 +98,20 @@ class RHRegistrationFormSummary(RHRegistrationFormRegistrationBase):
                                                event=self.event, regform=self.regform, registration=self.registration,
                                                payment_enabled=event_settings.get(self.event, 'enabled'),
                                                payment_conditions=bool(event_settings.get(self.event, 'conditions')))
+
+
+class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
+    """Checks how an email will affect the registration"""
+
+    def _process(self):
+        email = request.args['email'].lower().strip()
+        if self.regform.get_registration(email=email):
+            return jsonify(email_used=True)
+        user = get_user_by_email(email)
+        if user:
+            return jsonify(email_used=False, user=user.full_name, self=(user == session.user))
+        else:
+            return jsonify(email_used=False, user=None)
 
 
 class RHRegistrationFormSubmit(RHRegistrationFormBase):

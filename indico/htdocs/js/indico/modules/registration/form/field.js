@@ -158,6 +158,39 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldName = $scope.field.htmlName;
+    $scope.emailInfoMessage = '';
+    $scope.emailInfoError = false;
+    if ($scope.field.htmlName == 'email') {
+        $scope.$watch('userdata[fieldName]', _.debounce(function() {
+            $scope.emailInfoMessage = '';
+            $('#regformSubmit').prop('disabled', true);
+            var email = $scope.userdata.email ? $scope.userdata.email.trim() : '';
+            if (email) {
+                $.ajax({
+                    url: $scope.checkEmailUrl,
+                    data: {email: email},
+                    error: handleAjaxError,
+                    success: function(data) {
+                        var msg;
+                        if (data.email_used) {
+                            msg = $T.gettext('There is already a registration with this email address.');
+                        } else if (!data.user) {
+                            msg = $T.gettext('The registration will not be associated with any indico account.');
+                        } else if (data.self) {
+                            msg = $T.gettext('The registration will be associated with your Indico account.');
+                        } else {
+                            var name = $('<span>', {text: data.user}).html();
+                            msg = $T.gettext('The registration will be associated with the Indico account <strong>{0}</strong>.').format(name);
+                        }
+                        $('#regformSubmit').prop('disabled', data.email_used);
+                        $scope.emailInfoError = data.email_used;
+                        $scope.emailInfoMessage = msg;
+                        $scope.$apply();
+                    }
+                });
+            }
+        }, 250));
+    }
 });
 
 ndRegForm.controller('BillableCtrl', function($scope, $filter) {
