@@ -39,6 +39,7 @@ class RegistrationState(int, IndicoEnum):
 
 
 class Registration(db.Model):
+    """Somebody's registration for an event through a registration form"""
     __tablename__ = 'registrations'
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
                       db.Index(None, 'registration_form_id', 'user_id', unique=True,
@@ -173,6 +174,8 @@ class Registration(db.Model):
 
 
 class RegistrationData(db.Model):
+    """Data entry within a registration for a field in a registration form"""
+
     __tablename__ = 'registration_data'
     __table_args__ = (db.CheckConstraint("(file IS NULL) = (file_metadata::text = 'null')", name='valid_file'),
                       {'schema': 'event_registration'})

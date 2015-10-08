@@ -120,6 +120,8 @@ class PersonalDataType(int, IndicoEnum):
 
 
 class RegistrationFormItem(db.Model):
+    """Generic registration form item"""
+
     __tablename__ = 'form_items'
     __table_args__ = (
         db.CheckConstraint("(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))"
@@ -307,6 +309,8 @@ class RegistrationFormItem(db.Model):
 
 
 class RegistrationFormSection(RegistrationFormItem):
+    """Registration form section that can contain fields and text"""
+
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.section
     }
@@ -339,6 +343,8 @@ class RegistrationFormPersonalDataSection(RegistrationFormSection):
 
 
 class RegistrationFormText(RegistrationFormItem):
+    """Text to be displayed in registration form sections"""
+
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.text
     }
