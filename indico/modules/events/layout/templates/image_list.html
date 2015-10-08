@@ -8,19 +8,14 @@
                 <img src="{{ url_for('event_images.image_display', image) }}" alt="{% trans %}Image{% endtrans %}">
             </a>
             <span class="menu">
-                <a class="icon-link get-link" title="{% trans %}Get link to image{% endtrans %}"></a>
+                <a class="icon-link get-link" title="{% trans %}Get link to image{% endtrans %}"
+                   data-href="{{ url_for('event_images.image_display', image, _external=True) }}"></a>
                 <a class="icon-remove danger delete" title="{% trans %}Delete image{% endtrans %}"
                     data-href="{{ url_for('event_layout.image_delete', image) }}"
                     data-method="DELETE"
                     data-confirm="{% trans filename=image.filename %}Are you sure you want to delete '{{filename}}'? {% endtrans %}">
                 </a>
             </span>
-            <div class="clipboard-dialog" style="display: none;">
-                <div class="dialog-message">
-                    {% trans %}You can copy the URL below using CTRL + C (&#8984; + C on OSX):{% endtrans %}
-                </div>
-                <input type="text" readonly value="{{ url_for('event_images.image_display', image, _external=True) }}">
-            </div>
         </li>
     {% endfor %}
     </ul>

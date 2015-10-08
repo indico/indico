@@ -60,6 +60,54 @@
         }).end();
     };
 
+    $.fn.copyURLTooltip = function(url) {
+        /*
+         * Creates a tooltip with a URL in a text input with indication on how
+         * to copy it.
+         */
+        var dialogMessage = $('<div>', {
+            'class': 'dialog-message'
+        }).html($T.gettext("You can copy the URL below using CTRL + C (&#8984; + C on OSX):"));
+
+        var clipboardDialog = $('<div>', {
+            'class': 'clipboard-dialog',
+            'css': {'display': 'none'}
+        })
+        .append(dialogMessage)
+        .append($('<input>', {
+            'type': 'text',
+            'readonly': true,
+            'value': url
+        }));
+
+        return this.qtip({
+            content: {
+                text: clipboardDialog
+            },
+            position: {
+                my: 'top center',
+                at: 'bottom center'
+            },
+            hide: {
+                event: 'mouseleave',
+                fixed: true,
+                delay: 700
+            },
+            show: {
+                event: false,
+                ready: true
+            },
+            events: {
+                show: function() {
+                    var tip = $(this);
+                    _.defer(function() {
+                        tip.find('input:text').focus().select();
+                    });
+                }
+            }
+        });
+    };
+
     var __gotoToday = $.datepicker._gotoToday;
 
     $.extend($.datepicker, {
