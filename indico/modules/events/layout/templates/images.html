@@ -32,33 +32,8 @@
             });
 
             $('.image-container').on('click', '.menu .get-link', function(event) {
-                var $this = $(this),
-                    content = $this.closest('.image-list li').find('.clipboard-dialog').clone();
-
-                $this.qtip({
-                    content: {
-                        text: content
-                    },
-                    position: {
-                        my: 'top center',
-                        at: 'bottom center'
-                    },
-                    hide: {
-                        event: 'mouseleave',
-                        fixed: true,
-                        delay: 700
-                    },
-                    show: {
-                        event: false,
-                        ready: true
-                    },
-                    events: {
-                        show: function() {
-                            var tip = $(this);
-                            _.defer(function() { tip.find('input[type="text"]').focus().select(); });
-                        }
-                    }
-                });
+                var $this = $(this);
+                $this.copyURLTooltip($this.data('href'))
             }).on('indico:confirmed', '.menu .delete', function(e) {
                 var $this = $(this);
                 e.preventDefault();
