@@ -1,46 +1,43 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_regform_item_col_selector(item) %}
-    {% if item.is_section %}
-        <h3>{{ item.title }}</h3>
-        {% for child_item in item.children if child_item.is_field %}
-            {% set has_dropdown = child_item.input_type in ['radio', 'country'] %}
-            <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
-                 data-id="{{ child_item.id }}">
-                <span class="title {% if has_dropdown %}icon-filter{% endif %}"
-                      data-toggle="dropdown">
-                    {{- child_item.title -}}
-                </span>
-                {% if has_dropdown %}
-                    <ul class="dropdown" style="display: none">
-                        {% for id, caption in child_item.versioned_radioitems.iteritems() %}
-                            <li>
-                                <input type='checkbox' name='radiogroup_{{ child_item.id }}'
-                                       value='{{ id }}'
-                                       id="{{ id }}"
-                                       {% if id in filters %}
-                                           checked
-                                       {% endif %}>
-                                <label for="{{ id }}">
-                                    {{ caption }}
-                                </label>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                <span class="right actions">
-                    <span class="trigger icon-eye"></span>
-                </span>
-            </div>
-        {% endfor %}
-    {% endif %}
+{% macro _render_regform_item_col_selector(section) %}
+    <h3>{{ section.title }}</h3>
+    {% for child_item in section.children if child_item.is_field %}
+        {% set has_dropdown = child_item.input_type in ['radio', 'country'] %}
+        <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
+             data-id="{{ child_item.id }}">
+            <span class="title {% if has_dropdown %}icon-filter{% endif %}"
+                  data-toggle="dropdown">
+                {{- child_item.title -}}
+            </span>
+            {% if has_dropdown %}
+                <ul class="dropdown" style="display: none">
+                    {% for id, caption in child_item.versioned_radioitems.iteritems() %}
+                        <li>
+                            <input type="checkbox" name="radiogroup_{{ child_item.id }}" value="{{ id }}"
+                                   id="{{ id }}"
+                                   {% if id in filters %}
+                                       checked
+                                   {% endif %}>
+                            <label for="{{ id }}">
+                                {{ caption }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <span class="right actions">
+                <span class="trigger icon-eye"></span>
+            </span>
+        </div>
+    {% endfor %}
 {% endmacro %}
 
 <form class="reglist-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
-    {% for item in regform.form_items %}
-        {{ _render_regform_item_col_selector(item) }}
+    {% for section in regform.sections %}
+        {{ _render_regform_item_col_selector(section) }}
     {% endfor %}
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
