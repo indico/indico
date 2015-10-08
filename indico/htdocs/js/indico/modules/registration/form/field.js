@@ -172,8 +172,10 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     error: handleAjaxError,
                     success: function(data) {
                         var msg;
-                        if (data.email_used) {
+                        if (data.conflict == 'email') {
                             msg = $T.gettext('There is already a registration with this email address.');
+                        } else if (data.conflict == 'user') {
+                            msg = $T.gettext('The user associated with this email address is already registered.');
                         } else if (!data.user) {
                             msg = $T.gettext('The registration will not be associated with any indico account.');
                         } else if (data.self) {
@@ -182,8 +184,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                             var name = $('<span>', {text: data.user}).html();
                             msg = $T.gettext('The registration will be associated with the Indico account <strong>{0}</strong>.').format(name);
                         }
-                        $('#regformSubmit').prop('disabled', data.email_used);
-                        $scope.emailInfoError = data.email_used;
+                        $('#regformSubmit').prop('disabled', !!data.conflict);
+                        $scope.emailInfoError = !!data.conflict;
                         $scope.emailInfoMessage = msg;
                         $scope.$apply();
                     }
