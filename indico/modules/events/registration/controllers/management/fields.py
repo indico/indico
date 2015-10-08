@@ -16,18 +16,20 @@
 
 from __future__ import unicode_literals
 
+from uuid import uuid4
+
 from flask import request, jsonify, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
+from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.items import (RegistrationFormText, RegistrationFormItem,
                                                              RegistrationFormItemType)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData)
 from indico.util.string import snakify_keys
 from indico.web.util import jsonify_data
-from uuid import uuid4
 
 NON_VERSIONED_DATA = {'min_value', 'length', 'number_of_columns', 'number_of_rows', 'places_limit', 'date_format',
                       'with_extra_slots', 'item_type', 'default_item', 'time_format'}
@@ -130,21 +132,17 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
-        if field_data['input_type'] == 'date':
-            date_format = field_data['date_format'].split(' ')
-            field_data['date_format'] = date_format[0]
-            if len(date_format) == 2:
-                field_data['time_format'] = date_format[1]
-        elif field_data['input_type'] == 'radio':
-            items = field_data['radioitems']
-            for item in items:
-                item['id'] = unicode(uuid4())
-
         if field_data['input_type'] == 'label':
             del field_data['input_type']  # labels have no input type
             field_type = RegistrationFormText
         else:
             field_type = RegistrationFormField
+            try:
+                field_impl_type = get_field_types()[field_data['input_type']]
+            except KeyError:
+                raise BadRequest
+            field_impl_type.modify_post_data(field_data)
+
         form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
