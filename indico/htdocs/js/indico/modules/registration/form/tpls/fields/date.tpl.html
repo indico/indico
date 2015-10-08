@@ -6,7 +6,6 @@
         name="{{ field.htmlName }}"
         show-time="showTime(field.dateFormat)"
         validation="validationStarted"
-        value="{{ date }}"
         ng-required="{{ field.isRequired }}"
         ng-model="date"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"

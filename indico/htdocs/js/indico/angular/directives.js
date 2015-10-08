@@ -482,7 +482,7 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
                 element.datepicker({
                     dateFormat: scope.field.dateFormat,
                     onSelect: function(date) {
-                        scope.date = date;
+                        element.val(date);
                         scope.$apply();
                     }
                 });
