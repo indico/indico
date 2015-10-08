@@ -144,12 +144,13 @@
         });
     }
 
+    function colorizeFilter(filter) {
+        filter.toggleClass('active', filter.find(':checked').length > 0);
+    }
+
     function colorizeActiveFilters() {
         $('.reglist-filter .filter').each(function() {
-            var $this = $(this);
-            if ($this.find(':checked').length) {
-                $this.addClass('active');
-            }
+            colorizeFilter($(this));
         });
     }
 
@@ -190,6 +191,10 @@
 
         $('.reglist-filter .js-reset-btn').on('click', function() {
             $('.reglist-filter input:checkbox').prop('checked', false).trigger('change');
+        });
+
+        $('.reglist-filter input:checkbox').on('change', function() {
+            colorizeFilter($(this).closest('.filter'));
         });
     }
 })(window);
