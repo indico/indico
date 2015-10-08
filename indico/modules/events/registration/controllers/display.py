@@ -128,8 +128,8 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
-            self._save_registration(form.data)
-            return redirect(url_for('.display_regform_summary', self.regform))
+            registration = self._save_registration(form.data)
+            return redirect(url_for('.display_regform_summary', registration.locator.registrant))
         user_data = {t.name: getattr(session.user, t.name) if session.user else '' for t in PersonalDataType}
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
@@ -147,3 +147,4 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
         db.session.flush()
+        return registration
