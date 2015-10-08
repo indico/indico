@@ -45,7 +45,10 @@
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
                value="{% trans %}Apply{% endtrans %}">
-        <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+        <button class="i-button big js-reset-btn" type="button" title="{% trans %}Clear all filters{% endtrans %}">
+            {%- trans %}Clear{% endtrans -%}
+        </button>
+        <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     </div>
 </form>
 <script>
