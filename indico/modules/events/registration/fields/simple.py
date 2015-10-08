@@ -22,7 +22,7 @@ from uuid import uuid4
 import wtforms
 from wtforms.validators import NumberRange
 
-from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
+from indico.modules.events.registration.fields.base import RegistrationFormFieldBase, RegistrationFormBillableField
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.fs import secure_filename
 from indico.util.string import crc32, normalize_phone_number
@@ -35,7 +35,7 @@ class TextField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
 
-class NumberField(RegistrationFormFieldBase):
+class NumberField(RegistrationFormBillableField):
     name = 'number'
     wtf_field_class = wtforms.IntegerField
 
@@ -44,13 +44,19 @@ class NumberField(RegistrationFormFieldBase):
         min_value = self.form_item.data.get('min_value', None)
         return [NumberRange(min=min_value)] if min_value else None
 
+    def calculate_price(self, registration_data):
+        data = registration_data.field_data.versioned_data
+        if not data['is_billable']:
+            return 0
+        return data['price'] * registration_data.data
+
 
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
     wtf_field_class = wtforms.StringField
 
 
-class SelectField(RegistrationFormFieldBase):
+class SelectField(RegistrationFormBillableField):
     name = 'radio'
     wtf_field_class = wtforms.StringField
 
@@ -70,10 +76,21 @@ class SelectField(RegistrationFormFieldBase):
         for item in items:
             item['id'] = unicode(uuid4())
 
+    def calculate_price(self, registration_data):
+        data = registration_data.field_data.versioned_data
+        item = next((x for x in data['radioitems'] if registration_data.data == x['id'] and x['is_billable']), None)
+        return item['price'] if item else 0
 
-class CheckboxField(RegistrationFormFieldBase):
+
+class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     wtf_field_class = wtforms.BooleanField
+
+    def calculate_price(self, registration_data):
+        data = registration_data.field_data.versioned_data
+        if not data['is_billable'] or not registration_data.data:
+            return 0
+        return data['price']
 
 
 class DateField(RegistrationFormFieldBase):
@@ -88,9 +105,15 @@ class DateField(RegistrationFormFieldBase):
             post_data['time_format'] = date_format[1]
 
 
-class BooleanField(RegistrationFormFieldBase):
+class BooleanField(RegistrationFormBillableField):
     name = 'yes/no'
     wtf_field_class = wtforms.StringField
+
+    def calculate_price(self, registration_data):
+        data = registration_data.field_data.versioned_data
+        if not data['is_billable'] or registration_data.data != 'yes':
+            return 0
+        return data['price']
 
 
 class PhoneField(RegistrationFormFieldBase):

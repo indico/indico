@@ -68,3 +68,11 @@ class RegistrationFormFieldBase(object):
     @property
     def view_data(self):
         return {}
+
+
+class RegistrationFormBillableField(RegistrationFormFieldBase):
+    def calculate_price(self, registration_data):
+        data = registration_data.field_data.versioned_data
+        if not data['is_billable']:
+            return 0
+        return data['price']
