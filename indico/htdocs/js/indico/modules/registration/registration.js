@@ -57,36 +57,8 @@
                 url: $this.data('href'),
                 error: handleAjaxError,
                 complete: IndicoUI.Dialogs.Util.progress(),
-                success: function(result) {
-                    var content = $('.registrations > .clipboard-dialog').clone();
-                    content.find('input:text').val(result.url);
-
-                    $this.qtip({
-                        content: {
-                            text: content
-                        },
-                        position: {
-                            my: 'top center',
-                            at: 'bottom center'
-                        },
-                        hide: {
-                            event: 'mouseleave',
-                            fixed: true,
-                            delay: 700
-                        },
-                        show: {
-                            event: false,
-                            ready: true
-                        },
-                        events: {
-                            show: function() {
-                                var tip = $(this);
-                                _.defer(function() {
-                                    tip.find('input:text').focus().select();
-                                });
-                            }
-                        }
-                    });
+                success: function(data) {
+                    $this.copyURLTooltip(data.url);
                 }
             });
         });

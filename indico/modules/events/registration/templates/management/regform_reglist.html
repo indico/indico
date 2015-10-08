@@ -48,12 +48,6 @@
                 </a>
             </div>
         </div>
-        <div class="clipboard-dialog" style="display: none;">
-            <div class="dialog-message">
-                {% trans %}You can copy the URL below using CTRL + C (&#8984; + C on OSX):{% endtrans %}
-            </div>
-            <input type="text" readonly>
-        </div>
         {% if registrations %}
             {{ render_registration_list(registrations, visible_cols_regform_items) }}
         {% else %}
