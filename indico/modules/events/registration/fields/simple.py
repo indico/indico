@@ -41,7 +41,7 @@ class NumberField(RegistrationFormFieldBase):
 
     @property
     def validators(self):
-        min_value = self.form_item.current_data.versioned_data.get('minValue', None)
+        min_value = self.form_item.data.get('min_value', None)
         return [NumberRange(min=min_value)] if min_value else None
 
 
