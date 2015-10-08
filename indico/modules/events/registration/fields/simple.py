@@ -55,12 +55,13 @@ class SelectField(RegistrationFormFieldBase):
 
     @property
     def default_value(self):
-        data = self.form_item.current_data.versioned_data
+        data = self.form_item.data
+        versioned_data = self.form_item.current_data.versioned_data
         try:
-            default_item = data['defaultItem']
+            default_item = data['default_item']
         except KeyError:
             return None
-        return next((x['id'] for x in data['radioitems'] if x['caption'] == default_item), None)
+        return next((x['id'] for x in versioned_data['radioitems'] if x['caption'] == default_item), None)
 
 
 class CheckboxField(RegistrationFormFieldBase):
