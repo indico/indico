@@ -22,8 +22,10 @@ from flask import has_request_context, session, request
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.payment import event_settings as event_payment_settings
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
@@ -157,18 +159,19 @@ class Registration(db.Model):
         full_name = '{} {}'.format(self.first_name, self.last_name)
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, _text=full_name)
 
-    def init_state(self):
+    def init_state(self, event):
         """Initialize state of the object"""
         if self.state is not None:
             raise Exception("The registration already has a state")
-        if self.registration_form.moderation_enabled:
-            self.state = RegistrationState.pending
-        # TODO: Check if registration needs to be paid
-        elif False:
-            self.state = RegistrationState.unpaid
-        else:
-            self.state = RegistrationState.complete
+        with db.session.no_autoflush:
+            if self.registration_form.moderation_enabled:
+                self.state = RegistrationState.pending
+            elif event_payment_settings.get(event, 'enabled') and self.price:
+                self.state = RegistrationState.unpaid
+            else:
+                self.state = RegistrationState.complete
 
+    @property
     def price(self):
         return sum(data.price for data in self.data)
 

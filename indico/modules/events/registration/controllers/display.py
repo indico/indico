@@ -161,7 +161,6 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
 
     def _save_registration(self, data):
         registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))
-        registration.init_state()
         for form_item in self.regform.active_fields:
             if form_item.parent.is_manager_only:
                 value = form_item.field_impl.default_value
@@ -170,6 +169,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
             form_item.field_impl.save_data(registration, value)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
+        registration.init_state(self.event)
         db.session.flush()
         logger.info('New registration %s by %s', registration, session.user)
         return registration
