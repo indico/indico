@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from wtforms import ValidationError
+
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormFieldData)
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
@@ -30,13 +32,17 @@ def get_event_section_data(regform, management=False):
 def make_registration_form(regform, management=False):
     """Creates a WTForm based on registration form fields"""
 
-    form_class = type(b'RegistrationFormWTForm', (IndicoForm,), {})
+    class RegistrationFormWTF(IndicoForm):
+        def validate_email(self, field):
+            if regform.get_registration(email=field.data):
+                raise ValidationError('Email already in use')
+
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
             continue
         field_impl = form_item.field_impl
-        setattr(form_class, form_item.html_field_name, field_impl.create_wtf_field())
-    return form_class
+        setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
+    return RegistrationFormWTF
 
 
 def create_personal_data_fields(regform):
