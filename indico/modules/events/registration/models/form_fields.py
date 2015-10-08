@@ -89,6 +89,14 @@ class RegistrationFormField(RegistrationFormItem):
     def html_field_name(self):
         return 'field_{}'.format(self.id)
 
+    @property
+    def versioned_radioitems(self):
+        all_options = {}
+        for data in self.data_versions:
+            for option in data.versioned_data['radioitems']:
+                all_options[option['id']] = option['caption']
+        return all_options
+
     def calculate_price(self, registration_data):
         return self.field_impl.calculate_price(registration_data)
 

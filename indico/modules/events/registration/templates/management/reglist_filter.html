@@ -13,16 +13,16 @@
                 </span>
                 {% if has_dropdown %}
                     <ul class="dropdown" style="display: none">
-                        {% for radio_item in child_item.current_data.versioned_data.radioitems %}
+                        {% for id, caption in child_item.versioned_radioitems.iteritems() %}
                             <li>
                                 <input type='checkbox' name='radiogroup_{{ child_item.id }}'
-                                       value='{{ radio_item.id }}'
-                                       id="{{ radio_item.id }}"
-                                       {% if radio_item.id in filters %}
+                                       value='{{ id }}'
+                                       id="{{ id }}"
+                                       {% if id in filters %}
                                            checked
                                        {% endif %}>
-                                <label for="{{ radio_item.id }}">
-                                    {{ radio_item.caption }}
+                                <label for="{{ id }}">
+                                    {{ caption }}
                                 </label>
                             </li>
                         {% endfor %}
