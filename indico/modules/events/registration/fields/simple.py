@@ -120,6 +120,7 @@ class FileField(RegistrationFormFieldBase):
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
     wtf_field_class = wtforms.StringField
+    field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
 
     @property
     def validators(self):

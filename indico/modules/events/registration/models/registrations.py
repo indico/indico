@@ -31,6 +31,7 @@ from indico.util.string import return_ascii, format_repr
 class Registration(db.Model):
     __tablename__ = 'registrations'
     __table_args__ = (db.UniqueConstraint('registration_form_id', 'email'),
+                      db.CheckConstraint('email = lower(email)', 'lowercase_email'),
                       {'schema': 'event_registration'})
 
     #: The ID of the object
