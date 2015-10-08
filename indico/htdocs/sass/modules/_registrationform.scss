@@ -1150,6 +1150,15 @@ textarea.regFormDescriptionInputMgmt {
     max-width: 1200px;
 }
 
+%enabled-action {
+    @include icon-before('icon-eye');
+}
+
+%not-enabled-action {
+    @include icon-before('icon-eye-blocked');
+    color: $red !important;
+}
+
 .reglist-filter {
     padding-bottom: 14em;
     position: relative;
@@ -1158,6 +1167,14 @@ textarea.regFormDescriptionInputMgmt {
         margin: 5px;
         padding-bottom: 0;
         padding-left: 0;
+        text-align: left;
+        font-weight: bold;
+
+        > * {
+            line-height: 1.2em;
+            height: 1.2em;
+            vertical-align: middle;
+        }
 
         &.reglist-column {
             width: 12em;
@@ -1169,6 +1186,10 @@ textarea.regFormDescriptionInputMgmt {
                 padding-bottom: 4px;
                 padding-left: 10px;
                 box-sizing: border-box;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                display: inline-block;
+                overflow: hidden;
 
                 &:before {
                     margin-right: 0.5em;
@@ -1183,8 +1204,30 @@ textarea.regFormDescriptionInputMgmt {
 
             > .actions {
                 max-width: 10%;
+                visibility: hidden;
+
                 .trigger {
                     cursor: pointer;
+                }
+
+                > .enabled {
+                    @extend %enabled-action;
+                    &:hover {
+                        @extend %not-enabled-action;
+                    }
+                }
+                > .not-enabled {
+                    @extend %not-enabled-action;
+                    &:hover {
+                        @extend %enabled-action;
+                    }
+                }
+            }
+
+            &:hover > .actions {
+                visibility: visible;
+                > .not-default {
+                    display: inline !important;
                 }
             }
 
