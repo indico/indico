@@ -4,7 +4,7 @@
     $(document).ready(function() {
         setupRegistrationFormScheduleDialogs();
         setupRegistrationFormSummaryPage();
-        setupRegistrationsList();
+        setupRegistrationList();
     });
 
     $(window).scroll(function(){
@@ -104,7 +104,7 @@
         });
     }
 
-    function setupRegistrationsList() {
+    function setupRegistrationList() {
         colorizeSelectedRows();
         setupStaticURLGeneration();
         setupTableSorter();
@@ -121,7 +121,7 @@
                 title: $this.data('title'),
                 onClose: function(data) {
                     if (data) {
-                        $('.registrations-table-wrapper').html(data.registrations_list);
+                        $('.registrations-table-wrapper').html(data.registration_list);
                         colorizeSelectedRows();
                         setupTableSorter();
                     }
@@ -154,7 +154,7 @@
         });
     }
 
-    global.setupRegistrationsListFilter = function setupRegistrationsListFilter() {
+    global.setupRegistrationListFilter = function setupRegistrationListFilter() {
         $('.reglist-filter').dropdown({selector: '.reglist-column .title'});
         colorizeActiveFilters();
 
