@@ -221,5 +221,9 @@ $(document).ready(function() {
         }
     });
 
+    $('input.permalink').on('focus', function() {
+        this.select();
+    });
+
     showFormErrors();
 });
