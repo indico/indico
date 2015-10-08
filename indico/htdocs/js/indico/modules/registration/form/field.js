@@ -164,32 +164,33 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             $scope.emailInfoMessage = '';
             var email = $(this).val().trim();
-            if (email) {
-                $.ajax({
-                    url: $scope.checkEmailUrl,
-                    data: {email: email},
-                    error: handleAjaxError,
-                    success: function(data) {
-                        var msg;
-                        if (data.conflict == 'email') {
-                            msg = $T.gettext('There is already a registration with this email address.');
-                        } else if (data.conflict == 'user') {
-                            msg = $T.gettext('The user associated with this email address is already registered.');
-                        } else if (!data.user) {
-                            msg = $T.gettext('The registration will not be associated with any indico account.');
-                        } else if (data.self) {
-                            msg = $T.gettext('The registration will be associated with your Indico account.');
-                        } else {
-                            var name = $('<span>', {text: data.user}).html();
-                            msg = $T.gettext('The registration will be associated with the Indico account <strong>{0}</strong>.').format(name);
-                        }
-                        $('#regformSubmit').prop('disabled', !!data.conflict);
-                        $scope.emailInfoError = !!data.conflict;
-                        $scope.emailInfoMessage = msg;
-                        $scope.$apply();
-                    }
-                });
+            if (!email) {
+                return;
             }
+            $.ajax({
+                url: $scope.checkEmailUrl,
+                data: {email: email},
+                error: handleAjaxError,
+                success: function(data) {
+                    var msg;
+                    if (data.conflict == 'email') {
+                        msg = $T.gettext('There is already a registration with this email address.');
+                    } else if (data.conflict == 'user') {
+                        msg = $T.gettext('The user associated with this email address is already registered.');
+                    } else if (!data.user) {
+                        msg = $T.gettext('The registration will not be associated with any indico account.');
+                    } else if (data.self) {
+                        msg = $T.gettext('The registration will be associated with your Indico account.');
+                    } else {
+                        var name = $('<span>', {text: data.user}).html();
+                        msg = $T.gettext('The registration will be associated with the Indico account <strong>{0}</strong>.').format(name);
+                    }
+                    $('#regformSubmit').prop('disabled', !!data.conflict);
+                    $scope.emailInfoError = !!data.conflict;
+                    $scope.emailInfoMessage = msg;
+                    $scope.$apply();
+                }
+            });
         }, 250));
     }
 });
