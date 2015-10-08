@@ -18,11 +18,13 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+from flask import has_request_context, session, request
 from sqlalchemy.dialects.postgresql import JSON, UUID
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
 
 
@@ -104,6 +106,24 @@ class Registration(db.Model):
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
 
+    @locator_property
+    def locator(self):
+        return dict(self.registration_form.locator, registration_id=self.id)
+
+    @locator.registrant
+    def locator(self):
+        """A locator suitable for 'display' pages.
+
+        It includes the UUID of the registration unless the current
+        request doesn't contain the uuid and the registration is tied
+        to the currently logged-in user.
+        """
+        loc = self.registration_form.locator
+        if (not self.user or not has_request_context() or self.user != session.user or
+                request.args.get('token') == self.uuid):
+            loc['token'] = self.uuid
+        return loc
+
     @return_ascii
     def __repr__(self):
         full_name = '{} {}'.format(self.first_name, self.last_name)
@@ -161,5 +181,4 @@ class RegistrationData(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<RegistrationData({}, {}): {}>'.format(self.registration_id,
-                                                       self.field_data_id, self.data)
+        return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
