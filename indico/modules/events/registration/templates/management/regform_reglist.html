@@ -1,6 +1,6 @@
 {% extends 'layout/full_content_base.html' %}
 {% from 'message_box.html' import message_box %}
-{% from 'events/registration/management/_reglist.html' import render_registrations_list %}
+{% from 'events/registration/management/_reglist.html' import render_registration_list %}
 
 {% block title %}
     {%- trans %}Registrations{% endtrans -%}
@@ -55,7 +55,7 @@
             <input type="text" readonly>
         </div>
         {% if registrations %}
-            {{ render_registrations_list(registrations, visible_cols_regform_items) }}
+            {{ render_registration_list(registrations, visible_cols_regform_items) }}
         {% else %}
             {%- call message_box('info', fixed_width=true) -%}
                 {% trans %}There are no registrations yet.{% endtrans %}

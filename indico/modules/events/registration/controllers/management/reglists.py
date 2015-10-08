@@ -76,7 +76,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event"""
 
     def _process(self):
-        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        session_key = 'reglist_config_{}'.format(self.regform.id)
         report_config_uuid = request.args.get('config')
         if report_config_uuid:
             configuration = cache.get(report_config_uuid)
@@ -94,7 +94,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event"""
 
     def _process_GET(self):
-        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        session_key = 'reglist_config_{}'.format(self.regform.id)
         reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
         filters = set(itertools.chain.from_iterable(reg_list_config['filters'].itervalues()))
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
@@ -104,7 +104,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_POST(self):
         filters = _get_filters_from_request(self.regform)
-        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        session_key = 'reglist_config_{}'.format(self.regform.id)
         visible_regform_items = json.loads(request.values['visible_cols_regform_items'])
         reglist_config = session.setdefault(session_key, {})
         reglist_config['filters'] = filters
@@ -113,15 +113,15 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(visible_regform_items))
         registrations = _query_registrations(self.regform, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
-        reg_list = tpl.render_registrations_list(registrations=registrations, visible_cols_regform_items=regform_items)
-        return jsonify_data(registrations_list=reg_list)
+        reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items)
+        return jsonify_data(registration_list=reg_list)
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list"""
 
     def _process(self):
-        session_key = 'reg_list_config_{}'.format(self.regform.id)
+        session_key = 'reglist_config_{}'.format(self.regform.id)
         configuration = session.get(session_key)
         url = url_for('.manage_reglist', self.regform, _external=True)
         if configuration:
