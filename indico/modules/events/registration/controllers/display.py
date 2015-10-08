@@ -37,7 +37,8 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 def _can_redirect_to_single_regform(regforms):
     user = session.user
-    return len(regforms) == 1 and regforms[0].can_submit(user) and not regforms[0].get_registration(user=user)
+    return (len(regforms) == 1 and regforms[0].can_submit(user) and
+            (not user or not regforms[0].get_registration(user=user)))
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
@@ -63,7 +64,7 @@ class RHRegistrationFormBase(RHRegistrationFormDisplayBase, RegistrationFormMixi
         RegistrationFormMixin._checkParams(self)
 
 
-class RHRegistrationFormRegistration(RHRegistrationFormBase):
+class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
     """Base for RHs handling individual registrations"""
 
     def _checkParams(self, params):
@@ -88,7 +89,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                event=self.event, regforms=regforms)
 
 
-class RHRegistrationFormSummary(RHRegistrationFormRegistration):
+class RHRegistrationFormSummary(RHRegistrationFormRegistrationBase):
     """Displays user summary for a registration form"""
 
     def _process(self):
@@ -118,7 +119,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
         if not self.regform.is_active:
             flash(_('This registration form is not active'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
-        elif self.regform.get_registration(user=session.user):
+        elif session.user and self.regform.get_registration(user=session.user):
             flash(_('You have already registered with this form'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
         elif self.regform.limit_reached:
@@ -130,6 +131,10 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
         if form.validate_on_submit():
             registration = self._save_registration(form.data)
             return redirect(url_for('.display_regform_summary', registration.locator.registrant))
+        elif form.is_submitted():
+            # not very pretty but usually this never happens thanks to client-side validation
+            for error in form.error_list:
+                flash(error, 'error')
         user_data = {t.name: getattr(session.user, t.name) if session.user else '' for t in PersonalDataType}
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
