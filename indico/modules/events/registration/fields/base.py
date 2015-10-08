@@ -54,6 +54,10 @@ class RegistrationFormFieldBase(object):
     def save_data(self, registration, value):
         registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, data=value))
 
+    @classmethod
+    def modify_post_data(cls, post_data):
+        pass
+
     @property
     def default_value(self):
         return ''

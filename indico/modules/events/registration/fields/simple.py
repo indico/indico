@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from uuid import uuid4
 
 import wtforms
 from wtforms.validators import NumberRange
@@ -63,6 +64,12 @@ class SelectField(RegistrationFormFieldBase):
             return None
         return next((x['id'] for x in versioned_data['radioitems'] if x['caption'] == default_item), None)
 
+    @classmethod
+    def modify_post_data(cls, post_data):
+        items = post_data['radioitems']
+        for item in items:
+            item['id'] = unicode(uuid4())
+
 
 class CheckboxField(RegistrationFormFieldBase):
     name = 'checkbox'
@@ -72,6 +79,13 @@ class CheckboxField(RegistrationFormFieldBase):
 class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
+
+    @classmethod
+    def modify_post_data(cls, post_data):
+        date_format = post_data['date_format'].split(' ')
+        post_data['date_format'] = date_format[0]
+        if len(date_format) == 2:
+            post_data['time_format'] = date_format[1]
 
 
 class BooleanField(RegistrationFormFieldBase):
