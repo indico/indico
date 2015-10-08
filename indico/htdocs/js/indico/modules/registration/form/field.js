@@ -464,7 +464,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                         return item.caption == userdata[scope.field.htmlName];
                     }) || {};
 
-                    return item.isBillable && item.price !== '' && item.price !== 0;
+                    return item.isBillable && item.price !== 0;
                 }
 
                 return false;
@@ -540,7 +540,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                      align: 'center',
                      width: 50,
                      editable: true,
-                     edittype: "text",
+                     edittype: 'int',
                      pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
                      editoptions: {
                         size: "7",
@@ -703,7 +703,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 if ($scope.formData.price !== undefined) {
                     $scope.formData.price = parseFloat($scope.formData.price);
                     if (isNaN($scope.formData.price)) {
-                        $scope.formData.price = "";
+                        $scope.formData.price = 0;
                     }
                 }
             };
@@ -733,7 +733,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                         $('.regform-table .extra-slots').hide();
                     }, 500);
                 }
-            }
+            };
 
             $scope.$watch('formData.withExtraSlots', function(newValue) {
                 $scope.toggleExtraSlotsColumns(newValue);
