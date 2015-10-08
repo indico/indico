@@ -166,7 +166,6 @@
             var field = $this.closest('.reglist-column');
             var fieldId = field.data('id');
             var enabled = $this.hasClass('enabled');
-            var notEnabled = $this.hasClass('not-enabled');
 
             if (enabled) {
                 regItemsData.splice(regItemsData.indexOf(fieldId), 1);
@@ -175,7 +174,6 @@
             }
 
             $this.toggleClass('enabled', !enabled);
-            $this.toggleClass('not-enabled', enabled);
             field.toggleClass('striped', enabled);
             visibleColumnsRegItemsField.val(JSON.stringify(regItemsData)).trigger('change');
         })
@@ -187,7 +185,6 @@
                 field.find('.trigger').addClass('enabled');
             } else {
                 field.addClass('striped');
-                field.find('.trigger').addClass('not-enabled');
             }
         });
     }

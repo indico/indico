@@ -1210,13 +1210,13 @@ textarea.regFormDescriptionInputMgmt {
                     cursor: pointer;
                 }
 
-                > .enabled {
+                > span.enabled {
                     @extend %enabled-action;
                     &:hover {
                         @extend %not-enabled-action;
                     }
                 }
-                > .not-enabled {
+                > span:not(.enabled) {
                     @extend %not-enabled-action;
                     &:hover {
                         @extend %enabled-action;
