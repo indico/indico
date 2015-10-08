@@ -80,8 +80,9 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         report_config_uuid = request.args.get('config')
         if report_config_uuid:
             configuration = cache.get(report_config_uuid)
-            session[session_key] = configuration
-            return redirect(url_for('.manage_reglist', self.regform))
+            if configuration and configuration['regform_id'] == self.regform.id:
+                session[session_key] = configuration['data']
+                return redirect(url_for('.manage_reglist', self.regform))
         reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(reg_list_config['items']))
         registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
@@ -122,7 +123,10 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
 
     def _process(self):
         session_key = 'reglist_config_{}'.format(self.regform.id)
-        configuration = session.get(session_key)
+        configuration = {
+            'regform_id': self.regform.id,
+            'data': session.get(session_key)
+        }
         url = url_for('.manage_reglist', self.regform, _external=True)
         if configuration:
             uuid = unicode(uuid4())
