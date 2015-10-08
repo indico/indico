@@ -61,3 +61,7 @@ class RegistrationFormFieldBase(object):
     @property
     def default_value(self):
         return ''
+
+    @property
+    def view_data(self):
+        return {}

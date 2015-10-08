@@ -22,7 +22,6 @@ from indico.core.db import db
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.util.string import return_ascii, camelize_keys
-from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class RegistrationFormFieldData(db.Model):
@@ -79,10 +78,7 @@ class RegistrationFormField(RegistrationFormItem):
         base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
                          input_type=self.input_type, html_name=self.html_field_name,
                          **super(RegistrationFormField, self).view_data)
-        if self.input_type == 'country':
-            base_dict['radioitems'] = []
-            for key, val in CountryHolder.getCountries().iteritems():
-                base_dict['radioitems'].append({'caption': val, 'countryKey': key})
+        base_dict.update(self.field_impl.view_data)
         return camelize_keys(base_dict)
 
     @property

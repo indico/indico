@@ -107,6 +107,11 @@ class CountryField(RegistrationFormFieldBase):
     def field_kwargs(self):
         return {'choices': CountryHolder.getCountries().items()}
 
+    @property
+    def view_data(self):
+        return {'radioitems': [{'caption': val, 'countryKey': key}
+                               for key, val in CountryHolder.getCountries().iteritems()]}
+
 
 class FileField(RegistrationFormFieldBase):
     name = 'file'
