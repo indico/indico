@@ -128,7 +128,7 @@
                     {% if true %}
                         <div class="group">
                             {# TODO: link to ticket #}
-                            {# <a href="${ url_for('event.e-ticket-pdf', conf, token=registration.uuid) }" class="i-button highlight icon-ticket"> #}
+                            {# <a href="${ url_for('event.e-ticket-pdf', registration.locator.registrant) }" class="i-button highlight icon-ticket"> #}
                             <a href="" class="i-button highlight icon-ticket">
                                 {% trans %}Get ticket{% endtrans %}
                             </a>
@@ -215,7 +215,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('payment.event_payment', event, token=registration.uuid) }}"
+                                    <a href="{{ url_for('payment.event_payment', registration.locator.registrant) }}"
                                        class="action-button js-check-conditions">
                                         {% trans %}Checkout{% endtrans %}
                                     </a>
@@ -229,10 +229,13 @@
 
         <div class="permalink-text">
             <div>
-                {% trans %}Use this link to come back to this page:{% endtrans %}
+                {% trans -%}
+                    Use this link to come back to this page.<br>
+                    Make sure to keep it private as you do not need to be logged in to access it.
+                {% endtrans %}
             </div>
             <input type="text" class="permalink" readonly
-                   value="{{ url_for('.display_regform_summary', regform, _external=True, token=registration.uuid) }}">
+                   value="{{ url_for('.display_regform_summary', regform, token=registration.uuid, _external=true) }}">
         </div>
     {% endif %}
 {% endblock %}
