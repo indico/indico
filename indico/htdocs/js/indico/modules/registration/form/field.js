@@ -228,7 +228,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
             if (uservalue) places += 1;
             if (selectedvalue) places -= 1;
         } else if (item._type == 'GeneralField' && item.inputType == 'yes/no') {
-            if (uservalue == 'yes') places += 1;
+            if (uservalue) places += 1;
             if (selectedvalue == 'yes') places -= 1;
         } else if (item._type == 'RadioItem' || item._type == 'AccommodationType') {
             if (uservalue === item.id) places += 1;

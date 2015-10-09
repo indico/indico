@@ -25,7 +25,9 @@ from wtforms.validators import NumberRange
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase, RegistrationFormBillableField
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.fs import secure_filename
+from indico.util.i18n import _
 from indico.util.string import crc32, normalize_phone_number
+from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
 
@@ -107,11 +109,16 @@ class DateField(RegistrationFormFieldBase):
 
 class BooleanField(RegistrationFormBillableField):
     name = 'yes/no'
-    wtf_field_class = wtforms.StringField
+    wtf_field_class = IndicoRadioField
+
+    @property
+    def wtf_field_kwargs(self):
+        return {'choices': [(True, _('Yes')), (False, _('No'))],
+                'coerce': lambda x: {'yes': True, 'no': False}.get(x, None)}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
-        if not data['is_billable'] or registration_data.data != 'yes':
+        if not data['is_billable'] or registration_data.data:
             return 0
         return data['price']
 
