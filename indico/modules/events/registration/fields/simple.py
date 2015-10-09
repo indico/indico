@@ -148,10 +148,9 @@ class FileField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.FileField
 
     def save_data(self, registration, value):
-        if value is None:
+        if value is None or not value.filename:
             return
-        f = value.file
-        content = f.read()
+        content = value.file.read()
         metadata = {
             'hash': crc32(content),
             'size': len(content),
@@ -159,7 +158,7 @@ class FileField(RegistrationFormFieldBase):
             'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'
         }
 
-        registration.data.append(RegistrationData(field_data_id=self.form_item.current_data_id, file=content,
+        registration.data.append(RegistrationData(field_data=self.form_item.current_data, file=content,
                                                   file_metadata=metadata))
 
     @property
