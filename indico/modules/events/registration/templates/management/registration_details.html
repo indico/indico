@@ -26,6 +26,22 @@
                     {% set value = data[field.id].friendly_data if field.id in data else '' %}
                     {% if field.input_type == 'file' and value %}
                         <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ value }}</a>
+                    {% elif field.input_type == 'accommodation' %}
+                        <div>
+                            {% trans arrival_date=value['arrivalDate'] | format_date %}
+                                <b>Arrival:</b> {{ arrival_date }}
+                            {% endtrans %}
+                        </div>
+                        <div>
+                            {% trans departure_date=value['departureDate'] | format_date %}
+                                <b>Departure:</b> {{ departure_date }}
+                            {% endtrans %}
+                        </div>
+                        <div>
+                            {% trans accommodation=value['accommodation'] %}
+                                <b>Accommodation:</b> {{ accommodation }}
+                            {% endtrans %}
+                        </div>
                     {% else %}
                         {{ value }}
                     {% endif %}

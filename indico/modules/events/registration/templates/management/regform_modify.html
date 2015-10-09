@@ -13,6 +13,8 @@
             conf-form-id="{{ regform.id }}"
             conf-sections="{{ sections | tojson | forceescape }}"
             conf-currency="{{ currency }}"
+            conf-sdate="{{ event.as_legacy.startDate }}"
+            conf-edate="{{ event.as_legacy.endDate }}"
             edit-mode="true"></div>
     </div>
 {% endblock %}

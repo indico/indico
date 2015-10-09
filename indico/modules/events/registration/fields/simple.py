@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import mimetypes
 from copy import deepcopy
+from datetime import datetime
 from uuid import uuid4
 
 import wtforms
@@ -25,10 +26,11 @@ from wtforms.validators import NumberRange
 
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase, RegistrationFormBillableField
 from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.util.date_time import iterdays, format_date
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
 from indico.util.string import crc32, normalize_phone_number
-from indico.web.forms.fields import IndicoRadioField
+from indico.web.forms.fields import IndicoRadioField, JSONField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
 
@@ -225,3 +227,42 @@ class EmailField(RegistrationFormFieldBase):
     @property
     def validators(self):
         return [IndicoEmail()]
+
+
+class AccommodationField(RegistrationFormFieldBase):
+    name = 'accommodation'
+    wtf_field_class = JSONField
+    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'accommodation_options'}
+
+    @classmethod
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super(AccommodationField, cls).process_field_data(data, old_data,
+                                                                                             old_versioned_data)
+        items = versioned_data['accommodation_options']
+        captions = dict(old_data['captions']) if old_data is not None else {}
+        for item in items:
+            if 'id' not in item:
+                item['id'] = unicode(uuid4())
+            captions[item['id']] = item.pop('caption')
+        versioned_data['accommodation_options'] = items
+        unversioned_data['captions'] = captions
+        return unversioned_data, versioned_data
+
+    @property
+    def view_data(self):
+        data = {}
+        arrival_date_from = _to_date(self.form_item.data['arrival_date_from'])
+        arrival_date_to = _to_date(self.form_item.data['arrival_date_to'])
+        departure_date_from = _to_date(self.form_item.data['departure_date_from'])
+        departure_date_to = _to_date(self.form_item.data['departure_date_to'])
+        data['arrival_dates'] = [format_date(date) for date in iterdays(arrival_date_from, arrival_date_to)]
+        data['departure_dates'] = [format_date(date) for date in iterdays(departure_date_from, departure_date_to)]
+        items = deepcopy(self.form_item.versioned_data['accommodation_options'])
+        for item in items:
+            item['caption'] = self.form_item.data['captions'][item['id']]
+        data['accommodation_options'] = items
+        return data
+
+
+def _to_date(date):
+    return datetime.strptime(date, '%d-%m-%Y').date()

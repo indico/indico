@@ -10,6 +10,17 @@
                 {{ 'Edit items' | i18n }}
             </a>
         </li>
+        <li ng-if="field.inputType == 'accommodation'" ng-class="{active: isTabSelected('tab-accommodation')}">
+            <a ng-click="setSelectedTab('tab-accommodation')">
+                {{ 'Configuration' | i18n }}
+            </a>
+        </li>
+        <li ng-if="field.inputType == 'accommodation'"
+            ng-class="{active: isTabSelected('tab-accommodation-options')}">
+            <a ng-click="setSelectedTab('tab-accommodation-options')">
+                {{ 'Edit accommodations' | i18n }}
+            </a>
+        </li>
     </ul>
 
     <div class="tab-content regFormDialogTabContent">
@@ -70,5 +81,13 @@
             ng-if="settings.itemtable"
             ng-include="getTpl('fields/dialogs/itemtable.tpl.html')"
             ng-class="{active: isTabSelected('tab-editItems')}"></div>
+        <div class="tab-pane"
+            ng-if="settings.accommodationField"
+            ng-include="getTpl('fields/accommodation-config.tpl.html')"
+            ng-class="{active: isTabSelected('tab-accommodation')}"></div>
+        <div class="tab-pane"
+            ng-if="settings.accommodationField"
+            ng-include="getTpl('fields/accommodation-editionTable.tpl.html')"
+            ng-class="{active: isTabSelected('tab-accommodation-options')}"></div>
     </div>
 </div>
