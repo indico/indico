@@ -324,12 +324,8 @@ ndRegForm.directive('ndCheckboxField', function(url) {
             scope.settings.formData.push('placesLimit');
 
             scope.$watch('userdata[fieldName]', function() {
-                scope.checkboxValue = scope.getUserdataValue();
+                scope.checkboxValue = scope.userdata[scope.fieldName];
             });
-
-            scope.getUserdataValue = function() {
-                return scope.userdata[scope.fieldName] === 'yes';
-            };
         }
     };
 });
