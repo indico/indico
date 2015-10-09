@@ -31,7 +31,7 @@ class WPPaymentEventManagement(WPConferenceModifBase, WPPaymentJinjaMixin):
     template_prefix = 'payment/'
     sidemenu_option = 'payment'
 
-    def _getTabContent(self, params):
+    def _getPageContent(self, params):
         return WPPaymentJinjaMixin._getPageContent(self, params)
 
 
