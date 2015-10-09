@@ -119,7 +119,7 @@ class BooleanField(RegistrationFormBillableField):
 class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
     wtf_field_class = wtforms.StringField
-    field_kwargs = {'filters': [lambda x: normalize_phone_number(x) if x else '']}
+    wtf_field_kwargs = {'filters': [lambda x: normalize_phone_number(x) if x else '']}
 
 
 class CountryField(RegistrationFormFieldBase):
@@ -127,7 +127,7 @@ class CountryField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.SelectField
 
     @property
-    def field_kwargs(self):
+    def wtf_field_kwargs(self):
         return {'choices': CountryHolder.getCountries().items()}
 
     @property
@@ -163,7 +163,7 @@ class FileField(RegistrationFormFieldBase):
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
     wtf_field_class = wtforms.StringField
-    field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
+    wtf_field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
 
     @property
     def validators(self):

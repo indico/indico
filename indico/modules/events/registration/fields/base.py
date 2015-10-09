@@ -28,12 +28,12 @@ class RegistrationFormFieldBase(object):
     name = None
     #: wtform field class
     wtf_field_class = None
+    #: additional options for the WTForm class
+    wtf_field_kwargs = {}
     #: the validator to use when the field is required
     required_validator = DataRequired
     #: the validator to use when the field is not required
     not_required_validator = Optional
-    #: additional options for the WTForm class
-    field_kwargs = {}
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -57,7 +57,7 @@ class RegistrationFormFieldBase(object):
             validators.append(self.required_validator())
         elif self.not_required_validator:
             validators.append(self.not_required_validator())
-        return self.wtf_field_class(self.form_item.title, validators, **self.field_kwargs)
+        return self.wtf_field_class(self.form_item.title, validators, **self.wtf_field_kwargs)
 
     def save_data(self, registration, value):
         registration.data.append(RegistrationData(field_data=self.form_item.current_data, data=value))
