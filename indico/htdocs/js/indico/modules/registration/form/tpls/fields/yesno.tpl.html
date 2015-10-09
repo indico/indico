@@ -14,7 +14,7 @@
                 {{ getBillableStr(field, userdata[fieldName]) }}
             </option>
             <option value="no"
-                ng-selected="!userdata[fieldName] === false">
+                ng-selected="userdata[fieldName] === false">
                 {{ 'no' | i18n }}
             </option>
         </select>
