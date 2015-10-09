@@ -48,9 +48,9 @@ class NumberField(RegistrationFormBillableField):
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
-        if not data['is_billable']:
+        if not data.get('is_billable'):
             return 0
-        return data['price'] * registration_data.data
+        return data.get('price', 0) * int(registration_data.data or 0)
 
 
 class TextAreaField(RegistrationFormFieldBase):
@@ -90,9 +90,9 @@ class CheckboxField(RegistrationFormBillableField):
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
-        if not data['is_billable'] or not registration_data.data:
+        if not data.get('is_billable') or not registration_data.data:
             return 0
-        return data['price']
+        return data.get('price', 0)
 
 
 class DateField(RegistrationFormFieldBase):
@@ -118,9 +118,9 @@ class BooleanField(RegistrationFormBillableField):
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
-        if not data['is_billable'] or registration_data.data:
+        if not data.get('is_billable'):
             return 0
-        return data['price']
+        return data.get('price', 0) if registration_data.data else 0
 
 
 class PhoneField(RegistrationFormFieldBase):
