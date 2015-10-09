@@ -171,6 +171,11 @@ class FileField(RegistrationFormFieldBase):
     def default_value(self):
         return None
 
+    def get_friendly_data(self, registration_data):
+        if not registration_data:
+            return ''
+        return registration_data.file_metadata['filename']
+
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
