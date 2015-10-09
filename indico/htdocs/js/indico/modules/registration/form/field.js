@@ -674,12 +674,141 @@ ndRegForm.directive('ndEmailField', function(url) {
     };
 });
 
+ndRegForm.directive('ndAccommodationField', function(url) {
+    return {
+        require: 'ndField',
+        controller: function($scope) {
+            $scope.tplInput = url.tpl('fields/accommodation.tpl.html');
+        },
+        link: function(scope) {
+            scope.settings.accommodationField = true;
+            scope.settings.fieldName = $T("Accommodation");
+
+            scope.accommodation = {};
+            scope.$watch('userdata.accommodation', function() {
+                if (scope.userdata.accommodation === undefined ||
+                    scope.userdata.accommodation.accommodationType === null) {
+                    return;
+                }
+                scope.accommodation.typeId = scope.userdata.accommodation.accommodationType.id;
+                scope.accommodation.arrivalDate = scope.userdata.accommodation.arrivalDate;
+                scope.accommodation.departureDate = scope.userdata.accommodation.departureDate;
+            });
+
+            function updateAccommodationPostData(fieldName, value) {
+                var accommodationField = $('[name=field_{0}]'.format(scope.field.id)),
+                    accommodationData =  accommodationField.val() ? JSON.parse(accommodationField.val()) : {};
+                accommodationData[fieldName] = value;
+                accommodationField.val(JSON.stringify(accommodationData));
+            }
+
+            scope.$watch('accommodation.arrivalDate', function(newValue) {
+                updateAccommodationPostData('arrivalDate', moment(newValue).format('DD-MM-YYYY'));
+            });
+
+            scope.$watch('accommodation.departureDate', function(newValue) {
+                updateAccommodationPostData('departureDate', moment(newValue).format('DD-MM-YYYY'));
+            });
+
+            scope.$watch('accommodation.typeId', function(newValue) {
+                updateAccommodationPostData('accommodation', newValue);
+            });
+
+            scope.billableOptionPayed = function(userdata) {
+                if (userdata.accommodation !== undefined) {
+                    var accommodation = userdata.accommodation.accommodationType || {};
+                    return accommodation.billable === true && userdata.paid === true;
+                }
+
+                return false;
+            };
+
+            scope.possibleDeparture = function(departure) {
+                if (scope.arrival !== undefined) {
+                    var arrival = moment(scope.arrival, 'DD/MM/YYY');
+                    departure = moment(departure[0], 'DD/MM/YYY');
+                    return arrival.isBefore(departure);
+                }
+
+                return true;
+            };
+
+            scope.settings.formData.push('arrivalDateFrom');
+            scope.settings.formData.push('arrivalDateTo');
+            scope.settings.formData.push('departureDateFrom');
+            scope.settings.formData.push('departureDateTo');
+            scope.settings.formData.push('accommodationOptions');
+
+            scope.settings.editionTable = {
+                sortable: false,
+                colNames: [
+                    $T("Accommodation option"),
+                    $T("Billable"),
+                    $T("Price"),
+                    $T("Places limit"),
+                    $T("Cancelled")
+                ],
+                actions: ['remove'],
+                colModel: [
+                       {
+                           name: 'caption',
+                           index: 'caption',
+                           align: 'center',
+                           width: 100,
+                           editoptions: {size: "30", maxlength: "50"},
+                           editable: true,
+                           edittype: "text"
+                       },
+                       {
+                           name: 'billable',
+                           index: 'billable',
+                           width: 60,
+                           editable: true,
+                           align: 'center',
+                           edittype: 'bool_select',
+                           defaultVal: true
+
+                       },
+                       {
+                           name: 'price',
+                           index: 'price',
+                           align: 'center',
+                           width: 50,
+                           editable: true,
+                           edittype: "text",
+                           editoptions: {size: "7", maxlength: "20"}
+
+                       },
+                       {
+                           name: 'placesLimit',
+                           index: 'placesLimit',
+                           align: 'center',
+                           width: 80,
+                           editable: true,
+                           edittype: "text",
+                           editoptions: {size: "7", maxlength: "20"}
+                       },
+                       {
+                           name: 'cancelled',
+                           index: 'cancelled',
+                           width: 60,
+                           editable: true,
+                           align: 'center',
+                           defaultVal: false,
+                           edittype: 'bool_select'
+                       }
+
+                  ]
+            };
+        }
+    }
+});
+
 ndRegForm.directive('ndFieldDialog', function(url) {
     return {
         require: 'ndDialog',
         controller: function($scope) {
             $scope.templateUrl = url.tpl('fields/dialogs/base.tpl.html');
-
             $scope.actions.init = function() {
                 $scope.field = $scope.data;
                 $scope.settings = $scope.config;
@@ -701,6 +830,16 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     $scope.formData.choices = [];
                     _.each($scope.field.choices, function(item, ind) {
                         $scope.formData.choices[ind] = angular.copy(item);
+                    });
+                } else if ($scope.field.inputType == 'accommodation') {
+                    var field = $scope.field;
+                    $scope.formData.accommodationOptions = [];
+                    $scope.formData.arrivalDateFrom = $scope.field.arrivalDateFrom;
+                    $scope.formData.arrivalDateTo = $scope.field.arrivalDateTo;
+                    $scope.formData.departureDateFrom = $scope.field.departureDateFrom;
+                    $scope.formData.departureDateTo = $scope.field.departureDateTo;
+                    _.each(field.accommodationOptions, function(item, ind) {
+                        $scope.formData.accommodationOptions[ind] = angular.copy(item);
                     });
                 }
 
@@ -727,6 +866,13 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 });
 
                 $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
+            };
+
+            $scope.addAccommodationOption = function() {
+                $scope.formData.accommodationOptions.push({
+                    cancelled: false,
+                    pricePerPlace: false
+                });
             };
 
             $scope.sortItems = function() {
