@@ -74,6 +74,4 @@ class RegistrationFormFieldBase(object):
 class RegistrationFormBillableField(RegistrationFormFieldBase):
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
-        if not data['is_billable']:
-            return 0
-        return data['price']
+        return data.get('price', 0) if data.get('is_billable') else 0
