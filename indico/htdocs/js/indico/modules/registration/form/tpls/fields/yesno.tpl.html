@@ -9,17 +9,17 @@
             <option ng-if="!field.isRequired" value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option value="yes"
                 ng-disabled="!hasPlacesLeft(field, userdata[fieldName])"
-                ng-selected="userdata[fieldName] === 'yes'">
+                ng-selected="userdata[fieldName] === true">
                 {{ 'yes' | i18n }}
                 {{ getBillableStr(field, userdata[fieldName]) }}
             </option>
             <option value="no"
-                ng-selected="userdata[fieldName] === 'no'">
+                ng-selected="!userdata[fieldName] === false">
                 {{ 'no' | i18n }}
             </option>
         </select>
 
-        <span ng-if="isBillable(field) && userdata[fieldName] == 'yes'">
+        <span ng-if="isBillable(field) && userdata[fieldName]">
             <span class="regFormPrice">{{ field.price }}</span>
             <span class="regFormCurrency">{{ currency }}</span>
         </span>
