@@ -49,7 +49,7 @@
             </div>
         </div>
         {% if registrations %}
-            {{ render_registration_list(registrations, visible_cols_regform_items) }}
+            {{ render_registration_list(registrations, visible_cols_regform_items, special_items) }}
         {% else %}
             {%- call message_box('info', fixed_width=true) -%}
                 {% trans %}There are no registrations yet.{% endtrans %}
