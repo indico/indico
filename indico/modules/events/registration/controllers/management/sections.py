@@ -55,19 +55,7 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
 
 
 class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
-    """RH comprising of methods for update and removal of a section"""
-
-    def _process_POST(self):
-        enabled = request.args.get('enable') == 'true'
-        if not enabled and self.section.type == RegistrationFormItemType.section_pd:
-            raise BadRequest
-        self.section.is_enabled = enabled
-        db.session.flush()
-        if self.section.is_enabled:
-            logger.info('Section {} enabled by {}'.format(self.section, session.user))
-        else:
-            logger.info('Section {} disabled by {}'.format(self.section, session.user))
-        return jsonify_data(**self.section.view_data)
+    """Delete/modify a section"""
 
     def _process_DELETE(self):
         if self.section.type == RegistrationFormItemType.section_pd:
@@ -86,6 +74,22 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         db.session.flush()
         logger.info('Section {} modified by {}: {}'.format(self.section, session.user, changes))
         return jsonify(self.section.view_data)
+
+
+class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
+    """Enable/disable a section"""
+
+    def _process_POST(self):
+        enabled = request.args.get('enable') == 'true'
+        if not enabled and self.section.type == RegistrationFormItemType.section_pd:
+            raise BadRequest
+        self.section.is_enabled = enabled
+        db.session.flush()
+        if self.section.is_enabled:
+            logger.info('Section {} enabled by {}'.format(self.section, session.user))
+        else:
+            logger.info('Section {} disabled by {}'.format(self.section, session.user))
+        return jsonify_data(**self.section.view_data)
 
 
 class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):

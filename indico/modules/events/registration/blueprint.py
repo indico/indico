@@ -35,6 +35,7 @@ from indico.modules.events.registration.controllers.management.regforms import (
                                                                                 RHRegistrationFormModify)
 from indico.modules.events.registration.controllers.management.sections import (RHRegistrationFormAddSection,
                                                                                 RHRegistrationFormModifySection,
+                                                                                RHRegistrationFormToggleSection,
                                                                                 RHRegistrationFormMoveSection)
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -67,6 +68,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_se
                  methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>', 'modify_section',
                  RHRegistrationFormModifySection, methods=('PATCH', 'DELETE', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/toggle', 'toggle_section',
+                 RHRegistrationFormToggleSection, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/move', 'move_section',
                  RHRegistrationFormMoveSection, methods=('POST',))
 
@@ -74,9 +77,9 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields', 'add_field',
                  RHRegistrationFormAddField, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>',
-                 'modify_field', RHRegistrationFormModifyField, methods=('DELETE', 'POST'))
+                 'modify_field', RHRegistrationFormModifyField, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/toggle',
-                 'disable_field', RHRegistrationFormToggleFieldState, methods=('POST',))
+                 'toggle_field', RHRegistrationFormToggleFieldState, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
                  'move_field', RHRegistrationFormMoveField, methods=('POST',))
 

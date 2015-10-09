@@ -70,7 +70,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             delete postData['fieldId'];
         }
 
-        regFormFactory.Fields.save(postData, function(response) {
+        regFormFactory.Fields[$scope.isNew() ? 'save' : 'modify'](postData, function(response) {
             regFormFactory.processResponse(response, {
                 success: function(response) {
                     if ($scope.isNew()) {

@@ -71,9 +71,7 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
     defaults.common['X-CSRF-Token'] = $('#csrf-token').attr('content');
     defaults.common['X-Requested-With'] = 'XMLHttpRequest';
 
-    var sectionURL = editionURL + 'sections/:sectionId';
-    var sessionsURL = Indico.Urls.Base + '/event/:confId/manage/sessions';
-    var fieldURL = sectionURL + '/fields/:fieldId';
+    var urls = Indico.Urls.RegistrationForm;
 
     return {
         processResponse: function(data, callback) {
@@ -90,20 +88,19 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
         getDefaultFieldSetting: function(setting) {
             return fieldDefaults[setting];
         },
-        Sections: $resource(sectionURL, {confId: '@confId', sectionId: "@sectionId", confFormId: "@confFormId"}, {
-            "remove": {method: 'DELETE', url: sectionURL + "/", isArray: true},
-            "enable": {method: 'POST', url: sectionURL + "/", params: {enable: true}},
-            "disable": {method: 'POST', url: sectionURL + "/", params: {enable: false}},
-            "move": {method: 'POST', url: sectionURL + "/move"},
-            "modify": {method: 'PATCH', url: sectionURL + '/'}
+        Sections: $resource(urls.section.add, {confId: '@confId', sectionId: "@sectionId", confFormId: "@confFormId"}, {
+            "remove": {method: 'DELETE', url: urls.section.modify, isArray: true},
+            "enable": {method: 'POST', url: urls.section.toggle, params: {enable: true}},
+            "disable": {method: 'POST', url: urls.section.toggle, params: {enable: false}},
+            "move": {method: 'POST', url: urls.section.move},
+            "modify": {method: 'PATCH', url: urls.section.modify}
         }),
-        Fields: $resource(fieldURL, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId", confFormId: "@confFormId"}, {
-            "enable": {method:'POST', url: fieldURL + "/toggle", params: {enable: true}},
-            "disable": {method:'POST', url: fieldURL + "/toggle", params: {enable: false}},
-            "move": {method:'POST', url: fieldURL + "/move"}
-        }),
-        Sessions: $resource(sessionsURL, {confId: '@confId'}, {
-            "query": {method:'GET', isArray: true, cache: false}
+        Fields: $resource(urls.field.add, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId", confFormId: "@confFormId"}, {
+            "remove": {method: 'DELETE', url: urls.field.modify},
+            "enable": {method:'POST', url: urls.field.toggle, params: {enable: true}},
+            "disable": {method:'POST', url: urls.field.toggle, params: {enable: false}},
+            "move": {method:'POST', url: urls.field.move},
+            "modify": {method: 'PATCH', url: urls.field.modify}
         })
     };
 });
