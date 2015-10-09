@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import current_app
 from wtforms import ValidationError
 
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
@@ -64,3 +65,19 @@ def create_personal_data_fields(regform):
         for key, value in data.iteritems():
             setattr(field, key, value)
         section.children.append(field)
+
+
+def url_rule_to_angular(endpoint):
+    """Converts a flask-style rule to angular style"""
+    mapping = {
+        'reg_form_id': 'confFormId',
+        'section_id': 'sectionId',
+        'field_id': 'fieldId',
+    }
+    rules = list(current_app.url_map.iter_rules(endpoint))
+    assert len(rules) == 1
+    rule = rules[0]
+    assert not rule.defaults
+    segments = [':' + mapping.get(data, data) if is_dynamic else data
+                for is_dynamic, data in rule._trace]
+    return ''.join(segments).split('|', 1)[-1]

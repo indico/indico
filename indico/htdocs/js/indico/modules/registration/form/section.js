@@ -44,9 +44,6 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
             regFormFactory.processResponse(updatedSection, {
                 success: function(updatedSection)  {
                     $scope.section = angular.extend($scope.section, updatedSection);
-                    if (updatedSection.id == 'sessions') {
-                        $scope.fetchSessions();
-                    }
                 }
             });
         }, handleAjaxError);

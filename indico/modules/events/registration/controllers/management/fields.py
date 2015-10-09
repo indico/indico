@@ -83,7 +83,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         logger.info('Field {} deleted by {}'.format(self.field, session.user))
         return jsonify_data(flash=False)
 
-    def _process_POST(self):
+    def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
         if (self.field.type == RegistrationFormItemType.field_pd and self.field.personal_data_type.is_required and
                 not field_data['is_required']):

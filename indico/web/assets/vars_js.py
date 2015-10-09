@@ -21,6 +21,7 @@ from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
 from indico.modules.auth.util import url_for_login
+from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
 from indico.web.assets import core_env
 from indico.web.flask.util import url_rule_to_js, url_for
@@ -91,7 +92,22 @@ def generate_global_file(config):
 
             'APIKeyCreate': url_for('api.key_create'),
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
-            'FontSassBundle': core_env['fonts_sass'].urls()
+            'FontSassBundle': core_env['fonts_sass'].urls(),
+
+            'RegistrationForm': {
+                'section': {
+                    'add': url_rule_to_angular('event_registration.add_section'),
+                    'modify': url_rule_to_angular('event_registration.modify_section'),
+                    'toggle': url_rule_to_angular('event_registration.toggle_section'),
+                    'move': url_rule_to_angular('event_registration.move_section')
+                },
+                'field': {
+                    'add': url_rule_to_angular('event_registration.add_field'),
+                    'modify': url_rule_to_angular('event_registration.modify_field'),
+                    'toggle': url_rule_to_angular('event_registration.toggle_field'),
+                    'move': url_rule_to_angular('event_registration.move_field')
+                }
+            }
         },
 
         'Data': {
