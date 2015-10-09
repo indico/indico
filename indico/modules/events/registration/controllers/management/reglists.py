@@ -72,6 +72,12 @@ def _query_registrations(regform, filters):
     return _filter_registration(query, filters)
 
 
+def _get_visible_column_ids(items):
+    items = set(items)
+    special_cols = {'reg_date'}
+    return (items - special_cols), (items & special_cols)
+
+
 class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event"""
 
@@ -84,11 +90,12 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 session[session_key] = configuration['data']
                 return redirect(url_for('.manage_reglist', self.regform))
         reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(reg_list_config['items']))
+        items_ids, special_items = _get_visible_column_ids(reg_list_config['items'])
+        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids))
         registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
-                                                    registrations=registrations)
+                                                    registrations=registrations, special_items=special_items)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -111,10 +118,12 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         reglist_config['filters'] = filters
         reglist_config['items'] = visible_regform_items
         session.modified = True
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(visible_regform_items))
+        items_ids, special_items = _get_visible_column_ids(visible_regform_items)
+        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids))
         registrations = _query_registrations(self.regform, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
-        reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items)
+        reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
+                                                special_items=special_items)
         return jsonify_data(registration_list=reg_list)
 
 

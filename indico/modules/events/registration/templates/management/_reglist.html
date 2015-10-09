@@ -1,4 +1,4 @@
-{% macro render_registration_list(registrations, visible_cols_regform_items) %}
+{% macro render_registration_list(registrations, visible_cols_regform_items, special_items) %}
     <div class="registrations-table-wrapper">
         <table class="i-table tablesorter">
             <thead>
@@ -8,6 +8,9 @@
                     {% for item in visible_cols_regform_items %}
                         <th class="i-table">{{ item.title }}</th>
                     {% endfor %}
+                    {% if 'reg_date' in special_items %}
+                        <th class="i-table" data-sorter="text">{% trans %}Registration date{% endtrans %}</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -29,6 +32,11 @@
                                 {%- endif %}
                             </td>
                         {% endfor %}
+                        {% if 'reg_date' in special_items %}
+                            <td class="i-table" data-text="{{ registration.submitted_dt }}">
+                                {{- registration.submitted_dt | format_datetime -}}
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>
