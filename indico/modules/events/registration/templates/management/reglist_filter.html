@@ -41,6 +41,14 @@
         <span class="title">{% trans %}Registration date{% endtrans %}</span>
         <span class="right actions"><span class="trigger icon-eye"></span></span>
     </div>
+    <div class="i-label reglist-column js-regform-item" data-id="state">
+        <span class="title">{% trans %}Registration state{% endtrans %}</span>
+        <span class="right actions"><span class="trigger icon-eye"></span></span>
+    </div>
+    <div class="i-label reglist-column js-regform-item" data-id="price">
+        <span class="title">{% trans %}Price{% endtrans %}</span>
+        <span class="right actions"><span class="trigger icon-eye"></span></span>
+    </div>
     {% for section in regform.sections %}
         {{ _render_regform_item_col_selector(section) }}
     {% endfor %}

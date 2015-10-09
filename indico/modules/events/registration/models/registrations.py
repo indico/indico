@@ -27,12 +27,14 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.payment import event_settings as event_payment_settings
 from indico.util.date_time import now_utc
+from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
 
 
-class RegistrationState(int, IndicoEnum):
+class RegistrationState(TitledIntEnum):
+    __titles__ = [None, L_('Completed'), L_('Pending'), L_('Rejected'), L_('Withdrawn'), L_('Unpaid')]
     complete = 1
     pending = 2
     rejected = 3
