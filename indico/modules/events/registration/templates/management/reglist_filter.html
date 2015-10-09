@@ -36,6 +36,11 @@
 <form class="reglist-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
+    <h3>{% trans %}General registration info{% endtrans %}</h3>
+    <div class="i-label reglist-column js-regform-item" data-id="reg_date">
+        <span class="title">{% trans %}Registration date{% endtrans %}</span>
+        <span class="right actions"><span class="trigger icon-eye"></span></span>
+    </div>
     {% for section in regform.sections %}
         {{ _render_regform_item_col_selector(section) }}
     {% endfor %}
