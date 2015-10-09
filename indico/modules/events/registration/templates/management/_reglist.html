@@ -11,6 +11,12 @@
                     {% if 'reg_date' in special_items %}
                         <th class="i-table" data-sorter="text">{% trans %}Registration date{% endtrans %}</th>
                     {% endif %}
+                    {% if 'state' in special_items %}
+                        <th class="i-table">{% trans %}Registration state{% endtrans %}</th>
+                    {% endif %}
+                    {% if 'price' in special_items %}
+                        <th class="i-table">{% trans %}Price{% endtrans %}</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +42,12 @@
                             <td class="i-table" data-text="{{ registration.submitted_dt }}">
                                 {{- registration.submitted_dt | format_datetime -}}
                             </td>
+                        {% endif %}
+                        {% if 'state' in special_items %}
+                            <td class="i-table">{{ registration.state.title }}</td>
+                        {% endif %}
+                        {% if 'price' in special_items %}
+                            <td class="i-table">{{ registration.price }}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}

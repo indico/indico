@@ -74,7 +74,7 @@ def _query_registrations(regform, filters):
 
 def _get_visible_column_ids(items):
     items = set(items)
-    special_cols = {'reg_date'}
+    special_cols = {'reg_date', 'state', 'price'}
     return (items - special_cols), (items & special_cols)
 
 
