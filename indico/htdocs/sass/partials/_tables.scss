@@ -38,7 +38,11 @@ tr.i-table {
     border-top: 1px solid #E5E5E5;
 
     &.selected {
-        background-color: #CDEB8B;
+        background-color: $pastel-blue !important;
+    }
+
+    &:hover {
+        background-color: $light-gray;
     }
 }
 
