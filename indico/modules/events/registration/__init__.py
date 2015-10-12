@@ -40,18 +40,18 @@ def _extend_event_management_menu(sender, event, **kwargs):
                         section='organization')
 
 
-def _get_active_regforms(event):
+def _get_open_regforms(event):
     if not event.has_feature('registration'):
         return []
     from indico.modules.events.registration.models.forms import RegistrationForm
-    return (RegistrationForm.find(RegistrationForm.is_active, RegistrationForm.event_id == int(event.id))
+    return (RegistrationForm.find(RegistrationForm.is_open, event_id=int(event.id))
                             .order_by(db.func.lower(RegistrationForm.title))
                             .all())
 
 
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
-    regforms = _get_active_regforms(event)
+    regforms = _get_open_regforms(event)
     if regforms:
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event)
 

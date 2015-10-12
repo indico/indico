@@ -180,11 +180,11 @@ class RegistrationForm(db.Model):
         return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
 
     @hybrid_property
-    def is_active(self):
+    def is_open(self):
         return not self.is_deleted and self.has_started and not self.has_ended
 
-    @is_active.expression
-    def is_active(cls):
+    @is_open.expression
+    def is_open(cls):
         return ~cls.is_deleted & cls.has_started & ~cls.has_ended
 
     @hybrid_property
@@ -220,12 +220,16 @@ class RegistrationForm(db.Model):
     def limit_reached(self):
         return self.registration_limit and len(self.registrations) >= self.registration_limit
 
+    @property
+    def is_active(self):
+        return self.is_open and not self.limit_reached
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 
     def can_submit(self, user):
-        return self.is_active and (not self.require_login or user) and not self.limit_reached
+        return self.is_active and (not self.require_login or user)
 
     @memoize_request
     def get_registration(self, user=None, uuid=None, email=None):
