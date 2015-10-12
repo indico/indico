@@ -32,7 +32,7 @@ from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
-from indico.web.flask.util import url_for, url_rule_to_js
+from indico.web.flask.util import url_for
 
 
 class RHManageRegistrationForms(RHManageRegFormsBase):
