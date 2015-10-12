@@ -188,12 +188,12 @@ class RegistrationForm(db.Model):
         return ~cls.is_deleted & cls.has_started & ~cls.has_ended
 
     @hybrid_property
-    def is_visible(self):
-        return not self.is_deleted and self.form_items and self.has_started
+    def is_scheduled(self):
+        return not self.is_deleted and self.start_dt is not None
 
-    @is_visible.expression
-    def is_visible(cls):
-        return ~cls.is_deleted & cls.form_items.any() & cls.has_started
+    @is_scheduled.expression
+    def is_scheduled(cls):
+        return ~cls.is_deleted & (cls.start_dt != None)  # noqa
 
     @property
     def event(self):
