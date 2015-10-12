@@ -40,6 +40,7 @@ from indico.modules.events.registration.controllers.management.sections import (
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationsListManage,
                                                                                 RHRegistrationsListCustomize,
                                                                                 RHRegistrationDetails,
+                                                                                RHRegistrationDownloadAttachment,
                                                                                 RHRegistrationEdit,
                                                                                 RHRegistrationListStaticURL)
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -74,6 +75,9 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-ur
                  'generate_static_url', RHRegistrationListStaticURL, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
                  RHRegistrationDetails)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>'
+                 '/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>', 'registration_file',
+                 RHRegistrationDownloadAttachment)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
                  RHRegistrationEdit)
 
