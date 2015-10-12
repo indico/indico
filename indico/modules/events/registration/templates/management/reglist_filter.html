@@ -41,6 +41,13 @@
     {% endfor %}
 {% endmacro %}
 
+<div class="toolbar">
+    <div class="group right">
+        <a class="i-button js-reset-btn" type="button">
+            {%- trans %}Clear filters{% endtrans -%}
+        </a>
+    </div>
+</div>
 <form class="reglist-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
@@ -63,9 +70,6 @@
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
                value="{% trans %}Apply{% endtrans %}">
-        <button class="i-button big js-reset-btn" type="button" title="{% trans %}Clear all filters{% endtrans %}">
-            {%- trans %}Clear{% endtrans -%}
-        </button>
         <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     </div>
 </form>
