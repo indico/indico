@@ -143,6 +143,10 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 }
             }
 
+            if ($.isFunction($scope.validateFieldSettings) && !$scope.validateFieldSettings(dialogScope)) {
+                return false;
+            }
+
             $scope.fieldApi.updateField($scope.field, dialogScope.formData);
             return true;
         },
