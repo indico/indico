@@ -19,11 +19,13 @@ from __future__ import unicode_literals
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
 from indico.modules.events.registration.controllers.display import (RHRegistrationFormList, RHRegistrationFormSubmit,
                                                                     RHRegistrationFormSummary,
-                                                                    RHRegistrationFormCheckEmail)
+                                                                    RHRegistrationFormCheckEmail,
+                                                                    RHRegistrationFormDeclineInvitation)
 from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
                                                                               RHRegistrationFormModifyField,
                                                                               RHRegistrationFormMoveField,
                                                                               RHRegistrationFormAddField)
+from indico.modules.events.registration.controllers.management.invitations import RHRegistrationFormInvitations
 from indico.modules.events.registration.controllers.management.regforms import (RHManageRegistrationForms,
                                                                                 RHRegistrationFormCreate,
                                                                                 RHRegistrationFormEdit,
@@ -81,6 +83,9 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>'
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
                  RHRegistrationEdit)
 
+# Invitation management
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)
+
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated
 # Right now, Angular strips off trailing slashes, thus causing Flask to throw errors
@@ -109,6 +114,9 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform_summary',
 _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', RHRegistrationFormCheckEmail)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/register',
                  'display_regform', RHRegistrationFormSubmit, methods=('GET', 'POST'))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
+                 RHRegistrationFormDeclineInvitation, methods=('POST',))
+
 
 # API
 _bp.add_url_rule('!/api/events/<event_id>/registrants/<registrant_id>', 'api_registrant',

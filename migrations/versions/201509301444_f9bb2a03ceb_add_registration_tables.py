@@ -11,6 +11,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.events.registration.models.invitations import InvitationState
 from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.registrations import RegistrationState
@@ -132,10 +133,30 @@ def upgrade():
         schema='event_registration'
     )
 
+    op.create_table(
+        'invitations',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('uuid', postgresql.UUID(), nullable=False, index=True, unique=True),
+        sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('registration_id', sa.Integer(), nullable=True, index=True, unique=True),
+        sa.Column('state', PyIntEnum(InvitationState), nullable=False),
+        sa.Column('skip_moderation', sa.Boolean(), nullable=False),
+        sa.Column('email', sa.String(), nullable=False),
+        sa.Column('first_name', sa.String(), nullable=False),
+        sa.Column('last_name', sa.String(), nullable=False),
+        sa.Column('affiliation', sa.String(), nullable=False),
+        sa.CheckConstraint('(state = 1) OR (registration_id IS NULL)', name='registration_state'),
+        sa.Index(None, 'registration_form_id', 'email', unique=True, postgresql_where=sa.text('state = 0')),
+        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
+        sa.ForeignKeyConstraint(['registration_id'], ['event_registration.registrations.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='event_registration')
+
 
 def downgrade():
     op.drop_constraint('fk_form_items_current_data_id_form_field_data',
                        'form_items', schema='event_registration')
+    op.drop_table('invitations', schema='event_registration')
     op.drop_table('registration_data', schema='event_registration')
     op.drop_table('registrations', schema='event_registration')
     op.drop_table('form_field_data', schema='event_registration')
