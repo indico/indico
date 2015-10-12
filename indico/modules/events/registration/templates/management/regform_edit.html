@@ -12,9 +12,7 @@
 {% block content %}
     {% set back_url = url_for('.manage_regform', regform) if regform else url_for('.manage_regform_list', event) %}
     {{ form_header(form) }}
-    {% call form_fieldset(_('General settings')) %}
-        {{ form_rows(form, skip=form._notification_fields) }}
-    {% endcall %}
+    {{ form_rows(form, skip=form._notification_fields) }}
     {% call form_fieldset(_('Notifications')) %}
         {{ form_rows(form, fields=form._notification_fields) }}
     {% endcall %}
