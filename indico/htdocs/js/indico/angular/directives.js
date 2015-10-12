@@ -477,13 +477,12 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
     return {
         require: 'ngModel',
         restrict: 'A',
-        link: function(scope, element) {
+        link: function(scope, element, attrs, ctrl) {
             _.defer(function() {
                 element.datepicker({
                     dateFormat: scope.field.dateFormat,
                     onSelect: function(date) {
-                        element.val(date);
-                        scope.$apply();
+                        ctrl.$setViewValue(date);
                     }
                 });
             });
