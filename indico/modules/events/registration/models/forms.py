@@ -162,6 +162,16 @@ class RegistrationForm(db.Model):
             lazy=True
         )
     )
+    #: The registration invitations associated with this form
+    invitations = db.relationship(
+        'RegistrationInvitation',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'registration_form',
+            lazy=True
+        )
+    )
 
     @hybrid_property
     def has_ended(self):

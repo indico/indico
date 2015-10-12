@@ -54,6 +54,22 @@
                 </a>
             </div>
         </div>
+
+        <div class="section">
+            <div class="icon icon-mail"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Invitations{% endtrans %}
+                </div>
+                {% trans %}Manage invitations to register for your event.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('.invitations', regform) }}" class="i-button icon-settings">
+                    {% trans %}Manage{% endtrans %}
+                </a>
+            </div>
+        </div>
+
         <div class="section">
             <div class="icon icon-coins"></div>
             <div class="text">

@@ -24,6 +24,7 @@ from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
@@ -119,7 +120,19 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
             return jsonify(user=None)
 
 
-class RHRegistrationFormSubmit(RHRegistrationFormBase):
+class InvitationMixin:
+    """Mixin for RHs that accept an invitation token"""
+
+    def _checkParams(self):
+        try:
+            token = request.args['invitation']
+        except KeyError:
+            self.invitation = None
+        else:
+            self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).one()
+
+
+class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
     """Submit a registration form"""
 
     normalize_url_spec = {
@@ -136,7 +149,10 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
 
     def _checkParams(self, params):
         RHRegistrationFormBase._checkParams(self, params)
-        if not self.regform.is_open:
+        InvitationMixin._checkParams(self)
+        if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
+            return redirect(url_for('.display_regform_summary', self.invitation.registration.locator.registrant))
+        elif not self.regform.is_open:
             flash(_('This registration form is not open'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
         elif session.user and self.regform.get_registration(user=session.user):
@@ -156,10 +172,12 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
             for error in form.error_list:
                 flash(error, 'error')
         user_data = {t.name: getattr(session.user, t.name) if session.user else '' for t in PersonalDataType}
+        if self.invitation:
+            user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                currency=event_settings.get(self.event, 'currency'),
-                                               user_data=user_data)
+                                               user_data=user_data, invitation=self.invitation)
 
     def _save_registration(self, data):
         registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))
@@ -171,7 +189,24 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
             form_item.field_impl.save_data(registration, value)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
-        registration.init_state(self.event)
+        registration.init_state(self.event, self.invitation)
+        if self.invitation:
+            self.invitation.state = InvitationState.accepted
+            self.invitation.registration = registration
         db.session.flush()
         logger.info('New registration %s by %s', registration, session.user)
         return registration
+
+
+class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
+    """Decline an invitation to register"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormBase._checkParams(self, params)
+        InvitationMixin._checkParams(self)
+
+    def _process(self):
+        if self.invitation.state == InvitationState.pending:
+            self.invitation.state = InvitationState.declined
+            flash(_("You declined the invitation to register."))
+        return redirect(url_for('event.conferenceDisplay', self.event))

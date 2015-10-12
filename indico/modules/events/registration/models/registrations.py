@@ -182,12 +182,12 @@ class Registration(db.Model):
         full_name = '{} {}'.format(self.first_name, self.last_name)
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, _text=full_name)
 
-    def init_state(self, event):
+    def init_state(self, event, invitation):
         """Initialize state of the object"""
         if self.state is not None:
             raise Exception("The registration already has a state")
         with db.session.no_autoflush:
-            if self.registration_form.moderation_enabled:
+            if self.registration_form.moderation_enabled and (not invitation or not invitation.skip_moderation):
                 self.state = RegistrationState.pending
             elif event_payment_settings.get(event, 'enabled') and self.price:
                 self.state = RegistrationState.unpaid
