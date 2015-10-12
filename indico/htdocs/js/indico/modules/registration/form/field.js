@@ -168,6 +168,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     msg = $T.gettext('There is already a registration with this email address.');
                 } else if (data.conflict == 'user') {
                     msg = $T.gettext('The user associated with this email address is already registered.');
+                } else if (data.conflict == 'no-user') {
+                    msg = $T.gettext('There is no Indico user associated with this email address.');
                 } else if (!data.user) {
                     msg = $T.gettext('The registration will not be associated with any Indico account.');
                 } else if (data.self) {
