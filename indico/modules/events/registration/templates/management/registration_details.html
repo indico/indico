@@ -19,9 +19,12 @@
             {% for field in section.children if field.is_field and (field.is_enabled or field.id in data) %}
                 <dt>{{ field.title }}</dt>
                 <dd>
-                    {%- if field.id in data %}
-                        {{- data[field.id].friendly_data }}
-                    {%- endif %}
+                    {% set value = data[field.id].friendly_data if field.id in data else '' %}
+                    {% if field.input_type == 'file' and value %}
+                        <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ value }}</a>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
                 </dd>
             {% endfor %}
         </dl>

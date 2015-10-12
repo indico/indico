@@ -18,19 +18,21 @@ from __future__ import unicode_literals
 
 import itertools
 import json
+from io import BytesIO
 from uuid import uuid4
 
 from flask import session, request, redirect, jsonify
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
-from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegistrationBase
+from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
+                                                                       RHManageRegFormsBase)
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data
 from MaKaC.common.cache import GenericCache
 
@@ -150,6 +152,31 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration)
+
+
+class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
+    """Download a file attached to a registration"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.field_data.locator.file
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageRegFormsBase._checkParams(self, params)
+        self.field_data = (RegistrationData
+                           .find(RegistrationData.registration_id == request.view_args['registration_id'],
+                                 RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                 RegistrationData.file != None)  # noqa
+                           .options(joinedload('registration').joinedload('registration_form'))
+                           .options(undefer('file'))
+                           .one())
+
+    def _process(self):
+        data = self.field_data
+        metadata = data.file_metadata
+        return send_file(metadata['filename'], BytesIO(data.file), mimetype=metadata['content_type'], conditional=True)
 
 
 class RHRegistrationEdit(RHManageRegistrationBase):

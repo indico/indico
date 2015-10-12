@@ -209,10 +209,10 @@ class RegistrationData(db.Model):
         nullable=False
     )
     #: file contents for a file field
-    file = db.Column(
+    file = db.deferred(db.Column(
         db.LargeBinary,
         nullable=True
-    )
+    ))
     #: metadata of the uploaded file
     file_metadata = db.Column(
         JSON,
@@ -230,12 +230,25 @@ class RegistrationData(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - registration (Registration.data)
+
+    @locator_property
+    def locator(self):
+        # a normal locator doesn't make much sense
+        raise NotImplementedError
+
+    @locator.file
+    def locator(self):
+        """A locator that pointsto the associated file."""
+        if not self.file_metadata:
+            raise Exception('The file locator is only available if there is a file.')
+        return dict(self.registration.locator, field_data_id=self.field_data_id,
+                    filename=self.file_metadata['filename'])
+
     @property
     def friendly_data(self):
         return self.field_data.field.field_impl.get_friendly_data(self)
-
-    # relationship backrefs:
-    # - registration (Registration.data)
 
     @property
     def price(self):
