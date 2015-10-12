@@ -9,7 +9,11 @@
         <dt>{% trans %}Registration ID{% endtrans %}</dt>
         <dd>{{ registration.id }}</dd>
         <dt>{% trans %}Registration date{% endtrans %}</dt>
-        <dd>{{ registration.submitted_dt }}</dd>
+        <dd>{{ registration.submitted_dt | format_datetime }}</dd>
+        {% if registration.user %}
+            <dt>{% trans %}Indico user{% endtrans %}</dt>
+            <dd>{{ registration.user.full_name }}</dd>
+        {% endif %}
     </dl>
 
     {% set data = registration.data_by_field %}
