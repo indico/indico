@@ -96,7 +96,13 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether registrations must be done by logged users
+    #: Whether users must be logged in to register
+    require_login = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    #: Whether registrations must be associated with an Indico account
     require_user = db.Column(
         db.Boolean,
         nullable=False,
@@ -219,7 +225,7 @@ class RegistrationForm(db.Model):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 
     def can_submit(self, user):
-        return self.is_active and (not self.require_user or user) and not self.limit_reached
+        return self.is_active and (not self.require_login or user) and not self.limit_reached
 
     @memoize_request
     def get_registration(self, user=None, uuid=None, email=None):

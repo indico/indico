@@ -113,6 +113,8 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
             return jsonify(conflict='user')
         elif user:
             return jsonify(user=user.full_name, self=(user == session.user))
+        elif self.regform.require_user:
+            return jsonify(conflict='no-user')
         else:
             return jsonify(user=None)
 
@@ -128,7 +130,7 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
 
     def _checkProtection(self):
         RHRegistrationFormBase._checkProtection(self)
-        if self.regform.require_user and not session.user:
+        if self.regform.require_login and not session.user:
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))
 
