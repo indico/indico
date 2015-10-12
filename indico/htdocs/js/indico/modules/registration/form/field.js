@@ -187,10 +187,14 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     }, 250);
 
     function checkEmail(email) {
+        email = email.trim();
+        if (email === $scope.checkedEmail) {
+            return;
+        }
         $scope.emailInfoError = false;
         $scope.emailInfoMessage = email ? $T.gettext('Checking email address...') : '';
+        $scope.checkedEmail = email;
         $scope.$apply();
-        email = email.trim();
         if (email) {
             _checkEmailRemote(email);
         }
