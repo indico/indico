@@ -232,7 +232,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         if (item._type == 'GeneralField' && item.inputType == 'checkbox') {
             if (uservalue) places += 1;
             if (selectedvalue) places -= 1;
-        } else if (item._type == 'GeneralField' && item.inputType == 'yes/no') {
+        } else if (item._type == 'GeneralField' && item.inputType == 'bool') {
             if (uservalue) places += 1;
             if (selectedvalue == 'yes') places -= 1;
         } else if (item._type == 'RadioItem' || item._type == 'AccommodationType') {
@@ -635,11 +635,11 @@ ndRegForm.directive('ndTextareaField', function(url) {
     };
 });
 
-ndRegForm.directive('ndYesnoField', function(url) {
+ndRegForm.directive('ndBoolField', function(url) {
     return {
         require: 'ndField',
         controller: function($scope) {
-            $scope.tplInput = url.tpl('fields/yesno.tpl.html');
+            $scope.tplInput = url.tpl('fields/bool.tpl.html');
         },
 
         link: function(scope) {

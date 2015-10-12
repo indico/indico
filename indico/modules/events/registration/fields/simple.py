@@ -108,7 +108,7 @@ class DateField(RegistrationFormFieldBase):
 
 
 class BooleanField(RegistrationFormBillableField):
-    name = 'yes/no'
+    name = 'bool'
     wtf_field_class = IndicoRadioField
 
     @property
