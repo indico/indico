@@ -195,6 +195,11 @@ class Registration(db.Model):
                 self.state = RegistrationState.complete
 
     @property
+    def can_be_modified(self):
+        regform = self.registration_form
+        return regform.is_modification_open and regform.is_modification_allowed(self)
+
+    @property
     def price(self):
         return sum(data.price for data in self.data)
 
