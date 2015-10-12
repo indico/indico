@@ -16,7 +16,12 @@
 
 from __future__ import unicode_literals
 
+from flask import request, jsonify
+from sqlalchemy.orm import joinedload
+
+from indico.core.db import db
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
+from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.views import WPManageRegistration
 
 
@@ -24,5 +29,27 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
     """Overview of all registration invitations"""
 
     def _process(self):
+        invitations = (RegistrationInvitation.query
+                       .with_parent(self.regform)
+                       .options(joinedload('registration'))
+                       .all())
         return WPManageRegistration.render_template('management/regform_invitations.html', self.event,
-                                                    regform=self.regform)
+                                                    regform=self.regform, invitations=invitations)
+
+
+class RHRegistrationFormDeleteInvitation(RHManageRegFormBase):
+    """Delete a registration invitation"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.invitation
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageRegFormBase._checkParams(self, params)
+        self.invitation = RegistrationInvitation.get_one(request.view_args['invitation_id'])
+
+    def _process(self):
+        db.session.delete(self.invitation)
+        return jsonify(success=True)

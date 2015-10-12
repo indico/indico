@@ -7,5 +7,78 @@
 {% endblock %}
 
 {% block content %}
-    ...
+    <div class="action-box">
+        {% if regform.is_active %}
+            <div class="section">
+                <div class="icon icon-users"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Invite people{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans %}Invite people to register for your event.{% endtrans %}
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    <a class="i-button icon-user">
+                        {% trans %}Invite{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="i-box invitation-list">
+        {{ invitations_block('pending', _('Pending invitations')) }}
+        {{ invitations_block('accepted', _('Accepted invitations')) }}
+        {{ invitations_block('declined', _('Declined invitations')) }}
+    </div>
+
+    <script>
+        $('.js-delete-invitation').on('indico:confirmed', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    $this.closest('tr').remove();
+                }
+            });
+        });
+    </script>
 {% endblock %}
+
+
+{% macro invitations_block(state, title) %}
+    {% set filtered_invitations = invitations | selectattr('state.name', 'equalto', state) | list %}
+    {% if filtered_invitations %}
+        <div class="titled-rule">{{ title }}</div>
+        <table class="invitation-table">
+            {% for invitation in filtered_invitations %}
+                <tr>
+                    <td class="name">
+                        {% if invitation.registration_id is not none %}
+                            <a href="{{ url_for('.registration_details', invitation.registration) }}">{{ invitation.first_name }} {{ invitation.last_name }}</a>
+                        {% else %}
+                            {{ invitation.first_name }} {{ invitation.last_name }}
+                        {% endif %}
+                    </td>
+                    <td class="email">
+                        {{ invitation.email }}
+                    </td>
+                    <td class="actions">
+                        <a class="icon-remove js-delete-invitation"
+                           data-href="{{ url_for('.delete_invitation', invitation) }}"
+                           data-method="DELETE"
+                           data-title="{% trans %}Delete invitation{% endtrans %}"
+                           data-confirm="{% trans %}Do you really want to delete this invitation?{% endtrans %}"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endmacro %}
