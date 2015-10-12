@@ -238,6 +238,14 @@ class RegistrationForm(db.Model):
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 
+    def is_modification_allowed(self, registration):
+        if self.modification_mode == RegistrationFormModificationMode.allowed_always:
+            return True
+        elif self.modification_mode == RegistrationFormModificationMode.allowed_until_payment:
+            return registration.transaction is None
+        else:
+            return False
+
     def can_submit(self, user):
         return self.is_active and (not self.require_login or user)
 
