@@ -1,5 +1,4 @@
 {% extends 'layout/full_content_base.html' %}
-{% from 'message_box.html' import message_box %}
 {% from 'events/registration/management/_reglist.html' import render_registration_list %}
 
 {% block title %}
@@ -31,13 +30,18 @@
             <div class="group left">
                 <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
                 <a href="#" class="i-button icon-remove">{% trans %}Remove{% endtrans %}</a>
-                <a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a>
-                <a href="#" class="i-button icon-tag">{% trans %}Print Badges{% endtrans %}</a>
-                <a href="#" class="i-button icon-attachment">{% trans %}Attachments{% endtrans %}</a>
+            </div>
+            <div class="group left">
                 <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Export{% endtrans %}</a>
                 <ul class="dropdown">
                     <li><a href="#" class="icon-file-pdf">PDF</a></li>
                     <li><a href="#" class="icon-file-excel">CSV</a></li>
+                </ul>
+                <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Actions{% endtrans %}</a>
+                <ul class="dropdown">
+                    <li><a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a></li>
+                    <li><a href="#" class="icon-tag">{% trans %}Print Badges{% endtrans %}</a></li>
+                    <li><a href="#" class="icon-attachment">{% trans %}Attachments{% endtrans %}</a></li>
                 </ul>
             </div>
             <div class="group left">
@@ -48,12 +52,6 @@
                 </a>
             </div>
         </div>
-        {% if registrations %}
-            {{ render_registration_list(registrations, visible_cols_regform_items, special_items) }}
-        {% else %}
-            {%- call message_box('info', fixed_width=true) -%}
-                {% trans %}There are no registrations yet.{% endtrans %}
-            {%- endcall %}
-        {% endif %}
+        {{ render_registration_list(registrations, visible_cols_regform_items, special_items) }}
     </div>
 {% endblock %}

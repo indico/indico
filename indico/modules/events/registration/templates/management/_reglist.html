@@ -1,62 +1,70 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro render_registration_list(registrations, visible_cols_regform_items, special_items) %}
-    <div class="registrations-table-wrapper">
-        <table class="i-table tablesorter">
-            <thead>
-                <tr class="i-table">
-                    <th class="i-table checkbox-column"></th>
-                    <th class="i-table">{% trans %}Full name{% endtrans %}</th>
-                    {% for item in visible_cols_regform_items %}
-                        <th class="i-table">{{ item.title }}</th>
-                    {% endfor %}
-                    {% if 'reg_date' in special_items %}
-                        <th class="i-table" data-sorter="text">{% trans %}Registration date{% endtrans %}</th>
-                    {% endif %}
-                    {% if 'state' in special_items %}
-                        <th class="i-table">{% trans %}Registration state{% endtrans %}</th>
-                    {% endif %}
-                    {% if 'price' in special_items %}
-                        <th class="i-table">{% trans %}Price{% endtrans %}</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for registration in registrations %}
-                    {% set data = registration.data_by_field %}
+    {% if registrations %}
+        <div class="registrations-table-wrapper">
+            <table class="i-table tablesorter">
+                <thead>
                     <tr class="i-table">
-                        <td class="i-table">
-                            <input class="select-row" type="checkbox" name="registrant_id" value="{{ registration.id }}">
-                        </td>
-                        <td class="i-table">
-                            <a href="{{ url_for('.registration_details', registration) }}">
-                                {{- registration.first_name }} {{ registration.last_name -}}
-                            </a>
-                        </td>
+                        <th class="i-table checkbox-column"></th>
+                        <th class="i-table">{% trans %}Full name{% endtrans %}</th>
                         {% for item in visible_cols_regform_items %}
-                            {% if item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
-                                <td class="i-table{%- if data[item.id].data %} icon-checkmark{% endif %}"
-                                    data-text="{{ data[item.id].friendly_data }}"></td>
-                            {% else %}
-                                <td class="i-table">
-                                    {%- if item.id in data %}
-                                        {{- data[item.id].friendly_data }}
-                                    {%- endif %}
-                                </td>
-                            {% endif %}
+                            <th class="i-table">{{ item.title }}</th>
                         {% endfor %}
                         {% if 'reg_date' in special_items %}
-                            <td class="i-table" data-text="{{ registration.submitted_dt }}">
-                                {{- registration.submitted_dt | format_datetime -}}
-                            </td>
+                            <th class="i-table" data-sorter="text">{% trans %}Registration date{% endtrans %}</th>
                         {% endif %}
                         {% if 'state' in special_items %}
-                            <td class="i-table">{{ registration.state.title }}</td>
+                            <th class="i-table">{% trans %}Registration state{% endtrans %}</th>
                         {% endif %}
                         {% if 'price' in special_items %}
-                            <td class="i-table">{{ registration.price }}</td>
+                            <th class="i-table">{% trans %}Price{% endtrans %}</th>
                         {% endif %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for registration in registrations %}
+                        {% set data = registration.data_by_field %}
+                        <tr class="i-table">
+                            <td class="i-table">
+                                <input class="select-row" type="checkbox" name="registrant_id" value="{{ registration.id }}">
+                            </td>
+                            <td class="i-table">
+                                <a href="{{ url_for('.registration_details', registration) }}">
+                                    {{- registration.first_name }} {{ registration.last_name -}}
+                                </a>
+                            </td>
+                            {% for item in visible_cols_regform_items %}
+                                {% if item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
+                                    <td class="i-table{%- if data[item.id].data %} icon-checkmark{% endif %}"
+                                        data-text="{{ data[item.id].friendly_data }}"></td>
+                                {% else %}
+                                    <td class="i-table">
+                                        {%- if item.id in data %}
+                                            {{- data[item.id].friendly_data }}
+                                        {%- endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            {% if 'reg_date' in special_items %}
+                                <td class="i-table" data-text="{{ registration.submitted_dt }}">
+                                    {{- registration.submitted_dt | format_datetime -}}
+                                </td>
+                            {% endif %}
+                            {% if 'state' in special_items %}
+                                <td class="i-table">{{ registration.state.title }}</td>
+                            {% endif %}
+                            {% if 'price' in special_items %}
+                                <td class="i-table">{{ registration.price }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {%- call message_box('info', fixed_width=true) -%}
+            {% trans %}Either there are no registrations yet, or the filtering creteria do not match with any of the existing registrations.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
 {% endmacro %}
