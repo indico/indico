@@ -12,20 +12,18 @@
         <dd>{{ registration.submitted_dt }}</dd>
     </dl>
 
-    {% for item in registration.registration_form.form_items if item.is_section %}
-        {% set data = registration.data_by_field %}
-        <h3>{{ item.title }}</h3>
+    {% set data = registration.data_by_field %}
+    {% for section in registration.registration_form.sections %}
+        <h3>{{ section.title }}</h3>
         <dl class="i-data-list">
-        {% for child_item in item.children %}
-            {% if child_item.type.name == 'field' %}
-                <dt>{{ child_item.title }}</dt>
+            {% for field in section.children if field.is_field and (field.is_enabled or field.id in data) %}
+                <dt>{{ field.title }}</dt>
                 <dd>
-                    {%- if child_item.id in data %}
-                        {{- data[child_item.id].friendly_data }}
+                    {%- if field.id in data %}
+                        {{- data[field.id].friendly_data }}
                     {%- endif %}
                 </dd>
-            {% endif %}
-        {% endfor %}
+            {% endfor %}
         </dl>
     {% endfor %}
     <a href="{{ url_for('.edit_registration', registration) }}" class="i-button big highlight">
