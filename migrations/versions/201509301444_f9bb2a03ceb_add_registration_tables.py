@@ -35,6 +35,7 @@ def upgrade():
         sa.Column('modification_mode', PyIntEnum(RegistrationFormModificationMode), nullable=False),
         sa.Column('modification_end_dt', UTCDateTime, nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.Column('require_login', sa.Boolean(), nullable=False),
         sa.Column('require_user', sa.Boolean(), nullable=False),
         sa.Column('registration_limit', sa.Integer(), nullable=True),
         sa.Column('moderation_enabled', sa.Boolean(), nullable=False),
