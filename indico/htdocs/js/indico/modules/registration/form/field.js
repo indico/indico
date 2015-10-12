@@ -196,7 +196,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             checkEmail($(this).val());
         }, 250));
-        checkEmail($scope.userdata.email);
+        checkEmail($scope.userdata.email || '');
     }
 });
 
