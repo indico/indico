@@ -98,12 +98,18 @@ class SelectField(RegistrationFormBillableField):
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     wtf_field_class = wtforms.BooleanField
+    friendly_data_mapping = {None: '',
+                             True: L_('Yes'),
+                             False: L_('No')}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
         if not data.get('is_billable') or not registration_data.data:
             return 0
         return data.get('price', 0)
+
+    def get_friendly_data(self, registration_data):
+        return self.friendly_data_mapping[registration_data.data]
 
 
 class DateField(RegistrationFormFieldBase):
@@ -121,9 +127,9 @@ class DateField(RegistrationFormFieldBase):
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     wtf_field_class = IndicoRadioField
-    mapping = {None: '',
-               True: L_('Yes'),
-               False: L_('No')}
+    friendly_data_mapping = {None: '',
+                             True: L_('Yes'),
+                             False: L_('No')}
 
     @property
     def wtf_field_kwargs(self):
@@ -137,7 +143,7 @@ class BooleanField(RegistrationFormBillableField):
         return data.get('price', 0) if registration_data.data else 0
 
     def get_friendly_data(self, registration_data):
-        return self.mapping[registration_data.data]
+        return self.friendly_data_mapping[registration_data.data]
 
 
 class PhoneField(RegistrationFormFieldBase):
