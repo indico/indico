@@ -161,7 +161,7 @@
             }
         });
 
-        $('.reglist-filter .js-reset-btn').on('click', function() {
+        $('.js-reset-btn').on('click', function() {
             $('.reglist-filter input:checkbox').prop('checked', false).trigger('change');
         });
 
