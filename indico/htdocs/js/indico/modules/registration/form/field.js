@@ -194,7 +194,6 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         $scope.emailInfoError = false;
         $scope.emailInfoMessage = email ? $T.gettext('Checking email address...') : '';
         $scope.checkedEmail = email;
-        $scope.$apply();
         if (email) {
             _checkEmailRemote(email);
         }
@@ -206,6 +205,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     if ($scope.field.htmlName == 'email') {
         $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             checkEmail($(this).val());
+            $scope.$apply();
         }, 250));
         checkEmail($scope.userdata.email || '');
     }
