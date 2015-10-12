@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request
+from sqlalchemy.orm import contains_eager, defaultload
 
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -57,7 +58,13 @@ class RHManageRegistrationBase(RHManageRegFormBase):
 
     def _checkParams(self, params):
         RHManageRegFormBase._checkParams(self, params)
-        self.registration = Registration.find_one(Registration.id == request.view_args['registration_id'],
-                                                  ~RegistrationForm.is_deleted,
-                                                  _join=Registration.registration_form,
-                                                  _eager=Registration.registration_form)
+        self.registration = (Registration
+                             .find(Registration.id == request.view_args['registration_id'],
+                                   ~RegistrationForm.is_deleted)
+                             .join(Registration.registration_form)
+                             .options(contains_eager(Registration.registration_form)
+                                      .defaultload('form_items')
+                                      .joinedload('children'))
+                             .options(defaultload(Registration.data)
+                                      .joinedload('field_data'))
+                             .one())
