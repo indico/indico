@@ -25,7 +25,7 @@ from wtforms.validators import NumberRange
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase, RegistrationFormBillableField
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.fs import secure_filename
-from indico.util.i18n import _
+from indico.util.i18n import _, L_
 from indico.util.string import crc32, normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import IndicoEmail
@@ -51,6 +51,11 @@ class NumberField(RegistrationFormBillableField):
         if not data.get('is_billable'):
             return 0
         return data.get('price', 0) * int(registration_data.data or 0)
+
+    def get_friendly_data(self, registration_data):
+        if registration_data.data is None:
+            return ''
+        return registration_data.data
 
 
 class TextAreaField(RegistrationFormFieldBase):
@@ -116,6 +121,9 @@ class DateField(RegistrationFormFieldBase):
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     wtf_field_class = IndicoRadioField
+    mapping = {None: '',
+               True: L_('Yes'),
+               False: L_('No')}
 
     @property
     def wtf_field_kwargs(self):
@@ -127,6 +135,9 @@ class BooleanField(RegistrationFormBillableField):
         if not data.get('is_billable'):
             return 0
         return data.get('price', 0) if registration_data.data else 0
+
+    def get_friendly_data(self, registration_data):
+        return self.mapping[registration_data.data]
 
 
 class PhoneField(RegistrationFormFieldBase):
