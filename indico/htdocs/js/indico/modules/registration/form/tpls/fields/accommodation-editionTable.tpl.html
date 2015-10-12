@@ -6,4 +6,8 @@
         config="config.editionTable"
         form-data="formData.accommodationOptions">
     </nd-table>
+
+    <span ng-if="validationStarted && !hasAccommodationOptions()" class="error-message-tag">
+        {{ 'Add at least one item' | i18n }}
+    </span>
 </div>
