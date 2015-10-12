@@ -37,6 +37,11 @@ from indico.modules.events.registration.controllers.management.sections import (
                                                                                 RHRegistrationFormModifySection,
                                                                                 RHRegistrationFormToggleSection,
                                                                                 RHRegistrationFormMoveSection)
+from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationsListManage,
+                                                                                RHRegistrationsListCustomize,
+                                                                                RHRegistrationDetails,
+                                                                                RHRegistrationEdit,
+                                                                                RHRegistrationListStaticURL)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -60,6 +65,17 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/close',
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/schedule',
                  'schedule_regform', RHRegistrationFormSchedule, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform', RHRegistrationFormModify)
+
+# Registrations management
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/', 'manage_reglist', RHRegistrationsListManage)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/customize', 'customize_reglist',
+                 RHRegistrationsListCustomize, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-url',
+                 'generate_static_url', RHRegistrationListStaticURL, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
+                 RHRegistrationDetails)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
+                 RHRegistrationEdit)
 
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated

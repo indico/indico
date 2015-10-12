@@ -1,0 +1,57 @@
+{% extends 'layout/full_content_base.html' %}
+{% from 'events/registration/management/_reglist.html' import render_registration_list %}
+
+{% block title %}
+    {%- trans %}Registrations{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% trans title=regform.title %}List of registrations for "{{ title }}"{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="registrations">
+        <div class="toolbar">
+            <div class="group left">
+                <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
+                   title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
+                    <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
+                </ul>
+            </div>
+            <div class="group left">
+                <button class="i-button icon-settings js-dialog-action"
+                   data-href="{{ url_for('.customize_reglist', regform) }}"
+                   data-title="{% trans %}Customize report{% endtrans %}">
+                    {% trans %}Customize report{% endtrans %}
+                </button>
+            </div>
+            <div class="group left">
+                <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
+                <a href="#" class="i-button icon-remove">{% trans %}Remove{% endtrans %}</a>
+            </div>
+            <div class="group left">
+                <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Export{% endtrans %}</a>
+                <ul class="dropdown">
+                    <li><a href="#" class="icon-file-pdf">PDF</a></li>
+                    <li><a href="#" class="icon-file-excel">CSV</a></li>
+                </ul>
+                <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Actions{% endtrans %}</a>
+                <ul class="dropdown">
+                    <li><a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a></li>
+                    <li><a href="#" class="icon-tag">{% trans %}Print Badges{% endtrans %}</a></li>
+                    <li><a href="#" class="icon-attachment">{% trans %}Attachments{% endtrans %}</a></li>
+                </ul>
+            </div>
+            <div class="group left">
+                <a class="i-button icon-link js-static-url"
+                   data-href="{{ url_for('.generate_static_url', regform) }}"
+                   title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}">
+                   {%- trans %}Static URL{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        {{ render_registration_list(registrations, visible_cols_regform_items, special_items) }}
+    </div>
+{% endblock %}

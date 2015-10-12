@@ -27,12 +27,14 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.payment import event_settings as event_payment_settings
 from indico.util.date_time import now_utc
+from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
 
 
-class RegistrationState(int, IndicoEnum):
+class RegistrationState(TitledIntEnum):
+    __titles__ = [None, L_('Completed'), L_('Pending'), L_('Rejected'), L_('Withdrawn'), L_('Unpaid')]
     complete = 1
     pending = 2
     rejected = 3
@@ -154,6 +156,10 @@ class Registration(db.Model):
             loc['token'] = self.uuid
         return loc
 
+    @property
+    def data_by_field(self):
+        return {x.field_data.field_id: x for x in self.data}
+
     @return_ascii
     def __repr__(self):
         full_name = '{} {}'.format(self.first_name, self.last_name)
@@ -223,6 +229,10 @@ class RegistrationData(db.Model):
             cascade='all, delete-orphan'
         )
     )
+
+    @property
+    def friendly_data(self):
+        return self.field_data.field.field_impl.get_friendly_data(self)
 
     # relationship backrefs:
     # - registration (Registration.data)

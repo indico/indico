@@ -36,9 +36,17 @@ table.i-table {
 tr.i-table {
     border-bottom: 1px solid #E5E5E5;
     border-top: 1px solid #E5E5E5;
+
+    &.selected {
+        background-color: $pastel-blue !important;
+    }
+
+    &:hover {
+        background-color: $light-gray;
+    }
 }
 
-td.i-table {
+td.i-table, th.i-table {
     @include box-sizing(border-box);
     border-left: 2px solid transparent;
     overflow: hidden;
@@ -54,6 +62,10 @@ td.i-table {
 
     & ~ td.i-table {
         border-left: none !important;
+    }
+
+    &.checkbox-column {
+        width: 2.5em;
     }
 }
 
