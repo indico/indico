@@ -206,6 +206,9 @@ class PaymentTransaction(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - registration (Registration.transaction)
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder

@@ -79,6 +79,14 @@ class Registration(db.Model):
         index=True,
         nullable=True
     )
+    #: The ID of the latest payment transaction associated with this registration
+    transaction_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.payment_transactions.id'),
+        index=True,
+        unique=True,
+        nullable=True
+    )
     #: The state a registration is in
     state = db.Column(
         PyIntEnum(RegistrationState),
@@ -114,6 +122,15 @@ class Registration(db.Model):
             'registrations',
             lazy='dynamic',
             cascade='all, delete-orphan'
+        )
+    )
+    #: The latest payment transaction associated with this registration
+    transaction = db.relationship(
+        'PaymentTransaction',
+        lazy=True,
+        backref=db.backref(
+            'registration',
+            lazy=True
         )
     )
     #: The registration this data is associated with
