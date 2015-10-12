@@ -683,6 +683,42 @@ ndRegForm.directive('ndAccommodationField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/accommodation.tpl.html');
+            $scope.areArrivalDatesValid = function(data) {
+                return moment(data['arrivalDateTo'], "DD-MM-YYYY")
+                        .isAfter(moment(data['arrivalDateFrom'], "DD-MM-YYYY"));
+            };
+
+            $scope.areDepartureDatesValid = function(data) {
+                return moment(data['departureDateTo'], "DD-MM-YYYY")
+                        .isAfter(moment(data['departureDateFrom'], "DD-MM-YYYY"))
+            };
+
+            $scope.areAccommodationOptionsDefined = function(data) {
+                return data.accommodationOptions && data.accommodationOptions.length !== 0;
+            };
+
+            $scope.validateFieldSettings = function(dialogScope) {
+                var data = dialogScope.formData;
+                if (!$scope.areArrivalDatesValid(data)) {
+                    dialogScope.setSelectedTab('tab-accommodation');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                if (!$scope.areDepartureDatesValid(data)) {
+                    dialogScope.setSelectedTab('tab-accommodation');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                if (!$scope.areAccommodationOptionsDefined(data)) {
+                    dialogScope.setSelectedTab('tab-accommodation-options');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                return true;
+            };
         },
         link: function(scope) {
             scope.settings.accommodationField = true;
@@ -909,6 +945,18 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 return _.any(scope.formData.choices, function(item) {
                     return item.remove !== true;
                 });
+            };
+
+            scope.arrivalDatesValid = function() {
+                return scope.$parent.areArrivalDatesValid(scope.formData);
+            };
+
+            scope.departureDatesValid = function() {
+                return scope.$parent.areDepartureDatesValid(scope.formData);
+            };
+
+            scope.hasAccommodationOptions = function() {
+                return scope.$parent.areAccommodationOptionsDefined(scope.formData);
             };
         }
     };
