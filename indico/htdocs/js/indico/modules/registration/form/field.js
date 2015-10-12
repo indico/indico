@@ -157,12 +157,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         }
     };
 
-    function checkEmail(email) {
-        $scope.emailInfoMessage = '';
-        email = email.trim();
-        if (!email) {
-            return;
-        }
+    var _checkEmailRemote = _.debounce(function _checkEmailRemote(email) {
         $.ajax({
             url: $scope.checkEmailUrl,
             data: {email: email},
@@ -174,7 +169,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 } else if (data.conflict == 'user') {
                     msg = $T.gettext('The user associated with this email address is already registered.');
                 } else if (!data.user) {
-                    msg = $T.gettext('The registration will not be associated with any indico account.');
+                    msg = $T.gettext('The registration will not be associated with any Indico account.');
                 } else if (data.self) {
                     msg = $T.gettext('The registration will be associated with your Indico account.');
                 } else {
@@ -187,6 +182,16 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 $scope.$apply();
             }
         });
+    }, 250);
+
+    function checkEmail(email) {
+        $scope.emailInfoError = false;
+        $scope.emailInfoMessage = email ? $T.gettext('Checking email address...') : '';
+        $scope.$apply();
+        email = email.trim();
+        if (email) {
+            _checkEmailRemote(email);
+        }
     }
 
     $scope.fieldName = $scope.field.htmlName;
