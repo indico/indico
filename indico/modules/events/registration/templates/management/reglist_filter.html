@@ -3,7 +3,7 @@
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     {% for child_item in section.children if child_item.is_field %}
-        {% set has_dropdown = child_item.input_type in ['radio', 'country'] %}
+        {% set has_dropdown = child_item.input_type in ['radio', 'country', 'bool'] %}
         <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
              data-id="{{ child_item.id }}">
             <span class="title {% if has_dropdown %}icon-filter{% endif %}"
@@ -12,14 +12,22 @@
             </span>
             {% if has_dropdown %}
                 <ul class="dropdown" style="display: none">
-                    {% for id, caption in child_item.versioned_radioitems.iteritems() %}
+                    {% if child_item.input_type in ['radio', 'country'] %}
+                        {% set options = child_item.versioned_radioitems.iteritems() %}
+                    {% elif child_item.input_type == 'bool' %}
+                        {% set options = child_item.field_impl.mapping.iteritems() %}
+                    {% endif %}
+                    {% for value, caption in options if value is not none%}
+                        {% if child_item.input_type == 'bool' %}
+                            {% set value = value | string | lower %}
+                        {% endif %}
                         <li>
-                            <input type="checkbox" name="radiogroup_{{ child_item.id }}" value="{{ id }}"
-                                   id="{{ id }}"
-                                   {% if id in filters %}
+                            <input type="checkbox" name="field_{{ child_item.id }}" value="{{ value }}"
+                                   id="{{ value }}"
+                                   {% if value in filters %}
                                        checked
                                    {% endif %}>
-                            <label for="{{ id }}">
+                            <label for="{{ value }}">
                                 {{ caption }}
                             </label>
                         </li>
