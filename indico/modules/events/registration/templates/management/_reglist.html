@@ -32,11 +32,16 @@
                             </a>
                         </td>
                         {% for item in visible_cols_regform_items %}
-                            <td class="i-table">
-                                {%- if item.id in data %}
-                                    {{- data[item.id].friendly_data }}
-                                {%- endif %}
-                            </td>
+                            {% if item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
+                                <td class="i-table{%- if data[item.id].data %} icon-checkmark{% endif %}"
+                                    data-text="{{ data[item.id].friendly_data }}"></td>
+                            {% else %}
+                                <td class="i-table">
+                                    {%- if item.id in data %}
+                                        {{- data[item.id].friendly_data }}
+                                    {%- endif %}
+                                </td>
+                            {% endif %}
                         {% endfor %}
                         {% if 'reg_date' in special_items %}
                             <td class="i-table" data-text="{{ registration.submitted_dt }}">
