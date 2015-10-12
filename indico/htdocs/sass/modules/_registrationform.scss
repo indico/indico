@@ -1304,3 +1304,66 @@ textarea.regFormDescriptionInputMgmt {
         }
     }
 }
+
+
+.invitation-list {
+    .invitation-table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+
+        td {
+            padding: 0.35rem 5px 0.35rem 0;
+
+            &:first-child {
+                padding-left: 5px;
+            }
+
+            &.name {
+                font-weight: bold;
+                width: 45%;
+            }
+
+            &.email {
+                width: 53%;
+            }
+
+            &.actions {
+                font-size: 1.2em;
+                padding: 0 5px;
+                width: 2%;
+                white-space: nowrap;
+
+                a {
+                    color: $dark-gray;
+                    vertical-align: sub;
+                    visibility: hidden;
+
+                    &:hover {
+                        color: $blue;
+                    }
+                }
+            }
+        }
+
+        tr:nth-child(odd) > td {
+            background: $light-gray;
+        }
+
+        tr:hover > td {
+            background: $light-blue !important;
+
+            &.actions a {
+                visibility: visible;
+            }
+        }
+
+        &:not(:last-child) {
+            margin-bottom: 2em;
+        }
+    }
+
+    .titled-rule {
+        margin-top: 0;
+    }
+}
