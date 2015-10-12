@@ -136,8 +136,8 @@ class RHRegistrationFormSubmit(RHRegistrationFormBase):
 
     def _checkParams(self, params):
         RHRegistrationFormBase._checkParams(self, params)
-        if not self.regform.is_active:
-            flash(_('This registration form is not active'), 'error')
+        if not self.regform.is_open:
+            flash(_('This registration form is not open'), 'error')
             return redirect(url_for('.display_regform_list', self.event))
         elif session.user and self.regform.get_registration(user=session.user):
             flash(_('You have already registered with this form'), 'error')

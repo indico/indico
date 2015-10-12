@@ -36,7 +36,7 @@
                                title="{% trans %}You have already registered{% endtrans %}">
                                 {% trans %}Register{% endtrans %}
                             </a>
-                        {% elif not regform.is_active %}
+                        {% elif not regform.is_open %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}Registrations are closed{% endtrans %}">
                                 {% trans %}Register{% endtrans %}

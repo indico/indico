@@ -3,8 +3,8 @@
 {% block content %}
     {% if not regform.has_started %}
         {% include 'events/registration/management/regform_actions/not_started.html' %}
-    {% elif regform.is_active %}
-        {% include 'events/registration/management/regform_actions/active.html' %}
+    {% elif regform.is_open %}
+        {% include 'events/registration/management/regform_actions/open.html' %}
     {% elif regform.has_ended %}
         {% include 'events/registration/management/regform_actions/ended.html' %}
     {% endif %}
