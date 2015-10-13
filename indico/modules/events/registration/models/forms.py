@@ -28,7 +28,7 @@ from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
-class RegistrationFormModificationMode(int, IndicoEnum):
+class ModificationMode(int, IndicoEnum):
     allowed_always = 1
     allowed_until_payment = 2
     not_allowed = 3
@@ -81,9 +81,9 @@ class RegistrationForm(db.Model):
     )
     #: Whether registration modifications are allowed
     modification_mode = db.Column(
-        PyIntEnum(RegistrationFormModificationMode),
+        PyIntEnum(ModificationMode),
         nullable=False,
-        default=RegistrationFormModificationMode.not_allowed
+        default=ModificationMode.not_allowed
     )
     #: Datetime when the modification period is over
     modification_end_dt = db.Column(
@@ -239,9 +239,9 @@ class RegistrationForm(db.Model):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
 
     def is_modification_allowed(self, registration):
-        if self.modification_mode == RegistrationFormModificationMode.allowed_always:
+        if self.modification_mode == ModificationMode.allowed_always:
             return True
-        elif self.modification_mode == RegistrationFormModificationMode.allowed_until_payment:
+        elif self.modification_mode == ModificationMode.allowed_until_payment:
             return registration.transaction is None
         else:
             return False

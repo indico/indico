@@ -12,7 +12,7 @@ from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
-from indico.modules.events.registration.models.forms import RegistrationFormModificationMode
+from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.registrations import RegistrationState
 
 
@@ -32,7 +32,7 @@ def upgrade():
         sa.Column('contact_info', sa.String(), nullable=False),
         sa.Column('start_dt', UTCDateTime, nullable=True),
         sa.Column('end_dt', UTCDateTime, nullable=True),
-        sa.Column('modification_mode', PyIntEnum(RegistrationFormModificationMode), nullable=False),
+        sa.Column('modification_mode', PyIntEnum(ModificationMode), nullable=False),
         sa.Column('modification_end_dt', UTCDateTime, nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('require_login', sa.Boolean(), nullable=False),
