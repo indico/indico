@@ -3299,6 +3299,7 @@ div.timetableContribution  {
 
 .timetableBlock {
     box-shadow: 0px 0px 5px #DDD;
+    min-height: 26px;
 }
 
 /* Timetable drag n drop */
