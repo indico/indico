@@ -110,7 +110,6 @@
                         $('.js-add-entry-dropdown').dropdown();
 
                         $('.add-link, .add-page').ajaxDialog({
-                            title: function() { return $(this).data('title'); },
                             onClose: function(data) { _addNewEntry(data, 'nestable allow-nested'); }
                         });
                         $('.add-separator').on('click', function addSeparator (evt) {
