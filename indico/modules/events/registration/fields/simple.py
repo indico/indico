@@ -82,6 +82,10 @@ class SingleChoiceField(RegistrationFormBillableField):
         # only use the default item if it exists in the current version
         return default_item if any(x['id'] == default_item for x in versioned_data['choices']) else None
 
+    @property
+    def filter_choices(self):
+        return self.form_item.data['captions']
+
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super(SingleChoiceField, cls).process_field_data(data, old_data,
@@ -138,6 +142,10 @@ class CheckboxField(RegistrationFormBillableField):
     def get_friendly_data(self, registration_data):
         return self.friendly_data_mapping[registration_data.data]
 
+    @property
+    def filter_choices(self):
+        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems() if val is not None}
+
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
@@ -164,6 +172,10 @@ class BooleanField(RegistrationFormBillableField):
     def wtf_field_kwargs(self):
         return {'choices': [(True, _('Yes')), (False, _('No'))],
                 'coerce': lambda x: {'yes': True, 'no': False}.get(x, None)}
+
+    @property
+    def filter_choices(self):
+        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems() if val is not None}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
@@ -192,6 +204,10 @@ class CountryField(RegistrationFormFieldBase):
     @property
     def view_data(self):
         return {'choices': [{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()]}
+
+    @property
+    def filter_choices(self):
+        return dict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data):
         return CountryHolder.getCountries()[registration_data.data]
