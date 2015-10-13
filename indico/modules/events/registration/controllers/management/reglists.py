@@ -109,11 +109,10 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
     def _process_GET(self):
         session_key = 'reglist_config_{}'.format(self.regform.id)
         reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
-        filters = set(itertools.chain.from_iterable(reg_list_config['filters'].itervalues()))
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
                                                     visible_cols_regform_items=reg_list_config['items'],
-                                                    filters=filters)
+                                                    filters=reg_list_config['filters'])
 
     def _process_POST(self):
         filters = _get_filters_from_request(self.regform)
