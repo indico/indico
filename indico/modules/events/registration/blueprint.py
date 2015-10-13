@@ -26,6 +26,7 @@ from indico.modules.events.registration.controllers.management.fields import (RH
                                                                               RHRegistrationFormMoveField,
                                                                               RHRegistrationFormAddField)
 from indico.modules.events.registration.controllers.management.invitations import (RHRegistrationFormInvitations,
+                                                                                   RHRegistrationFormInvite,
                                                                                    RHRegistrationFormDeleteInvitation)
 from indico.modules.events.registration.controllers.management.regforms import (RHManageRegistrationForms,
                                                                                 RHRegistrationFormCreate,
@@ -86,6 +87,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
 
 # Invitation management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'invite', RHRegistrationFormInvite,
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
                  RHRegistrationFormDeleteInvitation, methods=('DELETE',))
 

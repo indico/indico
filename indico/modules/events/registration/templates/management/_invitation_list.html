@@ -1,0 +1,39 @@
+{% macro render_invitation_list(invitations) %}
+    {{ _render_invitations_block(invitations, 'pending', _('Pending invitations')) }}
+    {{ _render_invitations_block(invitations, 'accepted', _('Accepted invitations')) }}
+    {{ _render_invitations_block(invitations, 'declined', _('Declined invitations')) }}
+{% endmacro %}
+
+
+{% macro _render_invitations_block(invitations, state, title) %}
+    {% set filtered_invitations = invitations | selectattr('state.name', 'equalto', state) | list %}
+    {% if filtered_invitations %}
+        <div class="titled-rule">{{ title }}</div>
+        <table class="invitation-table">
+            {% for invitation in filtered_invitations %}
+                <tr>
+                    <td class="name">
+                        {% if invitation.registration_id is not none %}
+                            <a href="{{ url_for('.registration_details', invitation.registration) }}">{{ invitation.first_name }} {{ invitation.last_name }}</a>
+                        {% else %}
+                            {{ invitation.first_name }} {{ invitation.last_name }}
+                        {% endif %}
+                    </td>
+                    <td class="email">
+                        {{ invitation.email }}
+                    </td>
+                    <td class="affiliation">
+                        {{ invitation.affiliation }}
+                    </td>
+                    <td class="actions">
+                        <a class="icon-remove js-delete-invitation"
+                           data-href="{{ url_for('.delete_invitation', invitation) }}"
+                           data-method="DELETE"
+                           data-title="{% trans %}Delete invitation{% endtrans %}"
+                           data-confirm="{% trans %}Do you really want to delete this invitation?{% endtrans %}"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endmacro %}

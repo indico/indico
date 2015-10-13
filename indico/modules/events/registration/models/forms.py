@@ -167,7 +167,6 @@ class RegistrationForm(db.Model):
         'RegistrationInvitation',
         lazy=True,
         cascade='all, delete-orphan',
-        order_by='RegistrationInvitation.first_name, RegistrationInvitation.last_name, RegistrationInvitation.id',
         backref=db.backref(
             'registration_form',
             lazy=True

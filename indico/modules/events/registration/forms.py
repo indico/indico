@@ -16,14 +16,17 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField
-from wtforms.validators import DataRequired, NumberRange, Optional
+from flask import session
+from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 
+from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoDateTimeField, EmailListField
+from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField
 from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
 
 class RegistrationFormForm(IndicoForm):
@@ -64,3 +67,77 @@ class RegistrationFormScheduleForm(IndicoForm):
         regform = kwargs.pop('regform')
         self.timezone = regform.event.tz
         super(IndicoForm, self).__init__(*args, **kwargs)
+
+
+class _UsersField(PrincipalListField):
+    def __init__(self, *args, **kwargs):
+        super(_UsersField, self).__init__(*args, allow_external=True, serializable=True, **kwargs)
+
+    def _convert_principal(self, principal):
+        return principal
+
+    def _value(self):
+        return self._get_data()
+
+    def pre_validate(self, form):
+        pass
+
+
+class InvitationFormBase(IndicoForm):
+    _invitation_fields = ('skip_moderation',)
+    _email_fields = ('email_from', 'email_body')
+    email_from = SelectField(_('From'), [DataRequired()])
+    email_body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
+    skip_moderation = BooleanField(_("Skip moderation"), widget=SwitchWidget(),
+                                   description=_("If enabled, the user's registration will be approved automatically."))
+
+    def __init__(self, *args, **kwargs):
+        self.regform = kwargs.pop('regform')
+        super(InvitationFormBase, self).__init__(*args, **kwargs)
+        if not self.regform.moderation_enabled:
+            del self.skip_moderation
+        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
+                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
+        self.email_from.choices = zip(from_addresses, from_addresses)
+
+
+class InvitationFormNew(InvitationFormBase):
+    _invitation_fields = ('first_name', 'last_name', 'email', 'affiliation') + InvitationFormBase._invitation_fields
+    first_name = StringField(_('First name'), [DataRequired()],
+                             description=_("The first name of the user you are inviting."))
+    last_name = StringField(_('Last name'), [DataRequired()],
+                            description=_("The last name of the user you are inviting."))
+    email = EmailField(_('Email'), [DataRequired()], filters=[lambda x: x.lower() if x else x],
+                       description=_("The invitation will be sent to this address."))
+    affiliation = StringField(_('Affiliation'),
+                              description=_("The affiliation of the user you are inviting."))
+
+    @generated_data
+    def users(self):
+        return [{'first_name': self.first_name.data,
+                 'last_name': self.last_name.data,
+                 'email': self.email.data,
+                 'affiliation': self.affiliation.data}]
+
+    def validate_email(self, field):
+        if RegistrationInvitation.find(email=field.data).with_parent(self.regform).count():
+            raise ValidationError(_("There is already an invitation with this email address."))
+
+
+class InvitationFormExisting(InvitationFormBase):
+    _invitation_fields = ('users_field',) + InvitationFormBase._invitation_fields
+    users_field = _UsersField(_('Users'), [DataRequired()], description=_("Select the users to invite."))
+
+    @generated_data
+    def users(self):
+        return [{'first_name': x['firstName'],
+                 'last_name': x['familyName'],
+                 'email': x['email'].lower(),
+                 'affiliation': x['affiliation']}
+                for x in self.users_field.data]
+
+    def validate_users_field(self, field):
+        existing = {x.email for x in self.regform.invitations} & {x['email'].lower() for x in field.data}
+        if existing:
+            raise ValidationError(_("There are already invitations for the following email addresses: {emails}")
+                                  .format(emails=', '.join(sorted(existing))))

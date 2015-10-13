@@ -1,0 +1,30 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+from flask import session
+
+from indico.core.notifications import make_email, send_email
+from indico.web.flask.templating import get_template_module
+
+
+def notify_invitation(invitation, email_body, from_address):
+    """Send a notification about a new registration invitation."""
+    # TODO: placeholders
+    template = get_template_module('events/registration/emails/invitation.html', email_body=email_body)
+    email = make_email(invitation.email, from_address=from_address, template=template, html=True)
+    send_email(email, invitation.registration_form.event_new, 'Registration', session.user)

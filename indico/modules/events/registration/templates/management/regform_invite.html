@@ -1,0 +1,13 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
+
+{{ form_header(form) }}
+{% call form_fieldset(_('Invitation details')) %}
+    {{ form_rows(form, fields=form._invitation_fields) }}
+{% endcall %}
+{% call form_fieldset(_('Email')) %}
+    {{ form_rows(form, fields=form._email_fields) }}
+{% endcall %}
+{% call form_footer(form) %}
+    <input class="i-button big highlight" type="submit" value="{% trans %}Send{% endtrans %}" data-disabled-until-change>
+    <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+{% endcall %}
