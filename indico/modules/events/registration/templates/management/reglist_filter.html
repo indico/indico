@@ -3,24 +3,15 @@
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     {% for child_item in section.children if child_item.is_field %}
-        {% set has_dropdown = child_item.input_type in ['single_choice', 'country', 'bool', 'checkbox'] %}
-        <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
+        <div class="i-label reglist-column js-regform-item {%- if child_item.filter_choices %} filter{% endif %}"
              data-id="{{ child_item.id }}">
-            <span class="title {% if has_dropdown %}icon-filter{% endif %}"
+            <span class="title {% if child_item.filter_choices %}icon-filter{% endif %}"
                   data-toggle="dropdown">
                 {{- child_item.title -}}
             </span>
-            {% if has_dropdown %}
+            {% if child_item.filter_choices %}
                 <ul class="dropdown" style="display: none">
-                    {% elif child_item.input_type in ['bool', 'checkbox'] %}
-                        {% set options = child_item.field_impl.friendly_data_mapping.iteritems() %}
-                    {% elif child_item.input_type == 'country' %}
-                        {% set options = child_item.field_impl.wtf_field_kwargs['choices'] %}
-                    {% endif %}
-                    {% for value, caption in options if value is not none %}
-                        {% if child_item.input_type in ['bool', 'checkbox'] %}
-                            {% set value = value | string | lower %}
-                        {% endif %}
+                    {% for value, caption in child_item.filter_choices.iteritems() %}
                         <li>
                             <input type="checkbox" name="field_{{ child_item.id }}" value="{{ value }}"
                                    id="field_{{ child_item.id }}_option_{{ value }}"
