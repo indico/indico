@@ -872,12 +872,17 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                         $scope.formData.choices[ind] = angular.copy(item);
                     });
                 } else if ($scope.field.inputType == 'accommodation') {
-                    var field = $scope.field;
+                    var field = $scope.field,
+                        eventSDate = $scope.$parent.confSdate
+                        eventEDate = $scope.$parent.confEdate;
                     $scope.formData.accommodationOptions = [];
-                    $scope.formData.arrivalDateFrom = $scope.field.arrivalDateFrom;
-                    $scope.formData.arrivalDateTo = $scope.field.arrivalDateTo;
-                    $scope.formData.departureDateFrom = $scope.field.departureDateFrom;
-                    $scope.formData.departureDateTo = $scope.field.departureDateTo;
+                    $scope.formData.arrivalDateFrom = $scope.field.arrivalDateFrom
+                                                        || moment(eventSDate).subtract(2, 'days').format('DD/MM/YYYY');
+                    $scope.formData.arrivalDateTo = $scope.field.arrivalDateTo || moment(eventEDate).format('DD/MM/YYYY');
+                    $scope.formData.departureDateFrom = $scope.field.departureDateFrom
+                                                        || moment(eventSDate).add(1, 'days').format('DD/MM/YYYY');
+                    $scope.formData.departureDateTo = $scope.field.departureDateTo
+                                                        || moment(eventEDate).add(3, 'days').format('DD/MM/YYYY');
                     _.each(field.accommodationOptions, function(item, ind) {
                         $scope.formData.accommodationOptions[ind] = angular.copy(item);
                     });
