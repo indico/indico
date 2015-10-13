@@ -180,6 +180,16 @@ class RegistrationForm(db.Model):
         return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
 
     @hybrid_property
+    def is_modification_open(self):
+        end_dt = self.modification_end_dt if self.modification_end_dt else self.end_dt
+        return now_utc() <= end_dt if end_dt else True
+
+    @is_modification_open.expression
+    def is_modification_open(self):
+        now = now_utc()
+        return now <= db.func.coalesce(self.modification_end_dt, self.end_dt, now)
+
+    @hybrid_property
     def is_open(self):
         return not self.is_deleted and self.has_started and not self.has_ended
 
