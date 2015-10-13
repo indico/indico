@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import itertools
 import json
 from io import BytesIO
 from uuid import uuid4
@@ -26,6 +25,7 @@ from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
@@ -216,3 +216,17 @@ class RHRegistrationEmailRegistrants(RHManageRegFormBase):
             flash(_("Emails sent"), 'success')
             return jsonify_data()
         return WPManageRegistration.render_template('management/email.html', form=form)
+
+
+class RHRegistrationDelete(RHManageRegFormBase):
+    """Delete selected registrations"""
+
+    def _process(self):
+        ids = set(request.form.getlist('registration_ids'))
+        registrations = Registration.find(Registration.id.in_(ids)).with_parent(self.regform).all()
+        for registration in registrations:
+            registration.is_deleted = True
+            logger.info('Registration {} deleted by {}'.format(registration, session.user))
+            # TODO: Signal for deletion?
+        flashed_messages = flash(_("Registrations \"{ids}\" were deleted").format(ids=",".join(ids)), 'success')
+        return jsonify_data(flashed_messages=flashed_messages)
