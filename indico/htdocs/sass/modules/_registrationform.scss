@@ -1321,11 +1321,15 @@ textarea.regFormDescriptionInputMgmt {
 
             &.name {
                 font-weight: bold;
-                width: 45%;
+                width: 34%;
             }
 
             &.email {
-                width: 53%;
+                width: 34%;
+            }
+
+            &.affiliation {
+                width: 30%;
             }
 
             &.actions {

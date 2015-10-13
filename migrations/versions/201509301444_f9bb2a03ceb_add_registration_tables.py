@@ -146,7 +146,7 @@ def upgrade():
         sa.Column('last_name', sa.String(), nullable=False),
         sa.Column('affiliation', sa.String(), nullable=False),
         sa.CheckConstraint('(state = 1) OR (registration_id IS NULL)', name='registration_state'),
-        sa.Index(None, 'registration_form_id', 'email', unique=True, postgresql_where=sa.text('state = 0')),
+        sa.UniqueConstraint('registration_form_id', 'email'),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['registration_id'], ['event_registration.registrations.id']),
         sa.PrimaryKeyConstraint('id'),

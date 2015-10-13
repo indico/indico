@@ -40,8 +40,7 @@ class RegistrationInvitation(db.Model):
     __tablename__ = 'invitations'
     __table_args__ = (db.CheckConstraint("(state = {state}) OR (registration_id IS NULL)"
                                          .format(state=InvitationState.accepted), name='registration_state'),
-                      db.Index(None, 'registration_form_id', 'email', unique=True,
-                               postgresql_where=db.text('state = {state}'.format(state=InvitationState.pending))),
+                      db.UniqueConstraint('registration_form_id', 'email'),
                       {'schema': 'event_registration'})
 
     #: The ID of the invitation
@@ -75,7 +74,8 @@ class RegistrationInvitation(db.Model):
     #: The state of the invitation
     state = db.Column(
         PyIntEnum(InvitationState),
-        nullable=False
+        nullable=False,
+        default=InvitationState.pending
     )
     #: Whether registration moderation should be skipped
     skip_moderation = db.Column(
