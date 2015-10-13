@@ -108,6 +108,15 @@
         $('#select-none').on('click', function() {
             $('table.i-table input.select-row').prop('checked', false).trigger('change');
         });
+
+        $('.js-dialog-send-email').ajaxDialog({
+            getExtraData: function() {
+                var ids = $('.registrations input:checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                return {registration_ids: ids};
+            }
+        });
     }
 
     function colorizeSelectedRows() {

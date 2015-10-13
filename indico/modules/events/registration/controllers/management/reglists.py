@@ -21,16 +21,19 @@ import json
 from io import BytesIO
 from uuid import uuid4
 
-from flask import session, request, redirect, jsonify
+from flask import session, request, redirect, jsonify, flash
 from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
+from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.events.registration.forms import EmailRegistrantsForm
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data
@@ -185,3 +188,32 @@ class RHRegistrationEdit(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_modify.html', self.event,
                                                     registration=self.registration)
+
+
+class RHRegistrationEmailRegistrants(RHManageRegFormBase):
+    """Send email to selected registrants"""
+
+    def _checkParams(self, params):
+        self._doNotSanitizeFields.append('from_address')
+        RHManageRegFormBase._checkParams(self, params)
+
+    def _get_people(self):
+        ids = set(request.form.getlist('registration_ids'))
+        return Registration.find(Registration.id.in_(ids)).with_parent(self.regform).all()
+
+    def _send_emails(self, form):
+        people = self._get_people()
+        for person in people:
+            template = get_template_module('events/registration/emails/custom_email.html',
+                                           email_subject=form.subject.data, email_body=form.body.data)
+            email = make_email(to_list=person.email, cc_list=form.cc_addresses.data,
+                               from_address=form.from_address.data, template=template, html=True)
+            send_email(email, self.event, 'Registration')
+
+    def _process(self):
+        form = EmailRegistrantsForm()
+        if form.validate_on_submit():
+            self._send_emails(form)
+            flash(_("Emails sent"), 'success')
+            return jsonify_data()
+        return WPManageRegistration.render_template('management/email.html', form=form)

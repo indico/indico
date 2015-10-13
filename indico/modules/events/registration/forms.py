@@ -158,3 +158,17 @@ class InvitationFormExisting(InvitationFormBase):
         if existing:
             raise ValidationError(_("There are already registrations with the following email addresses: {emails}")
                                   .format(emails=', '.join(sorted(existing))))
+
+
+class EmailRegistrantsForm(IndicoForm):
+    from_address = SelectField(_("From"), [DataRequired()])
+    cc_addresses = EmailField(_("CC"),
+                              description=_("Beware, addresses in this field will receive one mail per registrant."))
+    subject = StringField(_("Subject"), [DataRequired()])
+    body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
+
+    def __init__(self, *args, **kwargs):
+        super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
+        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
+                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
+        self.from_address.choices = zip(from_addresses, from_addresses)
