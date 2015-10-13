@@ -447,6 +447,13 @@ ndRegForm.directive('ndRadioField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/radio.tpl.html');
+
+            $scope.initFormData = function(formData, field) {
+                formData.choices = [];
+                _.each(field.choices, function(item, ind) {
+                    formData.choices[ind] = angular.copy(item);
+                });
+            };
         },
 
         link: function(scope) {
@@ -719,6 +726,19 @@ ndRegForm.directive('ndAccommodationField', function(url) {
 
                 return true;
             };
+
+            $scope.initFormData = function(formData, field) {
+                var eventStartDate = $scope.confSdate
+                    eventEndDate = $scope.confEdate;
+                formData.accommodationOptions = [];
+                formData.arrivalDateFrom = field.arrivalDateFrom || moment(eventStartDate).subtract(2, 'days').format('DD-MM-YYYY');
+                formData.arrivalDateTo = field.arrivalDateTo || moment(eventEndDate).format('DD-MM-YYYY');
+                formData.departureDateFrom = field.departureDateFrom || moment(eventStartDate).add(1, 'days').format('DD-MM-YYYY');
+                formData.departureDateTo = field.departureDateTo || moment(eventEndDate).add(3, 'days').format('DD-MM-YYYY');
+                _.each(field.accommodationOptions, function(item, ind) {
+                    formData.accommodationOptions[ind] = angular.copy(item);
+                });
+            };
         },
         link: function(scope) {
             scope.settings.accommodationField = true;
@@ -737,7 +757,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
 
             function updateAccommodationPostData(fieldName, value) {
                 var accommodationField = $('[name=field_{0}]'.format(scope.field.id)),
-                    accommodationData =  accommodationField.val() ? JSON.parse(accommodationField.val()) : {};
+                    accommodationData = accommodationField.val() ? JSON.parse(accommodationField.val()) : {};
                 accommodationData[fieldName] = value;
                 accommodationField.val(JSON.stringify(accommodationData));
             }
@@ -866,26 +886,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     }
                 });
 
-                if ($scope.field.inputType == 'single_choice') {
-                    $scope.formData.choices = [];
-                    _.each($scope.field.choices, function(item, ind) {
-                        $scope.formData.choices[ind] = angular.copy(item);
-                    });
-                } else if ($scope.field.inputType == 'accommodation') {
-                    var field = $scope.field,
-                        eventSDate = $scope.$parent.confSdate
-                        eventEDate = $scope.$parent.confEdate;
-                    $scope.formData.accommodationOptions = [];
-                    $scope.formData.arrivalDateFrom = $scope.field.arrivalDateFrom
-                                                        || moment(eventSDate).subtract(2, 'days').format('DD/MM/YYYY');
-                    $scope.formData.arrivalDateTo = $scope.field.arrivalDateTo || moment(eventEDate).format('DD/MM/YYYY');
-                    $scope.formData.departureDateFrom = $scope.field.departureDateFrom
-                                                        || moment(eventSDate).add(1, 'days').format('DD/MM/YYYY');
-                    $scope.formData.departureDateTo = $scope.field.departureDateTo
-                                                        || moment(eventEDate).add(3, 'days').format('DD/MM/YYYY');
-                    _.each(field.accommodationOptions, function(item, ind) {
-                        $scope.formData.accommodationOptions[ind] = angular.copy(item);
-                    });
+                if ($.isFunction($scope.$parent.initFormData)) {
+                    $scope.$parent.initFormData($scope.formData, $scope.field);
                 }
 
                 $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
