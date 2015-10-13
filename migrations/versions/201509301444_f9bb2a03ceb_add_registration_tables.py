@@ -113,6 +113,7 @@ def upgrade():
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('first_name', sa.String(), nullable=False),
         sa.Column('last_name', sa.String(), nullable=False),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['event_id', 'registration_form_id'],
                                 ['event_registration.forms.event_id', 'event_registration.forms.id']),
@@ -120,8 +121,10 @@ def upgrade():
         sa.ForeignKeyConstraint(['transaction_id'], ['events.payment_transactions.id']),
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
         sa.Index(None, 'friendly_id', 'event_id', unique=True),
-        sa.Index(None, 'registration_form_id', 'user_id', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
-        sa.Index(None, 'registration_form_id', 'email', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
+        sa.Index(None, 'registration_form_id', 'user_id', unique=True,
+                 postgresql_where=sa.text('NOT is_deleted OR (state NOT IN (3, 4))')),
+        sa.Index(None, 'registration_form_id', 'email', unique=True,
+                 postgresql_where=sa.text('NOT is_deleted OR (state NOT IN (3, 4))')),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
