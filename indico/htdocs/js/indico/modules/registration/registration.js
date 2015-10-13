@@ -76,6 +76,12 @@
         });
     }
 
+    function getSelectedRows() {
+        return $('.registrations input:checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+    }
+
     function setupRegistrationList() {
         handleRowSelection();
         setupStaticURLGeneration();
@@ -111,11 +117,30 @@
 
         $('.js-dialog-send-email').ajaxDialog({
             getExtraData: function() {
-                var ids = $('.registrations input:checkbox:checked').map(function() {
-                    return $(this).val();
-                }).get();
-                return {registration_ids: ids};
+                return {registration_ids: getSelectedRows()};
             }
+        });
+
+        $('.registrations').on('indico:confirmed', '.js-delete-registrations', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var selectedRows = getSelectedRows();
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: {registration_ids: selectedRows},
+                traditional: true,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    for (var i = 0; i < selectedRows.length; i++) {
+                        var row = $('#registration-' + selectedRows[i]);
+                        row.fadeOut('fast', function() {
+                            $(this).remove();
+                        });
+                    }
+                }
+            });
         });
 
         $('.registrations .toolbar').on('click', '.disabled', function(e) {

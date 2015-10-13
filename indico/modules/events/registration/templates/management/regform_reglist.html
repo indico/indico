@@ -29,7 +29,10 @@
             </div>
             <div class="group left">
                 <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
-                <a href="#" class="i-button icon-remove js-delete-registrations disabled">
+                <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
+                   data-href="{{ url_for('.delete_registrations', regform) }}"
+                   data-method="POST"
+                   data-confirm="{% trans %}Do you really want to delete the selected registrations?{% endtrans %}">
                     {%- trans %}Remove{% endtrans -%}
                 </a>
             </div>

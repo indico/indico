@@ -26,7 +26,7 @@
                 <tbody>
                     {% for registration in registrations %}
                         {% set data = registration.data_by_field %}
-                        <tr class="i-table">
+                        <tr id="registration-{{ registration.id }}" class="i-table">
                             <td class="i-table">
                                 <input class="select-row" type="checkbox" name="registrant_id" value="{{ registration.id }}">
                             </td>
