@@ -77,7 +77,7 @@
     }
 
     function setupRegistrationList() {
-        colorizeSelectedRows();
+        handleRowSelection();
         setupStaticURLGeneration();
         setupTableSorter();
 
@@ -94,7 +94,7 @@
                 onClose: function(data) {
                     if (data) {
                         $('.registrations-table-wrapper').html(data.registration_list);
-                        colorizeSelectedRows();
+                        handleRowSelection();
                         setupTableSorter();
                     }
                 }
@@ -117,11 +117,17 @@
                 return {registration_ids: ids};
             }
         });
+
+        $('.registrations .toolbar').on('click', '.disabled', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        })
     }
 
-    function colorizeSelectedRows() {
+    function handleRowSelection() {
         $('table.i-table input.select-row').on('change', function() {
             $(this).closest('tr').toggleClass('selected', this.checked);
+            $('.js-requires-selected-row').toggleClass('disabled', !$('.registrations input:checkbox:checked').length);
         });
     }
 

@@ -29,23 +29,31 @@
             </div>
             <div class="group left">
                 <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
-                <a href="#" class="i-button icon-remove">{% trans %}Remove{% endtrans %}</a>
+                <a href="#" class="i-button icon-remove js-delete-registrations disabled">
+                    {%- trans %}Remove{% endtrans -%}
+                </a>
             </div>
             <div class="group left">
-                <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Export{% endtrans %}</a>
+                <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Export{% endtrans -%}
+                </a>
                 <ul class="dropdown">
-                    <li><a href="#" class="icon-file-pdf">PDF</a></li>
-                    <li><a href="#" class="icon-file-excel">CSV</a></li>
+                    <li><a href="#" class="icon-file-pdf js-requires-selected-row disabled">PDF</a></li>
+                    <li><a href="#" class="icon-file-excel js-requires-selected-row disabled">CSV</a></li>
                 </ul>
-                <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Actions{% endtrans %}</a>
+                <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Actions{% endtrans -%}
+                </a>
                 <ul class="dropdown">
-                    <li><a href="#" class="icon-mail js-dialog-send-email"
-                       data-href="{{ url_for('.email_registrants', regform) }}"
-                       data-title="{% trans %}Send email{% endtrans %}">
-                        {%- trans %}Email{% endtrans -%}
-                    </a></li>
-                    <li><a href="#" class="icon-tag">{% trans %}Print Badges{% endtrans %}</a></li>
-                    <li><a href="#" class="icon-attachment">{% trans %}Attachments{% endtrans %}</a></li>
+                    <li>
+                        <a href="#" class="icon-mail js-dialog-send-email js-requires-selected-row disabled"
+                           data-href="{{ url_for('.email_registrants', regform) }}"
+                           data-title="{% trans %}Send email{% endtrans %}">
+                            {%- trans %}Email{% endtrans -%}
+                        </a>
+                    </li>
+                    <li><a href="#" class="icon-tag js-requires-selected-row disabled">{% trans %}Print Badges{% endtrans %}</a></li>
+                    <li><a href="#" class="icon-attachment js-requires-selected-row disabled">{% trans %}Attachments{% endtrans %}</a></li>
                 </ul>
             </div>
             <div class="group left">
