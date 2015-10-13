@@ -27,8 +27,8 @@ from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.logs import EventLogRealm, EventLogKind
-from indico.modules.events.registration.notifications import (notify_registration_confirmation,
-                                                              notify_registration_modification)
+from indico.modules.events.registration.legacy_notifications import (notify_registration_confirmation,
+                                                                     notify_registration_modification)
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.users.util import get_user_by_email
 from indico.web.flask.util import send_file, url_for
