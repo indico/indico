@@ -58,9 +58,9 @@ class Registration(db.Model):
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
                       db.Index(None, 'friendly_id', 'event_id', unique=True),
                       db.Index(None, 'registration_form_id', 'user_id', unique=True,
-                               postgresql_where=db.text('state NOT IN (3, 4)')),
+                               postgresql_where=db.text('NOT is_deleted OR (state NOT IN (3, 4))')),
                       db.Index(None, 'registration_form_id', 'email', unique=True,
-                               postgresql_where=db.text('state NOT IN (3, 4)')),
+                               postgresql_where=db.text('NOT is_deleted OR (state NOT IN (3, 4))')),
                       db.ForeignKeyConstraint(['event_id', 'registration_form_id'],
                                               ['event_registration.forms.event_id', 'event_registration.forms.id']),
                       {'schema': 'event_registration'})
@@ -168,6 +168,12 @@ class Registration(db.Model):
             lazy=True
         )
     )
+    #: If the registration has been deleted
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
@@ -205,7 +211,8 @@ class Registration(db.Model):
     @return_ascii
     def __repr__(self):
         full_name = '{} {}'.format(self.first_name, self.last_name)
-        return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, _text=full_name)
+        return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, is_deleted=False,
+                           _text=full_name)
 
     def init_state(self, event, invitation):
         """Initialize state of the object"""
