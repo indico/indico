@@ -59,12 +59,10 @@
                     <li><a href="#" class="icon-attachment js-requires-selected-row disabled">{% trans %}Attachments{% endtrans %}</a></li>
                 </ul>
             </div>
-            <div class="group left">
+            <div class="group right">
                 <a class="i-button icon-link js-static-url"
                    data-href="{{ url_for('.generate_static_url', regform) }}"
-                   title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}">
-                   {%- trans %}Static URL{% endtrans -%}
-                </a>
+                   title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
             </div>
         </div>
         {{ render_registration_list(registrations, visible_cols_regform_items, special_items) }}
