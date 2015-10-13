@@ -49,7 +49,8 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationDetails,
                                                                                 RHRegistrationDownloadAttachment,
                                                                                 RHRegistrationEdit,
-                                                                                RHRegistrationListStaticURL)
+                                                                                RHRegistrationListStaticURL,
+                                                                                RHRegistrationEmailRegistrants)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -87,6 +88,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>'
                  RHRegistrationDownloadAttachment)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
                  RHRegistrationEdit)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
+                 RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 
 # Invitation management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)

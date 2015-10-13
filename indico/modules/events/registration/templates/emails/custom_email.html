@@ -1,0 +1,8 @@
+{% extends 'emails/base.html' %}
+{% block subject %}{{ email_subject | safe }}{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body %}
+    {{ email_body | safe }}
+{% endblock %}

@@ -39,7 +39,11 @@
                 </ul>
                 <a href="#" class="i-button arrow button" data-toggle="dropdown">{% trans %}Actions{% endtrans %}</a>
                 <ul class="dropdown">
-                    <li><a href="#" class="i-button icon-mail">{% trans %}Email{% endtrans %}</a></li>
+                    <li><a href="#" class="icon-mail js-dialog-send-email"
+                       data-href="{{ url_for('.email_registrants', regform) }}"
+                       data-title="{% trans %}Send email{% endtrans %}">
+                        {%- trans %}Email{% endtrans -%}
+                    </a></li>
                     <li><a href="#" class="icon-tag">{% trans %}Print Badges{% endtrans %}</a></li>
                     <li><a href="#" class="icon-attachment">{% trans %}Attachments{% endtrans %}</a></li>
                 </ul>
