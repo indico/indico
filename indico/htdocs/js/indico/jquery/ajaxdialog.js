@@ -36,7 +36,9 @@
                 var data_href = $(this).data('href');
                 href = data_href ? data_href : href;
             }
-            ajaxDialog($.extend({}, options, {
+            ajaxDialog($.extend({
+                title: $(this).data('title')
+            }, options, {
                 url: href,
                 trigger: this
             }));
