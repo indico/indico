@@ -127,22 +127,6 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 return false;
             }
 
-            if ($scope.settings.itemtable && !dialogScope.hasRadioItems()) {
-                dialogScope.$apply(dialogScope.setSelectedTab('tab-editItems'));
-                return false;
-            }
-
-            if ($scope.settings.itemtable) {
-                var validCaptions = _.all(dialogScope.formData.choices, function(item) {
-                    return item.remove || !!item.caption;
-                });
-
-                if (!validCaptions) {
-                    dialogScope.$apply(dialogScope.setSelectedTab('tab-editItems'));
-                    return false;
-                }
-            }
-
             if ($.isFunction($scope.validateFieldSettings) && !$scope.validateFieldSettings(dialogScope)) {
                 return false;
             }
@@ -453,6 +437,27 @@ ndRegForm.directive('ndRadioField', function(url) {
                 _.each(field.choices, function(item, ind) {
                     formData.choices[ind] = angular.copy(item);
                 });
+            };
+
+            $scope.validateFieldSettings = function(dialogScope) {
+                if (!dialogScope.hasRadioItems()) {
+                    dialogScope.setSelectedTab('tab-editItems');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                var validCaptions = _.all(dialogScope.formData.choices, function(item) {
+                    return item.remove || !!item.caption;
+                });
+
+                if (!validCaptions) {
+                    dialogScope.captionsNotValid = true;
+                    dialogScope.setSelectedTab('tab-editItems');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                return true;
             };
         },
 

@@ -37,3 +37,6 @@
 <div ng-if="validationStarted && !hasRadioItems()" class="error-message-tag">
     {{ 'Add at least one item' | i18n }}
 </div>
+<div ng-if="validationStarted && captionsNotValid" class="error-message-tag">
+    {{ "Field caption can't be blank" | i18n }}
+</div>
