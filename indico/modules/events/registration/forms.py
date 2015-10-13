@@ -39,8 +39,7 @@ class RegistrationFormForm(IndicoForm):
     require_login = BooleanField(_("Only logged-in users"), widget=SwitchWidget(),
                                  description=_("Users must be logged in to register"))
     require_user = BooleanField(_("Registrant must have account"), widget=SwitchWidget(),
-                                description=_("Registrations must be associated with an Indico account. "
-                                              "This allows only email addresses associated with an account."))
+                                description=_("Registrations emails must be associated with an Indico account"))
     limit_registrations = BooleanField(_("Limit registrations"), widget=SwitchWidget(),
                                        description=_("Whether there is a limit of registrations"))
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
