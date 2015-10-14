@@ -36,7 +36,7 @@ from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.forms import EmailRegistrantsForm
 from indico.modules.events.registration.util import get_event_section_data, make_registration_form
 from indico.modules.payment import event_settings
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
@@ -214,12 +214,14 @@ class RHRegistrationEmailRegistrants(RHManageRegFormBase):
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
                                from_address=form.from_address.data, template=template, html=True)
             send_email(email, self.event, 'Registration')
+        return len(registrations)
 
     def _process(self):
         form = EmailRegistrantsForm()
         if form.validate_on_submit():
-            self._send_emails(form)
-            flash(_("Emails sent"), 'success')
+            num_emails_sent = self._send_emails(form)
+            flash(ngettext("The email was sent.",
+                           "{num} emails were sent", num=num_emails_sent).format(num_emails_sent), 'success')
             return jsonify_data()
         return WPManageRegistration.render_template('management/email.html', form=form)
 
@@ -229,14 +231,18 @@ class RHRegistrationDelete(RHManageRegFormBase):
 
     def _process(self):
         ids = set(request.form.getlist('registration_ids'))
-        registrations = (Registration.find(Registration.id.in_(ids), ~Registration.is_deleted).with_parent(self.regform)
+        registrations = (Registration
+                         .find(Registration.id.in_(ids), ~Registration.is_deleted)
+                         .with_parent(self.regform)
                          .all())
         for registration in registrations:
             registration.is_deleted = True
             logger.info('Registration {} deleted by {}'.format(registration, session.user))
             # TODO: Signal for deletion?
-        flashed_messages = flash(_("Registrations \"{ids}\" were deleted").format(ids=",".join(ids)), 'success')
-        return jsonify_data(flashed_messages=flashed_messages)
+        num = len(registrations)
+        flash(ngettext("Registration was deleted.",
+                       "{num} registrations were deleted", num=num).format(num), 'success')
+        return jsonify_data()
 
 
 class RHRegistrationCreate(RHManageRegFormBase, RegistrationCreationMixin):
@@ -246,6 +252,7 @@ class RHRegistrationCreate(RHManageRegFormBase, RegistrationCreationMixin):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
             self._save_registration(form.data)
+            flash(_("The registration was created."), 'success')
             return redirect(url_for('.manage_reglist', self.regform))
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation
