@@ -25,8 +25,6 @@ from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
-from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
-                                                                         InvitationLinkPlaceholder)
 from indico.modules.events.registration.util import user_registered_in_event
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
@@ -114,6 +112,9 @@ def _associate_registrations(user, **kwargs):
 
 @signals.get_placeholders.connect_via('registration-invitation-email')
 def _get_invitation_placeholders(sender, invitation, **kwargs):
+    from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
+                                                                             InvitationLinkPlaceholder)
+
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield InvitationLinkPlaceholder
@@ -127,6 +128,21 @@ def _get_feature_definitions(sender, **kwargs):
 @signals.acl.get_management_roles.connect_via(Event)
 def _get_management_roles(sender, **kwargs):
     return RegistrationRole
+
+
+@signals.get_placeholders.connect_via('registration-email')
+def _get_registration_placeholders(sender, registration, **kwargs):
+    from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
+                                                                               FirstNamePlaceholder, LinkPlaceholder,
+                                                                               EventTitlePlaceholder,
+                                                                               EventLinkPlaceholder)
+
+    yield FirstNamePlaceholder
+    yield LastNamePlaceholder
+    yield EventTitlePlaceholder
+    yield EventLinkPlaceholder
+    yield IDPlaceholder
+    yield LinkPlaceholder
 
 
 class RegistrationFeature(EventFeature):
