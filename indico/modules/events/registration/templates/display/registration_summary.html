@@ -3,7 +3,7 @@
         <div class="icon icon-quill"></div>
         <div class="text">
             <div class="label">
-                {% trans state=registration.state.name -%}
+                {% trans state=registration.state.title.lower() -%}
                     Your registration ({{ state }})
                 {%- endtrans %}
             </div>
@@ -13,12 +13,17 @@
                 {%- endtrans %}
             {% elif registration.state.name == 'pending' %}
                 {% trans -%}
-                    Awating for a manager to aprove it.
+                    Awaiting manager approval.
                 {%- endtrans %}
             {% elif registration.state.name == 'unpaid' %}
-                {% trans -%}
-                    Awaiting for your payment.
-                {%- endtrans %}
+                {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
+                    {% trans %}Awaiting your payment.{% endtrans %}
+                {% elif registration.transaction.status.name == 'pending' %}
+                    {% trans %}Awaiting payment confirmation.{% endtrans %}
+                {% endif %}
+                <a href="#payment" class="js-highlight-payment">
+                    {%- trans %}Check it out here{% endtrans -%}
+                </a>.
             {% endif %}
         </div>
         <div class="toolbar right">
@@ -78,51 +83,25 @@
     </div>
 </div>
 
-{% if registration.price %}
-    {# TODO: check transaction status  #}
-    {% if true %}
-        <div class="warning-message-box">
-            <div class="message-text">
-                {% trans -%}
-                    Please notice, your registration won't be complete until you perform the payment
-                    <a href="#payment" class="js-highlight-payment">here</a>.
-                {%- endtrans %}
-            </div>
-        </div>
-    {# {% elif registrant.payment_status == TransactionStatus.pending %} #}
-    {% elif true %}
-        <div class="warning-message-box">
-            <div class="message-text">
-                {% trans -%}
-                    Your payment is being processed. Please notice, your registration won't be complete until you
-                    see a success message <a href="#payment" onclick="highlight_payment()">here</a>.
-                    Come back to this page soon to check for new status.
-                {%- endtrans %}
-            </div>
-        </div>
-    {% endif %}
-    <a name="payment"></a>
+{% if payment_enabled and registration.price %}
     <div id="payment-summary" class="regform-done">
         <div class="i-box-header">
             <div class="i-box-title">
                 {% trans %}Invoice{% endtrans %}
             </div>
-            {# TODO: check payment status #}
-            {# % if payment_done: #}
-            {% if true %}
+            {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
+                <div class="payment-status payment-not-paid right">
+                    {% trans %}Not paid{% endtrans %}
+                    <i class="icon-time"></i>
+                </div>
+            {% elif registration.transaction.status.name == 'successful' %}
                 <div class="payment-status payment-done right">
                     {% trans %}Paid{% endtrans %}
                     <i class="icon-checkbox-checked"></i>
                 </div>
-            {# % elif registrant.payment_status == TransactionStatus.pending: #}
-            {% elif true %}
+            {% elif registration.transaction and registration.transaction.status.name == 'pending' %}
                 <div class="payment-status payment-pending right">
                     {% trans %}Pending{% endtrans %}
-                    <i class="icon-time"></i>
-                </div>
-            {% else %}
-                <div class="payment-status payment-not-paid right">
-                    {% trans %}Not paid{% endtrans %}
                     <i class="icon-time"></i>
                 </div>
             {% endif %}
@@ -132,9 +111,7 @@
                 {# TODO: render payment info #}
                 {# ${ payment_info } #}
             </table>
-            {# TODO: check if pending to pay #}
-            {# % if not payment_done and registrant.payment_status != TransactionStatus.pending: #}
-            {% if true %}
+            {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
                 <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                         <td>
