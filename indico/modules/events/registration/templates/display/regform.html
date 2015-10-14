@@ -1,13 +1,5 @@
-{% extends 'layout/conference_page_base.html' %}
+{% extends 'events/registration/display/_event_regform_base.html' %}
 {% from 'events/registration/display/_regform_invitation_info.html' import render_invitation_info %}
-
-{% block title %}
-    {%- trans %}Registration{% endtrans -%}
-{% endblock %}
-
-{% block subtitle %}
-    {{ regform.title }}
-{% endblock %}
 
 {% block content %}
     {% if invitation %}
