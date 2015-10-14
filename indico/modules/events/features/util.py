@@ -55,19 +55,23 @@ def set_feature_enabled(event, name, state):
     :param state: If the feature is enabled or not.
     :return: Boolean indicating if the state of the feature changed.
     """
-    feature = get_feature_definition(name)
+    feature_definitions = get_feature_definitions()
+    feature = feature_definitions[name]
     enabled = get_enabled_features(event)
-    if (name in enabled) == state:
+    names = {name} | feature.requires_deep
+    if (state and names <= enabled) or (not state and name not in enabled):
         return False
     if state:
-        enabled.add(name)
-        func = feature.enabled
+        funcs = {feature_definitions[x].enabled for x in names - enabled}
+        enabled |= names
     else:
-        enabled.discard(name)
-        func = feature.disabled
+        old = set(enabled)
+        enabled -= feature.required_by_deep | {name}
+        funcs = {feature_definitions[x].disabled for x in old - enabled}
     features_event_settings.set(event, 'enabled', sorted(enabled))
     db.session.flush()
-    func(event)
+    for func in funcs:
+        func(event)
     return True
 
 

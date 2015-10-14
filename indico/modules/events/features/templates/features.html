@@ -37,6 +37,9 @@
                 }
             }).on('ajaxCheckbox:changed', function(e, state, data) {
                 $('#event-sidemenu').html(data.event_menu);
+                _.each(data.changed, function(name) {
+                    $('#' + name).prop('checked', state);
+                });
             });
         })();
     </script>

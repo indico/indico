@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.features.util import get_feature_definitions
+from indico.util.decorators import cached_classproperty
+
 
 class EventFeature(object):
     """Base class for event features.
@@ -53,6 +56,9 @@ class EventFeature(object):
     friendly_name = None
     #: description of the feature (optional)
     description = None
+    #: the names of features which must be enabled before this feature
+    #: may be enabled
+    requires = frozenset()
 
     @classmethod
     def is_default_for_event(cls, event):  # pragma: no cover
@@ -68,3 +74,30 @@ class EventFeature(object):
     def disabled(cls, event):  # pragma: no cover
         """Called when the feature is disabled for an event"""
         pass
+
+    @cached_classproperty
+    @classmethod
+    def requires_deep(cls):
+        """All feature names required by this feature.
+
+        This includes features required by a requirement.
+        """
+        feature_definitions = get_feature_definitions()
+        todo = set(cls.requires)
+        features = set()
+        while todo:
+            feature = todo.pop()
+            features.add(feature)
+            todo |= feature_definitions[feature].requires
+        return features
+
+    @cached_classproperty
+    @classmethod
+    def required_by_deep(cls):
+        """All feature names depending on this feature.
+
+        This includes features which depend on a feature depending on
+        this feature.
+        """
+        # This is not very efficient, but it runs exactly one on a not-very-large set
+        return {feature.name for feature in get_feature_definitions().itervalues() if cls.name in feature.requires_deep}

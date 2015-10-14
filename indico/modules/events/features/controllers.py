@@ -24,7 +24,7 @@ from indico.modules.events.features.util import (get_feature_definitions, get_en
                                                  get_feature_definition)
 from indico.modules.events.features.views import WPFeatures
 from indico.modules.events.logs import EventLogRealm, EventLogKind
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
@@ -71,20 +71,35 @@ class RHSwitchFeature(RHFeaturesBase):
         return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option, old_style=True,
                                event=self.event_new)
 
+    def _format_feature_names(self, names):
+        return ', '.join(sorted(unicode(f.friendly_name)
+                                for f in get_feature_definitions().itervalues()
+                                if f.name in names))
+
     def _process_PUT(self):
+        prev = get_enabled_features(self.event)
         feature = get_feature_definition(request.view_args['feature'])
+        changed = set()
         if set_feature_enabled(self.event, feature.name, True):
-            flash(_('Feature enabled: {feature}').format(feature=feature.friendly_name), 'success')
+            current = get_enabled_features(self.event)
+            changed = current - prev
+            flash(ngettext('Feature enabled: {features}', 'Features enabled: {features}', len(changed))
+                  .format(features=self._format_feature_names(changed)), 'success')
             logger.info("Feature '{}' for event {} was enabled by {}".format(feature, self.event, session.user))
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
                            'Enabled {}'.format(feature.friendly_name), session.user)
-        return jsonify_data(enabled=True, event_menu=self.render_event_menu())
+        return jsonify_data(enabled=True, event_menu=self.render_event_menu(), changed=list(changed))
 
     def _process_DELETE(self):
+        prev = get_enabled_features(self.event)
         feature = get_feature_definition(request.view_args['feature'])
+        changed = set()
         if set_feature_enabled(self.event, feature.name, False):
-            flash(_('Feature disabled: {feature}').format(feature=feature.friendly_name), 'warning')
+            current = get_enabled_features(self.event)
+            changed = prev - current
+            flash(ngettext('Feature disabled: {features}', 'Features disabled: {features}', len(changed))
+                  .format(features=self._format_feature_names(changed)), 'warning')
             logger.info("Feature '{}' for event {} was disabled by {}".format(feature, self.event, session.user))
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
                            'Disabled {}'.format(feature.friendly_name), session.user)
-        return jsonify_data(enabled=False, event_menu=self.render_event_menu())
+        return jsonify_data(enabled=False, event_menu=self.render_event_menu(), changed=list(changed))
