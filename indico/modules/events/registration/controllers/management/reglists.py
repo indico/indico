@@ -37,6 +37,7 @@ from indico.modules.events.registration.forms import EmailRegistrantsForm
 from indico.modules.events.registration.util import get_event_section_data, make_registration_form
 from indico.modules.payment import event_settings
 from indico.util.i18n import _
+from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data
@@ -200,16 +201,17 @@ class RHRegistrationEmailRegistrants(RHManageRegFormBase):
         self._doNotSanitizeFields.append('from_address')
         RHManageRegFormBase._checkParams(self, params)
 
-    def _get_people(self):
-        ids = set(request.form.getlist('registration_ids'))
-        return Registration.find(Registration.id.in_(ids), ~Registration.is_deleted).with_parent(self.regform).all()
-
     def _send_emails(self, form):
-        people = self._get_people()
-        for person in people:
+        ids = set(request.form.getlist('registration_ids'))
+        registrations = (Registration
+                         .find(Registration.id.in_(ids), ~Registration.is_deleted)
+                         .with_parent(self.regform)
+                         .all())
+        for registration in registrations:
+            email_body = replace_placeholders('registration-email', form.body.data, registration=registration)
             template = get_template_module('events/registration/emails/custom_email.html',
-                                           email_subject=form.subject.data, email_body=form.body.data)
-            email = make_email(to_list=person.email, cc_list=form.cc_addresses.data,
+                                           email_subject=form.subject.data, email_body=email_body)
+            email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
                                from_address=form.from_address.data, template=template, html=True)
             send_email(email, self.event, 'Registration')
 
