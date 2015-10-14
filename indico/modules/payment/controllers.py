@@ -52,7 +52,17 @@ class RHPaymentAdminPluginSettings(RHPluginDetails):
     back_button_endpoint = 'payment.admin_settings'
 
 
-class RHPaymentEventSettings(RHConferenceModifBase):
+class RHPaymentEventManagementBase(RHConferenceModifBase):
+    """Base RH for event management pages"""
+    EVENT_FEATURE = 'payment'
+
+
+class RHPaymentEventBase(RHRegistrationFormRegistrantBase):
+    """Base RH for non-management event pages"""
+    EVENT_FEATURE = 'payment'
+
+
+class RHPaymentEventSettings(RHPaymentEventManagementBase):
     """Payment settings (event)"""
 
     def _process(self):
@@ -66,7 +76,7 @@ class RHPaymentEventSettings(RHConferenceModifBase):
                                                         enabled_plugins=enabled_plugins)
 
 
-class RHPaymentEventSettingsEdit(RHConferenceModifBase):
+class RHPaymentEventSettingsEdit(RHPaymentEventManagementBase):
     """Edit payment settings (event)"""
 
     def _process(self):
@@ -82,7 +92,7 @@ class RHPaymentEventSettingsEdit(RHConferenceModifBase):
                                                         form=form)
 
 
-class RHPaymentEventToggle(RHConferenceModifBase):
+class RHPaymentEventToggle(RHPaymentEventManagementBase):
     """Enable/disable payment for an event"""
 
     CSRF_ENABLED = True
@@ -101,11 +111,11 @@ class RHPaymentEventToggle(RHConferenceModifBase):
         return redirect(url_for('.event_settings', event))
 
 
-class RHPaymentEventPluginEdit(RHConferenceModifBase):
+class RHPaymentEventPluginEdit(RHPaymentEventManagementBase):
     """Configure a payment plugin for an event"""
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHPaymentEventManagementBase._checkParams(self, params)
         try:
             self.plugin = get_payment_plugins()[request.view_args['method']]
         except KeyError:
@@ -117,7 +127,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         can_modify_event = self._conf.as_event.can_manage(session.user, allow_key=True)
         self.protection_overridden = can_modify_plugin and not can_modify_event
         if not can_modify_plugin and not can_modify_event:
-            RHConferenceModifBase._checkProtection(self)
+            RHPaymentEventManagementBase._checkProtection(self)
         return True
 
     def _check_currencies(self, form):
@@ -177,7 +187,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
                                                         widget_attrs=widget_attrs, invalid_currency=invalid_currency)
 
 
-class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
+class RHPaymentEventCheckout(RHPaymentEventBase):
     """Payment/Checkout page for registrants"""
 
     def _process(self):
@@ -201,11 +211,11 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
                                               registrant_params=get_registrant_params())
 
 
-class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
+class RHPaymentEventForm(RHPaymentEventBase):
     """Loads the form for the selected payment plugin"""
 
     def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
+        RHPaymentEventBase._checkParams(self, params)
         try:
             self.plugin = get_active_payment_plugins(self._conf)[request.args['method']]
         except KeyError:
@@ -218,7 +228,7 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
         return jsonify(html=html)
 
 
-class RHPaymentEventConditions(RHRegistrationFormRegistrantBase):
+class RHPaymentEventConditions(RHPaymentEventBase):
     def _process(self):
         conditions = event_settings.get(self._conf, 'conditions')
         return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)

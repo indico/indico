@@ -20,6 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.settings import SettingsProxy
+from indico.modules.events.features.base import EventFeature
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                             PaymentEventSettingsFormBase)
@@ -62,6 +63,18 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.has_feature('registration') or not event.can_manage(session.user, 'registration', allow_key=True):
+    if not event.has_feature('payment') or not event.can_manage(session.user, 'registration', allow_key=True):
         return
     return SideMenuItem('payment', _('Payments'), url_for('payment.event_settings', event), section='organization')
+
+
+@signals.event.get_feature_definitions.connect
+def _get_feature_definitions(sender, **kwargs):
+    return PaymentFeature
+
+
+class PaymentFeature(EventFeature):
+    name = 'payment'
+    friendly_name = _('Payment')
+    requires = {'registration'}
+    description = _('Gives event managers the opportunity to process payments for registrations.')
