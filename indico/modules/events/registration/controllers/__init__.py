@@ -16,10 +16,15 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import request, session
 from sqlalchemy.orm import defaultload
 
+from indico.core.db import db
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import RegistrationFormItemType
+from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.users.util import get_user_by_email
 
 
 class RegistrationFormMixin(object):
@@ -36,3 +41,22 @@ class RegistrationFormMixin(object):
                         .find(id=request.view_args['reg_form_id'], is_deleted=False)
                         .options(defaultload('form_items').joinedload('children').joinedload('current_data'))
                         .one())
+
+
+class RegistrationCreationMixin(object):
+    """Mixin for a single registration RH"""
+
+    def _save_registration(self, data):
+        registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))
+        for form_item in self.regform.active_fields:
+            if form_item.parent.is_manager_only:
+                value = form_item.field_impl.default_value
+            else:
+                value = data.get(form_item.html_field_name)
+            form_item.field_impl.save_data(registration, value)
+            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+                setattr(registration, form_item.personal_data_type.column, value)
+        registration.init_state(self.event)
+        db.session.flush()
+        logger.info('New registration %s by %s', registration, session.user)
+        return registration

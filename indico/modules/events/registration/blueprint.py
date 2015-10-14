@@ -51,7 +51,8 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationEdit,
                                                                                 RHRegistrationListStaticURL,
                                                                                 RHRegistrationEmailRegistrants,
-                                                                                RHRegistrationDelete)
+                                                                                RHRegistrationDelete,
+                                                                                RHRegistrationCreate)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -82,17 +83,19 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/customize
                  RHRegistrationsListCustomize, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-url',
                  'generate_static_url', RHRegistrationListStaticURL, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create', 'create_registration',
+                 RHRegistrationCreate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 'delete_registrations',
+                 RHRegistrationDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
                  RHRegistrationDetails)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
+                 RHRegistrationEdit)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>'
                  '/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>', 'registration_file',
                  RHRegistrationDownloadAttachment)
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
-                 RHRegistrationEdit)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 'delete_registrations',
-                 RHRegistrationDelete, methods=('POST',))
 
 # Invitation management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)
