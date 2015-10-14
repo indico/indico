@@ -92,12 +92,29 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                event=self.event, regforms=regforms)
 
 
-class RHRegistrationFormSummary(RHRegistrationFormRegistrationBase):
+class InvitationMixin:
+    """Mixin for RHs that accept an invitation token"""
+
+    def _checkParams(self):
+        try:
+            token = request.args['invitation']
+        except KeyError:
+            self.invitation = None
+        else:
+            self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).one()
+
+
+class RHRegistrationFormSummary(InvitationMixin, RHRegistrationFormRegistrationBase):
     """Displays user summary for a registration form"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrationBase._checkParams(self, params)
+        InvitationMixin._checkParams(self)
 
     def _process(self):
         return self.view_class.render_template('display/regform.html', self.event,
                                                event=self.event, regform=self.regform, registration=self.registration,
+                                               invitation=self.invitation,
                                                payment_enabled=event_settings.get(self.event, 'enabled'),
                                                payment_conditions=bool(event_settings.get(self.event, 'conditions')))
 
@@ -118,18 +135,6 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
             return jsonify(conflict='no-user')
         else:
             return jsonify(user=None)
-
-
-class InvitationMixin:
-    """Mixin for RHs that accept an invitation token"""
-
-    def _checkParams(self):
-        try:
-            token = request.args['invitation']
-        except KeyError:
-            self.invitation = None
-        else:
-            self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).one()
 
 
 class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
