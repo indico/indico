@@ -194,10 +194,18 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
             form_item.field_impl.save_data(registration, value)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
-        registration.init_state(self.event, self.invitation)
-        if self.invitation:
-            self.invitation.state = InvitationState.accepted
-            self.invitation.registration = registration
+        invitation = self.invitation
+        if invitation is None:
+            # Associate invitation based on email in case the user did not use the link
+            with db.session.no_autoflush:
+                invitation = (RegistrationInvitation
+                              .find(email=data['email'], registration_id=None)
+                              .with_parent(self.regform)
+                              .first())
+        registration.init_state(self.event, invitation)
+        if invitation:
+            invitation.state = InvitationState.accepted
+            invitation.registration = registration
         db.session.flush()
         logger.info('New registration %s by %s', registration, session.user)
         return registration
