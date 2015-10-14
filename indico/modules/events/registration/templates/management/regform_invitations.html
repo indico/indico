@@ -46,27 +46,6 @@
     </div>
 
     <script>
-        $('#invitation-list').on('indico:confirmed', '.js-delete-invitation', function(evt) {
-            evt.preventDefault();
-
-            var $this = $(this);
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                success: function() {
-                    $this.closest('tr').remove();
-                }
-            });
-        });
-
-        $('.js-invite-user').ajaxDialog({
-            onClose: function(data) {
-                if (data) {
-                    $('#invitation-list').html(data.invitation_list);
-                }
-            }
-        });
+        setupInvitationPage();
     </script>
 {% endblock %}
