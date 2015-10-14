@@ -22,6 +22,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.registrations import Registration
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
@@ -129,6 +130,8 @@ class InvitationFormNew(InvitationFormBase):
     def validate_email(self, field):
         if RegistrationInvitation.find(email=field.data).with_parent(self.regform).count():
             raise ValidationError(_("There is already an invitation with this email address."))
+        if Registration.find(email=field.data).with_parent(self.regform).count():
+            raise ValidationError(_("There is already a registration with this email address."))
 
 
 class InvitationFormExisting(InvitationFormBase):
@@ -144,7 +147,14 @@ class InvitationFormExisting(InvitationFormBase):
                 for x in self.users_field.data]
 
     def validate_users_field(self, field):
-        existing = {x.email for x in self.regform.invitations} & {x['email'].lower() for x in field.data}
+        emails = {x['email'].lower() for x in field.data}
+        # invitations
+        existing = {x.email for x in self.regform.invitations} & emails
         if existing:
             raise ValidationError(_("There are already invitations for the following email addresses: {emails}")
+                                  .format(emails=', '.join(sorted(existing))))
+        # registrations
+        existing = {x.email for x in self.regform.registrations} & emails
+        if existing:
+            raise ValidationError(_("There are already registrations with the following email addresses: {emails}")
                                   .format(emails=', '.join(sorted(existing))))
