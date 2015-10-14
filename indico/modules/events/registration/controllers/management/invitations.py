@@ -35,8 +35,8 @@ def _query_invitation_list(regform):
     return (RegistrationInvitation.query
             .with_parent(regform)
             .options(joinedload('registration'))
-            .order_by(RegistrationInvitation.first_name,
-                      RegistrationInvitation.last_name,
+            .order_by(db.func.lower(RegistrationInvitation.first_name),
+                      db.func.lower(RegistrationInvitation.last_name),
                       RegistrationInvitation.id)
             .all())
 
@@ -71,6 +71,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
             affiliation=user['affiliation']
         )
         self.regform.invitations.append(invitation)
+        db.session.flush()
         notify_invitation(invitation, email_body, email_from)
 
     def _process(self):

@@ -23,6 +23,7 @@ from wtforms.validators import DataRequired, NumberRange, Optional, ValidationEr
 
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.util.i18n import _
+from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField
 from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime
@@ -99,6 +100,12 @@ class InvitationFormBase(IndicoForm):
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
         self.email_from.choices = zip(from_addresses, from_addresses)
+        self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
+
+    def validate_email_body(self, field):
+        missing = get_missing_placeholders('registration-invitation-email', field.data, invitation=None)
+        if missing:
+            raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 
 
 class InvitationFormNew(InvitationFormBase):

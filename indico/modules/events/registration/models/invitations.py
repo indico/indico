@@ -128,6 +128,7 @@ class RegistrationInvitation(db.Model):
 
         Instead of the numeric ID it uses the UUID
         """
+        assert self.uuid is not None
         return dict(self.registration_form.locator, invitation=self.uuid)
 
     @return_ascii

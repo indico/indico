@@ -24,6 +24,8 @@ from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
+                                                                         InvitationLinkPlaceholder)
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -82,6 +84,13 @@ def _associate_registrations(user, **kwargs):
     num = len(done)
     flash(ngettext("A registration has been linked to your account.",
                    "{n} registrations have been linked to your account.", num).format(n=num), 'info')
+
+
+@signals.get_placeholders.connect_via('registration-invitation-email')
+def _get_invitation_placeholders(sender, invitation, **kwargs):
+    yield FirstNamePlaceholder
+    yield LastNamePlaceholder
+    yield InvitationLinkPlaceholder
 
 
 @signals.event.get_feature_definitions.connect
