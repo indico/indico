@@ -16,41 +16,28 @@
 
 from __future__ import unicode_literals
 
-from markupsafe import Markup, escape
+from markupsafe import Markup
 
-from indico.modules.events.agreements import EmailPlaceholderBase
 from indico.util.i18n import _
+from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
 
 
-def replace_placeholders(text, placeholders, agreement):
-    """Replaces placeholders in a text
-
-    :param text: the text to replace placeholders in
-    :param placeholders: a dict containing placeholders
-    :param agreement: the agreement to pass to the placeholder functions
-    """
-    for name, placeholder in placeholders.iteritems():
-        p = '{{{}}}'.format(name)
-        if p not in text:
-            continue
-        text = text.replace(p, escape(placeholder.render(agreement)))
-    return text
-
-
-class PersonNamePlaceholder(EmailPlaceholderBase):
+class PersonNamePlaceholder(Placeholder):
+    name = 'person_name'
     description = _("Name of the person")
 
     @classmethod
-    def render(cls, agreement):
+    def render(cls, definition, agreement):
         return agreement.person_name
 
 
-class AgreementLinkPlaceholder(EmailPlaceholderBase):
-    required = True
+class AgreementLinkPlaceholder(Placeholder):
+    name = 'agreement_link'
     description = _("Link to the agreement page")
+    required = True
 
     @classmethod
-    def render(cls, agreement):
+    def render(cls, definition, agreement):
         return Markup('<a href="{0}">{0}</a>'.format(url_for('agreements.agreement_form', agreement,
                                                              uuid=agreement.uuid, _external=True)))
