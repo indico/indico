@@ -190,6 +190,9 @@ class CountryField(RegistrationFormFieldBase):
     def view_data(self):
         return {'choices': [{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()]}
 
+    def get_friendly_data(self, registration_data):
+        return CountryHolder.getCountries()[registration_data.data]
+
 
 class FileField(RegistrationFormFieldBase):
     name = 'file'
@@ -262,6 +265,12 @@ class AccommodationField(RegistrationFormFieldBase):
             item['caption'] = self.form_item.data['captions'][item['id']]
         data['accommodation_options'] = items
         return data
+
+    def get_friendly_data(self, registration_data):
+        friendly_data = dict(registration_data.data)
+        unversioned_data = registration_data.field_data.field.data
+        friendly_data['accommodation'] = unversioned_data['captions'][friendly_data['accommodation']]
+        return friendly_data
 
 
 def _to_date(date):
