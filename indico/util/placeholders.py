@@ -36,7 +36,7 @@ class Placeholder(object):
     name = None
     #: Whether the placeholder must be used at least once.
     required = False
-    #: An optional description of the placeholder.
+    #: A short description of the placeholder.
     description = None
 
     @classmethod

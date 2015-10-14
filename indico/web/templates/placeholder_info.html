@@ -1,6 +1,7 @@
 <strong>{% trans %}Available placeholders{% endtrans %}:</strong><br>
 {%- set br = joiner('<br>'|safe) -%}
 {% for name, placeholder in placeholders|dictsort -%}
-    <span style="font-style: normal;" data-required="{{ placeholder.required | tojson }}">{ {{- name -}} }</span>:
-    {{ placeholder.description }} {% if placeholder.required %}(required){% endif %}{{ br() }}
+    {{ br() }}
+    <span style="font-style: normal;">{ {{- name -}} }</span>:
+    {{ placeholder.description }} {% if placeholder.required %}(required){% endif %}
 {% endfor %}
