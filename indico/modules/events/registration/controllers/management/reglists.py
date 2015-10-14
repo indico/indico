@@ -73,6 +73,7 @@ def _filter_registration(query, filters):
 def _query_registrations(regform, filters):
     query = (Registration.query
              .with_parent(regform)
+             .filter(~Registration.is_deleted)
              .options(joinedload('data').joinedload('field_data').joinedload('field')))
     return _filter_registration(query, filters)
 
@@ -198,7 +199,7 @@ class RHRegistrationEmailRegistrants(RHManageRegFormBase):
 
     def _get_people(self):
         ids = set(request.form.getlist('registration_ids'))
-        return Registration.find(Registration.id.in_(ids)).with_parent(self.regform).all()
+        return Registration.find(Registration.id.in_(ids), ~Registration.is_deleted).with_parent(self.regform).all()
 
     def _send_emails(self, form):
         people = self._get_people()
@@ -223,7 +224,8 @@ class RHRegistrationDelete(RHManageRegFormBase):
 
     def _process(self):
         ids = set(request.form.getlist('registration_ids'))
-        registrations = Registration.find(Registration.id.in_(ids)).with_parent(self.regform).all()
+        registrations = (Registration.find(Registration.id.in_(ids), ~Registration.is_deleted).with_parent(self.regform)
+                         .all())
         for registration in registrations:
             registration.is_deleted = True
             logger.info('Registration {} deleted by {}'.format(registration, session.user))

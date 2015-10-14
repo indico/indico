@@ -88,11 +88,13 @@ def _associate_registrations(user, **kwargs):
     from indico.modules.events.registration.models.registrations import Registration
     reg_alias = db.aliased(Registration)
     subquery = db.session.query(reg_alias).filter(reg_alias.user_id == user.id,
-                                                  reg_alias.registration_form_id == Registration.registration_form_id)
+                                                  reg_alias.registration_form_id == Registration.registration_form_id,
+                                                  ~reg_alias.is_deleted)
     registrations = (Registration
                      .find(Registration.user_id == None,  # noqa
                            Registration.email.in_(user.all_emails),
-                           ~subquery.exists())
+                           ~subquery.exists(),
+                           ~Registration.is_deleted)
                      .order_by(Registration.submitted_dt.desc())
                      .all())
     if not registrations:

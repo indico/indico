@@ -122,9 +122,9 @@ def upgrade():
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
         sa.Index(None, 'friendly_id', 'event_id', unique=True),
         sa.Index(None, 'registration_form_id', 'user_id', unique=True,
-                 postgresql_where=sa.text('NOT is_deleted OR (state NOT IN (3, 4))')),
+                 postgresql_where=sa.text('NOT is_deleted AND (state NOT IN (3, 4))')),
         sa.Index(None, 'registration_form_id', 'email', unique=True,
-                 postgresql_where=sa.text('NOT is_deleted OR (state NOT IN (3, 4))')),
+                 postgresql_where=sa.text('NOT is_deleted AND (state NOT IN (3, 4))')),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
