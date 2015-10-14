@@ -1,26 +1,12 @@
 <div class="infoline announcement">
-    <span class="icon icon-file-check"></span>
+    <span class="icon icon-ticket"></span>
     <div class="text">
-    <div class="label">{% trans %}Registration Forms{% endtrans %}</div>
-    <div>
-        {% trans count=regforms|length -%}
-            There is an open registration form.
-        {%- pluralize -%}
-            There are <strong>{{ count }}</strong> open registration forms.
-        {%- endtrans %}
-    </div>
-    <div class="toolbar right">
-        <a href="{{ url_for('event_registration.display_regform_list', event) }}" class="i-button next highlight">
-            {% if regforms|length == 1 %}
-                {%- trans %}Show the registration forms{% endtrans -%}
-            {% else %}
-                {%- trans count=regforms|length -%}
-                    Fill out the registration form
-                {%- pluralize -%}
-                    Show the registration forms
-                {%- endtrans -%}
-            {% endif %}
-        </a>
-    </div>
+        <div class="label">{% trans %}Registration{% endtrans %}</div>
+        <div>{% trans %}Registrations for this event are currently open.{% endtrans %}</div>
+        <div class="toolbar right">
+            <a href="{{ url_for('event_registration.display_regform_list', event) }}" class="i-button next highlight">
+                {% trans %}Register now{% endtrans %}
+            </a>
+        </div>
     </div>
 </div>
