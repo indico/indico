@@ -385,6 +385,7 @@ module_js = {
     'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
     'registration': rjs_bundle('modules_registration',
                                'js/indico/modules/registration/registration.js',
+                               'js/indico/modules/registration/invitations.js',
                                *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
                                           'sectiontoolbar.js', 'table.js'))
 }
