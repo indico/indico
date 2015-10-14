@@ -26,6 +26,7 @@ from sqlalchemy.orm import joinedload, undefer
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration import logger
+from indico.modules.events.registration.controllers import RegistrationCreationMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
@@ -33,6 +34,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.forms import EmailRegistrantsForm
+from indico.modules.events.registration.util import get_event_section_data, make_registration_form
+from indico.modules.payment import event_settings
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
@@ -232,3 +235,21 @@ class RHRegistrationDelete(RHManageRegFormBase):
             # TODO: Signal for deletion?
         flashed_messages = flash(_("Registrations \"{ids}\" were deleted").format(ids=",".join(ids)), 'success')
         return jsonify_data(flashed_messages=flashed_messages)
+
+
+class RHRegistrationCreate(RHManageRegFormBase, RegistrationCreationMixin):
+    """Create new registration (management area)"""
+
+    def _process(self):
+        form = make_registration_form(self.regform)()
+        if form.validate_on_submit():
+            self._save_registration(form.data)
+            return redirect(url_for('.manage_reglist', self.regform))
+        elif form.is_submitted():
+            # not very pretty but usually this never happens thanks to client-side validation
+            for error in form.error_list:
+                flash(error, 'error')
+        return WPManageRegistration.render_template('display/regform_display.html', self.event, event=self.event,
+                                                    sections=get_event_section_data(self.regform), regform=self.regform,
+                                                    currency=event_settings.get(self.event, 'currency'), user_data={},
+                                                    post_url=url_for('.create_registration', self.regform))

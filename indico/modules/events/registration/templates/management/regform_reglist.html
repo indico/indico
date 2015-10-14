@@ -28,7 +28,7 @@
                 </button>
             </div>
             <div class="group left">
-                <a href="#" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
+                <a href="{{ url_for('.create_registration', regform) }}" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
                 <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
                    data-href="{{ url_for('.delete_registrations', regform) }}"
                    data-method="POST"
