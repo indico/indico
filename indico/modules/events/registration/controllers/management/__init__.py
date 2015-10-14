@@ -60,6 +60,7 @@ class RHManageRegistrationBase(RHManageRegFormBase):
         RHManageRegFormBase._checkParams(self, params)
         self.registration = (Registration
                              .find(Registration.id == request.view_args['registration_id'],
+                                   ~Registration.is_deleted,
                                    ~RegistrationForm.is_deleted)
                              .join(Registration.registration_form)
                              .options(contains_eager(Registration.registration_form)
