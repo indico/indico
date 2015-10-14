@@ -1,3 +1,45 @@
+{% macro render_registration_info(registration) %}
+    <table>
+        {% for section in registration.registration_form.sections -%}
+            <tr>
+                <td class="regform-done-title">{{ section.title }}</td>
+            </tr>
+            {% for field in section.children if field.is_field -%}
+                <tr>
+                    <td class="regform-done-caption">{{ field.title }}</td>
+                    <td class="regform-done-data">
+                        {{ render_data(registration, field) }}
+                    </td>
+                </tr>
+            {%- endfor %}
+        {%- endfor %}
+    </table>
+{% endmacro %}
+
+
+{% macro render_data(registration, field) %}
+    {% set friendly_data = registration.data_by_field[field.id].friendly_data %}
+    {% if field.input_type == 'accommodation' %}
+        <div>
+            {% trans arrival_date=friendly_data['arrivalDate'] %}
+                <b>Arrival:</b> {{ arrival_date }}
+            {% endtrans %}
+        </div>
+        <div>
+            {% trans departure_date=friendly_data['departureDate'] %}
+                <b>Departure:</b> {{ departure_date }}
+            {% endtrans %}
+        </div>
+        <div>
+            {% trans accommodation=friendly_data['accommodation'] %}
+                <b>Accommodation:</b> {{ accommodation }}
+            {% endtrans %}
+        </div>
+    {% else %}
+        {{ friendly_data }}
+    {% endif %}
+{% endmacro %}
+
 <div class="action-box">
     <div class="section">
         <div class="icon icon-quill"></div>
@@ -77,8 +119,7 @@
     </div>
     <div class="i-box-content">
         <table width="100%" cellpadding="0" cellspacing="0">
-            {# TODO: render registration information #}
-            {# ${ registration_info } #}
+            {{ render_registration_info(registration) }}
         </table>
     </div>
 </div>
