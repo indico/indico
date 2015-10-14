@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from uuid import UUID
+
 from flask import request, session, redirect, flash, jsonify
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -96,12 +98,19 @@ class InvitationMixin:
     """Mixin for RHs that accept an invitation token"""
 
     def _checkParams(self):
+        self.invitation = None
         try:
             token = request.args['invitation']
         except KeyError:
-            self.invitation = None
-        else:
-            self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).one()
+            return
+        try:
+            UUID(hex=token)
+        except ValueError:
+            flash(_("Your invitation code is not valid."), 'warning')
+            return
+        self.invitation = RegistrationInvitation.find(uuid=token).with_parent(self.regform).first()
+        if self.invitation is None:
+            flash(_("This invitation does not exist or has been withdrawn."), 'warning')
 
 
 class RHRegistrationFormSummary(InvitationMixin, RHRegistrationFormRegistrationBase):
