@@ -16,13 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import session, render_template
+from flask import session
 
 from wtforms.fields import BooleanField, FileField, TextAreaField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, DataRequired, ValidationError
 
 from indico.util.i18n import _
+from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import UsedIf
@@ -46,15 +47,10 @@ class AgreementEmailForm(IndicoForm):
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
         self.from_address.choices = zip(from_addresses, from_addresses)
-        placeholders = self._definition.get_email_placeholders()
-        self.body.description = render_template('events/agreements/dialogs/placeholder_info.html',
-                                                placeholders=placeholders)
+        self.body.description = render_placeholder_info('agreement-email', definition=self._definition, agreement=None)
 
     def validate_body(self, field):
-        placeholders = {'{{{}}}'.format(name)
-                        for name, placeholder in self._definition.get_email_placeholders().iteritems()
-                        if placeholder.required}
-        missing = {p for p in placeholders if p not in field.data}
+        missing = get_missing_placeholders('agreement-email', field.data, definition=self._definition, agreement=None)
         if missing:
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 

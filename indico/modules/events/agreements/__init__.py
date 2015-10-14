@@ -20,15 +20,16 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase, EmailPlaceholderBase
+from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase
 from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.placeholders import PersonNamePlaceholder, AgreementLinkPlaceholder
 from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase', 'EmailPlaceholderBase')
+__all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase')
 
 logger = Logger.get('agreements')
 
@@ -52,3 +53,9 @@ def _extend_event_management_menu(sender, event, **kwargs):
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     Agreement.find(user_id=source.id).update({Agreement.user_id: target.id})
+
+
+@signals.get_placeholders.connect_via('agreement-email')
+def _get_placeholders(sender, agreement, definition, **kwargs):
+    yield PersonNamePlaceholder
+    yield AgreementLinkPlaceholder
