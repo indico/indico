@@ -1,88 +1,68 @@
-{% extends 'layout/base.html' %}
+{% extends 'payment/management/payments_base.html' %}
 
-{% block title %}
-    {% trans %}Payments{% endtrans %}
-{% endblock %}
-
-{% block subtitle %}
-    {% trans %}Settings{% endtrans %}
+{% block description %}
+    {% trans -%}
+        Event-wide payment settings
+    {%- endtrans %}
 {% endblock %}
 
 {% block content %}
-    {% if settings.enabled and not enabled_plugins %}
-        <div class="warning-message-box">
-            <div class="message-text">
-                {% trans -%}
-                    The payment module is enabled but you did not enable any payment methods. You must enable at least
-                    one method for the module to work properly.
-                {%- endtrans %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}General settings{% endtrans %}
+                </div>
+                {% trans %}Configure general settings for payments.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('.event_settings_edit', event) }}" class="i-button icon-edit">
+                    {% trans %}Configure{% endtrans %}
+                </a>
             </div>
         </div>
-    {% endif %}
+    </div>
 
-    <dl class="i-data-list">
-        <dt>{% trans %}Status{% endtrans %}</dt>
-        <dd>
-            <form action="{{ url_for('.event_toggle', event) }}" method="post">
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-                <label class="switch">
-                    <input type="checkbox" class="switch-input" id="toggle-payment"{% if settings.enabled %} checked{% endif %}>
-                    <span class="switch-label" data-on="On" data-off="Off"></span>
-                    <span class="switch-handle"></span>
-                </label>
-                <input type="hidden" name="enabled" value="{{ (not settings.enabled) | int }}">
-            </form>
-        </dd>
-        {% if settings.enabled %}
-            <dt>{% trans %}Currency{% endtrans %}</dt>
-            <dd>
-                {% if not settings.currency %}
-                    {% trans %}None selected{% endtrans %}
-                {% else %}
-                    {{ settings.currency }}{% if settings.currency in currencies %} ({{ currencies[settings.currency] }}){% endif %}
-                {% endif %}
-            </dd>
-            <dt>{% trans %}Conditions{% endtrans %}</dt>
-            <dd>{{ settings.conditions or '<em>None</em>'|safe }}</dd>
-            <dt>{% trans %}Register email message{% endtrans %}</dt>
-            <dd>{{ settings.register_email or '<em>None</em>'|safe }}</dd>
-            <dt>{% trans %}Success email message{% endtrans %}</dt>
-            <dd>{{ settings.success_email or '<em>None</em>'|safe }}</dd>
-            <dt></dt>
-            <dd><a class="i-button big" href="{{ url_for('.event_settings_edit', event) }}">{% trans %}Configure{% endtrans %}</a></dd>
-        {% endif %}
-    </dl>
+    <h3>
+        {% trans %}Payment methods{% endtrans %}
+    </h3>
 
-    {%- if settings.enabled %}
-        <p>
-            {%- trans -%}
-                The following payment methods are available. You can enable, disable and configure them by clicking on them.
-            {%- endtrans -%}
-        </p>
-        <div class="i-badges-list left i-badges-list-hover i-payments-list">
-            {%- for short_name, plugin in plugins %}
-                <a id="plugin-{{ plugin.name }}" class="js-plugin-edit i-badge {%- if plugin in enabled_plugins %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
-                   href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
-                    <div class="i-badge-legend">
-                        <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
-                        <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
-                    </div>
-                    <div class="i-badge-content">
-                        <span class="i-badge-img">
-                            <img src="{{ plugin.logo_url }}">
-                        </span>
-                        <span class="i-badge-title">{{ plugin.title }}</span>
-                    </div>
-                </a>
-            {%- endfor %}
-        </div>
-    {% endif %}
+    <div class="i-badges-list left i-badges-list-hover i-payments-list">
+        <a class="i-badge i-payment-enabled i-payment-manual"
+           title="{% trans %}Method only available for managers from the managment area. Can't be disabled.{% endtrans %}">
+            <div class="i-badge-legend">
+                <span class="i-badge-legend-right i-payment-status-enabled">
+                    {% trans %}enabled{% endtrans %}
+                </span>
+            </div>
+            <div class="i-badge-content">
+                <span class="i-badge-img icon-coins"></span>
+                <span class="i-badge-title">
+                    {% trans %}Manual{% endtrans %}
+                </span>
+            </div>
+        </a>
+        {%- for short_name, method in methods %}
+            <a id="plugin-{{ method.name }}" class="js-plugin-edit i-badge {%- if method in enabled_methods %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
+               href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
+                <div class="i-badge-legend">
+                    <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
+                    <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
+                </div>
+                <div class="i-badge-content">
+                    <span class="i-badge-img">
+                        <img src="{{ method.logo_url }}">
+                    </span>
+                    <span class="i-badge-title">
+                        {{ method.title }}
+                    </span>
+                </div>
+            </a>
+        {%- endfor %}
+    </div>
 
     <script>
-        $('#toggle-payment').on('change', function() {
-            this.form.submit();
-        });
-
         $('.js-plugin-edit').ajaxDialog({
             title: $T('Payment method settings'),
             onClose: function closePluginDialog(data) {

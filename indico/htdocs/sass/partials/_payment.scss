@@ -50,5 +50,21 @@
                 &> .i-payment-status-enabled { display: none; }
             }
         }
+
+        &.i-payment-manual {
+            &:hover {
+                cursor: default;
+                background-color: $light-green;
+            }
+
+            .i-badge-img {
+                color: $black;
+                font-size: 3em;
+
+                &:before {
+                    vertical-align: text-bottom;
+                }
+            }
+        }
     }
 }

@@ -67,13 +67,11 @@ class RHPaymentEventSettings(RHPaymentEventManagementBase):
 
     def _process(self):
         event = self._conf
-        currencies = {c['code']: c['name'] for c in settings.get('currencies')}
-        plugins = get_payment_plugins()
-        enabled_plugins = [plugin for plugin in plugins.itervalues() if plugin.event_settings.get(event, 'enabled')]
+        methods = get_payment_plugins()
+        enabled_methods = [method for method in methods.itervalues() if method.event_settings.get(event, 'enabled')]
         return WPPaymentEventManagement.render_template('event_settings.html', event, event=event,
                                                         settings=event_settings.get_all(event),
-                                                        currencies=currencies, plugins=plugins.items(),
-                                                        enabled_plugins=enabled_plugins)
+                                                        methods=methods.items(), enabled_methods=enabled_methods)
 
 
 class RHPaymentEventSettingsEdit(RHPaymentEventManagementBase):
