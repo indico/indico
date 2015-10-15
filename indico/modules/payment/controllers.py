@@ -69,7 +69,7 @@ class RHPaymentEventSettings(RHPaymentEventManagementBase):
         event = self._conf
         methods = get_payment_plugins()
         enabled_methods = [method for method in methods.itervalues() if method.event_settings.get(event, 'enabled')]
-        return WPPaymentEventManagement.render_template('event_settings.html', event, event=event,
+        return WPPaymentEventManagement.render_template('management/payments.html', event, event=event,
                                                         settings=event_settings.get_all(event),
                                                         methods=methods.items(), enabled_methods=enabled_methods)
 
@@ -86,8 +86,7 @@ class RHPaymentEventSettingsEdit(RHPaymentEventManagementBase):
             event_settings.set_multi(event, form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.event_settings', event))
-        return WPPaymentEventManagement.render_template('event_settings_edit.html', event, event=event,
-                                                        form=form)
+        return WPPaymentEventManagement.render_template('management/payments_edit.html', event, event=event, form=form)
 
 
 class RHPaymentEventToggle(RHPaymentEventManagementBase):
