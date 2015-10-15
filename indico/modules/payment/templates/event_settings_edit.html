@@ -1,8 +1,7 @@
-{% extends 'layout/base.html' %}
+{% extends 'payment/management/payments_base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
 
-{% block title %}{% trans %}Payment settings{% endtrans %}{% endblock %}
-{% block subtitle %}Configuration{% endblock %}
+{% block subtitle %}Settings{% endblock %}
 
 {% block content %}
     {{ form_header(form) }}
