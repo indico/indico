@@ -156,6 +156,30 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=[]
     )
+    #: Whether the e-ticket module is enabled for this form
+    tickets_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Whether to send the ticket by e-mail
+    ticket_on_email = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    #: Whether to show a ticket download link on the event homepage
+    ticket_on_event_page = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    #: Whether to show a ticket download link on the registration summary page
+    ticket_on_summary_page = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
 
     #: The Event containing this registration form
     event_new = db.relationship(

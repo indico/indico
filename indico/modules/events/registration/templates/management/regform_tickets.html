@@ -1,0 +1,7 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+
+{% from 'forms/_form.html' import simple_form %}
+
+{% block content %}
+    {{ simple_form(form, back_url=url_for('.manage_regform', regform)) }}
+{% endblock %}

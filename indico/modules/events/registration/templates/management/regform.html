@@ -100,5 +100,19 @@
                 </a>
             </div>
         </div>
+        <div class="section">
+            <div class="icon icon-ticket"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Tickets{% endtrans %}
+                </div>
+                {% trans %}Configure ticketing system{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <a href="{{ url_for('.tickets', regform) }}" class="i-button icon-settings">
+                    {% trans %}Configure{% endtrans %}
+                </a>
+            </div>
+        </div>
     </div>
 {% endblock %}
