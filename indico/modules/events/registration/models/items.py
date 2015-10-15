@@ -353,6 +353,6 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        field_data = dict(super(RegistrationFormText, self).view_data, is_enabled=self.is_enabled,
-                          input_type='label', title=self.title, **self.current_data.versioned_data)
+        field_data = dict(super(RegistrationFormText, self).view_data, is_enabled=self.is_enabled, input_type='label',
+                          title=self.title)
         return camelize_keys(field_data)

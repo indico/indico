@@ -41,6 +41,7 @@ def _fill_form_field_with_data(field, field_data):
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
     """Base class for a specific field within a registration form"""
 
+    field_class = RegistrationFormField
     normalize_url_spec = {
         'locators': {
             lambda self: self.field
@@ -49,7 +50,7 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 
     def _checkParams(self, params):
         RHManageRegFormSectionBase._checkParams(self, params)
-        self.field = RegistrationFormItem.get_one(request.view_args['field_id'])
+        self.field = self.field_class.get_one(request.view_args['field_id'])
 
 
 class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
@@ -82,14 +83,11 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         if (self.field.type == RegistrationFormItemType.field_pd and self.field.personal_data_type.is_required and
                 not field_data['is_required']):
             raise BadRequest
-        if self.field.type == RegistrationFormItemType.text:
-            del field_data['input_type']  # labels have no input type
         elif self.field.input_type != field_data['input_type']:
             raise BadRequest
         _fill_form_field_with_data(self.field, field_data)
-        if self.field.type != RegistrationFormItemType.text:
-            self.field.data, self.field.versioned_data = self.field.field_impl.process_field_data(
-                field_data, self.field.data, self.field.versioned_data)
+        self.field.data, self.field.versioned_data = self.field.field_impl.process_field_data(
+            field_data, self.field.data, self.field.versioned_data)
         return jsonify_data(flash=False)
 
 
@@ -123,24 +121,52 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
-        if field_data['input_type'] == 'label':
-            del field_data['input_type']  # labels have no input type
-            field_type = RegistrationFormText
-            data = versioned_data = None
-        else:
-            field_type = RegistrationFormField
-            try:
-                field_impl_type = get_field_types()[field_data['input_type']]
-            except KeyError:
-                raise BadRequest
-            data, versioned_data = field_impl_type.process_field_data(field_data)
+        try:
+            field_impl_type = get_field_types()[field_data['input_type']]
+        except KeyError:
+            raise BadRequest
+        data, versioned_data = field_impl_type.process_field_data(field_data)
 
-        form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
+        form_field = RegistrationFormField(parent_id=self.section.id, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data)
         if data is not None:
             form_field.data = data
         if versioned_data is not None:
             form_field.versioned_data = versioned_data
+        db.session.add(form_field)
+        db.session.flush()
+        return jsonify(form_field.view_data)
+
+
+class RHRegistrationFormToggleTextState(RHRegistrationFormToggleFieldState):
+    """Enable/Disable a static text field"""
+    field_class = RegistrationFormText
+
+
+class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
+    """Remove/Modify a static text field"""
+    field_class = RegistrationFormText
+
+    def _process_PATCH(self):
+        field_data = snakify_keys(request.json['fieldData'])
+        del field_data['input_type']
+        _fill_form_field_with_data(self.field, field_data)
+        return jsonify_data(flash=False)
+
+
+class RHRegistrationFormMoveText(RHRegistrationFormMoveField):
+    """Change position of a static text field within the section"""
+    field_class = RegistrationFormText
+
+
+class RHRegistrationFormAddText(RHManageRegFormSectionBase):
+    """Add a static text field to a section"""
+
+    def _process(self):
+        field_data = snakify_keys(request.json['fieldData'])
+        del field_data['input_type']
+        form_field = RegistrationFormText(parent_id=self.section.id, registration_form=self.regform)
+        _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
         return jsonify(form_field.view_data)

@@ -79,7 +79,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
             endPos: position
         });
 
-        regFormFactory.Fields.move(requestParams, function(updatedSection) {
+        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].move(requestParams, function(updatedSection) {
             regFormFactory.processResponse(updatedSection, {
                 success: function(updatedSection) {}
             });
@@ -99,7 +99,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                     fieldId: field.id
                 });
 
-                $scope.$apply(regFormFactory.Fields.remove(requestParams, {}, function(updatedSection) {
+                $scope.$apply(regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].remove(requestParams, {}, function(updatedSection) {
                     regFormFactory.processResponse(updatedSection, {
                         success: function(updatedSection) {
                             $scope.section.items = $scope.section.items.filter(function(obj) {

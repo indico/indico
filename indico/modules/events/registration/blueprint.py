@@ -22,9 +22,13 @@ from indico.modules.events.registration.controllers.display import (RHRegistrati
                                                                     RHRegistrationFormCheckEmail,
                                                                     RHRegistrationFormDeclineInvitation)
 from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
+                                                                              RHRegistrationFormToggleTextState,
                                                                               RHRegistrationFormModifyField,
+                                                                              RHRegistrationFormModifyText,
                                                                               RHRegistrationFormMoveField,
-                                                                              RHRegistrationFormAddField)
+                                                                              RHRegistrationFormMoveText,
+                                                                              RHRegistrationFormAddField,
+                                                                              RHRegistrationFormAddText)
 from indico.modules.events.registration.controllers.management.invitations import (RHRegistrationFormInvitations,
                                                                                    RHRegistrationFormInvite,
                                                                                    RHRegistrationFormDeleteInvitation)
@@ -113,6 +117,17 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
                  'toggle_field', RHRegistrationFormToggleFieldState, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
                  'move_field', RHRegistrationFormMoveField, methods=('POST',))
+
+# Regform edition: Static text
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text', 'add_text',
+                 RHRegistrationFormAddText, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>',
+                 'modify_text', RHRegistrationFormModifyText, methods=('DELETE', 'PATCH'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/toggle',
+                 'toggle_text', RHRegistrationFormToggleTextState, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/move',
+                 'move_text', RHRegistrationFormMoveText, methods=('POST',))
+
 
 # Display
 _bp.add_url_rule('/registrations/', 'display_regform_list', RHRegistrationFormList)

@@ -101,6 +101,13 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
             "disable": {method:'POST', url: urls.field.toggle, params: {enable: false}},
             "move": {method:'POST', url: urls.field.move},
             "modify": {method: 'PATCH', url: urls.field.modify}
+        }),
+        Labels: $resource(urls.text.add, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId", confFormId: "@confFormId"}, {
+            "remove": {method: 'DELETE', url: urls.text.modify},
+            "enable": {method:'POST', url: urls.text.toggle, params: {enable: true}},
+            "disable": {method:'POST', url: urls.text.toggle, params: {enable: false}},
+            "move": {method:'POST', url: urls.text.move},
+            "modify": {method: 'PATCH', url: urls.text.modify}
         })
     };
 });
