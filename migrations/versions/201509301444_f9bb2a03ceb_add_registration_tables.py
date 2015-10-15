@@ -72,6 +72,7 @@ def upgrade():
         sa.CheckConstraint("is_enabled OR type != 4", name='pd_section_enabled'),
         sa.CheckConstraint("is_enabled OR type != 5 OR personal_data_type NOT IN (1, 2, 3)", name='pd_field_enabled'),
         sa.CheckConstraint("is_required OR type != 5 OR personal_data_type NOT IN (1, 2, 3)", name='pd_field_required'),
+        sa.CheckConstraint("(current_data_id IS NOT NULL) = (type IN (2, 5))", name='current_data_id_only_field'),
         sa.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
                  postgresql_where=sa.text('type = 4')),
         sa.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
