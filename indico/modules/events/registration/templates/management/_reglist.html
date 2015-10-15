@@ -7,6 +7,7 @@
                 <thead>
                     <tr class="i-table">
                         <th class="i-table checkbox-column"></th>
+                        <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
                         <th class="i-table">{% trans %}Full name{% endtrans %}</th>
                         {% for item in visible_cols_regform_items %}
                             <th class="i-table">{{ item.title }}</th>
@@ -28,6 +29,9 @@
                         <tr class="i-table">
                             <td class="i-table">
                                 <input class="select-row" type="checkbox" name="registrant_id" value="{{ registration.id }}">
+                            </td>
+                            <td class="i-table">
+                                #{{ registration.friendly_id }}
                             </td>
                             <td class="i-table">
                                 <a href="{{ url_for('.registration_details', registration) }}">

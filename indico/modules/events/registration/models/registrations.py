@@ -25,6 +25,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.payment import event_settings as event_payment_settings
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
@@ -42,10 +43,18 @@ class RegistrationState(TitledIntEnum):
     unpaid = 5
 
 
+def _get_next_friendly_id(context):
+    """Get the next friendly id for a registration."""
+    from indico.modules.events.registration.models.forms import RegistrationForm
+    regform_id = context.current_parameters['registration_form_id']
+    return increment_and_get(RegistrationForm.last_friendly_id, RegistrationForm.id == regform_id)
+
+
 class Registration(db.Model):
     """Somebody's registration for an event through a registration form"""
     __tablename__ = 'registrations'
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
+                      db.Index(None, 'registration_form_id', 'friendly_id', unique=True),
                       db.Index(None, 'registration_form_id', 'user_id', unique=True,
                                postgresql_where=db.text('state NOT IN (3, 4)')),
                       db.Index(None, 'registration_form_id', 'email', unique=True,
@@ -64,6 +73,12 @@ class Registration(db.Model):
         unique=True,
         nullable=False,
         default=lambda: unicode(uuid4())
+    )
+    #: The human-friendly ID for the object
+    friendly_id = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_friendly_id
     )
     #: The ID of the registration form
     registration_form_id = db.Column(
