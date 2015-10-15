@@ -105,8 +105,8 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
             start_enum = new_position + 1
         else:
             def fn(field):
-                return (field.position > old_position and field.position <= new_position
-                        and field.id != self.field.id and not field.is_deleted)
+                return (old_position < field.position <= new_position and field.id != self.field.id and
+                        not field.is_deleted)
             start_enum = self.field.position
         to_update = filter(fn, self.section.children)
         self.field.position = new_position
