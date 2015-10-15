@@ -733,8 +733,8 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             };
 
             $scope.initFormData = function(formData, field) {
-                var eventStartDate = $scope.confSdate
-                    eventEndDate = $scope.confEdate;
+                var eventStartDate = $scope.eventStartDate
+                    eventEndDate = $scope.eventEndDate;
                 formData.accommodationOptions = [];
                 formData.arrivalDateFrom = field.arrivalDateFrom || moment(eventStartDate).subtract(2, 'days').format('DD-MM-YYYY');
                 formData.arrivalDateTo = field.arrivalDateTo || moment(eventEndDate).format('DD-MM-YYYY');
