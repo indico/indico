@@ -404,10 +404,8 @@ ndRegForm.directive('ndLabelField', function(url) {
         link: function(scope) {
             scope.settings.fieldName = $T("Free Text");
             scope.settings.singleColumn = true;
-            scope.settings.isBillable = true;
+            scope.settings.isBillable = false;
             scope.settings.isRequired = false;
-            scope.settings.formData.push('isBillable');
-            scope.settings.formData.push('price');
         }
     };
 });
