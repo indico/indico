@@ -129,10 +129,10 @@ def create_registration(regform, data, event, invitation=None):
                           .find(email=data['email'], registration_id=None)
                           .with_parent(regform)
                           .first())
-    registration.init_state(event, invitation)
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
+    registration.update_state()
     db.session.flush()
     logger.info('New registration %s by %s', registration, session.user)
     return registration
