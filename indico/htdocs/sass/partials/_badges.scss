@@ -36,6 +36,9 @@
     -webkit-justify-content: space-around;
     justify-content: space-around;
 
+    > .i-badge:first-child {
+        margin-left: 0;
+    }
 }
 
 .i-badges-list.left {
