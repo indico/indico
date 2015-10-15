@@ -79,10 +79,11 @@ class SelectField(RegistrationFormBillableField):
 
     @classmethod
     def modify_post_data(cls, post_data):
-        items = post_data['radioitems']
+        items = [x for x in post_data['radioitems'] if not x.get('remove')]
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
+        post_data['radioitems'] = items
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
