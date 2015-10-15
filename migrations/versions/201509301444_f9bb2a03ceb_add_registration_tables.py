@@ -28,6 +28,7 @@ def upgrade():
         'forms',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('last_friendly_id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('introduction', sa.Text(), nullable=False),
         sa.Column('contact_info', sa.String(), nullable=False),
@@ -101,6 +102,7 @@ def upgrade():
     op.create_table(
         'registrations',
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('friendly_id', sa.Integer(), nullable=False),
         sa.Column('uuid', postgresql.UUID, nullable=False, index=True, unique=True),
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
@@ -114,6 +116,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.ForeignKeyConstraint(['transaction_id'], ['events.payment_transactions.id']),
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
+        sa.Index(None, 'registration_form_id', 'friendly_id', unique=True),
         sa.Index(None, 'registration_form_id', 'user_id', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
         sa.Index(None, 'registration_form_id', 'email', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
         sa.PrimaryKeyConstraint('id'),

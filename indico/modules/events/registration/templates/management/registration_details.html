@@ -7,7 +7,7 @@
 {% block content %}
     <dl class="i-data-list">
         <dt>{% trans %}Registration ID{% endtrans %}</dt>
-        <dd>{{ registration.id }}</dd>
+        <dd>{{ registration.friendly_id }}</dd>
         <dt>{% trans %}Registration date{% endtrans %}</dt>
         <dd>{{ registration.submitted_dt | format_datetime }}</dd>
         {% if registration.user %}

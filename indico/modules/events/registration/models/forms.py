@@ -52,6 +52,12 @@ class RegistrationForm(db.Model):
         index=True,
         nullable=False
     )
+    #: The last user-friendly registration ID
+    last_friendly_id = db.deferred(db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
+    ))
     #: The title of the registration form
     title = db.Column(
         db.String,
