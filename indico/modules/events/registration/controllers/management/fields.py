@@ -22,18 +22,23 @@ from werkzeug.exceptions import BadRequest
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
-from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItemType
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.util.string import snakify_keys
 
 
-def _fill_form_field_with_data(field, field_data):
+def _fill_form_field_with_data(field, field_data, set_data=True):
     field.title = field_data.pop('title')
     field.description = field_data.pop('description', '')
     field.is_enabled = field_data.pop('is_enabled')
     field.is_required = field_data.pop('is_required', False)
     field.input_type = field_data.pop('input_type', None)
+    if set_data:
+        if field.id is None:  # new field
+            field.data, field.versioned_data = field.field_impl.process_field_data(field_data)
+        else:
+            field.data, field.versioned_data = field.field_impl.process_field_data(field_data, field.data,
+                                                                                   field.versioned_data)
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
@@ -84,8 +89,6 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif self.field.input_type != field_data['input_type']:
             raise BadRequest
         _fill_form_field_with_data(self.field, field_data)
-        self.field.data, self.field.versioned_data = self.field.field_impl.process_field_data(
-            field_data, self.field.data, self.field.versioned_data)
         return jsonify(view_data=self.field.view_data)
 
 
@@ -119,18 +122,8 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
-        try:
-            field_impl_type = get_field_types()[field_data['input_type']]
-        except KeyError:
-            raise BadRequest
-        data, versioned_data = field_impl_type.process_field_data(field_data)
-
         form_field = RegistrationFormField(parent_id=self.section.id, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data)
-        if data is not None:
-            form_field.data = data
-        if versioned_data is not None:
-            form_field.versioned_data = versioned_data
         db.session.add(form_field)
         db.session.flush()
         return jsonify(view_data=form_field.view_data)
@@ -148,7 +141,7 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
-        _fill_form_field_with_data(self.field, field_data)
+        _fill_form_field_with_data(self.field, field_data, set_data=False)
         return jsonify(view_data=self.field.view_data)
 
 
@@ -164,7 +157,7 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
         form_field = RegistrationFormText(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data)
+        _fill_form_field_with_data(form_field, field_data, set_data=False)
         db.session.add(form_field)
         db.session.flush()
         return jsonify(view_data=form_field.view_data)
