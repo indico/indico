@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.event import listens_for
+from werkzeug.datastructures import ImmutableDict
 
 from indico.core.db import db
 from indico.modules.events.registration.fields import get_field_types
@@ -78,8 +79,22 @@ class RegistrationFormField(RegistrationFormItem):
         return get_field_types()[self.input_type](self)
 
     @property
+    def versioned_data(self):
+        return ImmutableDict(self.current_data.versioned_data)
+
+    @versioned_data.setter
+    def versioned_data(self, value):
+        if self.current_data is not None and value == self.current_data.versioned_data:
+            return
+        # create new version if the current one is associated with anything
+        if self.current_data is None or self.current_data.registration_data:
+            self.current_data = RegistrationFormFieldData(versioned_data=value)
+        else:
+            self.current_data.versioned_data = value
+
+    @property
     def view_data(self):
-        base_dict = dict(self.current_data.versioned_data, **self.data)
+        base_dict = dict(self.versioned_data, **self.data)
         base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
                          input_type=self.input_type, html_name=self.html_field_name,
                          **super(RegistrationFormField, self).view_data)

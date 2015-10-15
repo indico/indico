@@ -88,10 +88,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             raise BadRequest
         _fill_form_field_with_data(self.field, field_data)
         if self.field.type != RegistrationFormItemType.text:
-            self.field.data, versioned_data = self.field.field_impl.process_field_data(
-                field_data, self.field.data, self.field.current_data.versioned_data)
-            if self.field.current_data.versioned_data != versioned_data:
-                self.field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
+            self.field.data, self.field.versioned_data = self.field.field_impl.process_field_data(
+                field_data, self.field.data, self.field.versioned_data)
         return jsonify_data(flash=False)
 
 
@@ -142,7 +140,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         if data is not None:
             form_field.data = data
         if versioned_data is not None:
-            form_field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
+            form_field.versioned_data = versioned_data
         db.session.add(form_field)
         db.session.flush()
         return jsonify(form_field.view_data)
