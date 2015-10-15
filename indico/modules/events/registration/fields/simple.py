@@ -77,7 +77,8 @@ class SelectField(RegistrationFormBillableField):
             default_item = data['default_item']
         except KeyError:
             return None
-        return next((x['id'] for x in versioned_data['radioitems'] if x['caption'] == default_item), None)
+        # only use the default item if it exists in the current version
+        return default_item if any(x['id'] == default_item for x in versioned_data['radioitems']) else None
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
@@ -85,12 +86,17 @@ class SelectField(RegistrationFormBillableField):
                                                                                       old_versioned_data)
         items = [x for x in versioned_data['radioitems'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
+        default_item = None
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
+            # XXX: it would be nice if we could use item['is_default'] but doing that with angular is tricky
+            if unversioned_data.get('default_item') in {item['caption'], item['id']}:
+                default_item = item['id']
             captions[item['id']] = item.pop('caption')
         versioned_data['radioitems'] = items
         unversioned_data['captions'] = captions
+        unversioned_data['default_item'] = default_item
         return unversioned_data, versioned_data
 
     @property
