@@ -29,7 +29,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.disableField = function(field) {
-        regFormFactory.Fields.disable(getRequestParams(field), function(updatedField) {
+        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].disable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
                     var index = -1;
@@ -47,7 +47,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.enableField = function(field) {
-        regFormFactory.Fields.enable(getRequestParams(field), function(updatedField) {
+        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].enable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
                     $scope.field.isEnabled = updatedField.isEnabled;
@@ -70,7 +70,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             delete postData['fieldId'];
         }
 
-        regFormFactory.Fields[$scope.isNew() ? 'save' : 'modify'](postData, function(response) {
+        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'][$scope.isNew() ? 'save' : 'modify'](postData, function(response) {
             regFormFactory.processResponse(response, {
                 success: function(response) {
                     if ($scope.isNew()) {

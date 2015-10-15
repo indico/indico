@@ -106,6 +106,12 @@ def generate_global_file(config):
                     'modify': url_rule_to_angular('event_registration.modify_field'),
                     'toggle': url_rule_to_angular('event_registration.toggle_field'),
                     'move': url_rule_to_angular('event_registration.move_field')
+                },
+                'text': {
+                    'add': url_rule_to_angular('event_registration.add_text'),
+                    'modify': url_rule_to_angular('event_registration.modify_text'),
+                    'toggle': url_rule_to_angular('event_registration.toggle_text'),
+                    'move': url_rule_to_angular('event_registration.move_text')
                 }
             }
         },
