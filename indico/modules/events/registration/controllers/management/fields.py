@@ -23,11 +23,9 @@ from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.fields import get_field_types
-from indico.modules.events.registration.models.items import (RegistrationFormText, RegistrationFormItem,
-                                                             RegistrationFormItemType)
-from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData)
+from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItemType
+from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.util.string import snakify_keys
-from indico.web.util import jsonify_data
 
 
 def _fill_form_field_with_data(field, field_data):
@@ -64,7 +62,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         self.field.is_enabled = enabled
         db.session.flush()
         logger.info('Field {} modified by {}'.format(self.field, session.user))
-        return jsonify_data(**self.field.view_data)
+        return jsonify(view_data=self.field.view_data)
 
 
 class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
@@ -76,7 +74,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         self.field.is_deleted = True
         db.session.flush()
         logger.info('Field {} deleted by {}'.format(self.field, session.user))
-        return jsonify_data(flash=False)
+        return jsonify()
 
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
@@ -88,7 +86,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         _fill_form_field_with_data(self.field, field_data)
         self.field.data, self.field.versioned_data = self.field.field_impl.process_field_data(
             field_data, self.field.data, self.field.versioned_data)
-        return jsonify_data(flash=False)
+        return jsonify(view_data=self.field.view_data)
 
 
 class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
@@ -98,7 +96,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
         new_position = request.json['endPos'] + 1
         old_position = self.field.position
         if new_position == old_position:
-            return jsonify(success=True)
+            return jsonify()
         elif new_position < old_position:
             def fn(field):
                 return field.position >= new_position and field.id != self.field.id and not field.is_deleted
@@ -113,7 +111,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
         for pos, field in enumerate(to_update, start_enum):
             field.position = pos
         db.session.flush()
-        return jsonify(success=True)
+        return jsonify()
 
 
 class RHRegistrationFormAddField(RHManageRegFormSectionBase):
@@ -135,7 +133,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
             form_field.versioned_data = versioned_data
         db.session.add(form_field)
         db.session.flush()
-        return jsonify(form_field.view_data)
+        return jsonify(view_data=form_field.view_data)
 
 
 class RHRegistrationFormToggleTextState(RHRegistrationFormToggleFieldState):
@@ -151,7 +149,7 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
         _fill_form_field_with_data(self.field, field_data)
-        return jsonify_data(flash=False)
+        return jsonify(view_data=self.field.view_data)
 
 
 class RHRegistrationFormMoveText(RHRegistrationFormMoveField):
@@ -169,4 +167,4 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
-        return jsonify(form_field.view_data)
+        return jsonify(view_data=form_field.view_data)

@@ -197,7 +197,8 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
         registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))
         for form_item in self.regform.active_fields:
             if form_item.parent.is_manager_only:
-                value = form_item.field_impl.default_value
+                with db.session.no_autoflush:
+                    value = form_item.field_impl.default_value
             else:
                 value = data.get(form_item.html_field_name)
             with db.session.no_autoflush:

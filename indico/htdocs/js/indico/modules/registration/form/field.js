@@ -73,11 +73,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'][$scope.isNew() ? 'save' : 'modify'](postData, function(response) {
             regFormFactory.processResponse(response, {
                 success: function(response) {
-                    if ($scope.isNew()) {
-                        $scope.field = angular.extend($scope.field, response);
-                    } else {
-                        $scope.field = angular.extend($scope.field, postData.fieldData);
-                    }
+                    $scope.field = angular.extend($scope.field, response.view_data);
                 }
             });
         }, handleAjaxError);
