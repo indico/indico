@@ -214,17 +214,36 @@ class Registration(db.Model):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, is_deleted=False,
                            _text=full_name)
 
-    def init_state(self, event, invitation):
-        """Initialize state of the object"""
-        if self.state is not None:
-            raise Exception("The registration already has a state")
+    def update_state(self, approved=None, paid=None):
+        if approved is not None and paid is not None:
+            raise Exception("Both approved and paid have been set")
+        regform = self.registration_form
+        invitation = self.invitation
+        moderation_required = regform.moderation_enabled and (not invitation or not invitation.skip_moderation)
         with db.session.no_autoflush:
-            if self.registration_form.moderation_enabled and (not invitation or not invitation.skip_moderation):
+            payment_required = regform.event.has_feature('payment') and self.price
+        if self.state is None:
+            if moderation_required:
                 self.state = RegistrationState.pending
-            elif event_payment_settings.get(event, 'enabled') and self.price:
+            elif payment_required:
                 self.state = RegistrationState.unpaid
             else:
                 self.state = RegistrationState.complete
+        elif self.state == RegistrationState.pending:
+            if approved and payment_required:
+                self.state = RegistrationState.unpaid
+            elif approved:
+                self.state = RegistrationState.complete
+        elif self.state == RegistrationState.unpaid:
+            if paid:
+                self.state = RegistrationState.complete
+            elif not approved:
+                self.state = Registration.pending
+        elif self.state == RegistrationState.complete:
+            if not approved and not payment_required and moderation_required:
+                self.state = RegistrationState.pending
+            elif not paid and payment_required:
+                self.state = RegistrationState.unpaid
 
     @property
     def can_be_modified(self):
