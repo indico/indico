@@ -17,7 +17,7 @@
 import re
 
 from sqlalchemy import over, func
-
+from sqlalchemy.sql import update
 
 TS_REGEX = re.compile(r'([@<>!()&|:\'])')
 
@@ -73,3 +73,25 @@ def preprocess_ts_string(text, prefix=True):
 def has_extension(conn, name):
     """Checks if the postgres database has a certain extension installed"""
     return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()
+
+
+def increment_and_get(col, filter_):
+    """Increments and returns a numeric column.
+
+    This is committed to the database immediately in a separate
+    transaction to avoid possible conflicts.
+
+    The main purpose of this utility is to generate "scoped" IDs
+    (which cannot be represented using database-level sequences as you
+    would need one sequence per scope) without risking collisions when
+    inserting the objects those IDs are eventually assigned to.
+
+    :param col: The column to update, e.g. ``SomeModel.last_num``
+    :param filter_: A filter expression such as ``SomeModel.id == n``
+                    to restrict which columns to update.
+    """
+    from indico.core.db import db
+    with db.tmp_session() as s:
+        rv = s.execute(update(col.class_).where(filter_).values({col: col + 1}).returning(col)).fetchone()[0]
+        s.commit()
+    return rv
