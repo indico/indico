@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from copy import deepcopy
 from uuid import uuid4
 
 import wtforms
@@ -66,6 +67,7 @@ class TextAreaField(RegistrationFormFieldBase):
 class SelectField(RegistrationFormBillableField):
     name = 'radio'
     wtf_field_class = wtforms.StringField
+    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'radioitems'}
 
     @property
     def default_value(self):
@@ -78,12 +80,25 @@ class SelectField(RegistrationFormBillableField):
         return next((x['id'] for x in versioned_data['radioitems'] if x['caption'] == default_item), None)
 
     @classmethod
-    def modify_post_data(cls, post_data):
-        items = [x for x in post_data['radioitems'] if not x.get('remove')]
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super(SelectField, cls).process_field_data(data, old_data,
+                                                                                      old_versioned_data)
+        items = [x for x in versioned_data['radioitems'] if not x.get('remove')]
+        captions = dict(old_data['captions']) if old_data is not None else {}
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
-        post_data['radioitems'] = items
+            captions[item['id']] = item.pop('caption')
+        versioned_data['radioitems'] = items
+        unversioned_data['captions'] = captions
+        return unversioned_data, versioned_data
+
+    @property
+    def view_data(self):
+        items = deepcopy(self.form_item.current_data.versioned_data['radioitems'])
+        for item in items:
+            item['caption'] = self.form_item.data['captions'][item['id']]
+        return {'radioitems': items}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
@@ -93,8 +108,7 @@ class SelectField(RegistrationFormBillableField):
     def get_friendly_data(self, registration_data):
         if not registration_data.data:
             return ''
-        items = registration_data.field_data.versioned_data['radioitems']
-        return next(x['caption'] for x in items if x['id'] == registration_data.data)
+        return registration_data.field_data.field.data['captions'][registration_data.data]
 
 
 class CheckboxField(RegistrationFormBillableField):
@@ -119,11 +133,13 @@ class DateField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
     @classmethod
-    def modify_post_data(cls, post_data):
-        date_format = post_data['date_format'].split(' ')
-        post_data['date_format'] = date_format[0]
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super(DateField, cls).process_field_data(data, old_data, old_versioned_data)
+        date_format = unversioned_data['date_format'].split(' ')
+        unversioned_data['date_format'] = date_format[0]
         if len(date_format) == 2:
-            post_data['time_format'] = date_format[1]
+            unversioned_data['time_format'] = date_format[1]
+        return unversioned_data, versioned_data
 
 
 class BooleanField(RegistrationFormBillableField):

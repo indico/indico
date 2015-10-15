@@ -29,9 +29,6 @@ from indico.modules.events.registration.models.form_fields import (RegistrationF
 from indico.util.string import snakify_keys
 from indico.web.util import jsonify_data
 
-NON_VERSIONED_DATA = {'min_value', 'length', 'number_of_columns', 'number_of_rows', 'places_limit', 'date_format',
-                      'with_extra_slots', 'item_type', 'default_item', 'time_format'}
-
 
 def _fill_form_field_with_data(field, field_data):
     field.title = field_data.pop('title')
@@ -39,7 +36,6 @@ def _fill_form_field_with_data(field, field_data):
     field.is_enabled = field_data.pop('is_enabled')
     field.is_required = field_data.pop('is_required', False)
     field.input_type = field_data.pop('input_type', None)
-    field.data = {key: field_data.pop(key) for key in NON_VERSIONED_DATA if key in field_data}
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
@@ -91,9 +87,11 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif self.field.input_type != field_data['input_type']:
             raise BadRequest
         _fill_form_field_with_data(self.field, field_data)
-        if field_data != self.field.current_data.versioned_data:
-            self.field.field_impl.modify_post_data(field_data)
-            self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, versioned_data=field_data)
+        if self.field.type != RegistrationFormItemType.text:
+            self.field.data, versioned_data = self.field.field_impl.process_field_data(
+                field_data, self.field.data, self.field.current_data.versioned_data)
+            if self.field.current_data.versioned_data != versioned_data:
+                self.field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
         return jsonify_data(flash=False)
 
 
@@ -130,17 +128,21 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         if field_data['input_type'] == 'label':
             del field_data['input_type']  # labels have no input type
             field_type = RegistrationFormText
+            data = versioned_data = None
         else:
             field_type = RegistrationFormField
             try:
                 field_impl_type = get_field_types()[field_data['input_type']]
             except KeyError:
                 raise BadRequest
-            field_impl_type.modify_post_data(field_data)
+            data, versioned_data = field_impl_type.process_field_data(field_data)
 
         form_field = field_type(parent_id=self.section.id, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data)
+        if data is not None:
+            form_field.data = data
+        if versioned_data is not None:
+            form_field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
         db.session.add(form_field)
         db.session.flush()
-        form_field.current_data = RegistrationFormFieldData(field_id=form_field.id, versioned_data=field_data)
         return jsonify(form_field.view_data)

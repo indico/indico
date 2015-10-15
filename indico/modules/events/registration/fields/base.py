@@ -34,6 +34,8 @@ class RegistrationFormFieldBase(object):
     required_validator = DataRequired
     #: the validator to use when the field is not required
     not_required_validator = Optional
+    #: the data fields that need to be versioned
+    versioned_data_fields = frozenset({'is_billable', 'price'})
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -63,8 +65,18 @@ class RegistrationFormFieldBase(object):
         registration.data.append(RegistrationData(field_data=self.form_item.current_data, data=value))
 
     @classmethod
-    def modify_post_data(cls, post_data):
-        pass
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        """Processes the settings of the field.
+
+        :param data: The field data from the client
+        :param old_data: The old unversioned field data (if available)
+        :param old_versioned_data: The old versioned field data (if
+                                   available)
+        :return: A ``(unversioned_data, versioned_data)`` tuple
+        """
+        versioned_data = {k: v for k, v in data.iteritems() if k in cls.versioned_data_fields}
+        unversioned_data = {k: v for k, v in data.iteritems() if k not in cls.versioned_data_fields}
+        return unversioned_data, versioned_data
 
     @property
     def view_data(self):
