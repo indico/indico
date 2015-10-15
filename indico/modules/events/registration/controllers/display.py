@@ -21,15 +21,12 @@ from uuid import UUID
 from flask import request, session, redirect, flash, jsonify
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
-from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
-from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
-from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.util import (get_event_section_data, make_registration_form)
+from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.util import get_event_section_data, make_registration_form, create_registration
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture)
@@ -147,7 +144,7 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormRegistrationBa
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
-            registration = self._save_registration(form.data)
+            registration = create_registration(self.regform, form.data, self.event, self.invitation)
             return redirect(url_for('.display_regform', registration.locator.registrant))
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation
@@ -161,34 +158,6 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormRegistrationBa
                                                currency=event_settings.get(self.event, 'currency'),
                                                user_data=user_data, invitation=self.invitation,
                                                registration=self.registration)
-
-    def _save_registration(self, data):
-        registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))
-        for form_item in self.regform.active_fields:
-            if form_item.parent.is_manager_only:
-                with db.session.no_autoflush:
-                    value = form_item.field_impl.default_value
-            else:
-                value = data.get(form_item.html_field_name)
-            with db.session.no_autoflush:
-                form_item.field_impl.save_data(registration, value)
-            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-                setattr(registration, form_item.personal_data_type.column, value)
-        invitation = self.invitation
-        if invitation is None:
-            # Associate invitation based on email in case the user did not use the link
-            with db.session.no_autoflush:
-                invitation = (RegistrationInvitation
-                              .find(email=data['email'], registration_id=None)
-                              .with_parent(self.regform)
-                              .first())
-        registration.init_state(self.event, invitation)
-        if invitation:
-            invitation.state = InvitationState.accepted
-            invitation.registration = registration
-        db.session.flush()
-        logger.info('New registration %s by %s', registration, session.user)
-        return registration
 
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):

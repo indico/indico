@@ -26,7 +26,6 @@ from sqlalchemy.orm import joinedload, undefer
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.controllers import RegistrationCreationMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
@@ -34,7 +33,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.forms import EmailRegistrantsForm
-from indico.modules.events.registration.util import get_event_section_data, make_registration_form
+from indico.modules.events.registration.util import get_event_section_data, make_registration_form, create_registration
 from indico.modules.payment import event_settings
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
@@ -245,13 +244,13 @@ class RHRegistrationDelete(RHManageRegFormBase):
         return jsonify_data()
 
 
-class RHRegistrationCreate(RHManageRegFormBase, RegistrationCreationMixin):
+class RHRegistrationCreate(RHManageRegFormBase):
     """Create new registration (management area)"""
 
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
-            self._save_registration(form.data)
+            create_registration(self.regform, form.data, self.event)
             flash(_("The registration was created."), 'success')
             return redirect(url_for('.manage_reglist', self.regform))
         elif form.is_submitted():
