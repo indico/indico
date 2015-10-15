@@ -55,7 +55,7 @@ class RegistrationFormFieldBase(object):
 
     def create_wtf_field(self):
         validators = list(self.validators) if self.validators is not None else []
-        if self.form_item.current_data.versioned_data.get('is_required'):
+        if self.form_item.is_required:
             validators.append(self.required_validator())
         elif self.not_required_validator:
             validators.append(self.not_required_validator())

@@ -72,7 +72,7 @@ class SelectField(RegistrationFormBillableField):
     @property
     def default_value(self):
         data = self.form_item.data
-        versioned_data = self.form_item.current_data.versioned_data
+        versioned_data = self.form_item.versioned_data
         try:
             default_item = data['default_item']
         except KeyError:
@@ -95,7 +95,7 @@ class SelectField(RegistrationFormBillableField):
 
     @property
     def view_data(self):
-        items = deepcopy(self.form_item.current_data.versioned_data['radioitems'])
+        items = deepcopy(self.form_item.versioned_data['radioitems'])
         for item in items:
             item['caption'] = self.form_item.data['captions'][item['id']]
         return {'radioitems': items}
