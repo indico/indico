@@ -205,8 +205,17 @@ class Registration(db.Model):
         return loc
 
     @property
+    def can_be_modified(self):
+        regform = self.registration_form
+        return regform.is_modification_open and regform.is_modification_allowed(self)
+
+    @property
     def data_by_field(self):
         return {x.field_data.field_id: x for x in self.data}
+
+    @property
+    def price(self):
+        return sum(data.price for data in self.data)
 
     @return_ascii
     def __repr__(self):
@@ -244,15 +253,6 @@ class Registration(db.Model):
                 self.state = RegistrationState.pending
             elif not paid and payment_required:
                 self.state = RegistrationState.unpaid
-
-    @property
-    def can_be_modified(self):
-        regform = self.registration_form
-        return regform.is_modification_open and regform.is_modification_allowed(self)
-
-    @property
-    def price(self):
-        return sum(data.price for data in self.data)
 
 
 class RegistrationData(db.Model):
