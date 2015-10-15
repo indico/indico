@@ -126,8 +126,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             confFormId: '@',
             confCurrency: '@',
             confSections: '@',
-            confSdate: '@',
-            confEdate: '@',
+            eventStartDate: '@',
+            eventEndDate: '@',
             userInfo: '@',
             csrfToken: '&',
             editMode: '=',
@@ -142,8 +142,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             $rootScope.confId = $scope.confId;
             $rootScope.confFormId = $scope.confFormId;
-            $rootScope.confSdate = $scope.confSdate;
-            $rootScope.confEdate = $scope.confEdate;
+            $rootScope.eventStartDate = $scope.eventStartDate;
+            $rootScope.eventEndDate = $scope.eventEndDate;
             $rootScope.editMode = $scope.editMode;
 
             $scope.csrfToken = $('#csrf-token').attr('content');
