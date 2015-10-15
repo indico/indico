@@ -193,54 +193,56 @@ class RHRegistrationEdit(RHManageRegistrationBase):
                                                     registration=self.registration)
 
 
-class RHRegistrationEmailRegistrants(RHManageRegFormBase):
+class RHRegistrationsActionBase(RHManageRegFormBase):
+    """Base class for classes performing actions on registrations"""
+
+    def _checkParams(self, params):
+        RHManageRegFormBase._checkParams(self, params)
+        ids = set(request.form.getlist('registration_ids'))
+        self.registrations = (Registration
+                              .find(Registration.id.in_(ids), ~Registration.is_deleted)
+                              .with_parent(self.regform)
+                              .all())
+
+
+class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     """Send email to selected registrants"""
 
     def _checkParams(self, params):
         self._doNotSanitizeFields.append('from_address')
-        RHManageRegFormBase._checkParams(self, params)
+        RHRegistrationsActionBase._checkParams(self, params)
 
     def _send_emails(self, form):
-        ids = set(request.form.getlist('registration_ids'))
-        registrations = (Registration
-                         .find(Registration.id.in_(ids), ~Registration.is_deleted)
-                         .with_parent(self.regform)
-                         .all())
-        for registration in registrations:
+        for registration in self.registrations:
             email_body = replace_placeholders('registration-email', form.body.data, registration=registration)
             template = get_template_module('events/registration/emails/custom_email.html',
                                            email_subject=form.subject.data, email_body=email_body)
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
                                from_address=form.from_address.data, template=template, html=True)
             send_email(email, self.event, 'Registration')
-        return len(registrations)
+        return len(self.registrations)
 
     def _process(self):
         form = EmailRegistrantsForm()
         if form.validate_on_submit():
             num_emails_sent = self._send_emails(form)
             flash(ngettext("The email was sent.",
-                           "{num} emails were sent", num=num_emails_sent).format(num_emails_sent), 'success')
+                           "{num} emails were sent", num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
         return WPManageRegistration.render_template('management/email.html', form=form)
 
 
-class RHRegistrationDelete(RHManageRegFormBase):
+class RHRegistrationDelete(RHRegistrationsActionBase):
     """Delete selected registrations"""
 
     def _process(self):
-        ids = set(request.form.getlist('registration_ids'))
-        registrations = (Registration
-                         .find(Registration.id.in_(ids), ~Registration.is_deleted)
-                         .with_parent(self.regform)
-                         .all())
-        for registration in registrations:
+        for registration in self.registrations:
             registration.is_deleted = True
             logger.info('Registration {} deleted by {}'.format(registration, session.user))
             # TODO: Signal for deletion?
-        num = len(registrations)
+        num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
-                       "{num} registrations were deleted", num=num).format(num), 'success')
+                       "{num} registrations were deleted", num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()
 
 
