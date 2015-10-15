@@ -32,7 +32,9 @@ from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
 
 class RegistrationFormForm(IndicoForm):
-    _notification_fields = ('notifications_enabled', 'recipients_emails')
+    _registrant_notification_fields = ('message_pending', 'message_unpaid', 'message_complete')
+    _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
+    _notifications_fields = _registrant_notification_fields + _manager_notification_fields
 
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration form"))
     introduction = TextAreaField(_("Introduction"),
@@ -50,13 +52,18 @@ class RegistrationFormForm(IndicoForm):
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
                                       description=_("Maximum number of registrations"))
-    notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
-                                         description=_('Send email notifications for events related to this '
-                                                       'registration form.'))
-    recipients_emails = EmailListField(_('List of recipients'),
-                                       [HiddenUnless('notifications_enabled', preserve_data=True), DataRequired()],
-                                       description=_('Email addresses to notify about events related to this '
-                                                     'registration form.'))
+    message_pending = TextAreaField(_("Message for pending registrations"),
+                                    description=_("Text included in emails sent to pending registrations"))
+    message_unpaid = TextAreaField(_("Message for unpaid registrations"),
+                                   description=_("Text included in emails sent to unpaid registrations"))
+    message_complete = TextAreaField(_("Message for complete registrations"),
+                                     description=_("Text included in emails sent to complete registrations"))
+    manager_notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
+                                                 description=_("Enable notifications to managers about registrations"))
+    manager_notification_recipients = EmailListField(_('List of recipients'),
+                                                     [HiddenUnless('manager_notifications_enabled',
+                                                                   preserve_data=True), DataRequired()],
+                                                     description=_("Email addresses that will receive notifications"))
 
 
 class RegistrationFormScheduleForm(IndicoForm):

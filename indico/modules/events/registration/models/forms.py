@@ -120,14 +120,32 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether the notifications for this event are enabled
-    notifications_enabled = db.Column(
+    #: Custom message to include in emails for pending registrations
+    message_pending = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    #: Custom message to include in emails for unpaid registrations
+    message_unpaid = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    #: Custom message to include in emails for complete registrations
+    message_complete = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
+    #: Whether the manager notifications for this event are enabled
+    manager_notifications_enabled = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
-    #: List of emails that should be notified on specific events
-    recipients_emails = db.Column(
+    #: List of emails that should receive management notifications
+    manager_notification_recipients = db.Column(
         ARRAY(db.String),
         nullable=False,
         default=[]
