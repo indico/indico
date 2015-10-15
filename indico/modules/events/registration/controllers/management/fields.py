@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from uuid import uuid4
-
 from flask import request, jsonify, session
 from werkzeug.exceptions import BadRequest
 
@@ -94,10 +92,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             raise BadRequest
         _fill_form_field_with_data(self.field, field_data)
         if field_data != self.field.current_data.versioned_data:
-            if self.field.input_type == 'radio':
-                for item in field_data['radioitems']:
-                    if not item.get('id', None):
-                        item['id'] = unicode(uuid4())
+            self.field.field_impl.modify_post_data(field_data)
             self.field.current_data = RegistrationFormFieldData(field_id=self.field.id, versioned_data=field_data)
         return jsonify_data(flash=False)
 
