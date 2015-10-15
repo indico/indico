@@ -23,7 +23,6 @@ from wtforms.validators import DataRequired, ValidationError, NumberRange
 from indico.modules.payment import settings
 from indico.modules.payment.util import get_active_payment_plugins
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
 
@@ -31,12 +30,6 @@ from indico.web.forms.fields import MultipleItemsField
 CURRENCY_CODE_LINK = 'http://en.wikipedia.org/wiki/ISO_4217#Active_codes'
 CONDITIONS_DESC = _('The registrant must agree to these conditions before paying. When left empty, no confirmation '
                     'prompt is shown to the user.')
-REGISTER_EMAIL_DESC = _('Custom message included in the registration email.')
-SUCCESS_EMAIL_DESC = _('Custom message included in the email after successful payment.')
-EMAIL_DISABLED_MSG = _('This email is currently <strong>disabled</strong>. You can enable it in the '
-                       '<a href="{0}">registration form setup</a>.')
-EMAIL_ENABLED_MSG = _('This email is currently <strong>enabled</strong>. You can disable it in the '
-                      '<a href="{0}">registration form setup</a>.')
 CHECKOUT_SESSION_TIMEOUT_MSG = _('Time in minutes a checkout session will be alive. On checkout, a new session will '
                                  'start. During this time, in every new checkout page a warning message will be '
                                  'displayed in order to prevent duplicated payments.')
@@ -54,8 +47,6 @@ class AdminSettingsForm(IndicoForm):
                            description=_('The default currency for new events. If you add a new currency, you need to '
                                          'save the settings first for it to show up here.'))
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-    register_email = TextAreaField(_('Register email message'), description=REGISTER_EMAIL_DESC)
-    success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
     checkout_session_timeout = IntegerField('Checkout session timeout', validators=[DataRequired(), NumberRange(min=0)],
                                             description=CHECKOUT_SESSION_TIMEOUT_MSG)
 
@@ -75,24 +66,11 @@ class AdminSettingsForm(IndicoForm):
 class EventSettingsForm(IndicoForm):
     currency = SelectField(_('Currency'), [DataRequired()])
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-    register_email = TextAreaField(_('Register email message'), description=REGISTER_EMAIL_DESC)
-    success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
 
     def __init__(self, *args, **kwargs):
         self._event = kwargs.pop('event')
         super(EventSettingsForm, self).__init__(*args, **kwargs)
-        self._include_email_status()
         self._set_currencies()
-
-    def _include_email_status(self):
-        regform = self._event.getRegistrationForm()
-        regform_setup_url = url_for('event_mgmt.confModifRegistrationForm-dataModif', self._event)
-        register_status = (EMAIL_ENABLED_MSG if regform.isSendRegEmail()
-                           else EMAIL_DISABLED_MSG).format(regform_setup_url)
-        success_status = (EMAIL_ENABLED_MSG if regform.isSendPaidEmail()
-                          else EMAIL_DISABLED_MSG).format(regform_setup_url)
-        self.register_email.description += '<br>' + register_status
-        self.success_email.description += '<br>' + success_status
 
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in settings.get('currencies')]
