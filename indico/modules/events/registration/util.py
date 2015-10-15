@@ -16,16 +16,20 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app
+from flask import current_app, session
 from wtforms import ValidationError
 
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormFieldData)
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
                                                              RegistrationFormItemType, PersonalDataType)
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
+from indico.core.db import db
 
 
 def user_registered_in_event(user, event):
@@ -99,3 +103,31 @@ def url_rule_to_angular(endpoint):
     segments = [':' + mapping.get(data, data) if is_dynamic else data
                 for is_dynamic, data in rule._trace]
     return ''.join(segments).split('|', 1)[-1]
+
+
+def create_registration(regform, data, event, invitation=None):
+    registration = Registration(registration_form=regform, user=get_user_by_email(data['email']))
+    for form_item in regform.active_fields:
+        if form_item.parent.is_manager_only:
+            with db.session.no_autoflush:
+                value = form_item.field_impl.default_value
+        else:
+            value = data.get(form_item.html_field_name)
+        with db.session.no_autoflush:
+            form_item.field_impl.save_data(registration, value)
+        if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+            setattr(registration, form_item.personal_data_type.column, value)
+    if invitation is None:
+        # Associate invitation based on email in case the user did not use the link
+        with db.session.no_autoflush:
+            invitation = (RegistrationInvitation
+                          .find(email=data['email'], registration_id=None)
+                          .with_parent(regform)
+                          .first())
+    registration.init_state(event, invitation)
+    if invitation:
+        invitation.state = InvitationState.accepted
+        invitation.registration = registration
+    db.session.flush()
+    logger.info('New registration %s by %s', registration, session.user)
+    return registration
