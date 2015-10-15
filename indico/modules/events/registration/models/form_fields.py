@@ -80,7 +80,7 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def versioned_data(self):
-        return ImmutableDict(self.current_data.versioned_data)
+        return ImmutableDict(self.current_data.versioned_data) if self.current_data is not None else None
 
     @versioned_data.setter
     def versioned_data(self, value):
