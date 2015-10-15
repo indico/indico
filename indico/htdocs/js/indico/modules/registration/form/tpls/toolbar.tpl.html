@@ -1,15 +1,24 @@
 <div class="toolbar follow-scroll">
     <div class="group">
-        <a ng-click="actions.openAddSection(false)"
-            class="i-button icon-plus"
-            title="{{ 'Create section' | i18n }}">
-            {{ 'Add section' | i18n }}
+        <a class="i-button icon-plus js-new-dropdown arrow" data-toggle="dropdown">
+            {{ 'Add new' | i18n }}
         </a>
-        <a ng-click="actions.openAddSection(true)"
-            class="i-button icon-user-reading"
-            title="{{ 'Create a section that is only visible in the management area' | i18n }}">
-            {{ 'Add administrative section' | i18n }}
-        </a>
+        <ul class="dropdown">
+            <li>
+                <a ng-click="actions.openAddSection(false)"
+                   title="{{ 'Add a form section' | i18n }}"
+                   data-qtip-opts='{"position": {"my": "middle left", "at": "middle right"}}'>
+                    {{ 'Section' | i18n }}
+                </a>
+            </li>
+            <li>
+                <a ng-click="actions.openAddSection(true)"
+                    title="{{ 'Create a section that is only visible in the management area' | i18n }}"
+                    data-qtip-opts='{"position": {"my": "middle left", "at": "middle right"}}'>
+                    {{ 'Administrative section' | i18n }}
+                </a>
+            </li>
+        </ul>
         <a ng-click="actions.openManagement()"
             ng-if="(sections | filter:{enabled:'false'}).length > 0"
             ng-animate="animations.recoverSectionButton"
@@ -25,3 +34,7 @@
             class="i-button icon-stack-minus" title="{{ 'Collapse All' | i18n }}"></a>
     </div>
 </div>
+
+<script>
+    $('.js-new-dropdown').closest('.group').dropdown();
+</script>
