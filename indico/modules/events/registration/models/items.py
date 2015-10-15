@@ -146,7 +146,7 @@ class RegistrationFormItem(db.Model):
                            "({pt.email}, {pt.first_name}, {pt.last_name})"
                            .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
                            name='pd_field_required'),
-        db.CheckConstraint("(current_data_id IS NOT NULL) = (type IN ({t.field}, {t.field_pd}))"
+        db.CheckConstraint("current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})"
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
