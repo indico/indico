@@ -36,6 +36,10 @@
             &.right {
                 padding-left: 0.5em;
             }
+
+            a:not(.i-button) {
+                line-height: 2.2em;
+            }
         }
 
         + .section:before {
