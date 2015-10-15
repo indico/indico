@@ -60,10 +60,10 @@ def create_personal_data_fields(regform):
             continue
         field = RegistrationFormPersonalDataField(registration_form=regform, personal_data_type=pd_type,
                                                   is_required=pd_type.is_required)
-        field.data = data.pop('data', {})
-        field.current_data = RegistrationFormFieldData(field=field, versioned_data=data.pop('versioned_data', {}))
         for key, value in data.iteritems():
             setattr(field, key, value)
+        field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))
+        field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
         section.children.append(field)
 
 

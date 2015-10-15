@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.event import listens_for
 
 from indico.core.db import db
 from indico.modules.events.registration.fields import get_field_types
@@ -89,14 +90,6 @@ class RegistrationFormField(RegistrationFormItem):
     def html_field_name(self):
         return 'field_{}'.format(self.id)
 
-    @property
-    def versioned_radioitems(self):
-        all_options = {}
-        for data in self.data_versions:
-            for option in data.versioned_data['radioitems']:
-                all_options[option['id']] = option['caption']
-        return all_options
-
     def calculate_price(self, registration_data):
         return self.field_impl.calculate_price(registration_data)
 
@@ -116,3 +109,12 @@ class RegistrationFormPersonalDataField(RegistrationFormField):
     @property
     def html_field_name(self):
         return self.personal_data_type.name
+
+
+@listens_for(RegistrationFormField.current_data, 'set')
+@listens_for(RegistrationFormPersonalDataField.current_data, 'set')
+def _add_current_data(target, value, *unused):
+    if value is None:
+        raise ValueError('current_data cannot be set to None')
+    with db.session.no_autoflush:
+        target.data_versions.append(value)
