@@ -190,3 +190,23 @@ class EmailRegistrantsForm(IndicoForm):
         missing = get_missing_placeholders('registration-email', field.data, registration=None)
         if missing:
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
+
+
+class TicketsForm(IndicoForm):
+    tickets_enabled = BooleanField(_('Ticket'), widget=SwitchWidget(),
+                                   description=_('Enable/disable e-ticket module for this registration form.'))
+    ticket_on_email = BooleanField(_('Attach to registration e-mail'), [HiddenUnless('tickets_enabled',
+                                                                                     preserve_data=True)],
+                                   widget=SwitchWidget(),
+                                   description=_('Attach e-ticket PDF to the email sent to the user after '
+                                                 'registration'))
+    ticket_on_event_page = BooleanField(_('Download from event homepage'), [HiddenUnless('tickets_enabled',
+                                                                                         preserve_data=True)],
+                                        widget=SwitchWidget(),
+                                        description=_('Allow users to download their e-ticket from the '
+                                                      'conference homepage menu'))
+    ticket_on_summary_page = BooleanField(_('Download from summary page'), [HiddenUnless('tickets_enabled',
+                                                                                         preserve_data=True)],
+                                          widget=SwitchWidget(),
+                                          description=_('Allow users to download their e-ticket from the summary '
+                                                        'page'))

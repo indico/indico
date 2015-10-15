@@ -20,6 +20,7 @@ from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistr
 from indico.modules.events.registration.controllers.display import (RHRegistrationFormList, RHRegistrationFormSubmit,
                                                                     RHRegistrationFormCheckEmail,
                                                                     RHRegistrationFormDeclineInvitation)
+from indico.modules.events.registration.controllers.management.tickets import RHRegistrationFormTickets
 from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
                                                                               RHRegistrationFormToggleTextState,
                                                                               RHRegistrationFormModifyField,
@@ -112,6 +113,10 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'i
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
                  RHRegistrationFormDeleteInvitation, methods=('DELETE',))
+
+# E-ticket management
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets', 'tickets', RHRegistrationFormTickets,
+                 methods=('GET', 'POST'))
 
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated
