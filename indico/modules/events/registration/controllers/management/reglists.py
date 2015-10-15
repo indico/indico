@@ -23,6 +23,7 @@ from uuid import uuid4
 from flask import session, request, redirect, jsonify, flash
 from sqlalchemy.orm import joinedload, undefer
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration import logger
@@ -41,6 +42,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data
 from MaKaC.common.cache import GenericCache
+from indico.core.errors import FormValuesError
+from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 
 
 cache = GenericCache('reglist-config')
@@ -87,18 +90,23 @@ def _get_visible_column_ids(items):
     return (items - special_cols), (items & special_cols)
 
 
+def _get_reg_list_config(regform):
+    session_key = 'reglist_config_{}'.format(regform.id)
+    report_config_uuid = request.args.get('config')
+    if report_config_uuid:
+        configuration = cache.get(report_config_uuid)
+        if configuration and configuration['regform_id'] == regform.id:
+            session[session_key] = configuration['data']
+    return session.get(session_key, {'items': [], 'filters': {}})
+
+
 class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event"""
 
     def _process(self):
-        session_key = 'reglist_config_{}'.format(self.regform.id)
-        report_config_uuid = request.args.get('config')
-        if report_config_uuid:
-            configuration = cache.get(report_config_uuid)
-            if configuration and configuration['regform_id'] == self.regform.id:
-                session[session_key] = configuration['data']
-                return redirect(url_for('.manage_reglist', self.regform))
-        reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
+        reg_list_config = _get_reg_list_config(regform=self.regform)
+        if 'config' in request.args:
+            return redirect(url_for('.manage_reglist', self.regform))
         items_ids, special_items = _get_visible_column_ids(reg_list_config['items'])
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids))
         registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
@@ -111,8 +119,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event"""
 
     def _process_GET(self):
-        session_key = 'reglist_config_{}'.format(self.regform.id)
-        reg_list_config = session.get(session_key, {'items': [], 'filters': {}})
+        reg_list_config = _get_reg_list_config(self.regform)
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
                                                     visible_cols_regform_items=reg_list_config['items'],
@@ -198,7 +205,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
 
     def _checkParams(self, params):
         RHManageRegFormBase._checkParams(self, params)
-        ids = set(request.form.getlist('registration_ids'))
+        ids = set(request.form.getlist('registration_id'))
         self.registrations = (Registration
                               .find(Registration.id.in_(ids), ~Registration.is_deleted)
                               .with_parent(self.regform)
@@ -263,3 +270,39 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     currency=event_settings.get(self.event, 'currency'), user_data={},
                                                     post_url=url_for('.create_registration', self.regform))
+
+
+class RHRegistrationsExportPDFBase(RHRegistrationsActionBase):
+    """Base class for all registration list export RHs"""
+
+    def _checkParams(self, params):
+        RHRegistrationsActionBase._checkParams(self, params)
+        reg_list_config = _get_reg_list_config(self.regform)
+        self.items_ids, self.special_items = _get_visible_column_ids(reg_list_config['items'])
+        self.regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(self.items_ids),
+                                                           ~RegistrationFormItem.is_deleted)
+
+
+class RHRegistrationsExportPDFTable(RHRegistrationsExportPDFBase):
+    """Export registration list to a PDF in table style"""
+
+    def _process(self):
+        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.regform_items,
+                                   special_items=self.special_items)
+        try:
+            data = pdf.getPDFBin()
+        except Exception:
+            if Config.getInstance().getDebug():
+                raise
+            raise FormValuesError(_("Text too large to generate a PDF with table style. "
+                                    "Please try again generating with book style."))
+        return send_file('RegistrantsList.pdf', BytesIO(data), 'PDF')
+
+
+class RHRegistrationsExportPDFBook(RHRegistrationsExportPDFBase):
+    """Export registration list to a PDF in book style"""
+
+    def _process(self):
+        pdf = RegistrantsListToBookPDF(self._conf, reglist=self.registrations, display=self.regform_items,
+                                       special_items=self.special_items)
+        return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')

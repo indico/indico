@@ -64,7 +64,7 @@ from MaKaC.common import utils
 
 from indico.core.config import Config
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_date
+from indico.util.date_time import format_date, format_datetime
 from indico.util.string import safe_upper, html_color_to_rgb
 from indico.util import json
 
@@ -1410,10 +1410,11 @@ class FilterCriteria(filters.FilterCriteria):
 
 class RegistrantToPDF(PDFBase):
 
-    def __init__(self, conf, reg, display, doc=None, story=None):
+    def __init__(self, conf, reg, display, doc=None, story=None, special_items=None):
         self._reg = reg
         self._conf = conf
         self._display = display
+        self.special_items = special_items
         if not story:
             story = [Spacer(inch, 5*cm)]
         PDFBase.__init__(self, doc, story)
@@ -1436,115 +1437,64 @@ class RegistrantToPDF(PDFBase):
         #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
         c.restoreState()
 
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
+    def getBody(self, story=None, indexedFlowable=None, level=1 ):
         if not story:
             story = self._story
-
         style = ParagraphStyle({})
         style.fontSize = 12
-        text = i18nformat(""" _("Registrant ID") : %s""")%self._reg.getId()
-        p = Paragraph(text, style, part=escape(self._reg.getFullName()))
-        story.append(p)
 
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._reg.getFullName())))
+        registration = self._reg
+        data = registration.data_by_field
+        full_name = "{first_name} {last_name}".format(first_name=registration.first_name.encode('utf-8'),
+                                                      last_name=registration.last_name.encode('utf-8'))
+
+        def _append_text_to_story(text, space=0.2, indexed_flowable=False):
+            p = Paragraph(text, style, full_name)
+            if indexed_flowable:
+                indexedFlowable[p] = {"text": full_name, "level": 1}
+            story.append(p)
+            story.append(Spacer(inch, space*cm, full_name))
+
+        text = _('Registrant ID: {id}').format(id=registration.id)
+        _append_text_to_story(text, space=0.5)
 
         style = ParagraphStyle({})
         style.alignment = TA_CENTER
         style.fontSize = 25
         style.leading = 30
-        text = escape(self._reg.getFullName())
-        p = Paragraph(text, style, part=escape(self._reg.getFullName()))
-        story.append(p)
-
-        indexedFlowable[p] = {"text":escape(self._reg.getFullName()), "level":1}
-        story.append(Spacer(inch, 1*cm, part=escape(self._reg.getFullName())))
+        _append_text_to_story(full_name, space=1.0, indexed_flowable=True)
         style = ParagraphStyle({})
         style.alignment = TA_JUSTIFY
-        for key in self._display:
-            text = ""
-            if key == "Email" and self._reg.getEmail() <> "":
-                text = i18nformat("""<b> _("Email")</b>: %s""")%escape(self._reg.getEmail())
-            elif key == "Position" and self._reg.getPosition() <> "":
-                text = i18nformat("""<b> _("Position")</b>: %s""")%escape(self._reg.getPosition())
-            elif key == "LastName" and self._reg.getFamilyName() <> "":
-                text = i18nformat("""<b> _("Surname")</b>: %s""")%escape(self._reg.getFamilyName())
-            elif key == "FirstName" and self._reg.getFirstName() <> "":
-                text = i18nformat("""<b> _("First Name")</b>: %s""")%escape(self._reg.getFirstName())
-            elif key == "Institution" and self._reg.getInstitution() <> "":
-                text = i18nformat("""<b> _("Institution")</b>: %s""")%escape(self._reg.getInstitution())
-            elif key == "Address" and self._reg.getAddress() <> "":
-                text = i18nformat("""<b> _("Address")</b>: %s""")%escape(self._reg.getAddress())
-            elif key == "City" and self._reg.getCity() <> "":
-                text = i18nformat("""<b> _("City")</b>:  %s""")%escape(self._reg.getCity())
-            elif key == "Country" and self._reg.getCountry() <> "":
-                text = i18nformat("""<b> _("Country")</b>: %s""")%escape(CountryHolder().getCountryById(self._reg.getCountry()))
-            elif key == "Phone" and self._reg.getPhone() <> "":
-                text = i18nformat("""<b> _("Phone")</b>: %s""")%escape(self._reg.getPhone())
-            elif key == "isPayed" and self._reg.isPayedText() <> "":
-                text = i18nformat("""<b> _("Paid")</b>: %s""")%escape(self._reg.isPayedText())
-            elif key == "idpayment" and self._reg.getIdPay() <> "":
-                text = i18nformat("""<b> _("idpayment")</b>: %s""")%escape(self._reg.getIdPay())
-            elif key == "amountToPay":
-                text = i18nformat("""<b> _("Amount")</b>: %.2f %s""")%(self._reg.getTotal(), escape(self._reg.getConference().getRegistrationForm().getCurrency()))
-            elif key == "Sessions":
-                listSession = []
-                for ses in self._reg.getSessionList():
-                    if ses is not None:
-                        listSession.append("%s"%escape(ses.getTitle()))
-                if len(listSession) > 0:
-                    text = i18nformat("""<b> _("Sessions")</b>: """)
-                    text += " ; ".join(listSession)
-            elif key == "SocialEvents":
-                listSocialEvents = []
-                for se in self._reg.getSocialEvents():
-                    if se is not None:
-                        listSocialEvents.append("%s"%escape(se.getCaption()))
-                if len(listSocialEvents) > 0:
-                    text = i18nformat("""<b> _("Social Events")</b>: """)
-                    text += " ; ".join(listSocialEvents)
-            elif key == "Accommodation" and self._reg.getAccommodation() is not None and \
-            self._reg.getAccommodation().getAccommodationType() is not None:
-                text = i18nformat("""<b> _("Acommodation")</b>: %s""") % escape(self._reg.getAccommodation().getAccommodationType().getCaption())
-            elif key == "ArrivalDate" and self._reg.getAccommodation() is not None and \
-            self._reg.getAccommodation().getArrivalDate() is not None:
-                text = i18nformat("""<b> _("Arrival Date")</b>: %s""") % escape(self._reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y"))
-            elif key == "DepartureDate" and self._reg.getAccommodation() is not None and \
-            self._reg.getAccommodation().getDepartureDate() is not None:
-                text = i18nformat("""<b> _("Departure Date")</b>: %s""") % escape(self._reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y"))
-            elif key == "ReasonParticipation" and self._reg.getReasonParticipation() is not None and \
-            self._reg.getReasonParticipation() is not None and self._reg.getReasonParticipation() != "":
-                text = i18nformat("""<b> _("Reason Participation")</b>: %s""") % escape(self._reg.getReasonParticipation())
-            elif key == "RegistrationDate" and self._reg.getRegistrationDate() is not None:
-                text = i18nformat("""<b> _("Registration date")</b>: %s""") % escape(self._reg.getAdjustedRegistrationDate().strftime("%d-%B-%Y-%H:%M"))
 
-            elif key.startswith("s-"):
-                ids = key.split("-")
-                if len(ids) == 2:
-                    status = self._reg.getStatusById(ids[1])
-                    if status.getStatusValue() is not None:
-                        text = _("""<b> %s</b>: %s""") % (escape(status.getCaption()), escape(status.getStatusValue().getCaption()))
-            else:
-                ids = key.split("-")
-                if len(ids) == 2:
-                    group = self._reg.getMiscellaneousGroupById(ids[0])
-                    if group is not None:
-                        field = self._conf.getRegistrationForm().getSectionById(ids[0]).getFieldById(ids[1])
-                        response = group.getResponseItemById(ids[1])
-                        if response is not None and response.getValue() != "":
-                            text = _("""<b> %s</b>: %s""") % (escape(field.getCaption()), escape(str(response.getValue())))
-            if text != "":
-                p = Paragraph(text, style,  part=escape(self._reg.getFullName()))
-                story.append(p)
-                story.append(Spacer(inch, 0.2*cm, part=escape(self._reg.getFullName())))
+        for item in self._display:
+            value = data[item.id].friendly_data if item.id in data else ''
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            text = ('<b>{field_name}</b>: {field_value}'.format(field_name=item.title.encode('utf-8'),
+                                                                field_value=value))
+            _append_text_to_story(text)
+
+        if 'reg_date' in self.special_items:
+            text = '<b>{}</b>: {}'.format(_('Registration date'), format_datetime(registration.submitted_dt))
+            _append_text_to_story(text)
+        if 'state' in self.special_items:
+            text = '<b>{}</b>: {}'.format(_('Registration state'), registration.state.title.encode('utf-8'))
+            _append_text_to_story(text)
+        if 'price' in self.special_items:
+            text = '<b>{}</b>: {}'.format(_('Price'), registration.price)
+            _append_text_to_story(text)
+
         return story
 
+
 class RegistrantsListToBookPDF(PDFWithTOC):
-    def __init__(self, conf,doc=None, story=[],list=None, display=["Institution", "Phone", "City", "Country"]):
+    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], special_items=None):
         self._conf = conf
         self._regForm = conf.getRegistrationForm()
-        self._regList = list
+        self._regList = reglist
         self._display = display
         self._title = _("Registrants Book")
+        self.special_items = special_items
         PDFWithTOC.__init__(self)
 
     def firstPage(self, c, doc):
@@ -1580,25 +1530,25 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
 
-
     def getBody(self):
         for reg in self._regList:
-            temp = RegistrantToPDF(self._conf, reg, self._display)
+            temp = RegistrantToPDF(self._conf, reg, self._display, special_items=self.special_items)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
 
 class RegistrantsListToPDF(PDFBase):
 
-    def __init__(self, conf,doc=None, story=[],list=None, display=["Institution", "Phone", "City", "Country"]):
+    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], special_items=None):
         self._conf = conf
         self._regForm = conf.getRegistrationForm()
-        self._regList = list
+        self._regList = reglist
         self._display = display
         PDFBase.__init__(self, doc, story, printLandscape=True)
         self._title = _("Registrants List")
         self._PAGE_HEIGHT = landscape(A4)[1]
         self._PAGE_WIDTH = landscape(A4)[0]
+        self.special_items = special_items
 
     def firstPage(self, c, doc):
         c.saveState()
@@ -1625,15 +1575,15 @@ class RegistrantsListToPDF(PDFBase):
         p.spaceAfter = 30
         story.append(p)
 
-        styleRegistrant = ParagraphStyle({})
-        styleRegistrant.leading = 10
-        styleRegistrant.fontName = "Times-Roman"
-        styleRegistrant.fontSize = 8
-        styleRegistrant.spaceBefore=0
-        styleRegistrant.spaceAfter=0
-        styleRegistrant.alignment=TA_LEFT
-        styleRegistrant.leftIndent=10
-        styleRegistrant.firstLineIndent=0
+        text_format = ParagraphStyle({})
+        text_format.leading = 10
+        text_format.fontName = "Times-Roman"
+        text_format.fontSize = 8
+        text_format.spaceBefore=0
+        text_format.spaceAfter=0
+        text_format.alignment=TA_LEFT
+        text_format.leftIndent=10
+        text_format.firstLineIndent=0
 
         tsRegs=TableStyle([('VALIGN',(0,0),(-1,-1),"MIDDLE"),
                         ('LINEBELOW',(0,0),(-1,0), 1, colors.black),
@@ -1641,138 +1591,41 @@ class RegistrantsListToPDF(PDFBase):
                         ('ALIGN',(0,1),(-1,-1),"LEFT") ] )
         l = []
         lp = []
-        lp.append(Paragraph( i18nformat("""<b> _("Name")</b>"""), styleRegistrant))
+        lp.append(Paragraph('<b>{}</b>'.format(_('Name')), text_format))
 
-        for key in self._display:
-            if key in ["Email", "Position", "LastName", "FirstName", "Institution", "Phone", "City", "Country", "Address", "RegistrationDate"]:
-                p=Paragraph("""<b>%s</b>"""%key, styleRegistrant)
-            elif key=="Accommodation":
-                p=Paragraph("""<b>%s</b>"""%escape(self._regForm.getAccommodationForm().getTitle()), styleRegistrant)
-            elif key == "SocialEvents":
-                p=Paragraph("""<b>%s</b>"""%escape(self._regForm.getSocialEventForm().getTitle()), styleRegistrant)
-            elif key == "Sessions":
-                p=Paragraph("""<b>%s</b>"""%escape(self._regForm.getSessionsForm().getTitle()), styleRegistrant)
-            elif key=="ArrivalDate":
-                p=Paragraph( i18nformat("""<b> _("Arrival Date")</b>"""), styleRegistrant)
-            elif key=="DepartureDate":
-                p=Paragraph( i18nformat("""<b> _("Departure Date")</b>"""), styleRegistrant)
-            elif key == "ReasonParticipation":
-                p=Paragraph("""<b>%s</b>"""%escape(self._regForm.getReasonParticipationForm().getTitle()), styleRegistrant)
-            elif key == "isPayed":
-                p=Paragraph("""<b>Paid</b>""", styleRegistrant)
-            elif key == "idpayment":
-                p=Paragraph("""<b>Payment ID</b>""", styleRegistrant)
-            elif key == "amountToPay":
-                p=Paragraph("""<b>Amount</b>""", styleRegistrant)
-            elif key.startswith("s-"):
-                ids=key.split("-")
-                if len(ids)==2:
-                    status=self._regForm.getStatusById(ids[1])
-                    p=Paragraph("""<b>%s</b>"""%escape(status.getCaption()), styleRegistrant)
-                else:
-                    p=Paragraph("", styleRegistrant)
-            else:
-                ids=key.split("-")
-                if len(ids)==2:
-                    group=self._regForm.getSectionById(ids[0])
-                    if group is not None:
-                        i=group.getFieldById(ids[1])
-                        if i is not None:
-                            p=Paragraph("""<b>%s</b>"""%escape(i.getCaption()), styleRegistrant)
+        for item in self._display:
+            p = Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format)
+            lp.append(p)
+        if 'reg_date' in self.special_items:
+            p = Paragraph('<b>{}</b>'.format(_('Registration date')), text_format)
+            lp.append(p)
+        if 'state' in self.special_items:
+            p = Paragraph('<b>{}</b>'.format(_('Registration state')), text_format)
+            lp.append(p)
+        if 'price' in self.special_items:
+            p = Paragraph('<b>{}</b>'.format(_('Price')), text_format)
             lp.append(p)
         l.append(lp)
 
-        if self._regList == None:
-            self._regList = self._conf.getRegistrantsList(True)
-        for reg in self._regList:
+        for registration in self._regList:
             lp = []
-            lp.append(Paragraph("""%s"""%escape(reg.getFullName()), styleRegistrant))
-            for key in self._display:
-                if key == "Email":
-                    lp.append(Paragraph("""%s"""%escape(reg.getEmail()), styleRegistrant))
-                elif key == "Position":
-                    lp.append(Paragraph("""%s"""%escape(reg.getPosition()), styleRegistrant))
-                elif key == "LastName":
-                    lp.append(Paragraph("""%s"""%escape(reg.getFamilyName()), styleRegistrant))
-                elif key == "FirstName":
-                    lp.append(Paragraph("""%s"""%escape(reg.getFirstName()), styleRegistrant))
-                elif key == "Institution":
-                    lp.append(Paragraph("""%s"""%escape(reg.getInstitution()), styleRegistrant))
-                elif key == "Address":
-                    lp.append(Paragraph("""%s"""%escape(reg.getAddress()), styleRegistrant))
-                elif key == "City":
-                    lp.append(Paragraph("""%s"""%escape(reg.getCity()), styleRegistrant))
-                elif key == "Country":
-                    lp.append(Paragraph("""%s"""%CountryHolder().getCountryById(reg.getCountry()), styleRegistrant))
-                elif key == "Phone":
-                    lp.append(Paragraph("""%s"""%escape(reg.getPhone()), styleRegistrant))
-                elif key == "isPayed":
-                    lp.append(Paragraph("""%s"""%escape(reg.isPayedText()), styleRegistrant))
-                elif key == "idpayment":
-                    lp.append(Paragraph("""%s"""%escape(reg.getIdPay()), styleRegistrant))
-                elif key == "amountToPay":
-                    lp.append(Paragraph("%.2f %s"%(reg.getTotal(), reg.getConference().getRegistrationForm().getCurrency()), styleRegistrant))
-                elif key == "Sessions":
-                    p7 = []
-                    for ses in reg.getSessionList():
-                        if ses is not None:
-                            p7.append(Paragraph("""%s"""%escape(ses.getTitle()), styleRegistrant))
-                    if p7 == []:
-                        p7 = Paragraph("", styleRegistrant)
-                    lp.append(p7)
-                elif key == "SocialEvents":
-                    p8 = []
-                    for se in reg.getSocialEvents():
-                        if se is not None:
-                            p8.append(Paragraph("""%s"""%escape(se.getCaption()), styleRegistrant))
-                    if p8 == []:
-                        p8 = Paragraph("", styleRegistrant)
-                    lp.append(p8)
-                elif key == "Accommodation":
-                    if reg.getAccommodation() is not None and reg.getAccommodation().getAccommodationType() is not None:
-                        lp.append(Paragraph("%s"%escape(reg.getAccommodation().getAccommodationType().getCaption()), styleRegistrant))
-                    else:
-                        lp.append(Paragraph("", styleRegistrant))
-                elif key == "ArrivalDate":
-                    if reg.getAccommodation() is not None and reg.getAccommodation().getArrivalDate() is not None:
-                        lp.append(Paragraph("%s"%escape(reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y")), styleRegistrant))
-                    else:
-                        lp.append(Paragraph("", styleRegistrant))
-                elif key == "DepartureDate":
-                    if reg.getAccommodation() is not None and reg.getAccommodation().getDepartureDate() is not None:
-                        lp.append(Paragraph("%s"%escape(reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")), styleRegistrant))
-                    else:
-                        lp.append(Paragraph("", styleRegistrant))
-                elif key == "ReasonParticipation":
-                    lp.append(Paragraph("""%s"""%escape(reg.getReasonParticipation() or ""), styleRegistrant))
-                elif key == "RegistrationDate":
-                    if reg.getRegistrationDate() is not None:
-                        lp.append(Paragraph("""%s"""%escape(reg.getAdjustedRegistrationDate().strftime("%d-%B-%Y-%H:%M")), styleRegistrant))
-                    else:
-                        lp.append(Paragraph("", styleRegistrant))
-                elif key.startswith("s-"):
-                    ids=key.split("-")
-                    if len(ids)==2:
-                        status=reg.getStatusById(ids[1])
-                        cap=""
-                        if status.getStatusValue() is not None:
-                            cap=status.getStatusValue().getCaption()
-                        lp.append(Paragraph("""%s"""%escape(cap), styleRegistrant))
-                else:
-                    ids=key.split("-")
-                    if len(ids)==2:
-                        group=reg.getMiscellaneousGroupById(ids[0])
-                        if group is not None:
-                            i=group.getResponseItemById(ids[1])
-                            if i is not None:
-                                lp.append(Paragraph("""%s"""%escape(str(i.getValue())), styleRegistrant))
-                                continue
-                    lp.append(Paragraph("", styleRegistrant))
+            lp.append(Paragraph("{} {}".format(registration.first_name.encode('utf-8'),
+                                               registration.last_name.encode('utf-8')), text_format))
+            data = registration.data_by_field
+            for item in self._display:
+                value = data[item.id].friendly_data if item.id in data else ''
+                if isinstance(value, unicode):
+                    value = value.encode('utf-8')
+                lp.append(Paragraph(str(value), text_format))
+            if 'reg_date' in self.special_items:
+                lp.append(Paragraph("{}".format(format_datetime(registration.submitted_dt)), text_format))
+            if 'state' in self.special_items:
+                lp.append(Paragraph("{}".format(registration.state.title.encode('utf-8')), text_format))
+            if 'price' in self.special_items:
+                lp.append(Paragraph("{}".format(registration.price), text_format))
             l.append(lp)
-        noneList = ()
-        for i in range(0, len(self._display)+1):
-            noneList += (None,)
-        t=Table(l,colWidths=noneList,style=tsRegs)
+        noneList = (None,) * (len(self._display) + len(self.special_items) + 1)
+        t = Table(l, colWidths=noneList, style=tsRegs)
         self._story.append(t)
         return story
 

@@ -117,8 +117,14 @@
 
         $('.js-dialog-send-email').ajaxDialog({
             getExtraData: function() {
-                return {registration_ids: getSelectedRows()};
+                return {registration_id: getSelectedRows()};
             }
+        });
+
+        $('.js-pdf-export').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            $('.registrations form').attr('action', $this.data('href')).submit();
         });
 
         $('.registrations').on('indico:confirmed', '.js-delete-registrations', function(evt) {
@@ -128,7 +134,7 @@
             $.ajax({
                 url: $this.data('href'),
                 method: $this.data('method'),
-                data: {registration_ids: selectedRows},
+                data: {registration_id: selectedRows},
                 traditional: true,
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,

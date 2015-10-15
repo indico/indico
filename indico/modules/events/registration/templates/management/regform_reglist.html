@@ -37,11 +37,22 @@
                 </a>
             </div>
             <div class="group left">
-                <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                     {%- trans %}Export{% endtrans -%}
                 </a>
                 <ul class="dropdown">
-                    <li><a href="#" class="icon-file-pdf js-requires-selected-row disabled">PDF</a></li>
+                    <li>
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-pdf-export"
+                           data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
+                            {%- trans %}PDF (table style){% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-pdf-export"
+                           data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
+                            {%- trans %}PDF (book style){% endtrans -%}
+                        </a>
+                    </li>
                     <li><a href="#" class="icon-file-excel js-requires-selected-row disabled">CSV</a></li>
                 </ul>
                 <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
