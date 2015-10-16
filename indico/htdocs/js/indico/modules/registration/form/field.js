@@ -706,7 +706,10 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             };
 
             $scope.areAccommodationOptionsDefined = function(data) {
-                return data.choices && data.choices.length !== 0;
+                var choices = data.choices.filter(function(item) {
+                    return item.remove !== true;
+                });
+                return choices.length !== 0;
             };
 
             $scope.validateFieldSettings = function(dialogScope) {
