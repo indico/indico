@@ -494,7 +494,11 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.getValue = function(fieldName) {
                 if (!scope.userdata[fieldName] || scope.userdata[fieldName] === '') {
-                    return scope.field.captions[scope.field.defaultItem] || '';
+                    if (scope.field.defaultItem && scope.field.captions) {
+                        return scope.field.captions[scope.field.defaultItem] || '';
+                    } else {
+                        return '';
+                    }
                 } else {
                     return scope.userdata[fieldName];
                 }
