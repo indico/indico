@@ -1,0 +1,46 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_regform_info(regform) %}
+    <div class="infogrid condensed">
+        <div class="infoline date">
+            <i class="icon icon-time"></i>
+            <div class="text">
+                <div>
+                    <span class="label">
+                        {% trans %}From{% endtrans %}
+                    </span>
+                    <span class="datetime">
+                        {{ regform.start_dt|format_date }}
+                    </span>
+                </div>
+                <div>
+                    <span class="label">
+                        {% trans %}To{% endtrans %}
+                    </span>
+                    <span class="datetime">
+                        {% if regform.end_dt %}
+                            {{ regform.end_dt|format_date }}
+                        {% else %}
+                            <em>{% trans %}Not specified{% endtrans %}</em>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% if regform.contact_info %}
+            <div class="infoline">
+                <i class="icon icon-phone"></i>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Contact info{% endtrans %}
+                    </div>
+                    <div>{{ regform.contact_info }}</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if regform.introduction %}
+        {{ message_box('info', regform.introduction) }}
+    {% endif %}
+{% endmacro %}
