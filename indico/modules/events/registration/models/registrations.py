@@ -330,6 +330,10 @@ class RegistrationData(db.Model):
     def price(self):
         return self.field_data.field.calculate_price(self)
 
+    @property
+    def summary_data(self):
+        return {'data': self.friendly_data, 'price': self.price}
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
