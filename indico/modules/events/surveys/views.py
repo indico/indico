@@ -62,6 +62,7 @@ class DisplaySurveyMixin(WPJinjaMixin):
 class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/surveys/'
     base_class = WPConferenceDefaultDisplayBase
+    menu_entry_name = 'surveys'
 
 
 class WPDisplaySurveyMeeting(DisplaySurveyMixin, WPMeetingDisplay):
