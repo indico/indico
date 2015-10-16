@@ -40,7 +40,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
-from indico.web.util import jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
 from indico.core.errors import FormValuesError
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
@@ -233,16 +233,16 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
                                from_address=form.from_address.data, template=template, html=True)
             send_email(email, self.event, 'Registration')
-        return len(self.registrations)
 
     def _process(self):
         form = EmailRegistrantsForm()
         if form.validate_on_submit():
-            num_emails_sent = self._send_emails(form)
+            self._send_emails(form)
+            num_emails_sent = len(self.registrations)
             flash(ngettext("The email was sent.",
-                           "{num} emails were sent", num_emails_sent).format(num=num_emails_sent), 'success')
+                           "{num} emails were sent.", num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
-        return WPManageRegistration.render_template('management/email.html', form=form)
+        return jsonify_template('events/registration/management/email.html', form=form)
 
 
 class RHRegistrationDelete(RHRegistrationsActionBase):
@@ -255,7 +255,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             # TODO: Signal for deletion?
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
-                       "{num} registrations were deleted", num_reg_deleted).format(num=num_reg_deleted), 'success')
+                       "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()
 
 
