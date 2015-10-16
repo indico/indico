@@ -20,8 +20,9 @@ from uuid import uuid4
 
 from flask import has_request_context, session, request
 from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-
+from sqlalchemy.orm import mapper
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -45,20 +46,23 @@ class RegistrationState(TitledIntEnum):
 
 def _get_next_friendly_id(context):
     """Get the next friendly id for a registration."""
-    from indico.modules.events.registration.models.forms import RegistrationForm
-    regform_id = context.current_parameters['registration_form_id']
-    return increment_and_get(RegistrationForm.last_friendly_id, RegistrationForm.id == regform_id)
+    from indico.modules.events import Event
+    event_id = context.current_parameters['event_id']
+    assert event_id is not None
+    return increment_and_get(Event._last_friendly_registration_id, Event.id == event_id)
 
 
 class Registration(db.Model):
     """Somebody's registration for an event through a registration form"""
     __tablename__ = 'registrations'
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
-                      db.Index(None, 'registration_form_id', 'friendly_id', unique=True),
+                      db.Index(None, 'friendly_id', 'event_id', unique=True),
                       db.Index(None, 'registration_form_id', 'user_id', unique=True,
                                postgresql_where=db.text('state NOT IN (3, 4)')),
                       db.Index(None, 'registration_form_id', 'email', unique=True,
                                postgresql_where=db.text('state NOT IN (3, 4)')),
+                      db.ForeignKeyConstraint(['event_id', 'registration_form_id'],
+                                              ['event_registration.forms.event_id', 'event_registration.forms.id']),
                       {'schema': 'event_registration'})
 
     #: The ID of the object
@@ -79,6 +83,12 @@ class Registration(db.Model):
         db.Integer,
         nullable=False,
         default=_get_next_friendly_id
+    )
+    #: The ID of the event
+    event_id = db.Column(
+        db.Integer,
+        index=True,
+        nullable=False
     )
     #: The ID of the registration form
     registration_form_id = db.Column(
@@ -294,3 +304,10 @@ class RegistrationData(db.Model):
     @return_ascii
     def __repr__(self):
         return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
+
+
+@listens_for(mapper, 'after_configured', once=True)
+def _mapper_configured():
+    @listens_for(Registration.registration_form, 'set')
+    def _set_event_id(target, value, *unused):
+        target.event_id = value.event_id

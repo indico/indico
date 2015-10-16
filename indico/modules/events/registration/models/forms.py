@@ -38,7 +38,8 @@ class RegistrationForm(db.Model):
     """A registration form for an event"""
 
     __tablename__ = 'forms'
-    __table_args__ = {'schema': 'event_registration'}
+    __table_args__ = (db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
+                      {'schema': 'event_registration'})
 
     #: The ID of the object
     id = db.Column(
@@ -52,12 +53,6 @@ class RegistrationForm(db.Model):
         index=True,
         nullable=False
     )
-    #: The last user-friendly registration ID
-    last_friendly_id = db.deferred(db.Column(
-        db.Integer,
-        nullable=False,
-        default=0
-    ))
     #: The title of the registration form
     title = db.Column(
         db.String,
@@ -163,6 +158,7 @@ class RegistrationForm(db.Model):
         'Registration',
         lazy=True,
         cascade='all, delete-orphan',
+        foreign_keys=[Registration.registration_form_id],
         backref=db.backref(
             'registration_form',
             lazy=True
