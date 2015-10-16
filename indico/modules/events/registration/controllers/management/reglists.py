@@ -108,7 +108,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if 'config' in request.args:
             return redirect(url_for('.manage_reglist', self.regform))
         items_ids, special_items = _get_visible_column_ids(reg_list_config['items'])
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids))
+        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids),
+                                                      ~RegistrationFormItem.is_deleted)
         registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
@@ -134,7 +135,8 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         reglist_config['items'] = visible_regform_items
         session.modified = True
         items_ids, special_items = _get_visible_column_ids(visible_regform_items)
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids))
+        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids),
+                                                      ~RegistrationFormItem.is_deleted)
         registrations = _query_registrations(self.regform, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
         reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,

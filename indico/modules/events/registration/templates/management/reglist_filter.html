@@ -2,7 +2,7 @@
 
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
-    {% for child_item in section.children if child_item.is_field %}
+    {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
         <div class="i-label reglist-column js-regform-item {%- if child_item.filter_choices %} filter{% endif %}"
              data-id="{{ child_item.id }}">
             <span class="title {% if child_item.filter_choices %}icon-filter{% endif %}"
