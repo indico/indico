@@ -92,6 +92,13 @@ class Event(ProtectionManagersMixin, db.Model):
         index=True,
         nullable=True
     )
+    #: The last user-friendly registration ID
+    _last_friendly_registration_id = db.deferred(db.Column(
+        'last_friendly_registration_id',
+        db.Integer,
+        nullable=False,
+        default=0
+    ))
 
     #: The user who created the event
     creator = db.relationship(

@@ -28,7 +28,6 @@ def upgrade():
         'forms',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('last_friendly_id', sa.Integer(), nullable=False),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('introduction', sa.Text(), nullable=False),
         sa.Column('contact_info', sa.String(), nullable=False),
@@ -44,6 +43,7 @@ def upgrade():
         sa.Column('notifications_enabled', sa.Boolean(), nullable=False),
         sa.Column('recipients_emails', postgresql.ARRAY(sa.String()), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.UniqueConstraint('id', 'event_id'),
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration'
     )
@@ -104,6 +104,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('friendly_id', sa.Integer(), nullable=False),
         sa.Column('uuid', postgresql.UUID, nullable=False, index=True, unique=True),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('registration_form_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column('transaction_id', sa.Integer(), nullable=True, index=True, unique=True),
@@ -113,10 +114,12 @@ def upgrade():
         sa.Column('first_name', sa.String(), nullable=False),
         sa.Column('last_name', sa.String(), nullable=False),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
+        sa.ForeignKeyConstraint(['event_id', 'registration_form_id'],
+                                ['event_registration.forms.event_id', 'event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.ForeignKeyConstraint(['transaction_id'], ['events.payment_transactions.id']),
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
-        sa.Index(None, 'registration_form_id', 'friendly_id', unique=True),
+        sa.Index(None, 'friendly_id', 'event_id', unique=True),
         sa.Index(None, 'registration_form_id', 'user_id', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
         sa.Index(None, 'registration_form_id', 'email', unique=True, postgresql_where=sa.text('state NOT IN (3, 4)')),
         sa.PrimaryKeyConstraint('id'),
@@ -156,8 +159,14 @@ def upgrade():
         sa.PrimaryKeyConstraint('id'),
         schema='event_registration')
 
+    op.add_column('events',
+                  sa.Column('last_friendly_registration_id', sa.Integer(), nullable=False, server_default='0'),
+                  schema='events')
+    op.alter_column('events', 'last_friendly_registration_id', server_default=None, schema='events')
+
 
 def downgrade():
+    op.drop_column('events', 'last_friendly_registration_id', schema='events')
     op.drop_constraint('fk_form_items_current_data_id_form_field_data',
                        'form_items', schema='event_registration')
     op.drop_table('invitations', schema='event_registration')
