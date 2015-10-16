@@ -235,19 +235,19 @@ class EmailField(RegistrationFormFieldBase):
 class AccommodationField(RegistrationFormFieldBase):
     name = 'accommodation'
     wtf_field_class = JSONField
-    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'accommodation_options'}
+    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super(AccommodationField, cls).process_field_data(data, old_data,
                                                                                              old_versioned_data)
-        items = versioned_data['accommodation_options']
+        items = versioned_data['choices']
         captions = dict(old_data['captions']) if old_data is not None else {}
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
             captions[item['id']] = item.pop('caption')
-        versioned_data['accommodation_options'] = items
+        versioned_data['choices'] = items
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
 
@@ -260,10 +260,10 @@ class AccommodationField(RegistrationFormFieldBase):
         departure_date_to = _to_date(self.form_item.data['departure_date_to'])
         data['arrival_dates'] = [format_date(date) for date in iterdays(arrival_date_from, arrival_date_to)]
         data['departure_dates'] = [format_date(date) for date in iterdays(departure_date_from, departure_date_to)]
-        items = deepcopy(self.form_item.versioned_data['accommodation_options'])
+        items = deepcopy(self.form_item.versioned_data['choices'])
         for item in items:
             item['caption'] = self.form_item.data['captions'][item['id']]
-        data['accommodation_options'] = items
+        data['choices'] = items
         return data
 
     def get_friendly_data(self, registration_data):
