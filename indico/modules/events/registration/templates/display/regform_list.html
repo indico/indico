@@ -8,9 +8,9 @@
     <table id="regforms-list" class="i-table-widget">
         <thead>
             <tr>
-                <th>{% trans %}Form{% endtrans %}</th>
-                <th>{% trans %}Starts{% endtrans %}</th>
-                <th>{% trans %}Deadline{% endtrans %}</th>
+                <th></th>
+                <th>{% trans %}Opens{% endtrans %}</th>
+                <th>{% trans %}Closes{% endtrans %}</th>
                 <th></th>
             </tr>
         </thead>
@@ -28,13 +28,14 @@
                     <td>{{ regform.end_dt | format_datetime if regform.end_dt else _('No deadline') }}</td>
                     <td class="regform-actions">
                         {% if session.user and regform.get_registration(user=session.user) %}
-                            <a class="i-button highlight disabled"
+                            <a href="{{ url_for('.display_regform', regform) }}"
+                               class="i-button highlight"
                                title="{% trans %}You have already registered{% endtrans %}">
-                                {% trans %}Register{% endtrans %}
+                                {% trans %}Check details{% endtrans %}
                             </a>
                         {% elif not regform.is_open %}
                             <a class="i-button highlight disabled"
-                               title="{% trans %}Registrations are closed{% endtrans %}">
+                               title="{% trans %}Registration is closed{% endtrans %}">
                                 {% trans %}Register{% endtrans %}
                             </a>
                         {% elif regform.limit_reached %}

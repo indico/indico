@@ -55,8 +55,10 @@ def _get_open_regforms(event):
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
     regforms = _get_open_regforms(event)
+    user_has_registered = session.user and any(regform.get_registration(user=session.user) for regform in regforms)
     if regforms:
-        return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event)
+        return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event,
+                               user_has_registered=user_has_registered)
 
 
 @signals.event.sidemenu.connect

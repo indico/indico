@@ -1,21 +1,27 @@
-<div class="action-box">
+{% set class_mapping = {'complete': 'accept', 'pending': 'warning', 'unpaid': 'warning'} %}
+
+<div class="action-box {{ class_mapping[registration.state.name] }}">
     <div class="section">
         <div class="icon icon-quill"></div>
         <div class="text">
-            <div class="label">
-                {% trans state=registration.state.title.lower() -%}
-                    Your registration ({{ state }})
-                {%- endtrans %}
-            </div>
             {% if registration.state.name == 'complete' %}
+                <div class="label">
+                    {% trans %}Your registration has been completed{% endtrans %}
+                </div>
                 {% trans -%}
-                    Everything is ready.
+                    Everything is done.
                 {%- endtrans %}
             {% elif registration.state.name == 'pending' %}
+                <div class="label">
+                    {% trans %}Your registration is awaiting approval{% endtrans %}
+                </div>
                 {% trans -%}
-                    Awaiting manager approval.
+                    An event manager will manually validate it.
                 {%- endtrans %}
             {% elif registration.state.name == 'unpaid' %}
+                <div class="label">
+                    {% trans %}Your registration is awaiting payment{% endtrans %}
+                </div>
                 {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
                     {% trans %}Awaiting your payment.{% endtrans %}
                 {% elif registration.transaction.status.name == 'pending' %}
@@ -46,7 +52,7 @@
             {% if true %}
                 <div class="group">
                     {# TODO: link to ticket #}
-                    <a href="" class="i-button highlight icon-ticket">
+                    <a href="" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}
                     </a>
                 </div>
@@ -153,5 +159,5 @@
         {%- endtrans %}
     </div>
     <input type="text" class="permalink" readonly
-           value="{{ url_for('.display_regform_summary', regform, token=registration.uuid, _external=true) }}">
+           value="{{ url_for('.display_regform', regform, token=registration.uuid, _external=true) }}">
 </div>
