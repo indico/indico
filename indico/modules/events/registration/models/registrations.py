@@ -214,14 +214,17 @@ class Registration(db.Model):
         return {x.field_data.field_id: x for x in self.data}
 
     @property
+    def full_name(self):
+        return '{} {}'.format(self.first_name, self.last_name)
+
+    @property
     def price(self):
         return sum(data.price for data in self.data)
 
     @return_ascii
     def __repr__(self):
-        full_name = '{} {}'.format(self.first_name, self.last_name)
-        return format_repr(self, 'id', 'registration_form_id', 'email', 'state', user_id=None, is_deleted=False,
-                           _text=full_name)
+        return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
+                           user_id=None, is_deleted=False, _text=self.full_name)
 
     def update_state(self, approved=None, paid=None):
         if approved is not None and paid is not None:
