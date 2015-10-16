@@ -266,13 +266,6 @@ def get_default_menu_entries():
             static_site='files/generatedPdf/BookOfAbstracts.pdf'
         ),
         MenuEntryData(
-            title=_("Registration"),
-            name='registration',
-            endpoint='event.confRegistrationFormDisplay',
-            position=10,
-            visible=_visibility_registration
-        ),
-        MenuEntryData(
             title=_("Participant List"),
             name='registrants',
             endpoint='event.confRegistrantsDisplay-list',

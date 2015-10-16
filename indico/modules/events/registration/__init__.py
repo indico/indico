@@ -24,6 +24,7 @@ from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
                                                                          InvitationLinkPlaceholder)
 from indico.util.i18n import _, ngettext
@@ -56,6 +57,27 @@ def _inject_regform_announcement(event, **kwargs):
     regforms = _get_open_regforms(event)
     if regforms:
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event)
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.registration.models.forms import RegistrationForm
+    from indico.modules.events.registration.models.registrations import Registration
+
+    def _visible(event):
+        if not event.has_feature('registration'):
+            return False
+        if RegistrationForm.find(RegistrationForm.is_scheduled, RegistrationForm.event_id == int(event.id)).count():
+            return True
+        if not session.user:
+            return False
+        return bool(Registration.find(Registration.user == session.user,
+                                      ~Registration.is_deleted,
+                                      ~RegistrationForm.is_deleted,
+                                      _join=Registration.registration_form).count())
+
+    return MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
+                         visible=_visible)
 
 
 @signals.users.registered.connect
