@@ -133,7 +133,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             }
 
             if ($scope.settings.itemtable) {
-                var validCaptions = _.all(dialogScope.formData.radioitems, function(item) {
+                var validCaptions = _.all(dialogScope.formData.choices, function(item) {
                     return item.remove || !!item.caption;
                 });
 
@@ -466,7 +466,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.paid) {
-                    var item = _.find(scope.field.radioitems, function(item) {
+                    var item = _.find(scope.field.choices, function(item) {
                         return item.caption == userdata[scope.field.htmlName];
                     }) || {};
 
@@ -480,7 +480,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                 var id;
 
                 if (fieldValue !== undefined) {
-                    var item = _.find(scope.field.radioitems, function(item) {
+                    var item = _.find(scope.field.choices, function(item) {
                         return item.caption == fieldValue;
                     });
 
@@ -505,7 +505,7 @@ ndRegForm.directive('ndRadioField', function(url) {
             };
 
             scope.getSelectedItem = function(itemId) {
-                return _.find(scope.field.radioitems, function(item) {
+                return _.find(scope.field.choices, function(item) {
                     return item.id == itemId;
                 });
             };
@@ -698,9 +698,9 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 });
 
                 if ($scope.field.inputType == 'radio') {
-                    $scope.formData.radioitems = [];
-                    _.each($scope.field.radioitems, function(item, ind) {
-                        $scope.formData.radioitems[ind] = angular.copy(item);
+                    $scope.formData.choices = [];
+                    _.each($scope.field.choices, function(item, ind) {
+                        $scope.formData.choices[ind] = angular.copy(item);
                     });
                 }
 
@@ -719,7 +719,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             };
 
             $scope.addItem = function() {
-                $scope.formData.radioitems.push({
+                $scope.formData.choices.push({
                     placesLimit: 0,
                     price: 0,
                     isEnabled: true,
@@ -730,7 +730,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             };
 
             $scope.sortItems = function() {
-                $scope.formData.radioitems = _.sortBy($scope.formData.radioitems, function(radioitem) {
+                $scope.formData.choices = _.sortBy($scope.formData.choices, function(radioitem) {
                     return radioitem.caption.toLowerCase();
                 });
             };
@@ -756,7 +756,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             };
 
             scope.hasRadioItems = function () {
-                return _.any(scope.formData.radioitems, function(item) {
+                return _.any(scope.formData.choices, function(item) {
                     return item.remove !== true;
                 });
             };
