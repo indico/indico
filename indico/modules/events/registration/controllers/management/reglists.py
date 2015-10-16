@@ -76,12 +76,11 @@ def _filter_registration(query, filters):
     return query.filter(subquery == len(filters))
 
 
-def _query_registrations(regform, filters):
-    query = (Registration.query
-             .with_parent(regform)
-             .filter(~Registration.is_deleted)
-             .options(joinedload('data').joinedload('field_data').joinedload('field')))
-    return _filter_registration(query, filters)
+def _query_registrations(regform):
+    return (Registration.query
+            .with_parent(regform)
+            .filter(~Registration.is_deleted)
+            .options(joinedload('data').joinedload('field_data').joinedload('field')))
 
 
 def _get_visible_column_ids(items):
@@ -110,10 +109,13 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         items_ids, special_items = _get_visible_column_ids(reg_list_config['items'])
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids),
                                                       ~RegistrationFormItem.is_deleted)
-        registrations = _query_registrations(self.regform, reg_list_config['filters']).all()
+        registrations_query = _query_registrations(self.regform)
+        total_regs = registrations_query.count()
+        registrations = _filter_registration(registrations_query, reg_list_config['filters']).all()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
-                                                    registrations=registrations, special_items=special_items)
+                                                    registrations=registrations, special_items=special_items,
+                                                    total_registrations=total_regs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -137,10 +139,12 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         items_ids, special_items = _get_visible_column_ids(visible_regform_items)
         regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(items_ids),
                                                       ~RegistrationFormItem.is_deleted)
-        registrations = _query_registrations(self.regform, filters).all()
+        registrations_query = _query_registrations(self.regform)
+        total_regs = registrations_query.count()
+        registrations = _filter_registration(registrations_query, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
         reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
-                                                special_items=special_items)
+                                                special_items=special_items, total_registrations=total_regs)
         return jsonify_data(registration_list=reg_list)
 
 

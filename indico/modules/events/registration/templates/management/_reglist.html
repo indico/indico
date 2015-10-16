@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_registration_list(registrations, visible_cols_regform_items, special_items) %}
+{% macro render_registration_list(registrations, visible_cols_regform_items, special_items, total_registrations) %}
     {% if registrations %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -71,7 +71,11 @@
         </form>
     {% else %}
         {%- call message_box('info', fixed_width=true) -%}
-            {% trans %}Either there are no registrations yet, or the filtering creteria do not match with any of the existing registrations.{% endtrans %}
+            {%- if total_registrations %}
+                {%- trans %}The filtering criteria do not match with any of the existing registrations. Try to clear the filters from the "Customize report" dialog.{% endtrans -%}
+            {% else %}
+                {% trans %}There are no registrations yet.{% endtrans %}
+            {% endif -%}
         {%- endcall %}
     {% endif %}
 {% endmacro %}
