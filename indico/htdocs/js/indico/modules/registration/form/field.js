@@ -706,7 +706,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             };
 
             $scope.areAccommodationOptionsDefined = function(data) {
-                return data.accommodationOptions && data.accommodationOptions.length !== 0;
+                return data.choices && data.choices.length !== 0;
             };
 
             $scope.validateFieldSettings = function(dialogScope) {
@@ -735,13 +735,13 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             $scope.initFormData = function(formData, field) {
                 var eventStartDate = $scope.eventStartDate
                     eventEndDate = $scope.eventEndDate;
-                formData.accommodationOptions = [];
+                formData.choices = [];
                 formData.arrivalDateFrom = field.arrivalDateFrom || moment(eventStartDate).subtract(2, 'days').format('DD-MM-YYYY');
                 formData.arrivalDateTo = field.arrivalDateTo || moment(eventEndDate).format('DD-MM-YYYY');
                 formData.departureDateFrom = field.departureDateFrom || moment(eventStartDate).add(1, 'days').format('DD-MM-YYYY');
                 formData.departureDateTo = field.departureDateTo || moment(eventEndDate).add(3, 'days').format('DD-MM-YYYY');
-                _.each(field.accommodationOptions, function(item, ind) {
-                    formData.accommodationOptions[ind] = angular.copy(item);
+                _.each(field.choices, function(item, ind) {
+                    formData.choices[ind] = angular.copy(item);
                 });
             };
         },
@@ -802,7 +802,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             scope.settings.formData.push('arrivalDateTo');
             scope.settings.formData.push('departureDateFrom');
             scope.settings.formData.push('departureDateTo');
-            scope.settings.formData.push('accommodationOptions');
+            scope.settings.formData.push('choices');
 
             scope.settings.editionTable = {
                 sortable: false,
@@ -921,7 +921,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             };
 
             $scope.addAccommodationOption = function() {
-                $scope.formData.accommodationOptions.push({
+                $scope.formData.choices.push({
                     cancelled: false,
                     pricePerPlace: false
                 });

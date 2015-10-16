@@ -52,12 +52,12 @@
     </div>
     <ng-form name="nestedFormAccommodation">
         <table cellspacing="0">
-            <tr ng-if="field.accommodationOptions.length === 0">
+            <tr ng-if="field.choices.length === 0">
                 <td class="section-placeholder">
                     {{ 'There are no available accommodation options' | i18n }}.
                 </td>
             </tr>
-            <tr ng-repeat="item in field.accommodationOptions">
+            <tr ng-repeat="item in field.choices">
                 <td align="left" class="accommodation-option-item">
                     <input type="radio" nd-radio-extend
                         id="{{ item.id }}"
