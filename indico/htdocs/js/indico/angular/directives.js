@@ -480,7 +480,7 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
         link: function(scope, element, attrs, ctrl) {
             _.defer(function() {
                 element.datepicker({
-                    dateFormat: scope.field.dateFormat,
+                    dateFormat: scope.field.dateFormat || attrs.dateFormat,
                     onSelect: function(date) {
                         ctrl.$setViewValue(date);
                     }
