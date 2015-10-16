@@ -305,6 +305,14 @@ class RegistrationFormItem(db.Model):
     def is_field(cls):
         return cls.type.in_([RegistrationFormItemType.field, RegistrationFormItemType.field_pd])
 
+    @hybrid_property
+    def is_visible(self):
+        return self.is_enabled and not self.is_deleted
+
+    @is_visible.expression
+    def is_visible(cls):
+        return cls.is_enabled & ~cls.is_deleted
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,
