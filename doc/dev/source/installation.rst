@@ -100,6 +100,15 @@ As well as some information on the paths::
     HtdocsDir:        /opt/indico/htdocs
 
 ==========================
+Compile all of the python modules
+==========================
+
+Python modules installed by indico will attempt to be compiled when they are used. If indico is running as a user that does not have write permissions to the python installation path (i.e. the root user) then you will need to precompile all of the modules.
+
+sudo python -m compileall -f /usr/lib/python*
+sudo python -m compileall -f /usr/lib64/python*
+
+==========================
 Configuring the Web Server
 ==========================
 
