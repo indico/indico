@@ -3,7 +3,7 @@
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     {% for child_item in section.children if child_item.is_field %}
-        {% set has_dropdown = child_item.input_type in ['radio', 'country', 'bool', 'checkbox'] %}
+        {% set has_dropdown = child_item.input_type in ['single_choice', 'country', 'bool', 'checkbox'] %}
         <div class="i-label reglist-column js-regform-item {%- if has_dropdown %} filter{% endif %}"
              data-id="{{ child_item.id }}">
             <span class="title {% if has_dropdown %}icon-filter{% endif %}"
@@ -12,7 +12,7 @@
             </span>
             {% if has_dropdown %}
                 <ul class="dropdown" style="display: none">
-                    {% if child_item.input_type in ['radio', 'country'] %}
+                    {% if child_item.input_type in ['single_choice', 'country'] %}
                         {% set options = child_item.data.captions.iteritems() %}
                     {% elif child_item.input_type in ['bool', 'checkbox'] %}
                         {% set options = child_item.field_impl.friendly_data_mapping.iteritems() %}

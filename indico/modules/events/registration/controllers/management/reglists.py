@@ -43,7 +43,7 @@ cache = GenericCache('reglist-config')
 def _get_filters_from_request(regform):
     filters = {}
     for field in regform.form_items:
-        if field.is_field and field.input_type in {'radio', 'country', 'bool', 'checkbox'}:
+        if field.is_field and field.input_type in {'single_choice', 'country', 'bool', 'checkbox'}:
             options = request.form.getlist('field_{}'.format(field.id))
             if options:
                 filters[field.id] = options

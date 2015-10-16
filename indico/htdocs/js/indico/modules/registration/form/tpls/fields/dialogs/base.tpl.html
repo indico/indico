@@ -5,7 +5,7 @@
                 {{ 'Options' | i18n }}
             </a>
         </li>
-        <li ng-if="field.inputType == 'radio'" ng-class="{active: isTabSelected('tab-editItems')}">
+        <li ng-if="field.inputType == 'single_choice'" ng-class="{active: isTabSelected('tab-editItems')}">
             <a ng-click="setSelectedTab('tab-editItems')">
                 {{ 'Edit items' | i18n }}
             </a>

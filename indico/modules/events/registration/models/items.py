@@ -67,7 +67,7 @@ class PersonalDataType(int, IndicoEnum):
         return [
             (cls.title, {
                 'title': 'Title',
-                'input_type': 'radio',
+                'input_type': 'single_choice',
                 'data': {
                     'input_type': 'dropdown',
                     'with_extra_slots': False,

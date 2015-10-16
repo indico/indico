@@ -697,7 +697,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     }
                 });
 
-                if ($scope.field.inputType == 'radio') {
+                if ($scope.field.inputType == 'single_choice') {
                     $scope.formData.choices = [];
                     _.each($scope.field.choices, function(item, ind) {
                         $scope.formData.choices[ind] = angular.copy(item);
