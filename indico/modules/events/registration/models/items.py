@@ -71,8 +71,7 @@ class PersonalDataType(int, IndicoEnum):
                 'data': {
                     'input_type': 'dropdown',
                     'with_extra_slots': False,
-                    'radioitems': [dict(title_item, id=unicode(uuid4()), caption=t)
-                                   for t in TitlesRegistry.getList() if t]
+                    'choices': [dict(title_item, id=unicode(uuid4()), caption=t) for t in TitlesRegistry.getList() if t]
                 }
             }),
             (cls.first_name, {

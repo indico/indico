@@ -67,7 +67,7 @@ class TextAreaField(RegistrationFormFieldBase):
 class SelectField(RegistrationFormBillableField):
     name = 'radio'
     wtf_field_class = wtforms.StringField
-    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'radioitems'}
+    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
 
     @property
     def default_value(self):
@@ -78,13 +78,13 @@ class SelectField(RegistrationFormBillableField):
         except KeyError:
             return None
         # only use the default item if it exists in the current version
-        return default_item if any(x['id'] == default_item for x in versioned_data['radioitems']) else None
+        return default_item if any(x['id'] == default_item for x in versioned_data['choices']) else None
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super(SelectField, cls).process_field_data(data, old_data,
                                                                                       old_versioned_data)
-        items = [x for x in versioned_data['radioitems'] if not x.get('remove')]
+        items = [x for x in versioned_data['choices'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
         default_item = None
         for item in items:
@@ -94,21 +94,21 @@ class SelectField(RegistrationFormBillableField):
             if unversioned_data.get('default_item') in {item['caption'], item['id']}:
                 default_item = item['id']
             captions[item['id']] = item.pop('caption')
-        versioned_data['radioitems'] = items
+        versioned_data['choices'] = items
         unversioned_data['captions'] = captions
         unversioned_data['default_item'] = default_item
         return unversioned_data, versioned_data
 
     @property
     def view_data(self):
-        items = deepcopy(self.form_item.versioned_data['radioitems'])
+        items = deepcopy(self.form_item.versioned_data['choices'])
         for item in items:
             item['caption'] = self.form_item.data['captions'][item['id']]
-        return {'radioitems': items}
+        return {'choices': items}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
-        item = next((x for x in data['radioitems'] if registration_data.data == x['id'] and x['is_billable']), None)
+        item = next((x for x in data['choices'] if registration_data.data == x['id'] and x['is_billable']), None)
         return item['price'] if item else 0
 
     def get_friendly_data(self, registration_data):
@@ -186,8 +186,7 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def view_data(self):
-        return {'radioitems': [{'caption': val, 'countryKey': key}
-                               for key, val in CountryHolder.getCountries().iteritems()]}
+        return {'choices': [{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()]}
 
 
 class FileField(RegistrationFormFieldBase):

@@ -8,7 +8,7 @@
         <option value="">
             {{ '-- Select a country --' | i18n }}
         </option>
-        <option ng-repeat="item in field.radioitems"
+        <option ng-repeat="item in field.choices"
             ng-selected="item.countryKey === userdata[fieldName]"
             value="{{ item.countryKey }}">
             {{ item.caption }}
