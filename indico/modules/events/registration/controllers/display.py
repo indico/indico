@@ -40,12 +40,6 @@ from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-def _can_redirect_to_single_regform(regforms):
-    user = session.user
-    return (len(regforms) == 1 and regforms[0].can_submit(user) and
-            (not user or not regforms[0].get_registration(user=user)))
-
-
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
     CSRF_ENABLED = True
 
@@ -88,8 +82,6 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 
     def _process(self):
         regforms = RegistrationForm.find_all(RegistrationForm.is_scheduled, event_id=int(self.event.id))
-        if _can_redirect_to_single_regform(regforms):
-            return redirect(url_for('.display_regform_summary', regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self.event,
                                                event=self.event, regforms=regforms)
 
@@ -113,21 +105,6 @@ class InvitationMixin:
             flash(_("This invitation does not exist or has been withdrawn."), 'warning')
 
 
-class RHRegistrationFormSummary(InvitationMixin, RHRegistrationFormRegistrationBase):
-    """Displays user summary for a registration form"""
-
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrationBase._checkParams(self, params)
-        InvitationMixin._checkParams(self)
-
-    def _process(self):
-        return self.view_class.render_template('display/regform.html', self.event,
-                                               event=self.event, regform=self.regform, registration=self.registration,
-                                               invitation=self.invitation,
-                                               payment_enabled=event_settings.get(self.event, 'enabled'),
-                                               payment_conditions=bool(event_settings.get(self.event, 'conditions')))
-
-
 class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
     """Checks how an email will affect the registration"""
 
@@ -146,7 +123,7 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
             return jsonify(user=None)
 
 
-class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
+class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormRegistrationBase):
     """Submit a registration form"""
 
     normalize_url_spec = {
@@ -156,31 +133,22 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
     }
 
     def _checkProtection(self):
-        RHRegistrationFormBase._checkProtection(self)
+        RHRegistrationFormRegistrationBase._checkProtection(self)
         if self.regform.require_login and not session.user:
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))
 
     def _checkParams(self, params):
-        RHRegistrationFormBase._checkParams(self, params)
+        RHRegistrationFormRegistrationBase._checkParams(self, params)
         InvitationMixin._checkParams(self)
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
-            return redirect(url_for('.display_regform_summary', self.invitation.registration.locator.registrant))
-        elif not self.regform.is_open:
-            flash(_('This registration form is not open'), 'error')
-            return redirect(url_for('.display_regform_list', self.event))
-        elif session.user and self.regform.get_registration(user=session.user):
-            flash(_('You have already registered with this form'), 'error')
-            return redirect(url_for('.display_regform_list', self.event))
-        elif self.regform.limit_reached:
-            flash(_('The maximum number of registrations has been reached'), 'error')
-            return redirect(url_for('.display_regform_list', self.event))
+            return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
             registration = self._save_registration(form.data)
-            return redirect(url_for('.display_regform_summary', registration.locator.registrant))
+            return redirect(url_for('.display_regform', registration.locator.registrant))
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
@@ -191,7 +159,8 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormBase):
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                currency=event_settings.get(self.event, 'currency'),
-                                               user_data=user_data, invitation=self.invitation)
+                                               user_data=user_data, invitation=self.invitation,
+                                               registration=self.registration)
 
     def _save_registration(self, data):
         registration = Registration(registration_form=self.regform, user=get_user_by_email(data['email']))

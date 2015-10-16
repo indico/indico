@@ -21,9 +21,24 @@ from wtforms import ValidationError
 
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormFieldData)
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
                                                              RegistrationFormItemType, PersonalDataType)
+from indico.modules.events.registration.models.registrations import Registration
 from indico.web.forms.base import IndicoForm
+
+
+def user_registered_in_event(user, event):
+    """Check whether there is a ``Registration`` entry
+       for a user in any form tied to a particular event
+
+       :param user: the ``User`` object
+       :param event: the ``Event`` in question
+    """
+    return bool(Registration.find(Registration.user == user,
+                                  RegistrationForm.event_id == event.id,
+                                  ~Registration.is_cancelled)
+                            .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id).count())
 
 
 def get_event_section_data(regform, management=False):
