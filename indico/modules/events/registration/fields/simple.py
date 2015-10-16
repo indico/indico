@@ -64,8 +64,8 @@ class TextAreaField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
 
-class SelectField(RegistrationFormBillableField):
-    name = 'radio'
+class SingleChoiceField(RegistrationFormBillableField):
+    name = 'single_choice'
     wtf_field_class = wtforms.StringField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
 
@@ -82,8 +82,8 @@ class SelectField(RegistrationFormBillableField):
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super(SelectField, cls).process_field_data(data, old_data,
-                                                                                      old_versioned_data)
+        unversioned_data, versioned_data = super(SingleChoiceField, cls).process_field_data(data, old_data,
+                                                                                            old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
         default_item = None
