@@ -51,6 +51,7 @@ class DisplayRegistrationFormMixin(WPJinjaMixin):
 class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/registration/'
     base_class = WPConferenceDefaultDisplayBase
+    menu_entry_name = 'registration'
 
 
 class WPDisplayRegistrationFormMeeting(DisplayRegistrationFormMixin, WPMeetingDisplay):
