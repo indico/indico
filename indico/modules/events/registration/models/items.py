@@ -327,6 +327,10 @@ class RegistrationFormSection(RegistrationFormItem):
     }
 
     @property
+    def fields(self):
+        return [child for child in self.children if child.is_field]
+
+    @property
     def locator(self):
         return dict(self.registration_form.locator, section_id=self.id)
 
