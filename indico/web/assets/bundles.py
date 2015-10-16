@@ -205,6 +205,15 @@ indico_badges_css = Bundle('css/badges.css',
 fonts_sass = Bundle('sass/partials/_fonts.scss',
                     filters=('pyscss', 'cssmin'), output='css/indico_fonts_%(version)s.min.css')
 
+indico_regform = rjs_bundle(
+    'indico_regform',
+    *namespace('js/indico/modules/registration/form',
+               'form.js',
+               'section.js',
+               'field.js',
+               'sectiontoolbar.js',
+               'table.js'))
+
 angular = rjs_bundle(
     'angular',
     'js/lib/angular.js',
@@ -445,6 +454,7 @@ def register_all_js(env):
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
     env.register('indico_badges_js', indico_badges_js)
+    env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('statistics_js', statistics_js)
     env.register('ie_compatibility', ie_compatibility)
