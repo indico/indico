@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from uuid import uuid4
 
 from flask import has_request_context, session, request
@@ -220,6 +221,33 @@ class Registration(db.Model):
     @property
     def price(self):
         return sum(data.price for data in self.data)
+
+    @property
+    def summary_data(self):
+        """Export registration data nested in sections and fields"""
+
+        def _fill_from_regform():
+            for section in self.registration_form.sections:
+                if not section.is_visible:
+                    continue
+                summary[section] = OrderedDict()
+                for field in section.fields:
+                    if not field.is_visible:
+                        continue
+                    summary[section][field] = field_summary[field]
+
+        def _fill_from_registration():
+            for field, data in field_summary.iteritems():
+                section = field.parent
+                summary.setdefault(section, OrderedDict())
+                if field not in summary[section]:
+                    summary[section][field] = data
+
+        summary = OrderedDict()
+        field_summary = {x.field_data.field: x for x in self.data}
+        _fill_from_regform()
+        _fill_from_registration()
+        return summary
 
     @return_ascii
     def __repr__(self):
