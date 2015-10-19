@@ -271,7 +271,7 @@ class AccommodationField(RegistrationFormFieldBase):
     def get_friendly_data(self, registration_data):
         friendly_data = dict(registration_data.data)
         unversioned_data = registration_data.field_data.field.data
-        friendly_data['accommodation'] = unversioned_data['captions'][friendly_data['accommodation']]
+        friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
         friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
         friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
         return friendly_data
@@ -280,7 +280,7 @@ class AccommodationField(RegistrationFormFieldBase):
         data = registration_data.field_data.versioned_data
         reg_data = registration_data.data
         item = next((x for x in data['choices']
-                     if reg_data['accommodation'] == x['id'] and x['billable']), None)
+                     if reg_data['choice'] == x['id'] and x['billable'], None)
         number_of_days = (_to_date(reg_data['departure_date'])
                           - _to_date(reg_data['arrival_date'])).days
         return item['price'] * number_of_days if item['price'] else 0

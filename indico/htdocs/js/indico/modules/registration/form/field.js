@@ -785,7 +785,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             });
 
             scope.$watch('accommodation.typeId', function(newValue) {
-                updateAccommodationPostData('accommodation', newValue);
+                updateAccommodationPostData('choice', newValue);
             });
 
             scope.billableOptionPayed = function(userdata) {
