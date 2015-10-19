@@ -243,6 +243,10 @@ class AccommodationField(RegistrationFormFieldBase):
                                                                                              old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
+        unversioned_data['arrival_date_from'] = _to_computer_friendly_date(unversioned_data['arrival_date_from'])
+        unversioned_data['arrival_date_to'] = _to_computer_friendly_date(unversioned_data['arrival_date_to'])
+        unversioned_data['departure_date_from'] = _to_computer_friendly_date(unversioned_data['departure_date_from'])
+        unversioned_data['departure_date_to'] = _to_computer_friendly_date(unversioned_data['departure_date_to'])
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
@@ -270,8 +274,14 @@ class AccommodationField(RegistrationFormFieldBase):
         friendly_data = dict(registration_data.data)
         unversioned_data = registration_data.field_data.field.data
         friendly_data['accommodation'] = unversioned_data['captions'][friendly_data['accommodation']]
+        friendly_data['arrivalDate'] = _to_date(friendly_data['arrivalDate'])
+        friendly_data['departureDate'] = _to_date(friendly_data['departureDate'])
         return friendly_data
 
 
+def _to_machine_date(date):
+    return datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
+
+
 def _to_date(date):
-    return datetime.strptime(date, '%d-%m-%Y').date()
+    return datetime.strptime(date, '%Y-%m-%d').date()
