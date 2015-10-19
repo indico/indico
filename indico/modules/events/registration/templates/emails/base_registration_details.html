@@ -1,70 +1,29 @@
-{% extends 'emails/base.html' %}
+{% extends 'events/registration/emails/base_registration.html' %}
 
-{% block subject -%}
-    {{ registration_subject() }} - {{ event.getTitle() }}: {{ registration.full_name }}
-{%- endblock %}
-
-{% block header %}{% endblock %}
-{% block footer %}{% endblock %}
-
-{% block body %}
-    <div class="mail" style="width: 600px; font-family: Arial; border: 1px solid #dfdfdf; background-color: #fcfcfc; margin: auto auto 40px auto;">
-        <div class="header" style="background-color: #5D95EA; color: #eee; padding: 10px 20px;">
-            <h1 style="margin: 0;">
-                {{ registration.registration_form.event.title }}
-            </h1>
-            <h3 style="margin: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                {{ registration.registration_form.title }}
-                <span style="float: right; font-style: italic;">
-                    ref: #{{ registration.friendly_id }}
+{% block registration_body %}
+    {% for section, fields in registration.summary_data.iteritems() %}
+        <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+            <h2>{{ section.title }}</h2>
+            <dl>
+                {% for field, regdata in fields.iteritems() if regdata.friendly_data %}
+                    {{ render_field(field) }}
+                    {{ render_regdata(regdata) }}
+                {% endfor %}
+            </dl>
+            <div style="clear: both;"></div>
+        </div>
+    {% endfor %}
+    {% if registration.price %}
+        <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+            <p style="text-align: right; margin-bottom: 0; font-size: 0.9em;">
+                <strong>Total:</strong>
+                <span style="font-style: italic">
+                    {{- registration.render_price() -}}
                 </span>
-            </h3>
+            </p>
         </div>
-        <div class="content" style="padding: 10px 20px; color: #555;">
-            <div style="border-bottom: 1px solid #EBEBEB;">
-                {% block registration_header %}{% endblock %}
-            </div>
-            {% for section, fields in registration.summary_data.iteritems() %}
-                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                    <h2>{{ section.title }}</h2>
-                    <dl>
-                        {% for field, regdata in fields.iteritems() if regdata.friendly_data %}
-                            {{ render_field(field) }}
-                            {{ render_regdata(regdata) }}
-                        {% endfor %}
-                    </dl>
-                    <div style="clear: both;"></div>
-                </div>
-            {% endfor %}
-            {% if registration.price %}
-                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                    <p style="text-align: right; margin-bottom: 0; font-size: 0.9em;">
-                        <strong>Total:</strong>
-                        <span style="font-style: italic">
-                            {{- registration.render_price() -}}
-                        </span>
-                    </p>
-                </div>
-            {% endif %}
-            {% block registration_footer %}
-                <p>
-                    To manage your registration, follow this link:
-                    <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant, _external=true) }}">
-                        Manage my registration
-                    </a>
-                </p>
-            {% endblock %}
-        </div>
-        <div style="text-align: center; padding: 10px; background: #EBEBEB; font-size: small; color: #999;">
-            Indico :: Event Registration
-        </div>
-    </div>
+    {% endif %}
 {% endblock %}
-
-
-{% macro registration_subject() %}
-    {% block registration_subject %}{% endblock %}
-{% endmacro %}
 
 
 {% macro render_field(field) %}

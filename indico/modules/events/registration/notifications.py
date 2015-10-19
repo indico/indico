@@ -31,8 +31,26 @@ def notify_invitation(invitation, email_body, from_address):
     send_email(email, invitation.registration_form.event_new, 'Registration', session.user)
 
 
-def notify_registration(registration):
-    template = get_template_module('events/registration/emails/registration_confirmation_registrant.html',
-                                   registration=registration, event=registration.registration_form.event)
-    email = make_email(to_list=registration.email, template=template, html=True)
+def _notify_registration(registration, template, to_managers=False):
+    template = get_template_module('events/registration/emails/{}'.format(template), registration=registration)
+    to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
+    email = make_email(to_list=to_list, template=template, html=True)
     send_email(email, event=registration.registration_form.event, module='Registration', user=session.user)
+
+
+def notify_registration_creation(registration):
+    _notify_registration(registration, 'registration_creation_to_registrant.html')
+    if registration.registration_form.manager_notifications_enabled:
+        _notify_registration(registration, 'registration_creation_to_managers.html', to_managers=True)
+
+
+def notify_registration_modification(registration):
+    _notify_registration(registration, 'registration_modification_to_registrant.html')
+    if registration.registration_form.manager_notifications_enabled:
+        _notify_registration(registration, 'registration_modification_to_managers.html', to_managers=True)
+
+
+def notify_registration_state_update(registration):
+    _notify_registration(registration, 'registration_state_update_to_registrant.html')
+    if registration.registration_form.manager_notifications_enabled:
+        _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)
