@@ -1,0 +1,13 @@
+{% extends 'events/registration/emails/registration_creation_to_managers.html' %}
+{% block registration_body %}{% endblock %}
+
+{% block subject_message -%}
+    Registration {{ registration.state.title|lower }}
+{%- endblock %}
+
+{% block registration_header_text %}
+    The registration {{ render_registration_info() }}
+    is now <strong>{{ registration.state.title|lower }}</strong>.
+    {{ render_text_pending() }}
+    {{ render_text_manage() }}
+{% endblock %}

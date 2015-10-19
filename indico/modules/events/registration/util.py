@@ -31,6 +31,7 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
                                                              RegistrationFormItemType, PersonalDataType)
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.notifications import notify_registration_creation
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
 from indico.core.db import db
@@ -133,6 +134,7 @@ def create_registration(regform, data, event, invitation=None):
         invitation.state = InvitationState.accepted
         invitation.registration = registration
     registration.update_state()
+    notify_registration_creation(registration)
     db.session.flush()
     logger.info('New registration %s by %s', registration, session.user)
     return registration

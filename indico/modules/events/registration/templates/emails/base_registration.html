@@ -1,0 +1,38 @@
+{% extends 'emails/base.html' %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% set event = registration.registration_form.event %}
+
+{% block subject -%}
+    {% block subject_message %}{% endblock %} for {{ event.title }}
+    {%- block subject_name %}: {{ registration.full_name }}{% endblock %}
+{%- endblock %}
+
+{% block body %}
+    <div class="mail" style="width: 600px; font-family: Arial; border: 1px solid #dfdfdf; background-color: #fcfcfc; margin: auto auto 40px auto;">
+        <div class="header" style="background-color: #5D95EA; color: #eee; padding: 10px 20px;">
+            <h1 style="margin: 0;">
+                {{ event.title }}
+            </h1>
+            <h3 style="margin: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                {{ registration.registration_form.title }}
+                <span style="float: right; font-style: italic;">
+                    ref: #{{ registration.friendly_id }}
+                </span>
+            </h3>
+        </div>
+        <div class="content" style="padding: 10px 20px; color: #555;">
+            <div style="border-bottom: 1px solid #EBEBEB;">
+                {% block registration_header %}{% endblock %}
+            </div>
+            {% block registration_body %}{% endblock %}
+            <div>
+                {% block registration_footer %}{% endblock %}
+            </div>
+        </div>
+        <div style="text-align: center; padding: 10px; background: #EBEBEB; font-size: small; color: #999;">
+            Indico :: Event Registration
+        </div>
+    </div>
+{% endblock %}

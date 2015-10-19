@@ -1,0 +1,49 @@
+{% extends 'events/registration/emails/base_registration_details.html' %}
+{% block subject_name %}{% endblock %}
+
+{% block subject_message -%}
+    Registration
+{%- endblock %}
+
+{% block registration_header -%}
+    {% set event = registration.registration_form.event %}
+    <p>Dear {{ registration.full_name }},</p>
+    <p>
+        {% block registration_header_text %}
+            Congratulations! Your registration {{ render_registration_info() }}
+            has been recorded successfully.
+            {{ render_text_pending() }}
+            {{ render_text_unpaid() }}
+        {% endblock %}
+    </p>
+{%- endblock %}
+
+{% block registration_footer %}
+    <p>
+        To manage your registration follow this link:
+        <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant, _external=true) }}">
+            Manage my registration
+        </a>
+    </p>
+{% endblock %}
+
+
+{% macro render_registration_info() %}
+    <strong>{{ registration.registration_form.title }}</strong>
+    for the event <strong>{{ event.title }}</strong>
+{% endmacro %}
+
+
+{% macro render_text_pending() %}
+    {% if registration.state.name == 'pending' %}
+        Please notice it's not complete yet since it's awaiting manual approval by a manager.
+        You will be notified when that happens.
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_text_unpaid() %}
+    {% if registration.state.name == 'unpaid' %}
+        Please proceed to the checkout <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant, _external=true) }}">here</a> in order to complete it.
+    {% endif %}
+{% endmacro %}
