@@ -49,13 +49,11 @@
                     ng-pattern="{{ elem.pattern }}"
                     class="editable"/>
                 <ng-form name="nestedForm" ng-if="elem.editable == true && elem.edittype == 'int'">
-                    <input type="number" name="{{ elem.name }}"
+                    <input type="text" name="{{ elem.name }}"
                         ng-model="item[elem.index]"
                         ng-init="item[elem.index] = item[elem.index] || 0"
                         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
                         class="editable"
-                        max="9999"
-                        min="0"
                         size="6"/>
                 </ng-form>
                 <input ng-if="elem.edittype == 'bool_select'"
