@@ -16,6 +16,10 @@
 
 from __future__ import unicode_literals
 
+import csv
+import re
+from io import BytesIO
+
 from flask import current_app, session
 from wtforms import ValidationError
 
@@ -30,6 +34,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
 from indico.core.db import db
+from indico.util.date_time import format_datetime
 
 
 def user_registered_in_event(user, event):
@@ -131,3 +136,49 @@ def create_registration(regform, data, event, invitation=None):
     db.session.flush()
     logger.info('New registration %s by %s', registration, session.user)
     return registration
+
+
+def _prepare_data(data):
+    if isinstance(data, list):
+        data = ','.join(data)
+    elif data is None:
+        data = ''
+    return re.sub(r'(\r?\n)+', '    ', unicode(data)).encode('utf-8')
+
+
+def generate_csv_from_registrations(registrations, regform_items, special_items):
+    """Generates a CSV file from a given registration list.
+
+    :param registrations: The list of registrations to include in the file
+    :param regform_items: The registration form items to be used as columns
+    :param special_items: Registration form information as extra columns
+    """
+
+    field_names = {'name'}
+    field_names |= {'{}_{}'.format(item.title, item.id) for item in regform_items}
+    if 'reg_date' in special_items:
+        field_names.add('Registration date')
+    if 'state' in special_items:
+        field_names.add('Registration state')
+    if 'price' in special_items:
+        field_names.add('Price')
+    buf = BytesIO()
+    writer = csv.DictWriter(buf, fieldnames=field_names)
+    writer.writeheader()
+    for registration in registrations:
+        data = registration.data_by_field
+        registration_dict = {
+            'name': "{} {}".format(registration.first_name, registration.last_name).encode('utf-8')
+        }
+        for item in regform_items:
+            key = '{}_{}'.format(item.title, item.id)
+            registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')
+        if 'reg_date' in special_items:
+            registration_dict['Registration date'] = format_datetime(registration.submitted_dt)
+        if 'state' in special_items:
+            registration_dict['Registration state'] = registration.state.title.encode('utf-8')
+        if 'price' in special_items:
+            registration_dict['Price'] = registration.price
+        writer.writerow(registration_dict)
+    buf.seek(0)
+    return buf
