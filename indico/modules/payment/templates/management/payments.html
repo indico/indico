@@ -45,6 +45,7 @@
         </a>
         {%- for short_name, method in methods %}
             <a id="plugin-{{ method.name }}" class="js-plugin-edit i-badge {%- if method in enabled_methods %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
+               data-title="{% trans %}Payment method settings{% endtrans %}"
                href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
                 <div class="i-badge-legend">
                     <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
@@ -64,10 +65,10 @@
 
     <script>
         $('.js-plugin-edit').ajaxDialog({
-            title: $T('Payment method settings'),
-            onClose: function closePluginDialog(data) {
-                if (!data) { return; }
-
+            onClose: function closePluginDialog(data) {1
+                if (!data) {
+                    return;
+                }
                 var plugin = $('#plugin-' + data.plugin);
                 plugin.toggleClass('i-payment-enabled', data.enabled);
                 plugin.toggleClass('i-payment-disabled', !data.enabled);
