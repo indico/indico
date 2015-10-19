@@ -696,13 +696,13 @@ ndRegForm.directive('ndAccommodationField', function(url) {
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/accommodation.tpl.html');
             $scope.areArrivalDatesValid = function(data) {
-                return moment(data['arrivalDateTo'], "DD-MM-YYYY")
-                        .isAfter(moment(data['arrivalDateFrom'], "DD-MM-YYYY"));
+                return moment(data['arrivalDateTo'], "DD/MM/YYYY")
+                        .isAfter(moment(data['arrivalDateFrom'], "DD/MM/YYYY"));
             };
 
             $scope.areDepartureDatesValid = function(data) {
-                return moment(data['departureDateTo'], "DD-MM-YYYY")
-                        .isAfter(moment(data['departureDateFrom'], "DD-MM-YYYY"))
+                return moment(data['departureDateTo'], "DD/MM/YYYY")
+                        .isAfter(moment(data['departureDateFrom'], "DD/MM/YYYY"))
             };
 
             $scope.areAccommodationOptionsDefined = function(data) {
@@ -735,14 +735,20 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 return true;
             };
 
+            function formatDate(date) {
+                if (date) {
+                    return moment(date).format('DD/MM/YYYY');
+                }
+            }
+
             $scope.initFormData = function(formData, field) {
                 var eventStartDate = $scope.eventStartDate
                     eventEndDate = $scope.eventEndDate;
                 formData.choices = [];
-                formData.arrivalDateFrom = field.arrivalDateFrom || moment(eventStartDate).subtract(2, 'days').format('DD-MM-YYYY');
-                formData.arrivalDateTo = field.arrivalDateTo || moment(eventEndDate).format('DD-MM-YYYY');
-                formData.departureDateFrom = field.departureDateFrom || moment(eventStartDate).add(1, 'days').format('DD-MM-YYYY');
-                formData.departureDateTo = field.departureDateTo || moment(eventEndDate).add(3, 'days').format('DD-MM-YYYY');
+                formData.arrivalDateFrom = formatDate(field.arrivalDateFrom) || moment(eventStartDate).subtract(2, 'days').format('DD/MM/YYYY');
+                formData.arrivalDateTo = formatDate(field.arrivalDateTo) || moment(eventEndDate).format('DD/MM/YYYY');
+                formData.departureDateFrom = formatDate(field.departureDateFrom) || moment(eventStartDate).add(1, 'days').format('DD/MM/YYYY');
+                formData.departureDateTo = formatDate(field.departureDateTo) || moment(eventEndDate).add(3, 'days').format('DD/MM/YYYY');
                 _.each(field.choices, function(item, ind) {
                     formData.choices[ind] = angular.copy(item);
                 });
@@ -771,11 +777,11 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             }
 
             scope.$watch('accommodation.arrivalDate', function(newValue) {
-                updateAccommodationPostData('arrivalDate', moment(newValue).format('DD-MM-YYYY'));
+                updateAccommodationPostData('arrivalDate', moment(newValue).format('YYYY-MM-DD'));
             });
 
             scope.$watch('accommodation.departureDate', function(newValue) {
-                updateAccommodationPostData('departureDate', moment(newValue).format('DD-MM-YYYY'));
+                updateAccommodationPostData('departureDate', moment(newValue).format('YYYY-MM-DD'));
             });
 
             scope.$watch('accommodation.typeId', function(newValue) {
