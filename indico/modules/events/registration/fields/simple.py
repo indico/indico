@@ -22,7 +22,7 @@ from datetime import datetime
 from uuid import uuid4
 
 import wtforms
-from wtforms.validators import NumberRange
+from wtforms.validators import NumberRange, ValidationError
 
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase, RegistrationFormBillableField
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -267,6 +267,14 @@ class AccommodationField(RegistrationFormFieldBase):
             item['caption'] = self.form_item.data['captions'][item['id']]
         data['choices'] = items
         return data
+
+    @property
+    def validators(self):
+        def stay_dates_valid(form, field):
+            data = snakify_keys(field.data)
+            if _to_date(data['arrival_date']) > _to_date(data['departure_date']):
+                raise ValidationError(_("Arrival date can't be set after the departure date."))
+        return [stay_dates_valid]
 
     def get_friendly_data(self, registration_data):
         friendly_data = dict(registration_data.data)
