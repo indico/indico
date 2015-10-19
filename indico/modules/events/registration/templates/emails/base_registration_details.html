@@ -1,141 +1,86 @@
 {% extends 'emails/base.html' %}
 
-{% macro print_dt(content, colon=True) %}
-    <dt style="width: 30%; float: left; clear:left;">{{ content }}{% if colon %}:{% endif %}</dt>
-{% endmacro %}
-
-{% macro print_dd(content) %}
-    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; padding-left: 20px; box-sizing: border-box;">{{ content }}</dd>
-{% endmacro %}
-
-{% macro registration_subject() %}
-    {% block registration_subject %}{% endblock %}
-{% endmacro %}
-
 {% block subject -%}
-    {{ registration_subject() }} - {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
+    {{ registration_subject() }} - {{ event.getTitle() }}: {{ registration.full_name }}
 {%- endblock %}
 
 {% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
-{% block body -%}
-    <div class="mail" style="width: 600px; font-family: Arial; border: 1px solid #dfdfdf; background-color: #f9f9f9; margin: auto auto 40px auto;">
-        <div class="header" style="background-color: #5D95EA; color: white; padding: 20px;">
-            <h1>{{ registration_subject() }} (#{{ registrant.getId() }})</h1>
+{% block body %}
+    <div class="mail" style="width: 600px; font-family: Arial; border: 1px solid #dfdfdf; background-color: #fcfcfc; margin: auto auto 40px auto;">
+        <div class="header" style="background-color: #5D95EA; color: #eee; padding: 10px 20px;">
+            <h1 style="margin: 0;">
+                {{ registration.registration_form.event.title }}
+            </h1>
+            <h3 style="margin: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                {{ registration.registration_form.title }}
+                <span style="float: right; font-style: italic;">
+                    ref: #{{ registration.friendly_id }}
+                </span>
+            </h3>
         </div>
-        <div class="content" style="padding: 20px; color: #555;">
-            {% block registration_header %}{% endblock %}
-            {% for title, fields in reg_details.personal_data.iteritems() %}
+        <div class="content" style="padding: 10px 20px; color: #555;">
+            <div style="border-bottom: 1px solid #EBEBEB;">
+                {% block registration_header %}{% endblock %}
+            </div>
+            {% for section, fields in registration.summary_data.iteritems() %}
                 <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                    <h2>{{ title }}</h2>
+                    <h2>{{ section.title }}</h2>
                     <dl>
-                        {%- for field in fields.itervalues() if field.value %}
-                            {{ print_dt(field.caption, field.value) }}
-                            {%- if field.value -%}
-                                {% set description = field.value %}
-                                {% if field.price -%}
-                                    {% set description = description + ' (' + field.price + ' ' + field.currency + ')' %}
-                                {%- endif %}
-                                {{ print_dd(description) }}
-                            {%- endif %}
-                        {%- endfor %}
+                        {% for field, regdata in fields.iteritems() if regdata.friendly_data %}
+                            {{ render_field(field) }}
+                            {{ render_regdata(regdata) }}
+                        {% endfor %}
                     </dl>
                     <div style="clear: both;"></div>
                 </div>
             {% endfor %}
-            <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                <h2>General information</h2>
-                <dl>
-                    {{ print_dt('Registrant ID') }}
-                    {{ print_dd(registrant.getId()) }}
-                    {%- if reg_details.reason %}
-                        {{ print_dt('Participation reason') }}
-                        {{ print_dd(reg_details.reason) }}
-                    {%- endif %}
-                </dl>
-                <div style="clear: both;"></div>
-            </div>
-            {%- if reg_details.accommodation_type %}
+            {% if registration.price %}
                 <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                    <h2>Accommodation details</h2>
-                    <dl>
-                        {{ print_dt('Arrival date') }}
-                        {{ print_dd(reg_details.accommodation_arrival) }}
-                        {{ print_dt('Departure date') }}
-                        {{ print_dd(reg_details.accommodation_departure) }}
-                        {{ print_dt('Accommodation type') }}
-                        {{ print_dd(reg_details.accommodation_type) }}
-                    </dl>
-                    <div style="clear: both;"></div>
+                    <p style="text-align: right; margin-bottom: 0; font-size: 0.9em;">
+                        <strong>Total:</strong>
+                        <span style="font-style: italic">
+                            {{- registration.render_price() -}}
+                        </span>
+                    </p>
                 </div>
-            {%- endif %}
-            {%- if reg_details.sessions %}
-                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                    <h2>Sessions</h2>
-                    {%- if reg_details.sessions_type %}
-                        <dl>
-                            {{ print_dt('First priority') }}
-                            {{ print_dd(reg_details.sessions[0]) }}
-                            {% if reg_details.sessions[1] %}
-                                {{ print_dt('Other option') }}
-                                {{ print_dd(reg_details.sessions[1]) }}
-                            {%- endif %}
-                        </dl>
-                    {%- else %}
-                        <ul>
-                            {%- for session in reg_details.sessions %}
-                                <li>{{ session }}</li>
-                            {%- endfor %}
-                        </ul>
-                    {%- endif %}
-                    <div style="clear: both;"></div>
-                </div>
-            {%- endif %}
-            {%- if reg_details.social %}
-                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
-                    <h2>Social events</h2>
-                    <ul>
-                        {% for name, places in reg_details.social.iteritems() %}
-                            <li>{{ name }} [{{ places }} place(s) needed]</li>
-                        {%- endfor %}
-                    </ul>
-                </div>
-            {%- endif %}
-            {%- if reg_details.misc_details %}
-                {% for title, fields in reg_details.misc_details.iteritems() if fields %}
-                    <div style="padding-bottom: 20px;{% if not loop.first %} border-top: 1px solid #EBEBEB;{% endif %}">
-                        <h2>{{ title }}</h2>
-                        <dl>
-                            {%- for field in fields.itervalues() if field.value %}
-                                {{ print_dt(field.caption, field.value) }}
-                                {%- if field.value -%}
-                                    {% set description = field.value %}
-                                    {% if field.price -%}
-                                        {% set description = description + ' (' + field.price + ' ' + field.currency + ')' %}
-                                    {%- endif %}
-                                    {{ print_dd(description) }}
-                                {%- endif %}
-                            {%- endfor %}
-                        </dl>
-                        <div style="clear: both;"></div>
-                    </div>
-                {% endfor %}
-            {%- endif %}
+            {% endif %}
             {% block registration_footer %}
-                {%- if registration_email_msg %}
-                    <div style="padding-bottom: 20px; border-top: 1px solid #EBEBEB;">
-                        <h2>Additional information</h2>
-                        <p style="white-space: pre;">{{ registration_email_msg }}</p>
-                    </div>
-                {%- endif %}
-                <p style="padding-top: 20px; border-top: 1px solid #EBEBEB;">To manage your registration, follow this link:
-                    <a href="{{ reg_page }}">Manage my registration</a>
+                <p>
+                    To manage your registration, follow this link:
+                    <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant, _external=true) }}">
+                        Manage my registration
+                    </a>
                 </p>
             {% endblock %}
         </div>
         <div style="text-align: center; padding: 10px; background: #EBEBEB; font-size: small; color: #999;">
-            Indico :: Event Registration Notifier
+            Indico :: Event Registration
         </div>
     </div>
 {% endblock %}
+
+
+{% macro registration_subject() %}
+    {% block registration_subject %}{% endblock %}
+{% endmacro %}
+
+
+{% macro render_field(field) %}
+    <dt style="width: 30%; float: left; clear:left;">
+        {{- field.title -}}:
+    </dt>
+{% endmacro %}
+
+
+{% macro render_regdata(regdata) %}
+    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
+        {{- regdata.friendly_data -}}
+        {%- if regdata.price -%}
+            <span style="float: right; font-style: italic; font-size: 0.9em;">
+                {{- regdata.render_price() -}}
+            </span>
+        {%- endif -%}
+    </dd>
+{% endmacro %}
