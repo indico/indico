@@ -29,7 +29,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.date_time import iterdays, format_date
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
-from indico.util.string import crc32, normalize_phone_number
+from indico.util.string import crc32, normalize_phone_number, snakify_keys
 from indico.web.forms.fields import IndicoRadioField, JSONField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
@@ -243,10 +243,8 @@ class AccommodationField(RegistrationFormFieldBase):
                                                                                              old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         captions = dict(old_data['captions']) if old_data is not None else {}
-        unversioned_data['arrival_date_from'] = _to_computer_friendly_date(unversioned_data['arrival_date_from'])
-        unversioned_data['arrival_date_to'] = _to_computer_friendly_date(unversioned_data['arrival_date_to'])
-        unversioned_data['departure_date_from'] = _to_computer_friendly_date(unversioned_data['departure_date_from'])
-        unversioned_data['departure_date_to'] = _to_computer_friendly_date(unversioned_data['departure_date_to'])
+        for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
+            unversioned_data[key] = _to_machine_date(unversioned_data[key])
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
@@ -274,8 +272,8 @@ class AccommodationField(RegistrationFormFieldBase):
         friendly_data = dict(registration_data.data)
         unversioned_data = registration_data.field_data.field.data
         friendly_data['accommodation'] = unversioned_data['captions'][friendly_data['accommodation']]
-        friendly_data['arrivalDate'] = _to_date(friendly_data['arrivalDate'])
-        friendly_data['departureDate'] = _to_date(friendly_data['departureDate'])
+        friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
+        friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
         return friendly_data
 
     def calculate_price(self, registration_data):
@@ -286,6 +284,11 @@ class AccommodationField(RegistrationFormFieldBase):
         number_of_days = (_to_date(reg_data['departure_date'])
                           - _to_date(reg_data['arrival_date'])).days
         return item['price'] * number_of_days if item['price'] else 0
+
+    def save_data(self, registration, value):
+        data = {'choice': value['choice'], 'arrival_date': value['arrivalDate'],
+                'departure_date': value['departureDate']}
+        return super(AccommodationField, self).save_data(registration, data)
 
 
 def _to_machine_date(date):

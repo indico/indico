@@ -21,12 +21,12 @@
     {% set friendly_data = registration.data_by_field[field.id].friendly_data %}
     {% if field.input_type == 'accommodation' %}
         <div>
-            {% trans arrival_date=friendly_data['arrivalDate'] | format_date %}
+            {% trans arrival_date=friendly_data['arrival_date'] | format_date %}
                 <b>Arrival:</b> {{ arrival_date }}
             {% endtrans %}
         </div>
         <div>
-            {% trans departure_date=friendly_data['departureDate'] | format_date %}
+            {% trans departure_date=friendly_data['departure_date'] | format_date %}
                 <b>Departure:</b> {{ departure_date }}
             {% endtrans %}
         </div>

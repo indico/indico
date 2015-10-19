@@ -28,12 +28,12 @@
                         <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ value }}</a>
                     {% elif field.input_type == 'accommodation' %}
                         <div>
-                            {% trans arrival_date=value['arrivalDate'] | format_date %}
+                            {% trans arrival_date=value['arrival_date'] | format_date %}
                                 <b>Arrival:</b> {{ arrival_date }}
                             {% endtrans %}
                         </div>
                         <div>
-                            {% trans departure_date=value['departureDate'] | format_date %}
+                            {% trans departure_date=value['departure_date'] | format_date %}
                                 <b>Departure:</b> {{ departure_date }}
                             {% endtrans %}
                         </div>
