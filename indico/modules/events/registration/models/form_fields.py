@@ -105,10 +105,6 @@ class RegistrationFormField(RegistrationFormItem):
     def html_field_name(self):
         return 'field_{}'.format(self.id)
 
-    @property
-    def filter_choices(self):
-        return getattr(self.field_impl, 'filter_choices', None)
-
     def calculate_price(self, registration_data):
         return self.field_impl.calculate_price(registration_data)
 

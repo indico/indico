@@ -49,6 +49,10 @@ class RegistrationFormFieldBase(object):
         """Returns a list of validators for this field"""
         return None
 
+    @property
+    def filter_choices(self):
+        return None
+
     def calculate_price(self, registration_data):
         """Calculates the price of the field given the registration data"""
         return 0
