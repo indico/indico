@@ -278,6 +278,15 @@ class AccommodationField(RegistrationFormFieldBase):
         friendly_data['departureDate'] = _to_date(friendly_data['departureDate'])
         return friendly_data
 
+    def calculate_price(self, registration_data):
+        data = registration_data.field_data.versioned_data
+        reg_data = registration_data.data
+        item = next((x for x in data['choices']
+                     if reg_data['accommodation'] == x['id'] and x['billable']), None)
+        number_of_days = (_to_date(reg_data['departure_date'])
+                          - _to_date(reg_data['arrival_date'])).days
+        return item['price'] * number_of_days if item['price'] else 0
+
 
 def _to_machine_date(date):
     return datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
