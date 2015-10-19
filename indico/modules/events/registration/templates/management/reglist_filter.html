@@ -3,15 +3,16 @@
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
-        <div class="i-label reglist-column js-regform-item {%- if child_item.filter_choices %} filter{% endif %}"
+        {% set filter_choices = child_item.field_impl.filter_choices %}
+        <div class="i-label reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
              data-id="{{ child_item.id }}">
-            <span class="title {% if child_item.filter_choices %}icon-filter{% endif %}"
+            <span class="title {% if filter_choices %}icon-filter{% endif %}"
                   data-toggle="dropdown">
                 {{- child_item.title -}}
             </span>
-            {% if child_item.filter_choices %}
+            {% if filter_choices %}
                 <ul class="dropdown" style="display: none">
-                    {% for value, caption in child_item.filter_choices.iteritems() %}
+                    {% for value, caption in filter_choices.iteritems() %}
                         <li>
                             <input type="checkbox" name="field_{{ child_item.id }}" value="{{ value }}"
                                    id="field_{{ child_item.id }}_option_{{ value }}"
