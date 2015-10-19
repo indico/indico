@@ -232,7 +232,7 @@ class EmailField(RegistrationFormFieldBase):
         return [IndicoEmail()]
 
 
-class AccommodationField(RegistrationFormFieldBase):
+class AccommodationField(RegistrationFormBillableField):
     name = 'accommodation'
     wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
@@ -289,9 +289,10 @@ class AccommodationField(RegistrationFormFieldBase):
         reg_data = registration_data.data
         item = next((x for x in data['choices']
                      if reg_data['choice'] == x['id'] and x.get('billable', False)), None)
-        number_of_days = (_to_date(reg_data['departure_date'])
-                          - _to_date(reg_data['arrival_date'])).days
-        return item['price'] * number_of_days if item and item['price'] else 0
+        if not item or not item['price']:
+            return 0
+        nights = (_to_date(reg_data['departure_date']) - _to_date(reg_data['arrival_date'])).days
+        return item['price'] * nights
 
     def save_data(self, registration, value):
         data = {'choice': value['choice'], 'arrival_date': value['arrivalDate'],
