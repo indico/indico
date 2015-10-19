@@ -87,6 +87,13 @@ class RegistrationFormFieldBase(object):
 
 
 class RegistrationFormBillableField(RegistrationFormFieldBase):
+    @classmethod
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        data = dict(data)
+        data.setdefault('is_billable', False)
+        data['price'] = float(data['price']) if data.get('price') else 0
+        return super(RegistrationFormBillableField, cls).process_field_data(data, old_data, old_versioned_data)
+
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
         return data.get('price', 0) if data.get('is_billable') else 0

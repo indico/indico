@@ -92,6 +92,8 @@ class SingleChoiceField(RegistrationFormBillableField):
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
+            item.setdefault('is_billable', False)
+            item['price'] = float(item['price']) if item['price'] else 0
             # XXX: it would be nice if we could use item['is_default'] but doing that with angular is tricky
             if unversioned_data.get('default_item') in {item['caption'], item['id']}:
                 default_item = item['id']
@@ -243,6 +245,7 @@ class AccommodationField(RegistrationFormBillableField):
                                                                                              old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         for item in items:
+            item.setdefault('is_billable', False)
             item['price'] = float(item['price']) if item['price'] else 0
         captions = dict(old_data['captions']) if old_data is not None else {}
         for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
