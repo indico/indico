@@ -280,10 +280,10 @@ class AccommodationField(RegistrationFormFieldBase):
         data = registration_data.field_data.versioned_data
         reg_data = registration_data.data
         item = next((x for x in data['choices']
-                     if reg_data['choice'] == x['id'] and x['billable'], None)
+                     if reg_data['choice'] == x['id'] and x.get('billable', False)), None)
         number_of_days = (_to_date(reg_data['departure_date'])
                           - _to_date(reg_data['arrival_date'])).days
-        return item['price'] * number_of_days if item['price'] else 0
+        return item['price'] * number_of_days if item and item['price'] else 0
 
     def save_data(self, registration, value):
         data = {'choice': value['choice'], 'arrival_date': value['arrivalDate'],
