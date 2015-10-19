@@ -849,7 +849,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                            align: 'center',
                            width: 50,
                            editable: true,
-                           edittype: "text",
+                           edittype: "int",
                            editoptions: {size: "7", maxlength: "20"}
 
                        },
