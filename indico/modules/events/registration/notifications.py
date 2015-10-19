@@ -29,3 +29,10 @@ def notify_invitation(invitation, email_body, from_address):
     template = get_template_module('events/registration/emails/invitation.html', email_body=email_body)
     email = make_email(invitation.email, from_address=from_address, template=template, html=True)
     send_email(email, invitation.registration_form.event_new, 'Registration', session.user)
+
+
+def notify_registration(registration):
+    template = get_template_module('events/registration/emails/registration_confirmation_registrant.html',
+                                   registration=registration, event=registration.registration_form.event)
+    email = make_email(to_list=registration.email, template=template, html=True)
+    send_email(email, event=registration.registration_form.event, module='Registration', user=session.user)
