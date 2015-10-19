@@ -34,7 +34,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.forms import EmailRegistrantsForm
-from indico.modules.events.registration.util import get_event_section_data, make_registration_form, create_registration
+from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
+                                                     create_registration, generate_csv_from_registrations)
 from indico.modules.payment import event_settings
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
@@ -280,7 +281,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     post_url=url_for('.create_registration', self.regform))
 
 
-class RHRegistrationsExportPDFBase(RHRegistrationsActionBase):
+class RHRegistrationsExportBase(RHRegistrationsActionBase):
     """Base class for all registration list export RHs"""
 
     def _checkParams(self, params):
@@ -291,7 +292,7 @@ class RHRegistrationsExportPDFBase(RHRegistrationsActionBase):
                                                            ~RegistrationFormItem.is_deleted)
 
 
-class RHRegistrationsExportPDFTable(RHRegistrationsExportPDFBase):
+class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style"""
 
     def _process(self):
@@ -307,10 +308,18 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportPDFBase):
         return send_file('RegistrantsList.pdf', BytesIO(data), 'PDF')
 
 
-class RHRegistrationsExportPDFBook(RHRegistrationsExportPDFBase):
+class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style"""
 
     def _process(self):
-        pdf = RegistrantsListToBookPDF(self._conf, reglist=self.registrations, display=self.regform_items,
+        pdf = RegistrantsListToBookPDF(self.event, reglist=self.registrations, display=self.regform_items,
                                        special_items=self.special_items)
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
+
+
+class RHRegistrationsExportCSV(RHRegistrationsExportBase):
+    """Export registration list to a CSV file"""
+
+    def _process(self):
+        csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.special_items)
+        return send_file('registrations.csv', csv_file, 'text/csv')

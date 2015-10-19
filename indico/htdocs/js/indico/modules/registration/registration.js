@@ -121,7 +121,7 @@
             }
         });
 
-        $('.js-pdf-export').on('click', function(e) {
+        $('.js-export-reglist').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
             $('.registrations form').attr('action', $this.data('href')).submit();

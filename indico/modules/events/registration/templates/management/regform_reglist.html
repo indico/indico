@@ -42,18 +42,23 @@
                 </a>
                 <ul class="dropdown">
                     <li>
-                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-pdf-export"
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-export-reglist"
                            data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
                             {%- trans %}PDF (table style){% endtrans -%}
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-pdf-export"
+                        <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-export-reglist"
                            data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
                             {%- trans %}PDF (book style){% endtrans -%}
                         </a>
                     </li>
-                    <li><a href="#" class="icon-file-excel js-requires-selected-row disabled">CSV</a></li>
+                    <li>
+                        <a href="#" class="icon-file-excel js-requires-selected-row disabled js-export-reglist"
+                           data-href="{{ url_for('.registrations_csv_export', regform) }}">
+                            CSV
+                        </a>
+                    </li>
                 </ul>
                 <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                     {%- trans %}Actions{% endtrans -%}
