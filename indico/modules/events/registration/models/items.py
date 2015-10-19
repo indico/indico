@@ -281,6 +281,9 @@ class RegistrationFormItem(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - registration_form (RegistrationForm.form_items)
+
     @property
     def view_data(self):
         """Returns object with data that Angular can understand"""
