@@ -101,13 +101,13 @@ class RegistrationForm(db.Model):
     require_login = db.Column(
         db.Boolean,
         nullable=False,
-        default=True
+        default=False
     )
     #: Whether registrations must be associated with an Indico account
     require_user = db.Column(
         db.Boolean,
         nullable=False,
-        default=True
+        default=False
     )
     #: Maximum number of registrations allowed
     registration_limit = db.Column(
