@@ -254,6 +254,10 @@ class Registration(db.Model):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
                            user_id=None, is_deleted=False, _text=self.full_name)
 
+    def render_price(self):
+        currency = event_payment_settings.get(self.registration_form.event, 'currency')
+        return '{} {}'.format(self.price, currency)
+
     def update_state(self, approved=None, paid=None):
         if approved is not None and paid is not None:
             raise Exception("Both approved and paid have been set")
@@ -365,6 +369,10 @@ class RegistrationData(db.Model):
     @return_ascii
     def __repr__(self):
         return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
+
+    def render_price(self):
+        currency = event_payment_settings.get(self.registration.registration_form.event, 'currency')
+        return '{} {}'.format(self.price, currency)
 
 
 @listens_for(mapper, 'after_configured', once=True)
