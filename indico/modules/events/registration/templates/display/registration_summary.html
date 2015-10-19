@@ -4,7 +4,7 @@
             <tr>
                 <td class="regform-done-title">{{ section.title }}</td>
             </tr>
-            {% for field in section.children if field.is_field -%}
+            {% for field in section.children if field.is_field and field.id in registration.data_by_field -%}
                 <tr>
                     <td class="regform-done-caption">{{ field.title }}</td>
                     <td class="regform-done-data">
