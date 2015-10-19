@@ -242,6 +242,8 @@ class AccommodationField(RegistrationFormBillableField):
         unversioned_data, versioned_data = super(AccommodationField, cls).process_field_data(data, old_data,
                                                                                              old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
+        for item in items:
+            item['price'] = float(item['price']) if item['price'] else 0
         captions = dict(old_data['captions']) if old_data is not None else {}
         for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
             unversioned_data[key] = _to_machine_date(unversioned_data[key])
