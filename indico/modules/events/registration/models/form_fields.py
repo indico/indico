@@ -105,6 +105,9 @@ class RegistrationFormField(RegistrationFormItem):
     def html_field_name(self):
         return 'field_{}'.format(self.id)
 
+    def get_friendly_data(self, registration_data):
+        return self.field_impl.get_friendly_data(registration_data)
+
     def calculate_price(self, registration_data):
         return self.field_impl.calculate_price(registration_data)
 
