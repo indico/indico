@@ -838,56 +838,54 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 ],
                 actions: ['remove'],
                 colModel: [
-                       {
-                           name: 'caption',
-                           index: 'caption',
-                           align: 'center',
-                           width: 100,
-                           editoptions: {size: "30", maxlength: "50"},
-                           editable: true,
-                           edittype: "text"
-                       },
-                       {
-                           name: 'isBillable',
-                           index: 'isBillable',
-                           width: 60,
-                           editable: true,
-                           align: 'center',
-                           edittype: 'bool_select',
-                           defaultVal: true
-
-                       },
-                       {
-                           name: 'price',
-                           index: 'price',
-                           align: 'center',
-                           width: 50,
-                           editable: true,
-                           edittype: "text",
-                           pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
-                           editoptions: {size: "7", maxlength: "20"}
-
-                       },
-                       {
-                           name: 'placesLimit',
-                           index: 'placesLimit',
-                           align: 'center',
-                           width: 80,
-                           editable: true,
-                           edittype: "text",
-                           editoptions: {size: "7", maxlength: "20"}
-                       },
-                       {
-                           name: 'cancelled',
-                           index: 'cancelled',
-                           width: 60,
-                           editable: true,
-                           align: 'center',
-                           defaultVal: false,
-                           edittype: 'bool_select'
-                       }
-
-                  ]
+                    {
+                        name: 'caption',
+                        index: 'caption',
+                        align: 'center',
+                        width: 100,
+                        editoptions: {size: "30", maxlength: "50"},
+                        editable: true,
+                        edittype: "text"
+                    },
+                    {
+                        name: 'isBillable',
+                        index: 'isBillable',
+                        width: 60,
+                        editable: true,
+                        align: 'center',
+                        edittype: 'bool_select',
+                        defaultVal: true
+                    },
+                    {
+                        name: 'price',
+                        index: 'price',
+                        align: 'center',
+                        width: 50,
+                        editable: true,
+                        edittype: "text",
+                        pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
+                        editoptions: {size: "7", maxlength: "20"}
+                    },
+                    {
+                        name: 'placesLimit',
+                        index: 'placesLimit',
+                        align: 'center',
+                        width: 80,
+                        editable: true,
+                        edittype: "text",
+                        pattern: '/^\\d*$/',
+                        editoptions: {size: "7", maxlength: "20"}
+                    },
+                    {
+                        name: 'cancelled',
+                        index: 'cancelled',
+                        width: 60,
+                        editable: true,
+                        align: 'center',
+                        defaultVal: false,
+                        edittype: 'bool_select'
+                    }
+                ]
             };
         }
     }
