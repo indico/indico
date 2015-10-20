@@ -33,7 +33,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture,
                                                       WPDisplayRegistrationParticipantList)
-from indico.modules.payment import event_settings
+from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -183,7 +183,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
-                                               currency=event_settings.get(self.event, 'currency'),
+                                               payment_conditions=payment_event_settings.get(self.event, 'conditions'),
+                                               payment_enabled=self.event.has_feature('payment'),
+                                               currency=payment_event_settings.get(self.event, 'currency'),
                                                user_data=user_data, invitation=self.invitation,
                                                payment_enabled=event_settings.get(self.event, 'enabled'),
                                                payment_conditions=event_settings.get(self.event, 'conditions'),
