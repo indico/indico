@@ -44,6 +44,15 @@
                                     {% if item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
                                         <td class="i-table{%- if data[item.id].data %} icon-checkmark{% endif %}"
                                             data-text="{{ data[item.id].friendly_data }}"></td>
+                                    {% elif item.id in data and data[item.id].field_data.field.input_type == 'accommodation' %}
+                                        <td class="i-table">
+                                            {% trans nights=data[item.id].friendly_data.nights,
+                                                     choice=data[item.id].friendly_data.choice -%}
+                                                {{ choice }} ({{ nights }} night)
+                                            {%- pluralize -%}
+                                                {{ choice }} ({{ nights }} nights)
+                                            {%- endtrans %}
+                                        </td>
                                     {% else %}
                                         <td class="i-table">
                                             {%- if item.id in data %}
