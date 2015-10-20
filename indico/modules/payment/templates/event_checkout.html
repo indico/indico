@@ -1,9 +1,4 @@
 <h2 class="page-title">{% trans %}Checkout{% endtrans %}</h2>
-{% if checkout_attempt_delta %}
-    <div class="warning-message-box">
-        <div class="message-text">There was an unfinished checkout attempt {{ checkout_attempt_delta }} minute(s) ago.</div>
-    </div>
-{% endif %}
 <div class="info-message-box">
     <div class="message-text">
         You need to pay {{ format_currency(amount, currency, locale=session.lang) }} for your registration.

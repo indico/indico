@@ -16,9 +16,6 @@
 
 from __future__ import unicode_literals
 
-import math
-from datetime import datetime
-
 from flask import redirect, flash, request, session, jsonify
 from werkzeug.exceptions import NotFound
 
@@ -191,12 +188,6 @@ class RHPaymentEventCheckout(RHPaymentEventBase):
         if self._registrant.getPayed():
             flash(_('You have already paid for your registration.'), 'info')
             return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
-        checkout_attempt_delta = None
-        if not self._registrant.isCheckoutSessionAlive():
-            self._registrant._checkout_attempt_dt = datetime.now()
-        else:
-            checkout_attempt_dt = self._registrant.getCheckoutAttemptDt()
-            checkout_attempt_delta = int(math.ceil((datetime.now() - checkout_attempt_dt).total_seconds() / 60))
         event = self._conf
         amount = self._registrant.getTotal()
         currency = event_settings.get(event, 'currency')
@@ -204,8 +195,7 @@ class RHPaymentEventCheckout(RHPaymentEventBase):
         force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', event, event=event, registrant=self._registrant,
                                               plugins=plugins.items(), force_plugin=force_plugin, amount=amount,
-                                              currency=currency, checkout_attempt_delta=checkout_attempt_delta,
-                                              registrant_params=get_registrant_params())
+                                              currency=currency, registrant_params=get_registrant_params())
 
 
 class RHPaymentEventForm(RHPaymentEventBase):
