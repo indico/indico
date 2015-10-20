@@ -7,7 +7,10 @@
         form-data="formData.choices">
     </nd-table>
 
-    <span ng-if="validationStarted && !hasAccommodationOptions()" class="error-message-tag">
+    <span ng-if="validationStarted && !hasAccommodationOptions()" class="errorMessage">
         {{ 'Add at least one item' | i18n }}
+    </span>
+    <span ng-if="validationStarted && settingsError" class="errorMessage">
+        {{ "Some fields have errors. Correct them before saving the configuration." | i18n }}
     </span>
 </div>
