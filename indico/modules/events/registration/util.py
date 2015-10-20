@@ -29,16 +29,19 @@ from indico.web.forms.base import IndicoForm
 
 
 def user_registered_in_event(user, event):
-    """Check whether there is a ``Registration`` entry
-       for a user in any form tied to a particular event
-
-       :param user: the ``User`` object
-       :param event: the ``Event`` in question
     """
-    return bool(Registration.find(Registration.user == user,
-                                  RegistrationForm.event_id == event.id,
-                                  ~Registration.is_cancelled)
-                            .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id).count())
+    Check whether there is a `Registration` entry for a user in any
+    form tied to a particular event.
+
+    :param user: the `User` object
+    :param event: the event in question
+    """
+    return bool(Registration
+                .find(Registration.user == user,
+                      RegistrationForm.event_id == int(event.id),
+                      ~Registration.is_cancelled)
+                .join(Registration.registration_form)
+                .count())
 
 
 def get_event_section_data(regform, management=False):
