@@ -37,7 +37,7 @@ from indico.util.struct.enum import TitledIntEnum
 
 
 class RegistrationState(TitledIntEnum):
-    __titles__ = [None, L_('Completed'), L_('Pending'), L_('Rejected'), L_('Withdrawn'), L_('Unpaid')]
+    __titles__ = [None, L_('Completed'), L_('Pending'), L_('Rejected'), L_('Withdrawn'), L_('Awaiting payment')]
     complete = 1
     pending = 2
     rejected = 3
