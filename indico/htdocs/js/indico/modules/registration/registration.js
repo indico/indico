@@ -159,7 +159,7 @@
         $('table.i-table input.select-row').on('change', function() {
             $(this).closest('tr').toggleClass('selected', this.checked);
             $('.js-requires-selected-row').toggleClass('disabled', !$('.registrations input:checkbox:checked').length);
-        });
+        }).trigger('change');
     }
 
     function colorizeFilter(filter) {
