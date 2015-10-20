@@ -442,19 +442,27 @@ var ndSelectController = function($scope) {
             return false;
         }
 
-        var captionsValid = _.all(dialogScope.formData.choices, function(item) {
+        var settingsValid = true;
+
+        settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
             return item.remove || !!item.caption;
         });
 
-        var pricesValid = _.all(dialogScope.formData.choices, function(item) {
+        settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
             return /^(\d*(\.\d{1,2})?)?$/.test(item.price);
         });
 
-        var placesLimitValid = _.all(dialogScope.formData.choices, function(item) {
+        settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
             return /^\d*$/.test(item.placesLimit);
         });
 
-        if (!captionsValid || !pricesValid || !placesLimitValid) {
+        if (dialogScope.settings.withExtraSlots) {
+            settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
+                return /^\d*$/.test(item.maxExtraSlots);
+            });
+        }
+
+        if (!settingsValid) {
             dialogScope.settingsError = true;
             dialogScope.setSelectedTab('tab-editItems');
             dialogScope.$apply();
@@ -599,6 +607,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                      width: 50,
                      editable: true,
                      edittype: "text",
+                     pattern: '/^\\d*$/',
                      className: 'extra-slots',
                      editoptions: {
                         size: "7",
@@ -743,19 +752,20 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     return false;
                 }
 
-                var captionsValid = _.all(data.choices, function(item) {
+                var settingsValid = true;
+                settingsValid = settingsValid && _.all(data.choices, function(item) {
                     return item.remove || !!item.caption;
                 });
 
-                var pricesValid = _.all(data.choices, function(item) {
+                settingsValid = settingsValid && _.all(data.choices, function(item) {
                     return /^(\d*(\.\d{1,2})?)?$/.test(item.price);
                 });
 
-                var placesLimitValid = _.all(data.choices, function(item) {
-                    return !item.placesLimit || /^\d*$/.test(item.placesLimit);
+                settingsValid = settingsValid && _.all(data.choices, function(item) {
+                    return /^\d*$/.test(item.placesLimit);
                 });
 
-                if (!captionsValid || !pricesValid || !placesLimitValid) {
+                if (!settingsValid) {
                     dialogScope.settingsError = true;
                     dialogScope.setSelectedTab('tab-accommodation-options');
                     dialogScope.$apply();
@@ -984,6 +994,7 @@ ndRegForm.directive('ndMultiChoiceField', function(url) {
                         width: 50,
                         editable: true,
                         edittype: 'text',
+                        pattern: '/^\\d*$/',
                         className: 'extra-slots',
                         editoptions: {
                             size: '7',
@@ -1012,9 +1023,7 @@ ndRegForm.directive('ndMultiChoiceField', function(url) {
                 ]
             };
 
-            scope.formData.push('withExtraSlots');
-            scope.formData.push('maxExtraSlots');
-            scope.formData.push('extraSlotsPay');
+            scope.settings.formData.push('withExtraSlots');
         }
     };
 });
@@ -1064,7 +1073,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     placesLimit: 0,
                     price: 0,
                     isEnabled: true,
-                    isBillable: false
+                    isBillable: false,
+                    maxExtraSlots: 0
                 });
 
                 $scope.toggleExtraSlotsColumns($scope.formData.withExtraSlots);
