@@ -231,7 +231,7 @@ class CountryField(RegistrationFormFieldBase):
         return dict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data):
-        return CountryHolder.getCountries()[registration_data.data]
+        return CountryHolder.getCountries()[registration_data.data] if registration_data.data else ''
 
 
 class FileField(RegistrationFormFieldBase):
