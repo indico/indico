@@ -1,0 +1,27 @@
+<div ng-controller="BillableCtrl">
+    <ng-form name="nestedForm">
+        <ul>
+            <li ng-repeat="item in field.choices | filter:{isEnabled: true}" ng-required="field.isRequired"
+                ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+                <input id="{{ item.id }}" type="checkbox" name="{{ fieldName }}" value="{{ item.id }}">
+                <label for="{{ item.id }}">{{ field.captions[item.id] }}</label>
+                <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
+                <span ng-if="isBillable(item)">
+                    <nd-currency currency="currency"></nd-currency>
+                </span>
+                <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, getUserdataValue())">
+                    <span ng-switch-when="false" class="unavailable-text" style="margin-left: 25px;">
+                        ({{ "no places left" | i18n }})
+                    </span>
+                    <span ng-switch-when="true" class="available-text" style="margin-left: 25px;">
+                        [{{ getPlacesLeft(item, getUserdataValue(), radioValue.id) }} {{ 'place(s) left' | i18n }}]
+                    </span>
+                </span>
+            </li>
+        </ul>
+        <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired"
+              class="error-message-tag">
+            {{ 'Field is mandatory' | i18n }}
+        </span>
+    </ng-form>
+</div>

@@ -330,3 +330,46 @@ def _to_machine_date(date):
 
 def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
+
+
+class MultiChoiceField(RegistrationFormBillableField):
+    name = 'multi_choice'
+    wtf_field_class = wtforms.SelectMultipleField
+    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
+
+    @property
+    def wtf_field_kwargs(self):
+        return {'choices': [(id, caption) for id, caption in self.form_item.data['captions'].iteritems()]}
+
+    @classmethod
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super(MultiChoiceField, cls).process_field_data(data, old_data,
+                                                                                           old_versioned_data)
+        items = [x for x in versioned_data['choices'] if not x.get('remove')]
+        for item in items:
+            item.setdefault('is_billable', False)
+            item['price'] = float(item['price']) if item.get('price') else 0
+            item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
+        captions = dict(old_data['captions']) if old_data is not None else {}
+        for item in items:
+            if 'id' not in item:
+                item['id'] = unicode(uuid4())
+            captions[item['id']] = item.pop('caption')
+        versioned_data['choices'] = items
+        unversioned_data['captions'] = captions
+        return unversioned_data, versioned_data
+
+    @property
+    def view_data(self):
+        items = deepcopy(self.form_item.versioned_data['choices'])
+        for item in items:
+            item['caption'] = self.form_item.data['captions'][item['id']]
+        return {'choices': items}
+
+    def get_friendly_data(self, registration_data):
+        reg_data = registration_data.data
+        return [self.form_item.data['captions'][x] for x in reg_data]
+
+    def calculate_price(self, registration_data):
+        reg_data = [x for x in self.form_item.versioned_data['choices'] if x['id'] in registration_data.data]
+        return sum(item['price'] for item in reg_data if item['is_billable'])

@@ -37,6 +37,12 @@
                 <b>Accommodation:</b> {{ accommodation }}
             {% endtrans %}
         </div>
+    {% elif field.input_type == 'multi_choice' %}
+        <ul>
+            {% for item in friendly_data -%}
+                <li>{{ item }}</li>
+            {%- endfor %}
+        </ul>
     {% else %}
         {{ friendly_data }}
     {% endif %}
