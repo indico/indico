@@ -395,6 +395,7 @@ module_js = {
     'registration': rjs_bundle('modules_registration',
                                'js/indico/modules/registration/registration.js',
                                'js/indico/modules/registration/invitations.js',
+                               'js/indico/modules/registration/reglists.js',
                                *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
                                           'sectiontoolbar.js', 'table.js'))
 }
