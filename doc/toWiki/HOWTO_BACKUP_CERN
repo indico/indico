@@ -60,7 +60,7 @@ $ sudo /usr/dsm/dsmc restore "/data04/MaKaC/zodb-bakup/" -subdir=yes /tmp/mydir/
 copying the restored directories to the archive path 
 (pcdh94:/data04/MaKaC/archive); for example:
 
-$ cp -R /tmp/mydir/bk/* /data04/MaKaC/archive/
+$ cp -R /tmp/mydir/archive/* /data04/MaKaC/archive/
 
     iii) restore the db from the backup directory using "repozo"; for example:
 $ /soft/bin/python2.3 /soft/python/bin/repozo.py -R -o data.fs
