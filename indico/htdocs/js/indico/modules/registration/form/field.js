@@ -427,45 +427,54 @@ ndRegForm.directive('ndNumberField', function(url) {
     };
 });
 
+var ndSelectController = function($scope) {
+    $scope.initFormData = function(formData, field) {
+        formData.choices = [];
+        _.each(field.choices, function(item, ind) {
+            formData.choices[ind] = angular.copy(item);
+        });
+    };
+
+    $scope.validateFieldSettings = function(dialogScope) {
+        if (!dialogScope.hasRadioItems()) {
+            dialogScope.setSelectedTab('tab-editItems');
+            dialogScope.$apply();
+            return false;
+        }
+
+        var captionsValid = _.all(dialogScope.formData.choices, function(item) {
+            return item.remove || !!item.caption;
+        });
+
+        var pricesValid = _.all(dialogScope.formData.choices, function(item) {
+            return /^(\d+(\.\d{1,2})?)?$/.test(item.price);
+        });
+
+        var placesLimitValid = _.all(dialogScope.formData.choices, function(item) {
+            return /^\d*$/.test(item.placesLimit);
+        });
+
+        if (!captionsValid || !pricesValid || !placesLimitValid) {
+            dialogScope.settingsError = true;
+            dialogScope.setSelectedTab('tab-editItems');
+            dialogScope.$apply();
+            return false;
+        }
+
+        return true;
+    };
+};
+
 ndRegForm.directive('ndRadioField', function(url) {
     return {
         require: 'ndField',
-        controller: function($scope) {
-            $scope.tplInput = url.tpl('fields/radio.tpl.html');
-
-            $scope.initFormData = function(formData, field) {
-                formData.choices = [];
-                _.each(field.choices, function(item, ind) {
-                    formData.choices[ind] = angular.copy(item);
-                });
-            };
-
-            $scope.validateFieldSettings = function(dialogScope) {
-                if (!dialogScope.hasRadioItems()) {
-                    dialogScope.setSelectedTab('tab-editItems');
-                    dialogScope.$apply();
-                    return false;
-                }
-
-                var validCaptions = _.all(dialogScope.formData.choices, function(item) {
-                    return item.remove || !!item.caption;
-                });
-
-                if (!validCaptions) {
-                    dialogScope.captionsNotValid = true;
-                    dialogScope.setSelectedTab('tab-editItems');
-                    dialogScope.$apply();
-                    return false;
-                }
-
-                return true;
-            };
-        },
-
+        controller: ndSelectController,
         link: function(scope) {
             scope.settings.fieldName = $T("Choice");
+            scope.tplInput = url.tpl('fields/radio.tpl.html');
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
+            scope.settings.withExtraSlots = true;
 
             // keep track of the selected radio item
             scope.radioValue = {};
@@ -887,39 +896,12 @@ ndRegForm.directive('ndAccommodationField', function(url) {
 ndRegForm.directive('ndMultiChoiceField', function(url) {
     return {
         require: 'ndField',
-        controller: function($scope) {
-            $scope.tplInput = url.tpl('fields/multi_choice.tpl.html');
-            $scope.initFormData = function(formData, field) {
-                formData.choices = [];
-                _.each(field.choices, function(item, ind) {
-                    formData.choices[ind] = angular.copy(item);
-                });
-            };
-
-            $scope.validateFieldSettings = function(dialogScope) {
-                if (!dialogScope.hasRadioItems()) {
-                    dialogScope.setSelectedTab('tab-editItems');
-                    dialogScope.$apply();
-                    return false;
-                }
-
-                var validCaptions = _.all(dialogScope.formData.choices, function(item) {
-                    return item.remove || !!item.caption;
-                });
-
-                if (!validCaptions) {
-                    dialogScope.captionsNotValid = true;
-                    dialogScope.setSelectedTab('tab-editItems');
-                    dialogScope.$apply();
-                    return false;
-                }
-
-                return true;
-            };
-        },
+        controller: ndSelectController,
         link: function(scope) {
+            scope.tplInput = url.tpl('fields/multi_choice.tpl.html');
             scope.settings.fieldName = $T("Multi choice");
             scope.settings.itemtable = true;
+            scope.settings.withExtraSlots = true;
 
             scope.settings.editionTable = {
                 sortable: false,
