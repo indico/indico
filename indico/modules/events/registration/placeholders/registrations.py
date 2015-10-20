@@ -77,6 +77,5 @@ class LinkPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, registration):
-        url = url_for('.display_regform_summary', registration.registration_form, token=registration.uuid,
-                      _external=True)
+        url = url_for('.display_regform', registration.registration_form, token=registration.uuid, _external=True)
         return Markup('<a href="{url}">{url}</a>'.format(url=url))
