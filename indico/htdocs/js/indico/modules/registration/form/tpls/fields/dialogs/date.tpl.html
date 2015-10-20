@@ -6,23 +6,23 @@
     <span ng-if="field.displayFormats === undefined">
         <select name="dateFormat" required
             ng-model="formData.dateFormat"
-            ng-init="formData.dateFormat=field.dateFormat ? '{0} {1}'.format(field.dateFormat, field.timeFormat || '') : getDefaultFieldSetting('defaultDateFormat')"
+            ng-init="formData.dateFormat=field.dateFormat ? '{0} {1}'.format(field.dateFormat, field.timeFormat || '').trim() : getDefaultFieldSetting('defaultDateFormat')"
             ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
-            <option value="dd/mm/yy HH:mm">DD/MM/YYYY hh:mm</option>
-            <option value="dd.mm.yy HH:mm">DD.MM.YYYY hh:mm</option>
-            <option value="mm/dd/yy HH:mm">MM/DD/YYYY hh:mm</option>
-            <option value="mm.dd.yy HH:mm">MM.DD.YYYY hh:mm</option>
-            <option value="yy/mm/dd HH:mm">YYYY/MM/DD hh:mm</option>
-            <option value="yy.mm.dd HH:mm">YYYY.MM.DD hh:mm</option>
-            <option value="dd/mm/yy">DD/MM/YYYY</option>
-            <option value="dd.mm.yy">DD.MM.YYYY</option>
-            <option value="mm/dd/yy">MM/DD/YYYY</option>
-            <option value="mm.dd.yy">MM.DD.YYYY</option>
-            <option value="yy/mm/dd">YYYY/MM/DD</option>
-            <option value="yy.mm.dd">YYYY.MM.DD</option>
-            <option value="mm/yy">MM/YYYY</option>
-            <option value="mm.yy">MM.YYYY</option>
-            <option value="yy">YYYY</option>
+            <option value="dd/MM/yyyy HH:mm">DD/MM/YYYY hh:mm</option>
+            <option value="dd.MM.yyyy HH:mm">DD.MM.YYYY hh:mm</option>
+            <option value="MM/dd/yyyy HH:mm">MM/DD/YYYY hh:mm</option>
+            <option value="MM.dd.yyyy HH:mm">MM.DD.YYYY hh:mm</option>
+            <option value="yyyy/MM/dd HH:mm">YYYY/MM/DD hh:mm</option>
+            <option value="yyyy.MM.dd HH:mm">YYYY.MM.DD hh:mm</option>
+            <option value="dd/MM/yyyy">DD/MM/YYYY</option>
+            <option value="dd.MM.yyyy">DD.MM.YYYY</option>
+            <option value="MM/dd/yyyy">MM/DD/YYYY</option>
+            <option value="MM.dd.yyyy">MM.DD.YYYY</option>
+            <option value="yyyy/MM/dd">YYYY/MM/DD</option>
+            <option value="yyyy.MM.dd">YYYY.MM.DD</option>
+            <option value="MM/yyyy">MM/YYYY</option>
+            <option value="MM.yyyy">MM.YYYY</option>
+            <option value="yyyy">YYYY</option>
         </select>
     </span>
 
