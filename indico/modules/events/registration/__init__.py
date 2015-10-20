@@ -25,7 +25,6 @@ from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
-from indico.modules.events.registration.util import user_registered_in_event
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -53,6 +52,7 @@ def _get_open_regforms(event):
 
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
+    from indico.modules.events.registration.util import user_registered_in_event
     regforms = _get_open_regforms(event)
     if regforms:
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event,
