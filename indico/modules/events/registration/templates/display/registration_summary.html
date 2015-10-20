@@ -1,201 +1,74 @@
+{% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
+                                                                               render_payment_summary %}
+
 {% set class_mapping = {'complete': 'accept', 'pending': 'warning', 'unpaid': 'warning'} %}
 
-{% macro render_registration_info(registration) %}
-    <table>
-        {% for section in registration.registration_form.sections -%}
-            <tr>
-                <td class="regform-done-title">{{ section.title }}</td>
-            </tr>
-            {% for field in section.children if field.is_field and field.id in registration.data_by_field -%}
-                <tr>
-                    <td class="regform-done-caption">{{ field.title }}</td>
-                    <td class="regform-done-data">
-                        {{ render_data(registration, field) }}
-                    </td>
-                </tr>
-            {%- endfor %}
-        {%- endfor %}
-    </table>
-{% endmacro %}
-
-
-{% macro render_data(registration, field) %}
-    {% set friendly_data = registration.data_by_field[field.id].friendly_data %}
-    {% if field.input_type == 'accommodation' %}
-        <div>
-            {% trans arrival_date=friendly_data['arrival_date'] | format_date %}
-                <b>Arrival:</b> {{ arrival_date }}
-            {% endtrans %}
-        </div>
-        <div>
-            {% trans departure_date=friendly_data['departure_date'] | format_date %}
-                <b>Departure:</b> {{ departure_date }}
-            {% endtrans %}
-        </div>
-        <div>
-            {% trans accommodation=friendly_data['choice'] %}
-                <b>Accommodation:</b> {{ accommodation }}
-            {% endtrans %}
-        </div>
-    {% elif field.input_type == 'multi_choice' %}
-        <ul>
-            {% for item in friendly_data -%}
-                <li>{{ item }}</li>
-            {%- endfor %}
-        </ul>
-    {% else %}
-        {{ friendly_data }}
-    {% endif %}
-{% endmacro %}
-
-
 <div class="action-box {{ class_mapping[registration.state.name] }}">
-    <div class="section">
-        <div class="icon icon-quill"></div>
-        <div class="text">
-            {% if registration.state.name == 'complete' %}
-                <div class="label">
-                    {% trans %}Your registration has been completed{% endtrans %}
-                </div>
-                {% trans -%}
-                    Everything is done.
-                {%- endtrans %}
-            {% elif registration.state.name == 'pending' %}
-                <div class="label">
-                    {% trans %}Your registration is awaiting approval{% endtrans %}
-                </div>
-                {% trans -%}
-                    An event manager will manually validate it.
-                {%- endtrans %}
-            {% elif registration.state.name == 'unpaid' %}
-                <div class="label">
-                    {% trans %}Your registration is awaiting payment{% endtrans %}
-                </div>
-                {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
-                    {% trans %}Awaiting your payment.{% endtrans %}
-                {% elif registration.transaction.status.name == 'pending' %}
-                    {% trans %}Awaiting payment confirmation.{% endtrans %}
-                {% endif %}
-                <a href="#payment" class="js-highlight-payment">
-                    {%- trans %}Check it out here{% endtrans -%}
-                </a>.
-            {% endif %}
-        </div>
-        <div class="toolbar right">
-            {% if regform.modification_mode.name != 'not_allowed' %}
-                <div class="group">
-                    {# TODO: link to registration modification #}
-                    <a href="#" class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
-                        {% if not registration.can_be_modified %}
-                            {% if not regform.is_modification_open -%}
-                                title="{% trans %}The modification period is over{% endtrans %}"
-                            {%- elif regform.modification_mode.name == 'allowed_until_payment' -%}
-                                title="{% trans %}Modifications are not allowed after payment{% endtrans %}"
-                            {%- endif %}
-                        {% endif %}>
-                        {% trans %}Modify{% endtrans %}
-                    </a>
-                </div>
-            {% endif %}
-            {% if registration.state.name == 'complete' and regform.tickets_enabled and regform.ticket_on_summary_page %}
+   <div class="section">
+       <div class="icon icon-quill"></div>
+       <div class="text">
+           {% if registration.state.name == 'complete' %}
+               <div class="label">
+                   {% trans %}Your registration has been completed{% endtrans %}
+               </div>
+               {% trans -%}
+                   Everything is done.
+               {%- endtrans %}
+           {% elif registration.state.name == 'pending' %}
+               <div class="label">
+                   {% trans %}Your registration is awaiting approval{% endtrans %}
+               </div>
+               {% trans -%}
+                   An event manager will manually validate it.
+               {%- endtrans %}
+           {% elif registration.state.name == 'unpaid' %}
+               <div class="label">
+                   {% trans %}Your registration is awaiting payment{% endtrans %}
+               </div>
+               {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
+                   {% trans %}Awaiting your payment.{% endtrans %}
+               {% elif registration.transaction.status.name == 'pending' %}
+                   {% trans %}Awaiting payment confirmation.{% endtrans %}
+               {% endif %}
+               <a href="#payment" class="js-highlight-payment">
+                   {%- trans %}Check it out here{% endtrans -%}
+               </a>.
+           {% endif %}
+       </div>
+       <div class="toolbar right">
+           {% if registration.registration_form.modification_mode.name != 'not_allowed' %}
+               <div class="group">
+                   {# TODO: link to registration modification #}
+                   <a href="#" class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
+                       {% if not registration.can_be_modified %}
+                           {% if not registration.registration_form.is_modification_open -%}
+                               title="{% trans %}The modification period is over{% endtrans %}"
+                           {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
+                               title="{% trans %}Modifications are not allowed after payment{% endtrans %}"
+                           {%- endif %}
+                       {% endif %}>
+                       {% trans %}Modify{% endtrans %}
+                   </a>
+               </div>
+           {% endif %}
+           {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and registration.registration_form.ticket_on_summary_page %}
                 <div class="group">
                     <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}
                     </a>
                 </div>
             {% endif %}
-        </div>
-    </div>
+       </div>
+   </div>
 </div>
 
-<div id="registration-summary" class="regform-done">
-    <div class="i-box-header">
-        <div class="i-box-title">
-            {% trans %}Summary{% endtrans %}
-        </div>
-        <div class="i-box-metadata">
-            <span class="label">
-                {% trans %}Reference:{% endtrans %}
-            </span>
-            <span class="content">
-                #{{ registration.friendly_id }}
-            </span>
-            <span class="label">
-                {% trans %}Date:{% endtrans %}
-            </span>
-            <span class="content">
-                {{ registration.submitted_dt|format_date }}
-            </span>
-        </div>
-    </div>
-    <div class="i-box-content">
-        <table width="100%" cellpadding="0" cellspacing="0">
-            {{ render_registration_info(registration) }}
-        </table>
-    </div>
-</div>
-
-{% if payment_enabled and registration.price %}
-    <div id="payment-summary" class="regform-done">
-        <div class="i-box-header">
-            <div class="i-box-title">
-                {% trans %}Invoice{% endtrans %}
-            </div>
-            {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
-                <div class="payment-status payment-not-paid right">
-                    {% trans %}Not paid{% endtrans %}
-                    <i class="icon-time"></i>
-                </div>
-            {% elif registration.transaction.status.name == 'successful' %}
-                <div class="payment-status payment-done right">
-                    {% trans %}Paid{% endtrans %}
-                    <i class="icon-checkbox-checked"></i>
-                </div>
-            {% elif registration.transaction and registration.transaction.status.name == 'pending' %}
-                <div class="payment-status payment-pending right">
-                    {% trans %}Pending{% endtrans %}
-                    <i class="icon-time"></i>
-                </div>
-            {% endif %}
-        </div>
-        <div class="i-box-content">
-            <table width="100%" cellpadding="0" cellspacing="0">
-                {# TODO: render payment info #}
-                {# ${ payment_info } #}
-            </table>
-            {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
-                <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td>
-                            {% if payment_conditions %}
-                                <div class="checkbox-with-text">
-                                    <input type="checkbox" id="conditions-accepted">
-                                    <div class="payment-conditions-agreement">
-                                        {% trans -%}
-                                            I have read and accept the terms and conditions and understand that
-                                            by confirming this order I will be entering into a binding transaction
-                                        {%- endtrans %}
-                                        (<a href="#" class="js-conditions-dialog"
-                                            data-href="{{ url_for('payment.event_payment_conditions', event) }}"
-                                            data-title="{% trans %}Terms and conditions{% endtrans %}">
-                                            {%- trans %}Terms and conditions{% endtrans -%}
-                                        </a>).
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('payment.event_payment', registration.locator.registrant) }}"
-                               class="action-button js-check-conditions">
-                                {% trans %}Checkout{% endtrans %}
-                            </a>
-                        </td>
-                    </tr>
-                </table>
-            {% endif %}
-        </div>
-    </div>
-{% endif %}
+{{ render_registration_summary(registration) }}
+{% call render_payment_summary(registration, payment_enabled, currency, payment_conditions) %}
+    <a href="{{ url_for('payment.event_payment', registration.locator.registrant) }}"
+       class="action-button js-check-conditions">
+        {% trans %}Checkout{% endtrans %}
+    </a>
+{% endcall %}
 
 <div class="permalink-text">
     <div>
@@ -205,5 +78,5 @@
         {%- endtrans %}
     </div>
     <input type="text" class="permalink" readonly
-           value="{{ url_for('.display_regform', regform, token=registration.uuid, _external=true) }}">
+           value="{{ url_for('.display_regform', registration.registration_form, token=registration.uuid, _external=true) }}">
 </div>

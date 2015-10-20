@@ -1,0 +1,134 @@
+{% macro render_registration_info(registration) %}
+    {% for section in registration.registration_form.sections -%}
+        <tr>
+            <td class="regform-done-title">{{ section.title }}</td>
+        </tr>
+        {% for field in section.children if field.is_field and field.id in registration.data_by_field -%}
+            <tr>
+                <td class="regform-done-caption">{{ field.title }}</td>
+                <td class="regform-done-data">
+                    {{ render_data(registration, field) }}
+                </td>
+            </tr>
+        {%- endfor %}
+    {%- endfor %}
+{% endmacro %}
+
+{% macro render_data(registration, field) %}
+    {% set friendly_data = registration.data_by_field[field.id].friendly_data %}
+    {% if field.input_type == 'accommodation' %}
+        <div>
+            {% trans arrival_date=friendly_data['arrival_date'] | format_date -%}
+                <strong>Arrival:</strong> {{ arrival_date }}
+            {%- endtrans %}
+        </div>
+        <div>
+            {% trans departure_date=friendly_data['departure_date'] | format_date -%}
+                <strong>Departure:</strong> {{ departure_date }}
+            {%- endtrans %}
+        </div>
+        <div>
+            {% trans accommodation=friendly_data['choice'] -%}
+                <strong>Accommodation:</strong> {{ accommodation }}
+            {%- endtrans %}
+        </div>
+    {% elif field.input_type == 'multi_choice' %}
+        <ul>
+            {% for item in friendly_data -%}
+                <li>{{ item }}</li>
+            {%- endfor %}
+        </ul>
+    {% else %}
+        {{ friendly_data }}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_registration_summary(registration) %}
+    <div id="registration-summary" class="regform-done">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans %}Summary{% endtrans %}
+            </div>
+            <div class="i-box-metadata">
+                <span class="label">
+                    {% trans %}Reference:{% endtrans %}
+                </span>
+                <span class="content">
+                    #{{ registration.friendly_id }}
+                </span>
+                <span class="label">
+                    {% trans %}Date:{% endtrans %}
+                </span>
+                <span class="content">
+                    {{ registration.submitted_dt|format_date }}
+                </span>
+            </div>
+        </div>
+        <div class="i-box-content">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                {{ render_registration_info(registration) }}
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_payment_summary(registration, payment_enabled, payment_conditions=false, is_management=false) %}
+    {% if payment_enabled and registration.price %}
+        <div id="payment-summary" class="regform-done">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {% trans %}Invoice{% endtrans %}
+                </div>
+                {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
+                    <div class="payment-status payment-not-paid right">
+                        {% trans %}Not paid{% endtrans %}
+                        <i class="icon-time"></i>
+                    </div>
+                {% elif registration.transaction.status.name == 'successful' %}
+                    <div class="payment-status payment-done right">
+                        {% trans %}Paid{% endtrans %}
+                        <i class="icon-checkbox-checked"></i>
+                    </div>
+                {% elif registration.transaction and registration.transaction.status.name == 'pending' %}
+                    <div class="payment-status payment-pending right">
+                        {% trans %}Pending{% endtrans %}
+                        <i class="icon-time"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="i-box-content">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    {# TODO: render payment info #}
+                    {# ${ payment_info } #}
+                </table>
+                {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
+                    <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td>
+                                {% if payment_conditions %}
+                                    <div class="checkbox-with-text">
+                                        <input type="checkbox" id="conditions-accepted">
+                                        <div class="payment-conditions-agreement">
+                                            {% trans -%}
+                                                I have read and accept the terms and conditions and understand that
+                                                by confirming this order I will be entering into a binding transaction
+                                            {%- endtrans %}
+                                            (<a href="#" class="js-conditions-dialog"
+                                                data-href="{{ url_for('payment.event_payment_conditions', registration.registration_form.event) }}"
+                                                data-title="{% trans %}Terms and conditions{% endtrans %}">
+                                                {%- trans %}Terms and conditions{% endtrans -%}
+                                            </a>).
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="regform-done-footer-button">
+                                {{ caller() }}
+                            </td>
+                        </tr>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}

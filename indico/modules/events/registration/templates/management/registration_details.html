@@ -1,58 +1,24 @@
 {% extends 'layout/base.html' %}
+{% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
+                                                                               render_payment_summary %}
 
 {% block title %}
     {%- trans %}Registration details{% endtrans -%}
 {% endblock %}
 
 {% block content %}
-    <dl class="i-data-list">
-        <dt>{% trans %}Registration ID{% endtrans %}</dt>
-        <dd>{{ registration.friendly_id }}</dd>
-        <dt>{% trans %}Registration date{% endtrans %}</dt>
-        <dd>{{ registration.submitted_dt | format_datetime }}</dd>
-        {% if registration.user %}
-            <dt>{% trans %}Indico user{% endtrans %}</dt>
-            <dd>{{ registration.user.full_name }}</dd>
+    {{ render_registration_summary(registration) }}
+    {% call render_payment_summary(registration, payment_enabled) %}
+        {% if not registration.transaction or registration.transaction.status != 'successful' %}
+            <a href="#" class="i-button big">
+                {% trans %}Mark as paid{% endtrans %}
+            </a>
+        {% elif registration.transaction.status.name == 'successful' %}
+            <a href="#" class="i-button big">
+                {% trans %}Mark as unpaid{% endtrans %}
+            </a>
         {% endif %}
-    </dl>
-
-    {% set data = registration.data_by_field %}
-    {% for section in registration.registration_form.sections %}
-        <h3>{{ section.title }}</h3>
-        <dl class="i-data-list">
-            {% for field in section.children if field.is_field and (field.is_enabled or field.id in data) %}
-                <dt>{{ field.title }}</dt>
-                <dd>
-                    {% set value = data[field.id].friendly_data if field.id in data else '' %}
-                    {% if field.input_type == 'file' and value %}
-                        <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ value }}</a>
-                    {% elif field.input_type == 'accommodation' %}
-                        <div>
-                            {% trans arrival_date=value['arrival_date'] | format_date %}
-                                <b>Arrival:</b> {{ arrival_date }}
-                            {% endtrans %}
-                        </div>
-                        <div>
-                            {% trans departure_date=value['departure_date'] | format_date %}
-                                <b>Departure:</b> {{ departure_date }}
-                            {% endtrans %}
-                        </div>
-                        <div>
-                            {% trans accommodation=value['choice'] %}
-                                <b>Accommodation:</b> {{ accommodation }}
-                            {% endtrans %}
-                        </div>
-                    {% elif field.input_type == 'multi_choice' %}
-                        {% for item in value -%}
-                            <div>{{ item }}</div>
-                        {%- endfor %}
-                    {% else %}
-                        {{ value }}
-                    {% endif %}
-                </dd>
-            {% endfor %}
-        </dl>
-    {% endfor %}
+    {% endcall %}
     <a href="{{ url_for('.edit_registration', registration) }}" class="i-button big highlight">
         {%- trans %}Modify{% endtrans -%}
     </a>
