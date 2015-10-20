@@ -325,6 +325,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
         friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
         friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
+        friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
         return friendly_data
 
     def calculate_price(self, registration_data):
