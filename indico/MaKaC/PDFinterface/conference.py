@@ -1455,6 +1455,12 @@ class RegistrantToPDF(PDFBase):
             story.append(p)
             story.append(Spacer(inch, space*cm, full_name))
 
+        def _print_row(caption, value):
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption.encode('utf-8'), field_value=value)
+            _append_text_to_story(text)
+
         text = _('Registrant ID: {id}').format(id=registration.id)
         _append_text_to_story(text, space=0.5)
 
@@ -1467,22 +1473,20 @@ class RegistrantToPDF(PDFBase):
         style.alignment = TA_JUSTIFY
 
         for item in self._display:
-            value = data[item.id].friendly_data if item.id in data else ''
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
-            text = ('<b>{field_name}</b>: {field_value}'.format(field_name=item.title.encode('utf-8'),
-                                                                field_value=value))
-            _append_text_to_story(text)
+            if item.input_type == 'accommodation':
+                _print_row(caption=item.title, value=data[item.id].friendly_data['choice'])
+                _print_row(caption=_('Arrival date'), value=format_date(data[item.id].friendly_data['arrival_date']))
+                _print_row(caption=_('Departure date'), value=format_date(data[item.id].friendly_data['departure_date']))
+            else:
+                value = data[item.id].friendly_data if item.id in data else ''
+                _print_row(caption=item.title, value=value)
 
         if 'reg_date' in self.special_items:
-            text = '<b>{}</b>: {}'.format(_('Registration date'), format_datetime(registration.submitted_dt))
-            _append_text_to_story(text)
+            _print_row(caption=_('Registration date'), value=format_datetime(registration.submitted_dt))
         if 'state' in self.special_items:
-            text = '<b>{}</b>: {}'.format(_('Registration state'), registration.state.title.encode('utf-8'))
-            _append_text_to_story(text)
+            _print_row(caption=_('Registration state'), value=registration.state.title)
         if 'price' in self.special_items:
-            text = '<b>{}</b>: {}'.format(_('Price'), registration.price)
-            _append_text_to_story(text)
+            _print_row(caption=_('Price'), value=registration.price)
 
         return story
 
@@ -1593,18 +1597,21 @@ class RegistrantsListToPDF(PDFBase):
         lp = []
         lp.append(Paragraph('<b>{}</b>'.format(_('Name')), text_format))
 
+        accommodation_col_counter = 0
         for item in self._display:
-            p = Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format)
-            lp.append(p)
+            if item.input_type == 'accommodation':
+                accommodation_col_counter += 1
+                lp.append(Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format))
+                lp.append(Paragraph("<b>{}</b>".format(_('Arrival date')), text_format))
+                lp.append(Paragraph("<b>{}</b>".format(_('Departure date')), text_format))
+            else:
+                lp.append(Paragraph("<b>{}</b>".format(item.title.encode('utf-8')), text_format))
         if 'reg_date' in self.special_items:
-            p = Paragraph('<b>{}</b>'.format(_('Registration date')), text_format)
-            lp.append(p)
+            lp.append(Paragraph('<b>{}</b>'.format(_('Registration date')), text_format))
         if 'state' in self.special_items:
-            p = Paragraph('<b>{}</b>'.format(_('Registration state')), text_format)
-            lp.append(p)
+            lp.append(Paragraph('<b>{}</b>'.format(_('Registration state')), text_format))
         if 'price' in self.special_items:
-            p = Paragraph('<b>{}</b>'.format(_('Price')), text_format)
-            lp.append(p)
+            lp.append(Paragraph('<b>{}</b>'.format(_('Price')), text_format))
         l.append(lp)
 
         for registration in self._regList:
@@ -1613,10 +1620,15 @@ class RegistrantsListToPDF(PDFBase):
                                                registration.last_name.encode('utf-8')), text_format))
             data = registration.data_by_field
             for item in self._display:
-                value = data[item.id].friendly_data if item.id in data else ''
-                if isinstance(value, unicode):
-                    value = value.encode('utf-8')
-                lp.append(Paragraph(str(value), text_format))
+                if item.input_type == 'accommodation':
+                    lp.append(Paragraph(data[item.id].friendly_data['choice'].encode('utf-8'), text_format))
+                    lp.append(Paragraph(format_date(data[item.id].friendly_data['arrival_date']), text_format))
+                    lp.append(Paragraph(format_date(data[item.id].friendly_data['departure_date']), text_format))
+                else:
+                    value = data[item.id].friendly_data if item.id in data else ''
+                    if isinstance(value, unicode):
+                        value = value.encode('utf-8')
+                    lp.append(Paragraph(str(value), text_format))
             if 'reg_date' in self.special_items:
                 lp.append(Paragraph("{}".format(format_datetime(registration.submitted_dt)), text_format))
             if 'state' in self.special_items:
@@ -1624,7 +1636,7 @@ class RegistrantsListToPDF(PDFBase):
             if 'price' in self.special_items:
                 lp.append(Paragraph("{}".format(registration.price), text_format))
             l.append(lp)
-        noneList = (None,) * (len(self._display) + len(self.special_items) + 1)
+        noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 1)
         t = Table(l, colWidths=noneList, style=tsRegs)
         self._story.append(t)
         return story
