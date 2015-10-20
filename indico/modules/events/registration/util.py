@@ -23,9 +23,9 @@ from io import BytesIO
 from flask import current_app, session
 from wtforms import ValidationError
 
+from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormFieldData)
-from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
