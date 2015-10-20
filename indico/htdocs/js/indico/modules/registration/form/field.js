@@ -106,6 +106,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         placesLimit: false,
         rowsAndColumns: false,
         size: false,
+        withExtraSlots: false,
         formData: [
             'title',
             'description',
@@ -881,6 +882,145 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             };
         }
     }
+});
+
+ndRegForm.directive('ndMultiChoiceField', function(url) {
+    return {
+        require: 'ndField',
+        controller: function($scope) {
+            $scope.tplInput = url.tpl('fields/multi_choice.tpl.html');
+            $scope.initFormData = function(formData, field) {
+                formData.choices = [];
+                _.each(field.choices, function(item, ind) {
+                    formData.choices[ind] = angular.copy(item);
+                });
+            };
+
+            $scope.validateFieldSettings = function(dialogScope) {
+                if (!dialogScope.hasRadioItems()) {
+                    dialogScope.setSelectedTab('tab-editItems');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                var validCaptions = _.all(dialogScope.formData.choices, function(item) {
+                    return item.remove || !!item.caption;
+                });
+
+                if (!validCaptions) {
+                    dialogScope.captionsNotValid = true;
+                    dialogScope.setSelectedTab('tab-editItems');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                return true;
+            };
+        },
+        link: function(scope) {
+            scope.settings.fieldName = $T("Multi choice");
+            scope.settings.itemtable = true;
+
+            scope.settings.editionTable = {
+                sortable: false,
+                actions: ['remove', 'sortable'],
+                colNames: [
+                    $T("Caption"),
+                    $T("Billable"),
+                    $T("Price"),
+                    $T("Places limit"),
+                    $T("Max. extra slots"),
+                    $T("Extra slots pay"),
+                    $T("Enabled")
+                ],
+                colModel: [
+                    {
+                        name: 'caption',
+                        index: 'caption',
+                        align: 'center',
+                        width: 160,
+                        editable: true,
+                        edittype: 'text',
+                        editoptions: {
+                            size: '30',
+                            maxlength: '50'
+                        }
+                    },
+                    {
+                        name: 'isBillable',
+                        index: 'isBillable',
+                        width: 50,
+                        editable: true,
+                        align: 'center',
+                        defaultVal: false,
+                        edittype: 'bool_select'
+                    },
+                    {
+                        name: 'price',
+                        index: 'price',
+                        align: 'center',
+                        width: 50,
+                        editable: true,
+                        edittype: 'text',
+                        pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
+                        editoptions: {
+                            size: '7',
+                            maxlength: '20'
+                        }
+                    },
+                    {
+                        name: 'placesLimit',
+                        index: 'placesLimit',
+                        align: 'center',
+                        width: 50,
+                        editable: true,
+                        edittype: 'text',
+                        pattern: '/^\\d*$/',
+                        editoptions: {
+                            size: '7',
+                            maxlength: '20'
+                        }
+                    },
+                    {
+                        name: 'maxExtraSlots',
+                        index: 'maxExtraSlots',
+                        align: 'center',
+                        width: 50,
+                        editable: true,
+                        edittype: 'text',
+                        className: 'extra-slots',
+                        editoptions: {
+                            size: '7',
+                            maxlength: '2'
+                        }
+                    },
+                    {
+                        name: 'extraSlotsPay',
+                        index: 'extraSlotsPay',
+                        align: 'center',
+                        width: 50,
+                        editable: true,
+                        edittype: 'bool_select',
+                        className: 'extra-slots',
+                        defaultVal: false
+                    },
+                    {
+                        name: 'isEnabled',
+                        index: 'isEnabled',
+                        width: 50,
+                        editable: true,
+                        align: 'center',
+                        edittype: 'bool_select',
+                        defaultVal: true
+                    }
+                ]
+            };
+
+            scope.formData.push('withExtraSlots');
+            scope.formData.push('maxExtraSlots');
+            scope.formData.push('extraSlotsPay');
+        }
+    };
 });
 
 ndRegForm.directive('ndFieldDialog', function(url) {

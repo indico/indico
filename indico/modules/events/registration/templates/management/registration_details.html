@@ -42,6 +42,10 @@
                                 <b>Accommodation:</b> {{ accommodation }}
                             {% endtrans %}
                         </div>
+                    {% elif field.input_type == 'multi_choice' %}
+                        {% for item in value -%}
+                            <div>{{ item }}</div>
+                        {%- endfor %}
                     {% else %}
                         {{ value }}
                     {% endif %}

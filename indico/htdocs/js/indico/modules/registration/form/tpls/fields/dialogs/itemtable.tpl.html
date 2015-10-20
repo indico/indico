@@ -1,7 +1,8 @@
 <div class="toolbar thin">
     <a class="i-button" ng-click="addItem()">{{ 'Create new item' | i18n }}</a>
     <a class="i-button" ng-click="sortItems()">{{ 'Sort alphabetically' | i18n }}</a>
-    <div class="group i-selection">
+    <div ng-if="settings.withExtraSlots"
+         class="group i-selection">
         <div class="inline-vcentered">
             <input type="checkbox" id="withExtraSlots-{{ field.id == -1 ? field.$$hashKey : field.id }}"
                    name="withExtraSlots" ng-model="formData.withExtraSlots">
@@ -18,7 +19,14 @@
     form-data="formData.choices">
 </nd-table>
 
-<div class="regFormEditLine">
+<div ng-if="validationStarted && !hasRadioItems()" class="errorMessage">
+    {{ 'Add at least one item' | i18n }}
+</div>
+<div ng-if="validationStarted && settingsError" class="errorMessage">
+    {{ "Some fields have errors. Correct them before saving the configuration." | i18n }}
+</div>
+
+<div ng-if="settings.defaultValue" class="regFormEditLine">
     <label class="regFormDialogCaption">
         {{ 'Default item' | i18n }}
     </label>
@@ -32,11 +40,4 @@
             {{ el.caption }}
         </option>
     </select>
-</div>
-
-<div ng-if="validationStarted && !hasRadioItems()" class="error-message-tag">
-    {{ 'Add at least one item' | i18n }}
-</div>
-<div ng-if="validationStarted && captionsNotValid" class="error-message-tag">
-    {{ "Field caption can't be blank" | i18n }}
 </div>
