@@ -35,7 +35,7 @@ from indico.modules.events.registration.notifications import notify_registration
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
 from indico.core.db import db
-from indico.util.date_time import format_datetime
+from indico.util.date_time import format_datetime, format_date
 
 
 def user_registered_in_event(user, event):
@@ -158,7 +158,11 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
     """
 
     field_names = {'name'}
-    field_names |= {'{}_{}'.format(item.title, item.id) for item in regform_items}
+    for item in regform_items:
+        field_names.add('{}_{}'.format(item.title.encode('utf-8'), item.id))
+        if item.input_type == 'accommodation':
+            field_names.add('{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id))
+            field_names.add('{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id))
     if 'reg_date' in special_items:
         field_names.add('Registration date')
     if 'state' in special_items:
@@ -174,8 +178,18 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
             'name': "{} {}".format(registration.first_name, registration.last_name).encode('utf-8')
         }
         for item in regform_items:
-            key = '{}_{}'.format(item.title, item.id)
-            registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')
+            if item.input_type == 'accommodation':
+                key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
+                registration_dict[key] = _prepare_data(data[item.id].friendly_data['choice'] if item.id in data else '')
+                key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id)
+                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data['arrival_date'])
+                                                       if item.id in data else '')
+                key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id)
+                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data['departure_date'])
+                                                       if item.id in data else '')
+            else:
+                key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
+                registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')
         if 'reg_date' in special_items:
             registration_dict['Registration date'] = format_datetime(registration.submitted_dt)
         if 'state' in special_items:
