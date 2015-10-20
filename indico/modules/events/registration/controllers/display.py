@@ -157,6 +157,8 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormRegistrationBa
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                currency=event_settings.get(self.event, 'currency'),
                                                user_data=user_data, invitation=self.invitation,
+                                               payment_enabled=event_settings.get(self.event, 'enabled'),
+                                               payment_conditions=event_settings.get(self.event, 'conditions'),
                                                registration=self.registration)
 
 
