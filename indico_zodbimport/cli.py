@@ -245,6 +245,20 @@ class Importer(object):
         ]
         self.print_msg(' '.join(filter(None, parts)), always)
 
+    def print_info(self, msg, always=False, has_event=True):
+        """Prints an info message to the console.
+
+        By default, info messages are not shown in quiet mode.
+        They are prefixed with blank spaces to align with other
+        messages.
+
+        When calling this in a loop that is invoked a lot, it is
+        recommended to add an explicit ``if not self.quiet`` check
+        to avoid expensive `cformat` or `format` calls for a message
+        that is never displayed.
+        """
+        self.print_msg(' ' * (11 if has_event else 4) + msg, always)
+
     def print_success(self, msg, always=False, event_id=None):
         """Prints a success message to the console.
 
