@@ -726,7 +726,11 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     return false;
                 }
 
-                if (!$scope.areAccommodationOptionsDefined(data)) {
+                var pricesValid = _.all(data.choices, function(item) {
+                    return !item.isBillable || /^(\d+(\.\d{1,2})?)?$/.test(item.price);
+                });
+
+                if (!$scope.areAccommodationOptionsDefined(data) || !pricesValid) {
                     dialogScope.setSelectedTab('tab-accommodation-options');
                     dialogScope.$apply();
                     return false;
@@ -834,8 +838,8 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                            edittype: "text"
                        },
                        {
-                           name: 'billable',
-                           index: 'billable',
+                           name: 'isBillable',
+                           index: 'isBillable',
                            width: 60,
                            editable: true,
                            align: 'center',
@@ -849,7 +853,8 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                            align: 'center',
                            width: 50,
                            editable: true,
-                           edittype: "int",
+                           edittype: "text",
+                           pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
                            editoptions: {size: "7", maxlength: "20"}
 
                        },

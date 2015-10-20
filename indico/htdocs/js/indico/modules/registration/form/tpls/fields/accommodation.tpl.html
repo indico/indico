@@ -84,13 +84,13 @@
                     <span ng-if="item.id == accommodation.typeId && userdata.accommodation.billable">
                         <span class="regFormPrice">{{ userdata.accommodation.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
-                        <span ng-if="item.billable">{{ "per night" | i18n }}</span>
+                        <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
                     </span>
 
-                    <span ng-if="item.id != accommodation.typeId && item.billable">
+                    <span ng-if="item.id != accommodation.typeId && item.isBillable">
                         <span class="regFormPrice">{{ item.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
-                        <span ng-if="item.billable">{{ "per night" | i18n }}</span>
+                        <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
                     </span>
                 </td>
             </tr>
