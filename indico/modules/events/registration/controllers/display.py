@@ -148,8 +148,8 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
             return jsonify(user=None)
 
 
-class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormRegistrationBase):
-    """Submit a registration form"""
+class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
+    """Display a registration form and registrations, and process submissions"""
 
     normalize_url_spec = {
         'locators': {

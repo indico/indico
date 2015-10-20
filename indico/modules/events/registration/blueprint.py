@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
-from indico.modules.events.registration.controllers.display import (RHRegistrationFormList, RHRegistrationFormSubmit,
+from indico.modules.events.registration.controllers.display import (RHRegistrationFormList, RHRegistrationForm,
                                                                     RHRegistrationFormCheckEmail,
                                                                     RHRegistrationFormDeclineInvitation,
                                                                     RHParticipantList)
@@ -159,8 +159,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
 # Display
 _bp.add_url_rule('/registrations/', 'display_regform_list', RHRegistrationFormList)
 _bp.add_url_rule('/registrations/participants', 'participant_list', RHParticipantList)
-_bp.add_url_rule('/registrations/<int:reg_form_id>/',
-                 'display_regform', RHRegistrationFormSubmit, methods=('GET', 'POST'))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform', RHRegistrationForm, methods=('GET', 'POST'))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', RHRegistrationFormCheckEmail)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  RHRegistrationFormDeclineInvitation, methods=('POST',))
