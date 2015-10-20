@@ -264,7 +264,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
         for item in items:
             item.setdefault('is_billable', False)
-            item['price'] = float(item['price']) if item['price'] else 0
+            item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
         captions = dict(old_data['captions']) if old_data is not None else {}
         for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
@@ -312,7 +312,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         data = registration_data.field_data.versioned_data
         reg_data = registration_data.data
         item = next((x for x in data['choices']
-                     if reg_data['choice'] == x['id'] and x.get('billable', False)), None)
+                     if reg_data['choice'] == x['id'] and x.get('is_billable', False)), None)
         if not item or not item['price']:
             return 0
         nights = (_to_date(reg_data['departure_date']) - _to_date(reg_data['arrival_date'])).days
