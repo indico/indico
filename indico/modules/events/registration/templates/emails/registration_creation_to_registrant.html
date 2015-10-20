@@ -16,6 +16,15 @@
             {{ render_text_unpaid() }}
         {% endblock %}
     </p>
+    <p>
+        {% if registration.state.name == 'pending' %}
+            {{ registration.registration_form.message_pending }}
+        {% elif registration.state.name == 'unpaid' %}
+            {{ registration.registration_form.message_unpaid }}
+        {% elif registration.state.name == 'complete' %}
+            {{ registration.registration_form.message_complete }}
+        {% endif %}
+    </p>
 {%- endblock %}
 
 {% block registration_footer %}
