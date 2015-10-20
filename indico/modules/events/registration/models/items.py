@@ -69,7 +69,7 @@ class PersonalDataType(int, IndicoEnum):
                 'title': 'Title',
                 'input_type': 'single_choice',
                 'data': {
-                    'input_type': 'dropdown',
+                    'item_type': 'dropdown',
                     'with_extra_slots': False,
                     'choices': [dict(title_item, id=unicode(uuid4()), caption=t) for t in TitlesRegistry.getList() if t]
                 }
