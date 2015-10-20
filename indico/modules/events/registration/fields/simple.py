@@ -110,6 +110,7 @@ class SingleChoiceField(ChoiceBaseField):
             item.setdefault('is_billable', False)
             item['price'] = float(item['price']) if item['price'] else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
+            item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
             # XXX: it would be nice if we could use item['is_default'] but doing that with angular is tricky
             if unversioned_data.get('default_item') in {item['caption'], item['id']}:
                 default_item = item['id']
@@ -354,6 +355,7 @@ class MultiChoiceField(ChoiceBaseField):
             item.setdefault('is_billable', False)
             item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
+            item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
         captions = dict(old_data['captions']) if old_data is not None else {}
         for item in items:
             if 'id' not in item:

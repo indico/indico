@@ -649,7 +649,7 @@ input.regFormTitleInputMgmt {
     font-weight: bold;
 }
 
-input[name='price'].ng-invalid, input[name='placesLimit'].ng-invalid {
+input[name='price'].ng-invalid, input[name='placesLimit'].ng-invalid, input[name='maxExtraSlots'].ng-invalid {
     border: 1px solid red;
 }
 
