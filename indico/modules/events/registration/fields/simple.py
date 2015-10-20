@@ -67,10 +67,24 @@ class TextAreaField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
 
-class SingleChoiceField(RegistrationFormBillableItemsField):
+class ChoiceBaseField(RegistrationFormBillableItemsField):
+    versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
+
+    @property
+    def view_data(self):
+        items = deepcopy(self.form_item.versioned_data['choices'])
+        for item in items:
+            item['caption'] = self.form_item.data['captions'][item['id']]
+        return {'choices': items}
+
+    @property
+    def filter_choices(self):
+        return self.form_item.data['captions']
+
+
+class SingleChoiceField(ChoiceBaseField):
     name = 'single_choice'
     wtf_field_class = wtforms.StringField
-    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
 
     @property
     def default_value(self):
@@ -82,10 +96,6 @@ class SingleChoiceField(RegistrationFormBillableItemsField):
             return None
         # only use the default item if it exists in the current version
         return default_item if any(x['id'] == default_item for x in versioned_data['choices']) else None
-
-    @property
-    def filter_choices(self):
-        return self.form_item.data['captions']
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
@@ -108,13 +118,6 @@ class SingleChoiceField(RegistrationFormBillableItemsField):
         unversioned_data['captions'] = captions
         unversioned_data['default_item'] = default_item
         return unversioned_data, versioned_data
-
-    @property
-    def view_data(self):
-        items = deepcopy(self.form_item.versioned_data['choices'])
-        for item in items:
-            item['caption'] = self.form_item.data['captions'][item['id']]
-        return {'choices': items}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
@@ -145,7 +148,8 @@ class CheckboxField(RegistrationFormBillableField):
 
     @property
     def filter_choices(self):
-        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems() if val is not None}
+        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
+                if val is not None}
 
 
 class DateField(RegistrationFormFieldBase):
@@ -176,7 +180,8 @@ class BooleanField(RegistrationFormBillableField):
 
     @property
     def filter_choices(self):
-        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems() if val is not None}
+        return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
+                if val is not None}
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
@@ -332,10 +337,9 @@ def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
 
 
-class MultiChoiceField(RegistrationFormBillableField):
+class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
     wtf_field_class = wtforms.SelectMultipleField
-    versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
 
     @property
     def wtf_field_kwargs(self):
@@ -358,13 +362,6 @@ class MultiChoiceField(RegistrationFormBillableField):
         versioned_data['choices'] = items
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
-
-    @property
-    def view_data(self):
-        items = deepcopy(self.form_item.versioned_data['choices'])
-        for item in items:
-            item['caption'] = self.form_item.data['captions'][item['id']]
-        return {'choices': items}
 
     def get_friendly_data(self, registration_data):
         reg_data = registration_data.data
