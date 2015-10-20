@@ -442,22 +442,25 @@ var ndSelectController = function($scope) {
             return false;
         }
 
-        var settingsValid = true;
+        var settingsValid = true,
+            choices = dialogScope.formData.choices.filter(function(item) {
+                return item.remove !== true;
+            });
 
-        settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
-            return item.remove || !!item.caption;
+        settingsValid = settingsValid && _.all(choices, function(item) {
+            return !!item.caption;
         });
 
-        settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
+        settingsValid = settingsValid && _.all(choices, function(item) {
             return /^(\d*(\.\d{1,2})?)?$/.test(item.price);
         });
 
-        settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
+        settingsValid = settingsValid && _.all(choices, function(item) {
             return /^\d*$/.test(item.placesLimit);
         });
 
         if (dialogScope.settings.withExtraSlots) {
-            settingsValid = settingsValid && _.all(dialogScope.formData.choices, function(item) {
+            settingsValid = settingsValid && _.all(choices, function(item) {
                 return /^\d*$/.test(item.maxExtraSlots);
             });
         }
@@ -752,16 +755,20 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     return false;
                 }
 
-                var settingsValid = true;
-                settingsValid = settingsValid && _.all(data.choices, function(item) {
-                    return item.remove || !!item.caption;
+                var settingsValid = true,
+                    choices = dialogScope.formData.choices.filter(function(item) {
+                        return item.remove !== true;
+                    });
+
+                settingsValid = settingsValid && _.all(choices, function(item) {
+                    return !!item.caption;
                 });
 
-                settingsValid = settingsValid && _.all(data.choices, function(item) {
+                settingsValid = settingsValid && _.all(choices, function(item) {
                     return /^(\d*(\.\d{1,2})?)?$/.test(item.price);
                 });
 
-                settingsValid = settingsValid && _.all(data.choices, function(item) {
+                settingsValid = settingsValid && _.all(choices, function(item) {
                     return /^\d*$/.test(item.placesLimit);
                 });
 
@@ -782,7 +789,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             }
 
             $scope.initFormData = function(formData, field) {
-                var eventStartDate = $scope.eventStartDate
+                var eventStartDate = $scope.eventStartDate,
                     eventEndDate = $scope.eventEndDate;
                 formData.choices = [];
                 formData.arrivalDateFrom = formatDate(field.arrivalDateFrom) || moment(eventStartDate).subtract(2, 'days').format('DD/MM/YYYY');
