@@ -447,7 +447,7 @@ var ndSelectController = function($scope) {
         });
 
         var pricesValid = _.all(dialogScope.formData.choices, function(item) {
-            return /^(\d+(\.\d{1,2})?)?$/.test(item.price);
+            return /^(\d*(\.\d{1,2})?)?$/.test(item.price);
         });
 
         var placesLimitValid = _.all(dialogScope.formData.choices, function(item) {
@@ -576,7 +576,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                      align: 'center',
                      width: 50,
                      editable: true,
-                     edittype: 'int',
+                     edittype: 'text',
                      pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
                      editoptions: {
                         size: "7",
@@ -588,6 +588,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                      width: 50,
                      editable: true,
                      edittype: "text",
+                     pattern: '/^\\d*$/',
                      editoptions: {
                         size: "7",
                         maxlength: "20"}},
@@ -736,11 +737,26 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     return false;
                 }
 
-                var pricesValid = _.all(data.choices, function(item) {
-                    return !item.isBillable || /^(\d+(\.\d{1,2})?)?$/.test(item.price);
+                if (!$scope.areAccommodationOptionsDefined(data)) {
+                    dialogScope.setSelectedTab('tab-accommodation-options');
+                    dialogScope.$apply();
+                    return false;
+                }
+
+                var captionsValid = _.all(data.choices, function(item) {
+                    return item.remove || !!item.caption;
                 });
 
-                if (!$scope.areAccommodationOptionsDefined(data) || !pricesValid) {
+                var pricesValid = _.all(data.choices, function(item) {
+                    return /^(\d*(\.\d{1,2})?)?$/.test(item.price);
+                });
+
+                var placesLimitValid = _.all(data.choices, function(item) {
+                    return !item.placesLimit || /^\d*$/.test(item.placesLimit);
+                });
+
+                if (!captionsValid || !pricesValid || !placesLimitValid) {
+                    dialogScope.settingsError = true;
                     dialogScope.setSelectedTab('tab-accommodation-options');
                     dialogScope.$apply();
                     return false;
@@ -1057,7 +1073,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             $scope.addAccommodationOption = function() {
                 $scope.formData.choices.push({
                     cancelled: false,
-                    pricePerPlace: false
+                    price: 0,
+                    placesLimit: 0
                 });
             };
 
