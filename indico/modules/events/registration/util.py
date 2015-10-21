@@ -112,7 +112,8 @@ def url_rule_to_angular(endpoint):
 
 
 def create_registration(regform, data, invitation=None):
-    registration = Registration(registration_form=regform, user=get_user_by_email(data['email']))
+    registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
+                                base_price=regform.base_price)
     for form_item in regform.active_fields:
         if form_item.parent.is_manager_only:
             with db.session.no_autoflush:

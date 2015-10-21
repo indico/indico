@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from decimal import Decimal
 from uuid import uuid4
 
 from flask import has_request_context, session, request
@@ -117,6 +118,12 @@ class Registration(db.Model):
     state = db.Column(
         PyIntEnum(RegistrationState),
         nullable=False,
+    )
+    #: The base registration fee (that is not specific to form items)
+    base_price = db.Column(
+        db.Numeric(8, 2),  # max. 999999.99
+        nullable=False,
+        default=0
     )
     #: The date/time when the registration was recorded
     submitted_dt = db.Column(
@@ -220,7 +227,7 @@ class Registration(db.Model):
 
     @property
     def price(self):
-        return sum(data.price for data in self.data)
+        return self.base_price + Decimal(sum(data.price for data in self.data))
 
     @property
     def summary_data(self):

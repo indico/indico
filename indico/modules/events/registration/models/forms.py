@@ -120,6 +120,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: The base fee users have to pay when registering
+    base_price = db.Column(
+        db.Numeric(8, 2),  # max. 999999.99
+        nullable=False,
+        default=0
+    )
     #: Custom message to include in emails for pending registrations
     message_pending = db.Column(
         db.Text,
