@@ -104,25 +104,24 @@ class PaymentPluginMixin(object):
         in the payment form or to provide additional data to the form. To do so, `data` must
         be modified.
 
-        :param data: a dict containing event, registrant, amount, currency,
+        :param data: a dict containing event, registration, amount, currency,
                      settings and event_settings
         """
         pass
 
-    def render_payment_form(self, event, registrant, amount, currency):
+    def render_payment_form(self, registration):
         """Returns the payment form shown to the user.
 
-        :param event: the :class:`Conference`
-        :param registrant: the :class:`Registrant`
-        :param amount: the amount of money the registrant has to pay
-        :param currency: the currency used for the payment
+        :param registration: a :class:`Registration` object
         """
+        from indico.modules.payment import event_settings as event_payment_settings
+        event = registration.registration_form.event
         settings = self.settings.get_all()
         event_settings = self.event_settings.get_all(event)
-        data = {'event': event,
-                'registrant': registrant,
-                'amount': amount,
-                'currency': currency,
+        data = {'event': registration.registration_form.event,
+                'registration': registration,
+                'amount': registration.price,
+                'currency': event_payment_settings.get(event, 'currency'),
                 'settings': settings,
                 'event_settings': event_settings}
         self.adjust_payment_form_data(data)

@@ -22,18 +22,19 @@ from werkzeug.exceptions import NotFound
 from indico.core.plugins.controllers import RHPluginDetails
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
-from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins, get_registrant_params
+from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins
 from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
+from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
+from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormRegistrantBase
 
 
 class RHPaymentAdminSettings(RHAdminBase):
-    """Payment settings (admin)"""
+    """Payment settings in server admin area"""
 
     def _process(self):
         form = AdminSettingsForm(obj=FormDefaults(**settings.get_all()))
@@ -45,22 +46,22 @@ class RHPaymentAdminSettings(RHAdminBase):
 
 
 class RHPaymentAdminPluginSettings(RHPluginDetails):
-    """Payment plugin settings (admin)"""
+    """Payment plugin settings in server admin area"""
     back_button_endpoint = 'payment.admin_settings'
 
 
-class RHPaymentEventManagementBase(RHConferenceModifBase):
+class RHPaymentManagementBase(RHConferenceModifBase):
     """Base RH for event management pages"""
     EVENT_FEATURE = 'payment'
 
 
-class RHPaymentEventBase(RHRegistrationFormRegistrantBase):
-    """Base RH for non-management event pages"""
+class RHPaymentBase(RHRegistrationFormRegistrationBase):
+    """Base RH for non-management payment pages"""
     EVENT_FEATURE = 'payment'
 
 
-class RHPaymentEventSettings(RHPaymentEventManagementBase):
-    """Payment settings (event)"""
+class RHPaymentSettings(RHPaymentManagementBase):
+    """Display payment settings"""
 
     def _process(self):
         event = self._conf
@@ -71,8 +72,8 @@ class RHPaymentEventSettings(RHPaymentEventManagementBase):
                                                         methods=methods.items(), enabled_methods=enabled_methods)
 
 
-class RHPaymentEventSettingsEdit(RHPaymentEventManagementBase):
-    """Edit payment settings (event)"""
+class RHPaymentSettingsEdit(RHPaymentManagementBase):
+    """Edit payment settings"""
 
     def _process(self):
         event = self._conf
@@ -86,7 +87,7 @@ class RHPaymentEventSettingsEdit(RHPaymentEventManagementBase):
         return WPPaymentEventManagement.render_template('management/payments_edit.html', event, event=event, form=form)
 
 
-class RHPaymentEventToggle(RHPaymentEventManagementBase):
+class RHPaymentToggle(RHPaymentEventManagementBase):
     """Enable/disable payment for an event"""
 
     CSRF_ENABLED = True
@@ -105,11 +106,11 @@ class RHPaymentEventToggle(RHPaymentEventManagementBase):
         return redirect(url_for('.event_settings', event))
 
 
-class RHPaymentEventPluginEdit(RHPaymentEventManagementBase):
+class RHPaymentPluginEdit(RHPaymentEventManagementBase):
     """Configure a payment plugin for an event"""
 
     def _checkParams(self, params):
-        RHPaymentEventManagementBase._checkParams(self, params)
+        RHPaymentManagementBase._checkParams(self, params)
         try:
             self.plugin = get_payment_plugins()[request.view_args['method']]
         except KeyError:
@@ -121,7 +122,7 @@ class RHPaymentEventPluginEdit(RHPaymentEventManagementBase):
         can_modify_event = self._conf.as_event.can_manage(session.user, allow_key=True)
         self.protection_overridden = can_modify_plugin and not can_modify_event
         if not can_modify_plugin and not can_modify_event:
-            RHPaymentEventManagementBase._checkProtection(self)
+            RHPaymentManagementBase._checkProtection(self)
         return True
 
     def _check_currencies(self, form):
@@ -181,28 +182,27 @@ class RHPaymentEventPluginEdit(RHPaymentEventManagementBase):
                                                         widget_attrs=widget_attrs, invalid_currency=invalid_currency)
 
 
-class RHPaymentEventCheckout(RHPaymentEventBase):
-    """Payment/Checkout page for registrants"""
+class RHPaymentCheckout(RHPaymentBase):
+    """Display payment checkout page"""
 
     def _process(self):
-        if self._registrant.getPayed():
-            flash(_('You have already paid for your registration.'), 'info')
-            return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
-        event = self._conf
-        amount = self._registrant.getTotal()
-        currency = event_settings.get(event, 'currency')
-        plugins = get_active_payment_plugins(event)
+        if self.registration.state != RegistrationState.unpaid:
+            flash(_("The registration doesn't need to be paid"), 'error')
+            return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
+        currency = event_settings.get(self.event, 'currency')
+        plugins = get_active_payment_plugins(self.event)
         force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
-        return WPPaymentEvent.render_template('event_checkout.html', event, event=event, registrant=self._registrant,
-                                              plugins=plugins.items(), force_plugin=force_plugin, amount=amount,
-                                              currency=currency, registrant_params=get_registrant_params())
+        return WPPaymentEvent.render_template('event_checkout.html', self.event, event=self.event,
+                                              registration=self.registration,
+                                              plugins=plugins.items(), force_plugin=force_plugin,
+                                              amount=self.registration.price, currency=currency)
 
 
-class RHPaymentEventForm(RHPaymentEventBase):
-    """Loads the form for the selected payment plugin"""
+class RHPaymentForm(RHPaymentBase):
+    """Load the form for the selected payment plugin"""
 
     def _checkParams(self, params):
-        RHPaymentEventBase._checkParams(self, params)
+        RHPaymentBase._checkParams(self, params)
         try:
             self.plugin = get_active_payment_plugins(self._conf)[request.args['method']]
         except KeyError:
@@ -210,12 +210,11 @@ class RHPaymentEventForm(RHPaymentEventBase):
 
     def _process(self):
         with self.plugin.plugin_context():
-            html = self.plugin.render_payment_form(self._conf, self._registrant, self._registrant.getTotal(),
-                                                   event_settings.get(self._conf, 'currency'))
+            html = self.plugin.render_payment_form(self.registration)
         return jsonify(html=html)
 
 
-class RHPaymentEventConditions(RHPaymentEventBase):
+class RHPaymentConditions(RHPaymentBase):
     def _process(self):
         conditions = event_settings.get(self._conf, 'conditions')
         return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)
