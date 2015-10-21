@@ -286,7 +286,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     currency=payment_event_settings.get(self.event, 'currency'),
                                                     post_url=url_for('.create_registration', self.regform),
-                                                    user_data={})
+                                                    user_data={}, management=True)
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
