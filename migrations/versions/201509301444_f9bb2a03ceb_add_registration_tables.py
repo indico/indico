@@ -136,7 +136,7 @@ def upgrade():
         'registration_data',
         sa.Column('registration_id', sa.Integer(), nullable=False),
         sa.Column('field_data_id', sa.Integer(), nullable=False),
-        sa.Column('data', postgresql.JSON(), nullable=False),
+        sa.Column('data', postgresql.JSONB(), nullable=False),
         sa.Column('file', sa.LargeBinary(), nullable=True),
         sa.Column('file_metadata', postgresql.JSON(), nullable=False),
         sa.CheckConstraint("(file IS NULL) = (file_metadata::text = 'null')", name='valid_file'),
