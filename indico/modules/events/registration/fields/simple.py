@@ -69,6 +69,7 @@ class TextAreaField(RegistrationFormFieldBase):
 
 class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
+    has_default_item = False
 
     @property
     def view_data(self):
@@ -81,10 +82,33 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def filter_choices(self):
         return self.form_item.data['captions']
 
+    @classmethod
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super(ChoiceBaseField, cls).process_field_data(data, old_data,
+                                                                                          old_versioned_data)
+        items = [x for x in versioned_data['choices'] if not x.get('remove')]
+        captions = dict(old_data['captions']) if old_data is not None else {}
+        if cls.has_default_item:
+            unversioned_data.setdefault('default_item', None)
+        for item in items:
+            if 'id' not in item:
+                item['id'] = unicode(uuid4())
+            item.setdefault('is_billable', False)
+            item['price'] = float(item['price']) if item.get('price') else 0
+            item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
+            item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
+            if cls.has_default_item and unversioned_data['default_item'] in {item['caption'], item['id']}:
+                unversioned_data['default_item'] = item['id']
+            captions[item['id']] = item.pop('caption')
+        versioned_data['choices'] = items
+        unversioned_data['captions'] = captions
+        return unversioned_data, versioned_data
+
 
 class SingleChoiceField(ChoiceBaseField):
     name = 'single_choice'
     wtf_field_class = wtforms.StringField
+    has_default_item = True
 
     @property
     def default_value(self):
@@ -96,29 +120,6 @@ class SingleChoiceField(ChoiceBaseField):
             return None
         # only use the default item if it exists in the current version
         return default_item if any(x['id'] == default_item for x in versioned_data['choices']) else None
-
-    @classmethod
-    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super(SingleChoiceField, cls).process_field_data(data, old_data,
-                                                                                            old_versioned_data)
-        items = [x for x in versioned_data['choices'] if not x.get('remove')]
-        captions = dict(old_data['captions']) if old_data is not None else {}
-        default_item = None
-        for item in items:
-            if 'id' not in item:
-                item['id'] = unicode(uuid4())
-            item.setdefault('is_billable', False)
-            item['price'] = float(item['price']) if item['price'] else 0
-            item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
-            item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
-            # XXX: it would be nice if we could use item['is_default'] but doing that with angular is tricky
-            if unversioned_data.get('default_item') in {item['caption'], item['id']}:
-                default_item = item['id']
-            captions[item['id']] = item.pop('caption')
-        versioned_data['choices'] = items
-        unversioned_data['captions'] = captions
-        unversioned_data['default_item'] = default_item
-        return unversioned_data, versioned_data
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
@@ -345,25 +346,6 @@ class MultiChoiceField(ChoiceBaseField):
     @property
     def wtf_field_kwargs(self):
         return {'choices': [(id, caption) for id, caption in self.form_item.data['captions'].iteritems()]}
-
-    @classmethod
-    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super(MultiChoiceField, cls).process_field_data(data, old_data,
-                                                                                           old_versioned_data)
-        items = [x for x in versioned_data['choices'] if not x.get('remove')]
-        for item in items:
-            item.setdefault('is_billable', False)
-            item['price'] = float(item['price']) if item.get('price') else 0
-            item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
-            item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
-        captions = dict(old_data['captions']) if old_data is not None else {}
-        for item in items:
-            if 'id' not in item:
-                item['id'] = unicode(uuid4())
-            captions[item['id']] = item.pop('caption')
-        versioned_data['choices'] = items
-        unversioned_data['captions'] = captions
-        return unversioned_data, versioned_data
 
     def get_friendly_data(self, registration_data):
         reg_data = registration_data.data
