@@ -230,6 +230,10 @@ class Registration(db.Model):
         return {x.field_data.field_id: x for x in self.data}
 
     @property
+    def billable_data(self):
+        return [data for data in self.data if data.price]
+
+    @property
     def full_name(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
