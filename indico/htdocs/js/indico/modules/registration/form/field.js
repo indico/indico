@@ -38,7 +38,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                         return item.id == $scope.field.id;
                     });
 
-                    $scope.field.isEnabled = updatedField.isEnabled;
+                    $scope.field.isEnabled = updatedField.view_data.isEnabled;
                     $scope.section.items.splice(index, 1);
                     $scope.section.items.push($scope.field);
                 }
@@ -50,7 +50,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].enable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
-                    $scope.field.isEnabled = updatedField.isEnabled;
+                    $scope.field.isEnabled = updatedField.view_data.isEnabled;
                     $scope.section.items.sort(function(a, b) {
                         return a.position - b.position;
                     });
