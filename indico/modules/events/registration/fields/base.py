@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from copy import deepcopy
+
 from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -96,7 +98,7 @@ class RegistrationFormFieldBase(object):
 class RegistrationFormBillableField(RegistrationFormFieldBase):
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        data = dict(data)
+        data = deepcopy(data)
         data.setdefault('is_billable', False)
         data['price'] = float(data['price']) if data.get('price') else 0
         return super(RegistrationFormBillableField, cls).process_field_data(data, old_data, old_versioned_data)
