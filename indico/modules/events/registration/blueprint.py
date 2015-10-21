@@ -20,7 +20,8 @@ from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistr
 from indico.modules.events.registration.controllers.display import (RHRegistrationFormList, RHRegistrationFormSubmit,
                                                                     RHRegistrationFormCheckEmail,
                                                                     RHRegistrationFormDeclineInvitation)
-from indico.modules.events.registration.controllers.management.tickets import RHRegistrationFormTickets
+from indico.modules.events.registration.controllers.management.tickets import (RHRegistrationFormTickets,
+                                                                               RHTicketDownload)
 from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
                                                                               RHRegistrationFormToggleTextState,
                                                                               RHRegistrationFormModifyField,
@@ -158,6 +159,7 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/',
 _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', RHRegistrationFormCheckEmail)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  RHRegistrationFormDeclineInvitation, methods=('POST',))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', RHTicketDownload)
 
 
 # API
