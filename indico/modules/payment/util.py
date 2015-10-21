@@ -18,12 +18,10 @@ from __future__ import unicode_literals
 
 import re
 
-from flask import request
-
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
-from indico.modules.payment.notifications import notify_double_payment, notify_payment_confirmation
+from indico.modules.payment.notifications import notify_double_payment
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 
 remove_prefix_re = re.compile('^payment_')
@@ -62,7 +60,7 @@ def register_transaction(registrant, amount, currency, action, provider=None, da
         if double_payment:
             notify_double_payment(registrant)
         if new_transaction.status == TransactionStatus.successful:
-            notify_payment_confirmation(registrant, amount)
+            new_transaction.registration.update_state(paid=True)
         return new_transaction
 
 

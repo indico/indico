@@ -31,7 +31,6 @@ from indico.modules.payment.util import get_registrant_params, register_transact
 def test_register_transaction(mocker, new, double, status):
     mocker.patch('indico.modules.payment.util.db')
     ndp = mocker.patch('indico.modules.payment.util.notify_double_payment')
-    npc = mocker.patch('indico.modules.payment.util.notify_payment_confirmation')
     cn = mocker.patch.object(PaymentTransaction, 'create_next')
     db_transaction = MagicMock(status=status) if new else None
     cn.return_value = db_transaction, double
@@ -39,11 +38,9 @@ def test_register_transaction(mocker, new, double, status):
     if new:
         assert transaction is db_transaction
         assert ndp.called == double
-        assert npc.called == (transaction.status == TransactionStatus.successful)
     else:
         assert transaction is None
         assert not ndp.called
-        assert not npc.called
 
 
 @pytest.mark.usefixtures('request_context')
