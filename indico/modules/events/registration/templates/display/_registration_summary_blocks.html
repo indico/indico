@@ -72,7 +72,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_payment_summary(registration, payment_enabled, payment_conditions=false, is_management=false) %}
+{% macro render_payment_summary(registration, payment_enabled, currency, payment_conditions=false) %}
     {% if payment_enabled and registration.price %}
         <div id="payment-summary" class="regform-done">
             <div class="i-box-header">
@@ -97,12 +97,52 @@
                 {% endif %}
             </div>
             <div class="i-box-content">
-                <table width="100%" cellpadding="0" cellspacing="0">
-                    {# TODO: render payment info #}
-                    {# ${ payment_info } #}
+                <table width="100%" cellpadding="3" cellspacing="0">
+                    <tr>
+                        <td class="regform-done-table-title">
+                            {% trans %}Item{% endtrans %}
+                        </td>
+                        <td class="regform-done-table-title">
+                            {% trans %}Value{% endtrans %}
+                        </td>
+                        <td align="right" class="regform-done-table-title">
+                            {% trans %}Cost{% endtrans %}
+                        </td>
+                    </tr>
+                    {% for item in registration.billable_data %}
+                        <tr class="regform-done-table-item">
+                            <td align="left">
+                                {{- item.field_data.field.title }}
+                                <span class="section-name">({{ item.field_data.field.parent.title -}})</span>
+                            </td>
+                            <td align="left">
+                                {% if item.field_data.field.input_type == 'accommodation' %}
+                                    {% trans nights=item.friendly_data.nights,
+                                             choice=item.friendly_data.choice %}
+                                        {{ choice }} ({{ nights }} night)
+                                    {%- pluralize -%}
+                                        {{ choice }} ({{ nights }} nights)
+                                    {% endtrans %}
+                                {% elif item.field_data.field.input_type == 'multi_choice' %}
+                                    {{ item.friendly_data | join(', ') }}
+                                {% else %}
+                                   {{ item.friendly_data }}
+                                {% endif %}
+                            </td>
+                            <td align="right" nowrap>{{ item.price }} <em>{{ currency }}</em></td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td align="right" class="regform-done-table-total" colspan="2">
+                            <strong>{% trans %}Total{% endtrans %}</strong>
+                        </td>
+                        <td align="right" class="regform-done-table-total" nowrap>
+                            {{ registration.render_price() }}
+                        </td>
+                    </tr>
                 </table>
                 {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
-                    <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
+                    <table class="regform-done-footer" width="100%" cellpadding="0" cellspacing="0">
                         <tr>
                             <td>
                                 {% if payment_conditions %}

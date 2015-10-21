@@ -248,6 +248,10 @@
             &:not(:first-child) {
                 padding-left: 15px;
             }
+
+            span.section-name {
+                color: $dark-gray;
+            }
         }
 
         &:nth-child(odd) {
@@ -261,7 +265,7 @@
         padding-top: 5px;
     }
 
-    .regform-done-conditions {
+    .regform-done-footer {
         margin-top: 20px;
 
         input[type=checkbox] {
@@ -271,6 +275,12 @@
 
         td:first-child {
             width: 100%;
+        }
+
+        td.regform-done-footer-button {
+            .i-button {
+                white-space: nowrap;
+            }
         }
     }
 
