@@ -115,6 +115,11 @@ class SingleChoiceField(ChoiceBaseField):
     has_default_item = True
 
     @property
+    def wtf_field_kwargs(self):
+        return dict(super(SingleChoiceField, self).wtf_field_kwargs,
+                    coerce=lambda x: x if x != 'None' else None)
+
+    @property
     def default_value(self):
         data = self.form_item.data
         versioned_data = self.form_item.versioned_data
