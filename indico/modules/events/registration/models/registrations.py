@@ -20,7 +20,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 from flask import has_request_context, session, request
-from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy.dialects.postgresql import JSON, JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
@@ -313,7 +313,7 @@ class RegistrationData(db.Model):
     )
     #: The user's data for the field
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
     #: file contents for a file field
