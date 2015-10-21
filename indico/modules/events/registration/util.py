@@ -30,7 +30,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
                                                              RegistrationFormItemType, PersonalDataType)
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_creation
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
@@ -185,3 +185,14 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
         writer.writerow(registration_dict)
     buf.seek(0)
     return buf
+
+
+def get_registrations_with_tickets(user, event):
+    return Registration.find(Registration.user == user,
+                             Registration.state == RegistrationState.complete,
+                             RegistrationForm.event_id == event.id,
+                             RegistrationForm.tickets_enabled,
+                             RegistrationForm.ticket_on_event_page,
+                             ~RegistrationForm.is_deleted,
+                             ~Registration.is_deleted,
+                             _join=Registration.registration_form).all()
