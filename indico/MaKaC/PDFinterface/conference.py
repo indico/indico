@@ -2142,9 +2142,9 @@ class LectureToPosterPDF:
 
 class TicketToPDF(PDFBase):
 
-    def __init__(self, conf, registrant, doc=None, story=None):
+    def __init__(self, conf, registration, doc=None, story=None):
         self._conf = conf
-        self._registrant = registrant
+        self._registration = registration
         PDFBase.__init__(self, doc, story)
 
     def firstPage(self, c, doc):
@@ -2190,8 +2190,8 @@ class TicketToPDF(PDFBase):
         )
         config = Config.getInstance()
         baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
-        qr_data = {"registrant_id": self._registrant.getId(),
-                   "checkin_secret": self._registrant.getCheckInUUID(),
+        qr_data = {"registrant_id": self._registration.id,
+                   "checkin_secret": self._registration.ticket_uuid,
                    "event_id": self._conf.getId(),
                    "server_url": baseURL
                    }
@@ -2211,32 +2211,23 @@ class TicketToPDF(PDFBase):
         # Registrant info
         width += 0.5*cm
         height += 3*cm
-        self._drawWrappedString(c, escape("ID: {0}".format(self._registrant.getId())),
+        self._drawWrappedString(c, escape("ID: {0}".format(self._registration.friendly_id)),
                                 height=height, width=width, size=15,
                                 align="left", font='Times-Roman')
         height -= 0.5*cm
-        self._drawWrappedString(c, escape(self._registrant.getFullName()),
+        self._drawWrappedString(c, escape(self._registration.full_name),
                                 height=height, width=width, size=15,
                                 align="left", font='Times-Roman')
-        if self._registrant.getInstitution():
+        personal_data = self._registration.get_personal_data()
+        if personal_data.get('affiliation'):
             height -= 0.5*cm
             self._drawWrappedString(c,
-                                    escape(self._registrant.getInstitution()),
+                                    escape(personal_data['affiliation']),
                                     height=height, width=width, size=15,
                                     align="left", font='Times-Roman')
-        if self._registrant.getAddress():
+        if personal_data.get('address'):
             height -= 0.5*cm
-            self._drawWrappedString(c, escape(self._registrant.getAddress()),
-                                    height=height, width=width, size=15,
-                                    align="left", font='Times-Roman')
-        if self._registrant.getCity():
-            height -= 0.5*cm
-            self._drawWrappedString(c, escape(self._registrant.getCity()),
-                                    height=height, width=width, size=15,
-                                    align="left", font='Times-Roman')
-        if self._registrant.getCountry():
-            height -= 0.5*cm
-            self._drawWrappedString(c, escape(self._registrant.getCountry()),
+            self._drawWrappedString(c, escape(personal_data['address']),
                                     height=height, width=width, size=15,
                                     align="left", font='Times-Roman')
         c.restoreState()
