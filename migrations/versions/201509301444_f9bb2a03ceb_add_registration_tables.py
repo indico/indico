@@ -123,6 +123,7 @@ def upgrade():
         sa.Column('first_name', sa.String(), nullable=False),
         sa.Column('last_name', sa.String(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.Column('ticket_uuid', postgresql.UUID(), nullable=False, index=True, unique=True),
         sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
         sa.ForeignKeyConstraint(['event_id', 'registration_form_id'],
                                 ['event_registration.forms.event_id', 'event_registration.forms.id']),

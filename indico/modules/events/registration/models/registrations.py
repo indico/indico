@@ -182,6 +182,14 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
+    #: The unique token used in tickets
+    ticket_uuid = db.Column(
+        UUID,
+        index=True,
+        unique=True,
+        nullable=False,
+        default=lambda: unicode(uuid4())
+    )
 
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
