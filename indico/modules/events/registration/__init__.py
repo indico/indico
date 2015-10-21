@@ -52,11 +52,12 @@ def _get_open_regforms(event):
 
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
-    from indico.modules.events.registration.util import user_registered_in_event
+    from indico.modules.events.registration.util import user_registered_in_event, get_registrations_with_tickets
     regforms = _get_open_regforms(event)
     if regforms:
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event,
-                               user_has_registered=(session.user and user_registered_in_event(session.user, event)))
+                               user_has_registered=(session.user and user_registered_in_event(session.user, event)),
+                               registrations_with_tickets=get_registrations_with_tickets(session.user, event))
 
 
 @signals.event.sidemenu.connect
