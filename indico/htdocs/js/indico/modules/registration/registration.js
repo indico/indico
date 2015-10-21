@@ -46,5 +46,19 @@
         $('.js-highlight-payment').on('click', function() {
             $('#payment-summary').effect('highlight', 800);
         });
+
+        $('.js-modify-payment').on('click', function() {
+            var $this = $(this);
+            $.ajax({
+                method: 'POST',
+                url: $this.data('href'),
+                error: handleAjaxError,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                data: {payment_status: $this.data('payment-completed')},
+                success: function(data) {
+                    $('.management-page').html(data.html)
+                }
+            });
+        });
     }
 })(window);

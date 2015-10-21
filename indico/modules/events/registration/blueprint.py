@@ -57,7 +57,8 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationCreate,
                                                                                 RHRegistrationsExportPDFTable,
                                                                                 RHRegistrationsExportPDFBook,
-                                                                                RHRegistrationsExportCSV)
+                                                                                RHRegistrationsExportCSV,
+                                                                                RHRegistrationTogglePayment)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -96,6 +97,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  RHRegistrationDetails)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
                  RHRegistrationEdit)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/toggle-payment',
+                 'toggle_registration_payment', RHRegistrationTogglePayment, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>'
                  '/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>', 'registration_file',
                  RHRegistrationDownloadAttachment)

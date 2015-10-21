@@ -9,15 +9,35 @@
 {% block content %}
     {{ render_registration_summary(registration) }}
     {% call render_payment_summary(registration, payment_enabled) %}
-        {% if not registration.transaction or registration.transaction.status != 'successful' %}
-            <a href="#" class="i-button big">
-                {% trans %}Mark as paid{% endtrans %}
-            </a>
-        {% elif registration.transaction.status.name == 'successful' %}
-            <a href="#" class="i-button big">
-                {% trans %}Mark as unpaid{% endtrans %}
-            </a>
-        {% endif %}
+        <table class="regform-done-footer" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    {% if registration.transaction and registration.transaction.data.changed_by_name %}
+                        <div class="checkbox-with-text">
+                            <div class="payment-conditions-agreement">
+                                {%- trans updated_by=registration.transaction.data.changed_by_name,
+                                         timestamp=registration.transaction.timestamp | format_date -%}
+                                    Last updated by {{ updated_by }} on {{ timestamp }}.
+                                {% endtrans -%}
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="regform-done-footer-button">
+                    {% if not registration.transaction or registration.transaction.status != 'successful' %}
+                        <a class="i-button big js-modify-payment" data-payment-completed="0"
+                           data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                            {% trans %}Mark as paid{% endtrans %}
+                        </a>
+                    {% elif registration.transaction.status.name == 'successful' %}
+                        <a class="i-button big js-modify-payment" data-payment-completed="1"
+                           data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                            {% trans %}Mark as unpaid{% endtrans %}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
     {% endcall %}
     <a href="{{ url_for('.edit_registration', registration) }}" class="i-button big highlight">
         {%- trans %}Modify{% endtrans -%}
