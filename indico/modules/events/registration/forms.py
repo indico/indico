@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
+from wtforms.widgets.html5 import NumberInput
 
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
@@ -52,6 +53,10 @@ class RegistrationFormForm(IndicoForm):
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
                                       description=_("Maximum number of registrations"))
+    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0), Optional()],
+                              filters=[lambda x: x if x is not None else 0],
+                              widget=NumberInput(step='0.01'),
+                              description=_("A fixed fee all users have to pay when registering."))
     message_pending = TextAreaField(_("Message for pending registrations"),
                                     description=_("Text included in emails sent to pending registrations"))
     message_unpaid = TextAreaField(_("Message for unpaid registrations"),
