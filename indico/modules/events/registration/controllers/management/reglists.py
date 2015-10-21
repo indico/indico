@@ -20,7 +20,7 @@ import json
 from io import BytesIO
 from uuid import uuid4
 
-from flask import session, request, redirect, jsonify, flash
+from flask import session, request, redirect, jsonify, flash, render_template
 from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.config import Config
@@ -36,7 +36,9 @@ from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.forms import EmailRegistrantsForm
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_csv_from_registrations)
-from indico.modules.payment import event_settings
+from indico.modules.payment import event_settings as payment_event_settings
+from indico.modules.payment.models.transactions import TransactionAction
+from indico.modules.payment.util import register_transaction
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
@@ -172,7 +174,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration,
-                                                    payment_enabled=event_settings.get(self.event, 'enabled'))
+                                                    payment_enabled=payment_event_settings.get(self.event, 'enabled'))
 
 
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
@@ -278,8 +280,9 @@ class RHRegistrationCreate(RHManageRegFormBase):
                 flash(error, 'error')
         return WPManageRegistration.render_template('display/regform_display.html', self.event, event=self.event,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
-                                                    currency=event_settings.get(self.event, 'currency'), user_data={},
-                                                    post_url=url_for('.create_registration', self.regform))
+                                                    currency=payment_event_settings.get(self.event, 'currency'),
+                                                    post_url=url_for('.create_registration', self.regform),
+                                                    user_data={})
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
@@ -324,3 +327,23 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
     def _process(self):
         csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.special_items)
         return send_file('registrations.csv', csv_file, 'text/csv')
+
+
+class RHRegistrationTogglePayment(RHManageRegistrationBase):
+    """Modify the payment status of a registration"""
+
+    def _process(self):
+        payment_completed = request.form.get('payment_status') == '1'
+        currency = payment_event_settings.get(self.registration.registration_form.event, 'currency')
+        action = TransactionAction.complete if not payment_completed else TransactionAction.cancel
+        register_transaction(registrant=self.registration,
+                             amount=self.registration.price,
+                             currency=currency,
+                             action=action,
+                             provider='_manual',
+                             data={'changed_by_name': session.user.full_name,
+                                   'changed_by_id': session.user.id})
+        flash(_("The registration payment was updated successfully."), 'success')
+        return jsonify_template('events/registration/management/registration_details.html',
+                                registration=self.registration,
+                                payment_enabled=payment_event_settings.get(self.event, 'enabled'))

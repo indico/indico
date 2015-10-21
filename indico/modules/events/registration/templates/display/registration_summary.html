@@ -64,10 +64,36 @@
 
 {{ render_registration_summary(registration) }}
 {% call render_payment_summary(registration, payment_enabled, currency, payment_conditions) %}
-    <a href="{{ url_for('payment.event_payment', registration.locator.registrant) }}"
-       class="action-button js-check-conditions">
-        {% trans %}Checkout{% endtrans %}
-    </a>
+    {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
+        <table class="regform-done-footer" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    {% if payment_conditions %}
+                        <div class="checkbox-with-text">
+                            <input type="checkbox" id="conditions-accepted">
+                            <div class="payment-conditions-agreement">
+                                {% trans -%}
+                                    I have read and accept the terms and conditions and understand that
+                                    by confirming this order I will be entering into a binding transaction
+                                {%- endtrans %}
+                                (<a href="#" class="js-conditions-dialog"
+                                    data-href="{{ url_for('payment.event_payment_conditions', registration.registration_form.event) }}"
+                                    data-title="{% trans %}Terms and conditions{% endtrans %}">
+                                    {%- trans %}Terms and conditions{% endtrans -%}
+                                </a>).
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="regform-done-footer-button">
+                    <a href="{{ url_for('payment.event_payment', registration.locator.registrant) }}"
+                       class="action-button js-check-conditions">
+                        {% trans %}Checkout{% endtrans %}
+                    </a>
+                </td>
+            </tr>
+        </table>
+    {% endif %}
 {% endcall %}
 
 <div class="permalink-text">
