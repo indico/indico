@@ -315,7 +315,7 @@ ndRegForm.directive('ndCheckboxField', function(url) {
 
         link: function(scope) {
             scope.checkboxValue = false;
-            scope.settings.fieldName = $T("Multiple choices/checkbox");
+            scope.settings.fieldName = $T("Checkbox");
             scope.settings.isBillable = true;
             scope.settings.singleColumn = true;
             scope.settings.placesLimit = true;
@@ -462,7 +462,7 @@ ndRegForm.directive('ndRadioField', function(url) {
         },
 
         link: function(scope) {
-            scope.settings.fieldName = $T("Multiple options/One choice");
+            scope.settings.fieldName = $T("Choice");
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
 
