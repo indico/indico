@@ -269,6 +269,14 @@ class Registration(db.Model):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
                            user_id=None, is_deleted=False, _text=self.full_name)
 
+    def get_personal_data(self):
+        personal_data = {}
+        for data in self.data:
+            field = data.field_data.field
+            if field.personal_data_type is not None and data.data:
+                personal_data[field.personal_data_type.name] = data.data
+        return personal_data
+
     def render_price(self):
         currency = event_payment_settings.get(self.registration_form.event, 'currency')
         return '{} {}'.format(self.price, currency)
