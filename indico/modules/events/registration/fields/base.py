@@ -104,3 +104,18 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
         return data.get('price', 0) if data.get('is_billable') else 0
+
+
+class RegistrationFormBillableItemsField(RegistrationFormBillableField):
+    @classmethod
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super(RegistrationFormBillableItemsField, cls).process_field_data(
+            data, old_data, old_versioned_data)
+        # we don't have field-level billing data here
+        del versioned_data['is_billable']
+        del versioned_data['price']
+        return unversioned_data, versioned_data
+
+    def calculate_price(self, registration_data):
+        # billable items need custom logic
+        raise NotImplementedError
