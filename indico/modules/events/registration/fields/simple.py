@@ -24,7 +24,8 @@ from uuid import uuid4
 import wtforms
 from wtforms.validators import NumberRange, ValidationError
 
-from indico.modules.events.registration.fields.base import RegistrationFormFieldBase, RegistrationFormBillableField
+from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
+                                                            RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import iterdays, format_date
 from indico.util.fs import secure_filename
@@ -66,7 +67,7 @@ class TextAreaField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
 
-class SingleChoiceField(RegistrationFormBillableField):
+class SingleChoiceField(RegistrationFormBillableItemsField):
     name = 'single_choice'
     wtf_field_class = wtforms.StringField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
@@ -251,7 +252,7 @@ class EmailField(RegistrationFormFieldBase):
         return [IndicoEmail()]
 
 
-class AccommodationField(RegistrationFormBillableField):
+class AccommodationField(RegistrationFormBillableItemsField):
     name = 'accommodation'
     wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
