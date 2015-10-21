@@ -1,3 +1,31 @@
+{% macro _render_ticket_dropdown() %}
+    {% if registrations_with_tickets %}
+        <div class="group">
+            <a class="i-button icon-file-download js-ticket-download-dropdown arrow" data-toggle="dropdown">
+                {% trans %}Generate ticket{% endtrans %}
+            </a>
+            <ul class="dropdown">
+                {% for registration in registration_with_tickets -%}
+                    {% set regform = registration.registration_form %}
+                    <li>
+                        <a title="{% trans title=regform.title -%}Generate ticket for the '{{ title }}' registration form{%- endtrans %}"
+                           data-qtip-opts='{"position": {"my": "middle left", "at": "middle right"}}'
+                           data-method="GET"
+                           data-href="{{ url_for('event_registration.ticket_download', regform) }}">
+                            {% trans title=regform.title -%}
+                                {{ title }}
+                            {%- endtrans %}
+                        </a>
+                    </li>
+                {%- endfor %}
+            </ul>
+        </div>
+        <script>
+            $('.js-ticket-download-dropdown').closest('.group').dropdown();
+        </script>
+    {% endif %}
+{% endmacro %}
+
 <div class="infoline announcement">
     <span class="icon icon-ticket"></span>
     <div class="text">
@@ -5,6 +33,7 @@
         {% if user_has_registered %}
             <div>{% trans %}You have registered for this event.{% endtrans %}</div>
             <div class="toolbar right">
+                {{ _render_ticket_dropdown() }}
                 <a class="i-button next highlight"
                    href="{{ url_for('event_registration.display_regform', regforms[0]) if regforms|length == 1 else
                             url_for('event_registration.display_regform_list', event) }}">
