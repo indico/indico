@@ -72,6 +72,10 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     has_default_item = False
 
     @property
+    def wtf_field_kwargs(self):
+        return {'choices': self.form_item.data['captions'].items()}
+
+    @property
     def view_data(self):
         items = deepcopy(self.form_item.versioned_data['choices'])
         for item in items:
@@ -107,7 +111,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 
 class SingleChoiceField(ChoiceBaseField):
     name = 'single_choice'
-    wtf_field_class = wtforms.StringField
+    wtf_field_class = wtforms.SelectField
     has_default_item = True
 
     @property
@@ -342,10 +346,6 @@ def _to_date(date):
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
     wtf_field_class = wtforms.SelectMultipleField
-
-    @property
-    def wtf_field_kwargs(self):
-        return {'choices': [(id, caption) for id, caption in self.form_item.data['captions'].iteritems()]}
 
     def get_friendly_data(self, registration_data):
         reg_data = registration_data.data
