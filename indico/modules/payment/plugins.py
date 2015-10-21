@@ -128,7 +128,7 @@ class PaymentPluginMixin(object):
         return render_plugin_template('event_payment_form.html', **data)
 
     def render_transaction_details(self, transaction):
-        """Renders the transaction details for the registrant details in event management
+        """Renders the transaction details in event management
 
         Override this (or inherit from the template) to show more useful data such as transaction IDs
 
@@ -137,4 +137,4 @@ class PaymentPluginMixin(object):
         # Try using the template in the plugin first in case it extends the default one
         return render_template(['{}:transaction_details.html'.format(transaction.plugin.name),
                                 'payment/transaction_details.html'],
-                               plugin=transaction.plugin, transaction=transaction, registrant=transaction.registrant)
+                               plugin=transaction.plugin, transaction=transaction)
