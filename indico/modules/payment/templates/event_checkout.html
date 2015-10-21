@@ -47,10 +47,9 @@
         // Simply call reloadPaymentMethod({your: 'custom data'}) in the payment form template of your plugin and
         // override render_payment_form in the plugin class.
         global.reloadPaymentMethod = function reloadPaymentMethod(extraData) {
-            var data = {{ registrant_params | tojson }};
-            data.method = paymentMethod;
+            var data = {method: paymentMethod};
             $.ajax({
-                url: {{ url_for('.event_payment_form', event) | tojson }},
+                url: {{ url_for('.event_payment_form', registration.locator.registrant) | tojson }},
                 type: 'GET',
                 cache: false,
                 data: $.extend({}, extraData || {}, data),
