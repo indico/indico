@@ -268,7 +268,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
-            create_registration(self.regform, form.data, self.event)
+            create_registration(self.regform, form.data)
             flash(_("The registration was created."), 'success')
             return redirect(url_for('.manage_reglist', self.regform))
         elif form.is_submitted():

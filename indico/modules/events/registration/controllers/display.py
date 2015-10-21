@@ -144,7 +144,7 @@ class RHRegistrationFormSubmit(InvitationMixin, RHRegistrationFormRegistrationBa
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
-            registration = create_registration(self.regform, form.data, self.event, self.invitation)
+            registration = create_registration(self.regform, form.data, self.invitation)
             return redirect(url_for('.display_regform', registration.locator.registrant))
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation
