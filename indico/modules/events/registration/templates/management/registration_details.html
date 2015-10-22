@@ -9,7 +9,7 @@
 {% block content %}
     {{ render_registration_summary(registration) }}
     {% call render_payment_summary(registration, payment_enabled) %}
-        <table class="regform-done-footer" width="100%" cellpadding="0" cellspacing="0">
+        <table class="regform-done-footer registration-info">
             <tr>
                 <td>
                     {% if registration.transaction and registration.transaction.data.changed_by_name %}
