@@ -338,11 +338,10 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         payment_completed = request.form.get('payment_status') == '1'
         currency = payment_event_settings.get(self.registration.registration_form.event, 'currency')
         action = TransactionAction.complete if not payment_completed else TransactionAction.cancel
-        register_transaction(registrant=self.registration,
+        register_transaction(registration=self.registration,
                              amount=self.registration.price,
                              currency=currency,
                              action=action,
-                             provider='_manual',
                              data={'changed_by_name': session.user.full_name,
                                    'changed_by_id': session.user.id})
         flash(_("The registration payment was updated successfully."), 'success')

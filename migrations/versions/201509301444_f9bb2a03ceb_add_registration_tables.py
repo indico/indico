@@ -129,7 +129,6 @@ def upgrade():
         sa.ForeignKeyConstraint(['event_id', 'registration_form_id'],
                                 ['event_registration.forms.event_id', 'event_registration.forms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.ForeignKeyConstraint(['transaction_id'], ['events.payment_transactions.id']),
         sa.CheckConstraint('email = lower(email)', name='lowercase_email'),
         sa.Index(None, 'friendly_id', 'event_id', unique=True),
         sa.Index(None, 'registration_form_id', 'user_id', unique=True,

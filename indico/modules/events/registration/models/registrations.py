@@ -161,10 +161,8 @@ class Registration(db.Model):
     transaction = db.relationship(
         'PaymentTransaction',
         lazy=True,
-        backref=db.backref(
-            'registration',
-            lazy=True
-        )
+        foreign_keys=[transaction_id],
+        post_update=True
     )
     #: The registration this data is associated with
     data = db.relationship(
@@ -193,6 +191,7 @@ class Registration(db.Model):
 
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
+    # - transactions (PaymentTransaction.registration)
 
     @hybrid_property
     def is_cancelled(self):
@@ -407,3 +406,7 @@ def _mapper_configured():
     @listens_for(Registration.registration_form, 'set')
     def _set_event_id(target, value, *unused):
         target.event_id = value.event_id
+
+    @listens_for(Registration.transaction, 'set')
+    def _set_transaction_id(target, value, *unused):
+        value.registration = target
