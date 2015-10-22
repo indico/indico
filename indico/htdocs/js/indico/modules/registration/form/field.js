@@ -473,6 +473,37 @@ var ndSelectController = function($scope) {
 
         return true;
     };
+
+    $scope.onSingleFieldItemChange = function(event) {
+        var valueElement = $('input[name={0}]'.format($scope.field.htmlName)),
+            data = {},
+            target = $(event.target);
+        if (target.val()) {
+            data[target.val()] = (+$('#extraSlotsSelect-{0}'.format(target.val())).val() + 1) || 1;
+        }
+        valueElement.val(JSON.stringify(data));
+    };
+
+    $scope.multiFieldItemChecked = function(event) {
+        var valueElement = $('input[name={0}]'.format($scope.field.htmlName)),
+            data = JSON.parse(valueElement.val() || '{}'),
+            target = $(event.target);
+        if (target.prop('checked')) {
+            data[target.prop('id')] = (+$('#extraSlotsSelect-{0}'.format(target.prop('id'))).val() + 1) || 1;
+        } else {
+            delete data[target.prop('id')];
+        }
+        valueElement.val(JSON.stringify(data));
+    };
+
+    $scope.onExtraSlotsChanged = function(item, value) {
+        var valueElement = $('[name={0}]'.format($scope.field.htmlName)),
+            data = JSON.parse(valueElement.val() || '{}');
+        if (data[item.id]) {
+            data[item.id] = value + 1;
+            valueElement.val(JSON.stringify(data));
+        }
+    };
 };
 
 ndRegForm.directive('ndRadioField', function(url) {

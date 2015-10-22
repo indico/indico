@@ -70,10 +70,7 @@ class TextAreaField(RegistrationFormFieldBase):
 class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
     has_default_item = False
-
-    @property
-    def wtf_field_kwargs(self):
-        return {'choices': self.form_item.data['captions'].items()}
+    wtf_field_class = JSONField
 
     @property
     def view_data(self):
@@ -108,16 +105,22 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
 
+    def calculate_price(self, registration_data):
+        if not registration_data.data:
+            return 0
+        data = registration_data.field_data.versioned_data
+        billable_choices = [x for x in data['choices'] if x['id'] in registration_data.data and x['is_billable']]
+        price = 0
+        for billable_field in billable_choices:
+            price += billable_field['price']
+            if billable_field.get('extra_slots_pay'):
+                price += (registration_data.data[billable_field['id']] - 1) * billable_field['price']
+        return price
+
 
 class SingleChoiceField(ChoiceBaseField):
     name = 'single_choice'
-    wtf_field_class = wtforms.SelectField
     has_default_item = True
-
-    @property
-    def wtf_field_kwargs(self):
-        return dict(super(SingleChoiceField, self).wtf_field_kwargs,
-                    coerce=lambda x: x if x != 'None' else None)
 
     @property
     def default_value(self):
@@ -130,15 +133,11 @@ class SingleChoiceField(ChoiceBaseField):
         # only use the default item if it exists in the current version
         return default_item if any(x['id'] == default_item for x in versioned_data['choices']) else None
 
-    def calculate_price(self, registration_data):
-        data = registration_data.field_data.versioned_data
-        item = next((x for x in data['choices'] if registration_data.data == x['id'] and x['is_billable']), None)
-        return item['price'] if item else 0
-
     def get_friendly_data(self, registration_data):
         if not registration_data.data:
             return ''
-        return registration_data.field_data.field.data['captions'][registration_data.data]
+        uuid, number_of_slots = registration_data.data.items()[0]
+        return registration_data.field_data.field.data['captions'][uuid]
 
 
 class CheckboxField(RegistrationFormBillableField):
@@ -355,12 +354,9 @@ def _to_date(date):
 
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
-    wtf_field_class = wtforms.SelectMultipleField
 
     def get_friendly_data(self, registration_data):
         reg_data = registration_data.data
+        if not reg_data:
+            return ''
         return [self.form_item.data['captions'][x] for x in reg_data]
-
-    def calculate_price(self, registration_data):
-        reg_data = [x for x in self.form_item.versioned_data['choices'] if x['id'] in registration_data.data]
-        return sum(item['price'] for item in reg_data if item['is_billable'])
