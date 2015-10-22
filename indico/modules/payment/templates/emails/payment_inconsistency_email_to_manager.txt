@@ -1,7 +1,7 @@
-Dear manager of the event {{ event.getTitle() }},
+Dear manager of the event {{ event.title }},
 
-It appears that the payment of the registrant with ID {{ registrant.getId() }} has an incorrect
-amount of money (received {{ format_currency(amount, currency, locale='en_GB') }} while expecting {{ format_currency(registrant.getTotal(), currency, locale='en_GB') }}.
+It appears that the payment of the registration with ID {{ registration.friendly_id }} has an incorrect
+amount of money (received {{ format_currency(amount, currency, locale='en_GB') }} while expecting {{ format_currency(registration.price, currency, locale='en_GB') }}.
 Please, check with the registrant to see if there was some misunderstanding.
 
 Regards.

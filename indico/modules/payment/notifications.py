@@ -21,18 +21,18 @@ from indico.modules.payment import event_settings as payment_event_settings
 
 
 @email_sender
-def notify_double_payment(registrant):
-    event = registrant.getConference()
+def notify_double_payment(registration):
+    event = registration.registration_form.event
     to = event.as_event.creator.email
-    body = render_template('payment/emails/double_payment_email_to_manager.txt', event=event, registrant=registrant)
+    body = render_template('payment/emails/double_payment_email_to_manager.txt', event=event, registration=registration)
     return make_email(to, subject='Double payment detected', body=body)
 
 
 @email_sender
-def notify_amount_inconsistency(registrant, amount):
-    event = registrant.getConference()
+def notify_amount_inconsistency(registration, amount):
+    event = registration.registration_form.event
     currency = payment_event_settings.get(event, 'currency')
     to = event.as_event.creator.email
-    body = render_template('payment/emails/payment_inconsistency_email_to_manager.txt', event=event,
-                           registrant=registrant, amount=amount, currency=currency)
+    body = render_template('payment/emails/payment_inconsistency_email_to_manager.txt',
+                           event=event, registration=registration, amount=amount, currency=currency)
     return make_email(to, subject='Payment inconsistency', body=body)
