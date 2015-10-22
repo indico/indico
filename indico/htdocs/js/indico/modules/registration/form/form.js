@@ -55,7 +55,7 @@ ndRegForm.value('fieldDefaults', {
     'defaultPrice': 0,
     'defaultMinValue': 0,
     'defaultPlacesLimit': 0,
-    'defaultDateFormat': 'dd/mm/yy',
+    'defaultDateFormat': '%d/%m/%Y',
     'defaultPhoneSize': 30
 });
 
