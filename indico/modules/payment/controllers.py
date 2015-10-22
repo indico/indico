@@ -87,26 +87,7 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
         return WPPaymentEventManagement.render_template('management/payments_edit.html', event, event=event, form=form)
 
 
-class RHPaymentToggle(RHPaymentEventManagementBase):
-    """Enable/disable payment for an event"""
-
-    CSRF_ENABLED = True
-
-    def _process(self):
-        event = self._conf
-        enabled = request.form['enabled'] == '1'
-        if enabled and not get_payment_plugins():
-            flash(_('There are no payment methods available. Please contact your Indico administrator.'), 'error')
-            return redirect(url_for('.event_settings', event))
-        if event_settings.get(event, 'enabled', None) is None:
-            copy_settings = {'currency', 'conditions', 'register_email', 'success_email'}
-            data = {k: v for k, v in settings.get_all().iteritems() if k in copy_settings}
-            event_settings.set_multi(event, data)
-        event_settings.set(event, 'enabled', enabled)
-        return redirect(url_for('.event_settings', event))
-
-
-class RHPaymentPluginEdit(RHPaymentEventManagementBase):
+class RHPaymentPluginEdit(RHPaymentManagementBase):
     """Configure a payment plugin for an event"""
 
     def _checkParams(self, params):
