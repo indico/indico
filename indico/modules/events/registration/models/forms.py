@@ -114,6 +114,12 @@ class RegistrationForm(db.Model):
         db.Integer,
         nullable=True
     )
+    #: Whether registrations should be displayed in the participant list
+    publish_registrations_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether registrations must be approved by a manager
     moderation_enabled = db.Column(
         db.Boolean,

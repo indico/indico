@@ -53,6 +53,9 @@ class RegistrationFormForm(IndicoForm):
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
                                       description=_("Maximum number of registrations"))
+    publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
+                                                 description=_("Registrations from this form will be displayed in the "
+                                                               "event page"))
     base_price = DecimalField(_('Registration fee'), [NumberRange(min=0), Optional()],
                               filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
