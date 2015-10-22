@@ -62,17 +62,3 @@ def register_transaction(registration, amount, currency, action, provider=None, 
         if new_transaction.status == TransactionStatus.successful:
             registration.update_state(paid=True)
         return new_transaction
-
-
-def get_registrant_params():
-    """Returns a dict containing the URL params for a registrant.
-
-    If a registrant id and authkey are currently present in the request
-    data, we preserve it in case the user is not logged in or logged in
-    but registered without being logged in (in that case the registration
-    is not tied to his Indico user).
-    """
-    try:
-        return {'registrantId': request.values['registrantId'], 'authkey': request.values['authkey']}
-    except KeyError:
-        return {}

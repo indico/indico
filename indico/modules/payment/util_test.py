@@ -15,11 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from flask import session, request
 from mock import MagicMock
 
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
-from indico.modules.payment.util import get_registrant_params, register_transaction
+from indico.modules.payment.util import register_transaction
 
 
 @pytest.mark.parametrize(('new', 'double', 'status'), (
@@ -42,15 +41,3 @@ def test_register_transaction(mocker, new, double, status):
     else:
         assert transaction is None
         assert not ndp.called
-
-
-@pytest.mark.usefixtures('request_context')
-@pytest.mark.parametrize(('user', 'params'), (
-    (True,  {}),
-    (False, {'registrantId': '0', 'authkey': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'}),
-))
-def test_get_registrant_params(dummy_user, user, params):
-    request.values = params
-    if user:
-        session.user = dummy_user
-    assert get_registrant_params() == params
