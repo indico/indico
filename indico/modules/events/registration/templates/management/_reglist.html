@@ -53,6 +53,12 @@
                                                 {{ choice }} ({{ nights }} nights)
                                             {%- endtrans %}
                                         </td>
+                                    {% elif item.id in data and data[item.id].field_data.field.input_type == 'multi_choice' %}
+                                        <td class="i-table">
+                                            {%- if item.id in data %}
+                                                {{- data[item.id].friendly_data | join(', ') }}
+                                            {%- endif %}
+                                        </td>
                                     {% else %}
                                         <td class="i-table">
                                             {%- if item.id in data %}
