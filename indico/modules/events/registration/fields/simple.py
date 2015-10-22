@@ -278,17 +278,16 @@ class AccommodationField(RegistrationFormBillableItemsField):
         unversioned_data, versioned_data = super(AccommodationField, cls).process_field_data(data, old_data,
                                                                                              old_versioned_data)
         items = [x for x in versioned_data['choices'] if not x.get('remove')]
-        for item in items:
-            item.setdefault('is_billable', False)
-            item['price'] = float(item['price']) if item.get('price') else 0
-            item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
         captions = dict(old_data['captions']) if old_data is not None else {}
-        for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
-            unversioned_data[key] = _to_machine_date(unversioned_data[key])
         for item in items:
             if 'id' not in item:
                 item['id'] = unicode(uuid4())
+            item.setdefault('is_billable', False)
+            item['price'] = float(item['price']) if item.get('price') else 0
+            item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
             captions[item['id']] = item.pop('caption')
+        for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
+            unversioned_data[key] = _to_machine_date(unversioned_data[key])
         versioned_data['choices'] = items
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
