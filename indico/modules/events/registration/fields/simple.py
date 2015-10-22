@@ -170,7 +170,7 @@ class DateField(RegistrationFormFieldBase):
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super(DateField, cls).process_field_data(data, old_data, old_versioned_data)
-        date_format = unversioned_data['date_format'].strip().split(' ')
+        date_format = unversioned_data['date_format'].split(' ')
         unversioned_data['date_format'] = date_format[0]
         if len(date_format) == 2:
             unversioned_data['time_format'] = date_format[1]
