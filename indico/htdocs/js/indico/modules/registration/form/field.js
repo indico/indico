@@ -248,8 +248,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.isDisabled = function(item, uservalue) {
         item = item || {};
-        return (item.disabled === true || item.isEnabled === false) ||
-            !$scope.hasPlacesLeft(item, uservalue) || item.isEnabled === true;
+        return !$scope.hasPlacesLeft(item, uservalue) || !item.isEnabled;
     };
 
     $scope.hasPlacesLeft = function(item, uservalue) {
