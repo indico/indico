@@ -207,6 +207,17 @@
     @extend %regform-section;
     margin-bottom: 15px;
 
+    table.registration-info {
+        border-collapse: collapse;
+        width: 100%;
+
+        &.payment-info {
+            td {
+                padding: 3px;
+            }
+        }
+    }
+
     .regform-done-title {
         @include border-bottom(lighten($gray, $color-variation));
         display: block;
@@ -223,12 +234,12 @@
         border-right: 1px dashed lighten($gray, $color-variation);
         color: $dark-gray;
         text-align: right;
-        padding-right: 8px;
+        padding: 0 8px 0 0;
         width: 120px;
     }
 
     .regform-done-data {
-        padding-left: 5px;
+        padding: 0 0 0 5px;
         vertical-align: top;
     }
 
@@ -237,7 +248,7 @@
         font-weight: bold;
 
         &:not(:first-child) {
-            padding-left: 15px;
+            padding: 0 0 0 15px;
         }
     }
 
@@ -246,7 +257,7 @@
             vertical-align: top;
 
             &:not(:first-child) {
-                padding-left: 15px;
+                padding: 0 0 0 15px;
             }
 
             span.section-name {

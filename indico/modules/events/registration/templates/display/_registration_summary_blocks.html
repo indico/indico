@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="i-box-content">
-            <table width="100%" cellpadding="0" cellspacing="0">
+            <table class="registration-info">
                 {{ render_registration_info(registration) }}
             </table>
         </div>
@@ -97,7 +97,7 @@
                 {% endif %}
             </div>
             <div class="i-box-content">
-                <table width="100%" cellpadding="3" cellspacing="0">
+                <table class="registration-info payment-info">
                     <tr>
                         <td class="regform-done-table-title">
                             {% trans %}Item{% endtrans %}
@@ -105,17 +105,17 @@
                         <td class="regform-done-table-title">
                             {% trans %}Value{% endtrans %}
                         </td>
-                        <td align="right" class="regform-done-table-title">
+                        <td class="regform-done-table-title text-right">
                             {% trans %}Cost{% endtrans %}
                         </td>
                     </tr>
                     {% for item in registration.billable_data %}
                         <tr class="regform-done-table-item">
-                            <td align="left">
+                            <td class="text-left">
                                 {{- item.field_data.field.title }}
                                 <span class="section-name">({{ item.field_data.field.parent.title -}})</span>
                             </td>
-                            <td align="left">
+                            <td class="text-left">
                                 {% if item.field_data.field.input_type == 'accommodation' %}
                                     {% trans nights=item.friendly_data.nights,
                                              choice=item.friendly_data.choice %}
@@ -129,14 +129,14 @@
                                    {{ item.friendly_data }}
                                 {% endif %}
                             </td>
-                            <td align="right" nowrap>{{ item.price }} <em>{{ currency }}</em></td>
+                            <td class="text-right">{{ item.price }} {{ currency }}</td>
                         </tr>
                     {% endfor %}
                     <tr>
-                        <td align="right" class="regform-done-table-total" colspan="2">
+                        <td class="regform-done-table-total text-right" colspan="2">
                             <strong>{% trans %}Total{% endtrans %}</strong>
                         </td>
-                        <td align="right" class="regform-done-table-total" nowrap>
+                        <td class="regform-done-table-total text-right">
                             {{ registration.render_price() }}
                         </td>
                     </tr>
