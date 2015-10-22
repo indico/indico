@@ -32,9 +32,10 @@ def test_register_transaction(mocker, new, double, status):
     mocker.patch('indico.modules.payment.util.db')
     ndp = mocker.patch('indico.modules.payment.util.notify_double_payment')
     cn = mocker.patch.object(PaymentTransaction, 'create_next')
+    registration = MagicMock()
     db_transaction = MagicMock(status=status) if new else None
     cn.return_value = db_transaction, double
-    transaction = register_transaction(None, None, None, None)
+    transaction = register_transaction(registration, None, None, None)
     if new:
         assert transaction is db_transaction
         assert ndp.called == double

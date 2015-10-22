@@ -39,10 +39,10 @@ def get_active_payment_plugins(event):
             if plugin.event_settings.get(event, 'enabled')}
 
 
-def register_transaction(registrant, amount, currency, action, provider=None, data=None):
+def register_transaction(registration, amount, currency, action, provider=None, data=None):
     """Creates a new transaction for a certain transaction action.
 
-    :param registrant: the `Registrant` of the transaction
+    :param registration: the `Registration` associated to the transaction
     :param amount: the (strictly positive) amount of the transaction
     :param currency: the currency used for the transaction
     :param action: the `TransactionAction` of the transaction
@@ -51,16 +51,16 @@ def register_transaction(registrant, amount, currency, action, provider=None, da
     :param data: arbitrary JSON-serializable data specific to the
                  transaction's provider
     """
-    new_transaction, double_payment = PaymentTransaction.create_next(registrant=registrant, amount=amount,
-                                                                     currency=currency, action=action,
+    new_transaction, double_payment = PaymentTransaction.create_next(registration=registration, action=action,
+                                                                     amount=amount, currency=currency,
                                                                      provider=provider, data=data)
     if new_transaction:
         db.session.add(new_transaction)
         db.session.flush()
         if double_payment:
-            notify_double_payment(new_transaction.registration)
+            notify_double_payment(registration)
         if new_transaction.status == TransactionStatus.successful:
-            new_transaction.registration.update_state(paid=True)
+            registration.update_state(paid=True)
         return new_transaction
 
 

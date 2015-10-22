@@ -24,7 +24,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
+from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -143,7 +143,6 @@ class PaymentTransaction(db.Model):
     """Payment transactions"""
     __tablename__ = 'payment_transactions'
     __table_args__ = (db.CheckConstraint('amount > 0', 'positive_amount'),
-                      db.UniqueConstraint('event_id', 'registrant_id', 'timestamp'),
                       {'schema': 'events'})
 
     #: Entry ID
@@ -151,16 +150,11 @@ class PaymentTransaction(db.Model):
         db.Integer,
         primary_key=True
     )
-    #: ID of the event
-    event_id = db.Column(
+    #: ID of the associated registration
+    registration_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.events.id'),
+        db.ForeignKey('event_registration.registrations.id'),
         index=True,
-        nullable=False
-    )
-    #: ID of the registrant
-    registrant_id = db.Column(
-        db.Integer,
         nullable=False
     )
     #: a :class:`TransactionStatus`
@@ -187,7 +181,6 @@ class PaymentTransaction(db.Model):
     timestamp = db.Column(
         UTCDateTime,
         default=now_utc,
-        index=True,
         nullable=False
     )
     #: plugin-specific data of the payment
@@ -196,32 +189,16 @@ class PaymentTransaction(db.Model):
         nullable=False
     )
 
-    #: The Event this transaction is associated with
-    event_new = db.relationship(
-        'Event',
+    #: The associated registration
+    registration = db.relationship(
+        'Registration',
         lazy=True,
+        foreign_keys=[registration_id],
         backref=db.backref(
-            'payment_transactions',
-            lazy='dynamic'
+            'transactions',
+            lazy=True
         )
     )
-
-    # relationship backrefs:
-    # - registration (Registration.transaction)
-
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @property
-    def registrant(self):
-        return self.event.getRegistrantById(str(self.registrant_id))
-
-    @registrant.setter
-    def registrant(self, registrant):
-        self.registrant_id = int(registrant.getId())
-        self.event_id = int(registrant.getConference().getId())
 
     @property
     def plugin(self):
@@ -236,15 +213,12 @@ class PaymentTransaction(db.Model):
     def __repr__(self):
         # in case of a new object we might not have the default status set
         status = TransactionStatus(self.status).name if self.status is not None else None
-        return '<PaymentTransaction({}, {}, {}, {}, {}, {} {}, {})>'.format(self.id, self.event_id, self.registrant_id,
-                                                                            status, self.provider, self.amount,
-                                                                            self.currency, self.timestamp)
+        return format_repr(self, 'id', 'registration_id', 'provider', 'amount', 'currency', 'timestamp', status=status)
 
     def render_details(self):
-        """Renders the transaction details for the registrant details in event management"""
+        """Renders the transaction details in event management"""
         if self.manual:
-            return render_template('payment/transaction_details_manual.html', transaction=self,
-                                   registrant=self.registrant)
+            return render_template('payment/transaction_details_manual.html', transaction=self)
         plugin = self.plugin
         if plugin is None:
             return '[plugin not loaded: {}]'.format(self.provider)
@@ -252,12 +226,12 @@ class PaymentTransaction(db.Model):
             return plugin.render_transaction_details(self)
 
     @classmethod
-    def create_next(cls, registrant, amount, currency, action, provider='_manual', data=None):
-        event = registrant.getConference()
-        new_transaction = PaymentTransaction(event_id=event.getId(), registrant_id=registrant.getId(), amount=amount,
-                                             currency=currency, provider=provider, data=data)
+    def create_next(cls, registration, amount, currency, action, provider='_manual', data=None):
+        previous_transaction = registration.transaction
+        new_transaction = PaymentTransaction(amount=amount, currency=currency,
+                                             provider=provider, data=data)
+        registration.transaction = new_transaction
         double_payment = False
-        previous_transaction = cls.find_latest_for_registrant(registrant)
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
@@ -277,7 +251,7 @@ class PaymentTransaction(db.Model):
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
             double_payment = True
-            Logger.get('payment').warning("Received successful payment for an already paid registrant")
+            Logger.get('payment').warning("Received successful payment for an already paid registration")
         new_transaction.status = next_status
         return new_transaction, double_payment
 
