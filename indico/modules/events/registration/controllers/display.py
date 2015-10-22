@@ -21,15 +21,18 @@ from uuid import UUID
 from flask import request, session, redirect, flash, jsonify
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_event_section_data, make_registration_form, create_registration
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
-                                                      WPDisplayRegistrationFormLecture)
+                                                      WPDisplayRegistrationFormLecture,
+                                                      WPDisplayRegistrationParticipantList)
 from indico.modules.payment import event_settings
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
@@ -79,8 +82,37 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 
     def _process(self):
         regforms = RegistrationForm.find_all(RegistrationForm.is_scheduled, event_id=int(self.event.id))
-        return self.view_class.render_template('display/regform_list.html', self.event,
-                                               event=self.event, regforms=regforms)
+        return self.view_class.render_template('display/regform_list.html', self.event, event=self.event,
+                                               regforms=regforms)
+
+
+class RHParticipantList(RHRegistrationFormDisplayBase):
+    """List of all public registrations"""
+
+    def _is_affiliation_available(self, regforms):
+        for regform in regforms:
+            for field in regform.active_fields:
+                if field.personal_data_type is not None and field.personal_data_type == PersonalDataType.affiliation:
+                    return True
+        return False
+
+    def _process(self):
+        regforms = RegistrationForm.find_all(RegistrationForm.publish_registrations_enabled,
+                                             event_id=int(self.event.id))
+        registrations = (Registration.find(Registration.event_id == self.event.id, ~Registration.is_deleted,
+                                           RegistrationForm.publish_registrations_enabled,
+                                           _join=Registration.registration_form)
+                                     .order_by(db.func.lower(Registration.first_name),
+                                               db.func.lower(Registration.last_name))
+                                     .all())
+        return WPDisplayRegistrationParticipantList.render_template(
+            'display/participant_list.html',
+            self.event,
+            event=self.event,
+            regforms=regforms,
+            show_affiliation=self._is_affiliation_available(regforms),
+            registrations=registrations
+        )
 
 
 class InvitationMixin:

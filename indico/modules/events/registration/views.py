@@ -54,6 +54,10 @@ class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConfer
     menu_entry_name = 'registration'
 
 
+class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
+    menu_entry_name = 'participants'
+
+
 class WPDisplayRegistrationFormMeeting(DisplayRegistrationFormMixin, WPMeetingDisplay):
     template_prefix = 'events/registration/'
     base_class = WPMeetingDisplay

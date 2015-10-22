@@ -64,10 +64,6 @@ def _visibility_paper_review_managment(event):
     return _visibility_role(event, 'paperReviewManager')
 
 
-def _visibility_registration(event):
-    return event.getRegistrationForm().isActivated() and event.hasEnabledSection('regForm')
-
-
 def _visibility_judge(event):
     return (_visibility_role(event, 'referee')
             and (event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING
@@ -264,13 +260,5 @@ def get_default_menu_entries():
             position=9,
             visible=_visibility_abstracts_book,
             static_site='files/generatedPdf/BookOfAbstracts.pdf'
-        ),
-        MenuEntryData(
-            title=_("Participant List"),
-            name='registrants',
-            endpoint='event.confRegistrantsDisplay-list',
-            position=11,
-            visible=_visibility_registration,
-            static_site=True
         )
     ]
