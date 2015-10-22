@@ -1,0 +1,35 @@
+{% extends 'events/registration/display/_event_registration_base.html' %}
+
+{% block title %}
+    {% trans %}Participant List{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="registrations">
+        <table class="i-table tablesorter">
+            <thead>
+                <tr class="i-table">
+                    <th class="i-table">{% trans %}Full name{% endtrans %}</th>
+                    {% if show_affiliation %}
+                        <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in registrations %}
+                    <tr class="i-table">
+                        <td class="i-table">{{ registration.first_name }} {{ registration.last_name }}</td>
+                        {% if show_affiliation %}
+                            <td class="i-table">
+                                {% set personal_data = registration.get_personal_data() %}
+                                {%- if personal_data.affiliation %}
+                                    {{- personal_data.affiliation -}}
+                                {% endif -%}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

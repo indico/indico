@@ -65,7 +65,7 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.events.registration.models.registrations import Registration
 
-    def _visible(event):
+    def _visible_registration(event):
         if not event.has_feature('registration'):
             return False
         if RegistrationForm.find(RegistrationForm.is_scheduled, RegistrationForm.event_id == int(event.id)).count():
@@ -77,8 +77,16 @@ def _extend_event_menu(sender, **kwargs):
                                       ~RegistrationForm.is_deleted,
                                       _join=Registration.registration_form).count())
 
-    return MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
-                         visible=_visible)
+    def _visible_participant_list(event):
+        if not event.has_feature('registration'):
+            return False
+        return bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
+                                          RegistrationForm.event_id == int(event.id)).count())
+
+    yield MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
+                        visible=_visible_registration)
+    yield MenuEntryData(_('Participant List'), 'participants', 'event_registration.participant_list', position=11,
+                        visible=_visible_participant_list)
 
 
 @signals.users.registered.connect
