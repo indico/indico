@@ -1,37 +1,39 @@
-<ng-form name="nestedForm"
-    ng-init="input = getId(getValue(fieldName))">
+<ng-form name="nestedForm" ng-init="input = getId(getValue(fieldName))">
     <select
-        id="field-{{ section.id }}-{{ field.id }}"
-        name="{{ fieldName }}"
+        id="{{ field.id }}"
         ng-model="input"
         ng-required="field.isRequired"
         ng-disabled="anyBillableItemPayed(userdata)"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-init="selectedItem = getSelectedItem(input) || {}"
-        ng-change="selectedItem = getSelectedItem(input) || {}">
+        ng-change="selectedItem = getSelectedItem(input) || {}"
+        ng-click="onSingleFieldItemChange($event)">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.choices | filter:isVisible"
+            id="{{ item.id }}"
             value="{{ item.id }}"
             ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || paymentBlocked(item, userdata)"
             ng-selected="item.caption == getValue(fieldName)">
             {{ item.caption }}
             {{ getBillableStr(item, getUserdataValue()) }}
-            </span>
         </option>
     </select>
-    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
+    <div ng-repeat="item in field.choices | filter:isVisible">
+        <span ng-if="field.withExtraSlots && item.maxExtraSlots && input==item.id">
+            <label for="extraSlotsSelect-{{ item.id }}">
+                <strong>{{ 'Select number of extra slots to use' | i18n }}</strong>
+            </label>
+            <select id="extraSlotsSelect-{{ item.id }}"
+                    ng-init="numberOfExtraSlotsUsed=0"
+                    ng-model="numberOfExtraSlotsUsed"
+                    ng-options="n for n in [] | range:0:item.maxExtraSlots"
+                    ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
+            </select>
+        </span>
+    </div>
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired"
+          class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
-    <input type="hidden"
-        ng-if="anyBillableItemPayed(userdata)"
-        name="{{ fieldName }}"
-        value="{{ getId(getValue(fieldName)) }}"/>
-    <span>
-        <span ng-if="isBillable(selectedItem)" class="regFormPrice">
-            {{ selectedItem.price }}
-        </span>
-            <span ng-if="isBillable(selectedItem)">
-                <nd-currency currency="currency"></nd-currency>
-            </span>
-    </span>
+    <input type="hidden" name="{{ fieldName }}">
 </ng-form>
