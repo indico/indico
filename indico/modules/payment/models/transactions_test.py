@@ -164,7 +164,7 @@ def test_event(dummy_transaction, dummy_event):
 ))
 def test_manual(dummy_transaction, provider, expected):
     dummy_transaction.provider = provider
-    assert dummy_transaction.manual == expected
+    assert dummy_transaction.is_manual == expected
 
 
 def test_create_next(creation_params):

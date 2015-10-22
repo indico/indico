@@ -6,7 +6,7 @@
         <dt>{% trans %}Paid with{% endtrans %}</dt>
         <dd>{{ plugin.title }}</dd>
     {% endif %}
-    {% if not transaction.manual %}
+    {% if not transaction.is_manual %}
         {# not useful for manual payments since it just uses the amount the user was supposed to pay #}
         <dt>{% trans %}Paid amount{% endtrans %}</dt>
         <dd>{{ format_currency(transaction.amount, transaction.currency, locale=session.lang) }}</dd>
