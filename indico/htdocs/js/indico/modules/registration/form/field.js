@@ -249,7 +249,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
     $scope.isDisabled = function(item, uservalue) {
         item = item || {};
         return (item.disabled === true || item.isEnabled === false) ||
-            !$scope.hasPlacesLeft(item, uservalue) || item.isCancelled === true;
+            !$scope.hasPlacesLeft(item, uservalue) || item.isEnabled === true;
     };
 
     $scope.hasPlacesLeft = function(item, uservalue) {
@@ -867,7 +867,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     $T("Billable"),
                     $T("Price"),
                     $T("Places limit"),
-                    $T("Cancelled")
+                    $T("Enabled")
                 ],
                 actions: ['remove'],
                 colModel: [
@@ -910,8 +910,8 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                         editoptions: {size: "7", maxlength: "20"}
                     },
                     {
-                        name: 'isCancelled',
-                        index: 'isCancelled',
+                        name: 'isEnabled',
+                        index: 'isEnabled',
                         width: 60,
                         editable: true,
                         align: 'center',
@@ -1089,7 +1089,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
 
             $scope.addAccommodationOption = function() {
                 $scope.formData.choices.push({
-                    isCancelled: false,
+                    isEnabled: true,
                     price: 0,
                     placesLimit: 0
                 });
