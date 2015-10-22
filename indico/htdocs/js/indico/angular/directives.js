@@ -479,8 +479,12 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
         restrict: 'A',
         link: function(scope, element, attrs, ctrl) {
             _.defer(function() {
+                var dateFormat = scope.field.dateFormat || attrs.dateFormat;
+                dateFormat = dateFormat.split(' ')[0].replace(/%([dmYHM])/g, function(match, c) {
+                    return {'d': 'dd', 'm': 'mm', 'Y': 'yy', 'H': 'HH', 'M': 'mm'}[c];
+                });
                 element.datepicker({
-                    dateFormat: scope.field.dateFormat || attrs.dateFormat,
+                    dateFormat: dateFormat,
                     onSelect: function(date) {
                         ctrl.$setViewValue(date);
                     }

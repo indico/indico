@@ -167,14 +167,18 @@ class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
 
-    @classmethod
-    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
-        unversioned_data, versioned_data = super(DateField, cls).process_field_data(data, old_data, old_versioned_data)
-        date_format = unversioned_data['date_format'].split(' ')
-        unversioned_data['date_format'] = date_format[0]
-        if len(date_format) == 2:
-            unversioned_data['time_format'] = date_format[1]
-        return unversioned_data, versioned_data
+    def save_data(self, registration, value):
+        # TODO: fix client side code to send us time information then adapt the next line
+        date_format = self.form_item.data['date_format'].split(' ')[0]
+        value = datetime.strptime(value, date_format).isoformat()
+        return super(DateField, self).save_data(registration, value)
+
+    def get_friendly_data(self, registration_data):
+        date_string = registration_data.data
+        if not date_string:
+            return ''
+        dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
+        return dt.strftime(self.form_item.data['date_format'])
 
 
 class BooleanField(RegistrationFormBillableField):
