@@ -156,13 +156,13 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=[]
     )
-    #: Whether the e-ticket module is enabled for this form
+    #: Whether tickets are enabled for this form
     tickets_enabled = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
-    #: Whether to send the ticket by e-mail
+    #: Whether to send tickets by e-mail
     ticket_on_email = db.Column(
         db.Boolean,
         nullable=False,
