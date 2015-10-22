@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from flask import redirect
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
@@ -51,6 +51,11 @@ def generate_ticket(registration):
 
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
     """Generate ticket for a given registration"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrationBase._checkParams(self, params)
+        if not self.registration:
+            raise NotFound
 
     def _checkProtection(self):
         RHRegistrationFormRegistrationBase._checkProtection(self)

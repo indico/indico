@@ -193,20 +193,20 @@ class EmailRegistrantsForm(IndicoForm):
 
 
 class TicketsForm(IndicoForm):
-    tickets_enabled = BooleanField(_('Ticket'), widget=SwitchWidget(),
-                                   description=_('Enable/disable e-ticket module for this registration form.'))
+    tickets_enabled = BooleanField(_('Enable Tickets'), widget=SwitchWidget(),
+                                   description=_('Create tickets for registrations using this registration form.'))
     ticket_on_email = BooleanField(_('Attach to registration e-mail'), [HiddenUnless('tickets_enabled',
                                                                                      preserve_data=True)],
                                    widget=SwitchWidget(),
-                                   description=_('Attach e-ticket PDF to the email sent to the user after '
-                                                 'registration'))
+                                   description=_('Attach PDF ticket to the email sent to a user after completing '
+                                                 'their registration.'))
     ticket_on_event_page = BooleanField(_('Download from event homepage'), [HiddenUnless('tickets_enabled',
                                                                                          preserve_data=True)],
                                         widget=SwitchWidget(),
-                                        description=_('Allow users to download their e-ticket from the '
-                                                      'conference homepage menu'))
+                                        description=_('Allow users to download their ticket from the '
+                                                      'conference homepage.'))
     ticket_on_summary_page = BooleanField(_('Download from summary page'), [HiddenUnless('tickets_enabled',
                                                                                          preserve_data=True)],
                                           widget=SwitchWidget(),
-                                          description=_('Allow users to download their e-ticket from the summary '
-                                                        'page'))
+                                          description=_('Allow users to download their ticket from the registration '
+                                                        'summary page.'))

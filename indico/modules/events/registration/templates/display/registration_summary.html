@@ -99,7 +99,7 @@
             {% endif %}
             {% if registration.state.name == 'complete' and regform.tickets_enabled and regform.ticket_on_summary_page %}
                 <div class="group">
-                    <a href="{{ url_for('.ticket_download', regform) }}" class="i-button accept icon-ticket">
+                    <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}
                     </a>
                 </div>
