@@ -46,9 +46,8 @@ settings = SettingsProxy('payment', {
 })
 
 event_settings = EventSettingsProxy('payment', {
-    'enabled': False,
-    'currency': 'EUR',
-    'conditions': '',
+    'currency': None,
+    'conditions': None,
 })
 
 
@@ -74,3 +73,10 @@ class PaymentFeature(EventFeature):
     friendly_name = _('Payment')
     requires = {'registration'}
     description = _('Gives event managers the opportunity to process payments for registrations.')
+
+    @classmethod
+    def enabled(cls, event):
+        for setting in ('currency', 'conditions'):
+            if event_settings.get(event, setting) is None:
+                value = settings.get(setting)
+                event_settings.set(event, setting, value)

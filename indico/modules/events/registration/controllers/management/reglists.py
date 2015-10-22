@@ -20,7 +20,7 @@ import json
 from io import BytesIO
 from uuid import uuid4
 
-from flask import session, request, redirect, jsonify, flash, render_template
+from flask import session, request, redirect, jsonify, flash
 from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.config import Config
@@ -175,7 +175,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration,
-                                                    payment_enabled=payment_event_settings.get(self.event, 'enabled'),
+                                                    payment_enabled=self.event.has_feature('payment'),
                                                     from_management=True)
 
 
@@ -347,4 +347,4 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         flash(_("The registration payment was updated successfully."), 'success')
         return jsonify_template('events/registration/management/registration_details.html',
                                 registration=self.registration,
-                                payment_enabled=payment_event_settings.get(self.event, 'enabled'))
+                                payment_enabled=self.event.has_feature('payment'))
