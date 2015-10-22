@@ -64,7 +64,7 @@
 
 {{ render_registration_summary(registration) }}
 {% call render_payment_summary(registration, payment_enabled, currency, payment_conditions) %}
-    {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
+    {% if payment_enabled and registration.state.name == 'unpaid' %}
         <table class="regform-done-footer" width="100%" cellpadding="0" cellspacing="0">
             <tr>
                 <td>

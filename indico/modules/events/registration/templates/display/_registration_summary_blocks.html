@@ -76,7 +76,7 @@
 {% endmacro %}
 
 {% macro render_payment_summary(registration, payment_enabled, currency, payment_conditions=false) %}
-    {% if payment_enabled and registration.price %}
+    {% if registration.price %}
         <div id="payment-summary" class="regform-done">
             <div class="i-box-header">
                 <div class="i-box-title">
