@@ -73,14 +73,14 @@ class TransactionStatusTransition(object):
     initial_statuses = [TransactionStatus.cancelled, TransactionStatus.failed, TransactionStatus.rejected]
 
     @classmethod
-    def next(cls, transaction, action, provider):
-        manual_provider = provider == '_manual'
+    def next(cls, transaction, action, provider=None):
+        manual = provider is None
         if not transaction or transaction.status in cls.initial_statuses:
-            return cls._next_from_initial(action, manual_provider)
+            return cls._next_from_initial(action, manual)
         elif transaction.status == TransactionStatus.successful:
-            return cls._next_from_successful(action, manual_provider)
+            return cls._next_from_successful(action, manual)
         elif transaction.status == TransactionStatus.pending:
-            return cls._next_from_pending(action, manual_provider)
+            return cls._next_from_pending(action, manual)
         else:
             raise InvalidTransactionStatus("Invalid transaction status code '{}'".format(transaction.status))
 
@@ -175,7 +175,8 @@ class PaymentTransaction(db.Model):
     #: the provider of the payment (e.g. manual, PayPal etc.)
     provider = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default='_manual'
     )
     #: the date and time the transaction was recorded
     timestamp = db.Column(
@@ -206,7 +207,7 @@ class PaymentTransaction(db.Model):
         return get_payment_plugins().get(self.provider)
 
     @property
-    def manual(self):
+    def is_manual(self):
         return self.provider == '_manual'
 
     @return_ascii
@@ -217,7 +218,7 @@ class PaymentTransaction(db.Model):
 
     def render_details(self):
         """Renders the transaction details in event management"""
-        if self.manual:
+        if self.is_manual:
             return render_template('payment/transaction_details_manual.html', transaction=self)
         plugin = self.plugin
         if plugin is None:
@@ -226,7 +227,7 @@ class PaymentTransaction(db.Model):
             return plugin.render_transaction_details(self)
 
     @classmethod
-    def create_next(cls, registration, amount, currency, action, provider='_manual', data=None):
+    def create_next(cls, registration, amount, currency, action, provider=None, data=None):
         previous_transaction = registration.transaction
         new_transaction = PaymentTransaction(amount=amount, currency=currency,
                                              provider=provider, data=data)
