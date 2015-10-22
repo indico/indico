@@ -95,9 +95,13 @@ class RegistrationFormFieldBase(object):
         unversioned_data = {k: v for k, v in data.iteritems() if k not in cls.versioned_data_fields}
         return unversioned_data, versioned_data
 
+    @classmethod
+    def unprocess_field_data(cls, versioned_data, unversioned_data):
+        return dict(versioned_data, **unversioned_data)
+
     @property
     def view_data(self):
-        return {}
+        return self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data)
 
     def get_friendly_data(self, registration_data):
         return registration_data.data

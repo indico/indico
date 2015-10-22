@@ -75,11 +75,11 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     has_default_item = False
     wtf_field_class = JSONField
 
-    @property
-    def view_data(self):
-        items = deepcopy(self.form_item.versioned_data['choices'])
+    @classmethod
+    def unprocess_field_data(cls, versioned_data, unversioned_data):
+        items = deepcopy(versioned_data['choices'])
         for item in items:
-            item['caption'] = self.form_item.data['captions'][item['id']]
+            item['caption'] = unversioned_data['captions'][item['id']]
         return {'choices': items}
 
     @property
@@ -229,8 +229,8 @@ class CountryField(RegistrationFormFieldBase):
     def wtf_field_kwargs(self):
         return {'choices': CountryHolder.getCountries().items()}
 
-    @property
-    def view_data(self):
+    @classmethod
+    def unprocess_field_data(self):
         choices = sorted([{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()],
                          key=itemgetter('caption'))
         return {'choices': choices}
@@ -305,18 +305,20 @@ class AccommodationField(RegistrationFormBillableItemsField):
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
 
-    @property
-    def view_data(self):
+    @classmethod
+    def unprocess_field_data(self, versioned_data, unversioned_data):
         data = {}
-        arrival_date_from = _to_date(self.form_item.data['arrival_date_from'])
-        arrival_date_to = _to_date(self.form_item.data['arrival_date_to'])
-        departure_date_from = _to_date(self.form_item.data['departure_date_from'])
-        departure_date_to = _to_date(self.form_item.data['departure_date_to'])
-        data['arrival_dates'] = [format_date(date) for date in iterdays(arrival_date_from, arrival_date_to)]
-        data['departure_dates'] = [format_date(date) for date in iterdays(departure_date_from, departure_date_to)]
-        items = deepcopy(self.form_item.versioned_data['choices'])
+        arrival_date_from = _to_date(unversioned_data['arrival_date_from'])
+        arrival_date_to = _to_date(unversioned_data['arrival_date_to'])
+        departure_date_from = _to_date(unversioned_data['departure_date_from'])
+        departure_date_to = _to_date(unversioned_data['departure_date_to'])
+        data['arrival_dates'] = [(dt.date().isoformat(), format_date(dt)) for dt in
+                                 iterdays(arrival_date_from, arrival_date_to)]
+        data['departure_dates'] = [(dt.date().isoformat(), format_date(dt)) for dt in
+                                   iterdays(departure_date_from, departure_date_to)]
+        items = deepcopy(versioned_data['choices'])
         for item in items:
-            item['caption'] = self.form_item.data['captions'][item['id']]
+            item['caption'] = unversioned_data['captions'][item['id']]
         data['choices'] = items
         return data
 
