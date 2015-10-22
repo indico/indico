@@ -75,8 +75,19 @@ class RegistrationFormFieldBase(object):
             validators.append(self.not_required_validator())
         return self.wtf_field_class(self.form_item.title, validators, **self.wtf_field_kwargs)
 
-    def save_data(self, registration, value):
-        registration.data.append(RegistrationData(field_data=self.form_item.current_data, data=value))
+    def has_data_changed(self, value, old_data):
+        return value != old_data.data
+
+    def process_form_data(self, registration, value, old_data=None):
+        """Convert form data into database-usable dictionary."""
+
+        if old_data is not None and not self.has_data_changed(value, old_data):
+            return {}
+        else:
+            return {
+                'field_data': self.form_item.current_data,
+                'data': value
+            }
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):

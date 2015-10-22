@@ -247,9 +247,9 @@ class FileField(RegistrationFormFieldBase):
     name = 'file'
     wtf_field_class = wtforms.FileField
 
-    def save_data(self, registration, value):
+    def process_form_data(self, registration, value):
         if value is None or not value.filename:
-            return
+            return {}
         content = value.file.read()
         metadata = {
             'hash': crc32(content),
@@ -258,8 +258,11 @@ class FileField(RegistrationFormFieldBase):
             'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'
         }
 
-        registration.data.append(RegistrationData(field_data=self.form_item.current_data, file=content,
-                                                  file_metadata=metadata))
+        return {
+            'field_data': self.form_item.current_data,
+            'file': content,
+            'file_metadata': metadata
+        }
 
     @property
     def default_value(self):
@@ -349,10 +352,12 @@ class AccommodationField(RegistrationFormBillableItemsField):
         nights = (_to_date(reg_data['departure_date']) - _to_date(reg_data['arrival_date'])).days
         return item['price'] * nights
 
-    def save_data(self, registration, value):
-        data = {'choice': value['choice'], 'arrival_date': value['arrivalDate'],
-                'departure_date': value['departureDate']}
-        return super(AccommodationField, self).save_data(registration, data)
+    def process_form_data(self, registration, value, old_data=None):
+        return super(AccommodationField, self).process_form_data(registration, {
+            'choice': value['choice'],
+            'arrival_date': value['arrivalDate'],
+            'departure_date': value['departureDate']
+        }, old_data=old_data)
 
 
 def _to_machine_date(date):
