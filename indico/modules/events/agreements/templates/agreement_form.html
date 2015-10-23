@@ -47,10 +47,12 @@
                     <i class="icon-time"></i>
                     {{ agreement.event.getStartDate() | format_datetime }}
                 </div>
-                <div class="info-event-details">
-                    <i class="icon-location"></i>
-                    {{ agreement.event.getLocation().getName() }}
-                </div>
+                {% if agreement.event.getLocation() %}
+                    <div class="info-event-details">
+                        <i class="icon-location"></i>
+                        {{ agreement.event.getLocation().getName() }}
+                    </div>
+                {% endif %}
             </div>
             {% block info_more %}{% endblock %}
         </div>
