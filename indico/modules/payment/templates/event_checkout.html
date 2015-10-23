@@ -1,88 +1,96 @@
-<h2 class="page-title">{% trans %}Checkout{% endtrans %}</h2>
-<div class="info-message-box">
-    <div class="message-text">
-        You need to pay {{ format_currency(amount, currency, locale=session.lang) }} for your registration.
-        {% if force_plugin %}
-            You can pay using <strong>{{ force_plugin[1].get_method_name(event) }}</strong>.
-        {% else %}
-            Please select a payment method below to see the final price.
-        {% endif %}
-    </div>
-</div>
-{% if not force_plugin %}
-    <div class="i-form horizontal">
-        <div class="form-group">
-            <div class="form-block form-label form-label-middle">
-                <label for="description">{% trans %}Payment method{% endtrans %}</label>
-            </div>
-            <div class="form-block form-field">
-                <select id="payment-method">
-                    <option value="">{% trans %}Please choose an option{% endtrans %}</option>
-                    {% for name, plugin in plugins %}
-                        <option value="{{ name }}">{{ plugin.get_method_name(event) }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+{% extends 'events/registration/display/_event_regform_base.html' %}
+
+{% block subtitle %}
+    {{ regform.title }}:
+    {% trans %}Checkout{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="info-message-box">
+        <div class="message-text">
+            You need to pay {{ format_currency(amount, currency, locale=session.lang) }} for your registration.
+            {% if force_plugin %}
+                You can pay using <strong>{{ force_plugin[1].get_method_name(event) }}</strong>.
+            {% else %}
+                Please select a payment method below to see the final price.
+            {% endif %}
         </div>
     </div>
-{% endif %}
+    {% if not force_plugin %}
+        <div class="i-form horizontal">
+            <div class="form-group">
+                <div class="form-block form-label form-label-middle">
+                    <label for="description">{% trans %}Payment method{% endtrans %}</label>
+                </div>
+                <div class="form-block form-field">
+                    <select id="payment-method">
+                        <option value="">{% trans %}Please choose an option{% endtrans %}</option>
+                        {% for name, plugin in plugins %}
+                            <option value="{{ name }}">{{ plugin.get_method_name(event) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
 
-<div id="payment" class="i-box titled">
-    <div class="i-box-header">
-        <div class="i-box-title">{% trans %}Payment information{% endtrans %}</div>
+    <div id="payment" class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">{% trans %}Payment information{% endtrans %}</div>
+        </div>
+        <div class="i-box-content">
+            <div id="payment-content"></div>
+        </div>
     </div>
-    <div class="i-box-content">
-        <div id="payment-content"></div>
-    </div>
-</div>
 
-<script>
-    (function(global) {
-        var paymentContainer = $('#payment-content');
-        var paymentMethod = {{ (force_plugin[0] if force_plugin else '') | tojson }} || $('#payment-method').val();
+    <script>
+        (function(global) {
+            var paymentContainer = $('#payment-content');
+            var paymentMethod = {{ (force_plugin[0] if force_plugin else '') | tojson }} || $('#payment-method').val();
 
-        // You can use this function if your payment plugin has any dynamic data which affect the displayed information.
-        // For example, selecting different credit card types could cause different fees to be applied.
-        // Simply call reloadPaymentMethod({your: 'custom data'}) in the payment form template of your plugin and
-        // override render_payment_form in the plugin class.
-        global.reloadPaymentMethod = function reloadPaymentMethod(extraData) {
-            var data = {method: paymentMethod};
-            $.ajax({
-                url: {{ url_for('.event_payment_form', registration.locator.registrant) | tojson }},
-                type: 'GET',
-                cache: false,
-                data: $.extend({}, extraData || {}, data),
-                dataType: 'json',
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                success: function(data) {
-                    paymentContainer.html('');
-                    if (handleAjaxError(data)) {
-                        return;
+            // You can use this function if your payment plugin has any dynamic data which affect the displayed information.
+            // For example, selecting different credit card types could cause different fees to be applied.
+            // Simply call reloadPaymentMethod({your: 'custom data'}) in the payment form template of your plugin and
+            // override render_payment_form in the plugin class.
+            global.reloadPaymentMethod = function reloadPaymentMethod(extraData) {
+                var data = {method: paymentMethod};
+                $.ajax({
+                    url: {{ url_for('.event_payment_form', registration.locator.registrant) | tojson }},
+                    type: 'GET',
+                    cache: false,
+                    data: $.extend({}, extraData || {}, data),
+                    dataType: 'json',
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        paymentContainer.html('');
+                        if (handleAjaxError(data)) {
+                            return;
+                        }
+                        paymentContainer.html(data.html);
                     }
-                    paymentContainer.html(data.html);
-                }
-            });
-        };
+                });
+            };
 
-        if(!paymentMethod) {
-            $('#payment').hide();
-        }
-
-        $('#payment-method').on('change', function() {
-            paymentMethod = $(this).val();
-            if (!paymentMethod) {
-                paymentContainer.html('');
+            if(!paymentMethod) {
                 $('#payment').hide();
-                return;
             }
-            $('#payment').show();
-            reloadPaymentMethod();
-        });
 
-        if (paymentMethod) {
-            reloadPaymentMethod();
-        }
-    })(window);
-</script>
+            $('#payment-method').on('change', function() {
+                paymentMethod = $(this).val();
+                if (!paymentMethod) {
+                    paymentContainer.html('');
+                    $('#payment').hide();
+                    return;
+                }
+                $('#payment').show();
+                reloadPaymentMethod();
+            });
+
+            if (paymentMethod) {
+                reloadPaymentMethod();
+            }
+        })(window);
+    </script>
+{% endblock %}

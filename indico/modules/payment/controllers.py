@@ -175,6 +175,7 @@ class RHPaymentCheckout(RHPaymentBase):
         force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', self.event, event=self.event,
                                               registration=self.registration,
+                                              regform=self.registration.registration_form,
                                               plugins=plugins.items(), force_plugin=force_plugin,
                                               amount=self.registration.price, currency=currency)
 
