@@ -343,12 +343,17 @@ class RegistrationFormSection(RegistrationFormItem):
         return dict(self.registration_form.locator, section_id=self.id)
 
     @property
-    def view_data(self):
+    def own_data(self):
         field_data = dict(super(RegistrationFormSection, self).view_data,
                           enabled=self.is_enabled,
                           title=self.title,
                           is_manager_only=self.is_manager_only,
-                          is_personal_data=False,
+                          is_personal_data=False)
+        return field_data
+
+    @property
+    def view_data(self):
+        field_data = dict(self.own_data,
                           items=[child.view_data for child in self.children if not child.is_deleted])
         return camelize_keys(field_data)
 
