@@ -63,10 +63,12 @@ from MaKaC.i18n import _
 from MaKaC.common import utils
 
 from indico.core.config import Config
+from indico.modules.events.registration.models.registrations import Registration
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date, format_datetime
 from indico.util.string import safe_upper, html_color_to_rgb
 from indico.util import json
+
 
 styles = getSampleStyleSheet()
 
@@ -1724,11 +1726,11 @@ class RegistrantsListToBadgesPDF:
         self.__marginRight = marginRight
         self.__marginColumns = marginColumns
         self.__marginRows = marginRows
-
         if registrantList == 'all':
-            self.__registrantList = self.__conf.getRegistrantsList(sort = True)
+            self.__registrantList = Registration.find(~Registration.is_deleted, Registration.event_id == conf.id).all()
         else:
-            self.__registrantList = [self.__conf.getRegistrantById(id) for id in registrantList]
+            self.__registrantList = (Registration.find(Registration.id.in_(registrantList), ~Registration.is_deleted,
+                                                       Registration.event_id == conf.id).all())
 
         self.__size = PDFSizes().PDFpagesizes[pagesize]
         if printLandscape:
@@ -1833,17 +1835,19 @@ class RegistrantsListToBadgesPDF:
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.
                 text = action
+            elif isinstance(action, types.LambdaType):
+                text = action(registrant)
             elif isinstance(action, types.MethodType):
                 # If the action is a method, depending on which class owns the method, we pass a
                 # different object to the method.
                 if action.im_class == Registrant:
                     text = action.__call__(registrant)
                 elif action.im_class == conference.Conference:
-                    text = action.__call__(self.__conf)
+                    text = action.__call__(registrant.registration_form.event)
                 elif action.im_class == BadgeTemplateItem:
                     text = action.__call__(item)
                 else:
-                    text= _("Error")
+                    text = _("Error")
             elif isinstance(action, types.ClassType):
                 # If the action is a class, it must be a class who complies to the following interface:
                 #  -it must have a getArgumentType() method, which returns either Conference, Registrant or BadgeTemplateItem.
@@ -1854,7 +1858,7 @@ class RegistrantsListToBadgesPDF:
                 if argumentType == Registrant:
                     text = action.getValue(registrant)
                 elif argumentType == conference.Conference:
-                    text = action.getValue(self.__conf)
+                    text = action.getValue(registrant.registration_form.event)
                 elif argumentType == BadgeTemplateItem:
                     text = action.getValue(item)
                 else:

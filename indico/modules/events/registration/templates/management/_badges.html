@@ -1,0 +1,42 @@
+{% macro render_template_list(templates) %}
+    <ul class="badge-template-list">
+        {% for template_id, template in templates %}
+            <li>
+                <input type="radio" name="templateId" value="{{ template_id }}" id="{{ template_id }}"
+                       {%- if loop.first %} checked{% endif %}>
+                <label for="{{ template_id }}">{{ template.getName() }}</label>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_badges_registration_list(registrations, registration_ids) %}
+    <div class="i-box titled">
+        <input type="hidden" name="registrantList" value="{{ registration_ids | join(',') }}"/>
+        <div class="i-box-header">
+            <div class="i-box-title">
+                {% trans num=registrations | length -%}
+                    Printing badge for one registrant
+                {%- pluralize -%}
+                    Printing badges for {{ num }} registrants
+                {%- endtrans %}
+            </div>
+        </div>
+        <div class="i-box-content">
+            <ul class="group-list no-content-before">
+                {% for registration in registrations %}
+                    <li>
+                        <span>
+                            <a href="{{ url_for('.registration_details', registration) }}">
+                                {{- registration.first_name }} {{ registration.last_name -}}
+                            </a>
+                        </span>
+                        <span class="right">
+                            {{- registration.get_personal_data().get('affiliation', '') -}}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endmacro %}

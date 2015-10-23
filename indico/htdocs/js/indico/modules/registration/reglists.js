@@ -97,7 +97,7 @@
             }
         });
 
-        $('.js-export-reglist').on('click', function(e) {
+        $('.js-submit-reglist-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
             $('.registrations form').attr('action', $this.data('href')).submit();
