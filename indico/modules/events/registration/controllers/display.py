@@ -89,28 +89,24 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 class RHParticipantList(RHRegistrationFormDisplayBase):
     """List of all public registrations"""
 
-    def _is_affiliation_available(self, regforms):
-        for regform in regforms:
-            for field in regform.active_fields:
-                if field.personal_data_type is not None and field.personal_data_type == PersonalDataType.affiliation:
-                    return True
-        return False
-
     def _process(self):
         regforms = RegistrationForm.find_all(RegistrationForm.publish_registrations_enabled,
                                              event_id=int(self.event.id))
-        registrations = (Registration.find(Registration.event_id == self.event.id, ~Registration.is_deleted,
-                                           RegistrationForm.publish_registrations_enabled,
-                                           _join=Registration.registration_form)
-                                     .order_by(db.func.lower(Registration.first_name),
-                                               db.func.lower(Registration.last_name))
-                                     .all())
+        query = (Registration
+                 .find(Registration.event_id == self.event.id,
+                       RegistrationForm.publish_registrations_enabled,
+                       ~RegistrationForm.is_deleted,
+                       ~Registration.is_deleted,
+                       _join=Registration.registration_form)
+                 .order_by(db.func.lower(Registration.first_name), db.func.lower(Registration.last_name)))
+        registrations = [('{} {}'.format(reg.first_name, reg.last_name), reg.get_personal_data().get('affiliation'))
+                         for reg in query]
         return WPDisplayRegistrationParticipantList.render_template(
             'display/participant_list.html',
             self.event,
             event=self.event,
             regforms=regforms,
-            show_affiliation=self._is_affiliation_available(regforms),
+            show_affiliation=any(x[1] for x in registrations),
             registrations=registrations
         )
 

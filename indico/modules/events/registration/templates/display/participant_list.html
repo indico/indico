@@ -16,16 +16,11 @@
                 </tr>
             </thead>
             <tbody>
-                {% for registration in registrations %}
+                {% for name, affiliation in registrations %}
                     <tr class="i-table">
-                        <td class="i-table">{{ registration.first_name }} {{ registration.last_name }}</td>
+                        <td class="i-table">{{ name }}</td>
                         {% if show_affiliation %}
-                            <td class="i-table">
-                                {% set personal_data = registration.get_personal_data() %}
-                                {%- if personal_data.affiliation %}
-                                    {{- personal_data.affiliation -}}
-                                {% endif -%}
-                            </td>
+                            <td class="i-table">{{ affiliation or '' }}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
