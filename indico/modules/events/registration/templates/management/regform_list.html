@@ -12,6 +12,29 @@
 {% endblock %}
 
 {% block content %}
+    {% if not event.has_feature('payment') %}
+        <div id="payment-disabled-notice" class="action-box highlight">
+            <div class="section">
+                <div class="icon icon-coins"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Payments disabled{% endtrans %}
+                    </div>
+                    {% trans %}Payments are disabled for this event{% endtrans %}
+                </div>
+                <div class="toolbar right">
+                    <a href="#" class="js-enable-payments"
+                       data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
+                       data-method="PUT"
+                       data-title="{% trans %}Enable payments for the whole event?{% endtrans %}"
+                       data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
+                        {% trans %}Enable payments{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% for regform in regforms %}
         <div class="action-box">
             <div class="section">
@@ -50,4 +73,8 @@
             </a>
         </div>
     </div>
+
+    <script>
+        setupRegistrationFormListPage();
+    </script>
 {% endblock %}

@@ -39,35 +39,6 @@
                 </a>
             </div>
         </div>
-
-        <div class="section">
-            <div class="icon icon-coins"></div>
-            {% if event.has_feature('payment') %}
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Payments{% endtrans %}
-                    </div>
-                    {% trans %}Configure payment settings and methods{% endtrans %}
-                </div>
-                <div class="toolbar right">
-                    <a href="{{ url_for('payment.event_settings', event) }}">
-                        {% trans %}Go to payments{% endtrans %}
-                    </a>
-                </div>
-            {% else %}
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Payments disabled{% endtrans %}
-                    </div>
-                    {% trans %}Payments are disabled for this event{% endtrans %}
-                </div>
-                <div class="toolbar right">
-                    <a href="{{ url_for('event_features.index', event) }}">
-                        {% trans %}Go to features{% endtrans %}
-                    </a>
-                </div>
-            {% endif %}
-        </div>
     </div>
 
     <div class="action-box">
