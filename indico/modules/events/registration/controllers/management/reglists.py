@@ -174,7 +174,8 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration,
-                                                    payment_enabled=payment_event_settings.get(self.event, 'enabled'))
+                                                    payment_enabled=payment_event_settings.get(self.event, 'enabled'),
+                                                    from_management=True)
 
 
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    {{ render_registration_summary(registration) }}
+    {{ render_registration_summary(registration, from_management) }}
     {% call render_payment_summary(registration, payment_enabled) %}
         <table class="regform-done-footer registration-info">
             <tr>
