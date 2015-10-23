@@ -282,7 +282,7 @@ class Registration(db.Model):
         for data in self.data:
             field = data.field_data.field
             if field.personal_data_type is not None and data.data:
-                personal_data[field.personal_data_type.name] = data.data
+                personal_data[field.personal_data_type.name] = data.friendly_data
         return personal_data
 
     def render_price(self):
