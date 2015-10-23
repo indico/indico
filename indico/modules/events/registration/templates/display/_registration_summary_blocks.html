@@ -1,4 +1,4 @@
-{% macro render_registration_info(registration) %}
+{% macro render_registration_info(registration, from_management=false) %}
     {% for section in registration.registration_form.sections -%}
         <tr>
             <td class="regform-done-title">{{ section.title }}</td>
@@ -7,16 +7,17 @@
             <tr>
                 <td class="regform-done-caption">{{ field.title }}</td>
                 <td class="regform-done-data">
-                    {{ render_data(registration, field) }}
+                    {{ render_data(registration, field, from_management) }}
                 </td>
             </tr>
         {%- endfor %}
     {%- endfor %}
 {% endmacro %}
 
-{% macro render_data(registration, field) %}
-    {% set friendly_data = registration.data_by_field[field.id].friendly_data %}
-    {% if field.input_type == 'accommodation' %}
+{% macro render_data(registration, field, from_management=false) %}
+    {% set data = registration.data_by_field %}
+    {% set friendly_data = data[field.id].friendly_data if field.id in data else '' %}
+    {% if field.input_type == 'accommodation' and friendly_data %}
         <div>
             {% trans arrival_date=friendly_data['arrival_date'] | format_date -%}
                 <strong>Arrival:</strong> {{ arrival_date }}
@@ -32,18 +33,20 @@
                 <strong>Accommodation:</strong> {{ accommodation }}
             {%- endtrans %}
         </div>
-    {% elif field.input_type == 'multi_choice' %}
+    {% elif field.input_type == 'multi_choice' and friendly_data %}
         <ul>
             {% for item in friendly_data -%}
                 <li>{{ item }}</li>
             {%- endfor %}
         </ul>
-    {% else %}
+    {% elif field.input_type == 'file' and friendly_data and from_management %}
+        <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ friendly_data }}</a>
+    {% elif friendly_data %}
         {{ friendly_data }}
     {% endif %}
 {% endmacro %}
 
-{% macro render_registration_summary(registration) %}
+{% macro render_registration_summary(registration, from_management=false) %}
     <div id="registration-summary" class="regform-done">
         <div class="i-box-header">
             <div class="i-box-title">
@@ -66,7 +69,7 @@
         </div>
         <div class="i-box-content">
             <table class="registration-info">
-                {{ render_registration_info(registration) }}
+                {{ render_registration_info(registration, from_management) }}
             </table>
         </div>
     </div>
