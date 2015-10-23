@@ -17,10 +17,8 @@
 from MaKaC.registration import Registrant
 from conference import Conference
 from badge import BadgeTemplateItem
-from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.i18n import _
 from indico.util.date_time import format_date
-from indico.util.string import safe_upper
 
 
 class RegistrantBadge:
@@ -29,61 +27,6 @@ class RegistrantBadge:
     def getArgumentType(cls):
         return Registrant
 
-class RegistrantCountry(RegistrantBadge):
-
-    @classmethod
-    def getValue(cls, reg):
-        return CountryHolder().getCountryById(reg.getCountry())
-
-
-class RegistrantFullName2(RegistrantBadge):
-    """
-    FullName without Title.
-    """
-    @classmethod
-    def getValue(cls, reg):
-        return reg.getFullName(title=False)
-
-class RegistrantFullName3(RegistrantBadge):
-    """
-    FullName with Title and with the FirstName first.
-    """
-    @classmethod
-    def getValue(cls, reg):
-        return reg.getFullName(firstNameFirst=True)
-
-class RegistrantFullName4(RegistrantBadge):
-    """
-    FullName without Title and with the FirstName first.
-    """
-    @classmethod
-    def getValue(cls, reg):
-        return reg.getFullName(title=False, firstNameFirst=True)
-
-class RegistrantFullName5(RegistrantBadge):
-    """
-    FullName with Title, the FirstName first and uppercase in surname.
-    """
-
-    @classmethod
-    def getValue(cls, reg):
-        res = "%s %s" % (reg.getFirstName(), safe_upper(reg.getFamilyName()))
-        res = res.strip()
-        if reg.getTitle() != "":
-            res = "%s %s" % (reg.getTitle(), res)
-        return res
-
-
-class RegistrantFullName6(RegistrantBadge):
-    """
-    FullName without Title, the FirstName first and uppercase inthe surname.
-    """
-
-    @classmethod
-    def getValue(cls, reg):
-        res = "%s %s" % (reg.getFirstName(), safe_upper(reg.getFamilyName()))
-        res = res.strip()
-        return res
 
 class ConferenceDates:
 
@@ -132,34 +75,34 @@ class BadgeDesignConfiguration:
       """
     def __init__(self):
 
-            self.items_actions = { "Title":               (_("Title"), Registrant.getTitle),
-                               "Full Name":               (_("Full Name"), Registrant.getFullName),
-                               "Full Name (w/o title)":   (_("Full Name (w/o title)"), RegistrantFullName2),
-                               "Full Name B":             (_("Full Name B"), RegistrantFullName3),
-                               "Full Name B (w/o title)": (_("Full Name B (w/o title)"), RegistrantFullName4),
-                               "Full Name C":             (_("Full Name C"), RegistrantFullName5),
-                               "Full Name C (w/o title)": (_("Full Name C (w/o title)"), RegistrantFullName6),
-                               "First Name":              (_("First Name"), Registrant.getFirstName),
-                               "Surname":                 (_("Surname"), Registrant.getSurName),
-                               "Position":                (_("Position"), Registrant.getPosition),
-                               "Institution":             (_("Institution"), Registrant.getInstitution),
-                               "Country":                 (_("Country"), RegistrantCountry),
-                               "City":                    (_("City"), Registrant.getCity),
-                               "Address":                 (_("Address"), Registrant.getAddress),
-                               "Phone":                   (_("Phone"), Registrant.getPhone),
-                               "Fax":                     (_("Fax"), Registrant.getFax),
-                               "Email":                   (_("Email"), Registrant.getEmail),
-                               "Personal homepage":       (_("Personal homepage"), Registrant.getPersonalHomepage),
-                               "Amount":                  (_("Amount"), Registrant.getTotal),
-                               "Conference Name":         (_("Conference Name"), Conference.getTitle),
-                               "Conference Dates":        (_("Conference Dates"), ConferenceDates),
-                               "Fixed Text":              (_("Fixed Text"), BadgeTemplateItem.getFixedText)
-                            }
+        self.items_actions = {
+            "Title": (_("Title"), lambda x: x.get_personal_data().get('title', '')),
+            "Full Name": (_("Full Name"), lambda x: "{} {} {}".format(x.get_personal_data().get('title', ''),
+                                                                      x.last_name, x.first_name)),
+            "Full Name (w/o title)": (_("Full Name (w/o title)"), lambda x: "{} {}".format(x.last_name, x.first_name)),
+            "Full Name B": (_("Full Name B"), lambda x: "{} {} {}".format(x.get_personal_data().get('title', ''),
+                                                                          x.first_name, x.last_name)),
+            "Full Name B (w/o title)": (_("Full Name B (w/o title)"), lambda x: "{} {}".format(x.first_name,
+                                                                                               x.last_name)),
+            "First Name": (_("First Name"), lambda x: x.first_name),
+            "Surname": (_("Surname"), lambda x: x.last_name),
+            "Institution": (_("Institution"), lambda x: x.get_personal_data().get('affiliation', '')),
+            "Address": (_("Address"), lambda x: x.get_personal_data().get('address', '')),
+            "Country": (_("Country"), lambda x: x.get_personal_data().get('country', '')),
+            "Phone": (_("Phone"), lambda x: x.get_personal_data().get('phone', '')),
+            "Email": (_("Email"), lambda x: x.email),
+            "Amount": (_("Amount"), lambda x: x.price),
+            "Conference Name": (_("Conference Name"), Conference.getTitle),
+            "Conference Dates": (_("Conference Dates"), ConferenceDates),
+            "Fixed Text": (_("Fixed Text"), BadgeTemplateItem.getFixedText)
+        }
 
-            """ Dictionary that maps group names to the item names that fall into that group.
-            The groups are only used for the <select> box in the WConfModifBadgeDesign.tpl file.
-            """
-            self.groups = [( _("Registrant Data"), [ "Title", "Full Name", "Full Name (w/o title)", "Full Name B", "Full Name B (w/o title)", "Full Name C", "Full Name C (w/o title)", "First Name",  "Surname",  "Position",
-                                                     "Institution",  "Country",  "City", "Address", "Phone", "Fax", "Email", "Personal homepage", "Amount"]),
-                      ( _("Conference Data"), [ "Conference Name",  "Conference Dates"]),
-                      ( _("Fixed Elements"), [ "Fixed Text"])]
+        # Dictionary that maps group names to the item names that fall into that group.
+        # The groups are only used for the <select> box in the WConfModifBadgeDesign.tpl file.
+        self.groups = [
+            (_("Registrant Data"), ["Title", "Full Name", "Full Name (w/o title)", "Full Name B",
+                                    "Full Name B (w/o title)", "First Name",  "Surname", "Institution", "Address",
+                                    "Country", "Phone", "Email", "Amount"]),
+            (_("Conference Data"), ["Conference Name",  "Conference Dates"]),
+            (_("Fixed Elements"), ["Fixed Text"])
+        ]

@@ -3135,7 +3135,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                                              self.__drawDashedRectangles,
                                              self.__registrantList,
                                              self.__landscape)
-            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=False)
 
 
 class RHConfBadgeSaveTempBackground(RHConfBadgeBase):

@@ -25,6 +25,7 @@ from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.config import Config
 from indico.core.db import db
+from indico.core.errors import FormValuesError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
@@ -46,8 +47,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
-from indico.core.errors import FormValuesError
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
+from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
 
 cache = GenericCache('reglist-config')
@@ -330,6 +331,23 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
     def _process(self):
         csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.special_items)
         return send_file('registrations.csv', csv_file, 'text/csv')
+
+
+class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
+    """Print badges for the selected registrations"""
+
+    def _process(self):
+        badge_templates = self.event.getBadgeTemplateManager().getTemplates().items()
+        badge_templates.sort(key=lambda x: x[1].getName())
+        pdf_options = WConfModifBadgePDFOptions(self.event).getHTML()
+        badge_design_url = url_for('event_mgmt.confModifTools-badgePrinting', self.event)
+        create_pdf_url = url_for('event_mgmt.confModifTools-badgePrintingPDF', self.event)
+
+        return WPManageRegistration.render_template('management/print_badges.html', self.event, regform=self.regform,
+                                                    templates=badge_templates, pdf_options=pdf_options,
+                                                    registrations=self.registrations,
+                                                    registration_ids=[x.id for x in self.registrations],
+                                                    badge_design_url=badge_design_url, create_pdf_url=create_pdf_url)
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):

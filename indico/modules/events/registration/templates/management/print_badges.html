@@ -1,0 +1,46 @@
+{% extends 'layout/full_content_base.html' %}
+{% from 'events/registration/management/_reglist.html' import render_registration_list %}
+{% from 'events/registration/management/_badges.html' import render_template_list, render_badges_registration_list %}
+
+{% block title %}
+    {%- trans %}Badges{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <form action="{{ create_pdf_url }}" method="post" target="_blank" class="i-form horizontal">
+        <div class="action-box">
+            <div class="section">
+                <div class="icon icon-tag"></div>
+                <div class="text">
+                    <div class="label">
+                        {%- trans title=regform.title -%}
+                            Print badges for registrations of "{{ title }}"
+                        {%- endtrans -%}
+                    </div>
+                    <div>{% trans %}Below you can configure the layout of the badges.{% endtrans %}</div>
+                </div>
+                <div class="toolbar right">
+                    <div class="group">
+                        <input class="i-button highlight" value="{% trans %}Print Badges{% endtrans %}"
+                               type="submit">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <fieldset>
+            <legend>{% trans %}List of available templates{% endtrans %}</legend>
+            {{ render_template_list(templates) }}
+            <a class="i-button right" href="{{ badge_design_url }}">
+                {%- trans %}Badge template design{% endtrans -%}
+            </a>
+        </fieldset>
+
+        <fieldset>
+            <legend>{% trans %}PDF Options{% endtrans %}</legend>
+            {{ pdf_options | safe }}
+        </fieldset>
+
+        {{ render_badges_registration_list(registrations, registration_ids) }}
+    </form>
+{% endblock %}
