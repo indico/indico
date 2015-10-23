@@ -219,6 +219,11 @@ class Registration(db.Model):
             loc['token'] = self.uuid
         return loc
 
+    @locator.uuid
+    def locator(self):
+        """A locator that uses uuid instead of id"""
+        return dict(self.registration_form.locator, token=self.uuid)
+
     @property
     def can_be_modified(self):
         regform = self.registration_form
