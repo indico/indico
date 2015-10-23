@@ -25,11 +25,13 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.payment.models.transactions import TransactionStatus
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
+from indico.util.i18n import L_
 from indico.util.string import return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
 
 
-class ModificationMode(int, IndicoEnum):
+class ModificationMode(TitledIntEnum):
+    __titles__ = [None, L_('Always'), L_('Until payment'), L_('Never')]
     allowed_always = 1
     allowed_until_payment = 2
     not_allowed = 3
