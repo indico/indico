@@ -4,10 +4,16 @@
             <td colspan="2">{{ section.title }}</td>
         </tr>
         {% for field in section.children if field.is_field and field.id in registration.data_by_field -%}
-            <tr>
-                <td class="regform-done-caption">{{ field.title }}</td>
+            <tr class="{{ 'deleted-field' if from_management and field.is_deleted }}">
+                <th class="regform-done-caption">{{ field.title }}</th>
                 <td class="regform-done-data">
                     {{- render_data(registration, field, from_management) -}}
+                    {% if from_management and field.is_deleted -%}
+                        <span class="icon-warning deleted-field-warning right"
+                              data-qtip-style="warning"
+                              title="{% trans %}This field no longer exists{% endtrans %}">
+                        </span>
+                    {% endif %}
                 </td>
             </tr>
         {%- endfor %}
