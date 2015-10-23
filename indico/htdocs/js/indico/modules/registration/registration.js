@@ -66,4 +66,21 @@
             cssDesc: 'header-sort-desc'
         });
     }
+
+    global.setupRegistrationFormListPage = function setupRegistrationFormListPage() {
+        $('#payment-disabled-notice').on('indico:confirmed', '.js-enable-payments', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function() {
+                    $('#payment-disabled-notice').remove();
+                }
+            });
+        });
+    };
 })(window);
