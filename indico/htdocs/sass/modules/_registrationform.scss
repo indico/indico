@@ -218,11 +218,16 @@
         }
     }
 
-    .regform-done-title {
-        @include border-bottom(lighten($gray, $color-variation));
-        display: block;
-        font-size: 1.3em;
-        margin: 15px 0 5px 0;
+    tr.regform-done-title {
+        td {
+            @include border-bottom(lighten($gray, $color-variation));
+            padding: 15px 0 5px 0;
+            font-size: 1.3em;
+        }
+
+        &:first-child td {
+            padding: 0;
+        }
     }
 
     tr:first-child .regform-done-title {

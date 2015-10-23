@@ -1,13 +1,13 @@
 {% macro render_registration_info(registration, from_management=false) %}
     {% for section in registration.registration_form.sections -%}
-        <tr>
-            <td class="regform-done-title">{{ section.title }}</td>
+        <tr class="regform-done-title">
+            <td colspan="2">{{ section.title }}</td>
         </tr>
         {% for field in section.children if field.is_field and field.id in registration.data_by_field -%}
             <tr>
                 <td class="regform-done-caption">{{ field.title }}</td>
                 <td class="regform-done-data">
-                    {{ render_data(registration, field, from_management) }}
+                    {{- render_data(registration, field, from_management) -}}
                 </td>
             </tr>
         {%- endfor %}
@@ -15,8 +15,8 @@
 {% endmacro %}
 
 {% macro render_data(registration, field, from_management=false) %}
-    {% set data = registration.data_by_field %}
-    {% set friendly_data = data[field.id].friendly_data if field.id in data else '' %}
+    {% set data = registration.data_by_field -%}
+    {% set friendly_data = data[field.id].friendly_data if field.id in data else '' -%}
     {% if field.input_type == 'accommodation' and friendly_data %}
         <div>
             {% trans arrival_date=friendly_data['arrival_date'] | format_date -%}
@@ -42,7 +42,7 @@
     {% elif field.input_type == 'file' and friendly_data and from_management %}
         <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ friendly_data }}</a>
     {% elif friendly_data %}
-        {{ friendly_data }}
+        {{- friendly_data -}}
     {% endif %}
 {% endmacro %}
 
