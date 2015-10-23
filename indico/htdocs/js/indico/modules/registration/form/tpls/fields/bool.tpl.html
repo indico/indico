@@ -19,7 +19,7 @@
             </option>
         </select>
 
-        <span ng-if="isBillable(field) && userdata[fieldName]">
+        <span ng-if="changesPrice(field) && userdata[fieldName]">
             <span class="regFormPrice">{{ field.price }}</span>
             <span class="regFormCurrency">{{ currency }}</span>
         </span>

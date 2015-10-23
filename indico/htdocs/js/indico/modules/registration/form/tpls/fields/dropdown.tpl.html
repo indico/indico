@@ -1,23 +1,30 @@
-<ng-form name="nestedForm" ng-init="input = getId(getValue(fieldName))">
-    <select
+<ng-form name="nestedForm" ng-init="input = getId(fieldName)">
+   <select
         id="{{ field.id }}"
         ng-model="input"
         ng-required="field.isRequired"
-        ng-disabled="anyBillableItemPayed(userdata)"
+        ng-disabled="!userdata.manager && selectedItemIsBillable(userdata)"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
-        ng-init="selectedItem = getSelectedItem(input) || {}"
-        ng-change="selectedItem = getSelectedItem(input) || {}"
-        ng-click="onSingleFieldItemChange($event)">
+        ng-change="selectedItem = getSelectedItem(input) || {}; onSingleFieldItemChange(selectedItem);">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.choices | filter:isVisible"
             id="{{ item.id }}"
             value="{{ item.id }}"
-            ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || paymentBlocked(item, userdata)"
-            ng-selected="item.caption == getValue(fieldName)">
+            ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || (!userdata.manager && paymentBlocked(item, userdata))"
+            ng-selected="item.id == getId(fieldName)">
             {{ item.caption }}
             {{ getBillableStr(item, getUserdataValue()) }}
         </option>
     </select>
+    <span ng-if="field.deletedChoice" class="icon-warning deleted-option-warning"
+          data-qtip-style="error"
+          title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
+    </span>
+    <span ng-if="!userdata.manager && userdata.paid && !field.billableDisabled && hasBillableOptions(field)"
+          class="icon-warning billable-items-warning right"
+          data-qtip-style="error"
+          title="{{ 'There are options that could trigger a price change and have been blocked.' | i18n }}">
+    </span>
     <div ng-repeat="item in field.choices | filter:isVisible">
         <span ng-if="field.withExtraSlots && item.maxExtraSlots && input==item.id">
             <label for="extraSlotsSelect-{{ item.id }}">
@@ -35,5 +42,5 @@
           class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
-    <input type="hidden" name="{{ fieldName }}">
+    <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
 </ng-form>

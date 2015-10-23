@@ -15,7 +15,7 @@
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
                             {% for item in basic_columns %}
-                                <th class="i-table" data-sorter="text">{{ item['caption'] }}</th>
+                                <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -62,16 +62,16 @@
                                     {% endif %}
                                 {% endfor %}
                                 {% for item in basic_columns %}
-                                    {% if item['id'] == 'reg_date' %}
+                                    {% if item.id == 'reg_date' %}
                                         <td class="i-table" data-text="{{ registration.submitted_dt }}">
                                             {{- registration.submitted_dt | format_datetime -}}
                                         </td>
-                                    {% elif item['id'] == 'state' %}
+                                    {% elif item.id == 'state' %}
                                         <td class="i-table">{{ registration.state.title }}</td>
-                                    {% elif item['id'] == 'price' %}
+                                    {% elif item.id == 'price' %}
                                         <td class="i-table">{{ registration.price }}</td>
                                     {% else %}
-                                        <td class="i-table">{{ data[item['id']].friendly_data }}</td>
+                                        <td class="i-table">{{ data[item.id].friendly_data }}</td>
                                     {% endif %}
                                 {% endfor %}
                             </tr>

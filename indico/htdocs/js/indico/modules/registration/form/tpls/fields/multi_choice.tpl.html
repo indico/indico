@@ -1,13 +1,22 @@
 <div ng-controller="BillableCtrl">
     <ng-form name="nestedForm">
+        <span ng-if="field.deletedChoice" class="icon-warning deleted-option-warning right"
+              data-qtip-style="error"
+              title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
+        </span>
+
         <ul>
             <li ng-repeat="item in field.choices | filter:{isEnabled: true}" ng-required="field.isRequired"
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}">
                 <input id="{{ item.id }}" type="checkbox" ng-click="multiFieldItemChecked($event)"
-                       ng-model="itemChecked">
+                       ng-disabled="isDisabled(item, getUserdataValue()) || !userdata.manager && paymentBlocked(item, userdata)"
+                       ng-model="itemChecked"
+                       data-paid="{{ userdata.paid }}"
+                       data-blocked="{{ paymentBlocked(item, userdata) }}"
+                       ng-checked="userdata[fieldName][item.id]">
                 <label for="{{ item.id }}">{{ field.captions[item.id] }}</label>
-                <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
-                <span ng-if="isBillable(item)">
+                <span ng-if="changesPrice(item)" class="regFormPrice">{{ item.price }}</span>
+                <span ng-if="changesPrice(item)">
                     <nd-currency currency="currency"></nd-currency>
                 </span>
                 <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, getUserdataValue())">
@@ -29,8 +38,13 @@
                             ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
                     </select>
                 </span>
+                <span ng-if="!userdata.manager && userdata.paid && changesPrice(item)"
+                      class="icon-warning billable-items-warning"
+                      data-qtip-style="error"
+                      title="{{ 'This option would result in a price change and has been blocked.' | i18n }}">
+                </span>
             </li>
-            <input type="hidden" name="{{ fieldName }}">
+            <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
         </ul>
         <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired"
               class="error-message-tag">

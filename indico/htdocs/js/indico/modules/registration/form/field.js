@@ -145,7 +145,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     var _checkEmailRemote = _.debounce(function _checkEmailRemote(email) {
         $.ajax({
             url: $scope.checkEmailUrl,
-            data: {email: email},
+            data: {email: email, update: $scope.updateMode ? $scope.registrationUuid : null},
             error: handleAjaxError,
             success: function(data) {
                 var msg;
@@ -155,6 +155,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     msg = $T.gettext('The user associated with this email address is already registered.');
                 } else if (data.conflict == 'no-user') {
                     msg = $T.gettext('There is no Indico user associated with this email address.');
+                } else if (data.conflict == 'email-not-user') {
+                    msg = $T.gettext("Email doesn't match registered user");
                 } else if (!data.user) {
                     msg = $T.gettext('The registration will not be associated with any Indico account.');
                 } else if (data.self) {
@@ -200,7 +202,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
     $scope.getBillableStr = function(item, uservalue) {
         var str = '';
 
-        if ($scope.isBillable(item)) {
+        if ($scope.changesPrice(item)) {
             str += ' {0} {1}'.format(item.price, $scope.currency);
         }
 
@@ -241,11 +243,6 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         return places;
     };
 
-    $scope.isBillable = function(item) {
-        item = item || {};
-        return item.isBillable;
-    };
-
     $scope.isDisabled = function(item, uservalue) {
         item = item || {};
         return !$scope.hasPlacesLeft(item, uservalue) || !item.isEnabled;
@@ -275,10 +272,16 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         userdata = userdata || {};
 
         if (validation !== undefined) {
-            return ($scope.isBillable(item) && userdata.paid) || validation(userdata);
+            return ($scope.changesPrice(item) && userdata.paid) || validation(userdata);
         } else {
-            return $scope.isBillable(item) && userdata.paid;
+            return $scope.changesPrice(item) && userdata.paid;
         }
+    };
+
+    $scope.hasBillableOptions = function(field) {
+        return !!_.find(field.choices, function(item) {
+            return item.isBillable && item.price !== 0;
+        });
     };
 
     $scope.isVisible = function(field) {
@@ -296,11 +299,22 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
         link: function(scope) {
             // This is a broadcast message from parent (section) scope
             // TODO look for broadcast messages to children the angular way
+
+            scope.changesPrice = function(item) {
+                return item && item.isBillable && item.price !== 0;
+            };
+
             scope.$parent.$watch('dialogs.newfield', function(val) {
                 if (val && scope.isNew()) {
                     scope.dialog.open = true;
                     scope.$parent.dialogs.newfield = false;
                 }
+
+                // After the field is loaded, we can check whether it's billable, etc
+                // and disable it if needed
+                scope.field.billableDisabled = !scope.userdata.manager && (scope.userdata.paid &&
+                    (scope.settings.isBillable && scope.field.price > 0)) ||
+                    (scope.selectedItemIsBillable && scope.selectedItemIsBillable(scope.userdata));
             });
         }
     };
@@ -474,12 +488,12 @@ var ndSelectController = function($scope) {
         return true;
     };
 
-    $scope.onSingleFieldItemChange = function(event) {
+    $scope.onSingleFieldItemChange = function(item) {
         var valueElement = $('input[name={0}]'.format($scope.field.htmlName)),
             data = {},
             target = $(event.target);
-        if (target.val()) {
-            data[target.val()] = (+$('#extraSlotsSelect-{0}'.format(target.val())).val() + 1) || 1;
+        if (item) {
+            data[item.id] = (+$('#extraSlotsSelect-{0}'.format(item.id)).val() + 1) || 1;
         }
         valueElement.val(JSON.stringify(data));
     };
@@ -504,6 +518,18 @@ var ndSelectController = function($scope) {
             valueElement.val(JSON.stringify(data));
         }
     };
+
+    $scope.selectedItemIsBillable = function(userdata) {
+        if (userdata.paid) {
+            var item = _.find($scope.field.choices, function(item) {
+                return userdata[$scope.field.htmlName] ? !!userdata[$scope.field.htmlName][item.id] : false;
+            }) || {};
+
+            return $scope.changesPrice(item);
+        }
+
+        return false;
+    };
 };
 
 ndRegForm.directive('ndRadioField', function(url) {
@@ -524,42 +550,14 @@ ndRegForm.directive('ndRadioField', function(url) {
             });
 
             scope.getUserdataValue = function() {
-                return scope.getId(scope.getValue(scope.fieldName));
+                return scope.getId(scope.fieldName);
             };
 
             scope.getInputTpl = function(itemType) {
                 return url.tpl('fields/{0}.tpl.html'.format(itemType));
             };
 
-            scope.anyBillableItemPayed = function(userdata) {
-                if (userdata.paid) {
-                    var item = _.find(scope.field.choices, function(item) {
-                        return item.caption == userdata[scope.field.htmlName];
-                    }) || {};
-
-                    return item.isBillable && item.price !== 0;
-                }
-
-                return false;
-            };
-
-            scope.getId = function(fieldValue) {
-                var id;
-
-                if (fieldValue !== undefined) {
-                    var item = _.find(scope.field.choices, function(item) {
-                        return item.caption == fieldValue;
-                    });
-
-                    if (item !== undefined) {
-                        id = item.id;
-                    }
-                }
-
-                return id;
-            };
-
-            scope.getValue = function(fieldName) {
+            scope.getId = function(fieldName) {
                 if (!scope.userdata[fieldName] || scope.userdata[fieldName] === '') {
                     if (scope.field.defaultItem && scope.field.captions) {
                         return scope.field.captions[scope.field.defaultItem] || '';
@@ -567,7 +565,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                         return '';
                     }
                 } else {
-                    return scope.userdata[fieldName];
+                    return _.keys(scope.userdata[fieldName]);
                 }
             };
 
@@ -866,9 +864,11 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             });
 
             scope.billableOptionPayed = function(userdata) {
-                if (userdata.accommodation !== undefined) {
-                    var accommodation = userdata.accommodation.accommodationType || {};
-                    return accommodation.billable === true && userdata.paid === true;
+                if (userdata[scope.field.htmlName] !== undefined) {
+                    var choice = _.find(scope.field.choices, function(choice) {
+                        return userdata[scope.field.htmlName].choice == choice.id;
+                    });
+                    return choice.isBillable && userdata.paid;
                 }
 
                 return false;

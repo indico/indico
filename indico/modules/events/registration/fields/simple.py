@@ -30,13 +30,35 @@ from indico.core.db import db
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.registrations import RegistrationData
-from indico.util.date_time import iterdays, format_date
+from indico.util.date_time import format_date, iterdays
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
 from indico.util.string import crc32, normalize_phone_number, snakify_keys
 from indico.web.forms.fields import IndicoRadioField, JSONField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
+
+
+def get_field_merged_options(field, registration_data):
+    rdata = registration_data.get(field.id)
+
+    try:
+        val = rdata.data.keys()[0]
+    except (AttributeError, IndexError):
+        val = None
+
+    result = deepcopy(field.view_data)
+
+    if val and not any(item['id'] == val for item in result['choices']):
+        field_data = rdata.field_data
+        merged_data = field.field_impl.unprocess_field_data(field_data.versioned_data,
+                                                            field_data.field.data)
+        missing_option = next((choice for choice in merged_data['choices'] if choice['id'] == val), None)
+        if missing_option:
+            result['choices'].append(missing_option)
+            result['deletedChoice'] = True
+
+    return result
 
 
 class TextField(RegistrationFormFieldBase):

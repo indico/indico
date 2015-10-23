@@ -38,8 +38,8 @@
        <div class="toolbar right">
            {% if registration.registration_form.modification_mode.name != 'not_allowed' %}
                <div class="group">
-                   {# TODO: link to registration modification #}
-                   <a href="#" class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
+                   <a href="{{ url_for('.edit_registration_display', registration) }}"
+                      class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
                        {% if not registration.can_be_modified %}
                            {% if not registration.registration_form.is_modification_open -%}
                                title="{% trans %}The modification period is over{% endtrans %}"

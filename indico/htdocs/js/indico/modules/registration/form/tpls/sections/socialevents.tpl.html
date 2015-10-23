@@ -44,7 +44,7 @@
                 [{{ getPlacesLeft(item, getNoPlacesFromUserData(item), getNoPlaces(item))}} {{ 'place(s) left' | i18n }}]
             </span>
         </td>
-        <td ng-if="hasPlacesLeft(item, getNoPlacesFromUserData(item)) && isBillable(item)" align="right">
+        <td ng-if="hasPlacesLeft(item, getNoPlacesFromUserData(item)) && changesPrice(item)" align="right">
             <span class="regFormPrice">{{ item.price }}</span>
             <span ng-show="item.billable">
                 <nd-currency currency="currency"></nd-currency>

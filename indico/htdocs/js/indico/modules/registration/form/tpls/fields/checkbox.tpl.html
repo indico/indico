@@ -4,6 +4,7 @@
             <input type="checkbox"
                 id="field-{{ section.id }}-{{ field.id }}"
                 name="{{ field.htmlName }}"
+                ng-disabled="field.billableDisabled"
                 ng-model="checkboxValue"
                 ng-required="field.isRequired"
                 ng-disabled="!hasPlacesLeft(field, getUserdataValue()) || paymentBlocked(field, userdata)">
@@ -22,8 +23,8 @@
     </ng-form>
 
     <div class="checkbox-info">
-        <span ng-if="isBillable(field)" class="regFormPrice">{{ field.price }}</span>
-        <span ng-if="isBillable(field)">
+        <span ng-if="changesPrice(field)" class="regFormPrice">{{ field.price }}</span>
+        <span ng-if="changesPrice(field)">
             <nd-currency currency="currency"></nd-currency>
         </span>
 

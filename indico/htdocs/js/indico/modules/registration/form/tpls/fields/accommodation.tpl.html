@@ -11,9 +11,12 @@
                         id="arrivalDate"
                         ng-model="accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
-                        ng-options="arrivalDate for arrivalDate in field.arrivalDates track by arrivalDate"
-                        ng-disabled="billableOptionPayed(userdata)">
+                        ng-disabled="!userdata.manager && billableOptionPayed(userdata)">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
+                        <option ng-repeat="date in field.arrivalDates" value="{{ date[0] }}"
+                                ng-selected="userdata[fieldName].arrivalDate == date[0]">
+                            {{ date [1]}}
+                        </option>
                     </select>
                     <input type="hidden"
                         ng-if="billableOptionPayed(userdata)"
@@ -32,9 +35,12 @@
                         id="departureDate"
                         ng-model="accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
-                        ng-options="departureDate for departureDate in field.departureDates track by departureDate"
-                        ng-disabled="billableOptionPayed(userdata)">
+                        ng-disabled="!userdata.manager && billableOptionPayed(userdata)">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
+                        <option ng-repeat="date in field.departureDates" value="{{ date[0] }}"
+                                ng-selected="userdata[fieldName].departureDate == date[0]">
+                            {{ date [1]}}
+                        </option>
                     </select>
                     <input type="hidden"
                         ng-if="billableOptionPayed(userdata)"
@@ -63,8 +69,9 @@
                         id="{{ item.id }}"
                         name="accommodationType-{{ field.id }}"
                         value="{{ item.id }}"
+                        ng-checked="userdata[fieldName].choice == item.id"
                         ng-model="accommodation.typeId"
-                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id) || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
+                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id) || !userdata.manager && (paymentBlocked(item, userdata) || billableOptionPayed(userdata))"
                         ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id) && !item.cancelled"/>
                     {{ item.caption }}
 
@@ -93,11 +100,18 @@
                         <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
                     </span>
                 </td>
+                <td>
+                    <span ng-if="!userdata.manager && (paymentBlocked(item, userdata) || billableOptionPayed(userdata))"
+                          class="icon-warning billable-items-warning"
+                          data-qtip-style="error"
+                          title="{{ 'This option could trigger a price change and has been blocked.' | i18n }}">
+                    </span>
+                </td>
             </tr>
         </table>
         <input type="hidden"
             ng-if="billableOptionPayed(userdata)"
             value="{{ accommodation.typeId }}"/>
-        <input type="hidden" name="{{ field.htmlName }}">
+        <input type="hidden" name="{{ field.htmlName }}" value="{{ userdata[fieldName] }}">
     </ng-form>
 </div>

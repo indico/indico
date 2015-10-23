@@ -24,13 +24,14 @@ from flask import current_app, session
 from wtforms import ValidationError
 
 from indico.modules.events.registration import logger
+from indico.modules.events.registration.fields.simple import ChoiceBaseField, get_field_merged_options
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormFieldData)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
                                                              RegistrationFormItemType, PersonalDataType)
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_creation
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
@@ -54,16 +55,39 @@ def user_registered_in_event(user, event):
                 .count())
 
 
-def get_event_section_data(regform, management=False):
-    return [s.view_data for s in regform.sections if not s.is_deleted and (management or not s.is_manager_only)]
+def get_event_section_data(regform, management=False, registration=None):
+    data = []
+    if not registration:
+        return [s.view_data for s in regform.sections if not s.is_deleted and (management or not s.is_manager_only)]
+
+    registration_data = {r.field_data.field.id: r for r in registration.data}
+    for section in regform.sections:
+        if section.is_deleted or (not management and section.is_manager_only):
+            continue
+
+        section_data = section.own_data
+        section_data['items'] = []
+
+        for child in section.children:
+            if child.is_deleted:
+                continue
+            if isinstance(child.field_impl, ChoiceBaseField):
+                field_data = get_field_merged_options(child, registration_data)
+            else:
+                field_data = child.view_data
+            section_data['items'].append(field_data)
+        data.append(section_data)
+    return data
 
 
-def make_registration_form(regform, management=False):
+def make_registration_form(regform, management=False, registration=None):
     """Creates a WTForm based on registration form fields"""
 
     class RegistrationFormWTF(IndicoForm):
         def validate_email(self, field):
-            if regform.get_registration(email=field.data):
+            existing_registration = regform.get_registration(email=field.data)
+            if ((registration is None and existing_registration) or
+                    (registration is not None and registration != existing_registration)):
                 raise ValidationError('Email already in use')
 
     for form_item in regform.active_fields:
@@ -121,7 +145,7 @@ def create_registration(regform, data, invitation=None):
         else:
             value = data.get(form_item.html_field_name)
         with db.session.no_autoflush:
-            form_item.field_impl.save_data(registration, value)
+            registration.data.append(RegistrationData(**form_item.field_impl.process_form_data(registration, value)))
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
     if invitation is None:
@@ -139,6 +163,36 @@ def create_registration(regform, data, invitation=None):
     notify_registration_creation(registration)
     logger.info('New registration %s by %s', registration, session.user)
     return registration
+
+
+def modify_registration(registration, data, event, management=False):
+    with db.session.no_autoflush:
+        regform = registration.registration_form
+        data_by_field = registration.data_by_field
+
+        for form_item in regform.active_fields:
+            if form_item.parent.is_manager_only and not management:
+                with db.session.no_autoflush:
+                    value = form_item.field_impl.default_value
+            else:
+                value = data.get(form_item.html_field_name)
+
+            if form_item.id not in data_by_field:
+                data_by_field[form_item.id] = RegistrationData(registration=registration,
+                                                               field_data=form_item.current_data)
+
+            attrs = form_item.field_impl.process_form_data(registration, value, data_by_field[form_item.id])
+
+            for key, val in attrs.iteritems():
+                setattr(data_by_field[form_item.id], key, val)
+            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+                setattr(registration, form_item.personal_data_type.column, value)
+        registration.update_state()
+
+    # TODO: notify_registration_modification
+
+    db.session.flush()
+    logger.info('Registration {} modified by {}', registration, session.user)
 
 
 def _prepare_data(data):

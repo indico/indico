@@ -23,7 +23,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
-from indico.modules.events.registration.controllers import RegistrationFormMixin
+from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -135,17 +135,31 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
     def _process(self):
         email = request.args['email'].lower().strip()
-        if self.regform.get_registration(email=email):
-            return jsonify(conflict='email')
         user = get_user_by_email(email)
-        if user and self.regform.get_registration(user=user):
-            return jsonify(conflict='user')
-        elif user:
-            return jsonify(user=user.full_name, self=(user == session.user))
-        elif self.regform.require_user:
-            return jsonify(conflict='no-user')
+        update = request.args.get('update')
+
+        if update:
+            existing = self.regform.get_registration(uuid=update)
+            if existing.user != user:
+                return jsonify(conflict='email-not-user')
+            elif user:
+                return jsonify(user=user.full_name, self=(user == session.user))
+            elif self.regform.require_user:
+                return jsonify(conflict='no-user')
+            else:
+                return jsonify(user=None)
         else:
-            return jsonify(user=None)
+            if self.regform.get_registration(email=email):
+                return jsonify(conflict='email')
+            user = get_user_by_email(email)
+            if user and self.regform.get_registration(user=user):
+                return jsonify(conflict='user')
+            elif user:
+                return jsonify(user=user.full_name, self=(user == session.user))
+            elif self.regform.require_user:
+                return jsonify(conflict='no-user')
+            else:
+                return jsonify(user=None)
 
 
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
@@ -188,6 +202,17 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                currency=payment_event_settings.get(self.event, 'currency'),
                                                user_data=user_data, invitation=self.invitation,
                                                registration=self.registration)
+
+
+class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
+    """Submit a registration form"""
+
+    template_file = 'display/registration_modify.html'
+    management = False
+
+    @property
+    def success_url(self):
+        return url_for('.display_regform', self.registration.locator.registrant)
 
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):

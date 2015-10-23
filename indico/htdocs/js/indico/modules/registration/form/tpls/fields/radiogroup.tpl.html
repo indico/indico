@@ -1,10 +1,15 @@
 <ng-form name="nestedForm">
+    <span ng-if="field.deletedChoice" class="icon-warning deleted-option-warning right"
+          data-qtip-style="error"
+          title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
+    </span>
+
     <ul ng-class="{hasError: validationStarted && nestedForm.$invalid}">
         <li ng-if="!field.isRequired">
             <input type="radio" name="radio-field-{{ fieldName }}" value=""
                    ng-model="radioValue.id"
-                   ng-click="onSingleFieldItemChange($event)"
-                   ng-disabled="paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
+                   ng-click="onSingleFieldItemChange({'': 1})"
+                   ng-disabled="field.billableDisabled || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
             {{ 'None' | i18n }}
         </li>
         <li ng-repeat="item in field.choices">
@@ -14,14 +19,13 @@
                 value="{{ item.id }}"
                 ng-model="radioValue.id"
                 ng-required="field.isRequired && radioValue.id === undefined"
-                ng-disabled="isDisabled(item, getUserdataValue()) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"
-                ng-click="onSingleFieldItemChange($event)"/>
+                ng-disabled="isDisabled(item, getUserdataValue()) || !userdata.manager && (paymentBlocked(item, userdata) || selectedItemIsBillable(userdata))"
+                ng-click="onSingleFieldItemChange(item)"/>
             <label ng-class="{'text-error': validationStarted && nestedForm.$invalid}" for="field-{{ section.id }}-{{ field.id }}-{{ item.id }}">
                 {{ item.caption }}
             </label>
-
-            <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
-            <span ng-if="isBillable(item)">
+            <span ng-if="changesPrice(item)" class="regFormPrice">{{ item.price }}</span>
+            <span ng-if="changesPrice(item)">
                 <nd-currency currency="currency"></nd-currency>
             </span>
 
@@ -32,6 +36,11 @@
                 <span ng-switch-when="true" class="available-text" style="margin-left: 25px;">
                     [{{ getPlacesLeft(item, getUserdataValue(), radioValue.id) }} {{ 'place(s) left' | i18n }}]
                 </span>
+            </span>
+            <span ng-if="!userdata.manager && !field.billableDisabled &&(paymentBlocked(item, userdata) || selectedItemIsBillable(userdata))"
+                  class="icon-warning billable-items-warning"
+                  data-qtip-style="error"
+                  title="{{ 'This option could trigger a price change and has been blocked.' | i18n }}">
             </span>
         </li>
     </ul>
@@ -48,5 +57,6 @@
             </select>
         </span>
     </div>
-    <input type="hidden" name="{{ fieldName }}">
+
+    <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
 </ng-form>

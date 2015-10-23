@@ -21,8 +21,8 @@
                         ng-checked="isSelected(item.id)"
                         ng-disabled="paymentBlocked(item, userdata)"/>
                     {{ item.caption }}
-                    <span ng-show="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
-                    <span ng-show="isBillable(item)">
+                    <span ng-show="changesPrice(item)" class="regFormPrice">{{ item.price }}</span>
+                    <span ng-show="changesPrice(item)">
                         <nd-currency currency="currency"></nd-currency>
                     </span>
                 </div>

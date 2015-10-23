@@ -536,7 +536,33 @@
             margin: 0 2px;
         }
     }
+
+    .deleted-option-warning {
+        margin-left: 1em;
+        color: $yellow;
+        vertical-align: middle;
+        font-size: 1.1em;
+    }
+
+    .billable-items-warning {
+        margin-left: 0.5em;
+        color: $yellow;
+        font-size: 1.1em;
+    }
 }
+
+.regform-field.billable-disabled {
+    background-color: lighten($pastel-gray, 5%);
+    padding-top: 10px;
+
+    .billable-disabled-warning {
+        width: 50px;
+        margin-left: 0.5em;
+        font-size: 2em;
+        color: $gray;
+    }
+}
+
 
 // ============================================================================
 // Section-specific

@@ -16,10 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import flash, redirect, request
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.util import modify_registration, get_event_section_data, make_registration_form
+from indico.modules.payment import event_settings as payment_event_settings
+from indico.util.string import camelize_keys
 
 
 class RegistrationFormMixin(object):
@@ -36,3 +40,32 @@ class RegistrationFormMixin(object):
                         .find(id=request.view_args['reg_form_id'], is_deleted=False)
                         .options(defaultload('form_items').joinedload('children').joinedload('current_data'))
                         .one())
+
+
+class RegistrationEditMixin(object):
+
+    def _process(self):
+        form = make_registration_form(self.regform, management=self.management, registration=self.registration)()
+
+        if form.validate_on_submit():
+            modify_registration(self.registration, form.data, self.event, management=self.management)
+            return redirect(self.success_url)
+        elif form.is_submitted():
+            # not very pretty but usually this never happens thanks to client-side validation
+            for error in form.error_list:
+                flash(error, 'error')
+
+        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.data) for r in self.registration.data}
+        section_data = camelize_keys(get_event_section_data(
+            self.regform, management=self.management, registration=self.registration))
+
+        registration_data.update({
+            'paid': self.registration.state == RegistrationState.complete,
+            'manager': self.management
+        })
+
+        return self.view_class.render_template(self.template_file, self.event, event=self.event,
+                                               sections=section_data, regform=self.regform,
+                                               currency=payment_event_settings.get(self.event, 'currency'),
+                                               registration_data=registration_data,
+                                               registration=self.registration)
