@@ -168,9 +168,10 @@ class DateField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
 
     def save_data(self, registration, value):
-        # TODO: fix client side code to send us time information then adapt the next line
-        date_format = self.form_item.data['date_format'].split(' ')[0]
-        value = datetime.strptime(value, date_format).isoformat()
+        if value:
+            # TODO: fix client side code to send us time information then adapt the next line
+            date_format = self.form_item.data['date_format'].split(' ')[0]
+            value = datetime.strptime(value, date_format).isoformat()
         return super(DateField, self).save_data(registration, value)
 
     def get_friendly_data(self, registration_data):
