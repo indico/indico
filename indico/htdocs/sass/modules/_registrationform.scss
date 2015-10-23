@@ -181,9 +181,17 @@
     }
 
     .email-info {
+        margin-top: 0.5em;
+        padding: 0.2em;
+        background-color: $light-green;
+        color: $light-black;
+
         &.error {
             @include icon-before(icon-warning);
-            color: $red;
+            background-color: $light-red;
+            &:before {
+                margin-right: 0.2em;
+            }
         }
     }
 
