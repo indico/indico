@@ -22,8 +22,10 @@ from datetime import datetime
 from uuid import uuid4
 
 import wtforms
+from sqlalchemy.dialects.postgresql import ARRAY
 from wtforms.validators import NumberRange, ValidationError
 
+from indico.core.db import db
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -104,6 +106,9 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         versioned_data['choices'] = items
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
+
+    def create_sql_filter(self, data_list):
+        return RegistrationData.data.has_any(db.func.cast(data_list, ARRAY(db.String)))
 
     def calculate_price(self, registration_data):
         if not registration_data.data:

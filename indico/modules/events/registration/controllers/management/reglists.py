@@ -55,19 +55,20 @@ cache = GenericCache('reglist-config')
 def _get_filters_from_request(regform):
     filters = {}
     for field in regform.form_items:
-        if field.is_field and field.input_type in {'single_choice', 'country', 'bool', 'checkbox'}:
+        if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox'}:
             options = request.form.getlist('field_{}'.format(field.id))
             if options:
                 filters[field.id] = options
     return filters
 
 
-def _filter_registration(query, filters):
+def _filter_registration(regform, query, filters):
     if not filters:
         return query
 
+    field_types = {f.id: f.field_impl for f in regform.form_items if not f.is_deleted and f.is_field}
     criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
-                        RegistrationData.data.op('#>>')('{}').in_(data_list))
+                        field_types[field_id].create_sql_filter(data_list))
                 for field_id, data_list in filters.iteritems()]
     subquery = (RegistrationData.query
                 .with_entities(db.func.count(RegistrationData.registration_id))
@@ -114,7 +115,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                                                       ~RegistrationFormItem.is_deleted)
         registrations_query = _query_registrations(self.regform)
         total_regs = registrations_query.count()
-        registrations = _filter_registration(registrations_query, reg_list_config['filters']).all()
+        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
                                                     registrations=registrations, special_items=special_items,
@@ -144,7 +145,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
                                                       ~RegistrationFormItem.is_deleted)
         registrations_query = _query_registrations(self.regform)
         total_regs = registrations_query.count()
-        registrations = _filter_registration(registrations_query, filters).all()
+        registrations = _filter_registration(self.regform, registrations_query, filters).all()
         tpl = get_template_module('events/registration/management/_reglist.html')
         reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
                                                 special_items=special_items, total_registrations=total_regs)
