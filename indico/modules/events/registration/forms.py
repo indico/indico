@@ -22,12 +22,13 @@ from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.html5 import NumberInput
 
+from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField
+from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
@@ -53,6 +54,8 @@ class RegistrationFormForm(IndicoForm):
     registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
                                       description=_("Maximum number of registrations"))
+    modification_mode = IndicoEnumSelectField(_("Modification allowed"), enum=ModificationMode,
+                                              description=_("Will users be able to modify their data? When?"))
     publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
                                                  description=_("Registrations from this form will be displayed in the "
                                                                "event page"))
