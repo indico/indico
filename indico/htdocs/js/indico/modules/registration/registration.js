@@ -54,9 +54,9 @@
                 url: $this.data('href'),
                 error: handleAjaxError,
                 complete: IndicoUI.Dialogs.Util.progress(),
-                data: {payment_status: $this.data('payment-completed')},
+                data: {pay: $this.data('pay')},
                 success: function(data) {
-                    $('.management-page').html(data.html)
+                    $('.management-page').html(data.html);
                 }
             });
         });

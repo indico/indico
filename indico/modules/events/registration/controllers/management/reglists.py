@@ -32,6 +32,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
+from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.forms import EmailRegistrantsForm
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
@@ -335,16 +336,21 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
     """Modify the payment status of a registration"""
 
     def _process(self):
-        payment_completed = request.form.get('payment_status') == '1'
-        currency = payment_event_settings.get(self.registration.registration_form.event, 'currency')
-        action = TransactionAction.complete if not payment_completed else TransactionAction.cancel
-        register_transaction(registration=self.registration,
-                             amount=self.registration.price,
-                             currency=currency,
-                             action=action,
-                             data={'changed_by_name': session.user.full_name,
-                                   'changed_by_id': session.user.id})
-        flash(_("The registration payment was updated successfully."), 'success')
+        pay = request.form.get('pay') == '1'
+        can_be_paid = pay and self.registration.state == RegistrationState.unpaid
+        can_be_unpaid = not pay and self.registration.state == RegistrationState.complete and self.registration.price
+        if can_be_paid or can_be_unpaid:
+            event = self.registration.registration_form.event
+            currency = payment_event_settings.get(event, 'currency') if pay else self.registration.transaction.currency
+            amount = self.registration.price if pay else self.registration.transaction.amount
+            action = TransactionAction.complete if pay else TransactionAction.cancel
+            register_transaction(registration=self.registration,
+                                 amount=amount,
+                                 currency=currency,
+                                 action=action,
+                                 data={'changed_by_name': session.user.full_name,
+                                       'changed_by_id': session.user.id})
+            flash(_("The registration payment was updated successfully."), 'success')
         return jsonify_template('events/registration/management/registration_details.html',
                                 registration=self.registration,
                                 payment_enabled=self.event.has_feature('payment'))
