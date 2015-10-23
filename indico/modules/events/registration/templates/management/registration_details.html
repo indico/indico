@@ -6,6 +6,10 @@
     {%- trans %}Registration details{% endtrans -%}
 {% endblock %}
 
+{% block subtitle %}
+    #{{registration.friendly_id}}: {{registration.first_name}} {{ registration.last_name }}
+{% endblock %}
+
 {% block content %}
     {{ render_registration_summary(registration, from_management) }}
     {% call render_payment_summary(registration, payment_enabled) %}
@@ -39,9 +43,11 @@
             </tr>
         </table>
     {% endcall %}
-    <a href="{{ url_for('.edit_registration', registration) }}" class="i-button big highlight">
+
+    <button data-href="{{ url_for('.edit_registration', registration) }}" data-method="GET"
+       class="i-button big highlight" {% if registration.is_cancelled %} disabled="disbled"{% endif %}>
         {%- trans %}Modify{% endtrans -%}
-    </a>
+    </button>
     <a href="{{ url_for('.manage_reglist', registration.registration_form) }}" class="i-button big">
         {%- trans %}Back{% endtrans -%}
     </a>

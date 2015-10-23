@@ -28,14 +28,17 @@ from indico.core.db import db
 from indico.core.errors import FormValuesError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration import logger
+from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormItem
+from indico.modules.events.registration.forms import EmailRegistrantsForm
+from indico.modules.events.registration.models.items import (RegistrationFormItemType, RegistrationFormItem,
+                                                             PersonalDataType)
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
-from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
+from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
+                                                                   RegistrationFormPersonalDataField)
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.views import WPManageRegistration
-from indico.modules.events.registration.forms import EmailRegistrantsForm
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_csv_from_registrations)
 from indico.modules.payment import event_settings as payment_event_settings
@@ -153,10 +156,10 @@ def _column_ids_to_db(form, ids):
     result = []
     for item_id in ids:
         if isinstance(item_id, basestring):
-            personal_data = getattr(PersonalDataType, item_id, None)
+            personal_data = PersonalDataType.get(item_id)
             if personal_data:
-                result.append(RegistrationFormItem.find_one(registration_form=form,
-                                                            personal_data_type=personal_data).id)
+                result.append(RegistrationFormPersonalDataField.find_one(registration_form=form,
+                                                                         personal_data_type=personal_data).id)
             else:
                 result.append(item_id)
         else:
@@ -201,7 +204,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
     def _process_GET(self):
         reg_list_config = _get_reg_list_config(self.regform)
         item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
-        visible_columns = reg_list_config['items']  # _get_real_column_ids(self.regform, reg_list_config['items'])
+        visible_columns = reg_list_config['items']
 
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
                                                     event=self.event, RegistrationFormItemType=RegistrationFormItemType,
@@ -284,12 +287,22 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
         return send_file(metadata['filename'], BytesIO(data.file), mimetype=metadata['content_type'], conditional=True)
 
 
-class RHRegistrationEdit(RHManageRegistrationBase):
-    """Edit the submitted information of a registration"""
+class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
+    """Edit the submitted information of a registration."""
 
-    def _process(self):
-        return WPManageRegistration.render_template('management/registration_modify.html', self.event,
-                                                    registration=self.registration)
+    view_class = WPManageRegistration
+    template_file = 'management/registration_modify.html'
+    management = True
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.registration
+        }
+    }
+
+    @property
+    def success_url(self):
+        return url_for('.registration_details', self.registration)
 
 
 class RHRegistrationsActionBase(RHManageRegFormBase):
@@ -410,7 +423,7 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
     """Export registration list to a CSV file"""
 
     def _process(self):
-        csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.basic_item_ids)
+        csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.special_item_ids)
         return send_file('registrations.csv', csv_file, 'text/csv')
 
 

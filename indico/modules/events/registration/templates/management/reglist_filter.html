@@ -5,7 +5,7 @@
     {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
         {% set filter_choices = child_item.field_impl.filter_choices %}
         <div class="i-label reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
-             data-id="{{ child_item.id }}">
+             data-id="{{ child_item.personal_data_type.name if child_item.personal_data_type else child_item.id }}">
             <span class="title {% if filter_choices %}icon-filter{% endif %}"
                   data-toggle="dropdown">
                 {{- child_item.title -}}
@@ -56,21 +56,18 @@
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
-    <div class="i-label reglist-column js-regform-item" data-id="reg_date">
-        <span class="title">{% trans %}Registration date{% endtrans %}</span>
-        <span class="right actions"><span class="trigger icon-eye"></span></span>
-    </div>
-    <div class="i-label reglist-column js-regform-item" data-id="state">
-        <span class="title">{% trans %}Registration state{% endtrans %}</span>
-        <span class="right actions"><span class="trigger icon-eye"></span></span>
-    </div>
-    <div class="i-label reglist-column js-regform-item" data-id="price">
-        <span class="title">{% trans %}Price{% endtrans %}</span>
-        <span class="right actions"><span class="trigger icon-eye"></span></span>
-    </div>
+
+    {% for item_id, caption in special_items.iteritems() %}
+        <div class="i-label reglist-column js-regform-item" data-id="{{ item_id }}">
+            <span class="title">{{ caption }}</span>
+            <span class="right actions"><span class="trigger icon-eye"></span></span>
+        </div>
+    {% endfor %}
+
     {% for section in regform.sections %}
         {{ _render_regform_item_col_selector(section) }}
     {% endfor %}
+
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
                value="{% trans %}Apply{% endtrans %}">

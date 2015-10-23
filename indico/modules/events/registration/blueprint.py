@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
-from indico.modules.events.registration.controllers.display import (RHRegistrationFormList, RHRegistrationForm,
+from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationFormList,
+                                                                    RHRegistrationForm,
                                                                     RHRegistrationFormCheckEmail,
                                                                     RHRegistrationFormDeclineInvitation,
                                                                     RHParticipantList)
@@ -98,7 +99,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
                  RHRegistrationDetails)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
-                 RHRegistrationEdit)
+                 RHRegistrationEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/toggle-payment',
                  'toggle_registration_payment', RHRegistrationTogglePayment, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>'
@@ -163,6 +164,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
 _bp.add_url_rule('/registrations/', 'display_regform_list', RHRegistrationFormList)
 _bp.add_url_rule('/registrations/participants', 'participant_list', RHParticipantList)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform', RHRegistrationForm, methods=('GET', 'POST'))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/edit',
+                 'edit_registration_display', RHRegistrationDisplayEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', RHRegistrationFormCheckEmail)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  RHRegistrationFormDeclineInvitation, methods=('POST',))

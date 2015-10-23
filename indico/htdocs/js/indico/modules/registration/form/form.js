@@ -129,6 +129,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             eventStartDate: '@',
             eventEndDate: '@',
             userInfo: '@',
+            registrationData: '@',
+            registrationUuid: '@',
             csrfToken: '&',
             editMode: '=',
             updateMode: '=',
@@ -139,6 +141,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         controller: function($scope, $resource, $location, $anchorScroll) {
             $scope.sections = angular.fromJson($scope.confSections);
             $scope.userInfo = angular.fromJson($scope.userInfo);
+            $scope.registrationData = angular.fromJson($scope.registrationData);
+            $scope.registrationUuid = $scope.registrationUuid;
 
             $rootScope.confId = $scope.confId;
             $rootScope.confFormId = $scope.confFormId;
@@ -278,9 +282,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             } else if (!scope.updateMode) {
                 scope.userdata = _.extend({}, scope.userInfo);
             } else {
-                // TODO: pass data via argument on the nd-reg-form div
-                // see userInfo/user-info for an example.
-                scope.userdata = {};
+                scope.userdata = _.extend({}, scope.registrationData);
             }
 
             element.on('submit', function(e) {
