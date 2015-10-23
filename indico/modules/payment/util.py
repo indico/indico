@@ -55,10 +55,11 @@ def register_transaction(registration, amount, currency, action, provider=None, 
                                                                      amount=amount, currency=currency,
                                                                      provider=provider, data=data)
     if new_transaction:
-        db.session.add(new_transaction)
         db.session.flush()
         if double_payment:
             notify_double_payment(registration)
         if new_transaction.status == TransactionStatus.successful:
             registration.update_state(paid=True)
+        elif new_transaction.status == TransactionStatus.cancelled:
+            registration.update_state(paid=False)
         return new_transaction

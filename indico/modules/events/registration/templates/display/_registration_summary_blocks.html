@@ -82,7 +82,7 @@
                 <div class="i-box-title">
                     {% trans %}Invoice{% endtrans %}
                 </div>
-                {% if not registration.transaction or registration.transaction.status not in ('successful', 'pending') %}
+                {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
                     <div class="payment-status payment-not-paid right">
                         {% trans %}Not paid{% endtrans %}
                         <i class="icon-time"></i>
