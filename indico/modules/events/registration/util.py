@@ -135,8 +135,8 @@ def create_registration(regform, data, invitation=None):
         invitation.state = InvitationState.accepted
         invitation.registration = registration
     registration.update_state()
-    notify_registration_creation(registration)
     db.session.flush()
+    notify_registration_creation(registration)
     logger.info('New registration %s by %s', registration, session.user)
     return registration
 
