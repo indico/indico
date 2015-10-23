@@ -246,6 +246,7 @@
         border-bottom: 1px dashed lighten($gray, $color-variation);
         border-right: 1px dashed lighten($gray, $color-variation);
         color: $dark-gray;
+        font-weight: normal;
         text-align: right;
         padding: 0 8px 0 0;
         width: 120px;
@@ -1399,5 +1400,19 @@ textarea.regFormDescriptionInputMgmt {
 
     .titled-rule {
         margin-top: 0;
+    }
+}
+
+.registration-info {
+    tr.deleted-field {
+        background-color: $light-yellow;
+
+        td {
+            padding: 0.5em;
+
+            .deleted-field-warning {
+                color: $yellow;
+            }
+        }
     }
 }
