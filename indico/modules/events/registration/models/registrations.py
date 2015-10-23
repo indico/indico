@@ -312,12 +312,12 @@ class Registration(db.Model):
         elif self.state == RegistrationState.unpaid:
             if paid:
                 self.state = RegistrationState.complete
-            elif not approved:
+            elif approved is False:
                 self.state = Registration.pending
         elif self.state == RegistrationState.complete:
-            if not approved and not payment_required and moderation_required:
+            if approved is False and payment_required is False and moderation_required:
                 self.state = RegistrationState.pending
-            elif not paid and payment_required:
+            elif paid is False and payment_required:
                 self.state = RegistrationState.unpaid
 
 
