@@ -59,6 +59,14 @@ class RegistrationFormFieldBase(object):
         """Calculates the price of the field given the registration data"""
         return 0
 
+    def create_sql_filter(self, data_list):
+        """
+        Creates a SQL criterion to check whether the field's value is
+        in `data_list`.  The function is expected to return an
+        operation on ``Registrationdata.data``.
+        """
+        return RegistrationData.data.op('#>>')('{}').in_(data_list)
+
     def create_wtf_field(self):
         validators = list(self.validators) if self.validators is not None else []
         if self.form_item.is_required:
