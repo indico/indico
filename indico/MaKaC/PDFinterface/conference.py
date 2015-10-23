@@ -1473,7 +1473,7 @@ class RegistrantToPDF(PDFBase):
         style.alignment = TA_JUSTIFY
 
         for item in self._display:
-            if item.input_type == 'accommodation':
+            if item.input_type == 'accommodation' and item.id in data:
                 _print_row(caption=item.title, value=data[item.id].friendly_data['choice'])
                 _print_row(caption=_('Arrival date'), value=format_date(data[item.id].friendly_data['arrival_date']))
                 _print_row(caption=_('Departure date'), value=format_date(data[item.id].friendly_data['departure_date']))
@@ -1620,7 +1620,7 @@ class RegistrantsListToPDF(PDFBase):
                                                registration.last_name.encode('utf-8')), text_format))
             data = registration.data_by_field
             for item in self._display:
-                if item.input_type == 'accommodation':
+                if item.input_type == 'accommodation' and item.id in data:
                     lp.append(Paragraph(data[item.id].friendly_data['choice'].encode('utf-8'), text_format))
                     lp.append(Paragraph(format_date(data[item.id].friendly_data['arrival_date']), text_format))
                     lp.append(Paragraph(format_date(data[item.id].friendly_data['departure_date']), text_format))
