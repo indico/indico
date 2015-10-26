@@ -186,6 +186,14 @@
         background-color: $light-green;
         color: $light-black;
 
+        &.warning {
+            @include icon-before(icon-warning);
+            background-color: $light-yellow;
+            &:before {
+                margin-right: 0.2em;
+            }
+        }
+
         &.error {
             @include icon-before(icon-warning);
             background-color: $light-red;

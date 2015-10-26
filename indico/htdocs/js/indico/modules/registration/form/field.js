@@ -149,24 +149,31 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             error: handleAjaxError,
             success: function(data) {
                 var msg;
-                if (data.conflict == 'email') {
+                var name = data.user ? $('<span>', {text: data.user}).html() : null;
+                if (data.conflict == 'email-already-registered') {
                     msg = $T.gettext('There is already a registration with this email address.');
-                } else if (data.conflict == 'user') {
+                } else if (data.conflict == 'user-already-registered') {
                     msg = $T.gettext('The user associated with this email address is already registered.');
                 } else if (data.conflict == 'no-user') {
                     msg = $T.gettext('There is no Indico user associated with this email address.');
-                } else if (data.conflict == 'email-not-user') {
-                    msg = $T.gettext("Email doesn't match registered user");
+                } else if (data.status == 'error' && (data.conflict == 'email-other-user' || data.conflict == 'email-no-user')) {
+                    msg = $T.gettext("This email address is not associated with your Indico account.");
+                } else if (data.conflict == 'email-other-user') {
+                    msg = $T.gettext("The registration will be re-associated to a different user (<strong>{0}</strong>).").format(name);
+                } else if (data.conflict == 'email-no-user') {
+                    msg = $T.gettext("The registration will be disassociated from the current user (<strong>{0}</strong>).").format(name);
                 } else if (!data.user) {
                     msg = $T.gettext('The registration will not be associated with any Indico account.');
                 } else if (data.self) {
                     msg = $T.gettext('The registration will be associated with your Indico account.');
+                } else if (data.same) {
+                    msg = $T.gettext('The registration will remain associated with the Indico account <strong>{0}</strong>.').format(name);
                 } else {
-                    var name = $('<span>', {text: data.user}).html();
                     msg = $T.gettext('The registration will be associated with the Indico account <strong>{0}</strong>.').format(name);
                 }
-                $('#regformSubmit').prop('disabled', !!data.conflict);
-                $scope.emailInfoError = !!data.conflict;
+                $('#regformSubmit').prop('disabled', data.status == 'error');
+                $scope.emailInfoError = data.status == 'error';
+                $scope.emailInfoWarning = data.status == 'warning';
                 $scope.emailInfoMessage = msg;
                 $scope.$apply();
             }
@@ -179,6 +186,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             return;
         }
         $scope.emailInfoError = false;
+        $scope.emailInfoWarning = false;
         $scope.emailInfoMessage = email ? $T.gettext('Checking email address...') : '';
         $scope.checkedEmail = email;
         if (email) {
@@ -189,6 +197,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.fieldName = $scope.field.htmlName;
     $scope.emailInfoMessage = '';
     $scope.emailInfoError = false;
+    $scope.emailInfoWarning = false;
     if ($scope.field.htmlName == 'email' && !$scope.editMode) {
         $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             checkEmail($(this).val());

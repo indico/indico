@@ -80,15 +80,57 @@ def get_event_section_data(regform, management=False, registration=None):
     return data
 
 
+def check_registration_email(regform, email, registration=None, management=False):
+    """Checks whether an email address is suitable for registration.
+
+    :param regform: The registration form
+    :param email: The email address
+    :param registration: The existing registration (in case of
+                         modification)
+    :param management: If it's a manager adding a new registration
+    """
+    email = email.lower().strip()
+    user = get_user_by_email(email)
+    email_registration = regform.get_registration(email=email)
+    user_registration = regform.get_registration(user=user) if user else None
+    if registration is not None:
+        if email_registration and email_registration != registration:
+            return dict(status='error', conflict='email-already-registered')
+        elif user_registration and user_registration != registration:
+            return dict(status='error', conflict='user-already-registered')
+        elif user and registration.user and registration.user != user:
+            return dict(status='warning' if management else 'error', conflict='email-other-user', user=user.full_name)
+        elif not user and registration.user:
+            return dict(status='warning' if management else 'error', conflict='email-no-user',
+                        user=registration.user.full_name)
+        elif user:
+            return dict(status='ok', user=user.full_name, self=(not management and user == session.user),
+                        same=(user == registration.user))
+        elif regform.require_user and (management or email != registration.email):
+            return dict(status='warning' if management else 'error', conflict='no-user')
+        else:
+            return dict(status='ok', user=None)
+    else:
+        if email_registration:
+            return dict(status='error', conflict='email-already-registered')
+        elif user_registration:
+            return dict(status='error', conflict='user-already-registered')
+        elif user:
+            return dict(status='ok', user=user.full_name, self=(not management and user == session.user), same=False)
+        elif regform.require_user:
+            return dict(status='warning' if management else 'error', conflict='no-user')
+        else:
+            return dict(status='ok', user=None)
+
+
 def make_registration_form(regform, management=False, registration=None):
     """Creates a WTForm based on registration form fields"""
 
     class RegistrationFormWTF(IndicoForm):
         def validate_email(self, field):
-            existing_registration = regform.get_registration(email=field.data)
-            if ((registration is None and existing_registration) or
-                    (registration is not None and registration != existing_registration)):
-                raise ValidationError('Email already in use')
+            status = check_registration_email(regform, field.data, registration, management=management)
+            if status['status'] == 'error':
+                raise ValidationError('Email validation failed: ' + status['conflict'])
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -165,10 +207,12 @@ def create_registration(regform, data, invitation=None):
     return registration
 
 
-def modify_registration(registration, data, event, management=False):
+def modify_registration(registration, data, management=False):
     with db.session.no_autoflush:
         regform = registration.registration_form
         data_by_field = registration.data_by_field
+        if management or not registration.user:
+            registration.user = get_user_by_email(data['email'])
 
         for form_item in regform.active_fields:
             if form_item.parent.is_manager_only and not management:
