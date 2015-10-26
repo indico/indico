@@ -212,6 +212,14 @@ class Registration(db.Model):
     # - legacy_mapping (LegacyRegistrationMapping.registration)
 
     @hybrid_property
+    def is_active(self):
+        return not self.is_cancelled and not self.is_deleted
+
+    @is_active.expression
+    def is_active(cls):
+        return ~cls.is_cancelled & ~cls.is_deleted
+
+    @hybrid_property
     def is_cancelled(self):
         return self.state in (RegistrationState.rejected, RegistrationState.withdrawn)
 
