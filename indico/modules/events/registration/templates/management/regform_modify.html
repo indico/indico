@@ -17,4 +17,9 @@
             event-end-date="{{ event.as_legacy.endDate }}"
             edit-mode="true"></div>
     </div>
+    <div class="toolbar right">
+        <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
+            {% trans %}Back{% endtrans %}
+        </a>
+    </div>
 {% endblock %}

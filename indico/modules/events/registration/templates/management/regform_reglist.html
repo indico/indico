@@ -85,6 +85,12 @@
             </div>
         </div>
         {{ render_registration_list(registrations, visible_cols_regform_items, basic_columns, total_registrations) }}
+
+        <div class="toolbar right">
+            <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
+                {% trans %}Back{% endtrans %}
+            </a>
+        </div>
     </div>
 
     <script>
