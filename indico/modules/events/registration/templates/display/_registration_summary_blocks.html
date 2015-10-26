@@ -125,7 +125,7 @@
                                 <span class="section-name">({{ item.field_data.field.parent.title -}})</span>
                             </td>
                             <td class="text-left">
-                                {% if item.field_data.field.input_type == 'accommodation' %}
+                                {% if item.field_data.field.input_type == 'accommodation' and item.friendly_data %}
                                     {% trans nights=item.friendly_data.nights,
                                              choice=item.friendly_data.choice -%}
                                         {{ choice }} ({{ nights }} night)

@@ -3,7 +3,7 @@
         <tr>
             <td align="left">
                 <span>{{ 'Arrival date' | i18n }}</span>
-                <span class="regFormMandatoryField">*</span>
+                <span ng-if="field.isRequired" class="regFormMandatoryField">*</span>
             </td>
             <td align="left">
                 <ng-form name="nestedFormArrival">
@@ -11,7 +11,8 @@
                         id="arrivalDate"
                         ng-model="accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
-                        ng-disabled="!userdata.manager && billableOptionPayed(userdata)">
+                        ng-disabled="!userdata.manager && billableOptionPayed(userdata)"
+                        ng-required="field.isRequired">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.arrivalDates" value="{{ date[0] }}"
                                 ng-selected="userdata[fieldName].arrivalDate == date[0]">
@@ -27,7 +28,7 @@
         <tr>
             <td align="left">
                 <span>{{ 'Departure date' | i18n }}</span>
-                <span class="regFormMandatoryField">*</span>
+                <span ng-if="field.isRequired" class="regFormMandatoryField">*</span>
             </td>
             <td align="left">
                 <ng-form name="nestedFormDeparture">
@@ -35,7 +36,8 @@
                         id="departureDate"
                         ng-model="accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
-                        ng-disabled="!userdata.manager && billableOptionPayed(userdata)">
+                        ng-disabled="!userdata.manager && billableOptionPayed(userdata)"
+                        ng-required="field.isRequired">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.departureDates" value="{{ date[0] }}"
                                 ng-selected="userdata[fieldName].departureDate == date[0]">
@@ -54,7 +56,7 @@
         <span ng-class="{'error-message-underline': validationStarted && nestedFormAccommodation.$invalid}">
             {{ 'Select your accommodation' | i18n }}:
         </span>
-        <span class="regFormMandatoryField">*</span>
+        <span ng-if="field.isRequired" class="regFormMandatoryField">*</span>
     </div>
     <ng-form name="nestedFormAccommodation">
         <table cellspacing="0">
@@ -72,7 +74,7 @@
                         ng-checked="userdata[fieldName].choice == item.id"
                         ng-model="accommodation.choice"
                         ng-disabled="isDisabled(item, userdata.accommodation.choice) || !userdata.manager && (paymentBlocked(item, userdata) || billableOptionPayed(userdata))"
-                        ng-required="hasPlacesLeft(item, userdata.accommodation.choice) && !item.cancelled"/>
+                        ng-required="field.isRequired"/>
                     {{ item.caption }}
 
                     <span class="unavailable-text" ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.choice)">
