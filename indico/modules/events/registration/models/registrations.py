@@ -322,9 +322,14 @@ class Registration(db.Model):
         currency = event_payment_settings.get(self.registration_form.event, 'currency')
         return '{} {}'.format(self.price, currency)
 
-    def update_state(self, approved=None, paid=None):
-        if approved is not None and paid is not None:
-            raise Exception("Both approved and paid have been set")
+    def update_state(self, approved=None, paid=None, rejected=None):
+        """Update the state of the registration for a given action
+
+        The accepted kwargs are the possible actions. ``True`` means that the
+        action occured and ``False`` that it was reverted.
+        """
+        if sum(action is not None for action in (approved, paid, rejected)) > 1:
+            raise Exception("More than one action specified")
         regform = self.registration_form
         invitation = self.invitation
         moderation_required = regform.moderation_enabled and (not invitation or not invitation.skip_moderation)
@@ -342,6 +347,8 @@ class Registration(db.Model):
                 self.state = RegistrationState.unpaid
             elif approved:
                 self.state = RegistrationState.complete
+            elif rejected:
+                self.state = RegistrationState.rejected
         elif self.state == RegistrationState.unpaid:
             if paid:
                 self.state = RegistrationState.complete
