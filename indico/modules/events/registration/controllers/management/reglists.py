@@ -257,6 +257,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     def _process(self):
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration,
+                                                    currency=payment_event_settings.get(self.event, 'currency'),
                                                     payment_enabled=self.event.has_feature('payment'),
                                                     from_management=True)
 
