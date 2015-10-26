@@ -1995,8 +1995,7 @@ class WPConfClone(WPConferenceModifBase):
                 "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
                 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
                                      <li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" />_("Full timetable")</li>
-                                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
-                                     <li><input type="checkbox" name="cloneRegistration" id="cloneRegistration" value="1" >_("Registration")</li>""") }
+                                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>""") }
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)
 
