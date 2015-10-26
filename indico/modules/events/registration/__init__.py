@@ -168,3 +168,17 @@ class RegistrationRole(ManagementRole):
     name = 'registration'
     friendly_name = _('Registration')
     description = _('Grants management access to the registration form.')
+
+
+@template_hook('event-header')
+def _inject_event_header(event, **kwargs):
+    from indico.modules.events.registration.models.forms import RegistrationForm
+
+    event = event.as_event
+    regforms = (event.registration_forms
+                .filter_by(is_deleted=False, is_open=True)
+                .order_by(db.func.lower(RegistrationForm.title))
+                .all())
+
+    if regforms:
+        return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)

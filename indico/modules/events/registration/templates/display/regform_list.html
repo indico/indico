@@ -1,4 +1,8 @@
-{% extends 'events/registration/display/_event_registration_base.html' %}
+{% if event.getType() == 'conference' %}
+    {% extends 'events/registration/display/_event_registration_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+{% endif %}
 
 {% block subtitle %}
     {% trans %}Available forms{% endtrans %}

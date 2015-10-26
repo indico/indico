@@ -61,3 +61,18 @@
         font-weight: normal;
     }
 }
+
+.meeting-header {
+    max-width: 800px;
+    margin: 2em auto 0 auto;
+
+    h1 {
+        color: $dark-blue;
+    }
+}
+
+.meeting-page {
+    @extend %indico-page;
+    max-width: 800px;
+    margin: 2em auto 0 auto;
+}
