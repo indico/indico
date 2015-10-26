@@ -349,6 +349,9 @@
 
 .regform-add-field-qtip {
     @include border-all();
+    @extend %font-family-title;
+    font-size: 0.8em;
+
     background: white;
 
     .qtip-content {
@@ -377,6 +380,10 @@
 
     .i-big-button {
         margin: 2px 0;
+    }
+
+    .caption {
+        font-size: 1.1em;
     }
 }
 
