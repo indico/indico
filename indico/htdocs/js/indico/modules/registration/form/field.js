@@ -833,13 +833,14 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             scope.settings.accommodationField = true;
             scope.settings.fieldName = $T("Accommodation");
 
-            scope.accommodation = {};
+            scope.accommodation = scope.userdata[scope.field.htmlName] || {};
+
             scope.$watch('userdata.accommodation', function() {
                 if (scope.userdata.accommodation === undefined ||
-                    scope.userdata.accommodation.accommodationType === null) {
+                    scope.userdata.accommodation.choice === null) {
                     return;
                 }
-                scope.accommodation.typeId = scope.userdata.accommodation.accommodationType.id;
+                scope.accommodation.choice = scope.userdata.accommodation.choice;
                 scope.accommodation.arrivalDate = scope.userdata.accommodation.arrivalDate;
                 scope.accommodation.departureDate = scope.userdata.accommodation.departureDate;
             });

@@ -70,7 +70,7 @@
                         name="accommodationType-{{ field.id }}"
                         value="{{ item.id }}"
                         ng-checked="userdata[fieldName].choice == item.id"
-                        ng-model="accommodation.typeId"
+                        ng-model="accommodation.choice"
                         ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id) || !userdata.manager && (paymentBlocked(item, userdata) || billableOptionPayed(userdata))"
                         ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id) && !item.cancelled"/>
                     {{ item.caption }}
