@@ -119,6 +119,7 @@ def upgrade():
         sa.Column('transaction_id', sa.Integer(), nullable=True, index=True, unique=True),
         sa.Column('state', PyIntEnum(RegistrationState), nullable=False),
         sa.Column('base_price', sa.Numeric(8, 2), nullable=False),
+        sa.Column('price_adjustment', sa.Numeric(8, 2), nullable=False),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('first_name', sa.String(), nullable=False),
