@@ -34,7 +34,8 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
                                                              RegistrationFormItemType, PersonalDataType)
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
-from indico.modules.events.registration.notifications import notify_registration_creation
+from indico.modules.events.registration.notifications import (notify_registration_creation,
+                                                              notify_registration_modification)
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
@@ -236,10 +237,8 @@ def modify_registration(registration, data, management=False):
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
         registration.update_state()
-
-    # TODO: notify_registration_modification
-
     db.session.flush()
+    notify_registration_modification(registration)
     logger.info('Registration {} modified by {}', registration, session.user)
 
 
