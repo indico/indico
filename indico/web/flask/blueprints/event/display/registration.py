@@ -20,31 +20,31 @@ from indico.web.flask.util import redirect_view
 
 
 # Registrants
-event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList,
+event.add_url_rule('/registration-old/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList,
                    methods=["GET", "POST"])
 
 # Registration
-event.add_url_rule('/registration/', 'confRegistrationFormDisplay',
+event.add_url_rule('/registration-old/', 'confRegistrationFormDisplay',
                    registrationFormDisplay.RHRegistrationForm)
-event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
+event.add_url_rule('/registration-old/conditions', 'confRegistrationFormDisplay-conditions',
                    registrationFormDisplay.RHRegistrationFormConditions)
-event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-creation',
+event.add_url_rule('/registration-old/register', 'confRegistrationFormDisplay-creation',
                    registrationFormDisplay.RHRegistrationFormCreation, methods=('POST',))
-event.add_url_rule('/registration/ticket.pdf', 'e-ticket-pdf',
+event.add_url_rule('/registration-old/ticket.pdf', 'e-ticket-pdf',
                    registrationFormDisplay.RHConferenceTicketPDF)
-event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-display',
+event.add_url_rule('/registration-old/register', 'confRegistrationFormDisplay-display',
                    registrationFormDisplay.RHRegistrationFormDisplay)
-event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-modify',
+event.add_url_rule('/registration-old/modify', 'confRegistrationFormDisplay-modify',
                    registrationFormDisplay.RHRegistrationFormModify)
-event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-performModify',
+event.add_url_rule('/registration-old/modify', 'confRegistrationFormDisplay-performModify',
                    registrationFormDisplay.RHRegistrationFormPerformModify, methods=('POST',))
-event.add_url_rule('/registration/userdata', 'confRegistrationFormDisplay-userData',
+event.add_url_rule('/registration-old/userdata', 'confRegistrationFormDisplay-userData',
                    registrationFormDisplay.RHRegistrationFormUserData)
 
 # Legacy
-event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
+event.add_url_rule('/registration-old/register/success', 'confRegistrationFormDisplay-creationDone',
                    redirect_view('event.confRegistrationFormDisplay'))
-event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
+event.add_url_rule('/registration-old/confirm', 'confRegistrationFormDisplay-confirmBooking',
                    redirect_view('event.confRegistrationFormDisplay'))
-event.add_url_rule('/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
+event.add_url_rule('/registration-old/pay', 'confRegistrationFormDisplay-confirmBookingDone',
                    redirect_view('event.confRegistrationFormDisplay'))

@@ -198,6 +198,7 @@ class Registration(db.Model):
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
     # - transactions (PaymentTransaction.registration)
+    # - legacy_mapping (LegacyRegistrationMapping.registration)
 
     @hybrid_property
     def is_cancelled(self):
