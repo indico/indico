@@ -22,6 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.payment.models.transactions import TransactionStatus
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
@@ -308,7 +309,8 @@ class RegistrationForm(db.Model):
         if self.modification_mode == ModificationMode.allowed_always:
             return True
         elif self.modification_mode == ModificationMode.allowed_until_payment:
-            return registration.transaction is None
+            paid_states = {TransactionStatus.successful, TransactionStatus.pending}
+            return registration.transaction is None or registration.transaction.status not in paid_states
         else:
             return False
 
