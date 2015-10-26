@@ -178,7 +178,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
                 flash(error, 'error')
-        user_data = {t.name: getattr(session.user, t.name) if session.user else '' for t in PersonalDataType}
+        user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
