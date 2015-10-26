@@ -71,7 +71,7 @@
                                     {% elif item.id == 'price' %}
                                         <td class="i-table">{{ registration.price }}</td>
                                     {% else %}
-                                        <td class="i-table">{{ data[item.id].friendly_data }}</td>
+                                        <td class="i-table">{{ data.get(item.id).friendly_data }}</td>
                                     {% endif %}
                                 {% endfor %}
                             </tr>
