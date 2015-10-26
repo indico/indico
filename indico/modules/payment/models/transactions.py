@@ -197,6 +197,7 @@ class PaymentTransaction(db.Model):
         foreign_keys=[registration_id],
         backref=db.backref(
             'transactions',
+            cascade='all, delete-orphan',
             lazy=True
         )
     )
