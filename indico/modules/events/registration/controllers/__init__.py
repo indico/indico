@@ -43,12 +43,11 @@ class RegistrationFormMixin(object):
 
 
 class RegistrationEditMixin(object):
-
     def _process(self):
         form = make_registration_form(self.regform, management=self.management, registration=self.registration)()
 
         if form.validate_on_submit():
-            modify_registration(self.registration, form.data, self.event, management=self.management)
+            modify_registration(self.registration, form.data, management=self.management)
             return redirect(self.success_url)
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation
@@ -56,8 +55,8 @@ class RegistrationEditMixin(object):
                 flash(error, 'error')
 
         registration_data = {r.field_data.field.html_field_name: camelize_keys(r.data) for r in self.registration.data}
-        section_data = camelize_keys(get_event_section_data(
-            self.regform, management=self.management, registration=self.registration))
+        section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
+                                                            registration=self.registration))
 
         registration_data.update({
             'paid': self.registration.state == RegistrationState.complete,

@@ -28,13 +28,13 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.util import get_event_section_data, make_registration_form, create_registration
+from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
+                                                     create_registration, check_registration_email)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.payment import event_settings as payment_event_settings
-from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -135,31 +135,14 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
     def _process(self):
         email = request.args['email'].lower().strip()
-        user = get_user_by_email(email)
         update = request.args.get('update')
+        management = request.args.get('management') == '1'
 
         if update:
             existing = self.regform.get_registration(uuid=update)
-            if existing.user != user:
-                return jsonify(conflict='email-not-user')
-            elif user:
-                return jsonify(user=user.full_name, self=(user == session.user))
-            elif self.regform.require_user:
-                return jsonify(conflict='no-user')
-            else:
-                return jsonify(user=None)
+            return jsonify(check_registration_email(self.regform, email, existing, management=management))
         else:
-            if self.regform.get_registration(email=email):
-                return jsonify(conflict='email')
-            user = get_user_by_email(email)
-            if user and self.regform.get_registration(user=user):
-                return jsonify(conflict='user')
-            elif user:
-                return jsonify(user=user.full_name, self=(user == session.user))
-            elif self.regform.require_user:
-                return jsonify(conflict='no-user')
-            else:
-                return jsonify(user=None)
+            return jsonify(check_registration_email(self.regform, email, management=management))
 
 
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):

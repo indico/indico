@@ -159,8 +159,8 @@ class Registration(db.Model):
         lazy=True,
         backref=db.backref(
             'registrations',
-            lazy='dynamic',
-            cascade='all, delete-orphan'
+            lazy='dynamic'
+            # XXX: a delete-orphan cascade here would delete registrations when NULLing the user
         )
     )
     #: The latest payment transaction associated with this registration
