@@ -68,7 +68,7 @@ def get_event_section_data(regform, management=False, registration=None):
         section_data = section.own_data
         section_data['items'] = []
 
-        for child in section.children:
+        for child in section.fields:
             if child.is_deleted:
                 continue
             if isinstance(child.field_impl, ChoiceBaseField):
