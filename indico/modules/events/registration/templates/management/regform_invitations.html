@@ -45,6 +45,12 @@
         {{ render_invitation_list(invitations) }}
     </div>
 
+    <div class="toolbar right">
+        <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
+            {% trans %}Back{% endtrans %}
+        </a>
+    </div>
+
     <script>
         setupInvitationPage();
     </script>
