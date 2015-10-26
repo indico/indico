@@ -20,7 +20,7 @@ from indico.modules.payment.models.transactions import PaymentTransaction, Trans
 
 
 @pytest.fixture
-def create_transaction(db, dummy_event, dummy_registrant):
+def create_transaction():
     """Returns a callable which lets you create transactions"""
 
     def _create_transaction(status, **params):
@@ -28,11 +28,7 @@ def create_transaction(db, dummy_event, dummy_registrant):
         params.setdefault('currency', 'USD')
         params.setdefault('provider', '_manual')
         params.setdefault('data', {})
-        transaction = PaymentTransaction(event_id=dummy_event.getId(), registrant_id=dummy_registrant.getId(),
-                                         status=status, **params)
-        db.session.add(transaction)
-        db.session.flush()
-        return transaction
+        return PaymentTransaction(status=status, **params)
 
     return _create_transaction
 

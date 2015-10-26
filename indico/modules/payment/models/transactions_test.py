@@ -35,8 +35,8 @@ def patch_transition_methods(mocker):
 
 
 @pytest.fixture
-def creation_params(dummy_registrant):
-    return {'registrant': dummy_registrant,
+def creation_params():
+    return {'registration': MagicMock(transaction=None),
             'amount': 10,
             'currency': 'USD',
             'action': TransactionAction.complete,
@@ -69,7 +69,7 @@ def test_next(create_transaction, status, expected_transition):
 
 @pytest.mark.usefixtures('patch_transition_methods')
 @pytest.mark.parametrize(('provider', 'manual'), (
-    ('_manual',   True),
+    (None,   True),
     ('manual',    False),
     ('whatever',  False),
 ))
@@ -153,10 +153,6 @@ def test_next_from_pending(action, manual, expected):
 # PaymentTransaction tests
 # ======================================================================================================================
 
-def test_event(dummy_transaction, dummy_event):
-    assert dummy_transaction.event == dummy_event
-
-
 @pytest.mark.parametrize(('provider', 'expected'), (
     ('_manual', True),
     ('manual', False),
@@ -191,8 +187,8 @@ def test_create_next_with_exception(caplog, mocker, creation_params, exception):
         assert log.exc_info[0] == exception
 
 
-def test_create_next_double_payment(caplog, create_transaction, creation_params):
-    create_transaction(TransactionStatus.successful)
+def test_create_next_double_payment(caplog, creation_params):
+    creation_params['registration'].transaction = MagicMock(status=TransactionStatus.successful)
     _, double_payment = PaymentTransaction.create_next(**creation_params)
     log = extract_logs(caplog, one=True, name='indico.payment').message
     assert 'already paid' in log
