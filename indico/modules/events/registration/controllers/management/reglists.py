@@ -38,6 +38,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
                                                                    RegistrationFormPersonalDataField)
 from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_csv_from_registrations)
@@ -178,6 +179,18 @@ def _get_reg_list_config(regform):
     return session.get(session_key, DEFAULT_REPORT_CONFIG)
 
 
+def _render_registration_list(regform, registrations, total_registrations=None):
+    reg_list_config = _get_reg_list_config(regform=regform)
+    item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
+    basic_columns = _get_basic_columns(regform, basic_item_ids)
+    regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(item_ids),
+                                                  ~RegistrationFormItem.is_deleted)
+    tpl = get_template_module('events/registration/management/_reglist.html')
+    reglist = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
+                                           basic_columns=basic_columns, total_registrations=total_registrations)
+    return reglist
+
+
 class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event"""
 
@@ -222,17 +235,13 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         reglist_config['items'] = visible_regform_items
 
         session.modified = True
-        item_ids, basic_item_ids = _split_column_ids(visible_regform_items)
-        basic_columns = _get_basic_columns(self.regform, basic_item_ids)
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(item_ids),
-                                                      ~RegistrationFormItem.is_deleted)
         registrations_query = _query_registrations(self.regform)
         total_regs = registrations_query.count()
         registrations = _filter_registration(self.regform, registrations_query, filters).all()
-        tpl = get_template_module('events/registration/management/_reglist.html')
-        reg_list = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
-                                                basic_columns=basic_columns, total_registrations=total_regs)
-        return jsonify_data(registration_list=reg_list)
+
+        _render_registration_list(self.regform, registrations, total_regs)
+
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs))
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
@@ -470,3 +479,43 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         return jsonify_template('events/registration/management/registration_details.html',
                                 registration=self.registration,
                                 payment_enabled=self.event.has_feature('payment'))
+
+
+def _modify_registration_status(registration, approve):
+    if approve:
+        registration.update_state(approved=True)
+    else:
+        registration.update_state(rejected=True)
+    db.session.flush()
+    notify_registration_state_update(registration)
+    logger.info('Registration {} status updated by {}'.format(registration, session.user))
+
+
+class RHRegistrationApprove(RHManageRegistrationBase):
+    """Accept a registration"""
+
+    def _process(self):
+        _modify_registration_status(self.registration, approve=True)
+        flash(_("The registration status was updated successfully."), 'success')
+        return redirect(url_for('.manage_reglist', self.regform))
+
+
+class RHRegistrationReject(RHManageRegistrationBase):
+    """Reject a registration"""
+
+    def _process(self):
+        _modify_registration_status(self.registration, approve=False)
+        flash(_("The registration was rejected successfully."), 'success')
+        return redirect(url_for('.manage_reglist', self.regform))
+
+
+class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
+    """Accept/Reject selected registrations"""
+
+    def _process(self):
+        approve = request.form['approve'] == '1'
+        for registration in self.registrations:
+            _modify_registration_status(registration, approve)
+        flash(_("The status of the selected registrations was updated successfully."), 'success')
+        registrations = _query_registrations(self.regform).all()
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations=registrations))

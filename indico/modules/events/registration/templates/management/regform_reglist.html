@@ -95,6 +95,32 @@
                     </li>
                     <li><a href="#" class="icon-attachment js-requires-selected-row disabled">{% trans %}Attachments{% endtrans %}</a></li>
                 </ul>
+                {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
+                {% if regform.moderation_enabled or pending_registrations %}
+                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                        {%- trans %}Moderation{% endtrans -%}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" class="icon-checkmark js-requires-selected-row disabled js-modify-status"
+                               data-href="{{ url_for('.registrations_modify_status', regform) }}"
+                               data-approve="1"
+                               data-method="POST"
+                               data-confirm="{% trans %}Do you really want to approve the selected registrations?{% endtrans %}">
+                                {%- trans %}Approve registrations{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
+                               data-href="{{ url_for('.registrations_modify_status', regform) }}"
+                               data-approve="0"
+                               data-method="POST"
+                               data-confirm="{% trans %}Do you really want to reject the selected registrations?{% endtrans %}">
+                                {%- trans %}Reject registrations{% endtrans -%}
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
             </div>
             <div class="group right">
                 <a class="i-button icon-link js-static-url"
