@@ -203,7 +203,6 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_GET(self):
         reg_list_config = _get_reg_list_config(self.regform)
-        item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
         visible_columns = reg_list_config['items']
 
         return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
