@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import mimetypes
 from copy import deepcopy
 from datetime import datetime
+from operator import itemgetter
 from uuid import uuid4
 
 import wtforms
@@ -229,7 +230,9 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def view_data(self):
-        return {'choices': [{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()]}
+        choices = sorted([{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()],
+                         key=itemgetter('caption'))
+        return {'choices': choices}
 
     @property
     def filter_choices(self):
