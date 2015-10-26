@@ -235,18 +235,18 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
      * :param selectedvalue: places selected currently selected substracting from the total places left
      */
     $scope.getPlacesLeft = function(item, uservalue, selectedvalue) {
-        var places = item.noPlacesLeft;
-        if (item._type == 'GeneralField' && item.inputType == 'checkbox') {
-            if (uservalue) places += 1;
+        var places = item.placesLimit;
+        if ($scope.field.inputType == 'checkbox' || $scope.field.inputType == 'bool') {
+            places -= ($scope.field.placesUsed || 0);
+            if (uservalue) places -= 1;
             if (selectedvalue) places -= 1;
-        } else if (item._type == 'GeneralField' && item.inputType == 'bool') {
-            if (uservalue) places += 1;
-            if (selectedvalue == 'yes') places -= 1;
-        } else if (item._type == 'RadioItem' || item._type == 'AccommodationType') {
-            if (uservalue === item.id) places += 1;
+        } else if ($scope.field.inputType == 'single_choice' || $scope.field.inputType == 'accommodation') {
+            places -= ($scope.field.placesUsed[item.id] || 0);
+            if (uservalue === item.id) places -= 1;
             if (selectedvalue === item.id) places -= 1;
-        } else if (item._type == 'SocialEventItem') {
-            if (uservalue) places += uservalue;
+        } else if ($scope.field.inputType == 'multi_choice') {
+            places -= ($scope.field.placesUsed[item.id] || 0);
+            if (uservalue) places -= uservalue;
             if (selectedvalue) places -= selectedvalue;
         }
         return places;

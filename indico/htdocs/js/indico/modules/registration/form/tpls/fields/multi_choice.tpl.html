@@ -19,7 +19,7 @@
                         ({{ "no places left" | i18n }})
                     </span>
                     <span ng-switch-when="true" class="available-text" style="margin-left: 25px;">
-                        [{{ getPlacesLeft(item, getUserdataValue(), item.id) }} {{ 'place(s) left' | i18n }}]
+                        [{{ getPlacesLeft(item, getUserdataValue(), itemChecked) }} {{ 'place(s) left' | i18n }}]
                     </span>
                 </span>
                 <span ng-if="field.withExtraSlots && item.maxExtraSlots && itemChecked">
