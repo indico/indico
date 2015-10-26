@@ -869,7 +869,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 updateAccommodationPostData('departureDate', moment(newValue).format('YYYY-MM-DD'));
             });
 
-            scope.$watch('accommodation.typeId', function(newValue) {
+            scope.$watch('accommodation.choice', function(newValue) {
                 updateAccommodationPostData('choice', newValue);
             });
 
