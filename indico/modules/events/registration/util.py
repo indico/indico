@@ -50,7 +50,8 @@ def user_registered_in_event(user, event):
     return bool(Registration
                 .find(Registration.user == user,
                       RegistrationForm.event_id == int(event.id),
-                      ~Registration.is_cancelled)
+                      ~RegistrationForm.is_deleted,
+                      Registration.is_active)
                 .join(Registration.registration_form)
                 .count())
 
