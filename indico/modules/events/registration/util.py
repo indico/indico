@@ -21,8 +21,10 @@ import re
 from io import BytesIO
 
 from flask import current_app, session
+from sqlalchemy.orm import load_only, joinedload
 from wtforms import ValidationError
 
+from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.fields.simple import ChoiceBaseField, get_field_merged_options
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
@@ -33,6 +35,7 @@ from indico.modules.events.registration.models.items import (RegistrationFormPer
                                                              RegistrationFormItemType, PersonalDataType)
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_creation
+from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
 from indico.core.db import db
@@ -309,3 +312,29 @@ def get_registrations_with_tickets(user, event):
                              ~RegistrationForm.is_deleted,
                              ~Registration.is_deleted,
                              _join=Registration.registration_form).all()
+
+
+def get_events_registered(user, from_dt=None, to_dt=None):
+    """Gets the IDs of events where the user is registered.
+
+    :param user: A `User`
+    :param from_dt: The earliest event start time to look for
+    :param to_dt: The latest event start time to look for
+    :return: A set of event ids
+    """
+    event_date_filter = True
+    if from_dt and to_dt:
+        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
+    elif from_dt:
+        event_date_filter = IndexedEvent.start_date >= from_dt
+    elif to_dt:
+        event_date_filter = IndexedEvent.start_date <= to_dt
+    query = (user.registrations
+             .options(load_only('event_id'))
+             .options(joinedload(Registration.registration_form).load_only('event_id'))
+             .join(Registration.registration_form)
+             .join(RegistrationForm.event_new)
+             .join(IndexedEvent, IndexedEvent.id == Registration.event_id)
+             .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted)
+             .filter(event_date_filter))
+    return {registration.event_id for registration in query}

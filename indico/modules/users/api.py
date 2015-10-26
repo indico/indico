@@ -19,6 +19,7 @@ import itertools
 from flask import jsonify, session
 
 from indico.modules.events.surveys.util import get_events_with_submitted_surveys
+from indico.modules.events.registration.util import get_events_registered
 from indico.modules.events.util import get_events_managed_by, get_events_created_by
 from indico.modules.oauth import oauth
 from indico.modules.users.util import get_related_categories
@@ -99,7 +100,8 @@ class UserEventHook(HTTPAPIHook):
             raise HTTPAPIError('This API is only available when using Redis')
         self._checkProtection(aw)
         links = avatar_links.get_links(self._avatar.user, self._fromDT, self._toDT)
-
+        for event_id in get_events_registered(self._avatar.user, self._fromDT, self._toDT):
+            links.setdefault(str(event_id), set()).add('registration_registrant')
         for event_id in get_events_with_submitted_surveys(self._avatar.user, self._fromDT, self._toDT):
             links.setdefault(str(event_id), set()).add('survey_submitter')
         for event_id in get_events_managed_by(self._avatar.user, self._fromDT, self._toDT):
