@@ -63,7 +63,8 @@
 
         $('.registrations .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
-            cssDesc: 'header-sort-desc'
+            cssDesc: 'header-sort-desc',
+            headerTemplate: ''
         });
     }
 
