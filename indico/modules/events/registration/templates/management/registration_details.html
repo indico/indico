@@ -71,6 +71,16 @@
            class="i-button big highlight" {% if registration.is_cancelled %} disabled="disbled"{% endif %}>
             {%- trans %}Modify{% endtrans -%}
         </button>
+        {% if registration.state.name == 'pending' %}
+            <button data-href="{{ url_for('.approve_registration', registration) }}" class="i-button big accept"
+                    data-method="POST">
+                {%- trans %}Approve{% endtrans -%}
+            </button>
+            <button data-href="{{ url_for('.reject_registration', registration) }}" class="i-button big danger"
+                    data-method="POST">
+                {%- trans %}Reject{% endtrans -%}
+            </button>
+        {% endif %}
         <a href="{{ url_for('.manage_reglist', registration.registration_form) }}" class="i-button big">
             {%- trans %}Back{% endtrans -%}
         </a>

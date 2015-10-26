@@ -62,7 +62,10 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationsExportPDFBook,
                                                                                 RHRegistrationsExportCSV,
                                                                                 RHRegistrationTogglePayment,
-                                                                                RHRegistrationsPrintBadges)
+                                                                                RHRegistrationsPrintBadges,
+                                                                                RHRegistrationApprove,
+                                                                                RHRegistrationReject,
+                                                                                RHRegistrationsModifyStatus)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -106,6 +109,10 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>'
                  '/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>', 'registration_file',
                  RHRegistrationDownloadAttachment)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/approve',
+                 'approve_registration', RHRegistrationApprove, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',
+                 'reject_registration', RHRegistrationReject, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/table.pdf',
@@ -116,6 +123,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrat
                  'registrations_csv_export', RHRegistrationsExportCSV, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/badges',
                  'registrations_print_badges', RHRegistrationsPrintBadges, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status',
+                 'registrations_modify_status', RHRegistrationsModifyStatus, methods=('POST',))
 
 # Invitation management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)

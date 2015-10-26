@@ -126,6 +126,30 @@
             });
         });
 
+        $('.registrations').on('indico:confirmed', '.js-modify-status', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var selectedRows = getSelectedRows();
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: {
+                    registration_id: selectedRows,
+                    approve: $this.data('approve')
+                },
+                traditional: true,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    if (data) {
+                        $('.registrations-table-wrapper').html(data.registration_list);
+                        handleRowSelection();
+                        setupTableSorter();
+                    }
+                }
+            });
+        });
+
         $('.registrations .toolbar').on('click', '.disabled', function(e) {
             e.preventDefault();
             e.stopPropagation();
