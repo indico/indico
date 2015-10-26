@@ -23,6 +23,7 @@ from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
 from indico.modules.payment.notifications import notify_double_payment
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.events.registration.notifications import notify_registration_state_update
 
 remove_prefix_re = re.compile('^payment_')
 
@@ -62,4 +63,5 @@ def register_transaction(registration, amount, currency, action, provider=None, 
             registration.update_state(paid=True)
         elif new_transaction.status == TransactionStatus.cancelled:
             registration.update_state(paid=False)
+        notify_registration_state_update(registration)
         return new_transaction
