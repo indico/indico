@@ -1,6 +1,6 @@
 {% extends 'layout/base.html' %}
 {% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
-                                                                               render_payment_summary %}
+                                                                               render_invoice %}
 
 {% block title %}
     {%- trans %}Registration details{% endtrans -%}
@@ -13,7 +13,7 @@
 {% block content %}
     {{ render_registration_summary(registration, from_management) }}
 
-    {% call render_payment_summary(registration, payment_enabled, currency) %}
+    {% call render_invoice(registration, payment_enabled, currency) %}
         <table class="regform-done-footer registration-info">
             <tr>
                 <td>
