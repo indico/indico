@@ -1,7 +1,18 @@
-{% extends 'events/registration/display/_event_regform_base.html' %}
+{% if management %}
+    {% extends 'events/registration/management/_regform_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_event_regform_base.html' %}
+{% endif %}
+
 {% from 'events/registration/display/_regform_invitation_info.html' import render_invitation_info %}
 {% from 'events/registration/display/_regform_info.html' import render_regform_info %}
 {% from 'message_box.html' import message_box %}
+
+
+{% block subtitle %}
+    {% trans title=regform.title %}Add registration to "{{ title }}"{% endtrans %}
+{% endblock %}
+
 
 {% block content %}
     {{ render_regform_info(regform) }}
