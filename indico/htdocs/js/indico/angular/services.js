@@ -20,7 +20,9 @@ var ndServices = angular.module('ndServices', []);
 ndServices.provider('url', function() {
     var baseUrl = Indico.Urls.Base;
     var modulePath = '';
-    var debug = $('body').data('debug') ? '?' + +Date.now() : '';
+    // XXX: don't remove the () around `+Date.now()`
+    // the minifier converts this to `'?'++Date.now()` which is a syntax error
+    var debug = $('body').data('debug') ? '?' + (+Date.now()) : '';
 
     return {
         setModulePath: function(path) {
