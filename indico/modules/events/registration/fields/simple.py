@@ -143,7 +143,8 @@ class SingleChoiceField(ChoiceBaseField):
         if not registration_data.data:
             return ''
         uuid, number_of_slots = registration_data.data.items()[0]
-        return registration_data.field_data.field.data['captions'][uuid]
+        caption = registration_data.field_data.field.data['captions'][uuid]
+        return '{} (+{})'.format(caption, number_of_slots - 1) if number_of_slots > 1 else caption
 
 
 class CheckboxField(RegistrationFormBillableField):
@@ -364,7 +365,11 @@ class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
 
     def get_friendly_data(self, registration_data):
+        def _format_item(uuid, number_of_slots):
+            caption = self.form_item.data['captions'][uuid]
+            return '{} (+{})'.format(caption, number_of_slots - 1) if number_of_slots > 1 else caption
+
         reg_data = registration_data.data
         if not reg_data:
             return ''
-        return [self.form_item.data['captions'][x] for x in reg_data]
+        return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
