@@ -107,4 +107,4 @@ class RHRegistrationFormDeleteInvitation(RHManageRegFormBase):
 
     def _process(self):
         db.session.delete(self.invitation)
-        return jsonify(success=True)
+        return jsonify_data(invitation_list=_render_invitation_list(self.regform))
