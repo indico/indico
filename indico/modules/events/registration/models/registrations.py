@@ -125,6 +125,12 @@ class Registration(db.Model):
         nullable=False,
         default=0
     )
+    #: The price modifier applied to the final calculated price
+    price_adjustment = db.Column(
+        db.Numeric(8, 2),  # max. 999999.99
+        nullable=False,
+        default=0
+    )
     #: The date/time when the registration was recorded
     submitted_dt = db.Column(
         UTCDateTime,
@@ -243,7 +249,20 @@ class Registration(db.Model):
 
     @property
     def price(self):
-        return self.base_price + Decimal(sum(data.price for data in self.data))
+        """The total price of the registration.
+
+        This includes the base price, the field-specific price, and
+        the custom price adjustment for the registrant.
+
+        :rtype: Decimal
+        """
+        # we convert the calculated price (float) to a string to avoid this:
+        # >>> Decimal(100.1)
+        # Decimal('100.099999999999994315658113919198513031005859375')
+        # >>> Decimal('100.1')
+        # Decimal('100.1')
+        calc_price = Decimal(str(sum(data.price for data in self.data)))
+        return (self.base_price + self.price_adjustment + calc_price).max(0)
 
     @property
     def summary_data(self):
