@@ -296,6 +296,10 @@
         @include border-top(lighten($gray, $color-variation));
         font-weight: bold;
         padding-top: 5px;
+
+        strong {
+            padding-right: 1em;
+        }
     }
 
     .regform-done-footer {

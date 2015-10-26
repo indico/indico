@@ -127,11 +127,11 @@
                             <td class="text-left">
                                 {% if item.field_data.field.input_type == 'accommodation' %}
                                     {% trans nights=item.friendly_data.nights,
-                                             choice=item.friendly_data.choice %}
+                                             choice=item.friendly_data.choice -%}
                                         {{ choice }} ({{ nights }} night)
                                     {%- pluralize -%}
                                         {{ choice }} ({{ nights }} nights)
-                                    {% endtrans %}
+                                    {%- endtrans %}
                                 {% elif item.field_data.field.input_type == 'multi_choice' %}
                                     {{ item.friendly_data | join(', ') }}
                                 {% else %}
@@ -141,11 +141,20 @@
                             <td class="text-right">{{ item.price }} {{ currency }}</td>
                         </tr>
                     {% endfor %}
+                    {% if registration.registration_form.base_price %}
+                        <tr class="regform-done-table-item">
+                            <td class="text-left">
+                                {% trans %}Registration fee{% endtrans %}
+                            </td>
+                            <td></td>
+                            <td class="text-right">
+                                {{ registration.registration_form.base_price }} {{ currency }}
+                            </td>
+                        </tr>
+                    {% endif %}
                     <tr>
-                        <td class="regform-done-table-total text-right" colspan="2">
+                        <td class="regform-done-table-total text-right" colspan="3">
                             <strong>{% trans %}Total{% endtrans %}</strong>
-                        </td>
-                        <td class="regform-done-table-total text-right">
                             {{ registration.render_price() }}
                         </td>
                     </tr>
