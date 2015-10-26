@@ -155,6 +155,18 @@ def upgrade():
     )
 
     op.create_table(
+        'legacy_registration_map',
+        sa.Column('event_id', sa.Integer(), autoincrement=False, nullable=False),
+        sa.Column('legacy_registrant_id', sa.Integer(), autoincrement=False, nullable=False),
+        sa.Column('legacy_registrant_key', sa.String(), nullable=False),
+        sa.Column('registration_id', sa.Integer(), nullable=False, index=True),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.ForeignKeyConstraint(['registration_id'], ['event_registration.registrations.id']),
+        sa.PrimaryKeyConstraint('event_id', 'legacy_registrant_id'),
+        schema='event_registration'
+    )
+
+    op.create_table(
         'invitations',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('uuid', postgresql.UUID(), nullable=False, index=True, unique=True),
@@ -184,6 +196,7 @@ def downgrade():
     op.drop_constraint('fk_form_items_current_data_id_form_field_data',
                        'form_items', schema='event_registration')
     op.drop_table('invitations', schema='event_registration')
+    op.drop_table('legacy_registration_map', schema='event_registration')
     op.drop_table('registration_data', schema='event_registration')
     op.drop_table('registrations', schema='event_registration')
     op.drop_table('form_field_data', schema='event_registration')

@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
+from indico.modules.events.registration.controllers.compat import compat_registration
 from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationFormList,
                                                                     RHRegistrationForm,
                                                                     RHRegistrationFormCheckEmail,
@@ -177,3 +178,9 @@ _bp.add_url_rule('!/api/events/<event_id>/registrants/<registrant_id>', 'api_reg
                  RHAPIRegistrant, methods=('GET', 'PATCH'))
 _bp.add_url_rule('!/api/events/<event_id>/registrants', 'api_registrants',
                  RHAPIRegistrants)
+
+
+# Legacy URLs
+_compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')
+_compat_bp.add_url_rule('/registration/', 'registration', compat_registration)
+_compat_bp.add_url_rule('/registration/<path:path>', 'registration', compat_registration)
