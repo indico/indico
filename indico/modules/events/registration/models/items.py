@@ -93,15 +93,18 @@ class PersonalDataType(int, IndicoEnum):
             }),
             (cls.address, {
                 'title': 'Address',
-                'input_type': 'textarea'
+                'input_type': 'textarea',
+                'is_enabled': False
             }),
             (cls.country, {
                 'title': 'Country',
-                'input_type': 'country'
+                'input_type': 'country',
+                'is_enabled': False
             }),
             (cls.phone, {
                 'title': 'Phone Number',
-                'input_type': 'phone'
+                'input_type': 'phone',
+                'is_enabled': False
             }),
         ]
 
