@@ -262,7 +262,9 @@ class Registration(db.Model):
         # >>> Decimal('100.1')
         # Decimal('100.1')
         calc_price = Decimal(str(sum(data.price for data in self.data)))
-        return (self.base_price + self.price_adjustment + calc_price).max(0)
+        base_price = self.base_price or Decimal('0')
+        price_adjustment = self.price_adjustment or Decimal('0')
+        return (base_price + price_adjustment + calc_price).max(0)
 
     @property
     def summary_data(self):
