@@ -234,9 +234,10 @@ class CheckboxField(RegistrationFormBillableField):
     @property
     def validators(self):
         def _check_number_of_places(form, field):
-            places_left = self.form_item.data.get('places_limit', 0) - self.get_places_used()
-            if field.data and not places_left:
-                raise ValidationError(_('There are no places left for this option.'))
+            if field.data and self.form_item.data.get('places_limit'):
+                places_left = self.form_item.data.get('places_limit') - self.get_places_used()
+                if not places_left:
+                    raise ValidationError(_('There are no places left for this option.'))
         return [_check_number_of_places]
 
 
@@ -282,14 +283,15 @@ class BooleanField(RegistrationFormBillableField):
     @property
     def validators(self):
         def _check_number_of_places(form, field):
-            places_left = self.form_item.data.get('places_limit', 0) - self.get_places_used()
-            if field.data and not places_left:
-                raise ValidationError(_('There are no places left for this option.'))
+            if field.data and self.form_item.data.get('places_limit'):
+                places_left = self.form_item.data.get('places_limit') - self.get_places_used()
+                if field.data and not places_left:
+                    raise ValidationError(_('There are no places left for this option.'))
         return [_check_number_of_places]
 
     def get_places_used(self):
         places_used = 0
-        if self.form_item.data['places_limit']:
+        if self.form_item.data.get('places_limit'):
             for registration in self.form_item.registration_form.active_registrations:
                 if self.form_item.id not in registration.data_by_field:
                     continue
@@ -425,8 +427,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
             item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']),
                         None)
             captions = self.form_item.data['captions']
-            if item and not (item['places_limit'] and (item['places_limit']
-                             - self.get_places_used()[field.data['choice']])):
+            if item and item['places_limit'] and not ((item['places_limit']
+                                                       - self.get_places_used()[field.data['choice']])):
                 raise ValidationError(_('Not enough rooms in the {0}').format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 
