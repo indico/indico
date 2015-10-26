@@ -1606,7 +1606,7 @@ class WPConfModifToolsBase(WPConferenceModifBase):
 class WPConfCloneConfirm(WPConferenceModifBase):
 
     def __init__(self, rh, conf, nbClones):
-        WPConfModifToolsBase.__init__(self, rh, conf)
+        WPConferenceModifBase.__init__(self, rh, conf)
         self._nbClones = nbClones
 
     def _getPageContent(self, params):
