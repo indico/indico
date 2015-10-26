@@ -110,6 +110,20 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def view_data(self):
         return dict(super(ChoiceBaseField, self).view_data, places_used=self.get_places_used())
 
+    @property
+    def validators(self):
+        def _check_number_of_places(form, field):
+            if not field.data:
+                return
+            choices = self.form_item.versioned_data['choices']
+            captions = self.form_item.data['captions']
+            for k, v in field.data.iteritems():
+                choice = next((x for x in choices if x['id'] == k), None)
+                places_left = choice.get('places_limit')
+                if places_left and (places_left - self.get_places_used()[k]):
+                    raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
+        return [_check_number_of_places]
+
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super(ChoiceBaseField, cls).process_field_data(data, old_data,
@@ -217,6 +231,14 @@ class CheckboxField(RegistrationFormBillableField):
         return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
                 if val is not None}
 
+    @property
+    def validators(self):
+        def _check_number_of_places(form, field):
+            places_left = self.form_item.data.get('places_limit', 0) - self.get_places_used()
+            if field.data and not places_left:
+                raise ValidationError(_('There are no places left for this option.'))
+        return [_check_number_of_places]
+
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
@@ -256,6 +278,14 @@ class BooleanField(RegistrationFormBillableField):
     @property
     def view_data(self):
         return dict(super(BooleanField, self).view_data, places_used=self.get_places_used())
+
+    @property
+    def validators(self):
+        def _check_number_of_places(form, field):
+            places_left = self.form_item.data.get('places_limit', 0) - self.get_places_used()
+            if field.data and not places_left:
+                raise ValidationError(_('There are no places left for this option.'))
+        return [_check_number_of_places]
 
     def get_places_used(self):
         places_used = 0
@@ -384,11 +414,19 @@ class AccommodationField(RegistrationFormBillableItemsField):
 
     @property
     def validators(self):
-        def stay_dates_valid(form, field):
+        def _stay_dates_valid(form, field):
             data = snakify_keys(field.data)
             if _to_date(data['arrival_date']) > _to_date(data['departure_date']):
                 raise ValidationError(_("Arrival date can't be set after the departure date."))
-        return [stay_dates_valid]
+
+        def _check_number_of_places(form, field):
+            if not field.data:
+                return
+            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']))
+            captions = self.form_item.data['captions']
+            if item and not item['places_limit'] - self.get_places_used()[field.data['choice']]:
+                raise ValidationError(_('Not enough rooms in the {0}').format(captions[item['id']]))
+        return [_stay_dates_valid, _check_number_of_places]
 
     @property
     def view_data(self):
