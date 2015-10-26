@@ -1,7 +1,9 @@
 {% if management %}
     {% extends 'events/registration/management/_regform_base.html' %}
-{% else %}
+{% elif event.getType() == 'conference' %}
     {% extends 'events/registration/display/_event_regform_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
 {% endif %}
 
 {% from 'events/registration/display/_regform_invitation_info.html' import render_invitation_info %}
@@ -10,7 +12,11 @@
 
 
 {% block subtitle %}
-    {% trans title=regform.title %}Add registration to "{{ title }}"{% endtrans %}
+    {% if management %}
+        {% trans title=regform.title %}Add registration to "{{ title }}"{% endtrans %}
+    {% else %}
+        {{ regform.title }}
+    {% endif %}
 {% endblock %}
 
 
@@ -23,6 +29,18 @@
 
     {% if not registration %}
         {% if management or regform.is_active %}
+
+            {% if regform.moderation_enabled %}
+                {% call message_box('warning', fixed_width=true, large_icon=true) %}
+                    <div class="label">
+                        {% trans %}Participation in this event is moderated{% endtrans %}
+                    </div>
+                    {% trans -%}
+                        The organizers will have to approve your application.
+                    {%- endtrans %}
+                {% endcall %}
+                {% endif %}
+
             <div ng-app="nd" ng-controller="AppCtrl">
                 <div nd-reg-form
                     conf-id="{{ event.id }}"

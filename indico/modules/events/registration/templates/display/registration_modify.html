@@ -1,4 +1,9 @@
-{% extends 'events/registration/display/_event_regform_base.html' %}
+{% if event.getType() == 'conference' %}
+    {% extends 'events/registration/display/_event_regform_base.html' %}
+{% else %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+{% endif %}
+
 {% from 'message_box.html' import message_box %}
 
 {% block title %}
