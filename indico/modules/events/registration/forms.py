@@ -22,6 +22,7 @@ from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.html5 import NumberInput
 
+from indico.core.config import Config
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
@@ -29,7 +30,7 @@ from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField
-from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime
+from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime, IndicoEmail
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
 
@@ -63,6 +64,8 @@ class RegistrationFormForm(IndicoForm):
                               filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_("A fixed fee all users have to pay when registering."))
+    notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
+                                              filters=[lambda x: (x or None)])
     message_pending = TextAreaField(_("Message for pending registrations"),
                                     description=_("Text included in emails sent to pending registrations"))
     message_unpaid = TextAreaField(_("Message for unpaid registrations"),
@@ -75,6 +78,13 @@ class RegistrationFormForm(IndicoForm):
                                                      [HiddenUnless('manager_notifications_enabled',
                                                                    preserve_data=True), DataRequired()],
                                                      description=_("Email addresses that will receive notifications"))
+
+    def __init__(self, *args, **kwargs):
+        super(IndicoForm, self).__init__(*args, **kwargs)
+        default_sender_address = Config.getInstance().getNoReplyEmail()
+        self.notification_sender_address.description = _('Email address set as the sender of all '
+                                                         'notifications sent to users. If empty, '
+                                                         'then {0} is used.'.format(default_sender_address))
 
 
 class RegistrationFormScheduleForm(IndicoForm):

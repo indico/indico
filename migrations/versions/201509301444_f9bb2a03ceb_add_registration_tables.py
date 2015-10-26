@@ -46,6 +46,7 @@ def upgrade():
         sa.Column('publish_registrations_enabled', sa.Boolean(), nullable=False),
         sa.Column('moderation_enabled', sa.Boolean(), nullable=False),
         sa.Column('base_price', sa.Numeric(8, 2), nullable=False),
+        sa.Column('notification_sender_address', sa.String(), nullable=True),
         sa.Column('message_pending', sa.Text(), nullable=False),
         sa.Column('message_unpaid', sa.Text(), nullable=False),
         sa.Column('message_complete', sa.Text(), nullable=False),

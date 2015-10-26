@@ -135,6 +135,11 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=0
     )
+    #: Notifications sender address
+    notification_sender_address = db.Column(
+        db.String,
+        nullable=True
+    )
     #: Custom message to include in emails for pending registrations
     message_pending = db.Column(
         db.Text,

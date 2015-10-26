@@ -34,7 +34,8 @@ def notify_invitation(invitation, email_body, from_address):
 def _notify_registration(registration, template, to_managers=False):
     template = get_template_module('events/registration/emails/{}'.format(template), registration=registration)
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
-    email = make_email(to_list=to_list, template=template, html=True)
+    from_address = registration.registration_form.notification_sender_address if not to_managers else None
+    email = make_email(to_list=to_list, template=template, html=True, from_address=from_address)
     send_email(email, event=registration.registration_form.event, module='Registration', user=session.user)
 
 
