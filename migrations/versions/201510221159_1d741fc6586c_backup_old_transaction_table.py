@@ -24,6 +24,7 @@ def upgrade():
     op.rename_table('payment_transactions', 'payment_transactions_old', schema='events')
     op.execute(_rename_constraint('events', 'payment_transactions_old',
                                   'pk_payment_transactions', 'pk_payment_transactions_old'))
+    op.execute("ALTER SEQUENCE events.payment_transactions_id_seq RENAME TO payment_transactions_old_id_seq")
     op.create_table(
         'payment_transactions',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -49,6 +50,7 @@ def downgrade():
     op.drop_constraint(op.f('fk_registrations_transaction_id_payment_transactions'), 'registrations',
                        schema='event_registration')
     op.drop_table('payment_transactions', schema='events')
+    op.execute("ALTER SEQUENCE events.payment_transactions_old_id_seq RENAME TO payment_transactions_id_seq")
     op.execute(_rename_constraint('events', 'payment_transactions_old',
                                   'pk_payment_transactions_old', 'pk_payment_transactions'))
     op.rename_table('payment_transactions_old', 'payment_transactions', schema='events')
