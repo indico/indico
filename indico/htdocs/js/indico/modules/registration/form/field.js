@@ -189,7 +189,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.fieldName = $scope.field.htmlName;
     $scope.emailInfoMessage = '';
     $scope.emailInfoError = false;
-    if ($scope.field.htmlName == 'email') {
+    if ($scope.field.htmlName == 'email' && !$scope.editMode) {
         $('#registrationForm').on('change input', 'input[name=email]', _.debounce(function() {
             checkEmail($(this).val());
             $scope.$apply();
