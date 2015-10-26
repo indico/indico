@@ -120,7 +120,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             for k, v in field.data.iteritems():
                 choice = next((x for x in choices if x['id'] == k), None)
                 places_left = choice.get('places_limit')
-                if places_left and (places_left - self.get_places_used()[k]):
+                if places_left and not (places_left - self.get_places_used()[k]):
                     raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
@@ -416,15 +416,17 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def validators(self):
         def _stay_dates_valid(form, field):
             data = snakify_keys(field.data)
-            if _to_date(data['arrival_date']) > _to_date(data['departure_date']):
+            if data and (_to_date(data['arrival_date']) > _to_date(data['departure_date'])):
                 raise ValidationError(_("Arrival date can't be set after the departure date."))
 
         def _check_number_of_places(form, field):
             if not field.data:
                 return
-            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']))
+            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']),
+                        None)
             captions = self.form_item.data['captions']
-            if item and not item['places_limit'] - self.get_places_used()[field.data['choice']]:
+            if item and not (item['places_limit'] and (item['places_limit']
+                             - self.get_places_used()[field.data['choice']])):
                 raise ValidationError(_('Not enough rooms in the {0}').format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 
@@ -434,6 +436,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
 
     def get_friendly_data(self, registration_data):
         friendly_data = dict(registration_data.data)
+        if not friendly_data:
+            return {}
         unversioned_data = registration_data.field_data.field.data
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
         friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
@@ -444,6 +448,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
         reg_data = registration_data.data
+        if not reg_data:
+            return 0
         item = next((x for x in data['choices']
                      if reg_data['choice'] == x['id'] and x.get('is_billable', False)), None)
         if not item or not item['price']:
@@ -452,11 +458,21 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return item['price'] * nights
 
     def process_form_data(self, registration, value, old_data=None):
+        if not value:
+            return super(AccommodationField, self).process_form_data(registration, {}, old_data=old_data)
         return super(AccommodationField, self).process_form_data(registration, {
             'choice': value['choice'],
             'arrival_date': value['arrivalDate'],
             'departure_date': value['departureDate']
         }, old_data=old_data)
+
+    def save_data(self, registration, value):
+        if not value:
+            data = {}
+        else:
+            data = {'choice': value.get('choice'), 'arrival_date': value.get('arrivalDate'),
+                    'departure_date': value.get('departureDate')}
+        return super(AccommodationField, self).save_data(registration, data)
 
     def get_places_used(self):
         places_used = Counter()
