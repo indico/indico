@@ -1,7 +1,17 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro render_invitation_list(invitations) %}
-    {{ _render_invitations_block(invitations, 'pending', _('Pending invitations')) }}
-    {{ _render_invitations_block(invitations, 'accepted', _('Accepted invitations')) }}
-    {{ _render_invitations_block(invitations, 'declined', _('Declined invitations')) }}
+    {% if invitations %}
+        <div class="i-box invitation-list">
+            {{ _render_invitations_block(invitations, 'pending', _('Pending invitations')) }}
+            {{ _render_invitations_block(invitations, 'accepted', _('Accepted invitations')) }}
+            {{ _render_invitations_block(invitations, 'declined', _('Declined invitations')) }}
+        </div>
+    {% else %}
+        {% call message_box('info', fixed_width=true) %}
+            {% trans %}Nobody has been invited yet.{% endtrans %}
+        {% endcall %}
+    {% endif %}
 {% endmacro %}
 
 

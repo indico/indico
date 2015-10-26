@@ -28,8 +28,8 @@
                 method: $this.data('method'),
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
-                success: function() {
-                    $this.closest('tr').remove();
+                success: function(data) {
+                    $('#invitation-list').html(data.invitation_list);
                 }
             });
         });
