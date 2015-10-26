@@ -117,6 +117,10 @@ class RegistrationFormFieldBase(object):
     def get_friendly_data(self, registration_data):
         return registration_data.data
 
+    def get_places_used(self):
+        """Returns the number of used places for the field"""
+        return 0
+
 
 class RegistrationFormBillableField(RegistrationFormFieldBase):
     @classmethod
