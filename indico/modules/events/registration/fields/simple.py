@@ -195,12 +195,12 @@ class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
 
-    def save_data(self, registration, value):
+    def process_form_data(self, registration, value, old_data=None):
         if value:
             # TODO: fix client side code to send us time information then adapt the next line
             date_format = self.form_item.data['date_format'].split(' ')[0]
             value = datetime.strptime(value, date_format).isoformat()
-        return super(DateField, self).save_data(registration, value)
+        return super(DateField, self).process_form_data(registration, value, old_data)
 
     def get_friendly_data(self, registration_data):
         date_string = registration_data.data
@@ -252,7 +252,7 @@ class CountryField(RegistrationFormFieldBase):
         return {'choices': CountryHolder.getCountries().items()}
 
     @classmethod
-    def unprocess_field_data(self):
+    def unprocess_field_data(cls, versioned_data, unversioned_data):
         choices = sorted([{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()],
                          key=itemgetter('caption'))
         return {'choices': choices}
@@ -269,7 +269,7 @@ class FileField(RegistrationFormFieldBase):
     name = 'file'
     wtf_field_class = wtforms.FileField
 
-    def process_form_data(self, registration, value):
+    def process_form_data(self, registration, value, old_data=None):
         if value is None or not value.filename:
             return {}
         content = value.file.read()
@@ -331,16 +331,16 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return unversioned_data, versioned_data
 
     @classmethod
-    def unprocess_field_data(self, versioned_data, unversioned_data):
+    def unprocess_field_data(cls, versioned_data, unversioned_data):
         data = {}
         arrival_date_from = _to_date(unversioned_data['arrival_date_from'])
         arrival_date_to = _to_date(unversioned_data['arrival_date_to'])
         departure_date_from = _to_date(unversioned_data['departure_date_from'])
         departure_date_to = _to_date(unversioned_data['departure_date_to'])
-        data['arrival_dates'] = [(dt.date().isoformat(), format_date(dt)) for dt in
-                                 iterdays(arrival_date_from, arrival_date_to)]
-        data['departure_dates'] = [(dt.date().isoformat(), format_date(dt)) for dt in
-                                   iterdays(departure_date_from, departure_date_to)]
+        data['arrival_dates'] = [(dt.date().isoformat(), format_date(dt))
+                                 for dt in iterdays(arrival_date_from, arrival_date_to)]
+        data['departure_dates'] = [(dt.date().isoformat(), format_date(dt))
+                                   for dt in iterdays(departure_date_from, departure_date_to)]
         items = deepcopy(versioned_data['choices'])
         for item in items:
             item['caption'] = unversioned_data['captions'][item['id']]

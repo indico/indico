@@ -38,7 +38,7 @@
        <div class="toolbar right">
            {% if registration.registration_form.modification_mode.name != 'not_allowed' %}
                <div class="group">
-                   <a href="{{ url_for('.edit_registration_display', registration) }}"
+                   <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
                       class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
                        {% if not registration.can_be_modified %}
                            {% if not registration.registration_form.is_modification_open -%}
@@ -104,5 +104,5 @@
         {%- endtrans %}
     </div>
     <input type="text" class="permalink" readonly
-           value="{{ url_for('.display_regform', registration.registration_form, token=registration.uuid, _external=true) }}">
+           value="{{ url_for('.display_regform', registration.locator.uuid, _external=true) }}">
 </div>
