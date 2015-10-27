@@ -152,6 +152,17 @@
                             </td>
                         </tr>
                     {% endif %}
+                    {% if registration.price_adjustment %}
+                        <tr class="regform-done-table-item">
+                            <td class="text-left">
+                                {% trans %}Price adjustment{% endtrans %}
+                            </td>
+                            <td></td>
+                            <td class="text-right">
+                                {{ registration.price_adjustment }} {{ currency }}
+                            </td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <td class="regform-done-table-total text-right" colspan="3">
                             <strong>{% trans %}Total{% endtrans %}</strong>
