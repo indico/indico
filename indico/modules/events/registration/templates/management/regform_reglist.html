@@ -28,7 +28,25 @@
                 </button>
             </div>
             <div class="group left">
-                <a href="{{ url_for('.create_registration', regform) }}" class="i-button icon-plus">{% trans %}Add new{% endtrans %}</a>
+                <div id="indico-user-to-add" class="hidden"></div>
+                <a class="i-button arrow icon-plus" data-toggle="dropdown">
+                    {% trans %}Add new{% endtrans %}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="{{ url_for('.create_registration', regform) }}"
+                           data-title="{% trans %}Register a user that doesn't exist in Indico{% endtrans %}">
+                            {% trans %}New user{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="js-add-user"
+                           data-href="{{ url_for('.create_registration', regform) }}"
+                           data-title="{% trans %}Register a Indico user{% endtrans %}">
+                            {% trans %}Indico user{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
                 <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
                    data-href="{{ url_for('.delete_registrations', regform) }}"
                    data-method="POST"
