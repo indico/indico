@@ -41,23 +41,19 @@ from MaKaC.webinterface.common.countries import CountryHolder
 
 def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
-
-    try:
-        val = rdata.data.keys()[0]
-    except (AttributeError, IndexError):
-        val = None
-
     result = deepcopy(field.view_data)
-
-    if val and not any(item['id'] == val for item in result['choices']):
-        field_data = rdata.field_data
-        merged_data = field.field_impl.unprocess_field_data(field_data.versioned_data,
-                                                            field_data.field.data)
-        missing_option = next((choice for choice in merged_data['choices'] if choice['id'] == val), None)
-        if missing_option:
-            result['choices'].append(missing_option)
-            result['deletedChoice'] = True
-
+    result['deletedChoice'] = []
+    if not rdata:
+        return result
+    for val in rdata.data.keys():
+        if val and not any(item['id'] == val for item in result['choices']):
+            field_data = rdata.field_data
+            merged_data = field.field_impl.unprocess_field_data(field_data.versioned_data,
+                                                                field_data.field.data)
+            missing_option = next((choice for choice in merged_data['choices'] if choice['id'] == val), None)
+            if missing_option:
+                result['choices'].append(missing_option)
+                result['deletedChoice'].append(missing_option['id'])
     return result
 
 

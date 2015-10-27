@@ -26,7 +26,8 @@ from wtforms import ValidationError
 
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.fields.simple import ChoiceBaseField, get_field_merged_options
+from indico.modules.events.registration.fields.simple import (ChoiceBaseField, AccommodationField,
+                                                              get_field_merged_options)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormFieldData)
 from indico.modules.events.registration.models.forms import RegistrationForm
