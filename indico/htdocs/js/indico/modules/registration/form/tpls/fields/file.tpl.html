@@ -1,4 +1,4 @@
-<div ng-switch="userdata[fieldName] !== undefined && userdata[fieldName] !== null">
+<div ng-switch="!!userdata[fieldName]">
     <div ng-switch-default>
         <ng-form name="nestedForm">
             <input type="file" nd-valid-file
@@ -9,16 +9,15 @@
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
         </div>
     </ng-form>
-
     <div ng-switch-when="true">
-        <a ng-href="{{userdata[fieldName].path}}" class="file-link">
-            {{userdata[fieldName].name}}
-        </a>
+        <span class="file-link">
+            {{ userdata[fieldName] }}
+        </span>
         <a href="" class="remove-file"
             title="{{ 'Remove attachment' | i18n }}"
             alt="{{ 'Remove attachment' | i18n }}"
             ng-click="removeAttachment()"></a>
         <input type="hidden" name="{{ fieldName }}"
-            value="{{userdata[fieldName].path}}">
+            value="{{ userdata[fieldName] }}">
     </div>
 </div>

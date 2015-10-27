@@ -308,6 +308,10 @@ class RegistrationForm(db.Model):
     def is_active(self):
         return self.is_open and not self.limit_reached
 
+    @property
+    def active_registrations(self):
+        return [r for r in self.registrations if not r.is_deleted and not r.is_cancelled]
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)

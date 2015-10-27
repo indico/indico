@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from collections import Counter
 from copy import deepcopy
 from datetime import datetime
 from operator import itemgetter
@@ -108,6 +109,30 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def filter_choices(self):
         return self.form_item.data['captions']
 
+    @property
+    def view_data(self):
+        return dict(super(ChoiceBaseField, self).view_data, places_used=self.get_places_used())
+
+    @property
+    def validators(self):
+        def _check_number_of_places(form, field):
+            if not field.data:
+                return
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(field.data, old_data):
+                    return
+            choices = self.form_item.versioned_data['choices']
+            captions = self.form_item.data['captions']
+            for k in field.data:
+                choice = next((x for x in choices if x['id'] == k), None)
+                places_limit = choice.get('places_limit')
+                places_used_dict = self.get_places_used()
+                places_used_dict.update(field.data)
+                if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
+                    raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
+        return [_check_number_of_places]
+
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super(ChoiceBaseField, cls).process_field_data(data, old_data,
@@ -129,6 +154,17 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         versioned_data['choices'] = items
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
+
+    def get_places_used(self):
+        places_used = Counter()
+        for registration in self.form_item.registration_form.active_registrations:
+            if self.form_item.id not in registration.data_by_field:
+                continue
+            data = registration.data_by_field[self.form_item.id].data
+            if not data:
+                continue
+            places_used.update(data)
+        return dict(places_used)
 
     def create_sql_filter(self, data_list):
         return RegistrationData.data.has_any(db.func.cast(data_list, ARRAY(db.String)))
@@ -185,10 +221,37 @@ class CheckboxField(RegistrationFormBillableField):
     def get_friendly_data(self, registration_data):
         return self.friendly_data_mapping[registration_data.data]
 
+    def get_places_used(self):
+        places_used = 0
+        if self.form_item.data.get('places_limit'):
+            for registration in self.form_item.registration_form.active_registrations:
+                if self.form_item.id not in registration.data_by_field:
+                    continue
+                if registration.data_by_field[self.form_item.id].data:
+                    places_used += 1
+        return places_used
+
+    @property
+    def view_data(self):
+        return dict(super(CheckboxField, self).view_data, places_used=self.get_places_used())
+
     @property
     def filter_choices(self):
         return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
                 if val is not None}
+
+    @property
+    def validators(self):
+        def _check_number_of_places(form, field):
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(field.data, old_data):
+                    return
+            if field.data and self.form_item.data.get('places_limit'):
+                places_left = self.form_item.data.get('places_limit') - self.get_places_used()
+                if not places_left:
+                    raise ValidationError(_('There are no places left for this option.'))
+        return [_check_number_of_places]
 
 
 class DateField(RegistrationFormFieldBase):
@@ -225,6 +288,33 @@ class BooleanField(RegistrationFormBillableField):
     def filter_choices(self):
         return {unicode(val).lower(): caption for val, caption in self.friendly_data_mapping.iteritems()
                 if val is not None}
+
+    @property
+    def view_data(self):
+        return dict(super(BooleanField, self).view_data, places_used=self.get_places_used())
+
+    @property
+    def validators(self):
+        def _check_number_of_places(form, field):
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(field.data, old_data):
+                    return
+            if field.data and self.form_item.data.get('places_limit'):
+                places_left = self.form_item.data.get('places_limit') - self.get_places_used()
+                if field.data and not places_left:
+                    raise ValidationError(_('There are no places left for this option.'))
+        return [_check_number_of_places]
+
+    def get_places_used(self):
+        places_used = 0
+        if self.form_item.data.get('places_limit'):
+            for registration in self.form_item.registration_form.active_registrations:
+                if self.form_item.id not in registration.data_by_field:
+                    continue
+                if registration.data_by_field[self.form_item.id].data:
+                    places_used += 1
+        return places_used
 
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
@@ -270,7 +360,7 @@ class FileField(RegistrationFormFieldBase):
 
     def process_form_data(self, registration, value, old_data=None):
         if value is None or not value.filename:
-            return {}
+            return {'file': {}}
         return {
             'field_data': self.form_item.current_data,
             'file': {
@@ -343,14 +433,35 @@ class AccommodationField(RegistrationFormBillableItemsField):
 
     @property
     def validators(self):
-        def stay_dates_valid(form, field):
+        def _stay_dates_valid(form, field):
             data = snakify_keys(field.data)
-            if _to_date(data['arrival_date']) > _to_date(data['departure_date']):
+            if data and (_to_date(data['arrival_date']) > _to_date(data['departure_date'])):
                 raise ValidationError(_("Arrival date can't be set after the departure date."))
-        return [stay_dates_valid]
+
+        def _check_number_of_places(form, field):
+            if not field.data:
+                return
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(snakify_keys(field.data), old_data):
+                    return
+            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']),
+                        None)
+            captions = self.form_item.data['captions']
+            places_used_dict = self.get_places_used()
+            if item and item['places_limit'] and not ((item['places_limit']
+                                                       - places_used_dict.get(field.data['choice'], 0))):
+                raise ValidationError(_('Not enough rooms in the {0}').format(captions[item['id']]))
+        return [_stay_dates_valid, _check_number_of_places]
+
+    @property
+    def view_data(self):
+        return dict(super(AccommodationField, self).view_data, places_used=self.get_places_used())
 
     def get_friendly_data(self, registration_data):
         friendly_data = dict(registration_data.data)
+        if not friendly_data:
+            return {}
         unversioned_data = registration_data.field_data.field.data
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
         friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
@@ -361,6 +472,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def calculate_price(self, registration_data):
         data = registration_data.field_data.versioned_data
         reg_data = registration_data.data
+        if not reg_data:
+            return 0
         item = next((x for x in data['choices']
                      if reg_data['choice'] == x['id'] and x.get('is_billable', False)), None)
         if not item or not item['price']:
@@ -369,11 +482,24 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return item['price'] * nights
 
     def process_form_data(self, registration, value, old_data=None):
+        if not value:
+            return super(AccommodationField, self).process_form_data(registration, {}, old_data=old_data)
         return super(AccommodationField, self).process_form_data(registration, {
             'choice': value['choice'],
             'arrival_date': value['arrivalDate'],
             'departure_date': value['departureDate']
         }, old_data=old_data)
+
+    def get_places_used(self):
+        places_used = Counter()
+        for registration in self.form_item.registration_form.active_registrations:
+            if self.form_item.id not in registration.data_by_field:
+                continue
+            data = registration.data_by_field[self.form_item.id].data
+            if not data:
+                continue
+            places_used.update((data['choice'],))
+        return dict(places_used)
 
 
 def _to_machine_date(date):
