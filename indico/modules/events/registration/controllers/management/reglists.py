@@ -44,6 +44,7 @@ from indico.modules.events.registration.util import (get_event_section_data, mak
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
+from indico.modules.users import User
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
@@ -363,6 +364,11 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
 class RHRegistrationCreate(RHManageRegFormBase):
     """Create new registration (management area)"""
 
+    def _checkParams(self, params):
+        RHManageRegFormBase._checkParams(self, params)
+        user_id = request.args.get('user')
+        self.user = User.find_first(User.id == user_id, ~User.is_deleted) if user_id else None
+
     def _process(self):
         form = make_registration_form(self.regform)()
         if form.validate_on_submit():
@@ -373,11 +379,12 @@ class RHRegistrationCreate(RHManageRegFormBase):
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
                 flash(error, 'error')
+        user_data = {t.name: getattr(self.user, t.name, None) if self.user else '' for t in PersonalDataType}
         return WPManageRegistration.render_template('display/regform_display.html', self.event, event=self.event,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     currency=payment_event_settings.get(self.event, 'currency'),
                                                     post_url=url_for('.create_registration', self.regform),
-                                                    user_data={}, management=True)
+                                                    user_data=user_data, management=True)
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):

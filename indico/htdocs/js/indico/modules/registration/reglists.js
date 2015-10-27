@@ -129,7 +129,20 @@
         $('.registrations .toolbar').on('click', '.disabled', function(e) {
             e.preventDefault();
             e.stopPropagation();
-        })
+        });
+
+        var principal = $('#indico-user-to-add').principalfield({
+            onUpdate: function(users) {
+                if (users.length) {
+                    var url = $('.js-add-user').data('href');
+                    location.href = build_url(url, {user: users[0].id});
+                }
+            }
+        });
+
+        $('.js-add-user').on('click', function() {
+            principal.principalfield('choose');
+        });
     };
 
 
