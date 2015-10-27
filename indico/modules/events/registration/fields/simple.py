@@ -197,8 +197,7 @@ class DateField(RegistrationFormFieldBase):
 
     def process_form_data(self, registration, value, old_data=None):
         if value:
-            # TODO: fix client side code to send us time information then adapt the next line
-            date_format = self.form_item.data['date_format'].split(' ')[0]
+            date_format = self.form_item.data['date_format']
             value = datetime.strptime(value, date_format).isoformat()
         return super(DateField, self).process_form_data(registration, value, old_data)
 

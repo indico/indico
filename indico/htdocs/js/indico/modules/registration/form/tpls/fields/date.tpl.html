@@ -1,15 +1,24 @@
 <ng-form name="nestedForm">
-    <input
-        type="text"
-        id="field-{{ section.id }}-{{ field.id }}"
-        class="datepicker"
-        name="{{ field.htmlName }}"
-        show-time="showTime(field.dateFormat)"
-        validation="validationStarted"
-        ng-required="{{ field.isRequired }}"
-        ng-model="date"
-        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
-        nd-jquery-datepicker>
+    <div>
+        <input
+            type="text"
+            id="field-{{ section.id }}-{{ field.id }}-date"
+            class="datepicker"
+            show-time="showTime(field.dateFormat)"
+            validation="validationStarted"
+            ng-required="{{ field.isRequired }}"
+            ng-model="dateTime.date"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+            nd-jquery-datepicker>
+
+        <input type="time"
+               id="field-{{ section.id }}-{{ field.id }}-time"
+               class="timepicker"
+               ng-if="dateTime.time"
+               ng-required="{{ field.isRequired }}"
+               ng-model="dateTime.time"
+               ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+    </div>
     <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
@@ -20,3 +29,5 @@
         {{ el[1] }}
     </span>
 </span>
+
+<input type="hidden" name="{{ field.htmlName }}" value="{{ dateTime.date }} {{ dateTime.time }}">
