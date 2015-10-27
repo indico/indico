@@ -722,7 +722,6 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                     "tracks"        : "cloneTracks"       in paramNames,
                     "registration"  : "cloneRegistration" in paramNames,
                     "abstracts"     : "cloneAbstracts"    in paramNames,
-                    "participants"  : "cloneParticipants" in paramNames,
                     "managing"      : self._getUser()
                     }
         #we notify the event in case any plugin wants to add their options

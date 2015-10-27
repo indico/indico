@@ -109,9 +109,7 @@ class WPSEConfClone(conferences.WPConfClone):
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
-            "cloneOptions": i18nformat("""
-    <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1">_("Participants")</li>
-           """)
+            "cloneOptions": ''
         }
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)

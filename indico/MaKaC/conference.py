@@ -3722,9 +3722,6 @@ class Conference(CommonObjectBase, Locatable):
                         conf.addContribution(nc)
                         sch.addEntry(nc.getSchEntry())
                         ContextManager.setdefault("clone.unique_id_map", {})[cont.getUniqueId()] = nc.getUniqueId()
-        # Participants' module settings and list cloning
-        if options.get("participants",False) :
-            self.getParticipation().clone(conf, options, eventManager)
         conf.notifyModification()
 
         # Copy the list of enabled features
