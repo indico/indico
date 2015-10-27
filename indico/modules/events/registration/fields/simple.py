@@ -357,7 +357,7 @@ class FileField(RegistrationFormFieldBase):
 
     def process_form_data(self, registration, value, old_data=None):
         if value is None or not value.filename:
-            return {'file': {}}
+            return {} if old_data is not None else {'field_data': self.form_item.current_data}
         return {
             'field_data': self.form_item.current_data,
             'file': {
