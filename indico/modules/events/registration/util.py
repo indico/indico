@@ -143,6 +143,7 @@ def make_registration_form(regform, management=False, registration=None):
             continue
         field_impl = form_item.field_impl
         setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
+    RegistrationFormWTF.modified_registration = registration
     return RegistrationFormWTF
 
 
@@ -235,7 +236,6 @@ def modify_registration(registration, data, management=False):
                                                                field_data=form_item.current_data)
 
             attrs = form_item.field_impl.process_form_data(registration, value, data_by_field[form_item.id])
-
             for key, val in attrs.iteritems():
                 setattr(data_by_field[form_item.id], key, val)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:

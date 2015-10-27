@@ -4,8 +4,9 @@
             <li ng-repeat="item in field.choices | filter:{isEnabled: true}" ng-required="field.isRequired"
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}">
                 <input id="{{ item.id }}" type="checkbox" ng-click="multiFieldItemChecked($event)"
-                       ng-disabled="isDisabled(item, getUserdataValue()) || !userdata.manager && paymentBlocked(item, userdata)"
+                       ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || !userdata.manager && paymentBlocked(item, userdata)"
                        ng-model="itemChecked"
+                       ng-init="itemChecked=userdata[fieldName][item.id] ? true : false"
                        data-paid="{{ userdata.paid }}"
                        data-blocked="{{ paymentBlocked(item, userdata) }}"
                        ng-checked="userdata[fieldName][item.id]">
@@ -14,22 +15,22 @@
                 <span ng-if="changesPrice(item)">
                     <nd-currency currency="currency"></nd-currency>
                 </span>
-                <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, getUserdataValue())">
+                <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, userdata[fieldName][item.id])">
                     <span ng-switch-when="false" class="unavailable-text" style="margin-left: 25px;">
                         ({{ "no places left" | i18n }})
                     </span>
                     <span ng-switch-when="true" class="available-text" style="margin-left: 25px;">
-                        [{{ getPlacesLeft(item, getUserdataValue(), itemChecked) }} {{ 'place(s) left' | i18n }}]
+                        [{{ getPlacesLeft(item, userdata[fieldName], itemChecked) }} {{ 'place(s) left' | i18n }}]
                     </span>
                 </span>
-                <span ng-if="field.withExtraSlots && item.maxExtraSlots && itemChecked">
+                <span ng-if="field.withExtraSlots && item.maxExtraSlots && (itemChecked || userdata[fieldName][item.id])">
                     <label for="extraSlotsSelect-{{ item.id }}">
                         <strong>{{ 'Select number of extra slots to use' | i18n }}</strong>
                     </label>
                     <select id="extraSlotsSelect-{{ item.id }}"
-                            ng-init="numberOfExtraSlotsUsed=0"
+                            ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id] - 1 : 0)"
                             ng-model="numberOfExtraSlotsUsed"
-                            ng-options="n for n in [] | range:0:item.maxExtraSlots"
+                            ng-options="n for n in [] | range:0:getNumberOfExtraSlots(item)"
                             ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
                     </select>
                 </span>

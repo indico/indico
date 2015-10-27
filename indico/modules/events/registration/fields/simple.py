@@ -115,12 +115,18 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         def _check_number_of_places(form, field):
             if not field.data:
                 return
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(field.data, old_data):
+                    return
             choices = self.form_item.versioned_data['choices']
             captions = self.form_item.data['captions']
-            for k, v in field.data.iteritems():
+            for k in field.data:
                 choice = next((x for x in choices if x['id'] == k), None)
-                places_left = choice.get('places_limit')
-                if places_left and not (places_left - self.get_places_used()[k]):
+                places_limit = choice.get('places_limit')
+                places_used_dict = self.get_places_used()
+                places_used_dict.update(field.data)
+                if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
                     raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
@@ -234,6 +240,10 @@ class CheckboxField(RegistrationFormBillableField):
     @property
     def validators(self):
         def _check_number_of_places(form, field):
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(field.data, old_data):
+                    return
             if field.data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if not places_left:
@@ -283,6 +293,10 @@ class BooleanField(RegistrationFormBillableField):
     @property
     def validators(self):
         def _check_number_of_places(form, field):
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(field.data, old_data):
+                    return
             if field.data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if field.data and not places_left:
@@ -343,7 +357,7 @@ class FileField(RegistrationFormFieldBase):
 
     def process_form_data(self, registration, value, old_data=None):
         if value is None or not value.filename:
-            return {}
+            return {'file': {}}
         return {
             'field_data': self.form_item.current_data,
             'file': {
@@ -424,11 +438,16 @@ class AccommodationField(RegistrationFormBillableItemsField):
         def _check_number_of_places(form, field):
             if not field.data:
                 return
+            if form.modified_registration:
+                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(snakify_keys(field.data), old_data):
+                    return
             item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']),
                         None)
             captions = self.form_item.data['captions']
+            places_used_dict = self.get_places_used()
             if item and item['places_limit'] and not ((item['places_limit']
-                                                       - self.get_places_used()[field.data['choice']])):
+                                                       - places_used_dict.get(field.data['choice'], 0))):
                 raise ValidationError(_('Not enough rooms in the {0}').format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 
@@ -467,14 +486,6 @@ class AccommodationField(RegistrationFormBillableItemsField):
             'arrival_date': value['arrivalDate'],
             'departure_date': value['departureDate']
         }, old_data=old_data)
-
-    def save_data(self, registration, value):
-        if not value:
-            data = {}
-        else:
-            data = {'choice': value.get('choice'), 'arrival_date': value.get('arrivalDate'),
-                    'departure_date': value.get('departureDate')}
-        return super(AccommodationField, self).save_data(registration, data)
 
     def get_places_used(self):
         places_used = Counter()

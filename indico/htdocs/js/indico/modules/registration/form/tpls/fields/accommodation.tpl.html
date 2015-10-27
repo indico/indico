@@ -85,7 +85,7 @@
                             ({{ 'no places left' | i18n }})
                         </span>
                         <span class="available-text" ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.choice)">
-                            [{{ getPlacesLeft(item, userdata.accommodation.accommodationType.id, accommodation.choice) }} {{ "place(s) left" | i18n }}]
+                            [{{ getPlacesLeft(item, userdata.accommodation.choice, accommodation.choice) }} {{ "place(s) left" | i18n }}]
                         </span>
                     </span>
                 </td>

@@ -487,7 +487,7 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
             _.defer(function() {
 
                 scope.$watch('field.dateFormat', function() {
-                    var fmt = translateDateFormat(scope.field.dateFormat);
+                    var fmt = translateDateFormat(scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat'));
                     element.datepicker('option', 'dateFormat', fmt);
 
                     // if new format has no time, set it to null in the model
