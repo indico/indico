@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import json
+from copy import deepcopy
 from io import BytesIO
 from uuid import uuid4
 
@@ -55,21 +56,39 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
-
 PERSONAL_COLUMNS = ('title', 'email', 'first_name', 'last_name', 'affiliation', 'address', 'phone', 'column')
 SPECIAL_COLUMNS = ('reg_date', 'price', 'state', 'checked_in', 'checked_in_date')
 
 SPECIAL_COLUMN_LABELS = {
-    'reg_date': _('Registation Date'),
-    'price': _('Price'),
-    'state': _('Status'),
-    'checked_in': _('Checked in'),
-    'checked_in_date': _('Checked in date')
+    'reg_date': {
+        'title': _('Registation Date'),
+        'id': 'reg_date'
+    },
+    'price': {
+        'title': _('Price'),
+        'id': 'price'
+    },
+    'state': {
+        'title': _('Status'),
+        'id': 'state'
+    },
+    'checked_in': {
+        'title': _('Checked in'),
+        'id': 'checked_in',
+        'filter_choices': {
+            '0': _('No'),
+            '1': _('Yes')
+        }
+    },
+    'checked_in_date': {
+        'title': _('Checked in date'),
+        'id': 'checked_in_date'
+    }
 }
 
 DEFAULT_REPORT_CONFIG = {
     'items': ('title', 'email', 'affiliation') + SPECIAL_COLUMNS,
-    'filters': {}
+    'filters': {'fields': {}, 'items': {}}
 }
 
 
@@ -77,31 +96,46 @@ cache = GenericCache('reglist-config')
 
 
 def _get_filters_from_request(regform):
-    filters = {}
+    filters = deepcopy(DEFAULT_REPORT_CONFIG['filters'])
     for field in regform.form_items:
         if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox'}:
             options = request.form.getlist('field_{}'.format(field.id))
             if options:
-                filters[field.id] = options
+                filters['fields'][field.id] = options
+    for item in SPECIAL_COLUMN_LABELS.itervalues():
+        if item.get('filter_choices'):
+            options = request.form.getlist('field_{}'.format(item['id']))
+            if options:
+                filters['items'][item['id']] = options
     return filters
 
 
 def _filter_registration(regform, query, filters):
-    if not filters:
+    # if not filters:
+    if not filters['fields'] and not filters['items']:
         return query
 
     field_types = {f.id: f.field_impl for f in regform.form_items if not f.is_deleted and f.is_field}
     criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                         field_types[field_id].create_sql_filter(data_list))
-                for field_id, data_list in filters.iteritems()]
-    subquery = (RegistrationData.query
-                .with_entities(db.func.count(RegistrationData.registration_id))
-                .join(RegistrationData.field_data)
-                .filter(RegistrationData.registration_id == Registration.id)
-                .filter(db.or_(*criteria))
-                .correlate(Registration)
-                .as_scalar())
-    return query.filter(subquery == len(filters))
+                for field_id, data_list in filters['fields'].iteritems()]
+
+    items_criteria = []
+    if 'checked_in' in filters['items']:
+        checked_in_values = filters['items']['checked_in']
+        # If both values 'true' and 'false' are selected, there's no point in filtering
+        if len(checked_in_values) == 1:
+            items_criteria.append(Registration.checked_in == bool(int(checked_in_values[0])))
+    if filters['fields']:
+        subquery = (RegistrationData.query
+                    .with_entities(db.func.count(RegistrationData.registration_id))
+                    .join(RegistrationData.field_data)
+                    .filter(RegistrationData.registration_id == Registration.id)
+                    .filter(db.or_(*criteria))
+                    .correlate(Registration)
+                    .as_scalar())
+        query = query.filter(subquery == len(filters['fields']))
+    return query.filter(db.or_(*items_criteria))
 
 
 def _query_registrations(regform):
@@ -150,7 +184,7 @@ def _get_basic_columns(form, ids):
         if item_id in ids:
             result.append({
                 'id': item_id,
-                'caption': SPECIAL_COLUMN_LABELS[item_id]
+                'caption': SPECIAL_COLUMN_LABELS[item_id]['title']
             })
     return result
 
@@ -241,8 +275,6 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         registrations_query = _query_registrations(self.regform)
         total_regs = registrations_query.count()
         registrations = _filter_registration(self.regform, registrations_query, filters).all()
-
-        _render_registration_list(self.regform, registrations, total_regs)
 
         return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs),
                             filtering_enabled=total_regs != len(registrations))

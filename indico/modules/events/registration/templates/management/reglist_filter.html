@@ -1,35 +1,40 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
+{% macro _render_column_selector(item, filter_choices, special_item=false) %}
+    {% set filters = filters['items'] if special_item else filters['fields'] %}
+    <div class="i-label reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
+         data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
+        <span class="title {% if filter_choices %}icon-filter{% endif %}"
+              data-toggle="dropdown">
+            {{- item.title -}}
+        </span>
+        {% if filter_choices %}
+            <ul class="dropdown" style="display: none">
+                {% for value, caption in filter_choices.iteritems() %}
+                    <li>
+                        <input type="checkbox" name="field_{{ item.id }}" value="{{ value }}"
+                               id="field_{{ item.id }}_option_{{ value }}"
+                               {% if value in filters[item.id] %}
+                                   checked
+                               {% endif %}>
+                        <label for="field_{{ item.id }}_option_{{ value }}">
+                            {{ caption }}
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <span class="right actions">
+            <span class="trigger icon-eye"></span>
+        </span>
+    </div>
+{% endmacro %}
+
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
         {% set filter_choices = child_item.field_impl.filter_choices %}
-        <div class="i-label reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
-             data-id="{{ child_item.personal_data_type.name if child_item.personal_data_type else child_item.id }}">
-            <span class="title {% if filter_choices %}icon-filter{% endif %}"
-                  data-toggle="dropdown">
-                {{- child_item.title -}}
-            </span>
-            {% if filter_choices %}
-                <ul class="dropdown" style="display: none">
-                    {% for value, caption in filter_choices.iteritems() %}
-                        <li>
-                            <input type="checkbox" name="field_{{ child_item.id }}" value="{{ value }}"
-                                   id="field_{{ child_item.id }}_option_{{ value }}"
-                                   {% if value in filters[child_item.id] %}
-                                       checked
-                                   {% endif %}>
-                            <label for="field_{{ child_item.id }}_option_{{ value }}">
-                                {{ caption }}
-                            </label>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            <span class="right actions">
-                <span class="trigger icon-eye"></span>
-            </span>
-        </div>
+        {{ _render_column_selector(child_item, filter_choices) }}
     {% endfor %}
 {% endmacro %}
 
@@ -64,11 +69,9 @@
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
 
-    {% for item_id, caption in special_items.iteritems() %}
-        <div class="i-label reglist-column js-regform-item" data-id="{{ item_id }}">
-            <span class="title">{{ caption }}</span>
-            <span class="right actions"><span class="trigger icon-eye"></span></span>
-        </div>
+    {% for item in special_items.itervalues() %}
+        {% set filter_choices = item.get('filter_choices') %}
+        {{ _render_column_selector(item, filter_choices, special_item=true) }}
     {% endfor %}
 
     {% for section in regform.sections %}
