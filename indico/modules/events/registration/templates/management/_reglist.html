@@ -81,7 +81,7 @@
             </div>
         </form>
     {% else %}
-        {%- call message_box('info', fixed_width=true) -%}
+        {%- call message_box('info') -%}
             {%- if total_registrations %}
                 {%- trans %}The filtering criteria do not match with any of the existing registrations. Try to clear the filters from the "Customize report" dialog.{% endtrans -%}
             {% else %}
