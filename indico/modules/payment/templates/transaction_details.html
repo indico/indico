@@ -1,5 +1,7 @@
 {% block warning_box %}{% endblock %}
 <dl class="i-data-list">
+    <dt>{% trans %}Amount{% endtrans %}</dt>
+    <dd>{{ transaction.amount }} {{ transaction.currency }}</dd>
     <dt>{% trans %}Payment date{% endtrans %}</dt>
     <dd>{{ transaction.timestamp | format_datetime }}</dd>
     {% if plugin %}
