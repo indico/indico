@@ -147,6 +147,7 @@ class RegformMigration(object):
         self.regform.modification_mode = ModificationMode.allowed_always
         self.regform.require_login = getattr(old_rf, '_mandatoryAccount', False)
         self.regform.registration_limit = old_rf.usersLimit if old_rf.usersLimit > 0 else None
+        self.regform.notification_sender_address = convert_to_unicode(getattr(old_rf, '_notificationSender', None))
         self.regform.manager_notification_recipients = sorted(set(old_rf.notification._ccList) |
                                                               set(old_rf.notification._toList))
         self.regform.manager_notifications_enabled = bool(self.regform.manager_notification_recipients)
