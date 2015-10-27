@@ -185,7 +185,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-        self._isRegistrar = self._conf.as_event.can_manage(session.user, role='registration', explicit_role=True)
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._requests_manager = is_request_manager(session.user)
@@ -193,7 +192,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
                                                single_value=True)
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
+        if not (self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
             RHConferenceModifKey._checkProtection(self)
 
     def _process(self):
@@ -204,8 +203,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         elif self._conf.canModify(self.getAW()):
             url = urlHandlers.UHConferenceModification.getURL( self._conf )
 
-        elif self._isRegistrar:
-            url = urlHandlers.UHConfModifRegForm.getURL( self._conf )
         elif self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:

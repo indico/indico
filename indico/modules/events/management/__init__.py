@@ -51,8 +51,6 @@ def _sidemenu_items(sender, event, **kwargs):
     can_modify = event.can_manage(session.user, allow_key=True)
     rb_active = Config.getInstance().getIsRoomBookingActive()
     cfa_enabled = event.as_legacy.hasEnabledSection('cfa')
-    can_manage_registration = can_modify or event.can_manage(session.user, 'registration')
-    reg_form_enabled = event.as_legacy.hasEnabledSection('regForm')
 
     event_type = event.as_legacy.getType()
     is_lecture = event_type == 'simple_event'
@@ -80,10 +78,6 @@ def _sidemenu_items(sender, event, **kwargs):
         if can_modify:
             yield SideMenuItem('program', _('Programme'),
                                url_for('event_mgmt.confModifProgram', event),
-                               section='organization')
-        if reg_form_enabled and can_manage_registration:
-            yield SideMenuItem('registration_old', _('Registration (old)'),
-                               url_for('event_mgmt.confModifRegistrationForm', event),
                                section='organization')
         if can_modify and cfa_enabled:
             yield SideMenuItem('abstracts', _('Abstracts'),
