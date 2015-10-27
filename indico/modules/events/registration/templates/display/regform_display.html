@@ -21,7 +21,7 @@
 
 
 {% block content %}
-    {{ render_regform_info(regform) }}
+    {{ render_regform_info(regform, currency) }}
 
     {% if invitation %}
         {{ render_invitation_info(invitation) }}
