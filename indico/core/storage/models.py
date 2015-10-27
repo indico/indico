@@ -14,14 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-"""Mixins that provide inheriting classes with the basic columns and
+"""
+Mixins that provide inheriting classes with the basic columns and
 relationships for non-DB storage of files.
 
 ``StoredFileMixin`` defines a pointer to a "physical" file that exists in some
 kind of storage backend. As for ``VersionedResourceMixin``, it allows do define
 an abstract resource with multiple versions (files). This allows for (very)
 rudimentary version control. Inheriting classes will be responsible for
-specifying, among others, which storage backend to use."""
+specifying, among others, which storage backend to use.
+"""
 
 
 from __future__ import unicode_literals
@@ -33,7 +35,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.storage.backend import get_storage
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
 
 
 class VersionedResourceMixin(object):
@@ -94,51 +95,70 @@ class VersionedResourceMixin(object):
             )
         )
 
-    @return_ascii
-    def __repr__(self):
-        return '<{}({}, {})>'.format(
-            self.__class__.__name__,
-            self.id,
-            self.file
-        )
-
 
 class StoredFileMixin(object):
-
-    # Name of attribute (backref) that will be made to point
-    # to the versioned resource (leave as ``None`` if you
-    # don't want versioning)
+    #: Name of attribute (backref) that will be made to point
+    #: to the versioned resource (leave as ``None`` if you
+    #: don't want versioning)
     version_of = None
+    #: Whether to track the creation time.  This is required when
+    #: using versioning!
+    add_file_date_column = True
+    #: Whether a row must always contain a file
+    file_required = True
 
-    #: The date/time when the file was uploaded
-    created_dt = db.Column(
-        UTCDateTime,
-        nullable=False,
-        default=now_utc
-    )
-    #: The name of the file
-    filename = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The MIME type of the file
-    content_type = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The size of the file (in bytes) - assigned automatically when `save()` is called
-    size = db.Column(
-        db.BigInteger,
-        nullable=False
-    )
-    storage_backend = db.Column(
-        db.String,
-        nullable=False
-    )
-    storage_file_id = db.Column(
-        db.String,
-        nullable=False
-    )
+    @declared_attr
+    def filename(cls):
+        """The name of the file"""
+        return db.Column(
+            db.String,
+            nullable=not cls.file_required
+        )
+
+    @declared_attr
+    def content_type(cls):
+        """The MIME type of the file"""
+        return db.Column(
+            db.String,
+            nullable=not cls.file_required
+        )
+
+    @declared_attr
+    def size(cls):
+        """
+        The size of the file (in bytes).
+
+        Automatically assigned when `save()` is called.
+        """
+        return db.Column(
+            db.BigInteger,
+            nullable=not cls.file_required
+        )
+
+    @declared_attr
+    def storage_backend(cls):
+        return db.Column(
+            db.String,
+            nullable=not cls.file_required
+        )
+
+    @declared_attr
+    def storage_file_id(cls):
+        return db.Column(
+            db.String,
+            nullable=not cls.file_required
+        )
+
+    @declared_attr
+    def created_dt(cls):
+        """The date/time when the file was uploaded"""
+        if not cls.add_file_date_column:
+            return None
+        return db.Column(
+            UTCDateTime,
+            nullable=not cls.file_required,
+            default=now_utc
+        )
 
     @property
     def storage(self):
@@ -177,18 +197,12 @@ class StoredFileMixin(object):
 
     def open(self):
         """Returns the stored file as a file-like object"""
+        if self.storage_file_id is None:
+            raise Exception('There is no file to open')
         return self.storage.open(self.storage_file_id)
 
     def send(self, inline=True):
         """Sends the file to the user"""
+        if self.storage_file_id is None:
+            raise Exception('There is no file to send')
         return self.storage.send_file(self.storage_file_id, self.content_type, self.filename, inline=inline)
-
-    @return_ascii
-    def __repr__(self):
-        return '<{}({}, {}, {}, {})>'.format(
-            self.__class__.__name__,
-            self.id,
-            self.resource_id,
-            self.filename,
-            self.content_type
-        )
