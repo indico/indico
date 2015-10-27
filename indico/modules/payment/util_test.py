@@ -29,6 +29,7 @@ from indico.modules.payment.util import register_transaction
 ))
 def test_register_transaction(mocker, new, double, status):
     mocker.patch('indico.modules.payment.util.db')
+    mocker.patch('indico.modules.payment.util.notify_registration_state_update')
     ndp = mocker.patch('indico.modules.payment.util.notify_double_payment')
     cn = mocker.patch.object(PaymentTransaction, 'create_next')
     registration = MagicMock()
