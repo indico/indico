@@ -25,13 +25,6 @@
 </tr>
 % endif
 
-% if participants:
-<tr id="eventParticipants">
-    <td class="leftCol">${_("Participants")}</td>
-    <td id="eventListParticipants">${participants}</td>
-</tr>
-% endif
-
 % if files or folders:
 <tr id="materialList">
     <td class="leftCol icon-attachment inline-attachments-icon"></td>
