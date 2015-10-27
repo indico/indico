@@ -57,12 +57,14 @@ from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
 
 PERSONAL_COLUMNS = ('title', 'email', 'first_name', 'last_name', 'affiliation', 'address', 'phone', 'column')
-SPECIAL_COLUMNS = ('reg_date', 'price', 'state')
+SPECIAL_COLUMNS = ('reg_date', 'price', 'state', 'checked_in', 'checked_in_date')
 
 SPECIAL_COLUMN_LABELS = {
     'reg_date': _('Registation Date'),
     'price': _('Price'),
-    'state': _('Status')
+    'state': _('Status'),
+    'checked_in': _('Checked in'),
+    'checked_in_date': _('Checked in date')
 }
 
 DEFAULT_REPORT_CONFIG = {
