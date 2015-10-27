@@ -70,6 +70,14 @@
                                         <td class="i-table">{{ registration.state.title }}</td>
                                     {% elif item.id == 'price' %}
                                         <td class="i-table">{{ registration.price }}</td>
+                                    {% elif item.id == 'checked_in' %}
+                                        <td class="i-table">{{ registration.checked_in }}</td>
+                                    {% elif item.id == 'checked_in_date' %}
+                                        <td class="i-table" data-text="{{ registration.checked_in_dt }}">
+                                            {%- if registration.checked_in_dt %}
+                                                {{- registration.checked_in_dt | format_datetime -}}
+                                            {%- endif %}
+                                        </td>
                                     {% else %}
                                         <td class="i-table">{{ data.get(item.id).friendly_data }}</td>
                                     {% endif %}
