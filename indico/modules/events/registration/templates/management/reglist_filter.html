@@ -52,6 +52,13 @@
         </div>
     </div>
 </div>
+<div class="success-message-box js-clear-filters-message" style="display: none">
+    <div class="message-text">
+        {%- trans -%}
+            All filters have been cleared.
+        {%- endtrans -%}
+    </div>
+</div>
 <form class="reglist-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
