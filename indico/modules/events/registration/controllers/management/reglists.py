@@ -524,7 +524,8 @@ def _modify_registration_status(registration, approve):
         registration.update_state(rejected=True)
     db.session.flush()
     notify_registration_state_update(registration)
-    logger.info('Registration {} status updated by {}'.format(registration, session.user))
+    status = 'approved' if approve else 'rejected'
+    logger.info('Registration {} was {} by {}'.format(registration, status, session.user))
 
 
 class RHRegistrationApprove(RHManageRegistrationBase):
