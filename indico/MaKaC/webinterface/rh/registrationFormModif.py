@@ -160,7 +160,8 @@ class _ActionNewStatus:
         self._params=params
 
     def perform( self ):
-        if self._params.get("caption","").strip() !="":
+        status_caption = self._params.get('caption', '').strip()
+        if status_caption and not self._conf.getRegistrationForm().has_status_defined(status_caption):
             self._conf.getRegistrationForm().addStatus(Status(self._conf.getRegistrationForm(), self._params))
 
 class _ActionRemoveStatuses:
@@ -228,8 +229,8 @@ class _TmpStatus:
         if params.get("addvalue","").strip()!="":
             sv=StatusValue(self)
             cap=params.get("newvalue")
-            if cap.strip()!="":
-                sv.setCaption(params.get("newvalue"))
+            if cap.strip() and not any(cap == val.getCaption() for val in self._values):
+                sv.setCaption(cap)
                 sv.setId("t%s"%self._counter)
                 self._counter+=1
                 self._values.append(sv)
@@ -291,6 +292,7 @@ class RHRegistrationFormStatusModif( RHRegistrationFormModifStatusBase ):
         p = registrationForm.WPConfModifRegFormStatusModif(self, self._status, tmpStatus)
         return p.display()
 
+
 class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBase ):
 
     def _checkParams( self, params ):
@@ -312,7 +314,7 @@ class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBa
                 self._status.setValues(tmpStatus.getValues())
                 session.pop('tmpStatus', None)
             else:
-                urlModif=urlHandlers.UHConfModifRegFormStatusModif.getURL(self._status)
+                urlModif = urlHandlers.UHConfModifRegFormStatusModif.getURL(self._status)
                 urlModif.addParam("firstTime", "no")
                 self._redirect(urlModif)
                 return

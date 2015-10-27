@@ -812,3 +812,9 @@ class IRegFormRegistrantFullFossil(IRegFormRegistrantFossil):
         Get Miscellaneous group list
         """
     getMiscellaneousGroupList.result = IRegFormMiscellaneousInfoGroupFullFossil
+
+    def getStatuses(self): pass
+
+    getStatuses.name = 'statuses'
+    getStatuses.produce = lambda x: {status.getCaption(): status.getStatusValue().getCaption()
+                                     for status in x.getStatuses().values()}

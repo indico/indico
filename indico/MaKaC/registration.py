@@ -585,6 +585,9 @@ class RegistrationForm(Persistent):
             self._eTicket = eticket.ETicket()
             return self._eTicket
 
+    def has_status_defined(self, status_name):
+        return any(status.getCaption() == status_name for status in self._statuses.itervalues())
+
 
 class Notification(Persistent):
     def __init__(self):
@@ -4821,6 +4824,10 @@ class Registrant(Persistent, Fossilizable):
 
     def getStatusesList(self):
         return self.getStatuses().values()
+
+    def get_statuses_with_values(self):
+        return {status.getCaption(): status.getStatusValue().getCaption()
+                for status in self._statuses.itervalues()}
 
     def addStatus(self, s):
         self.getStatuses()[s.getId()] = s

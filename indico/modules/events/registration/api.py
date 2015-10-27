@@ -214,6 +214,7 @@ class RegistrantsHook(EventBaseHook):
                 "checked_in": registrant.isCheckedIn(),
                 "full_name": registrant.getFullName(title=True, firstNameFirst=True),
                 "checkin_secret": registrant.getCheckInUUID(),
+                "statuses": registrant.get_statuses_with_values(),
             }
             regForm = self._conf.getRegistrationForm()
             reg["personal_data"] = regForm.getPersonalData().getRegistrantValues(registrant)
