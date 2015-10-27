@@ -318,6 +318,10 @@ class RegistrationForm(db.Model):
     def active_registrations(self):
         return [r for r in self.registrations if r.is_active]
 
+    @property
+    def sender_address(self):
+        return self.notification_sender_address or self.event.getSupportInfo().getEmail()
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationForm({}, {}, {})>'.format(self.id, self.event_id, self.title)
