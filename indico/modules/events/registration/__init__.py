@@ -119,6 +119,12 @@ def _associate_registrations(user, **kwargs):
                    "{n} registrations have been linked to your account.", num).format(n=num), 'info')
 
 
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if event.as_event.can_manage(session.user, role='registration'):
+        return url_for('event_registration.manage_regform_list', event)
+
+
 @signals.get_placeholders.connect_via('registration-invitation-email')
 def _get_invitation_placeholders(sender, invitation, **kwargs):
     from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,

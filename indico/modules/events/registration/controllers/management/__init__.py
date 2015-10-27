@@ -30,6 +30,7 @@ class RHManageRegFormsBase(RHConferenceModifBase):
     """Base class for all registration management RHs"""
 
     CSRF_ENABLED = True
+    ROLE = 'registration'
 
     def _process(self):
         return RH._process(self)
