@@ -31,15 +31,16 @@ class RegistrationFormCloner(EventCloner):
     def get_options(self):
         if not is_feature_enabled(self.event, 'registration'):
             return {}
-        return {'registration': (_('Registration form'), True, False)}
+        enabled = bool(self._find_registration_forms().count())
+        return {'form': (_('Registration forms'), enabled, False)}
 
     def clone(self, new_event, options):
-        if 'registration' not in options:
+        if 'form' not in options:
             return
         attrs = get_simple_column_attrs(RegistrationForm) - {'start_dt', 'end_dt'}
         for old_form in self._find_registration_forms():
             new_form = RegistrationForm(event_id=new_event.id, **{attr: getattr(old_form, attr) for attr in attrs})
-            self._clone_form_items(old_form, new_form, new_event)
+            self._clone_form_items(old_form, new_form)
             db.session.add(new_form)
             db.session.flush()
 
@@ -47,7 +48,7 @@ class RegistrationFormCloner(EventCloner):
         return RegistrationForm.find(~RegistrationForm.is_deleted,
                                      RegistrationForm.event_id == int(self.event.id))
 
-    def _clone_form_items(self, old_form, new_form, event_new):
+    def _clone_form_items(self, old_form, new_form):
         old_sections = RegistrationFormSection.find(RegistrationFormSection.registration_form_id == old_form.id,
                                                     ~RegistrationFormSection.is_deleted)
         section_attrs = get_simple_column_attrs(RegistrationFormSection) - {'registration_form_id'}
