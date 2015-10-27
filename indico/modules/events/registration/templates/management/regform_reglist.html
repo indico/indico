@@ -21,7 +21,7 @@
                 </ul>
             </div>
             <div class="group left">
-                <button class="i-button icon-settings js-dialog-action"
+                <button class="i-button icon-settings js-dialog-action js-customize-report {% if filtering_enabled %} highlight{% endif %}"
                    data-href="{{ url_for('.customize_reglist', regform) }}"
                    data-title="{% trans %}Registration list configuration{% endtrans %}">
                     {% trans %}Customize report{% endtrans %}

@@ -211,7 +211,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
                                                     event=self.event, visible_cols_regform_items=regform_items,
                                                     registrations=registrations, basic_columns=basic_columns,
-                                                    total_registrations=total_regs)
+                                                    total_registrations=total_regs,
+                                                    filtering_enabled=total_regs != len(registrations))
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -243,7 +244,8 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
         _render_registration_list(self.regform, registrations, total_regs)
 
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs))
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs),
+                            filtering_enabled=total_regs != len(registrations))
 
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
