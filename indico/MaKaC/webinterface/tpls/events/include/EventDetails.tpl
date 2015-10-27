@@ -73,4 +73,3 @@ ${ template_hook('event-header', event=conf) }
 
 </tbody>
 </table>
-<%include file="ApplyParticipation.tpl"/>
