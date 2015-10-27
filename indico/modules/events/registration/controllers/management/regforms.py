@@ -51,7 +51,9 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Creates a new registration form"""
 
     def _process(self):
-        form = RegistrationFormForm(event=self.event)
+        form = RegistrationFormForm(event=self.event,
+                                    publish_registrations_enabled=(self.event.getType() != 'conference'))
+
         if form.validate_on_submit():
             regform = RegistrationForm(event_new=self.event_new)
             create_personal_data_fields(regform)
