@@ -211,6 +211,13 @@ class Registration(db.Model):
     # - transactions (PaymentTransaction.registration)
     # - legacy_mapping (LegacyRegistrationMapping.registration)
 
+    @classmethod
+    def get_all_for_event(cls, event):
+        """Retrieve all registrations in all registration forms of an event."""
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        return Registration.find_all(Registration.is_active, ~RegistrationForm.is_deleted,
+                                     RegistrationForm.event_id == event.id, _join=Registration.registration_form)
+
     @hybrid_property
     def is_active(self):
         return not self.is_cancelled and not self.is_deleted
