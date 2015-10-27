@@ -27,7 +27,6 @@ from HTMLParser import HTMLParser
 from operator import attrgetter
 from uuid import uuid4
 
-import click
 import pytz
 from babel.dates import get_timezone
 from sqlalchemy.dialects.postgresql import JSON
@@ -52,14 +51,13 @@ from indico.util.caching import memoize
 from indico.util.console import verbose_iterator, cformat
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
-from indico.util.string import normalize_phone_number, crc32, format_repr
+from indico.util.string import normalize_phone_number, format_repr
 from indico.util.struct.iterables import committing_iterator
 from indico.web.flask.templating import strip_tags
 from MaKaC.conference import Conference
 
 from indico_zodbimport import Importer, convert_to_unicode
-from indico_zodbimport.util import get_archived_file
-
+from indico_zodbimport.util import LocalFileImporterMixin
 
 WHITESPACE_RE = re.compile(r'\s+')
 
@@ -869,19 +867,20 @@ class RegformMigration(object):
         elif field.input_type == 'file':
             if not old_item._value:
                 return
-            path = get_archived_file(old_item._value, self.importer.archive_dirs)[1]
-            if path is None:
-                self.importer.print_error(cformat('%{red!}File not found on disk; skipping it'), event_id=self.event.id)
+            local_file = old_item._value
+            content_type = mimetypes.guess_type(local_file.fileName)[0] or 'application/octet-stream'
+            storage_backend, storage_path, size = self.importer._get_local_file_info(local_file)
+            filename = secure_filename(local_file.fileName, 'attachment')
+            if storage_path is None:
+                self.importer.print_error(cformat('%{red!}File not found on disk; skipping it [{}]')
+                                          .format(local_file.id), event_id=self.event.id)
                 return
-            with open(path, 'rb') as f:
-                data = f.read()
-            filename = secure_filename(old_item._value.fileName, 'registration_form_file')
-            content_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
-            attrs['file'] = data
-            attrs['file_metadata'] = {'filename': filename,
-                                      'content_type': content_type,
-                                      'hash': crc32(data),
-                                      'size': len(data)}
+            attrs['filename'] = filename
+            attrs['content_type'] = content_type
+            attrs['storage_backend'] = storage_backend
+            attrs['storage_file_id'] = storage_path
+            attrs['size'] = size
+
         elif field.input_type == 'single_choice':
             try:
                 value = _sanitize(old_item._value)
@@ -951,18 +950,10 @@ class RegformMigration(object):
         return rv
 
 
-class EventRegformImporter(Importer):
+class EventRegformImporter(LocalFileImporterMixin, Importer):
     def __init__(self, **kwargs):
-        self.archive_dirs = kwargs.pop('archive_dir')
+        kwargs = self._set_config_options(**kwargs)
         super(EventRegformImporter, self).__init__(**kwargs)
-
-    @staticmethod
-    def decorate_command(command):
-        command = click.option('--archive-dir', required=True, multiple=True,
-                               help="The base path where resources are stored (ArchiveDir in indico.conf). "
-                                    "When used multiple times, the dirs are checked in order until a file is "
-                                    "found.")(command)
-        return command
 
     def has_data(self):
         return bool(RegistrationForm.find(RegistrationForm.title != 'Participants').count())
