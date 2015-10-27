@@ -473,23 +473,39 @@ ndDirectives.directive('ndInitFocus', function() {
     };
 });
 
+function translateDateFormat(fmt) {
+    return fmt.split(' ')[0].replace(/%([dmY])/g, function(match, c) {
+        return {'d': 'dd', 'm': 'mm', 'Y': 'yy'}[c];
+    });
+}
+
 ndDirectives.directive('ndJqueryDatepicker', function() {
     return {
         require: 'ngModel',
         restrict: 'A',
         link: function(scope, element, attrs, ctrl) {
             _.defer(function() {
-                var dateFormat = scope.field.dateFormat || attrs.dateFormat;
-                dateFormat = dateFormat.split(' ')[0].replace(/%([dmYHM])/g, function(match, c) {
-                    return {'d': 'dd', 'm': 'mm', 'Y': 'yy', 'H': 'HH', 'M': 'mm'}[c];
+
+                scope.$watch('field.dateFormat', function() {
+                    var fmt = translateDateFormat(scope.field.dateFormat);
+                    element.datepicker('option', 'dateFormat', fmt);
+
+                    // if new format has no time, set it to null in the model
+                    if (scope.field.dateFormat.indexOf(' ') == -1) {
+                        scope.dateTime.time = null;
+                    } else if (scope.dateTime.time === null) {
+                        scope.dateTime.time = "00:00";
+                    }
                 });
+
+                var dateFormat = scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat');
                 element.datepicker({
-                    dateFormat: dateFormat,
+                    dateFormat: translateDateFormat(dateFormat),
                     onSelect: function(date) {
                         ctrl.$setViewValue(date);
                     }
                 });
             });
         }
-    }
+    };
 });

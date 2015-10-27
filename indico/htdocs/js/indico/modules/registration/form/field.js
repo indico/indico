@@ -366,6 +366,15 @@ ndRegForm.directive('ndCountryField', function(url) {
     };
 });
 
+function splitDateTime(dt, fmt) {
+    var dtObj = moment(dt),
+        fmtParts = fmt.split(' ');
+    return {
+        date: dtObj.format(fmtParts[0]),
+        time: fmtParts[1] ? dtObj.format(fmtParts[1]) : null
+    };
+}
+
 ndRegForm.directive('ndDateField', function(url) {
     return {
         require: 'ndField',
@@ -374,13 +383,17 @@ ndRegForm.directive('ndDateField', function(url) {
         },
 
         link: function(scope) {
+            var fmt = scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat');
+
+            fmt = fmt.replace(/%([HMdmY])/g, function(match, c) {
+                    return {'H': 'HH', 'M': 'mm', 'd': 'DD', 'm': 'MM', 'Y': 'YYYY'}[c];
+            });
+
+            scope.dateTime = splitDateTime(scope.userdata[scope.field.htmlName], fmt);
             scope.settings.fieldName = $T("Date");
             scope.settings.date = true;
             scope.settings.formData.push('displayFormats');
             scope.settings.formData.push('dateFormat');
-            scope.showTime = function(str) {
-                return str? str.match('H') !== null : false;
-            };
         }
     };
 });
