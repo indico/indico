@@ -38,11 +38,13 @@ def get_feature_definition(name):
         raise RuntimeError('Feature does not exist: {}'.format(name))
 
 
-def get_enabled_features(event):
+def get_enabled_features(event, only_explicit=False):
     """Returns a set of enabled feature names for an event"""
     enabled_features = features_event_settings.get(event, 'enabled')
     if enabled_features is not None:
         return set(enabled_features)
+    elif only_explicit:
+        return set()
     else:
         return {name for name, feature in get_feature_definitions().iteritems() if feature.is_default_for_event(event)}
 
@@ -58,6 +60,9 @@ def set_feature_enabled(event, name, state):
     feature_definitions = get_feature_definitions()
     feature = feature_definitions[name]
     enabled = get_enabled_features(event)
+    if name in enabled and name not in get_enabled_features(event, only_explicit=True):
+        # if the feature was only implicitly enabled, enable it explicitly
+        enabled.remove(name)
     names = {name} | feature.requires_deep
     if (state and names <= enabled) or (not state and name not in enabled):
         return False
