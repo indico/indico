@@ -44,10 +44,10 @@
             </span>
         </li>
     </ul>
-    <div ng-repeat="item in field.choices | filter:isVisible">
+    <div ng-repeat="item in field.choices | filter:isVisible" style="margin-top: 10px;">
         <span ng-if="field.withExtraSlots && item.maxExtraSlots && radioValue.id==item.id">
             <label for="extraSlotsSelect-{{ item.id }}">
-                <strong>{{ 'Select number of extra slots to use' | i18n }}</strong>
+                <strong>{{ 'Number of +1' | i18n }}</strong>
             </label>
             <select id="extraSlotsSelect-{{ item.id }}"
                     ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id] - 1 : 0)"

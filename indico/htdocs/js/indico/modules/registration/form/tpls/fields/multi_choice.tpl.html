@@ -15,17 +15,10 @@
                 <span ng-if="changesPrice(item)">
                     <nd-currency currency="currency"></nd-currency>
                 </span>
-                <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, userdata[fieldName][item.id])">
-                    <span ng-switch-when="false" class="unavailable-text" style="margin-left: 25px;">
-                        ({{ "no places left" | i18n }})
-                    </span>
-                    <span ng-switch-when="true" class="available-text" style="margin-left: 25px;">
-                        [{{ getPlacesLeft(item, userdata[fieldName], itemChecked) }} {{ 'place(s) left' | i18n }}]
-                    </span>
-                </span>
-                <span ng-if="field.withExtraSlots && item.maxExtraSlots && (itemChecked || userdata[fieldName][item.id])">
+                <span ng-if="field.withExtraSlots && item.maxExtraSlots && (itemChecked || userdata[fieldName][item.id])"
+                      style="margin-left: 10px;">
                     <label for="extraSlotsSelect-{{ item.id }}">
-                        <strong>{{ 'Select number of extra slots to use' | i18n }}</strong>
+                        <strong>{{ 'Number of +1' | i18n }}</strong>
                     </label>
                     <select id="extraSlotsSelect-{{ item.id }}"
                             ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id] - 1 : 0)"
@@ -33,6 +26,15 @@
                             ng-options="n for n in [] | range:0:getNumberOfExtraSlots(item)"
                             ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
                     </select>
+                </span>
+                <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, userdata[fieldName][item.id])"
+                      class="right" style="margin-right: 35px;">
+                    <span ng-switch-when="false" class="unavailable-text">
+                        ({{ "no places left" | i18n }})
+                    </span>
+                    <span ng-switch-when="true" class="available-text" style="margin-left: 25px;">
+                        {{ getPlacesLeft(item, userdata[fieldName], itemChecked) }} {{ 'place(s) left' | i18n }}
+                    </span>
                 </span>
                 <span ng-if="!userdata.manager && userdata.paid && changesPrice(item)"
                       class="icon-warning billable-items-warning"
