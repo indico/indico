@@ -45,7 +45,8 @@ def get_field_merged_options(field, registration_data):
     result['deletedChoice'] = []
     if not rdata:
         return result
-    for val in rdata.data.keys():
+    values = [rdata.data['choice']] if 'choice' in rdata.data else rdata.data.keys()
+    for val in values:
         if val and not any(item['id'] == val for item in result['choices']):
             field_data = rdata.field_data
             merged_data = field.field_impl.unprocess_field_data(field_data.versioned_data,
