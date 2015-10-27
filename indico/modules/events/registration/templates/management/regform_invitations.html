@@ -21,7 +21,9 @@
                     </div>
                 </div>
                 <div class="toolbar right">
-                    <a class="i-button icon-user arrow js-dropdown" data-toggle="dropdown">Invite</a>
+                    <a class="i-button icon-user arrow js-dropdown" data-toggle="dropdown">
+                        {% trans %}Invite{% endtrans %}
+                    </a>
                     <ul class="dropdown">
                         <li>
                             <a class="js-invite-user" data-href="{{ url_for('.invite', regform) }}"
