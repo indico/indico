@@ -218,7 +218,7 @@ class PaymentTransaction(db.Model):
         return format_repr(self, 'id', 'registration_id', 'provider', 'amount', 'currency', 'timestamp', status=status)
 
     def render_details(self):
-        """Renders the transaction details in event management"""
+        """Renders the transaction details"""
         if self.is_manual:
             return render_template('payment/transaction_details_manual.html', transaction=self)
         plugin = self.plugin

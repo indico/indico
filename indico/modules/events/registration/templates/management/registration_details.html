@@ -42,6 +42,19 @@
         </table>
     {% endcall %}
 
+    {% if registration.transaction %}
+        <div id="registration-summary" class="regform-done">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {% trans %}Payment transaction{% endtrans %}
+                </div>
+            </div>
+            <div class="i-box-content">
+                {{ registration.transaction.render_details()|safe }}
+            </div>
+        </div>
+    {% endif %}
+
     <button data-href="{{ url_for('.edit_registration', registration) }}" data-method="GET"
        class="i-button big highlight" {% if registration.is_cancelled %} disabled="disbled"{% endif %}>
         {%- trans %}Modify{% endtrans -%}
