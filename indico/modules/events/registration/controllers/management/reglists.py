@@ -21,7 +21,7 @@ from io import BytesIO
 from uuid import uuid4
 
 from flask import session, request, redirect, jsonify, flash
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload
 
 from indico.core.config import Config
 from indico.core.db import db
@@ -277,15 +277,12 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
         self.field_data = (RegistrationData
                            .find(RegistrationData.registration_id == request.view_args['registration_id'],
                                  RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                 RegistrationData.file != None)  # noqa
+                                 RegistrationData.filename != None)  # noqa
                            .options(joinedload('registration').joinedload('registration_form'))
-                           .options(undefer('file'))
                            .one())
 
     def _process(self):
-        data = self.field_data
-        metadata = data.file_metadata
-        return send_file(metadata['filename'], BytesIO(data.file), mimetype=metadata['content_type'], conditional=True)
+        return self.field_data.send()
 
 
 class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):

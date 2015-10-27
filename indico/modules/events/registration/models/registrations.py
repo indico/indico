@@ -16,19 +16,23 @@
 
 from __future__ import unicode_literals
 
+import posixpath
+import time
 from collections import OrderedDict
 from decimal import Decimal
 from uuid import uuid4
 
 from flask import has_request_context, session, request
-from sqlalchemy.dialects.postgresql import JSON, JSONB, UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.core.storage import StoredFileMixin
 from indico.modules.payment import event_settings as event_payment_settings
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
@@ -376,12 +380,15 @@ class Registration(db.Model):
                 self.state = RegistrationState.unpaid
 
 
-class RegistrationData(db.Model):
+class RegistrationData(StoredFileMixin, db.Model):
     """Data entry within a registration for a field in a registration form"""
 
     __tablename__ = 'registration_data'
-    __table_args__ = (db.CheckConstraint("(file IS NULL) = (file_metadata::text = 'null')", name='valid_file'),
-                      {'schema': 'event_registration'})
+    __table_args__ = {'schema': 'event_registration'}
+
+    # StoredFileMixin settings
+    add_file_date_column = False
+    file_required = False
 
     #: The ID of the registration
     registration_id = db.Column(
@@ -397,19 +404,9 @@ class RegistrationData(db.Model):
         primary_key=True,
         autoincrement=False
     )
-    #: The user's data for the field
+    #: The submitted data for the field
     data = db.Column(
         JSONB,
-        nullable=False
-    )
-    #: file contents for a file field
-    file = db.deferred(db.Column(
-        db.LargeBinary,
-        nullable=True
-    ))
-    #: metadata of the uploaded file
-    file_metadata = db.Column(
-        JSON,
         nullable=False
     )
 
@@ -435,10 +432,9 @@ class RegistrationData(db.Model):
     @locator.file
     def locator(self):
         """A locator that pointsto the associated file."""
-        if not self.file_metadata:
+        if not self.filename:
             raise Exception('The file locator is only available if there is a file.')
-        return dict(self.registration.locator, field_data_id=self.field_data_id,
-                    filename=self.file_metadata['filename'])
+        return dict(self.registration.locator, field_data_id=self.field_data_id, filename=self.filename)
 
     @property
     def friendly_data(self):
@@ -452,9 +448,32 @@ class RegistrationData(db.Model):
     def summary_data(self):
         return {'data': self.friendly_data, 'price': self.price}
 
+    def _set_file(self, file_info):
+        self.filename = file_info['name']
+        self.content_type = file_info['content_type']
+        # in case we are replacing a file
+        self.storage_backend = None
+        self.storage_file_id = None
+        self.size = None
+        self.save(file_info['data'])
+
+    file = property(fset=_set_file)
+    del _set_file
+
     @return_ascii
     def __repr__(self):
         return '<RegistrationData({}, {}): {}>'.format(self.registration_id, self.field_data_id, self.data)
+
+    def _build_storage_path(self):
+        self.registration.registration_form.assign_id()
+        self.registration.assign_id()
+        path_segments = ['event', unicode(self.registration.event_id), 'registrations',
+                         unicode(self.registration.registration_form.id), unicode(self.registration.id)]
+        assert None not in path_segments
+        # add timestamp in case someone uploads the same file again
+        filename = '{}-{}-{}'.format(self.field_data.field_id, int(time.time()), self.filename)
+        path = posixpath.join(*(path_segments + [filename]))
+        return Config.getInstance().getAttachmentStorage(), path
 
     def render_price(self):
         currency = event_payment_settings.get(self.registration.registration_form.event, 'currency')

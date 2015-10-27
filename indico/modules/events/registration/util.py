@@ -192,7 +192,10 @@ def create_registration(regform, data, invitation=None):
         else:
             value = data.get(form_item.html_field_name)
         with db.session.no_autoflush:
-            registration.data.append(RegistrationData(**form_item.field_impl.process_form_data(registration, value)))
+            data_entry = RegistrationData()
+            registration.data.append(data_entry)
+            for attr, value in form_item.field_impl.process_form_data(registration, value).iteritems():
+                setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
     if invitation is None:

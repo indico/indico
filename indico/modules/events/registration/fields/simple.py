@@ -271,18 +271,13 @@ class FileField(RegistrationFormFieldBase):
     def process_form_data(self, registration, value, old_data=None):
         if value is None or not value.filename:
             return {}
-        content = value.file.read()
-        metadata = {
-            'hash': crc32(content),
-            'size': len(content),
-            'filename': secure_filename(value.filename, 'registration_form_file'),
-            'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'
-        }
-
         return {
             'field_data': self.form_item.current_data,
-            'file': content,
-            'file_metadata': metadata
+            'file': {
+                'data': value.file,
+                'name': secure_filename(value.filename, 'attachment'),
+                'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'
+            }
         }
 
     @property
@@ -292,7 +287,7 @@ class FileField(RegistrationFormFieldBase):
     def get_friendly_data(self, registration_data):
         if not registration_data:
             return ''
-        return registration_data.file_metadata['filename']
+        return registration_data.filename
 
 
 class EmailField(RegistrationFormFieldBase):
