@@ -386,7 +386,7 @@ ndRegForm.directive('ndDateField', function(url) {
             var fmt = scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat');
 
             fmt = fmt.replace(/%([HMdmY])/g, function(match, c) {
-                    return {'H': 'HH', 'M': 'mm', 'd': 'DD', 'm': 'MM', 'Y': 'YYYY'}[c];
+                return {'H': 'HH', 'M': 'mm', 'd': 'DD', 'm': 'MM', 'Y': 'YYYY'}[c];
             });
 
             scope.dateTime = splitDateTime(scope.userdata[scope.field.htmlName], fmt);
