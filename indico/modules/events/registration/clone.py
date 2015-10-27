@@ -29,7 +29,7 @@ from MaKaC.conference import EventCloner
 
 class RegistrationFormCloner(EventCloner):
     def get_options(self):
-        if self.event.getType() != 'conference' or not is_feature_enabled(self.event, 'registration'):
+        if not is_feature_enabled(self.event, 'registration'):
             return {}
         return {'registration': (_('Registration form'), True, False)}
 
