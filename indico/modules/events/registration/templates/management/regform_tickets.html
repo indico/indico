@@ -1,7 +1,33 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
-{% from 'forms/_form.html' import simple_form %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
+{% from 'message_box.html' import message_box %}
+
+{% block subtitle %}
+    {% trans -%}Configure Tickets{%- endtrans %}
+{% endblock %}
 
 {% block content %}
-    {{ simple_form(form, back_url=url_for('.manage_regform', regform)) }}
+    {{ form_header(form)}}
+    {{ form_row(form.tickets_enabled, disabled=not can_enable_tickets) }}
+    {{ form_rows(form, skip=('tickets_enabled',)) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+        <a class="i-button big" href="{{ url_for('.manage_regform', regform) }}">
+            {% trans %}Back{% endtrans %}
+        </a>
+    {% endcall %}
+
+    {% if form.tickets_enabled.data %}
+        <h2>Configuration</h2>
+
+        {% call message_box('info') %}
+        {% trans -%}
+            In order to configure your mobile app to use this event, you will have to scan the code below.
+        {%- endtrans %}
+
+        {% endcall %}
+
+        <img src="{{ url_for('.tickets_qrcode', regform) }}">
+    {% endif %}
 {% endblock %}

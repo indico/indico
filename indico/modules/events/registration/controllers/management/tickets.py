@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from flask import redirect
+import qrcode
+from flask import flash, json, redirect
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -27,21 +28,42 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.forms import TicketsForm
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.oauth.models.applications import OAuthApplication
+from indico.util.date_time import format_date
+from indico.util.i18n import _
 from indico.web.flask.util import url_for, send_file, secure_filename
+
 from MaKaC.PDFinterface.conference import TicketToPDF
+from MaKaC.common import Config
 
 
 class RHRegistrationFormTickets(RHManageRegFormBase):
-    """Display and modify ticket settings"""
+    """Display and modify ticket settings."""
+
+    def _check_ticket_app_enabled(self):
+        config = Config.getInstance()
+        checkin_app_client_id = config.getCheckinAppClientId()
+
+        if checkin_app_client_id is None:
+            flash(_("indico-checkin client_id is not defined in the Indico configuration"), 'warning')
+            return False
+
+        checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
+        if checkin_app is None:
+            flash(_("indico-checkin is not registered as an OAuth application with client_id {}")
+                  .format(checkin_app_client_id), 'warning')
+            return False
+        return True
 
     def _process(self):
         form = TicketsForm(obj=self.regform)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
-            return redirect(url_for('.manage_regform', self.regform))
+
         return WPManageRegistration.render_template('management/regform_tickets.html', self.event,
-                                                    regform=self.regform, form=form)
+                                                    regform=self.regform, form=form,
+                                                    can_enable_tickets=self._check_ticket_app_enabled())
 
 
 def generate_ticket(registration):
@@ -69,3 +91,44 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
     def _process(self):
         filename = secure_filename('{}-Ticket.pdf'.format(self.event_new.title), 'ticket.pdf')
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
+
+
+class RHTicketConfigQRCode(RHManageRegFormBase):
+    """Display configuration QRCode."""
+
+    def _process(self):
+        config = Config.getInstance()
+
+        # QRCode (Version 6 with error correction L can contain up to 106 bytes)
+        qr = qrcode.QRCode(
+            version=6,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=4,
+            border=1
+        )
+
+        checkin_app_client_id = config.getCheckinAppClientId()
+        checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
+
+        base_url = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
+        qr_data = {
+            "event_id": self._conf.getId(),
+            "title": self._conf.getTitle(),
+            "date": format_date(self._conf.getAdjustedStartDate()),
+            "server": {
+                "baseUrl": base_url,
+                "consumerKey": checkin_app.client_id,
+                "auth_url": url_for('oauth.oauth_authorize', _external=True),
+                "token_url": url_for('oauth.oauth_token', _external=True)
+            }
+        }
+        json_qr_data = json.dumps(qr_data)
+        qr.add_data(json_qr_data)
+        qr.make(fit=True)
+        qr_img = qr.make_image()
+
+        output = BytesIO()
+        qr_img.save(output)
+        output.seek(0)
+
+        return send_file('config.png', output, 'image/png')
