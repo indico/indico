@@ -107,6 +107,13 @@
                           title="{{ 'This option could trigger a price change and has been blocked.' | i18n }}">
                     </span>
                 </td>
+                <td>
+                    <span ng-if="field.deletedChoice && field.deletedChoice.indexOf(item.id) != -1"
+                          class="icon-warning deleted-option-warning right"
+                          data-qtip-style="error"
+                          title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
+                    </span>
+                </td>
             </tr>
         </table>
         <input type="hidden"
