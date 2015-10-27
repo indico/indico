@@ -95,6 +95,23 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         return $scope.field.id == -1;
     };
 
+    $scope.getNumberOfExtraSlots = function(item) {
+        if (!item || !item.maxExtraSlots) {
+            return 0;
+        }
+
+        var extraSlots = item.maxExtraSlots,
+            placesLimit = item.placesLimit;
+
+        if (!placesLimit) {
+            return extraSlots;
+        } else if (placesLimit && (placesLimit < extraSlots)) {
+            return placesLimit;
+        } else {
+           return extraSlots;
+        }
+    };
+
     $scope.settings = {
         isBillable: false,
         date: false,
@@ -238,16 +255,18 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         var places = item.placesLimit;
         if ($scope.field.inputType == 'checkbox' || $scope.field.inputType == 'bool') {
             places -= ($scope.field.placesUsed || 0);
-            if (uservalue) places -= 1;
+            if (uservalue) places += 1;
             if (selectedvalue) places -= 1;
         } else if ($scope.field.inputType == 'single_choice' || $scope.field.inputType == 'accommodation') {
             places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue === item.id) places -= 1;
+            if (uservalue === item.id) places += 1;
             if (selectedvalue === item.id) places -= 1;
         } else if ($scope.field.inputType == 'multi_choice') {
-            places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue) places -= uservalue;
-            if (selectedvalue) places -= selectedvalue;
+            if (uservalue && uservalue[item.id]) {
+                places -= ($scope.field.placesUsed[item.id]);
+                places += 1;
+            }
+            if (selectedvalue) places -= 1;
         }
         return places;
     };
@@ -512,9 +531,8 @@ var ndSelectController = function($scope) {
 
     $scope.onSingleFieldItemChange = function(item) {
         var valueElement = $('input[name={0}]'.format($scope.field.htmlName)),
-            data = {},
-            target = $(event.target);
-        if (item) {
+            data = {};
+        if (item.id) {
             data[item.id] = (+$('#extraSlotsSelect-{0}'.format(item.id)).val() + 1) || 1;
         }
         valueElement.val(JSON.stringify(data));
@@ -587,7 +605,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                         return '';
                     }
                 } else {
-                    return _.keys(scope.userdata[fieldName]);
+                    return _.keys(scope.userdata[fieldName])[0];
                 }
             };
 
@@ -855,7 +873,8 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             scope.settings.accommodationField = true;
             scope.settings.fieldName = $T("Accommodation");
 
-            scope.accommodation = scope.userdata[scope.field.htmlName] || {};
+            scope.userdata.accommodation = scope.userdata[scope.field.htmlName] || {};
+            scope.accommodation = {};
 
             scope.$watch('userdata.accommodation', function() {
                 if (scope.userdata.accommodation === undefined ||
@@ -891,7 +910,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     var choice = _.find(scope.field.choices, function(choice) {
                         return userdata[scope.field.htmlName].choice == choice.id;
                     });
-                    return choice.isBillable && userdata.paid;
+                    return choice && choice.isBillable && userdata.paid;
                 }
 
                 return false;

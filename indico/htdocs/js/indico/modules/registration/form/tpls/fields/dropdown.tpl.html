@@ -31,9 +31,9 @@
                 <strong>{{ 'Select number of extra slots to use' | i18n }}</strong>
             </label>
             <select id="extraSlotsSelect-{{ item.id }}"
-                    ng-init="numberOfExtraSlotsUsed=0"
+                    ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id] - 1 : 0)"
                     ng-model="numberOfExtraSlotsUsed"
-                    ng-options="n for n in [] | range:0:item.maxExtraSlots"
+                    ng-options="n for n in [] | range:0:getNumberOfExtraSlots(item)"
                     ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
             </select>
         </span>

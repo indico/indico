@@ -7,7 +7,7 @@
                 ng-disabled="field.billableDisabled"
                 ng-model="checkboxValue"
                 ng-required="field.isRequired"
-                ng-disabled="!hasPlacesLeft(field, getUserdataValue()) || paymentBlocked(field, userdata)">
+                ng-disabled="!hasPlacesLeft(field, userdata[field.fieldName]) || paymentBlocked(field, userdata)">
             <div>
                 <label for="field-{{ section.id }}-{{ field.id }}"
                     ng-bind-html="field.title"></label>
@@ -28,9 +28,9 @@
             <nd-currency currency="currency"></nd-currency>
         </span>
 
-        <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field, getUserdataValue())">
+        <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field, userdata[field.htmlName])">
             <span ng-switch-when="true" class="placesLeft">
-                [{{ getPlacesLeft(field, getUserdataValue(), checkboxValue) }} {{ 'place(s) left' | i18n }}]
+                [{{ getPlacesLeft(field, userdata[field.htmlName], checkboxValue) }} {{ 'place(s) left' | i18n }}]
             </span>
             <span ng-switch-when="false" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})
