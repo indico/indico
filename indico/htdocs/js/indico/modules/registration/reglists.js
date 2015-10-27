@@ -79,6 +79,7 @@
                         $('.registrations-table-wrapper').html(data.registration_list);
                         handleRowSelection();
                         setupTableSorter();
+                        $('.js-customize-report').toggleClass('highlight', data.filtering_enabled);
                     }
                 }
             });
