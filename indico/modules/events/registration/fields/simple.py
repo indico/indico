@@ -44,7 +44,7 @@ def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
     result = deepcopy(field.view_data)
     result['deletedChoice'] = []
-    if not rdata:
+    if not rdata or not rdata.data:
         return result
     values = [rdata.data['choice']] if 'choice' in rdata.data else rdata.data.keys()
     for val in values:
