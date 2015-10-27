@@ -57,7 +57,7 @@ class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
         return mapping[self.event.getType()]
 
 
-class RHRegistrationFormBase(RHRegistrationFormDisplayBase, RegistrationFormMixin):
+class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBase):
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
         RegistrationFormMixin._checkParams(self)

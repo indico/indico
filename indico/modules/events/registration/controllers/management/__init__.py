@@ -40,7 +40,7 @@ class RHManageRegFormsBase(RHConferenceModifBase):
         self.event = self._conf
 
 
-class RHManageRegFormBase(RHManageRegFormsBase, RegistrationFormMixin):
+class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
     """Base class for a specific registration form"""
 
     def _checkParams(self, params):

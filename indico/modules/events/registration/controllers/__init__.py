@@ -26,7 +26,7 @@ from indico.modules.payment import event_settings as payment_event_settings
 from indico.util.string import camelize_keys
 
 
-class RegistrationFormMixin(object):
+class RegistrationFormMixin:
     """Mixin for single registration form RH"""
 
     normalize_url_spec = {
@@ -42,7 +42,7 @@ class RegistrationFormMixin(object):
                         .one())
 
 
-class RegistrationEditMixin(object):
+class RegistrationEditMixin:
     def _process(self):
         form = make_registration_form(self.regform, management=self.management, registration=self.registration)()
 
