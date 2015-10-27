@@ -79,6 +79,7 @@
                         $('.registrations-table-wrapper').html(data.registration_list);
                         handleRowSelection();
                         setupTableSorter();
+                        $('.js-customize-report').toggleClass('highlight', data.filtering_enabled);
                     }
                 }
             });
@@ -101,7 +102,9 @@
         $('.js-submit-reglist-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            $('.registrations form').attr('action', $this.data('href')).submit();
+            if (!$this.hasClass('disabled')) {
+                $('.registrations form').attr('action', $this.data('href')).submit();
+            }
         });
 
         $('.registrations').on('indico:confirmed', '.js-delete-registrations', function(evt) {
@@ -121,6 +124,30 @@
                         row.fadeOut('fast', function() {
                             $(this).remove();
                         });
+                    }
+                }
+            });
+        });
+
+        $('.registrations').on('indico:confirmed', '.js-modify-status', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var selectedRows = getSelectedRows();
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: {
+                    registration_id: selectedRows,
+                    approve: $this.data('approve')
+                },
+                traditional: true,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    if (data) {
+                        $('.registrations-table-wrapper').html(data.registration_list);
+                        handleRowSelection();
+                        setupTableSorter();
                     }
                 }
             });
@@ -193,6 +220,7 @@
 
         $('.js-reset-btn').on('click', function() {
             $('.reglist-filter input:checkbox').prop('checked', false).trigger('change');
+            $('.js-clear-filters-message').show();
         });
 
         $('.reglist-filter input:checkbox').on('change', function() {
