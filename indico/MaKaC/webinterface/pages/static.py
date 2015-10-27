@@ -21,7 +21,6 @@ from MaKaC.webinterface.pages.conferences import (WPTPLConferenceDisplay, WPConf
                                                   WPSpeakerIndex)
 from MaKaC.webinterface.pages.sessions import WPSessionDisplay
 from MaKaC.webinterface.pages.contributions import WPContributionDisplay
-from MaKaC.webinterface.pages.registrants import WPConfRegistrantsList, WConfRegistrantsList
 from MaKaC.webinterface.pages.subContributions import WPSubContributionDisplay
 from MaKaC.webinterface.pages.authors import WPAuthorDisplay
 
@@ -49,11 +48,6 @@ class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
             info[key] = 'null'
         info['confId'] = self._conf.getId()
         return info
-
-    def _getVariables(self, conf):
-        variables = WPTPLConferenceDisplay._getVariables(self, conf)
-        variables['registrationOpen'] = False
-        return variables
 
 
 class WPStaticConferenceDisplay(WPStaticEventBase, WPConferenceDisplay):
@@ -108,19 +102,6 @@ class WPStaticSessionDisplay(WPStaticEventBase, WPSessionDisplay):
 
 class WPStaticContributionDisplay(WPStaticEventBase, WPContributionDisplay):
     pass
-
-
-class WPStaticConfRegistrantsList(WPStaticEventBase, WPConfRegistrantsList):
-    endpoint = 'event.confRegistrantsDisplay-list'
-
-    def _getBody(self, params):
-        from MaKaC.webinterface.rh.registrantsDisplay import RHRegistrantsList
-        from MaKaC.webinterface.common import regFilters
-
-        sortingCrit = regFilters.SortingCriteria([params.get("sortBy", "Name").strip()])
-        filterCrit = RHRegistrantsList.create_filter(self._conf, params)
-        wc = WConfRegistrantsList(self._conf, filterCrit, sortingCrit, None, "session")
-        return wc.getHTML()
 
 
 class WPStaticSubContributionDisplay(WPStaticEventBase, WPSubContributionDisplay):

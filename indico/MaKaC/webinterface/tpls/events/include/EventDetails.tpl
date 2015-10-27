@@ -55,16 +55,6 @@
 </tr>
 % endif
 
-% if registrationOpen:
-<tr>
-    <td class="leftCol">${_("Registration")}</td>
-    <td>
-        ${_("Want to participate?")}
-        <span class="fakeLink" id="applyLink">${_("Apply here")}</span>
-    </td>
-</tr>
-% endif
-
 % if conf.getOrgText():
 <tr>
     <td class="leftCol">${_("Organised by")}</td>

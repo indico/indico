@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
 import re
 import urlparse
 
@@ -239,10 +238,6 @@ class UHConferenceEmail(URLHandler):
 
 class UHConferenceSendEmail(URLHandler):
     _endpoint = 'event.EMail-send'
-
-
-class UHRegistrantsSendEmail(URLHandler):
-    _endpoint = 'event_mgmt.EMail-sendreg'
 
 
 class UHConvenersSendEmail(URLHandler):
@@ -730,10 +725,6 @@ class UHConfModifTools(URLHandler):
 
 class UHConfModifParticipants(URLHandler):
     _endpoint = 'event_mgmt.confModifParticipants'
-
-
-class UHConfDeletion(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-delete'
 
 
 class UHConfClone(URLHandler):
@@ -1574,96 +1565,6 @@ class UHConfTimeTableCustomizePDF(URLHandler):
         return "files/generatedPdf/Conference.pdf"
 
 
-class UHConfRegistrationForm(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay'
-
-
-class UHConfRegistrationFormDisplay(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-display'
-
-
-class UHConfRegistrationFormCreation(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-creation'
-
-
-class UHConfRegistrationFormCreationDone(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-creationDone'
-
-    @classmethod
-    def getURL(cls, registrant):
-        url = cls._getURL()
-        if not session.user:
-            url.setParams(registrant.getLocator())
-            url.addParam('authkey', registrant.getRandomId())
-        else:
-            url.setParams(registrant.getConference().getLocator())
-        return url
-
-
-class UHConfRegistrationFormModify(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-modify'
-
-
-class UHConfRegistrationFormPerformModify(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-performModify'
-
-
-class UHConfModifRegForm(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm'
-
-
-class UHConfModifRegFormChangeStatus(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-changeStatus'
-
-
-class UHConfModifRegFormDataModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-dataModif'
-
-
-class UHConfModifRegFormPerformDataModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-performDataModif'
-
-
-class UHConfModifRegFormActionStatuses(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-actionStatuses'
-
-
-class UHConfModifRegFormStatusModif(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-modifStatus'
-
-
-class UHConfModifRegFormStatusPerformModif(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifStatus'
-
-
-class UHConfModifRegistrationModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationModification'
-
-
-class UHConfModifRegistrantList(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants'
-
-
-class UHConfModifRegistrantNew(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-newRegistrant'
-
-
-class UHConfModifRegistrantListAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-action'
-
-
-class UHConfModifRegistrantPerformRemove(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-remove'
-
-
-class UHRegistrantModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modification'
-
-
-class UHRegistrantAttachmentFileAccess(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-getAttachedFile'
-
-
 class UHCategoryToiCal(URLHandler):
     _endpoint = 'category.categoryDisplay-ical'
 
@@ -1674,46 +1575,6 @@ class UHCategoryToAtom(URLHandler):
 
 class UHCategOverviewToRSS(URLHandler):
     _endpoint = 'category.categOverview-rss'
-
-
-class UHConfRegistrantsList(URLHandler):
-    _endpoint = 'event.confRegistrantsDisplay-list'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return "confRegistrantsDisplay.html"
-
-
-class UHConfModifRegistrantSessionModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifySessions'
-
-
-class UHConfModifRegistrantSessionPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifySessions'
-
-
-class UHConfModifRegistrantAccoModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyAccommodation'
-
-
-class UHConfModifRegistrantAccoPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyAccommodation'
-
-
-class UHConfModifRegistrantSocialEventsModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifySocialEvents'
-
-
-class UHConfModifRegistrantSocialEventsPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifySocialEvents'
-
-
-class UHConfModifRegistrantReasonPartModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyReasonParticipation'
-
-
-class UHConfModifRegistrantReasonPartPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyReasonParticipation'
 
 
 class UHConfModifPendingQueues(URLHandler):
@@ -1734,22 +1595,6 @@ class UHConfModifPendingQueuesActionMgr(URLHandler):
 
 class UHConfModifPendingQueuesActionCoord(URLHandler):
     _endpoint = 'event_mgmt.confModifPendingQueues-actionCoordinators'
-
-
-class UHConfModifRegistrantMiscInfoModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyMiscInfo'
-
-
-class UHConfModifRegistrantMiscInfoPerformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyMiscInfo'
-
-
-class UHConfModifRegistrantStatusesModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-modifyStatuses'
-
-
-class UHConfModifRegistrantStatusesPerformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-performModifyStatuses'
 
 
 class UHCategoryCalendarOverview(URLHandler):

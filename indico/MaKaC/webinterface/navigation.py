@@ -133,21 +133,6 @@ class NEAbstractSubmissionConfirmation( NavigationEntry ):
     _title = "Abstract submission confirmation"
 
 
-class NERegistrationForm( NavigationEntry ):
-    _url = urlHandlers.UHConfRegistrationForm
-    _title = "Registration"
-
-class NERegistrationFormDisplay( NavigationEntry ):
-    _url = urlHandlers.UHConfRegistrationFormDisplay
-    _parent = NERegistrationForm
-    _title = "Registration form display"
-
-class NERegistrationFormModify( NavigationEntry ):
-    _url = urlHandlers.UHConfRegistrationFormModify
-    _parent = NERegistrationForm
-    _title = "Registration form modification"
-
-
 class NEAuthorDisplay( NavigationEntry ):
     _url = urlHandlers.UHContribAuthorDisplay
     _parent = NEAuthorIndex

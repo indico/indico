@@ -96,16 +96,6 @@
           </td>
         </tr>
         % endif
-        % if registrationOpen:
-        <tr>
-          <td valign="top" align="right" class="headerTitle">
-                ${_("Want to participate")}
-          </td>
-          <td style="font-size:x-small;font-style:italic;">
-            <span class="fakeLink" id="applyLink">${_("Apply here")}</span>
-          </td>
-        </tr>
-        % endif
         % if conf.attached_items:
          <tr>
           <td valign="top" align="right" class="headerTitle icon-attachment inline-attachments-icon"></td>

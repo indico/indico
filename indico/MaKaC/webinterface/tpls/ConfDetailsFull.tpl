@@ -63,64 +63,6 @@
   </div>
   % endif
 
-  % if registration_enabled and in_registration_period or registrant:
-    <div class="infoline announcement">
-        <span class="icon icon-ticket"></span>
-        <div class="text">
-            % if not registrant:
-                <div class="label">
-                    ${ _("Registration for this event is now open") }
-                </div>
-                <div>
-                    ${ _("Deadline:") } <span class="date">${ registration_deadline }</span>
-                </div>
-            % else:
-                <div class="label">
-                    ${ _("You are registered for this event") }
-                </div>
-                <div>
-                    % if registrant.doPay():
-                        ${ _("Go to checkout to complete your registration") }
-                    % elif in_modification_period:
-                        ${ _("Modifications allowed until: ") } <span class="date">${ modification_deadline }</span>
-                    % else:
-                        ${ _("Go to summary to check your details") }
-                    % endif
-                </div>
-            % endif
-            <div class="toolbar right">
-                % if not registrant:
-                    <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="i-button next highlight">
-                        ${ _("Register now") }
-                    </a>
-                % else:
-                    % if ticket_enabled:
-                        <div class="group">
-                            <a href="${ url_for('event.e-ticket-pdf', conf) }" class="i-button icon-ticket">
-                                ${ _("Get ticket") }
-                            </a>
-                        </div>
-                    % endif
-                    <div class="group">
-                        % if in_modification_period:
-                            <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"class="i-button icon-edit">
-                                ${ _('Modify') }
-                            </a>
-                        % endif
-                        <a href="${ url_for('event.confRegistrationFormDisplay', conf) }" class="i-button next highlight">
-                            % if registrant.doPay():
-                                ${ _("Checkout") }
-                            % else:
-                                ${ _("Summary") }
-                            % endif
-                        </a>
-                    </div>
-                % endif
-            </div>
-        </div>
-    </div>
-  % endif
-
   ${ template_hook('conference-home-info', event=conf) }
   </div>
 </div>

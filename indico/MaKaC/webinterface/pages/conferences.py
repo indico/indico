@@ -364,17 +364,6 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["moreInfo"] = info
         vars["actions"] = ''
         vars["isSubmitter"] = self._conf.as_event.can_manage(session.user, 'submit')
-
-        regform = self._conf.getRegistrationForm()
-        if regform:
-            vars["registration_enabled"] = regform.isActivated()
-            vars["in_registration_period"] = regform.inRegistrationPeriod(nowutc())
-            vars["in_modification_period"] = regform.inModificationPeriod()
-            vars["registration_deadline"] = format_date(regform.getEndRegistrationDate())
-            vars["modification_deadline"] = format_date(regform.getModificationEndDate())
-            vars["ticket_enabled"] = regform.getETicket().isEnabled()
-            if session.avatar:
-                vars["registrant"] = session.avatar.getRegistrantById(self._conf.getId())
         return vars
 
 
@@ -554,7 +543,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def _getVariables(self, conf):
         wvars = {}
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         wvars['INCLUDE'] = '../include'
 
         wvars['accessWrapper'] = accessWrapper = self._rh._aw
@@ -591,11 +579,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             'lectures': sorted(lectures, cmp=cmp_title_number)
         })
 
-        if (conf.getType() in ("meeting", "simple_event")
-                and conf.getParticipation().isAllowedForApplying()
-                and conf.getStartDate() > nowutc()
-                and not conf.getParticipation().isFull()):
-            wvars['registrationOpen'] = True
         wvars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
 
         wvars['types'] = self._types

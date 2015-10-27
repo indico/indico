@@ -832,15 +832,6 @@ class WTrackBannerModif(WBannerModif):
         WBannerModif.__init__(self, path, itemType, title)
 
 
-class WRegFormBannerModif(WBannerModif):
-
-    def __init__( self, registrant ):
-        path=[{"url": urlHandlers.UHConfModifRegistrantList.getURL(registrant.getConference()), "title":_("Registrants list")}]
-
-        itemType="Registrant"
-        title=registrant.getFullName()
-        WBannerModif.__init__(self, path, itemType, title)
-
 
 class WContribModifTool(WTemplated):
     pass

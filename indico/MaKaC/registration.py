@@ -1515,10 +1515,7 @@ class FileInput(FieldInputType, Fossilizable):
         return """<a href="%s">%s</a>""" % (uh.getURL(value), value.getFileName())
 
     def _getModifHTML(self, item, registrant, default=None):
-        from MaKaC.webinterface.pages.registrationForm import WFileInputField
-
-        wc = WFileInputField(self, item, default)
-        return wc.getHTML()
+        pass
 
     def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         v = params.get(self.getHTMLName(), "")

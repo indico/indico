@@ -25,13 +25,11 @@ from bs4 import BeautifulSoup
 from werkzeug.utils import secure_filename
 
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStaticConferenceProgram, \
-    WPStaticContributionList, WPStaticCustomPage, \
-    WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, \
-    WPStaticContributionDisplay, WPStaticConfRegistrantsList, \
-    WPStaticSubContributionDisplay, \
-    WPStaticAuthorDisplay, WPTPLStaticConferenceDisplay, \
-    WPStaticConferenceDisplay
+from MaKaC.webinterface.pages.static import (WPStaticConferenceTimeTable, WPStaticConferenceProgram,
+                                             WPStaticContributionList, WPStaticCustomPage, WPStaticAuthorIndex,
+                                             WPStaticSpeakerIndex, WPStaticSessionDisplay, WPStaticContributionDisplay,
+                                             WPStaticSubContributionDisplay, WPStaticAuthorDisplay,
+                                             WPTPLStaticConferenceDisplay, WPStaticConferenceDisplay)
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.common import timezoneUtils, HelperMaKaCInfo
@@ -307,7 +305,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # the others are simply hardcoded.
         self._menu_offline_items = {'overview': None, 'abstracts_book': None}
         wps = {WPStaticConferenceProgram, WPStaticConferenceTimeTable, WPStaticAuthorIndex, WPStaticSpeakerIndex,
-               WPStaticContributionList, WPStaticConfRegistrantsList}
+               WPStaticContributionList}
         for cls in wps:
             self._menu_offline_items[cls.menu_entry_name] = cls(self._rh, self._conf)
 
