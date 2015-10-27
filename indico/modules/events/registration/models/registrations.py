@@ -194,6 +194,17 @@ class Registration(db.Model):
         nullable=False,
         default=lambda: unicode(uuid4())
     )
+    #: Whether the person has checked in
+    checked_in = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: The date/time when the person has checked in
+    checked_in_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     # relationship backrefs:
     # - registration_form (RegistrationForm.registrations)
