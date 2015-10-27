@@ -63,6 +63,7 @@ def _inject_regform_announcement(event, **kwargs):
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
     from indico.modules.events.registration.models.forms import RegistrationForm
+    from indico.modules.events.registration.models.registrations import Registration
 
     event = event.as_event
     regforms = (event.registration_forms
@@ -70,8 +71,13 @@ def _inject_event_header(event, **kwargs):
                 .order_by(db.func.lower(RegistrationForm.title))
                 .all())
 
-    if regforms:
-        return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)
+    registrations = Registration.find_all(Registration.is_active, ~RegistrationForm.is_deleted,
+                                          RegistrationForm.event_id == event.id,
+                                          RegistrationForm.publish_registrations_enabled,
+                                          _join=Registration.registration_form)
+
+    return render_template('events/registration/display/event_header.html', event=event, regforms=regforms,
+                           registrations=registrations)
 
 
 @signals.event.sidemenu.connect

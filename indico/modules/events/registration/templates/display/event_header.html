@@ -1,47 +1,62 @@
-<tr>
-    <td class="leftCol">{% trans %}Registration{% endtrans %}</td>
-    <td>
-        {% for regform in regforms %}
-            <div class="event-service-row">
-                <div class="event-service-row-collapsed clearfix">
-                    <div class="event-service-info left">
-                        <i class="icon-ticket"></i>
-                        <span class="event-service-title">
-                            {% if loop.length == 1%}
-                                <em>{% trans %}This event is open to new participants.{% endtrans %}</em>
-                            {% else %}
-                                {{ regform.title }}
-                            {% endif %}
-                        </span>
-                    </div>
-                    <div class="event-service-toolbar toolbar right">
-                        <div class="group">
-                           {% set registration = session.user and regform.get_registration(user=session.user) %}
-                           {% if registration  %}
-                                <a class="i-button i-button-small icon-edit highlight"
-                                    href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
-                                    <strong>{% trans %}Modify registration{% endtrans %}</strong>
-                                </a>
-                           {% elif regform.limit_reached %}
-                               <a class="i-button i-button-small highlight disabled"
-                                  title="{% trans %}There are no more places available.{% endtrans %}">
-                                   <strong>{% trans %}Register{% endtrans %}</strong>
-                               </a>
-                           {% elif regform.moderation_enabled %}
-                               <a class="i-button i-button-small highlight icon-question"
-                                  href="{{ url_for('event_registration.display_regform', regform) }}">
-                                   <strong>{% trans %}Apply for participation{% endtrans %}</strong>
-                               </a>
-                            {% else %}
-                                <a class="i-button i-button-small highlight icon-quill"
-                                    href="{{ url_for('event_registration.display_regform', regform) }}">
-                                    <strong>{% trans %}Register{% endtrans %}</strong>
-                                </a>
-                            {% endif %}
+{% if regforms %}
+    <tr>
+        <td class="leftCol">{% trans %}Registration{% endtrans %}</td>
+        <td>
+            {% for regform in regforms %}
+                <div class="event-service-row">
+                    <div class="event-service-row-collapsed clearfix">
+                        <div class="event-service-info left">
+                            <i class="icon-ticket"></i>
+                            <span class="event-service-title">
+                                {% if loop.length == 1%}
+                                    <em>{% trans %}This event is open to new participants.{% endtrans %}</em>
+                                {% else %}
+                                    {{ regform.title }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="event-service-toolbar toolbar right">
+                            <div class="group">
+                               {% set registration = session.user and regform.get_registration(user=session.user) %}
+                               {% if registration  %}
+                                    <a class="i-button i-button-small icon-edit highlight"
+                                        href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
+                                        <strong>{% trans %}Modify registration{% endtrans %}</strong>
+                                    </a>
+                               {% elif regform.limit_reached %}
+                                   <a class="i-button i-button-small highlight disabled"
+                                      title="{% trans %}There are no more places available.{% endtrans %}">
+                                       <strong>{% trans %}Register{% endtrans %}</strong>
+                                   </a>
+                               {% elif regform.moderation_enabled %}
+                                   <a class="i-button i-button-small highlight icon-question"
+                                      href="{{ url_for('event_registration.display_regform', regform) }}">
+                                       <strong>{% trans %}Apply for participation{% endtrans %}</strong>
+                                   </a>
+                                {% else %}
+                                    <a class="i-button i-button-small highlight icon-quill"
+                                        href="{{ url_for('event_registration.display_regform', regform) }}">
+                                        <strong>{% trans %}Register{% endtrans %}</strong>
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </td>
-</tr>
+            {% endfor %}
+        </td>
+    </tr>
+{% endif %}
+
+{% if registrations %}
+    <tr>
+        <td class="leftCol">{% trans %}Participants{% endtrans %}</td>
+        <td>
+            <ul class="participant-list">
+                {%- for registrant in registrations -%}
+                    <li>{{ registrant.full_name }}</li>
+                {%- endfor -%}
+            </ul>
+        </td>
+    </tr>
+{% endif %}

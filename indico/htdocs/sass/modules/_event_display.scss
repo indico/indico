@@ -100,3 +100,32 @@ li > table + .note-area-wrapper {
         font-size: 1.1em;
     }
 }
+
+ul.participant-list {
+    @extend %font-family-title;
+
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+
+    li {
+        @include border-radius(2px);
+        @include icon-before('icon-user');
+
+        display: inline-block;
+        font-size: 0.95em;
+        padding: 0.2em 0.5em;
+        margin-bottom: 0.1em;
+        color: $black;
+        background: $pastel-gray;
+
+        &:before {
+            color: $gray;
+            margin-right: 0.4em;
+        }
+
+        &:not(first-child) {
+            margin-left: 0.1em;
+        }
+    }
+}
