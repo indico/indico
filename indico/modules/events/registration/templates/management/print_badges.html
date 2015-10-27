@@ -3,7 +3,13 @@
 {% from 'events/registration/management/_badges.html' import render_template_list, render_badges_registration_list %}
 
 {% block title %}
-    {%- trans %}Badges{% endtrans -%}
+    {%- trans %}Registration{% endtrans -%}
+{% endblock %}
+
+{% block subtitle %}
+    {%- trans title=regform.title -%}
+        Badges for "{{ title }}"
+    {%- endtrans -%}
 {% endblock %}
 
 {% block content %}
