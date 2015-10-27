@@ -23,6 +23,7 @@ from wtforms.validators import DataRequired, NumberRange, Optional, ValidationEr
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import Config
+from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
@@ -32,6 +33,13 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime, IndicoEmail
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
+
+
+def _check_if_payment_required(form, field):
+    if not field.data:
+        return
+    if not is_feature_enabled(form.event, 'payment'):
+        raise ValidationError(_('You have to enable payment feature in order to set the registration fee.'))
 
 
 class RegistrationFormForm(IndicoForm):
@@ -60,7 +68,7 @@ class RegistrationFormForm(IndicoForm):
     publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
                                                  description=_("Registrations from this form will be displayed in the "
                                                                "event page"))
-    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0), Optional()],
+    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0), Optional(), _check_if_payment_required],
                               filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_("A fixed fee all users have to pay when registering."))
@@ -80,6 +88,7 @@ class RegistrationFormForm(IndicoForm):
                                                      description=_("Email addresses that will receive notifications"))
 
     def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
         super(IndicoForm, self).__init__(*args, **kwargs)
         default_sender_address = Config.getInstance().getNoReplyEmail()
         self.notification_sender_address.description = _('Email address set as the sender of all '

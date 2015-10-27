@@ -51,7 +51,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Creates a new registration form"""
 
     def _process(self):
-        form = RegistrationFormForm()
+        form = RegistrationFormForm(event=self.event)
         if form.validate_on_submit():
             regform = RegistrationForm(event_new=self.event_new)
             create_personal_data_fields(regform)
@@ -81,7 +81,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
 
     def _process(self):
-        form = RegistrationFormForm(obj=self._get_form_defaults())
+        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
