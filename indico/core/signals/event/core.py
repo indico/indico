@@ -85,30 +85,6 @@ Expected to return a list of tuples ('button_name', 'js-call-class').
 Called when building the timetable view.
 """)
 
-registrant_changed = _signals.signal('registrant-changed', """
-Called when an event registrant is added or removed. The `sender` is the event,
-and the following kwargs are available:
-
-* `user` - the registrant's :class:`Avatar` (or ``None``)
-* `registrant` - the :class:`Registrant`
-* `action` - the action, i.e. ``'removed'`` or ``'added'``
-""")
-
-participant_changed = _signals.signal('participant-changed', """
-Called when an event participant is added or removed. The `sender` is the event,
-and the following kwargs are available:
-
-* `user` - the participant's :class:`Avatar` (or ``None``)
-* `participant` - the :class:`Participant`
-* `old_status` - the previous participation status
-* `action` - the action, i.e. ``'removed'`` or ``'added'``
-
-This signal is only triggered if the participation state actually changed, i.e. he's
-considered `added` if he was added/approved by a manager or if he accepted an invitation.
-The participant is considered `removed` if he's participating (added by a manager or accepted
-an invitation) and he's removed from the event or refuses/rejects participation.
-""")
-
 has_read_access = _signals.signal('has-read-access', """
 Called when resolving the read access permissions for an event. The `sender` is the event,
 and the following parameters are available:

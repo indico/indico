@@ -28,6 +28,7 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -349,6 +350,7 @@ class Registration(db.Model):
         """
         if sum(action is not None for action in (approved, paid, rejected)) > 1:
             raise Exception("More than one action specified")
+        initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
         moderation_required = regform.moderation_enabled and (not invitation or not invitation.skip_moderation)
@@ -378,6 +380,8 @@ class Registration(db.Model):
                 self.state = RegistrationState.pending
             elif paid is False and payment_required:
                 self.state = RegistrationState.unpaid
+        if self.state != initial_state:
+            signals.event.registration_state_updated.send(self, previous_state=initial_state)
 
 
 class RegistrationData(StoredFileMixin, db.Model):

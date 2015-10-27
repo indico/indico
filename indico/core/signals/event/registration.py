@@ -14,12 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from blinker import Namespace
 
 _signals = Namespace()
 
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.notes import *
-from indico.core.signals.event.registration import *
-from indico.core.signals.event.surveys import *
+
+registration_state_updated = _signals.signal('registration-state-updated', """
+Called when the state of registration changes.  The `sender` is the
+registration; the previous state is passed in the `previous_state`
+kwarg.
+""")
+
+registration_deleted = _signals.signal('registration-deleted', """
+Called when a registration is removed.  The `sender` is the registration.
+""")

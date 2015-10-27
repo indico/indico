@@ -26,6 +26,8 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.config import Config
 from indico.core.db import db
+
+from indico.core import signals
 from indico.core.errors import FormValuesError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration import logger
@@ -395,8 +397,8 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
     def _process(self):
         for registration in self.registrations:
             registration.is_deleted = True
+            signals.event.registration_deleted.send(registration)
             logger.info('Registration {} deleted by {}'.format(registration, session.user))
-            # TODO: Signal for deletion?
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
