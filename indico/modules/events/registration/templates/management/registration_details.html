@@ -1,13 +1,10 @@
-{% extends 'layout/base.html' %}
+{% extends 'events/registration/management/_regform_base.html' %}
 {% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
                                                                                render_invoice %}
 
-{% block title %}
-    {%- trans %}Registration details{% endtrans -%}
-{% endblock %}
-
 {% block subtitle %}
-    #{{registration.friendly_id}}: {{registration.first_name}} {{ registration.last_name }}
+    Details for #{{registration.friendly_id}}:
+    {{ registration.full_name }} in "{{ registration.registration_form.title }}"
 {% endblock %}
 
 {% block content %}
