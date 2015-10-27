@@ -60,6 +60,20 @@ def _inject_regform_announcement(event, **kwargs):
                                registrations_with_tickets=get_registrations_with_tickets(session.user, event))
 
 
+@template_hook('event-header')
+def _inject_event_header(event, **kwargs):
+    from indico.modules.events.registration.models.forms import RegistrationForm
+
+    event = event.as_event
+    regforms = (event.registration_forms
+                .filter_by(is_deleted=False, is_open=True)
+                .order_by(db.func.lower(RegistrationForm.title))
+                .all())
+
+    if regforms:
+        return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)
+
+
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.registration.models.forms import RegistrationForm
@@ -129,10 +143,23 @@ def _get_event_management_url(event, **kwargs):
 def _get_invitation_placeholders(sender, invitation, **kwargs):
     from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder, LastNamePlaceholder,
                                                                              InvitationLinkPlaceholder)
-
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield InvitationLinkPlaceholder
+
+
+@signals.get_placeholders.connect_via('registration-email')
+def _get_registration_placeholders(sender, registration, **kwargs):
+    from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
+                                                                               FirstNamePlaceholder, LinkPlaceholder,
+                                                                               EventTitlePlaceholder,
+                                                                               EventLinkPlaceholder)
+    yield FirstNamePlaceholder
+    yield LastNamePlaceholder
+    yield EventTitlePlaceholder
+    yield EventLinkPlaceholder
+    yield IDPlaceholder
+    yield LinkPlaceholder
 
 
 @signals.event.get_feature_definitions.connect
@@ -143,21 +170,6 @@ def _get_feature_definitions(sender, **kwargs):
 @signals.acl.get_management_roles.connect_via(Event)
 def _get_management_roles(sender, **kwargs):
     return RegistrationRole
-
-
-@signals.get_placeholders.connect_via('registration-email')
-def _get_registration_placeholders(sender, registration, **kwargs):
-    from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
-                                                                               FirstNamePlaceholder, LinkPlaceholder,
-                                                                               EventTitlePlaceholder,
-                                                                               EventLinkPlaceholder)
-
-    yield FirstNamePlaceholder
-    yield LastNamePlaceholder
-    yield EventTitlePlaceholder
-    yield EventLinkPlaceholder
-    yield IDPlaceholder
-    yield LinkPlaceholder
 
 
 class RegistrationFeature(EventFeature):
@@ -174,17 +186,3 @@ class RegistrationRole(ManagementRole):
     name = 'registration'
     friendly_name = _('Registration')
     description = _('Grants management access to the registration form.')
-
-
-@template_hook('event-header')
-def _inject_event_header(event, **kwargs):
-    from indico.modules.events.registration.models.forms import RegistrationForm
-
-    event = event.as_event
-    regforms = (event.registration_forms
-                .filter_by(is_deleted=False, is_open=True)
-                .order_by(db.func.lower(RegistrationForm.title))
-                .all())
-
-    if regforms:
-        return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)
