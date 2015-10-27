@@ -24,7 +24,7 @@ from MaKaC.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function
-def compat_registration(event_id, path):
+def compat_registration(event_id, path=None):
     url = url_for('event_registration.display_regform_list', confId=event_id)
     try:
         registrant_id = int(request.args['registrantId'])
