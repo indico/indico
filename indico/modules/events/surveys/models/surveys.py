@@ -24,9 +24,10 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.errors import IndicoError
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii, to_unicode
+from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
 
@@ -222,12 +223,7 @@ class Survey(db.Model):
         """
         recipients = set(self.start_notification_emails)
         if self.notify_participants:
-            event = self.event
-            if event.getType() == 'conference':
-                recipients.update(to_unicode(r.getEmail().strip().lower()) for r in event.getRegistrantsList())
-            else:
-                recipients.update(to_unicode(p.getEmail().strip().lower())
-                                  for p in event.getParticipation().getParticipantList())
+            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event))
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 

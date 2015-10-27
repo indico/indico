@@ -22,10 +22,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii, to_unicode
+from indico.util.string import return_ascii
 
 
 class EventReminder(db.Model):
@@ -150,11 +151,7 @@ class EventReminder(db.Model):
         recipients = set(self.recipients)
         if self.send_to_participants:
             event = self.event
-            if event.getType() == 'conference':
-                recipients.update(to_unicode(r.getEmail().strip().lower()) for r in event.getRegistrantsList())
-            else:
-                recipients.update(to_unicode(p.getEmail().strip().lower())
-                                  for p in event.getParticipation().getParticipantList())
+            recipients.update(reg.email for reg in Registration.get_all_for_event(event))
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
