@@ -431,8 +431,15 @@ class AccommodationField(RegistrationFormBillableItemsField):
     @property
     def validators(self):
         def _stay_dates_valid(form, field):
+            if not field.data:
+                return
             data = snakify_keys(field.data)
-            if data and (_to_date(data['arrival_date']) > _to_date(data['departure_date'])):
+            try:
+                arrival_date = data['arrival_date']
+                departure_date = data['departure_date']
+            except KeyError:
+                raise ValidationError(_("Arrival/departure date is missing"))
+            if _to_date(arrival_date) > _to_date(departure_date):
                 raise ValidationError(_("Arrival date can't be set after the departure date."))
 
         def _check_number_of_places(form, field):
@@ -479,13 +486,14 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return item['price'] * nights
 
     def process_form_data(self, registration, value, old_data=None):
-        if not value:
-            return super(AccommodationField, self).process_form_data(registration, {}, old_data=old_data)
-        return super(AccommodationField, self).process_form_data(registration, {
-            'choice': value['choice'],
-            'arrival_date': value['arrivalDate'],
-            'departure_date': value['departureDate']
-        }, old_data=old_data)
+        data = {}
+        if value:
+            data = {
+                'choice': value['choice'],
+                'arrival_date': value['arrivalDate'],
+                'departure_date': value['departureDate']
+            }
+        return super(AccommodationField, self).process_form_data(registration, data, old_data=old_data)
 
     def get_places_used(self):
         places_used = Counter()
