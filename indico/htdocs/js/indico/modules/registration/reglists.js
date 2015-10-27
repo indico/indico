@@ -101,7 +101,9 @@
         $('.js-submit-reglist-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            $('.registrations form').attr('action', $this.data('href')).submit();
+            if (!$this.hasClass('disabled')) {
+                $('.registrations form').attr('action', $this.data('href')).submit();
+            }
         });
 
         $('.registrations').on('indico:confirmed', '.js-delete-registrations', function(evt) {
