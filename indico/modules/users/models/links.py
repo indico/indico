@@ -75,7 +75,6 @@ class UserLink(db.Model):
             'track': 'setTrack',
             'resource': 'setResource',
             'abstract': 'setAbstract',
-            'registration': 'setRegistrant',
         }
 
         try:
@@ -135,15 +134,14 @@ class UserLink(db.Model):
     @classmethod
     def _link_map(cls):
         import MaKaC.conference
-        import MaKaC.registration
         import MaKaC.review
         import MaKaC.user
         return {
             'category': {'cls': MaKaC.conference.Category,
                          'roles': {'access', 'creator', 'manager'}},
             'conference': {'cls': MaKaC.conference.Conference,
-                           'roles': {'abstractSubmitter', 'access', 'chair', 'editor',
-                                     'paperReviewManager', 'participant', 'referee', 'reviewer'}},
+                           'roles': {'abstractSubmitter', 'access', 'chair', 'editor', 'paperReviewManager', 'referee',
+                                     'reviewer'}},
             'session': {'cls': MaKaC.conference.Session,
                         'roles': {'access', 'coordinator', 'manager'}},
             'contribution': {'cls': MaKaC.conference.Contribution,
@@ -154,6 +152,4 @@ class UserLink(db.Model):
                          'roles': {'access'}},
             'abstract': {'cls': MaKaC.review.Abstract,
                          'roles': {'submitter'}},
-            'registration': {'cls': MaKaC.registration.Registrant,
-                             'roles': {'registrant'}},
         }

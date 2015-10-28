@@ -133,8 +133,7 @@ def _get_category_score(user, categ, attended_events, debug=False):
 
 
 def get_category_scores(user, debug=False):
-    attendance_roles = {'conference_participant', 'contribution_submission', 'abstract_submitter',
-                        'registration_registrant', 'survey_submitter'}
+    attendance_roles = {'contribution_submission', 'abstract_submitter', 'registration_registrant', 'survey_submitter'}
     links = avatar_links.get_links(user)
     for event_id in get_events_with_submitted_surveys(user):
         links.setdefault(str(event_id), set()).add('survey_submitter')
