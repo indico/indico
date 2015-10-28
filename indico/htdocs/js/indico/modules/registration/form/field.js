@@ -900,7 +900,11 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             });
 
             scope.$watch('accommodation.choice', function(newValue) {
-                updateAccommodationPostData('choice', newValue);
+                if (!newValue) {
+                    $('#registrationForm input[name=field_{0}]'.format(scope.field.id)).val('{}');
+                } else {
+                    updateAccommodationPostData('choice', newValue);
+                }
             });
 
             scope.billableOptionPayed = function(userdata) {
