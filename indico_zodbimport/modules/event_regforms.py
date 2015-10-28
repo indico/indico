@@ -341,7 +341,8 @@ class RegformMigration(object):
 
     def _migrate_general_section(self, form):
         section = RegistrationFormSection(registration_form=self.regform, title=_sanitize(form._title),
-                                          description=_sanitize(form._description, html=True))
+                                          description=_sanitize(form._description, html=True),
+                                          is_enabled=getattr(form, '_enabled', True))
         self.importer.print_info(cformat('%{green!}Section%{reset} - %{cyan}{}').format(section.title))
         self.section_map[form] = section
         for f in getattr(form, '_sortedFields', []) or getattr(form, '_fields', []):
