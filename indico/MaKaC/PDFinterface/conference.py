@@ -1489,6 +1489,11 @@ class RegistrantToPDF(PDFBase):
             _print_row(caption=_('Registration state'), value=registration.state.title)
         if 'price' in self.special_items:
             _print_row(caption=_('Price'), value=registration.render_price())
+        if 'checked_in' in self.special_items:
+            checked_in = 'Yes' if registration.checked_in else 'No'
+            _print_row(caption=_('Checked in'), value=checked_in)
+        if 'checked_in_date' in self.special_items:
+            _print_row(caption=_('Check-in date'), value=format_datetime(registration.checked_in_dt))
 
         return story
 
@@ -1614,6 +1619,10 @@ class RegistrantsListToPDF(PDFBase):
             lp.append(Paragraph('<b>{}</b>'.format(_('Registration state')), text_format))
         if 'price' in self.special_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Price')), text_format))
+        if 'checked_in' in self.special_items:
+            lp.append(Paragraph('<b>{}</b>'.format(_('Checked in')), text_format))
+        if 'checked_in_date' in self.special_items:
+            lp.append(Paragraph('<b>{}</b>'.format(_('Check-in date')), text_format))
         l.append(lp)
 
         for registration in self._regList:
@@ -1632,11 +1641,16 @@ class RegistrantsListToPDF(PDFBase):
                         value = value.encode('utf-8')
                     lp.append(Paragraph(str(value), text_format))
             if 'reg_date' in self.special_items:
-                lp.append(Paragraph("{}".format(format_datetime(registration.submitted_dt)), text_format))
+                lp.append(Paragraph(format_datetime(registration.submitted_dt), text_format))
             if 'state' in self.special_items:
-                lp.append(Paragraph("{}".format(registration.state.title.encode('utf-8')), text_format))
+                lp.append(Paragraph(registration.state.title.encode('utf-8'), text_format))
             if 'price' in self.special_items:
-                lp.append(Paragraph("{}".format(registration.render_price()), text_format))
+                lp.append(Paragraph(registration.render_price(), text_format))
+            if 'checked_in' in self.special_items:
+                checked_in = 'Yes' if registration.checked_in else 'No'
+                lp.append(Paragraph(checked_in, text_format))
+            if 'checked_in_date' in self.special_items:
+                lp.append(Paragraph(format_datetime(registration.checked_in_dt), text_format))
             l.append(lp)
         noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 1)
         t = Table(l, colWidths=noneList, style=tsRegs)
