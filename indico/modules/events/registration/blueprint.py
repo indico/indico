@@ -37,7 +37,8 @@ from indico.modules.events.registration.controllers.management.fields import (RH
 from indico.modules.events.registration.controllers.management.invitations import (RHRegistrationFormInvitations,
                                                                                    RHRegistrationFormInvite,
                                                                                    RHRegistrationFormDeleteInvitation)
-from indico.modules.events.registration.controllers.management.regforms import (RHManageRegistrationForms,
+from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
+                                                                                RHManageRegistrationForms,
                                                                                 RHRegistrationFormCreate,
                                                                                 RHRegistrationFormEdit,
                                                                                 RHRegistrationFormDelete,
@@ -71,7 +72,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')
-
 
 # Management
 _bp.add_url_rule('/manage/registration/', 'manage_regform_list', RHManageRegistrationForms)
@@ -189,6 +189,12 @@ _bp.add_url_rule('!/api/events/<event_id>/registrants/<registrant_id>', 'api_reg
                  RHAPIRegistrant, methods=('GET', 'PATCH'))
 _bp.add_url_rule('!/api/events/<event_id>/registrants', 'api_registrants',
                  RHAPIRegistrants)
+
+
+# Participants
+_bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<confId>',
+                                    template_folder='templates', virtual_template_folder='events/registration')
+_bp_participation.add_url_rule('/manage/participants/', 'manage', RHManageParticipants, methods=('GET', 'POST'))
 
 
 # Legacy URLs

@@ -1,0 +1,56 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+    {%- trans %}Participants{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <div class="action-box highlight">
+        <div class="section">
+            {% if regform and not registration_enabled %}
+                {{ render_feature_disabled() }}
+            {% elif not regform %}
+                {{ render_no_regform() }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% macro render_feature_disabled() %}
+    <div class="icon icon-users"></div>
+    <div class="text">
+        <div class="label">
+            {% trans %}The registration feature is disabled{% endtrans %}
+        </div>
+        {% trans -%}
+            Participants are now handled through a registration form.
+        {%- endtrans %}
+    </div>
+    <div class="toolbar right">
+        <a href="#" class="i-button highlight"
+           data-href="{{ url_for('.manage', event) }}"
+           data-method="POST">
+            {% trans %}Enable{% endtrans %}
+        </a>
+    </div>
+{% endmacro %}
+
+{% macro render_no_regform() %}
+    <div class="icon icon-users"></div>
+    <div class="text">
+        <div class="label">
+            {% trans %}There is no registration form for participants{% endtrans %}
+        </div>
+        {% trans -%}
+            Participants are now handled through a registration form.
+        {%- endtrans %}
+    </div>
+    <div class="toolbar right">
+        <a href="#" class="i-button highlight"
+           data-href="{{ url_for('.manage', event) }}"
+           data-method="POST">
+            {% trans %}Create{% endtrans %}
+        </a>
+    </div>
+{% endmacro %}

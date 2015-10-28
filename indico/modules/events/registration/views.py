@@ -24,13 +24,28 @@ from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 
 class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/registration/'
-    sidemenu_option = 'registration'
+
+    @property
+    def sidemenu_option(self):
+        if self._conf.getType() != 'conference':
+            regform = self._kwargs.get('regform')
+            if not regform:
+                registration = self._kwargs.get('registration')
+                if registration:
+                    regform = registration.registration_form
+            if regform and regform.is_participation:
+                return 'participants'
+        return 'registration'
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
+
+
+class WPManageParticipants(WPManageRegistration):
+    sidemenu_option = 'participants'
 
 
 class DisplayRegistrationFormMixin(WPJinjaMixin):

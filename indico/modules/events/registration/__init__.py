@@ -37,10 +37,15 @@ logger = Logger.get('events.registration')
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.has_feature('registration') or not event.can_manage(session.user, 'registration', allow_key=True):
+    registration_section = 'organization' if event.type == 'conference' else 'advanced'
+    if not event.can_manage(session.user, 'registration', allow_key=True):
         return
-    return SideMenuItem('registration', _('Registration'), url_for('event_registration.manage_regform_list', event),
-                        section='organization')
+    if event.type != 'conference':
+        yield SideMenuItem('participants', _("Participants"), url_for('event_participation.manage', event),
+                           section='organization')
+    if event.has_feature('registration'):
+        yield SideMenuItem('registration', _('Registration'), url_for('event_registration.manage_regform_list', event),
+                           section=registration_section)
 
 
 def _get_open_regforms(event):

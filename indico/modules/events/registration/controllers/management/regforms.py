@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, flash, session
 
 from indico.core.db import db
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
@@ -26,7 +27,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
-from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.events.registration.views import WPManageRegistration, WPManageParticipants
 from indico.modules.payment import event_settings
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
@@ -45,6 +46,30 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                     .all())
         return WPManageRegistration.render_template('management/regform_list.html', self.event,
                                                     event=self.event, regforms=regforms)
+
+
+class RHManageParticipants(RHManageRegFormsBase):
+    """Show and enable the dummy registration form for participants"""
+
+    def _process_POST(self):
+        regform = self.event_new.participation_regform
+        set_feature_enabled(self.event, 'registration', True)
+        if not regform:
+            regform = RegistrationForm(event_new=self.event_new, title="Participants", is_participation=True)
+            create_personal_data_fields(regform)
+            db.session.add(regform)
+            db.session.flush()
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
+                           'Registration form "{}" has been created'.format(regform.title), session.user)
+        return redirect(url_for('event_registration.manage_regform', regform))
+
+    def _process_GET(self):
+        regform = self.event_new.participation_regform
+        registration_enabled = self.event.has_feature('registration')
+        if not regform or not registration_enabled:
+            return WPManageParticipants.render_template('management/participants.html', self.event, event=self.event,
+                                                        regform=regform, registration_enabled=registration_enabled)
+        return redirect(url_for('event_registration.manage_regform', regform))
 
 
 class RHRegistrationFormCreate(RHManageRegFormsBase):
