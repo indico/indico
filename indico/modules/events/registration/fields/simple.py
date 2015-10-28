@@ -26,7 +26,7 @@ from uuid import uuid4
 import wtforms
 from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.datastructures import FileStorage
-from wtforms.validators import NumberRange, ValidationError
+from wtforms.validators import NumberRange, ValidationError, InputRequired
 
 from indico.core.db import db
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
@@ -273,6 +273,7 @@ class DateField(RegistrationFormFieldBase):
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     wtf_field_class = IndicoRadioField
+    required_validator = InputRequired
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
