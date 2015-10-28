@@ -84,7 +84,7 @@ SPECIAL_COLUMN_LABELS = {
         }
     },
     'checked_in_date': {
-        'title': _('Checked in date'),
+        'title': _('Check-in date'),
         'id': 'checked_in_date'
     }
 }
