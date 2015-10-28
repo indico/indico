@@ -504,10 +504,8 @@ class RegistrationData(StoredFileMixin, db.Model):
         return {'data': self.friendly_data, 'price': self.price}
 
     @property
-    def rdata(self):
-        if self.field_data.field.input_type == 'file':
-            return self.filename
-        return self.data
+    def user_data(self):
+        return self.filename if self.field_data.field.input_type == 'file' else self.data
 
     def _set_file(self, file_info):
         # in case we are deleting/replacing a file

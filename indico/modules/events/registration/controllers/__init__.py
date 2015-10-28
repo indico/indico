@@ -53,7 +53,8 @@ class RegistrationEditMixin:
             for error in form.error_list:
                 flash(error, 'error')
 
-        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.rdata) for r in self.registration.data}
+        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
+                             for r in self.registration.data}
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
 
