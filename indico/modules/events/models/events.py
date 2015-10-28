@@ -175,6 +175,13 @@ class Event(ProtectionManagersMixin, db.Model):
         return to_unicode(self.as_legacy.getTitle())
 
     @property
+    def type(self):
+        event_type = self.as_legacy.getType()
+        if event_type == 'simple_event':
+            event_type = 'lecture'
+        return event_type
+
+    @property
     @contextmanager
     def logging_disabled(self):
         """Temporarily disables event logging
