@@ -48,13 +48,13 @@
     </tr>
 {% endif %}
 
-{% if registrations %}
+{% if participants %}
     <tr>
         <td class="leftCol">{% trans %}Participants{% endtrans %}</td>
         <td>
             <ul class="participant-list">
-                {%- for registrant in registrations -%}
-                    <li>{{ registrant.full_name }}</li>
+                {%- for participant in participants -%}
+                    <li>{{ participant.full_name }}</li>
                 {%- endfor -%}
             </ul>
         </td>

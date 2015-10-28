@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session, render_template, flash
 
 from indico.core import signals
@@ -76,8 +78,12 @@ def _inject_event_header(event, **kwargs):
                                           RegistrationForm.publish_registrations_enabled,
                                           _join=Registration.registration_form)
 
+    linked_participants = {reg.user: reg for reg in registrations if reg.user is not None}
+    non_linked_participants = {reg for reg in registrations if reg.user is None}
+    participants = sorted(linked_participants.viewkeys() | non_linked_participants, key=attrgetter('id'))
+
     return render_template('events/registration/display/event_header.html', event=event, regforms=regforms,
-                           registrations=registrations)
+                           participants=participants)
 
 
 @signals.event.sidemenu.connect
