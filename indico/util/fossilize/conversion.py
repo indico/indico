@@ -22,7 +22,9 @@ from collections import defaultdict
 
 import pytz
 
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.groups.legacy import GroupWrapper
 from indico.modules.users.legacy import AvatarUserWrapper
 
 
@@ -231,7 +233,9 @@ class Conversion(object):
         for allowed in obj.getRecursiveAllowedToAccessList():
             if isinstance(allowed, AvatarUserWrapper):
                 allowed_emails.extend(allowed.getEmails())
-            else:
+            elif isinstance(allowed, EmailPrincipal):
+                allowed_emails.append(allowed.email)
+            elif isinstance(allowed, GroupWrapper):
                 allowed_groups.append(allowed.getId())
 
         return {'users': allowed_emails,
