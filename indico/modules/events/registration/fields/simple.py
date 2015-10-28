@@ -25,6 +25,7 @@ from uuid import uuid4
 
 import wtforms
 from sqlalchemy.dialects.postgresql import ARRAY
+from werkzeug.datastructures import FileStorage
 from wtforms.validators import NumberRange, ValidationError
 
 from indico.core.db import db
@@ -34,7 +35,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.date_time import format_date, iterdays
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
-from indico.util.string import crc32, normalize_phone_number, snakify_keys
+from indico.util.string import normalize_phone_number, snakify_keys
 from indico.web.forms.fields import IndicoRadioField, JSONField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
@@ -351,21 +352,38 @@ class CountryField(RegistrationFormFieldBase):
         return CountryHolder.getCountries()[registration_data.data] if registration_data.data else ''
 
 
+class _DeletableFileField(wtforms.FileField):
+    def process_formdata(self, valuelist):
+        if not valuelist:
+            self.data = {'keep_existing': False, 'uploaded_file': None}
+        else:
+            # This expects a form with a hidden field and a file field with the same name.
+            # If the hidden field is empty, it indicates that an existing file should be
+            # deleted or replaced with the newly uploaded file.
+            keep_existing = '' not in valuelist
+            uploaded_file = next((x for x in valuelist if isinstance(x, FileStorage)), None)
+            if not uploaded_file or not uploaded_file.filename:
+                uploaded_file = None
+            self.data = {'keep_existing': keep_existing, 'uploaded_file': uploaded_file}
+
+
 class FileField(RegistrationFormFieldBase):
     name = 'file'
-    wtf_field_class = wtforms.FileField
+    wtf_field_class = _DeletableFileField
 
     def process_form_data(self, registration, value, old_data=None):
-        if value is None or not value.filename:
-            return {} if old_data is not None else {'field_data': self.form_item.current_data}
-        return {
-            'field_data': self.form_item.current_data,
-            'file': {
-                'data': value.file,
-                'name': secure_filename(value.filename, 'attachment'),
-                'content_type': mimetypes.guess_type(value.filename)[0] or value.mimetype or 'application/octet-stream'
+        data = {'field_data': self.form_item.current_data}
+        file_ = value['uploaded_file']
+        if file_:
+            # we have a file -> always save it
+            data['file'] = {
+                'data': file_.file,
+                'name': secure_filename(file_.filename, 'attachment'),
+                'content_type': mimetypes.guess_type(file_.filename)[0] or file_.mimetype or 'application/octet-stream'
             }
-        }
+        elif not value['keep_existing']:
+            data['file'] = None
+        return data
 
     @property
     def default_value(self):

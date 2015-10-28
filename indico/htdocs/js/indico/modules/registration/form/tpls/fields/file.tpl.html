@@ -7,8 +7,8 @@
                 ng-model="input"
                 ng-required="field.isRequired"
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
-        </div>
-    </ng-form>
+        </ng-form>
+    </div>
     <div ng-switch-when="true">
         <span class="file-link">
             {{ userdata[fieldName] }}
@@ -17,7 +17,6 @@
             title="{{ 'Remove attachment' | i18n }}"
             alt="{{ 'Remove attachment' | i18n }}"
             ng-click="removeAttachment()"></a>
-        <input type="hidden" name="{{ fieldName }}"
-            value="{{ userdata[fieldName] }}">
     </div>
+    <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
 </div>
