@@ -71,8 +71,9 @@ SPECIAL_COLUMN_LABELS = {
         'id': 'price'
     },
     'state': {
-        'title': _('Status'),
-        'id': 'state'
+        'title': _('State'),
+        'id': 'state',
+        'filter_choices': {str(state.value): state.title for state in RegistrationState}
     },
     'checked_in': {
         'title': _('Checked in'),
@@ -128,6 +129,11 @@ def _filter_registration(regform, query, filters):
         # If both values 'true' and 'false' are selected, there's no point in filtering
         if len(checked_in_values) == 1:
             items_criteria.append(Registration.checked_in == bool(int(checked_in_values[0])))
+
+    if 'state' in filters['items']:
+        states = [RegistrationState(int(state)) for state in filters['items']['state']]
+        items_criteria.append(Registration.state.in_(states))
+
     if filters['fields']:
         subquery = (RegistrationData.query
                     .with_entities(db.func.count(RegistrationData.registration_id))
