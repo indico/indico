@@ -82,6 +82,8 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 
     def _process(self):
         regforms = RegistrationForm.find_all(RegistrationForm.is_scheduled, event_id=int(self.event.id))
+        if len(regforms) == 1:
+            return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self.event, event=self.event,
                                                regforms=regforms)
 
