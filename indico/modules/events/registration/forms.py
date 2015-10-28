@@ -43,7 +43,8 @@ def _check_if_payment_required(form, field):
 
 
 class RegistrationFormForm(IndicoForm):
-    _registrant_notification_fields = ('message_pending', 'message_unpaid', 'message_complete')
+    _registrant_notification_fields = ('notification_sender_address',
+                                       'message_pending', 'message_unpaid', 'message_complete')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
     _notifications_fields = _registrant_notification_fields + _manager_notification_fields
 
