@@ -1488,7 +1488,7 @@ class RegistrantToPDF(PDFBase):
         if 'state' in self.special_items:
             _print_row(caption=_('Registration state'), value=registration.state.title)
         if 'price' in self.special_items:
-            _print_row(caption=_('Price'), value=registration.price)
+            _print_row(caption=_('Price'), value=registration.render_price())
 
         return story
 
@@ -1636,7 +1636,7 @@ class RegistrantsListToPDF(PDFBase):
             if 'state' in self.special_items:
                 lp.append(Paragraph("{}".format(registration.state.title.encode('utf-8')), text_format))
             if 'price' in self.special_items:
-                lp.append(Paragraph("{}".format(registration.price), text_format))
+                lp.append(Paragraph("{}".format(registration.render_price()), text_format))
             l.append(lp)
         noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 1)
         t = Table(l, colWidths=noneList, style=tsRegs)
