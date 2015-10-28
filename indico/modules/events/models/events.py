@@ -171,6 +171,10 @@ class Event(ProtectionManagersMixin, db.Model):
         return {'confId': self.id}
 
     @property
+    def participation_regform(self):
+        return self.registration_forms.filter_by(is_participation=True, is_deleted=False).first()
+
+    @property
     def title(self):
         return to_unicode(self.as_legacy.getTitle())
 

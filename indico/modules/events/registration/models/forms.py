@@ -41,7 +41,9 @@ class RegistrationForm(db.Model):
     """A registration form for an event"""
 
     __tablename__ = 'forms'
-    __table_args__ = (db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
+    __table_args__ = (db.Index('ix_uq_forms_participation', 'event_id', unique=True,
+                               postgresql_where=db.text('is_participation AND NOT is_deleted')),
+                      db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
                       {'schema': 'event_registration'})
 
     #: The ID of the object
@@ -60,6 +62,11 @@ class RegistrationForm(db.Model):
     title = db.Column(
         db.String,
         nullable=False
+    )
+    is_participation = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     # An introduction text for users
     introduction = db.Column(
