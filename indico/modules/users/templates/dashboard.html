@@ -46,7 +46,9 @@
                         <h3>
                             {% trans %}Your events at hand{% endtrans %}
                             {% if session.user.is_admin %}
-                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-loop" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
+                                <a href="#" id="refresh-redis-links"
+                                   style="float: right;" class="icon-loop"
+                                   title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
                                 <script>
                                     $('#refresh-redis-links').on('click', function(e) {
                                         e.preventDefault();
