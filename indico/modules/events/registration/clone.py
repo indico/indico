@@ -60,9 +60,10 @@ class RegistrationFormCloner(EventCloner):
             for old_item in old_section_items:
                 new_item = RegistrationFormItem(parent=new_section, registration_form=new_form,
                                                 **{attr: getattr(old_item, attr) for attr in items_attrs})
-                field_data = RegistrationFormFieldData(field=new_item,
-                                                       versioned_data=getattr(old_item, 'versioned_data'))
-                new_item.current_data = field_data
+                if new_item.is_field:
+                    field_data = RegistrationFormFieldData(field=new_item,
+                                                           versioned_data=getattr(old_item, 'versioned_data'))
+                    new_item.current_data = field_data
                 new_section.children.append(new_item)
             db.session.add(new_section)
             db.session.flush()
