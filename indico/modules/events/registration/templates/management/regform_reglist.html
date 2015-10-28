@@ -127,6 +127,11 @@
                    data-href="{{ url_for('.generate_static_url', regform) }}"
                    title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
             </div>
+            <div class="group right">
+                <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                    {{ regform.registrations|length }}
+                </span>
+            </div>
         </div>
         {{ render_registration_list(registrations, visible_cols_regform_items, basic_columns, total_registrations) }}
 

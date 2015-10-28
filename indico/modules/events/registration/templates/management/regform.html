@@ -46,14 +46,21 @@
             <div class="icon icon-users"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}List of registrants{% endtrans %}
+                    {% trans %}List of registrations{% endtrans %}
                 </div>
                 {% trans %}Add, remove or modify registrations.{% endtrans %}
             </div>
             <div class="toolbar right">
-                <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-settings">
-                    {% trans %}Manage{% endtrans %}
-                </a>
+                <div class="group">
+                    <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                        {{ regform.registrations|length }}
+                    </span>
+                </div>
+                <div class="group">
+                    <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
+                </div>
             </div>
         </div>
 
