@@ -494,7 +494,7 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
                     if (scope.field.dateFormat.indexOf(' ') == -1) {
                         scope.dateTime.time = null;
                     } else if (scope.dateTime.time === null) {
-                        scope.dateTime.time = "00:00";
+                        scope.dateTime.time = '';
                     }
                 });
 
@@ -503,6 +503,7 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
                     dateFormat: translateDateFormat(dateFormat),
                     onSelect: function(date) {
                         ctrl.$setViewValue(date);
+                        scope.$apply();
                     }
                 });
             });

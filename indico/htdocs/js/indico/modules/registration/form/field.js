@@ -380,6 +380,9 @@ ndRegForm.directive('ndCountryField', function(url) {
 });
 
 function splitDateTime(dt, fmt) {
+    if (!dt) {
+        return {date: '', time: null};
+    }
     var dtObj = moment(dt),
         fmtParts = fmt.split(' ');
     return {

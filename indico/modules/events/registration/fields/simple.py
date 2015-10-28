@@ -269,6 +269,11 @@ class DateField(RegistrationFormFieldBase):
         dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
         return dt.strftime(self.form_item.data['date_format'])
 
+    @property
+    def view_data(self):
+        has_time = ' ' in self.form_item.data['date_format']
+        return dict(super(DateField, self).view_data, has_time=has_time)
+
 
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
