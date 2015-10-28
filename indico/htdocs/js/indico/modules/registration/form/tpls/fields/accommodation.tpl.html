@@ -12,7 +12,7 @@
                     {{ 'There are no available accommodation options' | i18n }}.
                 </td>
             </tr>
-            <tr ngif="!field.isRequired">
+            <tr ng-if="!field.isRequired">
                 <td class="accommodation-option-item">
                     <input type="radio" name="accommodationType-{{ field.id }}"
                            ng-model="accommodation.choice"
