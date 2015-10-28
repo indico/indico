@@ -20,12 +20,10 @@ Asynchronous request handlers for conference-related data modification.
 """
 
 # 3rd party imports
-from email.utils import formataddr
 from flask import session
 from indico.modules.events.layout import layout_settings
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
-from indico.util.string import permissive_format
 
 import datetime
 
@@ -33,7 +31,7 @@ import datetime
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, filters, timezoneUtils, HelperMaKaCInfo
+from MaKaC.common import indexes, filters, HelperMaKaCInfo
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -41,14 +39,10 @@ from MaKaC.common.contextManager import ContextManager
 from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
-from MaKaC.participant import Participant
 from MaKaC.fossils.contribution import IContributionFossil
 
-from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
-import MaKaC.webinterface.pages.conferences as conferences
 
 from MaKaC.services.implementation.base import (ProtectedModificationService, ListModificationBase, ParameterManager,
                                                 ProtectedDisplayService, ServiceBase, TextModificationBase,
@@ -74,10 +68,10 @@ class ConferenceBase:
 
         try:
             self._target = self._conf = conference.ConferenceHolder().getById(self._params["conference"])
-        except:
+        except Exception:
             try:
                 self._target = self._conf = conference.ConferenceHolder().getById(self._params["confId"])
-            except:
+            except Exception:
                 raise ServiceError("ERR-E4", "Invalid conference id.")
             if self._target is None:
                 Logger.get('rpc.conference').debug('self._target is null')
@@ -640,486 +634,10 @@ class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
         return [afmDict, cTypesDict]
 
 
-class ConferenceParticipantBase:
-
-    def _generateParticipant(self, av=None):
-        participant = Participant(self._conf, av)
-        if av is None:
-            participant.setTitle(self._title)
-            participant.setFamilyName(self._familyName)
-            participant.setFirstName(self._firstName)
-            participant.setEmail(self._email)
-            participant.setAffiliation(self._affiliation)
-            participant.setAddress(self._address)
-            participant.setTelephone(self._telephone)
-            participant.setFax(self._fax)
-        return participant
-
-    def _sendEmailWithFormat(self, participant, data):
-            data["toList"] = [participant.getEmail()]
-            urlInvitation = urlHandlers.UHConfParticipantsInvitation.getURL(self._conf)
-            urlInvitation.addParam("participantId", str(participant.getId()))
-            urlRefusal = urlHandlers.UHConfParticipantsRefusal.getURL(self._conf)
-            urlRefusal.addParam("participantId", str(participant.getId()))
-
-            mailEnv = dict(name=participant.getFullName(),
-                           confTitle=self._conf.getTitle(),
-                           url=urlHandlers.UHConferenceDisplay.getURL(self._conf),
-                           urlRefusal=urlRefusal, urlInvitation=urlInvitation)
-
-            data["body"] = permissive_format(data["body"], mailEnv)
-            data["subject"] = permissive_format(data["subject"], mailEnv)
-            data["content-type"] = 'text/html'
-            GenericMailer.sendAndLog(GenericNotification(data), self._conf,
-                                     'Participants')
-
-
-class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
-
-    def _checkParams(self):
-        pm = ParameterManager(self._params)
-        self._id = pm.extract("id", pType=str, allowEmpty=True)
-        self._title = pm.extract("title", pType=str, allowEmpty=True, defaultValue="")
-        self._familyName = pm.extract("surName", pType=str, allowEmpty=True)
-        self._firstName = pm.extract("name", pType=str, allowEmpty=True)
-        if self._familyName.strip() == "" and self._firstName.strip() == "":
-            raise NoReportError(_("User has neither First Name or Family Name."))
-        self._email = pm.extract("email", pType=str, allowEmpty=False)
-        self._affiliation = pm.extract("affiliation", pType=str, allowEmpty=True, defaultValue="")
-        self._address = pm.extract("address", pType=str, allowEmpty=True, defaultValue="")
-        self._telephone = pm.extract("phone", pType=str, allowEmpty=True, defaultValue="")
-        self._fax = pm.extract("fax", pType=str, allowEmpty=True, defaultValue="")
-
-
-class ConferenceParticipantListBase(ConferenceModifBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userList = pm.extract("userIds", pType=list, allowEmpty=False)
-
-    def _getWarningAlreadyAdded(self, list, typeList=""):
-        if len(list) == 1:
-            return _("""The participant identified by email %s
-                        is already in the %s participants' list.""") % (typeList, list[0])
-        else:
-
-            return _("""The participants identified by email %s
-                        are already in the %s participants' list.""") % (typeList, ", ".join(list))
-
-    def _checkParticipantConfirmed(self, participant):
-        if not participant.isConfirmed():
-            raise NoReportError(_("Selected participant(s) did not confirm invitation. Until then you can not change presence status"))
-
-
-class ConferenceParticipantsDisplay(ConferenceModifBase):
-
-    def _getAnswer(self):
-        if self._conf.getParticipation().displayParticipantList():
-            self._conf.getParticipation().participantListHide()
-        else:
-            self._conf.getParticipation().participantListDisplay()
-        return True
-
-
-class ConferenceParticipantsAddedInfo(ConferenceModifBase):
-
-    def _getAnswer(self):
-        if self._conf.getParticipation().isAddedInfo():
-            self._conf.getParticipation().setNoAddedInfo(self._getUser())
-        else:
-            self._conf.getParticipation().setAddedInfo(self._getUser())
-        return True
-
-
-class ConferenceParticipantsAllowForApplying(ConferenceModifBase):
-
-    def _getAnswer(self):
-        if self._conf.getParticipation().isAllowedForApplying():
-            self._conf.getParticipation().setNotAllowedForApplying(self._getUser())
-        else:
-            self._conf.getParticipation().setAllowedForApplying(self._getUser())
-        return True
-
-
-class ConferenceParticipantsAutoAccept(ConferenceModifBase):
-
-    def _getAnswer(self):
-        participation = self._conf.getParticipation()
-        participation.setAutoAccept(not participation.isAutoAccept(), self._getUser())
-        return participation.isAutoAccept()
-
-
-class ConferenceParticipantsNotifyMgrNewParticipant(ConferenceModifBase):
-
-    def _getAnswer(self):
-        participation = self._conf.getParticipation()
-        participation.setNotifyMgrNewParticipant(not participation.isNotifyMgrNewParticipant())
-
-
-class ConferenceParticipantsSetNumMaxParticipants(ConferenceTextModificationBase):
-    """
-    Conference num max participants modification
-    """
-    def _handleSet(self):
-        numMaxPart = self._value
-        if (self._value == ""):
-            raise ServiceError("ERR-E2", _("The value of the maximum numbers of participants cannot be empty."))
-        try:
-            numMaxPart = int(self._value)
-        except ValueError:
-            raise ServiceError("ERR-E3", _("The value of the maximum numbers of participants has to be a positive number."))
-
-        self._target.getParticipation().setNumMaxParticipants(int(numMaxPart))
-
-    def _handleGet(self):
-        return self._target.getParticipation().getNumMaxParticipants()
-
-
-class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditParticipantBase):
-
-    def _checkParams(self):
-        ConferenceDisplayBase._checkParams(self)
-        ConferenceAddEditParticipantBase._checkParams(self)
-
-    def _getAnswer(self):
-        if self._conf.getStartDate() < timezoneUtils.nowutc() :
-            raise NoReportError(_("""This event began on %s, you cannot apply for
-                                         participation after the event began."""%self._conf.getStartDate()), title=_("Event started"))
-        participation = self._conf.getParticipation()
-
-        if not participation.isAllowedForApplying() :
-            raise NoReportError( _("""Participation in this event is restricted to persons invited.
-                                           If you insist on taking part in this event, please contact the event manager."""), title=_("Application restricted"))
-        if participation.getNumMaxParticipants() > 0 and len(participation.getParticipantList()) >= participation.getNumMaxParticipants():
-            raise NoReportError( _("""You cannot apply for participation in this event because the maximum numbers of participants has been reached.
-                                           If you insist on taking part in this event, please contact the event manager."""), title=_("Maximum number of participants reached"))
-
-        result = {}
-        user = self._getUser()
-        pending = self._generateParticipant(user)
-        if participation.alreadyParticipating(pending) != 0:
-            raise NoReportError(_("The participant can not be added to the meeting because there is already a participant with the email address '%s'."
-                                % pending.getEmail()),title=_('Already registered participant'))
-        elif participation.alreadyPending(pending)!=0:
-            raise NoReportError(_("The participant can not be added to the meeting because there is already a pending participant with the email address '%s'."
-                                % pending.getEmail()),title=_('Already pending participant'))
-        else:
-            if participation.addPendingParticipant(pending):
-                if participation.isAutoAccept():
-                    result["msg"] = _("The request for participation has been accepted")
-                    if participation.displayParticipantList() :
-                        result["listParticipants"] = participation.getPresentParticipantListText()
-                    # check if an e-mail should be sent...
-                    if participation.isNotifyMgrNewParticipant():
-                        # to notify the manager of new participant addition
-                        data = self.preparedNewParticipantMessage(pending)
-                        GenericMailer.sendAndLog(GenericNotification(data),
-                                                 self._conf,
-                                                 'Participants')
-                else:
-                    result["msg"] = _("The participant identified by email '%s' has been added to the list of pending participants"
-                                    % pending.getEmail())
-            else:
-                return NoReportError(_("The participant cannot be added."), title=_("Error"))
-        return result
-
-    def preparedNewParticipantMessage(self, participant):
-        if participant is None :
-            return None
-
-        profileURL = urlHandlers.UHConfModifParticipants.getURL(self._conf)
-
-        data = {}
-        data["toList"] = self._conf.all_manager_emails
-        data["fromAddr"] = Config.getInstance().getSupportEmail()
-        data["subject"] = "New participant joined '%s'" % self._conf.getTitle()
-
-        data["body"] = """
-        Dear Event Manager,
-
-            A new participant, identified by email '%s' has been added to %s.
-            The full list of participants can be managed at %s
-
-        Your Indico
-        """%(participant.getEmail(), self._conf.getTitle(), profileURL)
-
-        return data
-
-class ConferenceAddParticipant(ConferenceModifBase, ConferenceAddEditParticipantBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        ConferenceAddEditParticipantBase._checkParams(self)
-
-    def _getAnswer(self):
-        eventManager = self._getUser()
-        user = get_user_by_email(self._email, create_pending=True)
-        participation = self._conf.getParticipation()
-        if user:
-            participant = self._generateParticipant(user.as_avatar)
-        else:
-            participant = self._generateParticipant()
-        if participation.alreadyParticipating(participant) != 0 :
-            raise NoReportError(_("The participant can not be added to the meeting because there is already a participant with the email address '%s'."
-                                % participant.getEmail()),title=_('Already registered participant'))
-        elif participation.alreadyPending(participant)!=0:
-            raise NoReportError(_("The participant can not be added to the meeting because there is already a pending participant with the email address '%s'."
-                                % participant.getEmail()),title=_('Already pending participant'))
-        else:
-            participation.addParticipant(participant, eventManager)
-        return conferences.WConferenceParticipant(self._conf,participant).getHTML().replace("\n","")
-
-class ConferenceEditParticipant(ConferenceModifBase, ConferenceAddEditParticipantBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        ConferenceAddEditParticipantBase._checkParams(self)
-
-    def _getAnswer(self):
-        participant = self._conf.getParticipation().getParticipantById(self._id)
-        if participant == None:
-            raise NoReportError(_("The participant that you are trying to edit does not exist."))
-        participant.setTitle(self._title)
-        participant.setFamilyName(self._familyName)
-        participant.setFirstName(self._firstName)
-        participant.setEmail(self._email)
-        participant.setAffiliation(self._affiliation)
-        participant.setAddress(self._address)
-        participant.setTelephone(self._telephone)
-        participant.setFax(self._fax)
-        return conferences.WConferenceParticipant(self._conf,participant).getHTML().replace("\n","")
-
-class ConferenceEditPending(ConferenceModifBase, ConferenceAddEditParticipantBase):
-
-    def _checkParams(self):
-        ConferenceModifBase._checkParams(self)
-        ConferenceAddEditParticipantBase._checkParams(self)
-
-    def _getAnswer(self):
-        pending = self._conf.getParticipation().getPendingParticipantByKey(self._id)
-        if pending == None:
-            raise NoReportError(_("The pending participant that you are trying to edit does not exist."))
-        pending.setTitle(self._title)
-        pending.setFamilyName(self._familyName)
-        pending.setFirstName(self._firstName)
-        pending.setEmail(self._email)
-        pending.setAffiliation(self._affiliation)
-        pending.setAddress(self._address)
-        pending.setTelephone(self._telephone)
-        pending.setFax(self._fax)
-        return conferences.WConferenceParticipantPending(self._conf, self._id, pending).getHTML().replace("\n","")
-
-class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipantListBase):
-
-    def _addParticipant(self, participant, participation):
-        if participation.alreadyParticipating(participant) != 0 :
-            self._usersParticipant.append(participant.getEmail())
-        elif participation.alreadyPending(participant)!=0:
-            self._usersPending.append(participant.getEmail())
-        else:
-            participation.addParticipant(participant, self._getUser())
-            self._added.append(conferences.WConferenceParticipant(self._conf,participant).getHTML())
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No users were selected to be added as participants."))
-        self._usersPending = []
-        self._usersParticipant = []
-        self._added =[]
-        participation = self._conf.getParticipation()
-        result = {}
-        infoWarning = []
-
-        avatars = [principal_from_fossil(x, allow_pending=True, allow_groups=False) for x in self._userList]
-        for avatar in avatars:
-            self._addParticipant(self._generateParticipant(avatar), participation)
-
-        result["added"] = ("".join(self._added)).replace("\n", "")
-        if self._usersPending:
-            infoWarning.append(self._getWarningAlreadyAdded(self._usersPending, "pending"))
-        if self._usersParticipant:
-            infoWarning.append(self._getWarningAlreadyAdded(self._usersParticipant))
-        if infoWarning:
-            result["infoWarning"] = infoWarning
-        return result
-
-class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticipantListBase):
-
-    def _checkParams(self):
-        ConferenceParticipantListBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._emailSubject = pm.extract("subject", pType=str, allowEmpty=False)
-        self._emailBody = pm.extract("body", pType=str, allowEmpty=False)
-
-    def _inviteParticipant(self, participant, participation):
-        if participation.alreadyParticipating(participant) != 0 :
-            self._usersParticipant.append(participant.getEmail())
-            return False
-        elif participation.alreadyPending(participant)!=0:
-            self._usersPending.append(participant.getEmail())
-            return False
-        else:
-            participation.inviteParticipant(participant, self._getUser())
-            self._added.append(conferences.WConferenceParticipant(self._conf,participant).getHTML())
-            return True
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No users were selected to be invited as participants."))
-        self._usersPending = []
-        self._usersParticipant = []
-        self._added =[]
-        currentUser = self._getUser()
-        participation = self._conf.getParticipation()
-        infoWarning = []
-
-        result = {}
-        data = {}
-
-        if currentUser:
-            data["fromAddr"] = currentUser.getEmail()
-        else:
-            data["fromAddr"] = formataddr((self._conf.getTitle(), Config.getInstance().getNoReplyEmail()))
-
-        if self._emailBody.find('{urlInvitation}') == -1:
-            raise NoReportError(_("The {urlInvitation} field is missing in your email. This is a mandatory field thus, this email cannot be sent."))
-
-        data["subject"] = self._emailSubject
-        data["body"] = self._emailBody
-        avatars = [principal_from_fossil(x, allow_pending=True, allow_groups=False) for x in self._userList]
-        for avatar in avatars:
-            participant = self._generateParticipant(avatar)
-            if self._inviteParticipant(participant, participation):
-                self._sendEmailWithFormat(participant, data)
-        result["added"] = ("".join(self._added)).replace("\n","")
-        if self._usersPending:
-            infoWarning.append(self._getWarningAlreadyAdded(self._usersPending, "pending"))
-        if self._usersParticipant:
-            infoWarning.append(self._getWarningAlreadyAdded(self._usersParticipant))
-        if infoWarning:
-            result["infoWarning"] = infoWarning
-        return result
-
-class ConferenceRemoveParticipants(ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No participants were selected to be removed."))
-        for id in self._userList:
-            self._conf.getParticipation().removeParticipant(id, self._getUser())
-        return True
-
-class ConferenceMarkPresenceParticipants(ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No participants were selected to be marked as presents."))
-        for id in self._userList:
-            participant = self._conf.getParticipation().getParticipantById(id)
-            self._checkParticipantConfirmed(participant)
-            participant.setPresent()
-        return True
-
-class ConferenceMarkAbsentParticipants(ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No participants were selected to be marked as absents."))
-        for id in self._userList:
-            participant = self._conf.getParticipation().getParticipantById(id)
-            self._checkParticipantConfirmed(participant)
-            participant.setAbsent()
-        return True
-
-class ConferenceExcuseAbsenceParticipants(ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No participants were selected to be excused."))
-        usersPresent = []
-        for id in self._userList:
-            participant = self._conf.getParticipation().getParticipantById(id)
-            if not participant.setStatusExcused() and participant.isPresent() :
-                usersPresent.append(participant.getFullName())
-        if usersPresent:
-            if len(usersPresent) == 1:
-                raise NoReportError(_("""You cannot excuse absence of %s - this participant was present
-                in the event""")%(usersPresent[0]))
-            else:
-                raise NoReportError(_("""You cannot excuse absence of %s - these participants were present
-                in the event""")%(", ".join(usersPresent)))
-
-        return True
-
-class ConferenceEmailParticipants(ConferenceParticipantBase, ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No participants were selected."))
-        emailSubject = self._params.get("subject","")
-        emailBody = self._params.get("body","")
-        data = {}
-        currentUser = self._getUser()
-
-        if currentUser:
-            data["fromAddr"] = currentUser.getEmail()
-        else:
-            data["fromAddr"] = formataddr((self._conf.getTitle(), Config.getInstance().getNoReplyEmail()))
-
-        data["content-type"] = "text/html"
-        data["subject"] = emailSubject
-        for id in self._userList:
-            participant = self._conf.getParticipation().getParticipantById(id)
-            if participant:
-                data["body"] = emailBody
-                self._sendEmailWithFormat(participant, data)
-        return True
-
-class ConferenceAcceptPendingParticipants(ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No pending participants were selected to be accepted."))
-        for id in self._userList:
-            pending = self._conf.getParticipation().getPendingParticipantByKey(id)
-            self._conf.getParticipation().addParticipant(pending)
-        return True
-
-class ConferenceRejectPendingParticipants(ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No pending participants were selected to be rejected."))
-        for id in self._userList:
-            pending = self._conf.getParticipation().getPendingParticipantByKey(id)
-            pending.setStatusDeclined()
-            self._conf.getParticipation().declineParticipant(pending)
-        return True
-
-class ConferenceRejectWithEmailPendingParticipants(ConferenceParticipantBase, ConferenceParticipantListBase):
-
-    def _getAnswer(self):
-        if self._userList == []:
-            raise NoReportError(_("No pending participants were selected to be rejected."))
-        pm = ParameterManager(self._params)
-        emailSubject = pm.extract("subject", pType=str, allowEmpty=True)
-        emailBody = pm.extract("body", pType=str, allowEmpty=True)
-        data = {}
-        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-        data["subject"] =  emailSubject
-        data["body"] =  emailBody
-        for userId in self._userList:
-            pending = self._conf.getParticipation().getPendingParticipantByKey(userId)
-            pending.setStatusDeclined()
-            self._conf.getParticipation().declineParticipant(pending)
-            self._sendEmailWithFormat(pending, data)
-        return True
-
 class ConferenceProtectionUserList(ConferenceModifBase):
 
     def _getAnswer(self):
-        #will use IAvatarFossil or IGroupFossil
+        # will use IAvatarFossil or IGroupFossil
         return fossilize(self._conf.getAllowedToAccessList())
 
 
@@ -1506,26 +1024,6 @@ methodMap = {
     "sessions.listAll" : ConferenceListSessions,
     "showConcurrentEvents": ShowConcurrentEvents,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
-    "participation.allowDisplay": ConferenceParticipantsDisplay,
-    "participation.notifyMgrNewParticipant": ConferenceParticipantsNotifyMgrNewParticipant,
-    "participation.addedInfo": ConferenceParticipantsAddedInfo,
-    "participation.allowForApply": ConferenceParticipantsAllowForApplying,
-    "participation.autoAccept": ConferenceParticipantsAutoAccept,
-    "participation.setNumMaxParticipants": ConferenceParticipantsSetNumMaxParticipants,
-    "participation.applyParticipant": ConferenceApplyParticipant,
-    "participation.addParticipant": ConferenceAddParticipant,
-    "participation.editParticipant": ConferenceEditParticipant,
-    "participation.editPending": ConferenceEditPending,
-    "participation.addParticipants": ConferenceAddParticipants,
-    "participation.inviteParticipants": ConferenceInviteParticipants,
-    "participation.removeParticipants": ConferenceRemoveParticipants,
-    "participation.markPresent": ConferenceMarkPresenceParticipants,
-    "participation.markAbsence": ConferenceMarkAbsentParticipants,
-    "participation.excuseAbsence": ConferenceExcuseAbsenceParticipants,
-    "participation.emailParticipants": ConferenceEmailParticipants,
-    "participation.acceptPending": ConferenceAcceptPendingParticipants,
-    "participation.rejectPending": ConferenceRejectPendingParticipants,
-    "participation.rejectPendingWithEmail": ConferenceRejectWithEmailPendingParticipants,
     "protection.getAllowedUsersList": ConferenceProtectionUserList,
     "protection.addAllowedUsers": ConferenceProtectionAddUsers,
     "protection.removeAllowedUser": ConferenceProtectionRemoveUser,

@@ -17,7 +17,7 @@
 import re
 import urlparse
 
-from flask import request, session, has_request_context
+from flask import request, has_request_context
 
 from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.timezoneUtils import nowutc
@@ -723,10 +723,6 @@ class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 
 
-class UHConfModifParticipants(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants'
-
-
 class UHConfClone(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-clone'
 
@@ -749,34 +745,6 @@ class UHConfAllSpeakers(URLHandler):
 
 class UHConfAllSpeakersAction(URLHandler):
     _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
-
-
-class UHConfModifParticipantsSetup(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-setup'
-
-
-class UHConfModifParticipantsPending(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-pendingParticipants'
-
-
-class UHConfModifParticipantsDeclined(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-declinedParticipants'
-
-
-class UHConfModifParticipantsAction(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-action'
-
-
-class UHConfModifParticipantsStatistics(URLHandler):
-    _endpoint = 'event_mgmt.confModifParticipants-statistics'
-
-
-class UHConfParticipantsInvitation(URLHandler):
-    _endpoint = 'event.confModifParticipants-invitation'
-
-
-class UHConfParticipantsRefusal(URLHandler):
-    _endpoint = 'event.confModifParticipants-refusal'
 
 
 class UHConfUser(URLHandler):

@@ -37,8 +37,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core import signals
 from indico.core.config import Config
-from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
-    ConferenceClosedError, NoReportError, NotFoundError
+from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
@@ -50,14 +49,13 @@ import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.contribPacker import ZIPFileHandler, AbstractPacker
 from MaKaC.common import pendingQueues
-from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
+from MaKaC.export.excel import AbstractListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
 from indico.modules.events import notify_pending
 from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
-from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.fossils.conference import ISessionBasicFossil
@@ -442,74 +440,6 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
                 for convener in slot.getConvenerList():
                     ses.grantModification(convener,False)
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
-
-
-class RHConfModifParticipants( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifParticipants
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        else:
-            return conferences.WPConfModifParticipants( self, self._target ).display()
-
-class RHConfModifParticipantsSetup(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsSetup
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        else:
-            return conferences.WPConfModifParticipantsSetup( self, self._target ).display()
-
-class RHConfModifParticipantsPending(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsPending
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        elif self._target.getParticipation().getPendingParticipantList() and nowutc() < self._target.getStartDate():
-            return conferences.WPConfModifParticipantsPending( self, self._target ).display()
-        else:
-            return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-class RHConfModifParticipantsDeclined(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsDeclined
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        elif self._target.getParticipation().getDeclinedParticipantList():
-            return conferences.WPConfModifParticipantsDeclined( self, self._target ).display()
-        else:
-            return self._redirect(RHConfModifParticipants._uh.getURL(self._conf))
-
-
-class RHConfModifParticipantsAction(RHConfModifParticipants):
-    _uh = urlHandlers.UHConfModifParticipantsAction
-
-    def _process( self ):
-        params = self._getRequestParams()
-        selectedList = self._normaliseListParam(self._getRequestParams().get("participants",[]))
-        toList = []
-        if selectedList == []:
-            raise FormValuesError(_("No participant selected! Please select at least one."))
-        else:
-            for id in selectedList :
-                participant = self._conf.getParticipation().getParticipantById(id)
-                toList.append(participant)
-        excel = ParticipantsListToExcel(self._conf, list=toList)
-        return send_file('ParticipantList.csv', StringIO(excel.getExcelFile()), 'CSV')
-
-
-class RHConfModifParticipantsStatistics(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfModifParticipantsStatistics
-
-    def _process( self ):
-        if self._conf.isClosed():
-            return conferences.WPConferenceModificationClosed( self, self._target ).display()
-        else:
-            return conferences.WPConfModifParticipantsStatistics( self, self._target ).display()
 
 
 #######################################################################################

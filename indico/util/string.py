@@ -179,15 +179,6 @@ def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
     return text
 
 
-def permissive_format(text, params):
-    """
-    Format text using params from dictionary. Function is resistant to missing parentheses
-    """
-    for k, v in params.iteritems():
-        text = text.replace("{" + k + "}", str(v))
-    return text
-
-
 def remove_extra_spaces(text):
     """
     Removes multiple spaces within text and removes whitespace around the text

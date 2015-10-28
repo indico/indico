@@ -625,64 +625,6 @@ class RHAbstractBook(RHConferenceBaseDisplay):
             return send_file(pdfFilename, cacheFile, 'PDF')
 
 
-class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConfParticipantsRefusal
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams(self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
-
-    def _process(self):
-        params = self._getRequestParams()
-        participantId = params["participantId"]
-        status = self._conf.getParticipation().getParticipantById(participantId).getStatus()
-        if status == 'accepted':
-            raise NoReportError(_('You have already accepted the invitation.'))
-        elif status == 'rejected':
-            raise NoReportError(_('You have already rejected the invitation.'))
-        if self._cancel:
-            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-            self._redirect(url)
-        elif self._confirm:
-            participant = self._conf.getParticipation().getParticipantById(participantId)
-            participant.setStatusRefused()
-            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-            self._redirect(url)
-        else:
-            return conferences.WPConfModifParticipantsRefuse(self, self._conf).display(**params)
-
-
-class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConfParticipantsInvitation
-
-    def _checkParams( self, params ):
-        RHConferenceBaseDisplay._checkParams(self, params )
-        self._confirm = params.has_key( "confirm" )
-        self._cancel = params.has_key( "cancel" )
-
-    def _process( self ):
-        params = self._getRequestParams()
-        participantId = params["participantId"]
-        status = self._conf.getParticipation().getParticipantById(participantId).getStatus()
-        if status == 'accepted':
-            raise NoReportError(_('You have already accepted the invitation.'))
-        elif status == 'rejected':
-            raise NoReportError(_('You have already rejected the invitation.'))
-        if self._cancel:
-            if not self._conf.getParticipation().setParticipantRejected(participantId):
-                raise NoReportError("It seems you have been withdrawn from the list of invited participants")
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            self._redirect( url )
-        elif self._confirm:
-            if not self._conf.getParticipation().setParticipantAccepted(participantId):
-                raise NoReportError("It seems you have been withdrawn from the list of invited participants")
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            self._redirect( url )
-        else:
-            return conferences.WPConfModifParticipantsInvite( self, self._conf ).display(**params)
-
-
 class RHConferenceToiCal(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
