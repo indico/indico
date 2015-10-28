@@ -184,7 +184,7 @@ def url_rule_to_angular(endpoint):
     return ''.join(segments).split('|', 1)[-1]
 
 
-def create_registration(regform, data, invitation=None):
+def create_registration(regform, data, invitation=None, management=False):
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
                                 base_price=regform.base_price)
     for form_item in regform.active_fields:
@@ -210,7 +210,7 @@ def create_registration(regform, data, invitation=None):
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
-    registration.update_state()
+    registration.update_state(management=management)
     db.session.flush()
     notify_registration_creation(registration)
     logger.info('New registration %s by %s', registration, session.user)

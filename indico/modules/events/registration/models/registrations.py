@@ -342,7 +342,7 @@ class Registration(db.Model):
         currency = event_payment_settings.get(self.registration_form.event, 'currency')
         return '{} {}'.format(self.price, currency)
 
-    def update_state(self, approved=None, paid=None, rejected=None):
+    def update_state(self, approved=None, paid=None, rejected=None, management=False):
         """Update the state of the registration for a given action
 
         The accepted kwargs are the possible actions. ``True`` means that the
@@ -353,7 +353,8 @@ class Registration(db.Model):
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
-        moderation_required = regform.moderation_enabled and (not invitation or not invitation.skip_moderation)
+        moderation_required = (regform.moderation_enabled and not management and
+                               (not invitation or not invitation.skip_moderation))
         with db.session.no_autoflush:
             payment_required = regform.event.has_feature('payment') and self.price
         if self.state is None:
