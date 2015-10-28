@@ -88,7 +88,8 @@ class ParticipationMigration(object):
         return 'ParticipationMigration({})'.format(self.event)
 
     def run(self):
-        self.regform = RegistrationForm(event_id=int(self.event.id), title=PARTICIPATION_FORM_TITLE)
+        self.regform = RegistrationForm(event_id=int(self.event.id), title=PARTICIPATION_FORM_TITLE,
+                                        is_participation=True)
         if not self.importer.quiet:
             self.importer.print_success(cformat('%{cyan}{}').format(self.regform.title), event_id=self.event.id)
         self._migrate_settings()
