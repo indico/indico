@@ -91,11 +91,6 @@ def _sidemenu_items(sender, event, **kwargs):
             yield SideMenuItem('paper_reviewing', _('Paper Reviewing'),
                                url_for('event_mgmt.confModifReviewing-access', event),
                                section='organization')
-    else:
-        if can_modify:
-            yield SideMenuItem('participants', _('Participants'),
-                               url_for('event_mgmt.confModifParticipants', event),
-                               section='organization')
 
     if can_modify:
         if not is_lecture:
