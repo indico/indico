@@ -300,7 +300,7 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
         if 'state' in special_items:
             registration_dict['Registration state'] = registration.state.title.encode('utf-8')
         if 'price' in special_items:
-            registration_dict['Price'] = registration.price
+            registration_dict['Price'] = registration.render_price()
         writer.writerow(registration_dict)
     buf.seek(0)
     return buf
