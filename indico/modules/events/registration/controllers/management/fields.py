@@ -66,7 +66,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
             raise BadRequest
         self.field.is_enabled = enabled
         db.session.flush()
-        logger.info('Field {} modified by {}'.format(self.field, session.user))
+        logger.info('Field %s modified by %s', self.field, session.user)
         return jsonify(view_data=self.field.view_data)
 
 
@@ -78,7 +78,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             raise BadRequest
         self.field.is_deleted = True
         db.session.flush()
-        logger.info('Field {} deleted by {}'.format(self.field, session.user))
+        logger.info('Field %s deleted by %s', self.field, session.user)
         return jsonify()
 
     def _process_PATCH(self):

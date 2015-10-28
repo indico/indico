@@ -99,7 +99,7 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
     def _process(self):
         self.regform.is_deleted = True
         flash(_("Registration form deleted"), 'success')
-        logger.info("Registration form {} deleted by {}".format(self.regform, session.user))
+        logger.info("Registration form %s deleted by %s", self.regform, session.user)
         return redirect(url_for('.manage_regform_list', self.event))
 
 
@@ -111,7 +111,7 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
             self.regform.end_dt = None
         else:
             self.regform.start_dt = now_utc()
-        logger.info("Registrations for {} opened by {}".format(self.regform, session.user))
+        logger.info("Registrations for %s opened by %s", self.regform, session.user)
         flash(_("Registrations for {} are now open").format(self.regform.title), 'success')
         return redirect(url_for('.manage_regform', self.regform))
 
@@ -124,7 +124,7 @@ class RHRegistrationFormClose(RHManageRegFormBase):
         if not self.regform.has_started:
             self.regform.start_dt = self.regform.end_dt
         flash(_("Registrations for {} are now closed").format(self.regform.title), 'success')
-        logger.info("Registrations for {} closed by {}".format(self.regform, session.user))
+        logger.info("Registrations for %s closed by %s", self.regform, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 
@@ -137,7 +137,7 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
             self.regform.start_dt = form.start_dt.data
             self.regform.end_dt = form.end_dt.data
             flash(_("Registrations for {} have been scheduled").format(self.regform.title), 'success')
-            logger.info("Registrations for {} scheduled by {}".format(self.regform, session.user))
+            logger.info("Registrations for %s scheduled by %s", self.regform, session.user)
             return jsonify_data(flash=False)
         return jsonify_template('events/registration/management/regform_schedule.html', form=form)
 

@@ -50,7 +50,7 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
         section.is_manager_only = request.json['is_manager_only']
         db.session.add(section)
         db.session.flush()
-        logger.info('Section {} created by {}'.format(section, session.user))
+        logger.info('Section %s created by %s', section, session.user)
         return jsonify_data(**section.view_data)
 
 
@@ -62,7 +62,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             raise BadRequest
         self.section.is_deleted = True
         db.session.flush()
-        logger.info('Section {} deleted by {}'.format(self.section, session.user))
+        logger.info('Section %s deleted by %s', self.section, session.user)
         return jsonify(success=True)
 
     def _process_PATCH(self):
@@ -72,7 +72,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         for field, value in changes.iteritems():
             setattr(self.section, field, value)
         db.session.flush()
-        logger.info('Section {} modified by {}: {}'.format(self.section, session.user, changes))
+        logger.info('Section %s modified by %s: %s', self.section, session.user, changes)
         return jsonify(self.section.view_data)
 
 
@@ -86,9 +86,9 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
         self.section.is_enabled = enabled
         db.session.flush()
         if self.section.is_enabled:
-            logger.info('Section {} enabled by {}'.format(self.section, session.user))
+            logger.info('Section %s enabled by %s', self.section, session.user)
         else:
-            logger.info('Section {} disabled by {}'.format(self.section, session.user))
+            logger.info('Section %s disabled by %s', self.section, session.user)
         return jsonify_data(**self.section.view_data)
 
 

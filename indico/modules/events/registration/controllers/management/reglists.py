@@ -398,7 +398,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
         for registration in self.registrations:
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration)
-            logger.info('Registration {} deleted by {}'.format(registration, session.user))
+            logger.info('Registration %s deleted by %s', registration, session.user)
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
@@ -527,7 +527,7 @@ def _modify_registration_status(registration, approve):
     db.session.flush()
     notify_registration_state_update(registration)
     status = 'approved' if approve else 'rejected'
-    logger.info('Registration {} was {} by {}'.format(registration, status, session.user))
+    logger.info('Registration %s was %s by %s', registration, status, session.user)
 
 
 class RHRegistrationApprove(RHManageRegistrationBase):

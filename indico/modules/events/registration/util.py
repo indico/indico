@@ -243,7 +243,7 @@ def modify_registration(registration, data, management=False):
         registration.update_state()
     db.session.flush()
     notify_registration_modification(registration)
-    logger.info('Registration {} modified by {}', registration, session.user)
+    logger.info('Registration %s modified by %s', registration, session.user)
 
 
 def _prepare_data(data):
