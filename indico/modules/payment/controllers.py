@@ -30,6 +30,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -196,7 +197,9 @@ class RHPaymentForm(RHPaymentBase):
         return jsonify(html=html)
 
 
-class RHPaymentConditions(RHPaymentBase):
+class RHPaymentConditions(RHConferenceBaseDisplay):
+    EVENT_FEATURE = 'payment'
+
     def _process(self):
         conditions = event_settings.get(self._conf, 'conditions')
         return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)
