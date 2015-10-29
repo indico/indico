@@ -17,9 +17,12 @@
 from __future__ import unicode_literals
 
 import json
+import os
 from copy import deepcopy
 from io import BytesIO
+from tempfile import NamedTemporaryFile
 from uuid import uuid4
+from zipfile import ZipFile
 
 from flask import session, request, redirect, jsonify, flash
 from sqlalchemy.orm import joinedload
@@ -30,6 +33,7 @@ from indico.core.db import db
 from indico.core import signals
 from indico.core.errors import FormValuesError
 from indico.core.notifications import make_email, send_email
+from indico.modules.attachments.controllers.event_package import adjust_path_length
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
@@ -49,13 +53,14 @@ from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
 from indico.modules.users import User
+from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
+from indico.util.tasks import delete_file
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
-from MaKaC.conference import CategoryManager
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
@@ -235,6 +240,34 @@ def _render_registration_list(regform, registrations, total_registrations=None):
     reglist = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
                                            basic_columns=basic_columns, total_registrations=total_registrations)
     return reglist
+
+
+def _generate_zip_file(attachments, regform):
+    temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
+    with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
+        for reg_attachments in attachments.itervalues():
+            for reg_attachment in reg_attachments:
+                name = _prepare_folder_structure(reg_attachment)
+                with reg_attachment.storage.get_local_path(reg_attachment.storage_file_id) as filepath:
+                    zip_handler.write(filepath, name)
+
+    # Delete the temporary file after some time.  Even for a large file we don't
+    # need a higher delay since the webserver will keep it open anyway until it's
+    # done sending it to the client.
+    delete_file.apply_async(args=[temp_file.name], countdown=3600)
+    temp_file.delete = False
+    return send_file('attachments-{}.zip'.format(regform.id), temp_file.name, 'application/zip', inline=False)
+
+
+def _prepare_folder_structure(attachment):
+    registration = attachment.registration
+    regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
+    registrant_name = secure_filename("{}_{}".format(registration.get_full_name(), unicode(registration.friendly_id)),
+                                      registration.friendly_id)
+    file_name = secure_filename("{}_{}_{}".format(attachment.field_data.field.title, attachment.field_data.field_id,
+                                                  attachment.filename), attachment.filename)
+    path = os.path.join(*adjust_path_length([regform_title, registrant_name, file_name]))
+    return path
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
@@ -564,3 +597,18 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         flash(_("The status of the selected registrations was updated successfully."), 'success')
         registrations = _query_registrations(self.regform).all()
         return jsonify_data(registration_list=_render_registration_list(self.regform, registrations=registrations))
+
+
+class RHRegistrationsExportAttachments(RHRegistrationsExportBase):
+    """Export registration attachments in a zip file"""
+
+    def _process(self):
+        attachments = {}
+        file_fields = [item for item in self.regform.form_items if item.input_type == 'file']
+        for registration in self.registrations:
+            data = registration.data_by_field
+            attachments_for_registration = [data.get(file_field.id) for file_field in file_fields
+                                            if data.get(file_field.id) and data.get(file_field.id).storage_file_id]
+            if attachments_for_registration:
+                attachments[registration.id] = attachments_for_registration
+        return _generate_zip_file(attachments, self.regform)
