@@ -399,14 +399,14 @@ class Registration(db.Model):
             elif rejected:
                 self.state = RegistrationState.rejected
         elif self.state == RegistrationState.unpaid:
-            if paid:
+            if paid or not payment_required:
                 self.state = RegistrationState.complete
             elif approved is False:
                 self.state = Registration.pending
         elif self.state == RegistrationState.complete:
             if approved is False and payment_required is False and moderation_required:
                 self.state = RegistrationState.pending
-            elif paid is False and payment_required:
+            elif not (paid or self.is_paid) and payment_required:
                 self.state = RegistrationState.unpaid
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
