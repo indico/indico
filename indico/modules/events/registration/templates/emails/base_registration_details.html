@@ -1,7 +1,7 @@
 {% extends 'events/registration/emails/base_registration.html' %}
 
 {% block registration_body %}
-    {% for section, fields in registration.summary_data.iteritems() %}
+    {% for section, fields in registration.summary_data.iteritems() if not section.is_manager_only %}
         <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
             <h2>{{ section.title }}</h2>
             <dl>
