@@ -26,12 +26,12 @@
                     {% endif %}
                 </td>
                 <td class="regform-done-footer-button">
-                    {% if registration.state.name == 'unpaid' %}
+                    {% if not registration.is_paid %}
                         <a class="i-button big js-modify-payment" data-pay="1"
                            data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                             {% trans %}Mark as paid{% endtrans %}
                         </a>
-                    {% elif registration.state.name == 'complete' %}
+                    {% else %}
                         <a class="i-button big js-modify-payment" data-pay="0"
                            data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                             {% trans %}Mark as unpaid{% endtrans %}

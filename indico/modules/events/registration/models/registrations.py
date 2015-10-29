@@ -35,6 +35,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.payment import event_settings as event_payment_settings
+from indico.modules.payment.models.transactions import TransactionStatus
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
@@ -279,6 +280,12 @@ class Registration(db.Model):
     def full_name(self):
         """Returns the user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False)
+
+    @property
+    def is_paid(self):
+        """Returns whether the registration has been paid for."""
+        paid_states = {TransactionStatus.successful, TransactionStatus.pending}
+        return self.transaction is not None and self.transaction.status in paid_states
 
     @property
     def price(self):

@@ -509,9 +509,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
 
     def _process(self):
         pay = request.form.get('pay') == '1'
-        can_be_paid = pay and self.registration.state == RegistrationState.unpaid
-        can_be_unpaid = not pay and self.registration.state == RegistrationState.complete and self.registration.price
-        if can_be_paid or can_be_unpaid:
+        if pay != self.registration.is_paid:
             event = self.registration.registration_form.event
             currency = payment_event_settings.get(event, 'currency') if pay else self.registration.transaction.currency
             amount = self.registration.price if pay else self.registration.transaction.amount
