@@ -490,8 +490,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations"""
 
     def _process(self):
-        default_templates = CategoryManager().getDefaultConference().getBadgeTemplateManager().getTemplates().items()
-        badge_templates = self.event.getBadgeTemplateManager().getTemplates().items() + default_templates
+        badge_templates = self.event.getBadgeTemplateManager().getTemplates().items()
         badge_templates.sort(key=lambda x: x[1].getName())
         pdf_options = WConfModifBadgePDFOptions(self.event).getHTML()
         badge_design_url = url_for('event_mgmt.confModifTools-badgePrinting', self.event)
