@@ -4,6 +4,13 @@
     {% trans %}Participant List{% endtrans %}
 {% endblock %}
 
+{% block subtitle %}
+    {% set count = registrations | length %}
+    {% if count > 1 %}
+        {%- trans %}{{ count }} participants{% endtrans -%}
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="registrations">
         <table class="i-table tablesorter">
