@@ -8,8 +8,22 @@
 {% endblock %}
 
 {% block content %}
-    {{ render_registration_summary(registration, from_management) }}
+    <div class="action-box">
+       <div class="section">
+           <div class="icon icon-quill"></div>
+            {% if registration.state.name == 'pending' %}
+                {{ render_pending_actions() }}
+            {% elif registration.state.name == 'unpaid' %}
+                {{ render_unpaid_actions() }}
+            {% elif registration.state.name == 'complete' %}
+                {{ render_complete_actions() }}
+            {% elif registration.state.name in ('rejected', 'withdrawn') %}
+                {{ render_cancalled_actions() }}
+            {% endif %}
+        </div>
+    </div>
 
+    {{ render_registration_summary(registration, from_management) }}
     {% call render_invoice(registration, payment_enabled, currency) %}
         <table class="regform-done-footer registration-info">
             <tr>
@@ -71,18 +85,88 @@
            class="i-button big highlight" {% if registration.is_cancelled %} disabled="disbled"{% endif %}>
             {%- trans %}Modify{% endtrans -%}
         </button>
-        {% if registration.state.name == 'pending' %}
-            <button data-href="{{ url_for('.approve_registration', registration) }}" class="i-button big accept"
-                    data-method="POST">
-                {%- trans %}Approve{% endtrans -%}
-            </button>
-            <button data-href="{{ url_for('.reject_registration', registration) }}" class="i-button big danger"
-                    data-method="POST">
-                {%- trans %}Reject{% endtrans -%}
-            </button>
-        {% endif %}
         <a href="{{ url_for('.manage_reglist', registration.registration_form) }}" class="i-button big">
             {%- trans %}Back{% endtrans -%}
         </a>
     </div>
 {% endblock %}
+
+
+{% macro render_pending_actions() %}
+    <div class="text">
+       <div class="label">
+           {% trans %}Registration awaiting manager approval{% endtrans %}
+       </div>
+       {% trans -%}
+           You can validate or reject it and the user will receive a notification.
+       {%- endtrans %}
+    </div>
+    <div class="toolbar right">
+        <div class="group">
+            <button data-href="{{ url_for('.approve_registration', registration) }}" class="i-button accept"
+                    data-method="POST">
+                {%- trans %}Approve{% endtrans -%}
+            </button>
+        </div>
+        <div class="group">
+            <button data-href="{{ url_for('.reject_registration', registration) }}" class="i-button danger"
+                    data-title="{% trans %}Reject registration{% endtrans %}"
+                    data-confirm="{% trans %}Are you sure you want to reject this registration? This action is not reversible.{% endtrans %}"
+                    data-method="POST">
+                {%- trans %}Reject{% endtrans -%}
+            </button>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_unpaid_actions() %}
+    <div class="text">
+        <div class="label">
+           {% trans %}Registration not paid yet{% endtrans %}
+        </div>
+        {% trans -%}
+            You can mark it as paid manually.
+        {%- endtrans %}
+    </div>
+    <div class="toolbar right">
+        <div class="group">
+            <span class="i-button label icon-coins">
+                {{ registration.render_price() }}
+            </span>
+        </div>
+        <div class="group">
+            <a class="i-button js-modify-payment" data-pay="1"
+               data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                {% trans %}Mark as paid{% endtrans %}
+            </a>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_complete_actions() %}
+    <div class="text">
+        <div class="label">
+            {% trans %}This registration is complete{% endtrans %}
+        </div>
+    </div>
+    {% if registration.registration_form.tickets_enabled %}
+        <div class="toolbar right">
+            <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
+                {% trans %}Get ticket{% endtrans %}
+            </a>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_cancalled_actions() %}
+    <div class="text">
+        <div class="label">
+            {% trans state=registration.state.title|lower%}
+                This registration is {{ state }}
+            {% endtrans %}
+        </div>
+    </div>
+{% endmacro %}
