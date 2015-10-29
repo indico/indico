@@ -36,7 +36,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
 from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_full_name
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -394,11 +394,9 @@ class User(db.Model):
         # Pending users might not have a first/last name...
         first_name = self.first_name or 'Unknown'
         last_name = self.last_name or 'Unknown'
-        if last_name_upper:
-            last_name = last_name.upper()
-        first_name = '{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
-        full_name = '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
-        return full_name if not show_title or not self.title else '{} {}'.format(self.title, full_name)
+        return format_full_name(first_name, last_name, self.title,
+                                last_name_first=last_name_first, last_name_upper=last_name_upper,
+                                abbrev_first_name=abbrev_first_name, show_title=show_title)
 
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.
