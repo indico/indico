@@ -91,7 +91,7 @@ SPECIAL_COLUMN_LABELS = {
 }
 
 DEFAULT_REPORT_CONFIG = {
-    'items': ('title', 'email', 'affiliation') + SPECIAL_COLUMNS,
+    'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
     'filters': {'fields': {}, 'items': {}}
 }
 
