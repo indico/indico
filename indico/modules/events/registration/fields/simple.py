@@ -193,7 +193,7 @@ class SingleChoiceField(ChoiceBaseField):
         except KeyError:
             return None
         # only use the default item if it exists in the current version
-        return default_item if any(x['id'] == default_item for x in versioned_data['choices']) else None
+        return {default_item: 1} if any(x['id'] == default_item for x in versioned_data['choices']) else None
 
     def get_friendly_data(self, registration_data):
         if not registration_data.data:
