@@ -2,9 +2,9 @@
     <ul class="badge-template-list">
         {% for template_id, template in templates %}
             <li>
-                <input type="radio" name="templateId" value="{{ template_id }}" id="{{ template_id }}"
+                <input type="radio" name="templateId" value="{{ template_id }}" id="badge-{{ template_id }}"
                        {%- if loop.first %} checked{% endif %}>
-                <label for="{{ template_id }}">{{ template.getName() }}</label>
+                <label for="badge-{{ template_id }}">{{ template.getName() }}</label>
             </li>
         {% endfor %}
     </ul>
