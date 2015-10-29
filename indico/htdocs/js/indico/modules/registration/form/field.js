@@ -255,10 +255,13 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         var places = item.placesLimit;
         if ($scope.field.inputType == 'checkbox' || $scope.field.inputType == 'bool') {
             places -= ($scope.field.placesUsed || 0);
+            if (uservalue) places += 1;
         } else if ($scope.field.inputType == 'single_choice' || $scope.field.inputType == 'accommodation') {
             places -= ($scope.field.placesUsed[item.id] || 0);
+            if (uservalue) places += 1;
         } else if ($scope.field.inputType == 'multi_choice') {
             places -= ($scope.field.placesUsed[item.id] || 0);
+            if (uservalue) places += 1;
         }
         return places;
     };
