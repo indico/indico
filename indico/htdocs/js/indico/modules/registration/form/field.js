@@ -336,7 +336,7 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
                 // After the field is loaded, we can check whether it's billable, etc
                 // and disable it if needed
                 scope.field.billableDisabled = !scope.userdata.manager && (scope.userdata.paid &&
-                    (scope.settings.isBillable && scope.field.price > 0)) ||
+                    (scope.field.isBillable && scope.field.price > 0)) ||
                     (scope.selectedItemIsBillable && scope.selectedItemIsBillable(scope.userdata));
             });
         }
