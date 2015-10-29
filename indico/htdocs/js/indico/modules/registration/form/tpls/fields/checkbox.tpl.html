@@ -4,7 +4,7 @@
             <input type="checkbox"
                 id="field-{{ section.id }}-{{ field.id }}"
                 name="{{ field.htmlName }}"
-                ng-disabled="field.billableDisabled"
+                ng-disabled="field.billableDisabled || !hasPlacesLeft(field, userdata[field.htmlName])"
                 ng-model="checkboxValue"
                 ng-required="field.isRequired"
                 ng-disabled="!hasPlacesLeft(field, userdata[field.fieldName]) || paymentBlocked(field, userdata)">
