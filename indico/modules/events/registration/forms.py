@@ -98,7 +98,7 @@ class RegistrationFormForm(IndicoForm):
 
 
 class RegistrationFormScheduleForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [DataRequired(), DateTimeRange(earliest='now')],
+    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()],
                                    description=_("Moment when registrations will be open"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
                                  description=_("Moment when registrations will be closed"))
