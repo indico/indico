@@ -1,5 +1,5 @@
 {% macro render_registration_info(registration, from_management=false) %}
-    {% for section in registration.registration_form.sections -%}
+    {% for section in registration.registration_form.sections if from_management or not section.is_manager_only -%}
         <tr class="regform-done-title">
             <td colspan="2">{{ section.title }}</td>
         </tr>
