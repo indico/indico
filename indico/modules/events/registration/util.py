@@ -289,12 +289,13 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
         for item in regform_items:
             if item.input_type == 'accommodation':
                 key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
-                registration_dict[key] = _prepare_data(data[item.id].friendly_data['choice'] if item.id in data else '')
+                registration_dict[key] = _prepare_data(data[item.id].friendly_data.get('choice')
+                                                       if item.id in data else '')
                 key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id)
-                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data['arrival_date'])
+                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data.get('arrival_date'))
                                                        if item.id in data else '')
                 key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id)
-                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data['departure_date'])
+                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data.get('departure_date'))
                                                        if item.id in data else '')
             else:
                 key = '{}_{}'.format(item.title.encode('utf-8'), item.id)

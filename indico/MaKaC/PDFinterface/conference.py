@@ -1476,9 +1476,11 @@ class RegistrantToPDF(PDFBase):
 
         for item in self._display:
             if item.input_type == 'accommodation' and item.id in data:
-                _print_row(caption=item.title, value=data[item.id].friendly_data['choice'])
-                _print_row(caption=_('Arrival date'), value=format_date(data[item.id].friendly_data['arrival_date']))
-                _print_row(caption=_('Departure date'), value=format_date(data[item.id].friendly_data['departure_date']))
+                _print_row(caption=item.title, value=data[item.id].friendly_data.get('choice'))
+                _print_row(caption=_('Arrival date'),
+                           value=format_date(data[item.id].friendly_data.get('arrival_date')))
+                _print_row(caption=_('Departure date'),
+                           value=format_date(data[item.id].friendly_data.get('departure_date')))
             else:
                 value = data[item.id].friendly_data if item.id in data else ''
                 _print_row(caption=item.title, value=value)
@@ -1632,9 +1634,9 @@ class RegistrantsListToPDF(PDFBase):
             data = registration.data_by_field
             for item in self._display:
                 if item.input_type == 'accommodation' and item.id in data:
-                    lp.append(Paragraph(data[item.id].friendly_data['choice'].encode('utf-8'), text_format))
-                    lp.append(Paragraph(format_date(data[item.id].friendly_data['arrival_date']), text_format))
-                    lp.append(Paragraph(format_date(data[item.id].friendly_data['departure_date']), text_format))
+                    lp.append(Paragraph(data[item.id].friendly_data.get('choice').encode('utf-8'), text_format))
+                    lp.append(Paragraph(format_date(data[item.id].friendly_data.get('arrival_date')), text_format))
+                    lp.append(Paragraph(format_date(data[item.id].friendly_data.get('departure_date')), text_format))
                 else:
                     value = data[item.id].friendly_data if item.id in data else ''
                     if isinstance(value, unicode):
