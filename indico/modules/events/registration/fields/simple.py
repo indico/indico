@@ -153,6 +153,12 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
 
+    def process_form_data(self, registration, value, old_data=None):
+        # always store no-option as empty dict
+        if value is None:
+            value = {}
+        return super(ChoiceBaseField, self).process_form_data(registration, value, old_data)
+
     def get_places_used(self):
         places_used = Counter()
         for registration in self.form_item.registration_form.active_registrations:
@@ -193,7 +199,7 @@ class SingleChoiceField(ChoiceBaseField):
         except KeyError:
             return None
         # only use the default item if it exists in the current version
-        return {default_item: 1} if any(x['id'] == default_item for x in versioned_data['choices']) else None
+        return {default_item: 1} if any(x['id'] == default_item for x in versioned_data['choices']) else {}
 
     def get_friendly_data(self, registration_data):
         if not registration_data.data:
@@ -551,3 +557,7 @@ class MultiChoiceField(ChoiceBaseField):
         if not reg_data:
             return ''
         return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
+
+    @property
+    def default_value(self):
+        return {}
