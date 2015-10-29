@@ -38,7 +38,7 @@ from indico.modules.payment import event_settings as event_payment_settings
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import return_ascii, format_repr, format_full_name
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -277,7 +277,8 @@ class Registration(db.Model):
 
     @property
     def full_name(self):
-        return '{} {}'.format(self.first_name, self.last_name)
+        """Returns the user's name in 'Firstname Lastname' notation."""
+        return self.get_full_name(last_name_first=False)
 
     @property
     def price(self):
@@ -329,6 +330,25 @@ class Registration(db.Model):
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
                            user_id=None, is_deleted=False, _text=self.full_name)
+
+    def get_full_name(self, last_name_first=True, last_name_upper=False, abbrev_first_name=False):
+        """Returns the user's in the specified notation.
+
+        If not format options are specified, the name is returned in
+        the 'Lastname, Firstname' notation.
+
+        Note: Do not use positional arguments when calling this method.
+        Always use keyword arguments!
+
+        :param last_name_first: if "lastname, firstname" instead of
+                                "firstname lastname" should be used
+        :param last_name_upper: if the last name should be all-uppercase
+        :param abbrev_first_name: if the first name should be abbreviated to
+                                  use only the first character
+        """
+        return format_full_name(self.first_name, self.last_name,
+                                last_name_first=last_name_first, last_name_upper=last_name_upper,
+                                abbrev_first_name=abbrev_first_name)
 
     def get_personal_data(self):
         personal_data = {}

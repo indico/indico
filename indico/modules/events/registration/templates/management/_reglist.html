@@ -41,7 +41,7 @@
                                 </td>
                                 <td class="i-table">
                                     <a href="{{ url_for('.registration_details', registration) }}">
-                                        {{- registration.first_name }} {{ registration.last_name -}}
+                                        {{- registration.get_full_name() -}}
                                     </a>
                                 </td>
                                 {% for item in visible_cols_regform_items %}
