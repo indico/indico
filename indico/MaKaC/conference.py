@@ -21,6 +21,7 @@ from werkzeug.urls import url_parse
 
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.features import event_settings as features_event_settings
+from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -3726,6 +3727,9 @@ class Conference(CommonObjectBase, Locatable):
 
         # Copy the list of enabled features
         features_event_settings.set_multi(conf, features_event_settings.get_all(self))
+        feature_definitions = get_feature_definitions()
+        for feature in get_enabled_features(conf):
+            feature_definitions[feature].enabled(conf)
 
         # Run the new modular cloning system
         EventCloner.clone_event(self, conf)
