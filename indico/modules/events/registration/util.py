@@ -310,7 +310,8 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
             checked_in = 'Yes' if registration.checked_in else 'No'
             registration_dict['Checked in'] = checked_in
         if 'checked_in_date' in special_items:
-            registration_dict['Check-in date'] = format_datetime(registration.checked_in_dt)
+            check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
+            registration_dict['Check-in date'] = check_in_date
         writer.writerow(registration_dict)
     buf.seek(0)
     return buf
