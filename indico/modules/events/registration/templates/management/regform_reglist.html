@@ -93,7 +93,13 @@
                             {%- trans %}Print Badges{% endtrans -%}
                         </a>
                     </li>
-                    <li><a href="#" class="icon-attachment js-requires-selected-row disabled">{% trans %}Attachments{% endtrans %}</a></li>
+                    <li>
+                        <a href="#"
+                           class="icon-attachment js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_attachments_export', regform) }}">
+                            {%- trans %}Download attachments{% endtrans -%}
+                        </a>
+                    </li>
                 </ul>
                 {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
                 {% if regform.moderation_enabled or pending_registrations %}
