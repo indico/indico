@@ -225,11 +225,14 @@ def modify_registration(registration, data, management=False):
             registration.user = get_user_by_email(data['email'])
 
         for form_item in regform.active_fields:
-            if form_item.parent.is_manager_only and not management:
-                with db.session.no_autoflush:
-                    value = form_item.field_impl.default_value
-            else:
+            if management or not form_item.parent.is_manager_only:
                 value = data.get(form_item.html_field_name)
+            elif form_item.id not in data_by_field:
+                # set default value for manager-only field if it didn't have one before
+                value = form_item.field_impl.default_value
+            else:
+                # manager-only field that has data which should be preserved
+                continue
 
             if form_item.id not in data_by_field:
                 data_by_field[form_item.id] = RegistrationData(registration=registration,
