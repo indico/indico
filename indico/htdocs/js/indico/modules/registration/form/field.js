@@ -95,21 +95,12 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         return $scope.field.id == -1;
     };
 
-    $scope.getNumberOfExtraSlots = function(item) {
+    $scope.getNumberOfSlots = function(item) {
         if (!item || !item.maxExtraSlots) {
             return 0;
         }
 
-        var extraSlots = item.maxExtraSlots,
-            placesLimit = item.placesLimit;
-
-        if (!placesLimit) {
-            return extraSlots;
-        } else if (placesLimit && (placesLimit < extraSlots)) {
-            return placesLimit;
-        } else {
-           return extraSlots;
-        }
+        return item.maxExtraSlots + 1;
     };
 
     $scope.settings = {

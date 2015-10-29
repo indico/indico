@@ -15,18 +15,15 @@
                 <span ng-if="changesPrice(item)">
                     <nd-currency currency="currency"></nd-currency>
                 </span>
-                <div ng-if="field.withExtraSlots && item.maxExtraSlots && itemChecked"
+                <span ng-if="field.withExtraSlots && item.maxExtraSlots && itemChecked"
                       style="margin-left: 10px;">
-                    <label for="extraSlotsSelect-{{ item.id }}">
-                        <strong>{{ 'Number of +1' | i18n }}</strong>
-                    </label>
                     <select id="extraSlotsSelect-{{ item.id }}"
-                            ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id] - 1 : 0)"
+                            ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id]: 1)"
                             ng-model="numberOfExtraSlotsUsed"
-                            ng-options="n for n in [] | range:0:getNumberOfExtraSlots(item)"
+                            ng-options="n for n in [] | range:1:getNumberOfSlots(item)"
                             ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
                     </select>
-                </div>
+                </span>
                 <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, userdata[fieldName][item.id])"
                       class="right" style="margin-right: 35px;">
                     <span ng-switch-when="false" class="unavailable-text">
