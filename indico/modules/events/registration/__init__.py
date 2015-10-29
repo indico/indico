@@ -104,6 +104,7 @@ def _extend_event_menu(sender, **kwargs):
         if not session.user:
             return False
         return bool(Registration.find(Registration.user == session.user,
+                                      Registration.event_id == int(event.id),
                                       ~Registration.is_deleted,
                                       ~RegistrationForm.is_deleted,
                                       _join=Registration.registration_form).count())
