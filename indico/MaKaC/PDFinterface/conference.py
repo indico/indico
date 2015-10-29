@@ -1495,7 +1495,8 @@ class RegistrantToPDF(PDFBase):
             checked_in = 'Yes' if registration.checked_in else 'No'
             _print_row(caption=_('Checked in'), value=checked_in)
         if 'checked_in_date' in self.special_items:
-            _print_row(caption=_('Check-in date'), value=format_datetime(registration.checked_in_dt))
+            check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
+            _print_row(caption=_('Check-in date'), value=check_in_date)
 
         return story
 
@@ -1652,7 +1653,8 @@ class RegistrantsListToPDF(PDFBase):
                 checked_in = 'Yes' if registration.checked_in else 'No'
                 lp.append(Paragraph(checked_in, text_format))
             if 'checked_in_date' in self.special_items:
-                lp.append(Paragraph(format_datetime(registration.checked_in_dt), text_format))
+                check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
+                lp.append(Paragraph(check_in_date, text_format))
             l.append(lp)
         noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 1)
         t = Table(l, colWidths=noneList, style=tsRegs)
