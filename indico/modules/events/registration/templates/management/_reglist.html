@@ -67,7 +67,7 @@
                                         </td>
                                     {% else %}
                                         <td class="i-table">
-                                            {%- if item.id in data %}
+                                            {%- if item.id in data and data[item.id].friendly_data %}
                                                 {{- data[item.id].friendly_data }}
                                             {%- endif %}
                                         </td>
