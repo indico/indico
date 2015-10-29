@@ -196,6 +196,18 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
     template_file = 'display/registration_modify.html'
     management = False
 
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrationBase._checkParams(self, params)
+        if self.registration is None:
+            if session.user:
+                flash(_("We could not find a registration for you.  If have already registered, please use the "
+                        "direct access link from the email you received after registering."), 'warning')
+            else:
+                flash(_("We could not find a registration for you.  If have already registered, please use the "
+                        "direct access link from the email you received after registering or log in to your Indico "
+                        "account."), 'warning')
+            return redirect(url_for('.display_regform', self.regform))
+
     @property
     def success_url(self):
         return url_for('.display_regform', self.registration.locator.registrant)
