@@ -295,11 +295,11 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
                 registration_dict[key] = _prepare_data(data[item.id].friendly_data.get('choice')
                                                        if item.id in data else '')
                 key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id)
-                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data.get('arrival_date'))
-                                                       if item.id in data else '')
+                arrival_date = data[item.id].friendly_data.get('arrival_date') if item.id in data else None
+                registration_dict[key] = _prepare_data(format_date(arrival_date) if arrival_date else '')
                 key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id)
-                registration_dict[key] = _prepare_data(format_date(data[item.id].friendly_data.get('departure_date'))
-                                                       if item.id in data else '')
+                departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
+                registration_dict[key] = _prepare_data(format_date(departure_date) if departure_date else '')
             else:
                 key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
                 registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')

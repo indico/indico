@@ -1477,10 +1477,10 @@ class RegistrantToPDF(PDFBase):
         for item in self._display:
             if item.input_type == 'accommodation' and item.id in data:
                 _print_row(caption=item.title, value=data[item.id].friendly_data.get('choice'))
-                _print_row(caption=_('Arrival date'),
-                           value=format_date(data[item.id].friendly_data.get('arrival_date')))
-                _print_row(caption=_('Departure date'),
-                           value=format_date(data[item.id].friendly_data.get('departure_date')))
+                arrival_date = data[item.id].friendly_data.get('arrival_date')
+                _print_row(caption=_('Arrival date'), value=format_date(arrival_date) if arrival_date else '')
+                departure_date = data[item.id].friendly_data.get('departure_date')
+                _print_row(caption=_('Departure date'), value=format_date(departure_date) if departure_date else '')
             else:
                 value = data[item.id].friendly_data if item.id in data else ''
                 _print_row(caption=item.title, value=value)
@@ -1634,10 +1634,20 @@ class RegistrantsListToPDF(PDFBase):
                                                registration.last_name.encode('utf-8')), text_format))
             data = registration.data_by_field
             for item in self._display:
-                if item.input_type == 'accommodation' and item.id in data:
-                    lp.append(Paragraph(data[item.id].friendly_data.get('choice').encode('utf-8'), text_format))
-                    lp.append(Paragraph(format_date(data[item.id].friendly_data.get('arrival_date')), text_format))
-                    lp.append(Paragraph(format_date(data[item.id].friendly_data.get('departure_date')), text_format))
+                if item.input_type == 'accommodation':
+                    if item.id in data:
+                        lp.append(Paragraph(data[item.id].friendly_data.get('choice').encode('utf-8'), text_format))
+                        arrival_date = data[item.id].friendly_data.get('arrival_date')
+                        arrival_date = format_date(arrival_date) if arrival_date else ''
+                        lp.append(Paragraph(arrival_date, text_format))
+                        departure_date = data[item.id].friendly_data.get('departure_date')
+                        departure_date = format_date(departure_date) if departure_date else ''
+                        lp.append(Paragraph(departure_date, text_format))
+                    else:
+                        # Fill in with empty space to avoid braking the layout
+                        lp.append(Paragraph('', text_format))
+                        lp.append(Paragraph('', text_format))
+                        lp.append(Paragraph('', text_format))
                 else:
                     value = data[item.id].friendly_data if item.id in data else ''
                     if isinstance(value, unicode):
