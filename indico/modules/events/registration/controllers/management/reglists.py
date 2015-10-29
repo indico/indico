@@ -55,6 +55,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
+from MaKaC.conference import CategoryManager
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
@@ -489,7 +490,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations"""
 
     def _process(self):
-        badge_templates = self.event.getBadgeTemplateManager().getTemplates().items()
+        default_templates = CategoryManager().getDefaultConference().getBadgeTemplateManager().getTemplates().items()
+        badge_templates = self.event.getBadgeTemplateManager().getTemplates().items() + default_templates
         badge_templates.sort(key=lambda x: x[1].getName())
         pdf_options = WConfModifBadgePDFOptions(self.event).getHTML()
         badge_design_url = url_for('event_mgmt.confModifTools-badgePrinting', self.event)
