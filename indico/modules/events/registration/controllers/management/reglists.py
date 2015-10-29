@@ -574,8 +574,7 @@ class RHRegistrationApprove(RHManageRegistrationBase):
 
     def _process(self):
         _modify_registration_status(self.registration, approve=True)
-        flash(_("The registration status was updated successfully."), 'success')
-        return redirect(url_for('.manage_reglist', self.regform))
+        return redirect(url_for('.registration_details', self.registration))
 
 
 class RHRegistrationReject(RHManageRegistrationBase):
@@ -583,8 +582,7 @@ class RHRegistrationReject(RHManageRegistrationBase):
 
     def _process(self):
         _modify_registration_status(self.registration, approve=False)
-        flash(_("The registration was rejected successfully."), 'success')
-        return redirect(url_for('.manage_reglist', self.regform))
+        return redirect(url_for('.registration_details', self.registration))
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
