@@ -258,9 +258,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         } else if ($scope.field.inputType == 'single_choice' || $scope.field.inputType == 'accommodation') {
             places -= ($scope.field.placesUsed[item.id] || 0);
         } else if ($scope.field.inputType == 'multi_choice') {
-            if (uservalue && uservalue[item.id]) {
-                places -= ($scope.field.placesUsed[item.id]);
-            }
+            places -= ($scope.field.placesUsed[item.id] || 0);
         }
         return places;
     };
