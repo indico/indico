@@ -7,7 +7,7 @@
             size="{{ field.length }}"
             min="{{ field.minValue || getDefaultFieldSetting('defaultMinValue') }}"
             ng-required="field.isRequired"
-            ng-disabled="paymentBlocked(field, userdata)"
+            ng-disabled="!userdata.manager && paymentBlocked(field, userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
     </ng-form>
     <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">

@@ -4,7 +4,7 @@
             <li ng-repeat="item in field.choices | filter:{isEnabled: true}" ng-required="field.isRequired"
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}">
                 <input id="{{ item.id }}" type="checkbox" ng-click="multiFieldItemChecked($event)"
-                       ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || !userdata.manager && paymentBlocked(item, userdata)"
+                       ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || (!userdata.manager && paymentBlocked(item, userdata))"
                        ng-model="itemChecked"
                        ng-init="itemChecked=userdata[fieldName][item.id] ? true : false"
                        data-paid="{{ userdata.paid }}"
