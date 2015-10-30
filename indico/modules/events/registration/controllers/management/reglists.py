@@ -574,7 +574,11 @@ class RHRegistrationApprove(RHManageRegistrationBase):
 
     def _process(self):
         _modify_registration_status(self.registration, approve=True)
-        return redirect(url_for('.registration_details', self.registration))
+        return jsonify_template('events/registration/management/registration_details.html',
+                                registration=self.registration,
+                                currency=payment_event_settings.get(self.event, 'currency'),
+                                payment_enabled=self.event.has_feature('payment'),
+                                from_management=True)
 
 
 class RHRegistrationReject(RHManageRegistrationBase):
@@ -582,7 +586,23 @@ class RHRegistrationReject(RHManageRegistrationBase):
 
     def _process(self):
         _modify_registration_status(self.registration, approve=False)
-        return redirect(url_for('.registration_details', self.registration))
+        return jsonify_template('events/registration/management/registration_details.html',
+                                registration=self.registration,
+                                currency=payment_event_settings.get(self.event, 'currency'),
+                                payment_enabled=self.event.has_feature('payment'),
+                                from_management=True)
+
+
+class RHRegistrationToggleCheckIn(RHManageRegistrationBase):
+    """Toggle checked in state of a registration"""
+
+    def _process(self):
+        self.registration.checked_in = not self.registration.checked_in
+        return jsonify_template('events/registration/management/registration_details.html',
+                                registration=self.registration,
+                                currency=payment_event_settings.get(self.event, 'currency'),
+                                payment_enabled=self.event.has_feature('payment'),
+                                from_management=True)
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):

@@ -21,6 +21,9 @@
                 {{ render_cancalled_actions() }}
             {% endif %}
         </div>
+        {% if registration.state.name in ('unpaid', 'complete') %}
+            {{ render_check_in() }}
+        {% endif %}
     </div>
 
     {{ render_registration_summary(registration, from_management) }}
@@ -103,18 +106,19 @@
     </div>
     <div class="toolbar right">
         <div class="group">
-            <button data-href="{{ url_for('.approve_registration', registration) }}" class="i-button accept"
-                    data-method="POST">
+            <a class="i-button accept js-moderate" data-method="POST"
+               data-href="{{ url_for('.approve_registration', registration) }}">
                 {%- trans %}Approve{% endtrans -%}
-            </button>
+            </a>
         </div>
         <div class="group">
-            <button data-href="{{ url_for('.reject_registration', registration) }}" class="i-button danger"
-                    data-title="{% trans %}Reject registration{% endtrans %}"
-                    data-confirm="{% trans %}Are you sure you want to reject this registration? This action is not reversible.{% endtrans %}"
-                    data-method="POST">
+            <a class="i-button danger js-moderate"
+               data-method="POST"
+               data-href="{{ url_for('.reject_registration', registration) }}"
+               data-confirm="{% trans %}Are you sure you want to reject this registration? This action is not reversible.{% endtrans %}"
+               data-title="{% trans %}Reject registration{% endtrans %}">
                 {%- trans %}Reject{% endtrans -%}
-            </button>
+            </a>
         </div>
     </div>
 {% endmacro %}
@@ -150,6 +154,9 @@
         <div class="label">
             {% trans %}This registration is complete{% endtrans %}
         </div>
+        {% trans submitted=registration.submitted_dt|format_date %}
+            Submited: {{ submitted }}
+        {% endtrans %}
     </div>
     {% if registration.registration_form.tickets_enabled %}
         <div class="toolbar right">
@@ -168,5 +175,52 @@
                 This registration is {{ state }}
             {% endtrans %}
         </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_check_in() %}
+    <div class="section">
+        <div class="icon icon-location"></div>
+        {% if registration.checked_in %}
+            <div class="text">
+                <div class="label">
+                    {% trans %}Checked in{% endtrans %}
+                </div>
+                {% trans checked_in_dt=registration.checked_in_dt|format_date -%}
+                    Checked in: {{ checked_in_dt }}
+                {%- endtrans %}
+                (<a href="#" class="js-toggle-checked-in"
+                   title="{% trans %}Mark as not checked in{% endtrans %}"
+                   data-method="POST"
+                   data-href="{{ url_for('.toggle_registration_checked_in', registration) }}"
+                   data-title="{% trans %}Reset check-in info{% endtrans %}"
+                   data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}">
+                   {%- trans %}reset{% endtrans -%}
+                </a>)
+            </div>
+        {% else %}
+            <div class="text">
+                <div class="label">
+                    {% trans %}Not checked in{% endtrans %}
+                </div>
+                {% if registration.registration_form.tickets_enabled %}
+                    {% trans -%}
+                        You can mark it as checked in manually here or with the Indico Check in app.
+                    {%- endtrans %}
+                {% else %}
+                    {% trans -%}
+                        You can mark it as checked in manually.
+                    {%- endtrans %}
+                {% endif %}
+            </div>
+            <div class="toolbar right">
+                <a class="i-button js-toggle-checked-in"
+                   data-method="POST"
+                   data-href="{{ url_for('.toggle_registration_checked_in', registration) }}">
+                    {% trans %}Check-in{% endtrans %}
+                </a>
+            </div>
+        {% endif %}
     </div>
 {% endmacro %}

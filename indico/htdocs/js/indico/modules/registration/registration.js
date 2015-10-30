@@ -61,6 +61,21 @@
             });
         });
 
+        $('.management-page').on('indico:confirmed', '.js-toggle-checked-in, .js-moderate', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            $.ajax({
+                method: $this.data('method'),
+                url: $this.data('href'),
+                error: handleAjaxError,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                success: function(data) {
+                    $('.management-page').html(data.html);
+                }
+            });
+        });
+
         $('.registrations .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
