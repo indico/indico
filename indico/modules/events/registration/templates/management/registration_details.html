@@ -44,12 +44,18 @@
                 </td>
                 <td class="regform-done-footer-button">
                     {% if not registration.is_paid %}
-                        <a class="i-button big js-modify-payment" data-pay="1"
+                        <a class="i-button big"
+                           data-update=".management-page"
+                           data-method="POST"
+                           data-params="{{ dict(pay=1) | tojson | forceescape }}"
                            data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                             {% trans %}Mark as paid{% endtrans %}
                         </a>
                     {% else %}
-                        <a class="i-button big js-modify-payment" data-pay="0"
+                        <a class="i-button big"
+                           data-update=".management-page"
+                           data-method="POST"
+                           data-params="{{ dict(pay=0) | tojson | forceescape }}"
                            data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                             {% trans %}Mark as unpaid{% endtrans %}
                         </a>
@@ -106,13 +112,16 @@
     </div>
     <div class="toolbar right">
         <div class="group">
-            <a class="i-button accept js-moderate" data-method="POST"
+            <a class="i-button accept"
+               data-update=".management-page"
+               data-method="POST"
                data-href="{{ url_for('.approve_registration', registration) }}">
                 {%- trans %}Approve{% endtrans -%}
             </a>
         </div>
         <div class="group">
-            <a class="i-button danger js-moderate"
+            <a class="i-button danger"
+               data-update=".management-page"
                data-method="POST"
                data-href="{{ url_for('.reject_registration', registration) }}"
                data-confirm="{% trans %}Are you sure you want to reject this registration? This action is not reversible.{% endtrans %}"
@@ -140,7 +149,10 @@
             </span>
         </div>
         <div class="group">
-            <a class="i-button js-modify-payment" data-pay="1"
+            <a class="i-button js-modify-payment"
+               data-update=".management-page"
+               data-method="POST"
+               data-params="{{ dict(pay=1) | tojson | forceescape }}"
                data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                 {% trans %}Mark as paid{% endtrans %}
             </a>
@@ -190,12 +202,13 @@
                 {% trans checked_in_dt=registration.checked_in_dt|format_date -%}
                     Checked in: {{ checked_in_dt }}
                 {%- endtrans %}
-                (<a href="#" class="js-toggle-checked-in"
+                (<a href="#"
                    title="{% trans %}Mark as not checked in{% endtrans %}"
+                   data-update=".management-page"
                    data-method="POST"
                    data-href="{{ url_for('.toggle_registration_checked_in', registration) }}"
-                   data-title="{% trans %}Reset check-in info{% endtrans %}"
-                   data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}">
+                   data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
+                   data-title="{% trans %}Reset check-in info{% endtrans %}">
                    {%- trans %}reset{% endtrans -%}
                 </a>)
             </div>
@@ -215,7 +228,8 @@
                 {% endif %}
             </div>
             <div class="toolbar right">
-                <a class="i-button js-toggle-checked-in"
+                <a class="i-button"
+                   data-update=".management-page"
                    data-method="POST"
                    data-href="{{ url_for('.toggle_registration_checked_in', registration) }}">
                     {% trans %}Check-in{% endtrans %}
