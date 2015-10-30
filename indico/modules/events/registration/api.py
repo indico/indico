@@ -24,6 +24,7 @@ from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.events.api import EventBaseHook
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
+from indico.modules.events.registration.util import build_registrations_api_data
 from indico.util.fossilize import fossilize
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.util import get_query_parameter
@@ -84,27 +85,15 @@ class RHAPIRegistrants(RH):
     """RESTful registrants API"""
 
     @oauth.require_oauth('registrants')
-    def _checkParams(self):
-        event = ConferenceHolder().getById(request.view_args['event_id'], True)
-        if event is None:
-            raise NotFound("No such event")
-        if not event.canManageRegistration(request.oauth.user):
+    def _checkProtection(self):
+        if not self.event.can_manage(request.oauth.user, role='registration'):
             raise Forbidden()
-        self.event = event
+
+    def _checkParams(self):
+        self.event = Event.find(id=request.view_args['event_id'], is_deleted=False).first_or_404()
 
     def _process_GET(self):
-        registrants = []
-        for registrant in self.event.getRegistrantsList():
-            regForm = self.event.getRegistrationForm()
-            registrant_entry = {
-                "registrant_id": registrant.getId(),
-                "checked_in": registrant.isCheckedIn(),
-                "full_name": registrant.getFullName(title=True, firstNameFirst=True),
-                "checkin_secret": registrant.getCheckInUUID(),
-                "personal_data": regForm.getPersonalData().getRegistrantValues(registrant)
-            }
-            registrants.append(registrant_entry)
-        return jsonify(registrants=registrants)
+        return jsonify(registrants=build_registrations_api_data(self.event))
 
 
 @HTTPAPIHook.register
@@ -198,23 +187,10 @@ class RegistrantsHook(EventBaseHook):
 
     def _getParams(self):
         super(RegistrantsHook, self)._getParams()
-        self._conf_id = self._pathParams['event']
-        self._conf = ConferenceHolder().getById(self._conf_id)
+        self._event = Event.find_one(id=self._pathParams['event'], is_deleted=False)
 
     def _hasAccess(self, aw):
-        return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
+        return self._event.can_manage(aw.getUser(legacy=False), role='registration')
 
     def export_registrants(self, aw):
-        registrants = self._conf.getRegistrantsList()
-        registrant_list = []
-        for registrant in registrants:
-            reg = {
-                "registrant_id": registrant.getId(),
-                "checked_in": registrant.isCheckedIn(),
-                "full_name": registrant.getFullName(title=True, firstNameFirst=True),
-                "checkin_secret": registrant.getCheckInUUID(),
-            }
-            regForm = self._conf.getRegistrationForm()
-            reg["personal_data"] = regForm.getPersonalData().getRegistrantValues(registrant)
-            registrant_list.append(reg)
-        return {"registrants": registrant_list}
+        return {"registrants": build_registrations_api_data(self._event)}

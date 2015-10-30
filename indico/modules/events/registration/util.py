@@ -382,3 +382,21 @@ def get_events_registered(user, from_dt=None, to_dt=None):
              .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted)
              .filter(event_date_filter))
     return {registration.event_id for registration in query}
+
+
+def build_registrations_api_data(event):
+    api_data = []
+    for regform in event.registration_forms.filter_by(is_deleted=False):
+        for registration in regform.active_registrations:
+            api_data.append(build_registration_api_data(registration))
+    return api_data
+
+
+def build_registration_api_data(registration):
+    return {
+        'registrant_id': str(registration.id),
+        'checked_in': registration.checked_in,
+        'checkin_secret': registration.uuid,
+        'full_name': registration.full_name,
+        'personal_data': registration.get_personal_data()
+    }
