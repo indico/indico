@@ -1483,3 +1483,17 @@ textarea.regFormDescriptionInputMgmt {
         display: none;
     }
 }
+
+#registration-details {
+    .registration-unpaid {
+        color: $yellow;
+    }
+    .registration-complete,
+    .registration-checked-in {
+        color: $green;
+    }
+    .registration-rejected,
+    .registration-withdrawn, {
+        color: $red;
+    }
+}

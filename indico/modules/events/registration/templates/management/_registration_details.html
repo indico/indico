@@ -5,7 +5,7 @@
     <div id="registration-details">
         <div class="action-box">
            <div class="section">
-               <div class="icon icon-quill"></div>
+               <div class="icon icon-quill registration-{{ registration.state.name }}"></div>
                 {% if registration.state.name == 'pending' %}
                     {{ _render_pending_actions(registration) }}
                 {% elif registration.state.name == 'unpaid' %}
@@ -124,7 +124,7 @@
             </span>
         </div>
         <div class="group">
-            <a class="i-button js-modify-payment"
+            <a class="i-button"
                data-update="#registration-details"
                data-method="POST"
                data-params="{{ dict(pay=1) | tojson | forceescape }}"
@@ -168,8 +168,8 @@
 
 {% macro _render_check_in(registration) %}
     <div class="section">
-        <div class="icon icon-location"></div>
         {% if registration.checked_in %}
+            <div class="icon icon-location registration-checked-in"></div>
             <div class="text">
                 <div class="label">
                     {% trans %}Checked in{% endtrans %}
@@ -188,6 +188,7 @@
                 </a>)
             </div>
         {% else %}
+            <div class="icon icon-location"></div>
             <div class="text">
                 <div class="label">
                     {% trans %}Not checked in{% endtrans %}
