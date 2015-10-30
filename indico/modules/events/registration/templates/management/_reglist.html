@@ -21,11 +21,11 @@
                             <th class="i-table checkbox-column"></th>
                             <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
                             <th class="i-table">{% trans %}Full name{% endtrans %}</th>
-                            {% for item in visible_cols_regform_items %}
-                                <th class="i-table">{{ item.title }}</th>
-                            {% endfor %}
                             {% for item in basic_columns %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
+                            {% endfor %}
+                            {% for item in visible_cols_regform_items %}
+                                <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -46,6 +46,32 @@
                                         {{- registration.get_full_name() -}}
                                     </a>
                                 </td>
+                                {% for item in basic_columns %}
+                                    {% if item.id == 'reg_date' %}
+                                        <td class="i-table" data-text="{{ registration.submitted_dt }}">
+                                            {{- registration.submitted_dt | format_datetime -}}
+                                        </td>
+                                    {% elif item.id == 'state' %}
+                                        <td class="i-table">{{ registration.state.title }}</td>
+                                    {% elif item.id == 'price' %}
+                                        <td class="i-table">{{ registration.render_price() }}</td>
+                                    {% elif item.id == 'checked_in' %}
+                                        <td class="i-table">
+                                            {% if registration.checked_in %}
+                                                {%- trans %}Yes{% endtrans -%}
+                                            {% else %}
+                                                {%- trans %}No{% endtrans -%}
+                                            {% endif %}
+                                    {% elif item.id == 'checked_in_date' %}
+                                        <td class="i-table" data-text="{{ registration.checked_in_dt }}">
+                                            {%- if registration.checked_in_dt %}
+                                                {{- registration.checked_in_dt | format_datetime -}}
+                                            {%- endif %}
+                                        </td>
+                                    {% else %}
+                                        <td class="i-table">{{ data.get(item.id).friendly_data }}</td>
+                                    {% endif %}
+                                {% endfor %}
                                 {% for item in visible_cols_regform_items %}
                                     {% if item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
                                         <td class="i-table{%- if data[item.id].data %} icon-checkmark{% endif %}"
@@ -73,32 +99,6 @@
                                                 {{- data[item.id].friendly_data }}
                                             {%- endif %}
                                         </td>
-                                    {% endif %}
-                                {% endfor %}
-                                {% for item in basic_columns %}
-                                    {% if item.id == 'reg_date' %}
-                                        <td class="i-table" data-text="{{ registration.submitted_dt }}">
-                                            {{- registration.submitted_dt | format_datetime -}}
-                                        </td>
-                                    {% elif item.id == 'state' %}
-                                        <td class="i-table">{{ registration.state.title }}</td>
-                                    {% elif item.id == 'price' %}
-                                        <td class="i-table">{{ registration.render_price() }}</td>
-                                    {% elif item.id == 'checked_in' %}
-                                        <td class="i-table">
-                                            {% if registration.checked_in %}
-                                                {%- trans %}Yes{% endtrans -%}
-                                            {% else %}
-                                                {%- trans %}No{% endtrans -%}
-                                            {% endif %}
-                                    {% elif item.id == 'checked_in_date' %}
-                                        <td class="i-table" data-text="{{ registration.checked_in_dt }}">
-                                            {%- if registration.checked_in_dt %}
-                                                {{- registration.checked_in_dt | format_datetime -}}
-                                            {%- endif %}
-                                        </td>
-                                    {% else %}
-                                        <td class="i-table">{{ data.get(item.id).friendly_data }}</td>
                                     {% endif %}
                                 {% endfor %}
                             </tr>

@@ -64,7 +64,7 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
-PERSONAL_COLUMNS = ('title', 'email', 'first_name', 'last_name', 'affiliation', 'address', 'phone', 'column')
+PERSONAL_COLUMNS = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'address', 'phone', 'column')
 SPECIAL_COLUMNS = ('reg_date', 'price', 'state', 'checked_in', 'checked_in_date')
 
 SPECIAL_COLUMN_LABELS = {
@@ -230,12 +230,24 @@ def _get_reg_list_config(regform):
     return session.get(session_key, DEFAULT_REPORT_CONFIG)
 
 
+def _get_sorted_regform_items(regform, item_ids):
+    """Return the form items ordered by their position in the registration form."""
+
+    return (RegistrationFormItem
+            .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
+            .with_parent(regform)
+            .join(RegistrationFormItem.parent, aliased=True)
+            .order_by(RegistrationFormItem.position)  # parent position
+            .reset_joinpoint()
+            .order_by(RegistrationFormItem.position)  # item position
+            .all())
+
+
 def _render_registration_list(regform, registrations, total_registrations=None):
     reg_list_config = _get_reg_list_config(regform=regform)
     item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
     basic_columns = _get_basic_columns(regform, basic_item_ids)
-    regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(item_ids),
-                                                  ~RegistrationFormItem.is_deleted)
+    regform_items = _get_sorted_regform_items(regform, item_ids)
     tpl = get_template_module('events/registration/management/_reglist.html')
     reglist = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
                                            basic_columns=basic_columns, total_registrations=total_registrations)
@@ -288,8 +300,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 
         item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
         basic_columns = _get_basic_columns(self.regform, basic_item_ids)
-        regform_items = RegistrationFormItem.find_all(RegistrationFormItem.id.in_(item_ids),
-                                                      ~RegistrationFormItem.is_deleted)
+        regform_items = _get_sorted_regform_items(self.regform, item_ids)
         registrations_query = _query_registrations(self.regform)
         total_regs = registrations_query.count()
         registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
@@ -487,10 +498,7 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
         reg_list_config = _get_reg_list_config(self.regform)
         item_ids, self.special_item_ids = _split_special_ids(reg_list_config['items'])
         self.item_ids = _column_ids_to_db(self.regform, item_ids)
-
-        self.regform_items = RegistrationFormItem.find(RegistrationFormItem.id.in_(self.item_ids),
-                                                       ~RegistrationFormItem.is_deleted).with_parent(
-                                                           self.regform).all()
+        self.regform_items = _get_sorted_regform_items(self.regform, self.item_ids)
 
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):

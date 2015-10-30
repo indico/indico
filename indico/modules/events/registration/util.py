@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import csv
 import re
+from collections import OrderedDict
 from io import BytesIO
 
 from flask import current_app, session
@@ -273,22 +274,20 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
     :param special_items: Registration form information as extra columns
     """
 
-    field_names = {'name'}
+    field_names = ['name']
+    special_item_mapping = OrderedDict([
+        ('reg_date', ('Registration date', lambda x: format_datetime(x.submitted_dt))),
+        ('state', ('Registration state', lambda x: x.state.title)),
+        ('price', ('Price', lambda x: x.render_price())),
+        ('checked_in', ('Checked in', lambda x: 'Yes' if x.checked_in else 'No')),
+        ('checked_in_date', ('Check-in date', lambda x: format_datetime(x.checked_in_dt) if x.checked_in else ''))
+    ])
     for item in regform_items:
-        field_names.add('{}_{}'.format(item.title.encode('utf-8'), item.id))
+        field_names.append('{}_{}'.format(item.title.encode('utf-8'), item.id))
         if item.input_type == 'accommodation':
-            field_names.add('{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id))
-            field_names.add('{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id))
-    if 'reg_date' in special_items:
-        field_names.add('Registration date')
-    if 'state' in special_items:
-        field_names.add('Registration state')
-    if 'price' in special_items:
-        field_names.add('Price')
-    if 'checked_in' in special_items:
-        field_names.add('Checked in')
-    if 'checked_in_date' in special_items:
-        field_names.add('Check-in date')
+            field_names.append('{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id))
+            field_names.append('{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id))
+    field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in special_items)
     buf = BytesIO()
     writer = csv.DictWriter(buf, fieldnames=field_names)
     writer.writeheader()
@@ -310,18 +309,13 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
                 registration_dict[key] = _prepare_data(format_date(departure_date) if departure_date else '')
             else:
                 registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')
-        if 'reg_date' in special_items:
-            registration_dict['Registration date'] = format_datetime(registration.submitted_dt)
-        if 'state' in special_items:
-            registration_dict['Registration state'] = registration.state.title.encode('utf-8')
-        if 'price' in special_items:
-            registration_dict['Price'] = registration.render_price()
-        if 'checked_in' in special_items:
-            checked_in = 'Yes' if registration.checked_in else 'No'
-            registration_dict['Checked in'] = checked_in
-        if 'checked_in_date' in special_items:
-            check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
-            registration_dict['Check-in date'] = check_in_date
+        for name, (title, fn) in special_item_mapping.iteritems():
+            if name not in special_items:
+                continue
+            value = fn(registration)
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            registration_dict[title] = value
         writer.writerow(registration_dict)
     buf.seek(0)
     return buf
