@@ -388,15 +388,41 @@ def build_registrations_api_data(event):
     api_data = []
     for regform in event.registration_forms.filter_by(is_deleted=False):
         for registration in regform.active_registrations:
-            api_data.append(build_registration_api_data(registration))
+            registration_info = _build_base_registration_info(registration)
+            registration_info['checkin_secret'] = registration.uuid
+            api_data.append(registration_info)
     return api_data
 
 
-def build_registration_api_data(registration):
+def _build_base_registration_info(registration):
+    personal_data = _build_personal_data(registration)
     return {
         'registrant_id': str(registration.id),
         'checked_in': registration.checked_in,
         'checkin_secret': registration.uuid,
-        'full_name': registration.full_name,
-        'personal_data': registration.get_personal_data()
+        'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name),
+        'personal_data': personal_data
     }
+
+
+def _build_personal_data(registration):
+    personal_data = registration.get_personal_data()
+    personal_data['firstName'] = personal_data.pop('first_name')
+    personal_data['surname'] = personal_data.pop('last_name')
+    personal_data['country'] = personal_data.pop('country', '')
+    personal_data['phone'] = personal_data.pop('phone', '')
+    return personal_data
+
+
+def build_registration_api_data(registration, full_details=False):
+    registration_info = _build_base_registration_info(registration)
+    registration_info['amount_paid'] = registration.price if registration.is_paid else 0
+    registration_info['registration_date'] = registration.submitted_dt.isoformat()
+    registration_info['paid'] = registration.is_paid
+    registration_info['checkin_date'] = registration.checked_in_dt.isoformat() if registration.checked_in_dt else ''
+    registration_info['event_id'] = registration.event_id
+
+    if full_details:
+        for data in registration.data:
+            registration_info[data.field_data.field.title] = data.friendly_data
+    return registration_info

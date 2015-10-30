@@ -17,16 +17,17 @@
 from __future__ import unicode_literals
 
 from flask import request, jsonify
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.modules.oauth import oauth
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.events.api import EventBaseHook
+from indico.modules.events.models.events import Event
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
-from indico.modules.events.registration.util import build_registrations_api_data
-from indico.util.fossilize import fossilize
-from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
+from indico.modules.events.registration.util import build_registrations_api_data, build_registration_api_data
+from indico.modules.events.registration.models.registrations import Registration
+from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 
@@ -38,47 +39,32 @@ class RHAPIRegistrant(RH):
     """RESTful registrant API"""
 
     @oauth.require_oauth('registrants')
-    def _checkParams(self):
-        event = ConferenceHolder().getById(request.view_args['event_id'], True)
-        if event is None:
-            raise NotFound("No such event")
-        if not event.canManageRegistration(request.oauth.user):
+    def _checkProtection(self):
+        if not self.event.can_manage(request.oauth.user, role='registration'):
             raise Forbidden()
-        registrant = event.getRegistrantById(request.view_args['registrant_id'])
-        if registrant is None:
-            raise NotFound("No such registrant")
-        self.event = event
-        self.registrant = registrant
 
-    def _get_result(self, **kwargs):
-        checkin_date = None
-        if self.registrant.isCheckedIn():
-            checkin_date = self.registrant.getCheckInDate().isoformat()
-        return jsonify(event_id=self.event.getId(),
-                       registrant_id=self.registrant.getId(),
-                       full_name=self.registrant.getFullName(title=True, firstNameFirst=True),
-                       checked_in=self.registrant.isCheckedIn(),
-                       checkin_secret=self.registrant.getCheckInUUID(),
-                       checkin_date=checkin_date,
-                       registration_date=self.registrant.getRegistrationDate().isoformat(),
-                       **kwargs)
+    def _checkParams(self):
+        self.event = Event.find(id=request.view_args['event_id'], is_deleted=False).first_or_404()
+        self._registration = (self.event.registrations
+                              .filter_by(id=request.view_args['registrant_id'],
+                                         is_deleted=False)
+                              .first_or_404())
 
     def _process_GET(self):
-        registration_form = self.event.getRegistrationForm()
-        personal_data = registration_form.getPersonalData().getRegistrantValues(self.registrant)
-        return self._get_result(personal_data=personal_data)
+        return jsonify(build_registration_api_data(self._registration))
 
     def _process_PATCH(self):
         if request.json is None:
             raise BadRequest('Expected JSON payload')
+
         invalid_fields = request.json.viewkeys() - {'checked_in'}
         if invalid_fields:
             raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
-        if self.registrant is None:
-            raise NotFound("No such registrant")
+
         if 'checked_in' in request.json:
-            self.registrant.setCheckedIn(bool(request.json['checked_in']))
-        return self._get_result()
+            self._registration.checked_in = bool(request.json['checked_in'])
+
+        return jsonify(build_registration_api_data(self._registration))
 
 
 class RHAPIRegistrants(RH):
@@ -109,9 +95,8 @@ class SetPaidHook(EventBaseHook):
         super(SetPaidHook, self)._getParams()
         self.auth_key = get_query_parameter(self._queryParams, ["auth_key"])
         self.is_paid = get_query_parameter(self._queryParams, ["is_paid"]) == "yes"
-        registrant_id = self._pathParams["registrant_id"]
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
-        self._registrant = self._conf.getRegistrantById(registrant_id)
+        self._registrant = self._conf.getRegistrantById(self._pathParams["registrant_id"])
         if not payment_event_settings.get(self._conf, 'enabled'):
             raise HTTPAPIError('E-payment is not enabled')
 
@@ -139,44 +124,14 @@ class RegistrantHook(EventBaseHook):
 
     def _getParams(self):
         super(RegistrantHook, self)._getParams()
-        self.auth_key = get_query_parameter(self._queryParams, ["auth_key"])
-        self._conf = ConferenceHolder().getById(self._pathParams['event'])
-        registrant_id = self._pathParams["registrant_id"]
-        self._registrant = self._conf.getRegistrantById(registrant_id)
+        self._event = Event.find_one(id=self._pathParams['event'], is_deleted=False)
+        self._registration = self._event.registrations.filter_by(id=self._pathParams['registrant_id']).first_or_404()
 
     def _hasAccess(self, aw):
-        return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
+        return self._event.can_manage(aw.getUser(legacy=False), role='registration')
 
     def export_registrant(self, aw):
-        expInt = RegistrantFetcher(aw, self)
-        return expInt.registrant()
-
-
-class RegistrantFetcher(DataFetcher):
-    # DETAIL_INTERFACES = {
-    #     'basic': IRegFormRegistrantBasicFossil,
-    #     'full': IRegFormRegistrantFullFossil
-    # }
-
-    def __init__(self, aw, hook):
-        super(RegistrantFetcher, self).__init__(aw, hook)
-        self._registrant = hook._registrant
-        self._conf = hook._conf
-        self._detail = hook._detail
-
-    def _makeFossil(self):
-        iface = self.DETAIL_INTERFACES.get(self._detail)
-        if iface is None:
-            raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
-
-        return fossilize(self._registrant, iface)
-
-    def registrant(self):
-        result = self._makeFossil()
-        if self._detail == 'basic':
-            regForm = self._conf.getRegistrationForm()
-            result["personal_data"] = regForm.getPersonalData().getRegistrantValues(self._registrant)
-        return result
+        return build_registration_api_data(self._registration, self._detail != 'basic')
 
 
 @HTTPAPIHook.register
