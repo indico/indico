@@ -242,6 +242,14 @@ def _render_registration_list(regform, registrations, total_registrations=None):
     return reglist
 
 
+def _render_registration_details(registration):
+    event = registration.registration_form.event
+    tpl = get_template_module('events/registration/management/_registration_details.html')
+    return tpl.render_registration_details(registration=registration,
+                                           currency=payment_event_settings.get(event, 'currency'),
+                                           payment_enabled=event.has_feature('payment'))
+
+
 def _generate_zip_file(attachments, regform):
     temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
     with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
@@ -344,11 +352,10 @@ class RHRegistrationDetails(RHManageRegistrationBase):
     """Displays information about a registration"""
 
     def _process(self):
+        registration_details_html = _render_registration_details(self.registration)
         return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration,
-                                                    currency=payment_event_settings.get(self.event, 'currency'),
-                                                    payment_enabled=self.event.has_feature('payment'),
-                                                    from_management=True)
+                                                    registration_details_html=registration_details_html)
 
 
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
@@ -552,10 +559,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
                                  action=action,
                                  data={'changed_by_name': session.user.full_name,
                                        'changed_by_id': session.user.id})
-            flash(_("The registration payment was updated successfully."), 'success')
-        return jsonify_template('events/registration/management/registration_details.html',
-                                registration=self.registration,
-                                payment_enabled=self.event.has_feature('payment'))
+        return jsonify_data(html=_render_registration_details(self.registration))
 
 
 def _modify_registration_status(registration, approve):
@@ -574,11 +578,7 @@ class RHRegistrationApprove(RHManageRegistrationBase):
 
     def _process(self):
         _modify_registration_status(self.registration, approve=True)
-        return jsonify_template('events/registration/management/registration_details.html',
-                                registration=self.registration,
-                                currency=payment_event_settings.get(self.event, 'currency'),
-                                payment_enabled=self.event.has_feature('payment'),
-                                from_management=True)
+        return jsonify_data(html=_render_registration_details(self.registration))
 
 
 class RHRegistrationReject(RHManageRegistrationBase):
@@ -586,11 +586,7 @@ class RHRegistrationReject(RHManageRegistrationBase):
 
     def _process(self):
         _modify_registration_status(self.registration, approve=False)
-        return jsonify_template('events/registration/management/registration_details.html',
-                                registration=self.registration,
-                                currency=payment_event_settings.get(self.event, 'currency'),
-                                payment_enabled=self.event.has_feature('payment'),
-                                from_management=True)
+        return jsonify_data(html=_render_registration_details(self.registration))
 
 
 class RHRegistrationToggleCheckIn(RHManageRegistrationBase):
@@ -598,11 +594,7 @@ class RHRegistrationToggleCheckIn(RHManageRegistrationBase):
 
     def _process(self):
         self.registration.checked_in = not self.registration.checked_in
-        return jsonify_template('events/registration/management/registration_details.html',
-                                registration=self.registration,
-                                currency=payment_event_settings.get(self.event, 'currency'),
-                                payment_enabled=self.event.has_feature('payment'),
-                                from_management=True)
+        return jsonify_data(html=_render_registration_details(self.registration))
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
