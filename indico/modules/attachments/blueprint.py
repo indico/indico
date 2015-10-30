@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import itertools
 
-from indico.modules.attachments.controllers.compat import compat_folder, compat_attachment
+from indico.modules.attachments.controllers.compat import compat_folder, compat_folder_old, compat_attachment
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
 from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
                                                                   RHListEventAttachmentFolder,
@@ -152,3 +152,4 @@ _compat_bp.add_url_rule('!/getFile.py/access', 'getfile',
                                                                   'subContId': 'subcontrib_id',
                                                                   'materialId': 'material_id',
                                                                   'resId': 'resource_id'}))
+_compat_bp.add_url_rule('!/materialDisplay.py', 'materialdisplay', compat_folder_old)

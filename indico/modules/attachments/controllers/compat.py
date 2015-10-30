@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app, redirect
+from flask import current_app, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
@@ -43,6 +43,16 @@ def compat_folder(**kwargs):
     if folder.is_deleted or folder.linked_object is None:
         raise NotFound
     return redirect(url_for('attachments.list_folder', folder), 302 if current_app.debug else 301)
+
+
+def compat_folder_old():
+    mapping = {'confId': 'event_id',
+               'sessionId': 'session_id',
+               'contribId': 'contrib_id',
+               'subContId': 'subcontrib_id',
+               'materialId': 'material_id'}
+    kwargs = {mapping.get(k, k): v for k, v in request.args.iteritems()}
+    return compat_folder(**kwargs)
 
 
 @RHSimple.wrap_function
