@@ -259,7 +259,7 @@ def modify_registration(registration, data, management=False):
 
 def _prepare_data(data):
     if isinstance(data, list):
-        data = ','.join(data)
+        data = ', '.join(data)
     elif data is None:
         data = ''
     return re.sub(r'(\r?\n)+', '    ', unicode(data)).encode('utf-8')
@@ -298,8 +298,8 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
             'name': "{} {}".format(registration.first_name, registration.last_name).encode('utf-8')
         }
         for item in regform_items:
+            key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
             if item.input_type == 'accommodation':
-                key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
                 registration_dict[key] = _prepare_data(data[item.id].friendly_data.get('choice')
                                                        if item.id in data else '')
                 key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id)
@@ -309,7 +309,6 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
                 registration_dict[key] = _prepare_data(format_date(departure_date) if departure_date else '')
             else:
-                key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
                 registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')
         if 'reg_date' in special_items:
             registration_dict['Registration date'] = format_datetime(registration.submitted_dt)

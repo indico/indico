@@ -1481,6 +1481,9 @@ class RegistrantToPDF(PDFBase):
                 _print_row(caption=_('Arrival date'), value=format_date(arrival_date) if arrival_date else '')
                 departure_date = data[item.id].friendly_data.get('departure_date')
                 _print_row(caption=_('Departure date'), value=format_date(departure_date) if departure_date else '')
+            elif item.input_type == 'multi_choice' and item.id in data:
+                multi_choice_data = ', '.join(data[item.id].friendly_data)
+                _print_row(caption=item.title, value=multi_choice_data)
             else:
                 value = data[item.id].friendly_data if item.id in data else ''
                 _print_row(caption=item.title, value=value)
@@ -1634,22 +1637,28 @@ class RegistrantsListToPDF(PDFBase):
                                                registration.last_name.encode('utf-8')), text_format))
             data = registration.data_by_field
             for item in self._display:
+                friendly_data = data.get(item.id).friendly_data if data.get(item.id) else ''
                 if item.input_type == 'accommodation':
-                    if data.get(item.id):
+                    if friendly_data:
                         friendly_data = data[item.id].friendly_data
                         lp.append(Paragraph(friendly_data['choice'].encode('utf-8'), text_format))
                         lp.append(Paragraph(format_date(friendly_data['arrival_date']), text_format))
                         lp.append(Paragraph(format_date(friendly_data['departure_date']), text_format))
                     else:
-                        # Fill in with empty space to avoid braking the layout
+                        # Fill in with empty space to avoid breaking the layout
                         lp.append(Paragraph('', text_format))
                         lp.append(Paragraph('', text_format))
+                        lp.append(Paragraph('', text_format))
+                elif item.input_type == 'multi_choice':
+                    if friendly_data:
+                        multi_choice_data = ', '.join(friendly_data).encode('utf-8')
+                        lp.append(Paragraph(multi_choice_data, text_format))
+                    else:
                         lp.append(Paragraph('', text_format))
                 else:
-                    value = data[item.id].friendly_data if item.id in data else ''
-                    if isinstance(value, unicode):
-                        value = value.encode('utf-8')
-                    lp.append(Paragraph(str(value), text_format))
+                    if isinstance(friendly_data, unicode):
+                        friendly_data = friendly_data.encode('utf-8')
+                    lp.append(Paragraph(str(friendly_data), text_format))
             if 'reg_date' in self.special_items:
                 lp.append(Paragraph(format_datetime(registration.submitted_dt), text_format))
             if 'state' in self.special_items:
