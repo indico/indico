@@ -109,7 +109,7 @@ class RegistrationFormField(RegistrationFormItem):
         return self.field_impl.get_friendly_data(registration_data)
 
     def calculate_price(self, registration_data):
-        return self.field_impl.calculate_price(registration_data)
+        return self.field_impl.calculate_price(registration_data.data, registration_data.field_data.versioned_data)
 
 
 class RegistrationFormPersonalDataField(RegistrationFormField):

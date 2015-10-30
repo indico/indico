@@ -74,11 +74,10 @@ class NumberField(RegistrationFormBillableField):
         min_value = self.form_item.data.get('min_value', None)
         return [NumberRange(min=min_value)] if min_value else None
 
-    def calculate_price(self, registration_data):
-        data = registration_data.field_data.versioned_data
-        if not data.get('is_billable'):
+    def calculate_price(self, reg_data, versioned_data):
+        if not versioned_data.get('is_billable'):
             return 0
-        return data.get('price', 0) * int(registration_data.data or 0)
+        return versioned_data.get('price', 0) * int(reg_data or 0)
 
     def get_friendly_data(self, registration_data):
         if registration_data.data is None:
@@ -153,12 +152,6 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         unversioned_data['captions'] = captions
         return unversioned_data, versioned_data
 
-    def process_form_data(self, registration, value, old_data=None):
-        # always store no-option as empty dict
-        if value is None:
-            value = {}
-        return super(ChoiceBaseField, self).process_form_data(registration, value, old_data)
-
     def get_places_used(self):
         places_used = Counter()
         for registration in self.form_item.registration_form.active_registrations:
@@ -173,16 +166,15 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def create_sql_filter(self, data_list):
         return RegistrationData.data.has_any(db.func.cast(data_list, ARRAY(db.String)))
 
-    def calculate_price(self, registration_data):
-        if not registration_data.data:
+    def calculate_price(self, reg_data, versioned_data):
+        if not reg_data:
             return 0
-        data = registration_data.field_data.versioned_data
-        billable_choices = [x for x in data['choices'] if x['id'] in registration_data.data and x['is_billable']]
+        billable_choices = [x for x in versioned_data['choices'] if x['id'] in reg_data and x['is_billable']]
         price = 0
         for billable_field in billable_choices:
             price += billable_field['price']
             if billable_field.get('extra_slots_pay'):
-                price += (registration_data.data[billable_field['id']] - 1) * billable_field['price']
+                price += (reg_data[billable_field['id']] - 1) * billable_field['price']
         return price
 
 
@@ -208,6 +200,15 @@ class SingleChoiceField(ChoiceBaseField):
         caption = registration_data.field_data.field.data['captions'][uuid]
         return '{} (+{})'.format(caption, number_of_slots - 1) if number_of_slots > 1 else caption
 
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
+        if billable_items_locked and old_data.price:
+            # if the old field was paid we can simply ignore any change and keep the old value
+            return {}
+        # always store no-option as empty dict
+        if value is None:
+            value = {}
+        return super(SingleChoiceField, self).process_form_data(registration, value, old_data, billable_items_locked)
+
 
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
@@ -216,11 +217,10 @@ class CheckboxField(RegistrationFormBillableField):
                              True: L_('Yes'),
                              False: L_('No')}
 
-    def calculate_price(self, registration_data):
-        data = registration_data.field_data.versioned_data
-        if not data.get('is_billable') or not registration_data.data:
+    def calculate_price(self, reg_data, versioned_data):
+        if not versioned_data.get('is_billable') or not reg_data:
             return 0
-        return data.get('price', 0)
+        return versioned_data.get('price', 0)
 
     def get_friendly_data(self, registration_data):
         return self.friendly_data_mapping[registration_data.data]
@@ -262,11 +262,11 @@ class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
 
-    def process_form_data(self, registration, value, old_data=None):
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         if value:
             date_format = self.form_item.data['date_format']
             value = datetime.strptime(value, date_format).isoformat()
-        return super(DateField, self).process_form_data(registration, value, old_data)
+        return super(DateField, self).process_form_data(registration, value, old_data, billable_items_locked)
 
     def get_friendly_data(self, registration_data):
         date_string = registration_data.data
@@ -326,11 +326,10 @@ class BooleanField(RegistrationFormBillableField):
                     places_used += 1
         return places_used
 
-    def calculate_price(self, registration_data):
-        data = registration_data.field_data.versioned_data
-        if not data.get('is_billable'):
+    def calculate_price(self, reg_data, versioned_data):
+        if not versioned_data.get('is_billable'):
             return 0
-        return data.get('price', 0) if registration_data.data else 0
+        return versioned_data.get('price', 0) if reg_data else 0
 
     def get_friendly_data(self, registration_data):
         return self.friendly_data_mapping[registration_data.data]
@@ -383,7 +382,7 @@ class FileField(RegistrationFormFieldBase):
     name = 'file'
     wtf_field_class = _DeletableFileField
 
-    def process_form_data(self, registration, value, old_data=None):
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         data = {'field_data': self.form_item.current_data}
         file_ = value['uploaded_file']
         if file_:
@@ -503,19 +502,20 @@ class AccommodationField(RegistrationFormBillableItemsField):
         friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
         return friendly_data
 
-    def calculate_price(self, registration_data):
-        data = registration_data.field_data.versioned_data
-        reg_data = registration_data.data
+    def calculate_price(self, reg_data, versioned_data):
         if not reg_data:
             return 0
-        item = next((x for x in data['choices']
+        item = next((x for x in versioned_data['choices']
                      if reg_data['choice'] == x['id'] and x.get('is_billable', False)), None)
         if not item or not item['price']:
             return 0
         nights = (_to_date(reg_data['departure_date']) - _to_date(reg_data['arrival_date'])).days
         return item['price'] * nights
 
-    def process_form_data(self, registration, value, old_data=None):
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
+        if billable_items_locked and old_data.price:
+            # if the old field was paid we can simply ignore any change and keep the old data
+            return {}
         data = {}
         if value:
             data = {
@@ -523,7 +523,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                 'arrival_date': value['arrivalDate'],
                 'departure_date': value['departureDate']
             }
-        return super(AccommodationField, self).process_form_data(registration, data, old_data=old_data)
+        return super(AccommodationField, self).process_form_data(registration, data, old_data, billable_items_locked)
 
     def get_places_used(self):
         places_used = Counter()
@@ -548,6 +548,10 @@ def _to_date(date):
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
 
+    @property
+    def default_value(self):
+        return {}
+
     def get_friendly_data(self, registration_data):
         def _format_item(uuid, number_of_slots):
             caption = self.form_item.data['captions'][uuid]
@@ -558,6 +562,39 @@ class MultiChoiceField(ChoiceBaseField):
             return ''
         return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
 
-    @property
-    def default_value(self):
-        return {}
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
+        # TODO: create new data version here if an item from old_data's version
+        # was already chosen but doesn't exist anymore (or has a new price) and
+        # the user also selected a new item that doesn't exist in the current
+        # version yet.
+
+        # always store no-option as empty dict
+        if value is None:
+            value = {}
+        if not billable_items_locked:
+            return super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
+        if old_data.data == value:
+            # nothing changed
+            # XXX: should we ignore slot changes if extra slots don't pay?
+            # probably that needs a js update to keep the slots choice
+            # enabled even if the item is paid...
+            return {}
+        # XXX: This code still relies on the client sending data for the disabled fields.
+        # This is pretty ugly but especially in case of non-billable extra slots it makes
+        # sense to keep it like this.  If someone tampers with the list of billable fields
+        # we detect it any reject the change to the field's data anyway.
+        old_choices = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
+        new_choices = {x['id']: x for x in self.form_item.versioned_data['choices']}
+        old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
+                        if old_choices[uuid]['is_billable'] and old_choices[uuid]['price']}
+        new_billable = {uuid: num for uuid, num in value.iteritems()
+                        if new_choices[uuid]['is_billable'] and new_choices[uuid]['price']}
+        if old_billable != new_billable:
+            # preserve existing data
+            return {}
+        else:
+            # nothing price-related changed
+            # TODO: check item prices (in case there's a change between old/new version)
+            # for now we simply ignore field changes in this case (since the old/new price
+            # check in the base method will fail)
+            return super(MultiChoiceField, self).process_form_data(registration, value, old_data, True)

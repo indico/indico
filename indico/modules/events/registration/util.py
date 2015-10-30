@@ -218,18 +218,21 @@ def create_registration(regform, data, invitation=None, management=False):
 
 
 def modify_registration(registration, data, management=False):
+    old_price = registration.price
     with db.session.no_autoflush:
         regform = registration.registration_form
         data_by_field = registration.data_by_field
         if management or not registration.user:
             registration.user = get_user_by_email(data['email'])
 
+        billable_items_locked = not management and registration.is_paid
         for form_item in regform.active_fields:
+            field_impl = form_item.field_impl
             if management or not form_item.parent.is_manager_only:
                 value = data.get(form_item.html_field_name)
             elif form_item.id not in data_by_field:
                 # set default value for manager-only field if it didn't have one before
-                value = form_item.field_impl.default_value
+                value = field_impl.default_value
             else:
                 # manager-only field that has data which should be preserved
                 continue
@@ -238,13 +241,18 @@ def modify_registration(registration, data, management=False):
                 data_by_field[form_item.id] = RegistrationData(registration=registration,
                                                                field_data=form_item.current_data)
 
-            attrs = form_item.field_impl.process_form_data(registration, value, data_by_field[form_item.id])
+            attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
+                                                 billable_items_locked=billable_items_locked)
             for key, val in attrs.iteritems():
                 setattr(data_by_field[form_item.id], key, val)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
         registration.update_state()
     db.session.flush()
+    # sanity check
+    if billable_items_locked and old_price != registration.price:
+        raise Exception("There was an error while modifying your registration (price mismatch: %s / %s)",
+                        old_price, registration.price)
     notify_registration_modification(registration)
     logger.info('Registration %s modified by %s', registration, session.user)
 

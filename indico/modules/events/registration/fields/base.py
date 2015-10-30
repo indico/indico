@@ -55,8 +55,12 @@ class RegistrationFormFieldBase(object):
     def filter_choices(self):
         return None
 
-    def calculate_price(self, registration_data):
-        """Calculates the price of the field given the registration data"""
+    def calculate_price(self, reg_data, versioned_data):
+        """Calculates the price of the field
+
+        :param reg_data: The user data for the field
+        :param versioned_data: The versioned field data to use
+        """
         return 0
 
     def create_sql_filter(self, data_list):
@@ -78,8 +82,16 @@ class RegistrationFormFieldBase(object):
     def has_data_changed(self, value, old_data):
         return value != old_data.data
 
-    def process_form_data(self, registration, value, old_data=None):
-        """Convert form data into database-usable dictionary."""
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
+        """Convert form data into database-usable dictionary.
+
+        :param registration: The registration the data is used for
+        :param value: The value from the WTForm
+        :param old_data: The existing `RegistrationData` in case a
+                         registration is being modified.
+        :param billable_items_locked: Whether modifications to any
+                                      billable item should be ignored.
+        """
 
         if old_data is not None and not self.has_data_changed(value, old_data):
             return {}
@@ -130,9 +142,13 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
         data['price'] = float(data['price']) if data.get('price') else 0
         return super(RegistrationFormBillableField, cls).process_field_data(data, old_data, old_versioned_data)
 
-    def calculate_price(self, registration_data):
-        data = registration_data.field_data.versioned_data
-        return data.get('price', 0) if data.get('is_billable') else 0
+    def calculate_price(self, reg_data, versioned_data):
+        return versioned_data.get('price', 0) if versioned_data.get('is_billable') else 0
+
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
+        if billable_items_locked and old_data.price != self.calculate_price(value, self.form_item.versioned_data):
+            return {}
+        return super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
@@ -145,6 +161,6 @@ class RegistrationFormBillableItemsField(RegistrationFormBillableField):
         del versioned_data['price']
         return unversioned_data, versioned_data
 
-    def calculate_price(self, registration_data):
+    def calculate_price(self, reg_data, versioned_data):
         # billable items need custom logic
         raise NotImplementedError
