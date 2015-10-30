@@ -141,6 +141,7 @@ $(document).ready(function() {
         var url = $this.data('href');
         var method = $this.data('method').toUpperCase();
         var params = $this.data('params') || {};
+        var update = $this.data('update');
         if (!$.isPlainObject(params)) {
             throw new Error('Invalid params. Must be valid JSON if set.');
         }
@@ -148,9 +149,28 @@ $(document).ready(function() {
         function execute() {
             var evt = $.Event('indico:confirmed');
             $this.trigger(evt);
+
+            // Handle custom code
             if (evt.isDefaultPrevented()) {
                 return;
             }
+
+            // Handle html update
+            if (update) {
+                $.ajax({
+                    method: method,
+                    url: url,
+                    data: params,
+                    error: handleAjaxError,
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    success: function(data) {
+                        $(update).html(data.html);
+                    }
+                });
+                return;
+            }
+
+            // Handle normal GET/POST
             if (method === 'GET') {
                 location.href = build_url(url, params);
             } else if (method === 'POST') {
