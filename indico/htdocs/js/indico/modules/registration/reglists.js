@@ -184,8 +184,18 @@
         });
     }
 
+
     global.setupRegistrationListFilter = function setupRegistrationListFilter() {
+        $('.ui-dialog').on('click', function(){
+            $('.reglist-column .dropdown').fadeOut(200);
+        });
+
         $('.reglist-filter').dropdown({selector: '.reglist-column .title'});
+
+        $('.reglist-filter .reglist-column .title').on('click', function(e) {
+            e.stopPropagation();
+        });
+
         colorizeActiveFilters();
 
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
