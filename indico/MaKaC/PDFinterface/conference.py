@@ -1865,6 +1865,8 @@ class RegistrantsListToBadgesPDF:
                 text = action
             elif isinstance(action, types.LambdaType):
                 text = action(registrant)
+                if isinstance(text, unicode):
+                    text = text.encode('utf-8')
             elif isinstance(action, types.MethodType):
                 # If the action is a method, depending on which class owns the method, we pass a
                 # different object to the method.
