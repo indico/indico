@@ -141,14 +141,14 @@
                             <td class="text-right">{{ item.price }} {{ currency }}</td>
                         </tr>
                     {% endfor %}
-                    {% if registration.registration_form.base_price %}
+                    {% if registration.base_price %}
                         <tr class="regform-done-table-item">
                             <td class="text-left">
                                 {% trans %}Registration fee{% endtrans %}
                             </td>
                             <td></td>
                             <td class="text-right">
-                                {{ registration.registration_form.base_price }} {{ currency }}
+                                {{ registration.base_price }} {{ currency }}
                             </td>
                         </tr>
                     {% endif %}
