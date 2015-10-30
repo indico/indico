@@ -1635,14 +1635,11 @@ class RegistrantsListToPDF(PDFBase):
             data = registration.data_by_field
             for item in self._display:
                 if item.input_type == 'accommodation':
-                    if item.id in data:
-                        lp.append(Paragraph(data[item.id].friendly_data.get('choice').encode('utf-8'), text_format))
-                        arrival_date = data[item.id].friendly_data.get('arrival_date')
-                        arrival_date = format_date(arrival_date) if arrival_date else ''
-                        lp.append(Paragraph(arrival_date, text_format))
-                        departure_date = data[item.id].friendly_data.get('departure_date')
-                        departure_date = format_date(departure_date) if departure_date else ''
-                        lp.append(Paragraph(departure_date, text_format))
+                    if data.get(item.id):
+                        friendly_data = data[item.id].friendly_data
+                        lp.append(Paragraph(friendly_data['choice'].encode('utf-8'), text_format))
+                        lp.append(Paragraph(format_date(friendly_data['arrival_date']), text_format))
+                        lp.append(Paragraph(format_date(friendly_data['departure_date']), text_format))
                     else:
                         # Fill in with empty space to avoid braking the layout
                         lp.append(Paragraph('', text_format))
