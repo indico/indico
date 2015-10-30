@@ -34,7 +34,9 @@
                             {% set data = registration.data_by_field %}
                             <tr id="registration-{{ registration.id }}" class="i-table">
                                 <td class="i-table">
-                                    <input class="select-row" type="checkbox" name="registration_id" value="{{ registration.id }}">
+                                    <input class="select-row" type="checkbox" name="registration_id"
+                                           value="{{ registration.id }}"
+                                           data-has-files="{{ registration.has_files | tojson }}">
                                 </td>
                                 <td class="i-table">
                                     #{{ registration.friendly_id }}

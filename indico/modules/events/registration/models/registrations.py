@@ -333,6 +333,10 @@ class Registration(db.Model):
         _fill_from_registration()
         return summary
 
+    @property
+    def has_files(self):
+        return any(item.storage_file_id is not None for item in self.data)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
