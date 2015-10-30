@@ -211,7 +211,7 @@ def create_registration(regform, data, invitation=None, management=False):
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
-    registration.update_state(management=management)
+    registration.sync_state(_skip_moderation=management)
     db.session.flush()
     notify_registration_creation(registration)
     logger.info('New registration %s by %s', registration, session.user)
@@ -248,7 +248,7 @@ def modify_registration(registration, data, management=False):
                 setattr(data_by_field[form_item.id], key, val)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
                 setattr(registration, form_item.personal_data_type.column, value)
-        registration.update_state()
+        registration.sync_state()
     db.session.flush()
     # sanity check
     if billable_items_locked and old_price != registration.price:

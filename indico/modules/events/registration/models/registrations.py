@@ -373,7 +373,32 @@ class Registration(db.Model):
         currency = event_payment_settings.get(self.registration_form.event, 'currency')
         return '{} {}'.format(self.price, currency)
 
-    def update_state(self, approved=None, paid=None, rejected=None, management=False):
+    def sync_state(self, _skip_moderation=True):
+        """Sync the state of the registration"""
+        initial_state = self.state
+        regform = self.registration_form
+        invitation = self.invitation
+        moderation_required = (regform.moderation_enabled and not _skip_moderation and
+                               (not invitation or not invitation.skip_moderation))
+        with db.session.no_autoflush:
+            payment_required = regform.event.has_feature('payment') and self.price and not self.is_paid
+        if self.state is None:
+            if moderation_required:
+                self.state = RegistrationState.pending
+            elif payment_required:
+                self.state = RegistrationState.unpaid
+            else:
+                self.state = RegistrationState.complete
+        elif self.state == RegistrationState.unpaid:
+            if not self.price:
+                self.state = RegistrationState.complete
+        elif self.state == RegistrationState.complete:
+            if payment_required:
+                self.state = RegistrationState.unpaid
+        if self.state != initial_state:
+            signals.event.registration_state_updated.send(self, previous_state=initial_state)
+
+    def update_state(self, approved=None, paid=None, rejected=None, _skip_moderation=False):
         """Update the state of the registration for a given action
 
         The accepted kwargs are the possible actions. ``True`` means that the
@@ -384,18 +409,11 @@ class Registration(db.Model):
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
-        moderation_required = (regform.moderation_enabled and not management and
+        moderation_required = (regform.moderation_enabled and not _skip_moderation and
                                (not invitation or not invitation.skip_moderation))
         with db.session.no_autoflush:
             payment_required = regform.event.has_feature('payment') and self.price
-        if self.state is None:
-            if moderation_required:
-                self.state = RegistrationState.pending
-            elif payment_required:
-                self.state = RegistrationState.unpaid
-            else:
-                self.state = RegistrationState.complete
-        elif self.state == RegistrationState.pending:
+        if self.state == RegistrationState.pending:
             if approved and payment_required:
                 self.state = RegistrationState.unpaid
             elif approved:
@@ -403,14 +421,14 @@ class Registration(db.Model):
             elif rejected:
                 self.state = RegistrationState.rejected
         elif self.state == RegistrationState.unpaid:
-            if paid or not payment_required:
+            if paid:
                 self.state = RegistrationState.complete
             elif approved is False:
                 self.state = RegistrationState.pending
         elif self.state == RegistrationState.complete:
             if approved is False and payment_required is False and moderation_required:
                 self.state = RegistrationState.pending
-            elif not (paid or self.is_paid) and payment_required:
+            elif paid is False and payment_required:
                 self.state = RegistrationState.unpaid
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
