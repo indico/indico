@@ -1859,7 +1859,8 @@ class RegistrantsListToBadgesPDF:
         # We draw the items of the badge
         for item in self.__badgeTemplate.getItems():
             # First we determine the actual text that has to be drawed.
-            action = BadgeDesignConfiguration().items_actions[item.getKey()][1]
+            action = BadgeDesignConfiguration().items_actions.get(item.getKey())
+            action = action[1] if action else ''
             if isinstance(action, str):
                 # If for this kind of item we have to draw always the same string, let's draw it.
                 text = action
