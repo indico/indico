@@ -402,7 +402,7 @@ class Registration(db.Model):
             if paid or not payment_required:
                 self.state = RegistrationState.complete
             elif approved is False:
-                self.state = Registration.pending
+                self.state = RegistrationState.pending
         elif self.state == RegistrationState.complete:
             if approved is False and payment_required is False and moderation_required:
                 self.state = RegistrationState.pending
