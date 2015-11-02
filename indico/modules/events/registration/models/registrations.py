@@ -200,7 +200,8 @@ class Registration(db.Model):
         nullable=False,
         default=lambda: unicode(uuid4())
     )
-    #: Whether the person has checked in
+    #: Whether the person has checked in. Setting this also sets or clears
+    #: `checked_in_dt`.
     checked_in = db.Column(
         db.Boolean,
         nullable=False,
@@ -548,6 +549,13 @@ def _mapper_configured():
     @listens_for(Registration.registration_form, 'set')
     def _set_event_id(target, value, *unused):
         target.event_id = value.event_id
+
+    @listens_for(Registration.checked_in, 'set')
+    def _set_checked_in_dt(target, value, *unused):
+        if not value:
+            target.checked_in_dt = None
+        elif target.checked_in != value:
+            target.checked_in_dt = now_utc()
 
     @listens_for(Registration.transaction, 'set')
     def _set_transaction_id(target, value, *unused):
