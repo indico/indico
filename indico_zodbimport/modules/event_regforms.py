@@ -495,8 +495,9 @@ class RegformMigration(object):
                                     email=self._fix_email(old_reg._email),
                                     submitted_dt=getattr(old_reg, '_registrationDate', self.regform.start_dt),
                                     base_price=0, price_adjustment=0,
-                                    checked_in=getattr(old_reg, '_checkedIn', False),
-                                    checked_in_dt=getattr(old_reg, '_checkInDate', None))
+                                    checked_in=getattr(old_reg, '_checkedIn', False))
+        # set `checked_in_dt` after initialization since `checked_in` sets it to current dt automatically
+        registration.checked_in_dt = getattr(old_reg, '_checkInDate', None)
         # the next two columns break when testing things locally with an existing
         # db, but both can be safely commented out without causing any issues
         registration.friendly_id = int(old_reg._id)
