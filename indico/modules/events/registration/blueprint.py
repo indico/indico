@@ -69,7 +69,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationReject,
                                                                                 RHRegistrationsModifyStatus,
                                                                                 RHRegistrationsExportAttachments,
-                                                                                RHRegistrationToggleCheckIn,
+                                                                                RHRegistrationCheckIn,
                                                                                 RHRegistrationBulkCheckIn)
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -117,8 +117,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'approve_registration', RHRegistrationApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',
                  'reject_registration', RHRegistrationReject, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/toggle-checked-in',
-                 'toggle_registration_checked_in', RHRegistrationToggleCheckIn, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
+                 'registration_check_in', RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/table.pdf',

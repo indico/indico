@@ -180,8 +180,8 @@
                 (<a href="#"
                    title="{% trans %}Mark as not checked in{% endtrans %}"
                    data-update="#registration-details"
-                   data-method="POST"
-                   data-href="{{ url_for('.toggle_registration_checked_in', registration) }}"
+                   data-method="DELETE"
+                   data-href="{{ url_for('.registration_check_in', registration) }}"
                    data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
                    data-title="{% trans %}Reset check-in info{% endtrans %}">
                    {%- trans %}reset{% endtrans -%}
@@ -206,8 +206,8 @@
             <div class="toolbar right">
                 <a class="i-button"
                    data-update="#registration-details"
-                   data-method="POST"
-                   data-href="{{ url_for('.toggle_registration_checked_in', registration) }}">
+                   data-method="PUT"
+                   data-href="{{ url_for('.registration_check_in', registration) }}">
                     {% trans %}Check-in{% endtrans %}
                 </a>
             </div>

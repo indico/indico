@@ -597,11 +597,15 @@ class RHRegistrationReject(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationToggleCheckIn(RHManageRegistrationBase):
-    """Toggle checked in state of a registration"""
+class RHRegistrationCheckIn(RHManageRegistrationBase):
+    """Set checked in state of a registration"""
 
-    def _process(self):
-        self.registration.checked_in = not self.registration.checked_in
+    def _process_PUT(self):
+        self.registration.checked_in = True
+        return jsonify_data(html=_render_registration_details(self.registration))
+
+    def _process_DELETE(self):
+        self.registration.checked_in = False
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
