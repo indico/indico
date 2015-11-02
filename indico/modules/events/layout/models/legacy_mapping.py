@@ -16,9 +16,8 @@
 
 from __future__ import unicode_literals
 
-
 from indico.core.db import db
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_repr
 
 
 class LegacyImageMapping(db.Model):
@@ -63,7 +62,7 @@ class LegacyImageMapping(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<LegacyImageMapping({}, {})>'.format(self.legacy_image_id, self.image_id)
+        return format_repr(self, 'legacy_page_id', 'image_id')
 
 
 class LegacyPageMapping(db.Model):
@@ -108,4 +107,4 @@ class LegacyPageMapping(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<LegacyPageMapping({}, {})>'.format(self.legacy_page_id, self.image_id)
+        return format_repr(self, 'legacy_page_id', 'page_id')

@@ -23,7 +23,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.contextManager import ContextManager
 from indico.util.i18n import _
-from indico.util.string import return_ascii, slugify
+from indico.util.string import return_ascii, slugify, text_to_repr, format_repr
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 from MaKaC.conference import ConferenceHolder
@@ -406,7 +406,7 @@ class EventPage(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<EventPage({}, {})>'.format(self.id, self.html)
+        return format_repr(self, 'id', _text=text_to_repr(self.html, html=True))
 
 
 @listens_for(MenuEntry.children, 'append')
