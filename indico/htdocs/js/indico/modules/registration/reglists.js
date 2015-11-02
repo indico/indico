@@ -220,7 +220,7 @@
         });
 
         $('.js-reset-btn').on('click', function() {
-            $('.reglist-filter input:checkbox').prop('checked', false).trigger('change');
+            $('.reglist-filter input:checkbox:checked').prop('checked', false).trigger('change');
             $('.js-clear-filters-message').show({
                 done: function() {
                     var $this = $(this);
