@@ -18,8 +18,10 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
+from sqlalchemy import literal
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import aliased
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -315,11 +317,17 @@ class RegistrationFormItem(db.Model):
 
     @hybrid_property
     def is_visible(self):
-        return self.is_enabled and not self.is_deleted
+        return self.is_enabled and not self.is_deleted and (self.parent_id is None or self.parent.is_visible)
 
     @is_visible.expression
     def is_visible(cls):
-        return cls.is_enabled & ~cls.is_deleted
+        sections = aliased(RegistrationFormSection)
+        query = (db.session.query(literal(True))
+                   .filter(sections.id == cls.parent_id)
+                   .filter(~sections.is_deleted)
+                   .filter(sections.is_enabled)
+                   .exists())
+        return cls.is_enabled & ~cls.is_deleted & ((cls.parent_id == None) | query)  # noqa
 
     @return_ascii
     def __repr__(self):

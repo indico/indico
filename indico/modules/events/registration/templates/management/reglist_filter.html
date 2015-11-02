@@ -73,7 +73,7 @@
         {{ _render_column_selector(item, filter_choices, special_item=true) }}
     {% endfor %}
 
-    {% for section in regform.sections %}
+    {% for section in regform.sections if not section.is_deleted %}
         {{ _render_regform_item_col_selector(section) }}
     {% endfor %}
 

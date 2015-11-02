@@ -125,7 +125,8 @@ def _filter_registration(regform, query, filters):
     if not filters['fields'] and not filters['items']:
         return query
 
-    field_types = {f.id: f.field_impl for f in regform.form_items if not f.is_deleted and f.is_field}
+    field_types = {f.id: f.field_impl for f in regform.form_items
+                   if not f.is_deleted and not (f.parent_id is None or f.parent.is_deleted)}
     criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                         field_types[field_id].create_sql_filter(data_list))
                 for field_id, data_list in filters['fields'].iteritems()]
@@ -238,6 +239,7 @@ def _get_sorted_regform_items(regform, item_ids):
             .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
             .with_parent(regform)
             .join(RegistrationFormItem.parent, aliased=True)
+            .filter(~RegistrationFormItem.is_deleted)  # parent deleted
             .order_by(RegistrationFormItem.position)  # parent position
             .reset_joinpoint()
             .order_by(RegistrationFormItem.position)  # item position
