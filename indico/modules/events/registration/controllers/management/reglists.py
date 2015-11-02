@@ -605,6 +605,20 @@ class RHRegistrationToggleCheckIn(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
+class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
+    """Bulk apply check-in/not checked-in state to registrations"""
+
+    def _process(self):
+        check_in = request.form['check_in'] == '1'
+        msg = 'checked-in' if check_in else 'not checked-in'
+        for registration in self.registrations:
+            registration.checked_in = check_in
+            logger.info('Registration {} was marked as {} by {}'.format(registration, msg, session.user))
+        flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
+        registrations = _query_registrations(self.regform).all()
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations=registrations))
+
+
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
     """Accept/Reject selected registrations"""
 

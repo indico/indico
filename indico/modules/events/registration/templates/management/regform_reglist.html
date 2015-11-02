@@ -127,6 +127,29 @@
                         </li>
                     </ul>
                 {% endif %}
+                <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    {%- trans %}Check-in control{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
+                           data-method="POST"
+                           data-check-in="1"
+                           data-href="{{ url_for('.registrations_check_in', regform) }}">
+                            {%- trans %}Check-in{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
+                           data-href="{{ url_for('.registrations_check_in', regform) }}"
+                           data-method="POST"
+                           data-check-in="0"
+                           data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
+                           data-title="{% trans %}Reset check-in{% endtrans %}">
+                            {%- trans %}Reset check-in{% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
             </div>
             <div class="group right">
                 <a class="i-button icon-link js-static-url"

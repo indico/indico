@@ -139,7 +139,8 @@
                 method: $this.data('method'),
                 data: {
                     registration_id: selectedRows,
-                    approve: $this.data('approve')
+                    approve: $this.data('approve'),
+                    check_in: $this.data('check-in')
                 },
                 traditional: true,
                 complete: IndicoUI.Dialogs.Util.progress(),

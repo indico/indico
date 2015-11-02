@@ -69,7 +69,8 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationReject,
                                                                                 RHRegistrationsModifyStatus,
                                                                                 RHRegistrationsExportAttachments,
-                                                                                RHRegistrationToggleCheckIn)
+                                                                                RHRegistrationToggleCheckIn,
+                                                                                RHRegistrationBulkCheckIn)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -130,6 +131,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/badges',
                  'registrations_print_badges', RHRegistrationsPrintBadges, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status',
                  'registrations_modify_status', RHRegistrationsModifyStatus, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in',
+                 'registrations_check_in', RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments',
                  'registrations_attachments_export', RHRegistrationsExportAttachments, methods=('POST',))
 
