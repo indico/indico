@@ -4,10 +4,9 @@
     {% set filters = filters['items'] if special_item else filters['fields'] %}
     <div class="i-label reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
          data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
-        <span class="title {% if filter_choices %}icon-filter{% endif %}"
-              data-toggle="dropdown">
+        <a class="title {% if filter_choices %}icon-filter{% endif %}" data-toggle="dropdown">
             {{- item.title -}}
-        </span>
+        </a>
         {% if filter_choices %}
             <ul class="dropdown" style="display: none">
                 {% for value, caption in filter_choices.iteritems() %}

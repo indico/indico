@@ -1268,6 +1268,7 @@ textarea.regFormDescriptionInputMgmt {
                 text-overflow: ellipsis;
                 display: inline-block;
                 overflow: hidden;
+                color: $light-black;
 
                 &:before {
                     margin-right: 0.5em;
