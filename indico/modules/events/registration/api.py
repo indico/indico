@@ -20,18 +20,17 @@ from flask import request, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.modules.oauth import oauth
-from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.events.api import EventBaseHook
+from indico.modules.payment import event_settings as event_payment_settings
+from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.models.events import Event
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
 from indico.modules.events.registration.util import build_registrations_api_data, build_registration_api_data
-from indico.modules.events.registration.models.registrations import Registration
 from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 
-from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -93,25 +92,28 @@ class SetPaidHook(EventBaseHook):
 
     def _getParams(self):
         super(SetPaidHook, self)._getParams()
-        self.auth_key = get_query_parameter(self._queryParams, ["auth_key"])
-        self.is_paid = get_query_parameter(self._queryParams, ["is_paid"]) == "yes"
-        self._conf = ConferenceHolder().getById(self._pathParams['event'])
-        self._registrant = self._conf.getRegistrantById(self._pathParams["registrant_id"])
-        if not payment_event_settings.get(self._conf, 'enabled'):
+        self._is_paid = get_query_parameter(self._queryParams, ['is_paid']) == 'yes'
+        self._event = Event.find_one(id=self._pathParams['event'], is_deleted=False)
+        self._registration = self._event.registrations.filter_by(id=self._pathParams['registrant_id']).first_or_404()
+
+        if not is_feature_enabled(self._event, 'payment'):
             raise HTTPAPIError('E-payment is not enabled')
 
+        if not self._registration.price:
+            raise HTTPAPIError("This registration doesn't require user to pay")
+
     def _hasAccess(self, aw):
-        return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
+        return self._event.can_manage(aw.getUser(legacy=False), role='registration')
 
     def api_pay(self, aw):
-        action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
-        register_transaction(registrant=self._registrant,
-                             amount=self._registrant.getTotal(),
-                             currency=self._registrant.getCurrency(),
+        action = TransactionAction.complete if self._is_paid else TransactionAction.cancel
+        register_transaction(registration=self._registration,
+                             amount=float(self._registration.price),
+                             currency=event_payment_settings.get(self._event, 'currency'),
                              action=action)
         return {
-            "paid": self._registrant.getPayed(),
-            "amount_paid": self._registrant.getTotal()
+            'paid': self._registration.is_paid,
+            'amount_paid': self._registration.price
         }
 
 
