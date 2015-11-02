@@ -620,8 +620,11 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
             registration.checked_in = check_in
             logger.info('Registration {} was marked as {} by {}'.format(registration, msg, session.user))
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
-        registrations = _query_registrations(self.regform).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations=registrations))
+        reg_list_config = _get_reg_list_config(regform=self.regform)
+        registrations_query = _query_registrations(self.regform)
+        total_regs = registrations_query.count()
+        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs))
 
 
 class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
