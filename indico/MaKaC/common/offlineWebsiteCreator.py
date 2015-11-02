@@ -25,22 +25,25 @@ from bs4 import BeautifulSoup
 from werkzeug.utils import secure_filename
 
 from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.webinterface.pages.static import (WPStaticConferenceTimeTable, WPStaticConferenceProgram,
                                              WPStaticContributionList, WPStaticCustomPage, WPStaticAuthorIndex,
                                              WPStaticSpeakerIndex, WPStaticSessionDisplay, WPStaticContributionDisplay,
                                              WPStaticSubContributionDisplay, WPStaticAuthorDisplay,
-                                             WPTPLStaticConferenceDisplay, WPStaticConferenceDisplay)
+                                             WPTPLStaticConferenceDisplay, WPStaticConferenceDisplay,
+                                             WPStaticDisplayRegistrationParticipantList)
+from MaKaC.webinterface.rh.base import RH
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.common import timezoneUtils, HelperMaKaCInfo
-from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
-    ContribsToPDF
+from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, ContribsToPDF
 
 from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
+from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.util.string import remove_tags
 from indico.web.assets import ie_compatibility
 from indico.web.flask.util import url_for
@@ -308,6 +311,11 @@ class ConferenceOfflineCreator(OfflineEventCreator):
                WPStaticContributionList}
         for cls in wps:
             self._menu_offline_items[cls.menu_entry_name] = cls(self._rh, self._conf)
+        rhs = {RHParticipantList: WPStaticDisplayRegistrationParticipantList}
+        for rh_cls, wp in rhs.iteritems():
+            rh = rh_cls()
+            rh.view_class = wp
+            self._menu_offline_items[wp.menu_entry_name] = rh
 
     def _create_home(self):
         p = WPStaticConferenceDisplay(self._rh, self._conf)
@@ -345,10 +353,13 @@ class ConferenceOfflineCreator(OfflineEventCreator):
             # register something to be included in the static site
 
     def _get_builtin_page(self, entry):
-        wp = self._menu_offline_items.get(entry.name)
-        if wp:
-            content = wp.display()
-            self._addPage(content, wp.endpoint, self._conf)
+        obj = self._menu_offline_items.get(entry.name)
+        if isinstance(obj, WPBase):
+            content = obj.display()
+            self._addPage(content, obj.endpoint, self._conf)
+        elif isinstance(obj, RH):
+            obj._checkParams({'confId': self._conf.id})
+            self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
         if entry.name == 'abstracts_book':
             self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
         if entry.name == 'program':

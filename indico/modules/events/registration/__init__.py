@@ -118,7 +118,7 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
                         visible=_visible_registration)
     yield MenuEntryData(_('Participant List'), 'participants', 'event_registration.participant_list', position=11,
-                        visible=_visible_participant_list)
+                        visible=_visible_participant_list, static_site=True)
 
 
 @signals.users.registered.connect

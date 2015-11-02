@@ -91,6 +91,8 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 class RHParticipantList(RHRegistrationFormDisplayBase):
     """List of all public registrations"""
 
+    view_class = WPDisplayRegistrationParticipantList
+
     def _process(self):
         regforms = RegistrationForm.find_all(RegistrationForm.publish_registrations_enabled,
                                              event_id=int(self.event.id))
@@ -103,7 +105,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
         registrations = [(reg.get_full_name(), reg.get_personal_data().get('affiliation'))
                          for reg in query]
-        return WPDisplayRegistrationParticipantList.render_template(
+        return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
             event=self.event,

@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
 from indico.modules.events.layout.views import WPPage
+from indico.modules.events.registration.views import WPDisplayRegistrationParticipantList
 from MaKaC.webinterface.pages.conferences import (WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable,
                                                   WPConferenceProgram, WPContributionList, WPAuthorIndex,
                                                   WPSpeakerIndex)
@@ -63,6 +63,10 @@ class WPStaticConferenceTimeTable(WPStaticEventBase, WPConferenceTimeTable):
 
 class WPStaticConferenceProgram(WPStaticEventBase, WPConferenceProgram):
     endpoint = 'event.conferenceProgram'
+
+
+class WPStaticDisplayRegistrationParticipantList(WPStaticEventBase, WPDisplayRegistrationParticipantList):
+    endpoint = 'event_registration.participant_list'
 
 
 class WPStaticContributionList(WPStaticEventBase, WPContributionList):

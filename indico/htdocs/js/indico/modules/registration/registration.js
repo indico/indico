@@ -46,12 +46,6 @@
         $('.js-highlight-payment').on('click', function() {
             $('#payment-summary').effect('highlight', 800);
         });
-
-        $('.registrations .tablesorter').tablesorter({
-            cssAsc: 'header-sort-asc',
-            cssDesc: 'header-sort-desc',
-            headerTemplate: ''
-        });
     }
 
     global.setupRegistrationFormListPage = function setupRegistrationFormListPage() {
