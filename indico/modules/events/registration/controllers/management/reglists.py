@@ -243,7 +243,7 @@ def _get_sorted_regform_items(regform, item_ids):
             .all())
 
 
-def _render_registration_list(regform, registrations, total_registrations=None):
+def _render_registration_list(regform, registrations, total_registrations):
     reg_list_config = _get_reg_list_config(regform=regform)
     item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
     basic_columns = _get_basic_columns(regform, basic_item_ids)
@@ -613,8 +613,11 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         for registration in self.registrations:
             _modify_registration_status(registration, approve)
         flash(_("The status of the selected registrations was updated successfully."), 'success')
-        registrations = _query_registrations(self.regform).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations=registrations))
+        reg_list_config = _get_reg_list_config(regform=self.regform)
+        registrations_query = _query_registrations(self.regform)
+        total_regs = registrations_query.count()
+        registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs))
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase):
