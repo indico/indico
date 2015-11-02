@@ -21,7 +21,6 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError, NumberRange
 
 from indico.modules.payment import settings
-from indico.modules.payment.util import get_active_payment_plugins
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
@@ -64,26 +63,8 @@ class AdminSettingsForm(IndicoForm):
 
 
 class EventSettingsForm(IndicoForm):
-    currency = SelectField(_('Currency'), [DataRequired()])
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
 
     def __init__(self, *args, **kwargs):
         self._event = kwargs.pop('event')
         super(EventSettingsForm, self).__init__(*args, **kwargs)
-        self._set_currencies()
-
-    def _set_currencies(self):
-        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in settings.get('currencies')]
-        # In case the event's currency was deleted, we keep it here anyway.
-        event_currency = self.currency.object_data
-        if event_currency and not any(x[0] == event_currency for x in currencies):
-            currencies.append((event_currency, event_currency))
-        self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
-
-    def validate_currency(self, field):
-        for plugin in get_active_payment_plugins(self._event).itervalues():
-            if plugin.valid_currencies is None:
-                continue
-            if field.data not in plugin.valid_currencies:
-                raise ValidationError(_("The currency is not supported by the payment method '{}'. "
-                                        "Please disable it first.").format(plugin.title))

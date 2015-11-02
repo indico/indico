@@ -141,6 +141,11 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=0
     )
+    #: Currency for prices in the registration form
+    currency = db.Column(
+        db.String,
+        nullable=False
+    )
     #: Notifications sender address
     notification_sender_address = db.Column(
         db.String,

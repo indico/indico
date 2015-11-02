@@ -27,6 +27,7 @@ from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.payment import settings as payment_global_settings
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
@@ -43,10 +44,11 @@ def _check_if_payment_required(form, field):
 
 
 class RegistrationFormForm(IndicoForm):
+    _price_fields = ('currency', 'base_price')
     _registrant_notification_fields = ('notification_sender_address',
                                        'message_pending', 'message_unpaid', 'message_complete')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
-    _notifications_fields = _registrant_notification_fields + _manager_notification_fields
+    _special_fields = _price_fields + _registrant_notification_fields + _manager_notification_fields
 
     title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration form"))
     introduction = TextAreaField(_("Introduction"),
@@ -73,6 +75,7 @@ class RegistrationFormForm(IndicoForm):
                               filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_("A fixed fee all users have to pay when registering."))
+    currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
     message_pending = TextAreaField(_("Message for pending registrations"),
@@ -91,10 +94,15 @@ class RegistrationFormForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(IndicoForm, self).__init__(*args, **kwargs)
+        self._set_currencies()
         default_sender_address = Config.getInstance().getNoReplyEmail()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
                                                          'then {0} is used.'.format(default_sender_address))
+
+    def _set_currencies(self):
+        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_global_settings.get('currencies')]
+        self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
 
 class RegistrationFormScheduleForm(IndicoForm):

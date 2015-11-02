@@ -35,7 +35,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
-from indico.modules.payment import event_settings as event_payment_settings
 from indico.modules.payment.models.transactions import TransactionStatus
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
@@ -139,6 +138,11 @@ class Registration(db.Model):
         db.Numeric(8, 2),  # max. 999999.99
         nullable=False,
         default=0
+    )
+    #: Registration price currency
+    currency = db.Column(
+        db.String,
+        nullable=False
     )
     #: The date/time when the registration was recorded
     submitted_dt = db.Column(

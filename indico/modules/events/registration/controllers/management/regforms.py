@@ -29,7 +29,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
 from indico.modules.events.registration.views import WPManageRegistration, WPManageParticipants
-from indico.modules.payment import event_settings
+from indico.modules.payment import settings as payment_global_settings
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -61,7 +61,8 @@ class RHManageParticipants(RHManageRegFormsBase):
         regform = self.event_new.participation_regform
         set_feature_enabled(self.event, 'registration', True)
         if not regform:
-            regform = RegistrationForm(event_new=self.event_new, title="Participants", is_participation=True)
+            regform = RegistrationForm(event_new=self.event_new, title="Participants", is_participation=True,
+                                       currency=payment_global_settings.get('currency'))
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()
@@ -84,7 +85,6 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     def _process(self):
         form = RegistrationFormForm(event=self.event,
                                     publish_registrations_enabled=(self.event.getType() != 'conference'))
-
         if form.validate_on_submit():
             regform = RegistrationForm(event_new=self.event_new)
             create_personal_data_fields(regform)
