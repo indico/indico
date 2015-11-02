@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import json
 import os
+from collections import OrderedDict
 from copy import deepcopy
 from io import BytesIO
 from tempfile import NamedTemporaryFile
@@ -67,33 +68,33 @@ from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 PERSONAL_COLUMNS = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'address', 'phone', 'column')
 SPECIAL_COLUMNS = ('reg_date', 'price', 'state', 'checked_in', 'checked_in_date')
 
-SPECIAL_COLUMN_LABELS = {
-    'reg_date': {
+SPECIAL_COLUMN_LABELS = OrderedDict([
+    ('reg_date', {
         'title': _('Registation Date'),
         'id': 'reg_date'
-    },
-    'price': {
+    }),
+    ('price', {
         'title': _('Price'),
         'id': 'price'
-    },
-    'state': {
+    }),
+    ('state', {
         'title': _('State'),
         'id': 'state',
         'filter_choices': {str(state.value): state.title for state in RegistrationState}
-    },
-    'checked_in': {
+    }),
+    ('checked_in', {
         'title': _('Checked in'),
         'id': 'checked_in',
         'filter_choices': {
             '0': _('No'),
             '1': _('Yes')
         }
-    },
-    'checked_in_date': {
+    }),
+    ('checked_in_date', {
         'title': _('Check-in date'),
         'id': 'checked_in_date'
-    }
-}
+    })
+])
 
 DEFAULT_REPORT_CONFIG = {
     'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
