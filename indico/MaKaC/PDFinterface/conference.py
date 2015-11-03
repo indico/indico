@@ -1761,10 +1761,16 @@ class RegistrantsListToBadgesPDF:
         self.__marginColumns = marginColumns
         self.__marginRows = marginRows
         if registrantList == 'all':
-            self.__registrantList = Registration.find(~Registration.is_deleted, Registration.event_id == conf.id).all()
+            self.__registrantList = (Registration
+                                     .find(Registration.is_active, Registration.event_id == conf.id)
+                                     .order_by(*Registration.order_by_name)
+                                     .all())
         else:
-            self.__registrantList = (Registration.find(Registration.id.in_(registrantList), ~Registration.is_deleted,
-                                                       Registration.event_id == conf.id).all())
+            self.__registrantList = (Registration
+                                     .find(Registration.id.in_(registrantList), Registration.is_active,
+                                           Registration.event_id == conf.id)
+                                     .order_by(*Registration.order_by_name)
+                                     .all())
 
         self.__size = PDFSizes().PDFpagesizes[pagesize]
         if printLandscape:
