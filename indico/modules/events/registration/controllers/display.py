@@ -103,14 +103,16 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                        ~Registration.is_deleted,
                        _join=Registration.registration_form)
                  .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
-        registrations = [(reg.get_full_name(), reg.get_personal_data().get('affiliation'))
+        registrations = [(reg.get_full_name(), reg.get_personal_data().get('title'),
+                         reg.get_personal_data().get('affiliation'))
                          for reg in query]
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
             event=self.event,
             regforms=regforms,
-            show_affiliation=any(x[1] for x in registrations),
+            show_title=any(x[1] for x in registrations),
+            show_affiliation=any(x[2] for x in registrations),
             registrations=registrations
         )
 

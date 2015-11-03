@@ -23,9 +23,14 @@
                 </tr>
             </thead>
             <tbody>
-                {% for name, affiliation in registrations %}
+                {% for name, title, affiliation in registrations %}
                     <tr class="i-table">
-                        <td class="i-table">{{ name }}</td>
+                        <td class="i-table" data-text="{{ name }}">
+                            {% if show_title %}
+                                {{ title }}
+                            {% endif %}
+                            {{ name }}
+                        </td>
                         {% if show_affiliation %}
                             <td class="i-table">{{ affiliation or '' }}</td>
                         {% endif %}
