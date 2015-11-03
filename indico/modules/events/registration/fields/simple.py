@@ -31,6 +31,7 @@ from wtforms.validators import NumberRange, ValidationError, InputRequired
 from indico.core.db import db
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date, iterdays, strftime_all_years
 from indico.util.fs import secure_filename
@@ -579,38 +580,60 @@ class MultiChoiceField(ChoiceBaseField):
         return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
-        # TODO: create new data version here if an item from old_data's version
-        # was already chosen but doesn't exist anymore (or has a new price) and
-        # the user also selected a new item that doesn't exist in the current
-        # version yet.
 
         # always store no-option as empty dict
         if value is None:
             value = {}
+
+        return_value = {}
+
+        if old_data:
+            old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
+            new_choices_mapping = {x['id']: x for x in self.form_item.versioned_data['choices']}
+            revoked_selected_choice_ids = {}
+            selected_new_option_exists = False
+
+            # if an item from old_data's version was already chosen but doesn't exist anymore
+            revoked_selected_choice_ids = value.viewkeys() - new_choices_mapping.viewkeys()
+            # and the user also selected a new item that doesn't exist in the current version yet
+            selected_new_option_exists = value.viewkeys() > old_choices_mapping.viewkeys()
+
+            if selected_new_option_exists and revoked_selected_choice_ids:
+                # Creating a new data version
+                new_data_version = deepcopy(self.form_item.current_version.versioned_data)
+                for choice_id in revoked_selected_choice_ids:
+                    revoked_selected_choice = old_choices_mapping[choice_id]
+                    new_data_version['choices'].append(revoked_selected_choice)
+                data_version = RegistrationFormFieldData(field=self.form_item, versioned_data=new_data_version)
+                return_value['field_data'] = data_version
+            else:
+                return_value['field_data'] = old_data.field_data
+
         if not billable_items_locked:
-            return super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
+            processed_data = super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
+            return {key: return_value.get(key, value) for key, value in processed_data.iteritems()}
         if old_data.data == value:
             # nothing changed
             # XXX: should we ignore slot changes if extra slots don't pay?
             # probably that needs a js update to keep the slots choice
             # enabled even if the item is paid...
-            return {}
+            return return_value
         # XXX: This code still relies on the client sending data for the disabled fields.
         # This is pretty ugly but especially in case of non-billable extra slots it makes
         # sense to keep it like this.  If someone tampers with the list of billable fields
         # we detect it any reject the change to the field's data anyway.
-        old_choices = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
-        new_choices = {x['id']: x for x in self.form_item.versioned_data['choices']}
-        old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
-                        if old_choices[uuid]['is_billable'] and old_choices[uuid]['price']}
-        new_billable = {uuid: num for uuid, num in value.iteritems()
-                        if new_choices[uuid]['is_billable'] and new_choices[uuid]['price']}
-        if old_billable != new_billable:
+        if old_data:
+            old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
+                            if old_choices_mapping[uuid]['is_billable'] and old_choices_mapping[uuid]['price']}
+            new_billable = {uuid: num for uuid, num in value.iteritems()
+                            if new_choices_mapping[uuid]['is_billable'] and new_choices_mapping[uuid]['price']}
+        if old_data and old_billable != new_billable:
             # preserve existing data
-            return {}
+            return return_value
         else:
             # nothing price-related changed
             # TODO: check item prices (in case there's a change between old/new version)
             # for now we simply ignore field changes in this case (since the old/new price
             # check in the base method will fail)
-            return super(MultiChoiceField, self).process_form_data(registration, value, old_data, True)
+            processed_data = super(MultiChoiceField, self).process_form_data(registration, value, old_data, True)
+            return {key: return_value.get(key, value) for key, value in processed_data.iteritems()}
