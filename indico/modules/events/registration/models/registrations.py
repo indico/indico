@@ -37,6 +37,7 @@ from indico.core.storage import StoredFileMixin
 from indico.modules.payment import event_settings as event_payment_settings
 from indico.modules.payment.models.transactions import TransactionStatus
 from indico.util.date_time import now_utc
+from indico.util.decorators import classproperty
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr, format_full_name
@@ -337,6 +338,11 @@ class Registration(db.Model):
     @property
     def has_files(self):
         return any(item.storage_file_id is not None for item in self.data)
+
+    @classproperty
+    @classmethod
+    def order_by_name(cls):
+        return db.func.lower(cls.last_name), db.func.lower(cls.first_name), cls.friendly_id
 
     @return_ascii
     def __repr__(self):
