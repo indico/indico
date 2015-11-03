@@ -246,14 +246,15 @@ def _get_sorted_regform_items(regform, item_ids):
             .all())
 
 
-def _render_registration_list(regform, registrations, total_registrations):
+def _render_registration_list(regform, registrations):
     reg_list_config = _get_reg_list_config(regform=regform)
     item_ids, basic_item_ids = _split_column_ids(reg_list_config['items'])
     basic_columns = _get_basic_columns(regform, basic_item_ids)
     regform_items = _get_sorted_regform_items(regform, item_ids)
+    total_regs = _query_registrations(regform).count()
     tpl = get_template_module('events/registration/management/_reglist.html')
     reglist = tpl.render_registration_list(registrations=registrations, visible_cols_regform_items=regform_items,
-                                           basic_columns=basic_columns, total_registrations=total_registrations)
+                                           basic_columns=basic_columns, total_registrations=total_regs)
     return reglist
 
 
@@ -341,7 +342,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         total_regs = registrations_query.count()
         registrations = _filter_registration(self.regform, registrations_query, filters).all()
 
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs),
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations),
                             filtering_enabled=total_regs != len(registrations))
 
 
@@ -639,9 +640,8 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
         flash(_("The status of the selected registrations was updated successfully."), 'success')
         reg_list_config = _get_reg_list_config(regform=self.regform)
         registrations_query = _query_registrations(self.regform)
-        total_regs = registrations_query.count()
         registrations = _filter_registration(self.regform, registrations_query, reg_list_config['filters']).all()
-        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations, total_regs))
+        return jsonify_data(registration_list=_render_registration_list(self.regform, registrations))
 
 
 class RHRegistrationsExportAttachments(RHRegistrationsExportBase):
