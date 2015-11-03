@@ -52,6 +52,6 @@
     </div>
 
     {% if regform.introduction %}
-        {{ message_box('info', regform.introduction) }}
+        {{ message_box('info', regform.introduction | markdown) }}
     {% endif %}
 {% endmacro %}
