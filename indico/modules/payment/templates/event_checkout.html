@@ -8,7 +8,7 @@
 {% block content %}
     <div class="info-message-box">
         <div class="message-text">
-            You need to pay {{ format_currency(amount, currency, locale=session.lang) }} for your registration.
+            You need to pay {{ registration.render_price() }} for your registration.
             {% if force_plugin %}
                 You can pay using <strong>{{ force_plugin[1].get_method_name(event) }}</strong>.
             {% else %}

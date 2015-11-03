@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from babel.numbers import format_currency
+from flask import session
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -356,6 +358,9 @@ class RegistrationForm(db.Model):
             return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(Registration.is_active).first()
         if email:
             return Registration.query.with_parent(self).filter_by(email=email).filter(Registration.is_active).first()
+
+    def render_base_price(self):
+        return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
 
     def unschedule(self):
         self.start_dt = None

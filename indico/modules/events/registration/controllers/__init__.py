@@ -21,7 +21,6 @@ from sqlalchemy.orm import defaultload
 
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import modify_registration, get_event_section_data, make_registration_form
-from indico.modules.payment import event_settings as payment_event_settings
 from indico.util.string import camelize_keys
 
 
@@ -67,7 +66,6 @@ class RegistrationEditMixin:
 
         return self.view_class.render_template(self.template_file, self.event, event=self.event,
                                                sections=section_data, regform=self.regform,
-                                               currency=payment_event_settings.get(self.event, 'currency'),
                                                registration_data=registration_data,
                                                registration_metadata=registration_metadata,
                                                registration=self.registration)

@@ -12,7 +12,7 @@
             conf-id="{{ event.id }}"
             conf-form-id="{{ regform.id }}"
             conf-sections="{{ sections | tojson | forceescape }}"
-            conf-currency="{{ currency }}"
+            conf-currency="{{ regform.currency }}"
             event-start-date="{{ event.as_legacy.startDate }}"
             event-end-date="{{ event.as_legacy.endDate }}"
             edit-mode="true"></div>

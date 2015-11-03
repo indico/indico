@@ -17,7 +17,6 @@
 from flask import render_template
 
 from indico.core.notifications import email_sender, make_email
-from indico.modules.payment import event_settings as payment_event_settings
 
 
 @email_sender
@@ -29,9 +28,8 @@ def notify_double_payment(registration):
 
 
 @email_sender
-def notify_amount_inconsistency(registration, amount):
+def notify_amount_inconsistency(registration, amount, currency):
     event = registration.registration_form.event
-    currency = payment_event_settings.get(event, 'currency')
     to = event.as_event.creator.email
     body = render_template('payment/emails/payment_inconsistency_email_to_manager.txt',
                            event=event, registration=registration, amount=amount, currency=currency)

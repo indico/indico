@@ -21,7 +21,7 @@
 
 
 {% block content %}
-    {{ render_regform_info(regform, currency) }}
+    {{ render_regform_info(regform) }}
 
     {% if invitation %}
         {{ render_invitation_info(invitation) }}
@@ -85,7 +85,7 @@
             <div nd-reg-form
                 conf-id="{{ event.id }}"
                 conf-sections="{{ sections | tojson | forceescape }}"
-                conf-currency="{{ currency }}"
+                conf-currency="{{ regform.currency }}"
                 user-info="{{ user_data | tojson | forceescape }}"
                 post-url="{{ request.url | tojson | forceescape }}"
                 check-email-url="{{ url_for('.check_email', regform, management=management) | tojson | forceescape }}">

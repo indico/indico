@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_regform_info(regform, currency) %}
+{% macro render_regform_info(regform) %}
     <div class="infogrid condensed">
         {% if regform.is_scheduled %}
             <div class="infoline date">
@@ -36,7 +36,7 @@
                     <div class="label">
                         {% trans %}Registration fee{% endtrans %}
                     </div>
-                    <div>{{ regform.base_price }} {{ currency }}</div>
+                    <div>{{ regform.render_base_price() }}</div>
                 </div>
             </div>
         {%- endif %}

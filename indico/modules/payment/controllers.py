@@ -171,14 +171,12 @@ class RHPaymentCheckout(RHPaymentBase):
         if self.registration.state != RegistrationState.unpaid:
             flash(_("The registration doesn't need to be paid"), 'error')
             return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
-        currency = event_settings.get(self.event, 'currency')
         plugins = get_active_payment_plugins(self.event)
         force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', self.event, event=self.event,
                                               registration=self.registration,
                                               regform=self.registration.registration_form,
-                                              plugins=plugins.items(), force_plugin=force_plugin,
-                                              amount=self.registration.price, currency=currency)
+                                              plugins=plugins.items(), force_plugin=force_plugin)
 
 
 class RHPaymentForm(RHPaymentBase):

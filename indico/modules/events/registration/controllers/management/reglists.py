@@ -50,7 +50,6 @@ from indico.modules.events.registration.notifications import notify_registration
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_csv_from_registrations)
-from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
 from indico.modules.users import User
@@ -502,7 +501,6 @@ class RHRegistrationCreate(RHManageRegFormBase):
         user_data = {t.name: getattr(self.user, t.name, None) if self.user else '' for t in PersonalDataType}
         return WPManageRegistration.render_template('display/regform_display.html', self.event, event=self.event,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
-                                                    currency=payment_event_settings.get(self.event, 'currency'),
                                                     post_url=url_for('.create_registration', self.regform),
                                                     user_data=user_data, management=True)
 
@@ -574,8 +572,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
     def _process(self):
         pay = request.form.get('pay') == '1'
         if pay != self.registration.is_paid:
-            event = self.registration.registration_form.event
-            currency = payment_event_settings.get(event, 'currency') if pay else self.registration.transaction.currency
+            currency = self.registration.currency if pay else self.registration.transaction.currency
             amount = self.registration.price if pay else self.registration.transaction.amount
             action = TransactionAction.complete if pay else TransactionAction.cancel
             register_transaction(registration=self.registration,

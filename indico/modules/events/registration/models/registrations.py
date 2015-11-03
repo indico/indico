@@ -402,8 +402,7 @@ class Registration(db.Model):
         return personal_data
 
     def _render_price(self, price):
-        currency = event_payment_settings.get(self.registration_form.event, 'currency', '')
-        return format_currency(price, currency, locale=session.lang or 'en_GB')
+        return format_currency(price, self.currency, locale=session.lang or 'en_GB')
 
     def render_price(self):
         return self._render_price(self.price)
@@ -578,8 +577,7 @@ class RegistrationData(StoredFileMixin, db.Model):
         return Config.getInstance().getAttachmentStorage(), path
 
     def render_price(self):
-        currency = event_payment_settings.get(self.registration.registration_form.event, 'currency', '')
-        return format_currency(self.price, currency, locale=session.lang or 'en_GB')
+        return format_currency(self.price, self.registration.currency, locale=session.lang or 'en_GB')
 
 
 @listens_for(mapper, 'after_configured', once=True)

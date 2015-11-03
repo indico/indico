@@ -114,14 +114,13 @@ class PaymentPluginMixin(object):
 
         :param registration: a :class:`Registration` object
         """
-        from indico.modules.payment import event_settings as event_payment_settings
         event = registration.registration_form.event
         settings = self.settings.get_all()
         event_settings = self.event_settings.get_all(event)
         data = {'event': registration.registration_form.event,
                 'registration': registration,
                 'amount': registration.price,
-                'currency': event_payment_settings.get(event, 'currency'),
+                'currency': registration.currency,
                 'settings': settings,
                 'event_settings': event_settings}
         self.adjust_payment_form_data(data)
