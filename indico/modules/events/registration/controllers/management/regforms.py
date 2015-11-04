@@ -181,3 +181,11 @@ class RHRegistrationFormModify(RHManageRegFormBase):
                                                     sections=get_event_section_data(self.regform, management=True),
                                                     regform=self.regform,
                                                     currency=event_settings.get(self.event, 'currency'))
+
+
+class RHRegistrationFormUnschedule(RHManageRegFormBase):
+    """Reset the form start and end date"""
+
+    def _process(self):
+        self.regform.unschedule()
+        return redirect(url_for('.manage_regform', self.regform))

@@ -351,3 +351,7 @@ class RegistrationForm(db.Model):
             return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(Registration.is_active).first()
         if email:
             return Registration.query.with_parent(self).filter_by(email=email).filter(Registration.is_active).first()
+
+    def unschedule(self):
+        self.start_dt = None
+        self.end_dt = None
