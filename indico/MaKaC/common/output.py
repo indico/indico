@@ -309,9 +309,6 @@ class outputGenerator(object):
 
         out.writeTag("description",conf.getDescription())
 
-        if conf.getParticipation().displayParticipantList() :
-            out.writeTag("participants",conf.getParticipation().getPresentParticipantListText())
-
         out.writeTag("closed", str(conf.isClosed()))
 
         if conf.getLocationList()!=[] or conf.getRoom():

@@ -78,10 +78,6 @@ ${ prettyDate(conf.getAdjustedStartDate()) }
     Description: ${conf.getDescription()}<br/>
 % endif
 
-% if conf.getParticipation().displayParticipantList() and conf.getParticipation().getParticipantList():
-    Participants: ${ conf.getParticipation().getPresentParticipantListText() }<br/>
-% endif
-
 % for index, item in enumerate(entries):
 
     <%

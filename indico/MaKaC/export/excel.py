@@ -316,37 +316,6 @@ class AbstractListToExcel:
             excelGen.newLine()
         return excelGen.getExcelContent()
 
-class ParticipantsListToExcel:
-
-    def __init__(self, conf,list=None, excelSpecific=True):
-        self._conf = conf
-        self._partList = list
-        self._excelSpecific = excelSpecific
-
-    def getExcelFile(self):
-        excelGen=ExcelGenerator()
-        excelGen.addValue("Name")
-        excelGen.addValue("Email")
-        excelGen.addValue("Affiliation")
-        excelGen.addValue("Address")
-        excelGen.addNumberAsString("Phone", self._excelSpecific)
-        excelGen.addNumberAsString("Fax", self._excelSpecific)
-        excelGen.newLine()
-
-        if self._partList == None:
-            self._partList = self._conf.getParticipation().getParticipantList()
-
-        for reg in self._partList:
-            excelGen.addValue(reg.getFullName())
-            excelGen.addValue(reg.getEmail())
-            excelGen.addValue(reg.getAffiliation())
-            excelGen.addValue(reg.getAddress())
-            excelGen.addNumberAsString(reg.getTelephone(), self._excelSpecific)
-            excelGen.addNumberAsString(reg.getFax(), self._excelSpecific)
-            excelGen.newLine()
-        return excelGen.getExcelContent()
-
-
 
 class ContributionsListToExcel:
 

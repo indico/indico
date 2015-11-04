@@ -557,9 +557,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         wvars['endDate'] = conf.getAdjustedEndDate(tz)
         wvars['timezone'] = tz
 
-        if conf.getParticipation().displayParticipantList() :
-            wvars['participants']  = conf.getParticipation().getPresentParticipantListText()
-
         attached_items = conf.attached_items
 
         lectures, folders = [], []

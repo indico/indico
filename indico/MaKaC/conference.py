@@ -87,7 +87,6 @@ from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.participant import Participation
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.common import mail
@@ -103,10 +102,9 @@ from indico.core import signals
 from indico.core.db import DBMgr, db
 from indico.core.db.event import SupportInfo
 from indico.core.db.sqlalchemy.principals import PrincipalType
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.config import Config
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
-from indico.modules.events.logs import EventLogEntry, EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_attached_items
@@ -1761,7 +1759,6 @@ class Conference(CommonObjectBase, Locatable):
         self._visibility = 999
         self._pendingQueuesMgr=pendingQueues.ConfPendingQueuesMgr(self)
         self._sections = []
-        self._participation = Participation(self)
         self._reportNumberHolder=ReportNumberHolder(self)
         self._enableSessionSlots = False
         self._enableSessions = False
@@ -1920,14 +1917,6 @@ class Conference(CommonObjectBase, Locatable):
         return self.as_event.reservations.options(noload('created_by_user'), noload('booked_for_user')).all()
 
     # ========================================================================
-
-    def getParticipation(self):
-        try :
-            if self._participation :
-                pass
-        except AttributeError :
-            self._participation = Participation(self)
-        return self._participation
 
     def getType( self ):
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
