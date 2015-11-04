@@ -8,15 +8,17 @@
                 ng-model="checkboxValue"
                 ng-required="field.isRequired">
             <div>
-                <label for="field-{{ section.id }}-{{ field.id }}"
-                    ng-bind-html="field.title"></label>
+                <label for="field-{{ section.id }}-{{ field.id }}">
+                    {{ field.title }}
+                </label>
                 <span ng-show="field.isRequired" class="regFormMandatoryField">*</span>
                 <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
                     {{ 'must be checked' | i18n }}
                 </span>
                 <br>
-                <small class="field-description"
-                    ng-bind-html="field.description"></small>
+                <small class="field-description">
+                    {{ field.description }}
+                </small>
             </div>
         </div>
     </ng-form>

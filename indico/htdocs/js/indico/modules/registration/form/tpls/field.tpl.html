@@ -6,17 +6,17 @@
             <td ng-if="editMode" class="field-sortable-handle"/>
             <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
-                    <label for="field-{{ section.id }}-{{ field.id }}"
-                        ng-bind-html="field.title"></label>
+                    <label for="field-{{ section.id }}-{{ field.id }}">
+                        {{ field.title }}
+                    </label>
                     <span ng-show="field.isRequired" class="regFormMandatoryField">*</span>
                 </div>
             </td>
 
             <td ng-if="!settings.singleColumn">
                 <div ng-include="tplInput" class="field-input"></div>
-                <div ng-if="field.description"
-                    class="field-description"
-                    ng-bind-html="field.description">
+                <div ng-if="field.description" class="field-description">
+                    {{ field.description }}
                 </div>
             </td>
             <td ng-if="settings.singleColumn" ng-include="tplInput" class="field-input" colspan="2"></td>

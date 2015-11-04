@@ -5,11 +5,12 @@
             <tr ng-switch-default>
                 <td>
                     <div>
-                        <div class="i-box-title"
-                            ng-bind-html="section.title"></div>
-                        <div ng-if="section.description"
-                            class="i-box-description"
-                            ng-bind-html="section.description"></div>
+                        <div class="i-box-title">
+                            {{ section.title }}
+                        </div>
+                        <div ng-if="section.description" class="i-box-description">
+                            {{ section.description }}
+                        </div>
                     </div>
                 </td>
             </tr>

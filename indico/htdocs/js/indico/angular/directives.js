@@ -178,7 +178,7 @@ ndDirectives.directive("contenteditable", function() {
                     .replace(/^(( )*(<br>))*/, '')
                     .replace(/(( )*(<br>)( )*)*$/, '');
 
-                elem.html(sanitized);
+                elem.text(_.unescape(sanitized));
             };
 
             var updateHtml = function() {
@@ -186,7 +186,7 @@ ndDirectives.directive("contenteditable", function() {
                     elem.html(attrs.placeholder);
                     elem.addClass('empty');
                 } else {
-                    elem.html(_.unescape(ctrl.$viewValue));
+                    elem.text(_.unescape(ctrl.$viewValue));
                 }
             };
 
@@ -210,7 +210,7 @@ ndDirectives.directive("contenteditable", function() {
                     }
 
                     if (!scope.edition) {
-                        elem.text(elem.html());
+                        elem.text(elem.text());
                     }
 
                     scope.edition = true;
