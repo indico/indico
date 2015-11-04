@@ -390,7 +390,7 @@ class Registration(db.Model):
 
     def render_price(self):
         currency = event_payment_settings.get(self.registration_form.event, 'currency')
-        return format_currency(self.price, currency, locale=session.lang)
+        return format_currency(self.price, currency, locale=session.lang or 'en_GB')
 
     def sync_state(self, _skip_moderation=True):
         """Sync the state of the registration"""
@@ -557,7 +557,7 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     def render_price(self):
         currency = event_payment_settings.get(self.registration.registration_form.event, 'currency')
-        return '{} {}'.format(self.price, currency)
+        return format_currency(self.price, currency, locale=session.lang or 'en_GB')
 
 
 @listens_for(mapper, 'after_configured', once=True)
