@@ -27,6 +27,15 @@
             {% endif %}
         </a>
     </div>
+    {% if survey.start_dt %}
+        <div class="group">
+            <a href="#" class="i-button" data-method="POST" data-href="{{ url_for('.unschedule_survey', survey) }}"
+               data-title="{% trans %}Unschedule survey{% endtrans %}"
+               data-confirm="{% trans %}Unscheduling will close the current survey. Are you sure you want to proceed?{% endtrans %}">
+                {% trans %}Unschedule{% endtrans %}
+            </a>
+        </div>
+    {% endif %}
     <div class="group">
         <a href="#" data-href="{{ url_for('.open_survey', survey) }}" data-method="POST" class="i-button highlight"
            {% if survey.notifications_enabled %}
