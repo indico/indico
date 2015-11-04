@@ -22,6 +22,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from uuid import uuid4
 
+from babel.numbers import format_currency
 from flask import has_request_context, session, request
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
@@ -389,7 +390,7 @@ class Registration(db.Model):
 
     def render_price(self):
         currency = event_payment_settings.get(self.registration_form.event, 'currency')
-        return '{} {}'.format(self.price, currency)
+        return format_currency(self.price, currency, locale=session.lang)
 
     def sync_state(self, _skip_moderation=True):
         """Sync the state of the registration"""

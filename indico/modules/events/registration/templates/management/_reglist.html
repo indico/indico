@@ -54,7 +54,7 @@
                                     {% elif item.id == 'state' %}
                                         <td class="i-table">{{ registration.state.title }}</td>
                                     {% elif item.id == 'price' %}
-                                        <td class="i-table">{{ registration.render_price() }}</td>
+                                        <td class="i-table" data-text="{{ registration.price }}">{{ registration.render_price() }}</td>
                                     {% elif item.id == 'checked_in' %}
                                         <td class="i-table">
                                             {% if registration.checked_in %}
