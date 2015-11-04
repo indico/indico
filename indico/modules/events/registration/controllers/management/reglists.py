@@ -121,12 +121,11 @@ def _get_filters_from_request(regform):
 
 
 def _filter_registration(regform, query, filters):
-    # if not filters:
     if not filters['fields'] and not filters['items']:
         return query
 
     field_types = {f.id: f.field_impl for f in regform.form_items
-                   if not f.is_deleted and not (f.parent_id is None or f.parent.is_deleted)}
+                   if f.is_field and not f.is_deleted and (f.parent_id is None or not f.parent.is_deleted)}
     criteria = [db.and_(RegistrationFormFieldData.field_id == field_id,
                         field_types[field_id].create_sql_filter(data_list))
                 for field_id, data_list in filters['fields'].iteritems()]
