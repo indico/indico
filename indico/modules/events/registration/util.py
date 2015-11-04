@@ -332,6 +332,27 @@ def get_registrations_with_tickets(user, event):
                              _join=Registration.registration_form).all()
 
 
+def get_unique_published_registrations(event):
+    """Get a list of unique published registrations for an event.
+
+    Uniqueness is determined by associated user, so if someone has
+    registered in more than one registration form in the event, they
+    will be included only once.
+
+    :param event: The Event to get registrations for
+    """
+    registrations = Registration.find_all(Registration.is_active,
+                                          ~RegistrationForm.is_deleted,
+                                          RegistrationForm.event_id == event.id,
+                                          RegistrationForm.publish_registrations_enabled,
+                                          _join=Registration.registration_form)
+
+    linked_participants = {reg.user_id: reg for reg in registrations if reg.user_id is not None}
+    non_linked_participants = {reg for reg in registrations if reg.user_id is None}
+    return sorted(set(linked_participants.viewvalues()) | non_linked_participants,
+                  key=lambda x: (x.first_name.lower(), x.last_name.lower(), x.id))
+
+
 def get_events_registered(user, from_dt=None, to_dt=None):
     """Gets the IDs of events where the user is registered.
 

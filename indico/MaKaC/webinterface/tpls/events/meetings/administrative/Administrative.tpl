@@ -67,9 +67,14 @@
             <span class="textTitle">Description: </span><br/><span class="descriptionText">${common.renderDescription(conf.getDescription())}</span>
         % endif
 
+        <%
+        from indico.modules.events.registration.util import get_unique_published_registrations
+        participants = get_unique_published_registrations(conf)
+        %>
         % if participants:
             <br/><br/>
-            <span class="textTitle">Participants: </span><br/><span class="participantText">${participants}</span>
+            <span class="textTitle">Participants: </span><br>
+            <span class="participantText">${', '.join(reg.full_name for reg in participants)}</span>
         % endif
 
         <br/><br/>

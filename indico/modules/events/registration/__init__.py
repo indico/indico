@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from flask import session, render_template, flash
 
 from indico.core import signals
@@ -71,6 +69,7 @@ def _inject_regform_announcement(event, **kwargs):
 def _inject_event_header(event, **kwargs):
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.events.registration.models.registrations import Registration
+    from indico.modules.events.registration.util import get_unique_published_registrations
 
     event = event.as_event
     regforms = (event.registration_forms
@@ -78,15 +77,7 @@ def _inject_event_header(event, **kwargs):
                 .order_by(db.func.lower(RegistrationForm.title))
                 .all())
 
-    registrations = Registration.find_all(Registration.is_active, ~RegistrationForm.is_deleted,
-                                          RegistrationForm.event_id == event.id,
-                                          RegistrationForm.publish_registrations_enabled,
-                                          _join=Registration.registration_form)
-
-    linked_participants = {reg.user: reg for reg in registrations if reg.user is not None}
-    non_linked_participants = {reg for reg in registrations if reg.user is None}
-    participants = sorted(linked_participants.viewkeys() | non_linked_participants, key=attrgetter('id'))
-
+    participants = get_unique_published_registrations(event)
     return render_template('events/registration/display/event_header.html', event=event, regforms=regforms,
                            participants=participants)
 

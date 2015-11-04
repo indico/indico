@@ -86,13 +86,21 @@
         </tr>
         %endif
 
+        <%
+        from indico.modules.events.registration.util import get_unique_published_registrations
+        participants = get_unique_published_registrations(conf)
+        %>
         % if participants:
         <tr>
           <td valign="top" align="right" class="headerTitle">
             Participants:
           </td>
           <td class="headerInfo" style="font-style:italic;">
-            ${participants}
+            <ul class="participant-list">
+              % for participant in participants:
+                <li>${ participant.full_name }</li>
+              % endfor
+            </ul>
           </td>
         </tr>
         % endif
