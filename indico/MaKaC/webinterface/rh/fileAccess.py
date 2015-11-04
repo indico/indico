@@ -22,10 +22,8 @@ from MaKaC.review import Abstract
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.errors import NotFoundError, AccessError
-from MaKaC.registration import Registrant
 from MaKaC.conference import Reviewing, LocalFile
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
-from MaKaC.i18n import _
 
 from indico.web.flask.util import send_file
 
@@ -45,13 +43,8 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
                 selfcopy._target.canUserSubmit(self.getAW().getUser()) or \
                 self._target.canModify( self.getAW() )):
                 raise AccessError()
-        elif isinstance(self._file.getOwner(), Registrant) and \
-             not self._file.getOwner().canUserModify(self.getAW().getUser()):
-            raise AccessError(_("Access to this resource is forbidden."))
-
         elif isinstance(self._file.getOwner(), Abstract):
             RHDisplayBaseProtected._checkProtection(self)
-
         else:
             # superseded by attachments
             raise NotFound

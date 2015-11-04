@@ -82,7 +82,6 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
-from MaKaC import registration
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
@@ -1749,8 +1748,6 @@ class Conference(CommonObjectBase, Locatable):
         self._sessionCoordinatorRights = []
         self._submitterIdx=SubmitterIndex()
         self._boa=BOAConfig(self)
-        self._registrationForm = registration.RegistrationForm(self)
-        self._registrants = {} #key=registrantId; value=Registrant
         self._bookings = {}
         self._registrantGenerator = Counter()
         self._accessKey=""
@@ -3380,10 +3377,6 @@ class Conference(CommonObjectBase, Locatable):
                             key=lambda x: (not x.is_group, x.name.lower()))
         return [x.as_legacy for x in registrars]
 
-    @unify_user_args
-    def canManageRegistration(self, av):
-        return self.as_event.can_manage(av, role='registration', allow_key=True)
-
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
 
@@ -3501,11 +3494,7 @@ class Conference(CommonObjectBase, Locatable):
                 conf.addSessionCoordinatorRight(right)
             for domain in self.getDomainList():
                 conf.requireDomain(domain)
-        # conference's registration form
-        if options.get("registration",False) :
-            conf.setRegistrationForm(self.getRegistrationForm().clone(conf))
-
-        #conference's abstracts
+        # Conference's abstracts
         if options.get("abstracts",False) :
             conf.abstractMgr = self.abstractMgr.clone(conf)
         # Meetings' and conferences' contributions cloning
@@ -3633,166 +3622,6 @@ class Conference(CommonObjectBase, Locatable):
         c=auth.getContribution()
         if c and not isinstance(c.getCurrentStatus(),ContribStatusWithdrawn):
             self.getSpeakerIndex().unindex(auth)
-
-    def getRegistrationForm(self):
-        try:
-            if self._registrationForm is None:
-                self._registrationForm = registration.RegistrationForm(self)
-        except AttributeError,e:
-            self._registrationForm = registration.RegistrationForm(self)
-        return self._registrationForm
-
-    def setRegistrationForm(self,rf):
-        self._registrationForm = rf
-        rf.setConference(self)
-
-    def removeRegistrationForm(self):
-        try:
-            self._registrationForm.delete()
-            self._registrationForm.setConference(None)
-            self._registrationForm = None
-        except AttributeError:
-            self._registrationForm = None
-
-    def recoverRegistrationForm(self, rf):
-        self.setRegistrationForm(rf)
-        rf.recover()
-
-    ## Videoconference bookings related
-    def getBookings(self):
-        try:
-            if self._bookings:
-                pass
-        except AttributeError, e:
-            self._bookings = {}
-            self.notifyModification()
-        return self._bookings
-
-    def getBookingsList(self, sort = False):
-        bl = self.getBookings().values()
-        if sort:
-            bl.sort()
-        return bl
-
-    def _getBookingGenerator(self):
-        try:
-            return self._bookingGenerator
-        except AttributeError, e:
-            self._bookingGenerator = Counter()
-            return self._bookingGenerator
-
-    def getNewBookingId(self):
-        return str(self._getBookingGenerator().newCount())
-
-    def addBooking(self, bp):
-        if (bp.getId() == ""):
-            bp.setId(self.getNewBookingId())
-        self.getBookings()[bp.getId()] = bp
-        self.notifyModification()
-
-    def hasBooking(self,booking):
-        return booking.getConference()==self and \
-        self.getBookings().has_key(booking.getId())
-
-    def removeBooking(self, booking):
-        if self.hasBooking(booking):
-            deletion= booking.deleteBooking()
-            if deletion[0] != 1:
-                del self.getBookings()[booking.getId()]
-                self.notifyModification()
-        return deletion
-
-    def getBookingByType(self, type):
-        if self.getBookings().has_key(type):
-            return self.getBookings()[type]
-        return None
-
-    def getBookingById(self, id):
-        if self.getBookings().has_key(id):
-            return self.getBookings()[id]
-        return None
-
-    ## End of Videoconference bookings related
-
-    def getRegistrants(self):
-        try:
-            if self._registrants:
-                pass
-        except AttributeError, e:
-            self._registrants = {}
-            self.notifyModification()
-        return self._registrants
-
-    def getRegistrantsByEmail(self, email=None):
-        """
-        Returns the index of registrants by email OR a specific registrant if an email address
-        is passed as argument.
-        """
-        try:
-            if self._registrantsByEmail:
-                pass
-        except AttributeError, e:
-            self._registrantsByEmail = self._createRegistrantsByEmail()
-            self.notifyModification()
-        if email:
-            return self._registrantsByEmail.get(email)
-        return self._registrantsByEmail
-
-    def _createRegistrantsByEmail(self):
-        dicByEmail = {}
-        for r in self.getRegistrantsList():
-            dicByEmail[r.getEmail()] = r
-        return dicByEmail
-
-    def getRegistrantsList(self, sort = False):
-        rl = self.getRegistrants().values()
-        if sort:
-            rl.sort(registration.Registrant._cmpFamilyName)
-        return rl
-
-    def _getRegistrantGenerator(self):
-        try:
-            return self._registrantGenerator
-        except AttributeError, e:
-            self._registrantGenerator = Counter()
-            return self._registrantGenerator
-
-    def addRegistrant(self, rp, user):
-        rp.setId( str(self._getRegistrantGenerator().newCount()) )
-        rp.setOwner( self )
-        self.getRegistrants()[rp.getId()] = rp
-        signals.event.registrant_changed.send(self, user=user, registrant=rp, action='added')
-        self.notifyModification()
-
-    def updateRegistrantIndexByEmail(self, rp, newEmail):
-        oldEmail = rp.getEmail()
-        if oldEmail != newEmail:
-            if self.getRegistrantsByEmail().has_key(oldEmail):
-                del self.getRegistrantsByEmail()[oldEmail]
-            self.getRegistrantsByEmail()[newEmail] = rp
-            self.notifyModification()
-
-    def hasRegistrant(self,rp):
-        return rp.getConference()==self and \
-                self.getRegistrants().has_key(rp.getId())
-
-    def hasRegistrantByEmail(self, email):
-        # Return true if there is someone with the email of the param "email"
-        return self.getRegistrantsByEmail().has_key(email)
-
-    def removeRegistrant(self, id):
-        part = self.getRegistrants()[id]
-        self._registrationForm.notifyRegistrantRemoval(self.getRegistrants()[id])
-        del self.getRegistrantsByEmail()[self.getRegistrantById(id).getEmail()]
-        del self.getRegistrants()[id]
-        signals.event.registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
-        TrashCanManager().add(part)
-        self.notifyModification()
-
-    def getRegistrantById(self, id):
-        if self.getRegistrants().has_key(id):
-            return self.getRegistrants()[id]
-        return None
 
     def _getPrimAuthIndex(self):
         try:
@@ -4269,7 +4098,6 @@ class Session(CommonObjectBase, Locatable):
         self._textColorToLinks=False
         self._ttType=SlotSchTypeFactory.getDefaultId()
         self._closed = False
-        self._registrationSession = None
         self._creationDS = nowutc()
         self._modificationDS = nowutc()
         self._keywords = ""
@@ -4381,20 +4209,6 @@ class Session(CommonObjectBase, Locatable):
         return cmp(session1.getTitle(), session2.getTitle())
     cmpSessionByTitle = staticmethod(cmpSessionByTitle)
 
-    def hasRegistrationSession(self):
-        return self.getRegistrationSession() is not None
-
-    def getRegistrationSession(self):
-        try:
-            if self._registrationSession:
-                pass
-        except AttributeError, e:
-            self._registrationSession = None
-        return self._registrationSession
-
-    def setRegistrationSession(self, rs):
-        self._registrationSession = rs
-
     def isClosed( self ):
         if self.getConference().isClosed():
             return True
@@ -4428,20 +4242,11 @@ class Session(CommonObjectBase, Locatable):
             self._removeSlot(self.slots.values()[0])
         if self.getConference() is not None:
             self.getConference().removeSession(self)
-            if self.hasRegistrationSession():
-                self.getConference().getRegistrationForm().getSessionsForm().removeSession(self.getId())
-                self.getRegistrationSession().setRegistrationForm(None)
-                TrashCanManager().add(self.getRegistrationSession())
             self.notify_protection_to_owner(self, delete=True)
             self.conference=None
             TrashCanManager().add(self)
 
     def recover(self, isCancelled):
-        if self.hasRegistrationSession():
-            if not isCancelled:
-                self.getRegistrationSession().setRegistrationForm(self.getConference().getRegistrationForm())
-                self.getConference().getRegistrationForm().getSessionsForm().addSession(self.getRegistrationSession())
-            TrashCanManager().remove(self.getRegistrationSession())
         TrashCanManager().remove(self)
 
     def getLocator( self ):

@@ -93,7 +93,6 @@ class WebLocator:
         self.__notifTplId = None
         self.__location = None
         self.__roomID = None
-        self.__registrantId = None
 
     def setCategory( self, params, mustExist=1 ):
         if not ("categId" in params.keys()) or params["categId"].strip()=="":
@@ -220,24 +219,12 @@ class WebLocator:
         else:
             self.__reviewId = params["reviewId"]
 
-    def setRegistrant( self, params, mustExist=1  ):
-        self.setConference( params )
-        if not ("registrantId" in params.keys()) or \
-           params["registrantId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("registrant id not set"))
-        else:
-            self.__registrantId = params["registrantId"]
-
     def setMaterial( self, params, mustExist=1 ):
         if "confId" in params.keys() and params["confId"] != None:
             if "reviewId" in params.keys():
                 self.setReview(params, 0)
             elif "abstractId" in params.keys():
                 self.setAbstract(params, mustExist)
-                return
-            elif "registrantId" in params.keys():
-                self.setRegistrant(params, mustExist)
                 return
             else:
                 self.setSubContribution( params, 0 )
@@ -291,12 +278,6 @@ class WebLocator:
             obj = obj.getAbstractMgr().getAbstractById( self.__abstractId )
             if obj == None:
                 raise errors.NoReportError("The abstract you are trying to access does not exist or has been deleted")
-            if self.__resId:
-                return obj.getAttachmentById( self.__resId )
-        if self.__registrantId:
-            obj = obj.getRegistrantById( self.__registrantId )
-            if obj == None:
-                raise errors.NoReportError("The registrant you are trying to access does not exist or has been deleted")
             if self.__resId:
                 return obj.getAttachmentById( self.__resId )
         if self.__sessionId:

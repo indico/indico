@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import request, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
-from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
 from indico.modules.oauth import oauth
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.events.api import EventBaseHook
@@ -165,10 +164,10 @@ class RegistrantHook(EventBaseHook):
 
 
 class RegistrantFetcher(DataFetcher):
-    DETAIL_INTERFACES = {
-        'basic': IRegFormRegistrantBasicFossil,
-        'full': IRegFormRegistrantFullFossil
-    }
+    # DETAIL_INTERFACES = {
+    #     'basic': IRegFormRegistrantBasicFossil,
+    #     'full': IRegFormRegistrantFullFossil
+    # }
 
     def __init__(self, aw, hook):
         super(RegistrantFetcher, self).__init__(aw, hook)

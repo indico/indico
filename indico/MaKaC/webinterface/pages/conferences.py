@@ -2371,14 +2371,12 @@ class WAbstracts( wcomponents.WTemplated ):
                        "options": self._getOthersFilterItemList()})
             ]
 
-        extraInfo = ""
-        if self._conf.getRegistrationForm().getStatusesList():
-            extraInfo = i18nformat("""<table align="center" cellspacing="10" width="100%%">
-                                <tr>
-                                    <td colspan="5" class="titleCellFormat"> _("Author search") <input type="text" name="authSearch" value=%s></td>
-                                </tr>
-                            </table>
-                        """)%(quoteattr(str(self._authSearch)))
+        extraInfo = i18nformat("""<table align="center" cellspacing="10" width="100%%">
+                            <tr>
+                                <td colspan="5" class="titleCellFormat"> _("Author search") <input type="text" name="authSearch" value=%s></td>
+                            </tr>
+                        </table>
+                    """)%(quoteattr(str(self._authSearch)))
 
         p = WFilterCriteriaAbstracts(options, None, extraInfo)
 

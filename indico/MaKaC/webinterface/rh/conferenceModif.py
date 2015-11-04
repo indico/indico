@@ -2848,11 +2848,11 @@ class RHReschedule(RHConferenceModifBase):
 # ============================================================================
 
 ##------------------------------------------------------------------------------------------------------------
-class RHConfBadgeBase(RHConferenceModifBase):
 
-    def _checkProtection( self ):
-        if not self._target.canManageRegistration(self.getAW().getUser()):
-            RHConferenceModifBase._checkProtection(self)
+
+class RHConfBadgeBase(RHConferenceModifBase):
+    ROLE = 'registration'
+
 
 """
 Badge Design and Printing classes
@@ -3023,7 +3023,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
 
         self.__registrantList = params.get("registrantList","all")
         if self.__registrantList != "all":
-            self.__registrantList = self.__registrantList.split(',')
+            self.__registrantList = self.__registrantList.split(',') if self.__registrantList else []
 
 
     def _process(self):
@@ -3031,10 +3031,10 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
-            if self._conf.getRegistrantsList() == []:
-                return  _("There are no registrants, so no badges to print.")
-            elif self.__templateId == None:
-                return  _("There is no badge template selected for this conference.")
+            if not self.__registrantList:
+                return _("There are no registrations to print badges for.")
+            elif self.__templateId is None:
+                return _("There is no badge template selected for this conference.")
 
             if self.__keepPDFOptions:
                 #we store the pdf options into the conference

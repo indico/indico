@@ -37,7 +37,6 @@ import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 from MaKaC.badge import BadgeTemplateItem
 from MaKaC.poster import PosterTemplateItem
-from MaKaC.registration import Registrant
 from MaKaC.PDFinterface.base import (PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, FileDummy,
                                      setTTFonts, PDFSizes, modifiedFontSize)
 from MaKaC.webinterface.pages.tracks import (
@@ -1507,7 +1506,6 @@ class RegistrantToPDF(PDFBase):
 class RegistrantsListToBookPDF(PDFWithTOC):
     def __init__(self, conf, doc=None, story=[], reglist=None, display=[], special_items=None):
         self._conf = conf
-        self._regForm = conf.getRegistrationForm()
         self._regList = reglist
         self._display = display
         self._title = _("Registrants Book")
@@ -1558,7 +1556,6 @@ class RegistrantsListToPDF(PDFBase):
 
     def __init__(self, conf, doc=None, story=[], reglist=None, display=[], special_items=None):
         self._conf = conf
-        self._regForm = conf.getRegistrationForm()
         self._regList = reglist
         self._display = display
         PDFBase.__init__(self, doc, story, printLandscape=True)
@@ -1883,9 +1880,7 @@ class RegistrantsListToBadgesPDF:
             elif isinstance(action, types.MethodType):
                 # If the action is a method, depending on which class owns the method, we pass a
                 # different object to the method.
-                if action.im_class == Registrant:
-                    text = action.__call__(registrant)
-                elif action.im_class == conference.Conference:
+                if action.im_class == conference.Conference:
                     text = action.__call__(registrant.registration_form.event)
                 elif action.im_class == BadgeTemplateItem:
                     text = action.__call__(item)
@@ -1898,9 +1893,7 @@ class RegistrantsListToBadgesPDF:
                 #  -it must have a getValue(object) method, to which a Conference instance, a Registrant instance or a
                 #  BadgeTemplateItem instance must be passed, depending on the result of the getArgumentType() method.
                 argumentType = action.getArgumentType()
-                if argumentType == Registrant:
-                    text = action.getValue(registrant)
-                elif argumentType == conference.Conference:
+                if argumentType == conference.Conference:
                     text = action.getValue(registrant.registration_form.event)
                 elif argumentType == BadgeTemplateItem:
                     text = action.getValue(item)

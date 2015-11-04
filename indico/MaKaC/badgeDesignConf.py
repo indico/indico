@@ -14,18 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.registration import Registrant
 from conference import Conference
 from badge import BadgeTemplateItem
 from MaKaC.i18n import _
 from indico.util.date_time import format_date
-
-
-class RegistrantBadge:
-
-    @classmethod
-    def getArgumentType(cls):
-        return Registrant
 
 
 class ConferenceDates:

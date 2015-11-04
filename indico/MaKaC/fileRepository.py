@@ -30,7 +30,6 @@ from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.util.i18n import _
 from MaKaC.review import Abstract
-from MaKaC.registration import Registrant
 
 
 class MaterialLocalRepository(Persistent):
@@ -136,8 +135,6 @@ class MaterialLocalRepository(Persistent):
 
             if (isinstance(newFile.getOwner(), Abstract)):
                 abstract = newFile.getOwner()
-            elif (isinstance(newFile.getOwner(), Registrant)):
-                registrant = newFile.getOwner()
             else:
                 session = newFile.getSession()
                 cont = newFile.getContribution()
