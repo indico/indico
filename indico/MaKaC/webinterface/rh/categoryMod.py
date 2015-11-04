@@ -129,27 +129,8 @@ class RHCategoryPerformModification( RHCategModifBase ):
                 f.setFileName( self._fileName )
                 f.setFilePath( self._filePath )
                 self._target.setIcon( f )
-            if "tasksAllowed" in params :
-                if params["tasksAllowed"] == "allowed" :
-                    self._target.setTasksAllowed()
-                else :
-                    self._target.setTasksForbidden()
 
         self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
-
-class RHCategoryTaskOption( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryTasksOption
-
-    def _process( self ):
-
-        if self._target.tasksAllowed() :
-            self._target.setTasksForbidden()
-        else :
-            self._target.setTasksAllowed()
-
-        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
 
 
 class RHCategoryAC( RHCategModifBase ):
@@ -167,105 +148,6 @@ class RHCategoryTools( RHCategModifBase ):
         p = category.WPCategModifTools( self, self._target )
         return p.display()
 
-
-class RHCategoryTasks( RHCategModifBase ):
-    _uh = urlHandlers.UHCategModifTasks
-
-    def _process( self ):
-        p = category.WPCategModifTasks( self, self._target )
-        return p.display()
-
-
-class RHCategoryTasksAction( RHCategModifBase ):
-    _uh = urlHandlers.UHCategModifTasksAction
-
-    def _process( self ):
-        params = self._getRequestParams()
-
-        if params.get("accessVisibility","") == _("PRIVATE") :
-            self._target.setTasksPrivate()
-        elif params.get("accessVisibility","") == _("PUBLIC") :
-            self._target.setTasksPublic()
-        else :
-            pass
-
-        if params.get("commentVisibility","") == _("PRIVATE") :
-            self._target.setTasksCommentPrivate()
-        elif params.get("commentVisibility","") == _("PUBLIC") :
-            self._target.setTasksCommentPublic()
-        else :
-            pass
-
-        if params.get("taskAccessAction","") == "Add":
-            chosen = params.get("accessChosen",None)
-            if chosen is not None and chosen != "" :
-                person = self._findPerson(chosen)
-                if person is not None :
-                    self._target.addTasksAccessPerson(person)
-        elif params.get("taskAccessAction","") == "New":
-            pass
-        elif params.get("taskAccessAction","") == "Remove":
-            chosen = self._normaliseListParam(params.get("access", []))
-            for c in chosen :
-                self._target.removeTasksAccessPerson(int(c))
-        else :
-            pass
-
-        if params.get("taskCommentAction","") == "Add":
-            chosen = params.get("commentChosen",None)
-            if chosen is not None and chosen != "" :
-                person = self._findPerson(chosen)
-                if person is not None :
-                    self._target.addTasksCommentator(person)
-        elif params.get("taskCommentAction","") == "New":
-            pass
-        elif params.get("taskCommentAction","") == "Remove":
-            chosen = self._normaliseListParam(params.get("commentator", []))
-            for c in chosen :
-                self._target.removeTasksCommentator(int(c))
-        else :
-            pass
-
-
-        if params.get("taskManagerAction","") == "Add":
-            chosen = params.get("managerChosen",None)
-            if chosen is not None and chosen != "" :
-                person = self._findPerson(chosen)
-                if person is not None :
-                    self._target.addTasksManager(person)
-        elif params.get("taskManagerAction","") == "New":
-            pass
-        elif params.get("taskManagerAction","") == "Remove":
-            chosen = self._normaliseListParam(params.get("manager", []))
-            for c in chosen :
-                self._target.removeTasksManager(int(c))
-        else :
-            pass
-
-
-        p = category.WPCategModifTasks( self, self._target )
-        return p.display()
-
-    def _findPerson(self, idString):
-        if idString is None or idString == "" :
-            return None
-        if idString[0] == "c" :
-            return self.getTasksCommentator(int(idString[1:]))
-        elif idString[0] == "a" :
-            return self._target.getTasksAccessPerson(int(idString[1:]))
-
-        index = idString.find("-")
-        eventId = idString[1:index]
-        personId = idString[index+1:]
-
-        if idString[0] == "h" :
-            return self._target.getConferenceById(eventId).getChairById(personId)
-        elif idString[0] == "m" :
-            return self._target.getConferenceById(eventId).getManagerList()[int(personId)]
-        elif idString[0] == "p" :
-            return self._target.getConferenceById(eventId).getParticipation().getParticipantById(personId)
-
-        return None
 
 class RHCategoryCreation( RHCategModifBase ):
     _uh = urlHandlers.UHCategoryCreation

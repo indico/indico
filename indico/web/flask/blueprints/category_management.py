@@ -34,8 +34,6 @@ category_mgmt.add_url_rule('/data', 'categoryDataModification', categoryMod.RHCa
                            methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/data/save', 'categoryDataModification-modify', categoryMod.RHCategoryPerformModification,
                            methods=('POST',))
-category_mgmt.add_url_rule('/settings/tasks', 'categoryDataModification-tasksOption', categoryMod.RHCategoryTaskOption,
-                           methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/events', 'categoryModification-actionConferences', categoryMod.RHCategoryActionConferences,
                            methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/subcategories', 'categoryModification-actionSubCategs',
@@ -52,8 +50,3 @@ category_mgmt.add_url_rule('/access/notify-creation', 'categoryConfCreationContr
 # Tools
 category_mgmt.add_url_rule('/tools/', 'categoryTools', categoryMod.RHCategoryTools)
 category_mgmt.add_url_rule('/tools/delete', 'categoryTools-delete', categoryMod.RHCategoryDeletion, methods=('POST',))
-
-# Tasks (unused, possibly even obsolete)
-category_mgmt.add_url_rule('/tasks', 'categoryTasks', categoryMod.RHCategoryTasks, methods=('GET', 'POST'))
-category_mgmt.add_url_rule('/tasks/action', 'categoryTasks-taskAction', categoryMod.RHCategoryTasksAction,
-                           methods=('GET', 'POST'))

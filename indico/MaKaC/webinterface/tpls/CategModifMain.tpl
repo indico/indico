@@ -54,30 +54,6 @@ ${ render_template('flashed_messages.html', fixed_width=True) }
       <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
     <tr><td></td></tr>
-    <!-- <tr>
-        <td class="dataCaptionTD">
-          <a name="sections"></a>
-          <span class="dataCaptionFormat"> ${ _("Management features")}</span>
-          <br>
-          <br>
-          <img src=${ enablePic } alt="Click to disable"> <small> ${ _("Enabled feature")}</small>
-          <br>
-          <img src=${ disablePic } alt="Click to enable"> <small> ${ _("Disabled feature")}</small>
-        </td>
-        <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px">
-            <table align="left">
-            <tr>
-              <td>
-                ${ tasksManagement }
-              </td>
-            </tr>
-            </table>
-        </td>
-    </tr>
-    <tr><td></td></tr>
-    <tr>
-      <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>-->
     </table>
   </td>
 </tr>

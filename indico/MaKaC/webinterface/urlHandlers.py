@@ -895,24 +895,12 @@ class UHCategoryDeletion(URLHandler):
     _endpoint = 'category_mgmt.categoryTools-delete'
 
 
-class UHCategModifTasks(URLHandler):
-    _endpoint = 'category_mgmt.categoryTasks'
-
-
-class UHCategModifTasksAction(URLHandler):
-    _endpoint = 'category_mgmt.categoryTasks-taskAction'
-
-
 class UHCategoryDataModif(URLHandler):
     _endpoint = 'category_mgmt.categoryDataModification'
 
 
 class UHCategoryPerformModification(URLHandler):
     _endpoint = 'category_mgmt.categoryDataModification-modify'
-
-
-class UHCategoryTasksOption(URLHandler):
-    _endpoint = 'category_mgmt.categoryDataModification-tasksOption'
 
 
 class UHCategorySetVisibility(URLHandler):
