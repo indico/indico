@@ -351,6 +351,11 @@ class Registration(db.Model):
     def has_files(self):
         return any(item.storage_file_id is not None for item in self.data)
 
+    @property
+    def sections_with_answered_fields(self):
+        return [x for x in self.registration_form.sections
+                if any(child.id in self.data_by_field for child in x.children)]
+
     @classproperty
     @classmethod
     def order_by_name(cls):
