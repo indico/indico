@@ -4302,7 +4302,6 @@ class WPConfModifBadgeDesign(WPBadgeBase):
             templMan = conf.getBadgeTemplateManager()
             newId = templateId
             default_template = dconf.getBadgeTemplateManager().getTemplateById(baseTemplateId)
-            default_template._BadgeTemplate__templateData[4].pop(4)
             default_template.clone(templMan, newId)
             # now, let's pretend nothing happened, and let the code
             # handle the template as if it existed before
