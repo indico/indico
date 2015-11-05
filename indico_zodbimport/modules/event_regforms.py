@@ -327,7 +327,8 @@ class RegformMigration(object):
             'institution': PersonalDataType.affiliation,
             'title': PersonalDataType.title,
             'address': PersonalDataType.address,
-            'phone': PersonalDataType.phone
+            'phone': PersonalDataType.phone,
+            'position': PersonalDataType.position
         }
         section = RegistrationFormPersonalDataSection(registration_form=self.regform, title=_sanitize(form._title),
                                                       description=_sanitize(form._description, html=True))
