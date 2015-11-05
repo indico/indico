@@ -59,6 +59,7 @@ class PersonalDataType(int, IndicoEnum):
     address = 6
     phone = 7
     country = 8
+    position = 9
 
     @strict_classproperty
     @classmethod
@@ -106,6 +107,11 @@ class PersonalDataType(int, IndicoEnum):
             (cls.phone, {
                 'title': 'Phone Number',
                 'input_type': 'phone',
+                'is_enabled': False
+            }),
+            (cls.position, {
+                'title': 'Position',
+                'input_type': 'text',
                 'is_enabled': False
             }),
         ]
