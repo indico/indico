@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify, flash
+from flask import request, flash
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db

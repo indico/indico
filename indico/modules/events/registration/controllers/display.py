@@ -81,7 +81,16 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
     def _process(self):
-        regforms = RegistrationForm.find_all(RegistrationForm.is_scheduled, event_id=int(self.event.id))
+        regforms = self.event_new.registration_forms.filter(~RegistrationForm.is_deleted)
+        if session.user:
+            criteria = db.or_(
+                RegistrationForm.is_scheduled,
+                RegistrationForm.registrations.any((Registration.user == session.user) & Registration.is_active),
+                RegistrationForm.invitations.any(RegistrationInvitation.email.in_(session.user.all_emails))
+            )
+        else:
+            criteria = RegistrationForm.is_scheduled
+        regforms = regforms.filter(criteria).all()
         if len(regforms) == 1:
             return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self.event, event=self.event,

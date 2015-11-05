@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if registration.can_be_modified %}
+    {% if registration.can_be_modified or registration.invitation %}
         <div ng-app="nd" ng-controller="AppCtrl">
             <div nd-reg-form
                 conf-id="{{ event.id }}"

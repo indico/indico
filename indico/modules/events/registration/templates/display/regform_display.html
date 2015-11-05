@@ -29,7 +29,7 @@
 
     {% if registration %}
         {% include 'events/registration/display/registration_summary.html' %}
-    {% elif not management and not regform.is_active %}
+    {% elif not management and not regform.is_active and not invitation %}
         {% if regform.limit_reached %}
             {% call message_box('error', fixed_width=true, large_icon=true) %}
                 <div class="label">

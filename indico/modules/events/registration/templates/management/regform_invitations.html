@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if regform.is_active %}
+    {% if not regform.limit_reached %}
         <div class="action-box">
             <div class="section">
                 <div class="icon icon-users"></div>
