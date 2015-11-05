@@ -96,6 +96,7 @@ class Registration(db.Model):
     #: The ID of the event
     event_id = db.Column(
         db.Integer,
+        db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
@@ -159,7 +160,42 @@ class Registration(db.Model):
         db.String,
         nullable=False
     )
+    #: If the registration has been deleted
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: The unique token used in tickets
+    ticket_uuid = db.Column(
+        UUID,
+        index=True,
+        unique=True,
+        nullable=False,
+        default=lambda: unicode(uuid4())
+    )
+    #: Whether the person has checked in. Setting this also sets or clears
+    #: `checked_in_dt`.
+    checked_in = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: The date/time when the person has checked in
+    checked_in_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
 
+    #: The Event containing this registration
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'registrations',
+            lazy='dynamic'
+        )
+    )
     # The user linked to this registration
     user = db.relationship(
         'User',
@@ -186,32 +222,6 @@ class Registration(db.Model):
             'registration',
             lazy=True
         )
-    )
-    #: If the registration has been deleted
-    is_deleted = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    #: The unique token used in tickets
-    ticket_uuid = db.Column(
-        UUID,
-        index=True,
-        unique=True,
-        nullable=False,
-        default=lambda: unicode(uuid4())
-    )
-    #: Whether the person has checked in. Setting this also sets or clears
-    #: `checked_in_dt`.
-    checked_in = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    #: The date/time when the person has checked in
-    checked_in_dt = db.Column(
-        UTCDateTime,
-        nullable=True
     )
 
     # relationship backrefs:
