@@ -90,6 +90,7 @@ class BadgeDesignConfiguration:
             "First Name": (_("First Name"), lambda x: x.first_name),
             "Surname": (_("Surname"), lambda x: x.last_name),
             "Institution": (_("Institution"), lambda x: x.get_personal_data().get('affiliation', '')),
+            "Position": (_("Position"), lambda x: x.get_personal_data().get('position', '')),
             "Address": (_("Address"), lambda x: x.get_personal_data().get('address', '')),
             "Country": (_("Country"), lambda x: x.get_personal_data().get('country', '')),
             "Phone": (_("Phone"), lambda x: x.get_personal_data().get('phone', '')),
@@ -106,7 +107,7 @@ class BadgeDesignConfiguration:
             (_("Registrant Data"), ["Title", "Full Name", "Full Name (w/o title)", "Full Name B",
                                     "Full Name B (w/o title)", "Full Name C", "Full Name C (w/o title)",
                                     "Full Name D (abbrev)", "Full Name D (abbrev, w/o title)", "First Name",
-                                    "Surname", "Institution", "Address",
+                                    "Surname", "Institution", "Position", "Address",
                                     "Country", "Phone", "Email", "Amount"]),
             (_("Conference Data"), ["Conference Name",  "Conference Dates"]),
             (_("Fixed Elements"), ["Fixed Text"])
