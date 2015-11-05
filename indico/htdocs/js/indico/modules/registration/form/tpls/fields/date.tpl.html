@@ -23,6 +23,9 @@
     <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}
     </span>
+    <span ng-show="validationStarted && nestedForm.$error.date">
+        {{ "The date doesn't conform to the specified format " | i18n }}
+    </span>
 </ng-form>
 
 <span class="inputDescription">

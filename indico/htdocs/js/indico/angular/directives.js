@@ -503,7 +503,16 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
                     dateFormat: translateDateFormat(dateFormat),
                     onSelect: function(date) {
                         ctrl.$setViewValue(date);
+                        $(this).change();
                         scope.$apply();
+                    }
+                });
+
+                element.on('change', function(event) {
+                    var dateValue = $(event.target).val();
+                    if (scope.field.isRequired || dateValue) {
+                        var momentJsFormat = translateDateFormat(dateFormat).replace('yy', 'yyyy').toUpperCase();
+                        ctrl.$setValidity('date', new moment(dateValue, momentJsFormat, true).isValid());
                     }
                 });
             });
