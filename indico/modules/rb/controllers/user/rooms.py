@@ -99,7 +99,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
             rooms = Room.find_with_filters(form.data, session.user)
             return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
         equipment_locations = {eq.id: eq.location_id for eq in EquipmentType.find()}
-        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),
+        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(is_active=True),
                                         equipment_locations=equipment_locations).display()
 
 
