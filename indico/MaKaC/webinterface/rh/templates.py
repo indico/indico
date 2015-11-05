@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+from werkzeug.exceptions import Forbidden
+
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from indico.core.config import Config
 from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.pages import conferences
 import MaKaC.conference as conference
 
 class RHTemplatesBase(admins.RHAdminBase):
@@ -109,8 +110,12 @@ class RHTemplateModifBase( RHConferenceBase, RHModificationBaseProtected ):
     def _checkParams( self, params ):
         RHConferenceBase._checkParams( self, params )
 
-    def _checkProtection( self ):
-        RHModificationBaseProtected._checkProtection( self )
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHModificationBaseProtected._checkProtection(self)
 
     def _displayCustomPage( self, wf ):
         return None
