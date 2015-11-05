@@ -20,11 +20,16 @@ from flask import current_app, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
+from indico.modules.events import LegacyEventMapping
+from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.base import RHSimple
 
 
 def _clean_args(kwargs):
+    if is_legacy_id(kwargs['event_id']):
+        mapping = LegacyEventMapping.find(legacy_event_id=kwargs['event_id']).first_or_404()
+        kwargs['event_id'] = mapping.event_id
     if 'contrib_id' in kwargs:
         kwargs['contribution_id'] = kwargs.pop('contrib_id')
     if 'subcontrib_id' in kwargs:
