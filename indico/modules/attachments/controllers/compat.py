@@ -56,7 +56,7 @@ def compat_folder_old():
                'contribId': 'contrib_id',
                'subContId': 'subcontrib_id',
                'materialId': 'material_id'}
-    kwargs = {mapping.get(k, k): v for k, v in request.args.iteritems()}
+    kwargs = {mapping[k]: v for k, v in request.args.iteritems() if k in mapping}
     return compat_folder(**kwargs)
 
 
