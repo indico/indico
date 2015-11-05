@@ -17,11 +17,11 @@
 from datetime import datetime
 from flask import request
 from hashlib import md5
+from indico.modules.groups import GroupProxy
 from pytz import timezone
 from sqlalchemy.orm import joinedload
 
 import string
-from indico.util.json import dumps
 import StringIO
 
 from lxml import etree
@@ -45,8 +45,10 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users import User
 from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.util.event import uniqueId
+from indico.util.json import dumps
 from indico.web.flask.util import url_for
 
 
@@ -213,15 +215,17 @@ class outputGenerator(object):
         allowed_groups = []
 
         for user_obj in acl:
-            if isinstance(user_obj, AvatarUserWrapper):
+            if isinstance(user_obj, (User, AvatarUserWrapper)):
+                if isinstance(user_obj, AvatarUserWrapper):
+                    user_obj = user_obj.user
                 # user names for all non-local accounts
-                for (provider, identifier) in user_obj.user.iter_identifiers():
+                for provider, identifier in user_obj.iter_identifiers():
                     if provider != 'indico':
                         allowed_logins.add(identifier)
             elif isinstance(user_obj, LDAPGroupWrapper):
                 allowed_groups.append(user_obj.getId())
-            else:
-                allowed_logins.add(user_obj.getId())
+            elif isinstance(user_obj, GroupProxy) and not user_obj.is_local:
+                allowed_groups.append(user_obj.name)
 
         if len(allowed_groups) + len(allowed_logins) > 0:
             # Create XML list of groups
