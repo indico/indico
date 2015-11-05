@@ -24,6 +24,7 @@ from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
 from BTrees.OOBTree import OOBTree
+from werkzeug.exceptions import Forbidden
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -3073,6 +3074,13 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
         or in the corresponding template if we are editing a template.
     """
 
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConfBadgeBase._checkProtection(self)
+
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
         tempPath = cfg.getUploadedFilesSharedTempDir()
@@ -3124,6 +3132,13 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
         The background can be obtained from the archived files
         or from the temporary files.
     """
+
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConfBadgeBase._checkProtection(self)
 
     def _checkParams(self, params):
         RHConfBadgeBase._checkParams(self, params)
@@ -3319,6 +3334,13 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         or in the corresponding template if we are editing a template.
     """
 
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConferenceModifBase._checkProtection(self)
+
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
         tempPath = cfg.getUploadedFilesSharedTempDir()
@@ -3379,6 +3401,13 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
         The background can be obtained from the archived files
         or from the temporary files.
     """
+
+    def _checkProtection(self):
+        if self._conf.id == 'default':
+            if not session.user or not session.user.is_admin:
+                raise Forbidden
+        else:
+            RHConferenceModifBase._checkProtection(self)
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)

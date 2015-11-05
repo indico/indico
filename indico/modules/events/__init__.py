@@ -148,11 +148,17 @@ def _handle_legacy_ids(app, **kwargs):
 
     # Endpoints which need to deal with non-standard event "ids" because they might be shorturls.
     # Those endpoints handle legacy event ids on their own so we ignore them here.
-    _shorturl_endpoints = {'event.shorturl', 'event.conferenceDisplay', 'conferenceDisplay-overview'}
+    # confModifTools-*Background is called via /event/default/... when editing a global
+    # badge/poster template...
+    _non_standard_id_endpoints = {'event.shorturl', 'event.conferenceDisplay', 'conferenceDisplay-overview',
+                                  'event_mgmt.confModifTools-badgeGetBackground',
+                                  'event_mgmt.confModifTools-badgeSaveBackground',
+                                  'event_mgmt.confModifTools-posterGetBackground',
+                                  'event_mgmt.confModifTools-posterSaveBackground'}
 
     @app.before_request
     def _redirect_legacy_id():
-        if not request.view_args or request.endpoint in _shorturl_endpoints:
+        if not request.view_args or request.endpoint in _non_standard_id_endpoints:
             return
 
         key = event_id = None
