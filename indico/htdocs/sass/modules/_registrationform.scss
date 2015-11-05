@@ -1384,19 +1384,6 @@ textarea.regFormDescriptionInputMgmt {
             }
         }
     }
-
-    .toolbar {
-        ul.dropdown {
-            a.disabled {
-                color: $gray;
-
-                &:hover, &:before {
-                    color: $gray;
-                    cursor: default;
-                }
-            }
-        }
-    }
 }
 
 

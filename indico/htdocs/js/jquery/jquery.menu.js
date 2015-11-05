@@ -75,7 +75,7 @@
                         if ($this.data('toggle') == 'dropdown') {
                             if ($this.data('on')) {
                                 self._close($this);
-                            } else {
+                            } else if (!$this.hasClass('disabled')) {
                                 self._open($this);
                             }
                             e.preventDefault();
