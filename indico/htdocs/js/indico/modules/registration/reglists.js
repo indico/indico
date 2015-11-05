@@ -100,6 +100,22 @@
             }
         });
 
+        $('body').on('click', '#preview-email', function() {
+            var $this = $(this);
+            ajaxDialog({
+                url: $this.data('href'),
+                title: $T.gettext('Email Preview'),
+                method: 'POST',
+                data: function() {
+                    return {
+                        registration_id: getSelectedRows()[0],
+                        subject: $('#subject').val(),
+                        body: $('#body').val()
+                    };
+                }
+            });
+        });
+
         $('.js-submit-reglist-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);

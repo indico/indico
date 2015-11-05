@@ -1,0 +1,15 @@
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('highlight', fixed_width=true) %}
+    {% trans -%}
+        This preview is only shown for a single registration.<br>
+        When sending the emails, each registrant will receive an email
+        customized with the data of their registration.
+    {%- endtrans %}
+{% endcall %}
+
+<strong>{% trans %}Subject{% endtrans %}</strong>
+<pre class="mono">{{ subject }}</pre>
+<br>
+<strong>{% trans %}Body{% endtrans %}</strong>
+<div>{{ body }}</div>

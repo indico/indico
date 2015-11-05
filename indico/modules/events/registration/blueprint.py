@@ -58,6 +58,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationEdit,
                                                                                 RHRegistrationListStaticURL,
                                                                                 RHRegistrationEmailRegistrants,
+                                                                                RHRegistrationEmailRegistrantsPreview,
                                                                                 RHRegistrationDelete,
                                                                                 RHRegistrationCreate,
                                                                                 RHRegistrationsExportPDFTable,
@@ -121,6 +122,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'registration_check_in', RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email-preview', 'email_registrants_preview',
+                 RHRegistrationEmailRegistrantsPreview, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/table.pdf',
                  'registrations_pdf_export_table', RHRegistrationsExportPDFTable, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/book.pdf',

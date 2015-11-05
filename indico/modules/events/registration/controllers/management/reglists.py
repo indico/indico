@@ -25,7 +25,7 @@ from tempfile import NamedTemporaryFile
 from uuid import uuid4
 from zipfile import ZipFile
 
-from flask import session, request, redirect, jsonify, flash
+from flask import session, request, redirect, jsonify, flash, render_template
 from sqlalchemy.orm import joinedload
 
 from indico.core.config import Config
@@ -424,6 +424,19 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
                               .all())
 
 
+class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
+    """Previews the email that will be sent to registrants"""
+
+    def _process(self):
+        registration = self.registrations[0]
+        email_body = replace_placeholders('registration-email', request.form['body'], registration=registration)
+        tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=request.form['subject'],
+                                  email_body=email_body)
+        html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
+                               body=tpl.get_body())
+        return jsonify(html=html)
+
+
 class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     """Send email to selected registrants"""
 
@@ -450,7 +463,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             flash(ngettext("The email was sent.",
                            "{num} emails were sent.", num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
-        return jsonify_template('events/registration/management/email.html', form=form)
+        return jsonify_template('events/registration/management/email.html', form=form, regform=self.regform)
 
 
 class RHRegistrationDelete(RHRegistrationsActionBase):
