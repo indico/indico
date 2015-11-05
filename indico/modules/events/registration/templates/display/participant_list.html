@@ -17,19 +17,25 @@
             <thead>
                 <tr class="i-table">
                     <th class="i-table">{% trans %}Full name{% endtrans %}</th>
+                    {% if show_position %}
+                        <th class="i-table">{% trans %}Position{% endtrans %}</th>
+                    {% endif %}
                     {% if show_affiliation %}
                         <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
                     {% endif %}
                 </tr>
             </thead>
             <tbody>
-                {% for name, title, affiliation in registrations %}
+                {% for name, personal_data in registrations %}
                     <tr class="i-table">
                         <td class="i-table" data-text="{{ name }}">
                             {{ title }} {{ name }}
                         </td>
+                        {% if show_position %}
+                            <td class="i-table">{{ personal_data.position or '' }}</td>
+                        {% endif %}
                         {% if show_affiliation %}
-                            <td class="i-table">{{ affiliation or '' }}</td>
+                            <td class="i-table">{{ personal_data.affiliation or '' }}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
