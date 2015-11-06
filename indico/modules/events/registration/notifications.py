@@ -45,8 +45,9 @@ def notify_registration_creation(registration):
         _notify_registration(registration, 'registration_creation_to_managers.html', to_managers=True)
 
 
-def notify_registration_modification(registration):
-    _notify_registration(registration, 'registration_modification_to_registrant.html')
+def notify_registration_modification(registration, notify_user=True):
+    if notify_user:
+        _notify_registration(registration, 'registration_modification_to_registrant.html')
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_modification_to_managers.html', to_managers=True)
 

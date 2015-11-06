@@ -46,7 +46,9 @@ class RegistrationEditMixin:
         form = make_registration_form(self.regform, management=self.management, registration=self.registration)()
 
         if form.validate_on_submit():
-            modify_registration(self.registration, form.data, management=self.management)
+            data = form.data
+            notify_user = data.pop('notify_modification', False)
+            modify_registration(self.registration, data, management=self.management, notify_user=notify_user)
             return redirect(self.success_url)
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation

@@ -14,6 +14,41 @@
         <div ng-animate="animations.section" ng-repeat="section in sections | filter: {enabled: true}">
             <nd-section nd-general-section></nd-section>
         </div>
+        <div ng-if="updateMode && management" class="regform-section manager-only">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {{ 'Email notification ' | i18n }}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <p>{{ 'Choose whether the user should be notified about the modifications or not.' | i18n }}</p>
+                <table class="regform-field">
+                    <tbody>
+                        <tr>
+                            <td class="field-caption ng-scope">
+                                <div>
+                                    <label for="send-modification-notification" class="ng-binding">
+                                        {{ 'Send email' | i18n }}
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="ng-scope">
+                                <div class="field-input">
+                                    <label class="switch">
+                                        <input type="checkbox" class="switch-input" value="y" checked
+                                               id="send-modification-notification"
+                                               name="notify_modification">
+                                        <span class="switch-label" data-on="{{ 'Yes' | i18n }}"
+                                              data-off="{{ 'No' | i18n }}"></span>
+                                        <span class="switch-handle"></span>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div ng-if="!editMode" align="center">

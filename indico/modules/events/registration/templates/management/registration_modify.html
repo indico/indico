@@ -16,6 +16,7 @@
             check-email-url="{{ url_for('.check_email', regform, management=true) | tojson | forceescape }}"
             registration-data="{{ registration_data | tojson | forceescape }}"
             registration-uuid="{{ registration.uuid }}"
-            update-mode="true"></div>
+            update-mode="true"
+            management="true"></div>
     </div>
 {% endblock %}

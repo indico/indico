@@ -134,6 +134,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             csrfToken: '&',
             editMode: '=',
             updateMode: '=',
+            management: '=',
             postUrl: '=',
             checkEmailUrl: '='
         },

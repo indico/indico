@@ -23,7 +23,7 @@ from io import BytesIO
 
 from flask import current_app, session
 from sqlalchemy.orm import load_only, joinedload
-from wtforms import ValidationError
+from wtforms import BooleanField, ValidationError
 
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
@@ -41,8 +41,10 @@ from indico.modules.events.registration.notifications import (notify_registratio
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.users.util import get_user_by_email
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.widgets import SwitchWidget
 from indico.core.db import db
 from indico.util.date_time import format_datetime, format_date
+from indico.util.i18n import _
 
 
 def user_registered_in_event(user, event):
@@ -134,6 +136,9 @@ def make_registration_form(regform, management=False, registration=None):
     """Creates a WTForm based on registration form fields"""
 
     class RegistrationFormWTF(IndicoForm):
+        if management and registration:
+            notify_modification = BooleanField(_("Send email"), widget=SwitchWidget())
+
         def validate_email(self, field):
             status = check_registration_email(regform, field.data, registration, management=management)
             if status['status'] == 'error':
@@ -218,7 +223,7 @@ def create_registration(regform, data, invitation=None, management=False):
     return registration
 
 
-def modify_registration(registration, data, management=False):
+def modify_registration(registration, data, management=False, notify_user=True):
     old_price = registration.price
     with db.session.no_autoflush:
         regform = registration.registration_form
@@ -254,7 +259,7 @@ def modify_registration(registration, data, management=False):
     if billable_items_locked and old_price != registration.price:
         raise Exception("There was an error while modifying your registration (price mismatch: %s / %s)",
                         old_price, registration.price)
-    notify_registration_modification(registration)
+    notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
 
 
