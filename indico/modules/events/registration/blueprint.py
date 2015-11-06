@@ -197,9 +197,9 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download
 
 
 # API
-_bp.add_url_rule('!/api/events/<event_id>/registrants/<registrant_id>', 'api_registrant',
+_bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
                  RHAPIRegistrant, methods=('GET', 'PATCH'))
-_bp.add_url_rule('!/api/events/<event_id>/registrants', 'api_registrants',
+_bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
                  RHAPIRegistrants)
 
 
