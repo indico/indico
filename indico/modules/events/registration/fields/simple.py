@@ -580,7 +580,6 @@ class MultiChoiceField(ChoiceBaseField):
         return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
-
         # always store no-option as empty dict
         if value is None:
             value = {}
@@ -590,24 +589,39 @@ class MultiChoiceField(ChoiceBaseField):
         if old_data:
             old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
             new_choices_mapping = {x['id']: x for x in self.form_item.versioned_data['choices']}
-            revoked_selected_choice_ids = {}
-            selected_new_option_exists = False
 
-            # if an item from old_data's version was already chosen but doesn't exist anymore
+            # choices that have been removed but are still selected
             revoked_selected_choice_ids = value.viewkeys() - new_choices_mapping.viewkeys()
-            # and the user also selected a new item that doesn't exist in the current version yet
-            selected_new_option_exists = value.viewkeys() > old_choices_mapping.viewkeys()
+            # choices that had their price updated
+            updated_selected_choice_ids = {
+                x for x in value
+                if (x in old_choices_mapping and x in new_choices_mapping and
+                    (old_choices_mapping[x]['is_billable'] != new_choices_mapping[x]['is_billable'] or
+                     old_choices_mapping[x]['price'] != new_choices_mapping[x]['price']))
+            }
+            # if the user selected a new item that doesn't exist in the current version yet
+            new_items_selected = any(x not in old_choices_mapping for x in value)
+            # if all selected options exist in the old data version
+            all_choices_in_old = value.viewkeys() <= old_choices_mapping.viewkeys()
 
-            if selected_new_option_exists and revoked_selected_choice_ids:
-                # Creating a new data version
-                new_data_version = deepcopy(self.form_item.current_version.versioned_data)
-                for choice_id in revoked_selected_choice_ids:
-                    revoked_selected_choice = old_choices_mapping[choice_id]
-                    new_data_version['choices'].append(revoked_selected_choice)
-                data_version = RegistrationFormFieldData(field=self.form_item, versioned_data=new_data_version)
-                return_value['field_data'] = data_version
-            else:
+            if all_choices_in_old:
                 return_value['field_data'] = old_data.field_data
+            elif new_items_selected:
+                # XXX: should we create a new version when deselecting a removed item
+                if not revoked_selected_choice_ids and not updated_selected_choice_ids:
+                    # only new choices selected, so just upgrade to the latest version
+                    return_value['field_data'] = self.form_item.current_data
+                else:
+                    # Create a new data version where the removed/updated items  have been added back.
+                    new_data_version = deepcopy(self.form_item.current_data.versioned_data)
+                    new_data_version['choices'].extend(old_choices_mapping[x] for x in revoked_selected_choice_ids)
+                    for i, data in enumerate(new_data_version['choices']):
+                        if data['id'] in updated_selected_choice_ids:
+                            new_data_version['choices'][i] = dict(old_choices_mapping[data['id']])
+                    data_version = RegistrationFormFieldData(field=self.form_item, versioned_data=new_data_version)
+                    return_value['field_data'] = data_version
+            else:  # pragma: no cover
+                raise Exception('Unexpected state - not all choices in old version but nothing new selected')
 
         if not billable_items_locked:
             processed_data = super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
