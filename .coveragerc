@@ -8,6 +8,7 @@ include =
     indico/modules/events/agreements/*.py
     indico/modules/events/models/*.py
     indico/modules/events/notes/*.py
+    indico/modules/events/registration/*.py
     indico/modules/oauth/*.py
     indico/modules/payment/*.py
     indico/modules/rb/*.py
