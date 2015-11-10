@@ -42,6 +42,12 @@ from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
 
 
+def _get_choice_by_id(choice_id, choices):
+    for choice in choices:
+        if choice['id'] == choice_id:
+            return choice
+
+
 def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
     result = deepcopy(field.view_data)
@@ -58,6 +64,9 @@ def get_field_merged_options(field, registration_data):
             if missing_option:
                 result['choices'].append(missing_option)
                 result['deletedChoice'].append(missing_option['id'])
+        else:
+            result['choices'].remove(_get_choice_by_id(val, result['choices']))
+            result['choices'].append(_get_choice_by_id(val, rdata.field_data.versioned_data.get('choices', {})))
     return result
 
 
