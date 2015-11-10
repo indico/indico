@@ -53,6 +53,13 @@
                         </a>
                     </div>
                     <div class="group">
+                        <a href="{{ url_for('.manage_reglist', regform) }}"
+                           class="i-button icon-list" style="min-width: 183px;">
+                            {% trans %}Registration list{% endtrans %}
+                            <span class="badge">{{ regform.active_registrations|length }}</span>
+                        </a>
+                    </div>
+                    <div class="group">
                         <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
                             {% trans %}Manage{% endtrans %}
                         </a>
