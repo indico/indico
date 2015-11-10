@@ -209,3 +209,12 @@
         & > .i-badge-legend-right { float: right; }
     }
 }
+
+span.badge {
+    border-radius: 5px;
+    padding: 0.1em 0.4em;
+    font-size: 0.8em;
+    margin-left: 0.5em;
+    color: #FFFFFF;
+    background: $indico-blue;
+}
