@@ -26,6 +26,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegFormsBase)
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
 from indico.modules.events.registration.views import WPManageRegistration, WPManageParticipants
 from indico.modules.payment import event_settings
@@ -44,8 +45,13 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                     .filter_by(is_deleted=False)
                     .order_by(db.func.lower(RegistrationForm.title))
                     .all())
+        registration_counts = dict(self.event_new.registrations
+                                   .with_entities(Registration.registration_form_id, db.func.count())
+                                   .filter(Registration.is_active)
+                                   .group_by(Registration.registration_form_id))
         return WPManageRegistration.render_template('management/regform_list.html', self.event,
-                                                    event=self.event, regforms=regforms)
+                                                    event=self.event, regforms=regforms,
+                                                    registration_counts=registration_counts)
 
 
 class RHManageParticipants(RHManageRegFormsBase):

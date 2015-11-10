@@ -44,25 +44,24 @@
                 </div>
                 <div class="toolbar right">
                     <div class="group">
-                        <a href="#" class="i-button icon-remove"
-                           data-href="{{ url_for('.delete_regform', regform) }}"
-                           data-method="POST"
-                           data-title="{% trans %}Delete registration form?{% endtrans %}"
-                           data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}">
-                            {% trans %}Delete{% endtrans %}
-                        </a>
-                    </div>
-                    <div class="group">
-                        <a href="{{ url_for('.manage_reglist', regform) }}"
-                           class="i-button icon-list" style="min-width: 183px;">
-                            {% trans %}Registration list{% endtrans %}
-                            <span class="badge">{{ regform.active_registrations|length }}</span>
+                        <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-users">
+                            {% trans %}Registrations{% endtrans %}
+                            <span class="badge">{{ registration_counts.get(regform.id, 0) }}</span>
                         </a>
                     </div>
                     <div class="group">
                         <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
                             {% trans %}Manage{% endtrans %}
                         </a>
+                    </div>
+                    <div class="group">
+                        <a href="#" class="i-button icon-remove danger light"
+                           title="{% trans %}Delete this registration form{% endtrans %}"
+                           data-qtip-style="error"
+                           data-href="{{ url_for('.delete_regform', regform) }}"
+                           data-method="POST"
+                           data-title="{% trans %}Delete registration form?{% endtrans %}"
+                           data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}"></a>
                     </div>
                 </div>
             </div>
