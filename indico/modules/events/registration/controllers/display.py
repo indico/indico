@@ -160,7 +160,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
     def _checkProtection(self):
         RHRegistrationFormRegistrationBase._checkProtection(self)
-        if self.regform.require_login and not session.user:
+        if self.regform.require_login and not session.user and request.method != 'GET':
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))
 
@@ -189,7 +189,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                payment_enabled=self.event.has_feature('payment'),
                                                currency=payment_event_settings.get(self.event, 'currency'),
                                                user_data=user_data, invitation=self.invitation,
-                                               registration=self.registration)
+                                               registration=self.registration,
+                                               login_required=self.regform.require_login and not session.user)
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
