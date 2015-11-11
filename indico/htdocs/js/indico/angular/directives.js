@@ -491,7 +491,7 @@ ndDirectives.directive('ndJqueryDatepicker', function() {
                     element.datepicker('option', 'dateFormat', fmt);
 
                     // if new format has no time, set it to null in the model
-                    if (scope.dateTime && fmt.indexOf(' ') == -1) {
+                    if (scope.field.dateFormat && scope.field.dateFormat.indexOf(' ') == -1) {
                         scope.dateTime.time = null;
                     } else if (scope.dateTime && scope.dateTime.time === null) {
                         scope.dateTime.time = '';
