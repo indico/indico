@@ -60,6 +60,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
+            return redirect(url_for('.tickets', self.regform))
 
         return WPManageRegistration.render_template('management/regform_tickets.html', self.event,
                                                     regform=self.regform, form=form,
