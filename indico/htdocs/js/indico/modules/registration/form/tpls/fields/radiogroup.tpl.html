@@ -47,7 +47,7 @@
     <div ng-repeat="item in field.choices | filter:isVisible" style="margin-top: 10px;">
         <span ng-if="field.withExtraSlots && item.maxExtraSlots && radioValue.id==item.id">
             <select id="extraSlotsSelect-{{ item.id }}"
-                    ng-init="numberOfExtraSlotsUsed=(field.placesUsed[item.id] ? field.placesUsed[item.id]: 1)"
+                    ng-init="numberOfExtraSlotsUsed=(userdata[fieldName][item.id] ? userdata[fieldName][item.id] - 1: 1)"
                     ng-model="numberOfExtraSlotsUsed"
                     ng-options="n for n in [] | range:1:getNumberOfSlots(item)"
                     ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
