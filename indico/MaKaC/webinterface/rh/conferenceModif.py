@@ -427,7 +427,7 @@ class RHConfRemoveAllSubmissionRights( RHConferenceModifBase ):
         for cont in self._target.getContributionList():
             cont.revokeAllSubmitters()
         event = self._conf.as_event
-        for entry in event.acl_entries:
+        for entry in set(event.acl_entries):
             if entry.has_management_role('submit', explicit=True):
                 event.update_principal(entry.principal, del_roles={'submit'})
         self._redirect( urlHandlers.UHConfModifAC.getURL( self._target ) )
