@@ -417,15 +417,11 @@ def _build_personal_data(registration):
     return personal_data
 
 
-def build_registration_api_data(registration, full_details=False):
+def build_registration_api_data(registration):
     registration_info = _build_base_registration_info(registration)
     registration_info['amount_paid'] = registration.price if registration.is_paid else 0
     registration_info['registration_date'] = registration.submitted_dt.isoformat()
     registration_info['paid'] = registration.is_paid
     registration_info['checkin_date'] = registration.checked_in_dt.isoformat() if registration.checked_in_dt else ''
     registration_info['event_id'] = registration.event_id
-
-    if full_details:
-        for data in registration.data:
-            registration_info[data.field_data.field.title] = data.friendly_data
     return registration_info
