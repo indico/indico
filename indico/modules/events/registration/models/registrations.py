@@ -386,6 +386,10 @@ class Registration(db.Model):
             field = data.field_data.field
             if field.personal_data_type is not None and data.data:
                 personal_data[field.personal_data_type.name] = data.friendly_data
+        # might happen with imported legacy registrations (missing personal data)
+        personal_data.setdefault('first_name', self.first_name)
+        personal_data.setdefault('last_name', self.last_name)
+        personal_data.setdefault('email', self.email)
         return personal_data
 
     def render_price(self):
