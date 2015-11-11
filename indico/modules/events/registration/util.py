@@ -386,7 +386,10 @@ def get_events_registered(user, from_dt=None, to_dt=None):
 
 def build_registrations_api_data(event):
     api_data = []
-    for regform in event.registration_forms.filter_by(is_deleted=False):
+    query = (event.registration_forms
+             .filter_by(is_deleted=False)
+             .options(joinedload('registrations').joinedload('data').joinedload('field_data')))
+    for regform in query:
         for registration in regform.active_registrations:
             registration_info = _build_base_registration_info(registration)
             registration_info['checkin_secret'] = registration.uuid

@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, jsonify
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.modules.oauth import oauth
@@ -47,6 +48,7 @@ class RHAPIRegistrant(RH):
         self._registration = (self.event.registrations
                               .filter_by(id=request.view_args['registrant_id'],
                                          is_deleted=False)
+                              .options(joinedload('data').joinedload('field_data'))
                               .first_or_404())
 
     def _process_GET(self):
