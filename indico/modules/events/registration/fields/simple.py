@@ -133,11 +133,13 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             captions = self.form_item.data['captions']
             for k in field.data:
                 choice = next((x for x in choices if x['id'] == k), None)
-                places_limit = choice.get('places_limit')
-                places_used_dict = self.get_places_used()
-                places_used_dict.update(field.data)
-                if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
-                    raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
+                # Need to check the selected choice, because it might have been deleted.
+                if choice:
+                    places_limit = choice.get('places_limit')
+                    places_used_dict = self.get_places_used()
+                    places_used_dict.update(field.data)
+                    if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
+                        raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
     @classmethod
