@@ -377,18 +377,20 @@ class RegformMigration(object):
         field = field_cls(registration_form=self.regform, personal_data_type=pd_type, is_required=is_required,
                           is_enabled=is_enabled, title=_sanitize(old_field._caption),
                           description=_sanitize(getattr(old_field, '_description', '')))
-        self._migrate_field_input(field, old_field)
+        self._migrate_field_input(field, old_field, pd_type)
         self.importer.print_info(cformat('%{green}Field/{}%{reset} - %{cyan}{}').format(field.input_type, field.title))
         self.field_map[old_field] = field
         return field
 
-    def _migrate_field_input(self, field, old_field):
+    def _migrate_field_input(self, field, old_field, pd_type):
         field_data = {}
         field_billable = False
         field_places_limit = False
         inp = old_field._input
         old_type = inp._id
-        if old_type in {'text', 'country', 'file'}:
+        if pd_type == PersonalDataType.email:
+            input_type = 'email'
+        elif old_type in {'text', 'country', 'file'}:
             input_type = old_type
         elif old_type == 'textarea':
             input_type = 'textarea'
