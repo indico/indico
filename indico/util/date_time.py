@@ -361,3 +361,12 @@ def round_up_month(date, from_day=1):
         return date + relativedelta(day=1, months=+1)
     else:
         return date
+
+
+def strftime_all_years(dt, fmt):
+    """Exactly like datetime.strftime but supports year<1900"""
+    assert '%%Y' not in fmt  # unlikely but just in case
+    if dt.year >= 1900:
+        return dt.strftime(fmt)
+    else:
+        return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', unicode(dt.year))

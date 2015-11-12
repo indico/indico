@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import pytest
 from dateutil.parser import parse
 
-from indico.util.date_time import round_up_month, format_human_timedelta
+from indico.util.date_time import round_up_month, format_human_timedelta, strftime_all_years
 
 
 @pytest.mark.parametrize(('current_date', 'from_day', 'expected_month'), (
@@ -53,3 +53,11 @@ def test_round_up_month(current_date, from_day, expected_month):
 ))
 def test_format_human_timedelta(delta, granularity, expected):
     assert format_human_timedelta(delta, granularity) == expected
+
+
+@pytest.mark.parametrize(('dt', 'fmt', 'expected'), (
+    (datetime(2015, 11, 12, 17, 30), '%Y-%m-%d', '2015-11-12'),
+    (datetime(1015, 11, 12, 17, 30), '%Y-%m-%d %H:%M', '1015-11-12 17:30'),
+))
+def test_strftime_all_years(dt, fmt, expected):
+    assert strftime_all_years(dt, fmt) == expected

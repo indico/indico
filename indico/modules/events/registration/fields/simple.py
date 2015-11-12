@@ -32,7 +32,7 @@ from indico.core.db import db
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.registrations import RegistrationData
-from indico.util.date_time import format_date, iterdays
+from indico.util.date_time import format_date, iterdays, strftime_all_years
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
 from indico.util.string import normalize_phone_number, snakify_keys
@@ -273,7 +273,7 @@ class DateField(RegistrationFormFieldBase):
         if not date_string:
             return ''
         dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
-        return dt.strftime(self.form_item.data['date_format'])
+        return strftime_all_years(dt, self.form_item.data['date_format'])
 
     @property
     def view_data(self):
