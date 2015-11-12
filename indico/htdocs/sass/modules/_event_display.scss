@@ -100,32 +100,81 @@ li > table + .note-area-wrapper {
         font-size: 1.1em;
     }
 }
+.participant-list-wrapper {
+    position: relative;
 
-ul.participant-list {
-    @extend %font-family-title;
+    &.collapsible {
+        &.collapsed {
+            max-height: 4.75em;
+            overflow: hidden;
 
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-
-    li {
-        @include border-radius(2px);
-        @include icon-before('icon-user');
-
-        display: inline-block;
-        font-size: 0.95em;
-        padding: 0.2em 0.5em;
-        margin-bottom: 0.1em;
-        color: $black;
-        background: $pastel-gray;
-
-        &:before {
-            color: $gray;
-            margin-right: 0.4em;
+            .gradient-layer {
+                @include gradient(rgba(0,0,0,0.0), #ECECEC);
+                display: block;
+                position: absolute;
+                bottom: 0;
+                height: 1.5em;
+                width: 100%;
+                cursor: pointer;
+            }
         }
 
-        &:not(first-child) {
-            margin-left: 0.1em;
+        &:hover {
+            & > .trigger {
+                color: $light-black;
+            }
+        }
+
+        & > .trigger {
+            display: inline-block;
+            position: absolute;
+            cursor: pointer;
+            right: 0.6em;
+            top: 0;
+            color: $dark-gray;
+            @include user-select(none);
+        }
+
+        & > ul.participant-list {
+            width: 95%; // To avoid overlap with expansion arrow
+        }
+    }
+
+    .gradient-layer, .trigger {
+        display: none;
+    }
+
+    .height-control {
+        height: 5.3em; // Enough to display 3 rows of participants
+        display: none;
+    }
+
+    ul.participant-list {
+        @extend %font-family-title;
+
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+
+        li {
+            @include border-radius(2px);
+            @include icon-before('icon-user');
+
+            display: inline-block;
+            font-size: 0.95em;
+            padding: 0.2em 0.5em;
+            margin-bottom: 0.1em;
+            color: $black;
+            background: $pastel-gray;
+
+            &:before {
+                color: $gray;
+                margin-right: 0.4em;
+            }
+
+            &:not(first-child) {
+                margin-left: 0.1em;
+            }
         }
     }
 }

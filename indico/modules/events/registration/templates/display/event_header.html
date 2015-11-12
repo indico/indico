@@ -52,11 +52,15 @@
     <tr>
         <td class="leftCol">{% trans %}Participants{% endtrans %}</td>
         <td>
-            <ul class="participant-list">
-                {%- for participant in participants -%}
-                    <li>{{ participant.full_name }}</li>
-                {%- endfor -%}
-            </ul>
+            <div class="participant-list-wrapper">
+                <ul class="participant-list">
+                    {%- for participant in participants -%}
+                        <li>{{ participant.full_name }}</li>
+                    {%- endfor -%}
+                </ul>
+                <div class="gradient-layer"></div>
+                <a class="trigger icon-expand" title="{% trans %}See the full list{% endtrans %}"></a>
+            </div>
         </td>
     </tr>
 {% endif %}

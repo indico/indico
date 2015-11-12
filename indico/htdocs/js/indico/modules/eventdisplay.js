@@ -1,7 +1,7 @@
 $(document).ready(function() {
     'use strict';
 
-    $('.event-service-row > .trigger').click(function() {
+    $('.event-service-row > .trigger').on('click', function() {
         var toggler = $(this);
         toggler.siblings('.event-service-details').slideToggle({
             start: function() {
@@ -21,6 +21,51 @@ $(document).ready(function() {
             },
             duration: 'fast'
         });
+    });
+
+    var gradientLayer = $('.participant-list-wrapper > .gradient-layer');
+    var heightControl = $('<div>', {'class': 'height-control'});
+    gradientLayer.append(heightControl);
+    var threeRowsHeight = heightControl.height();
+    $('.participant-list-wrapper').toggleClass('collapsible collapsed',
+        $('.participant-list').height() > threeRowsHeight);
+    var initialHeight = $('.participant-list-wrapper').height();
+    heightControl.remove();
+
+    $('.participant-list-wrapper > .trigger, .participant-list-wrapper > .gradient-layer').on('click', function() {
+        var toggler = $('.participant-list-wrapper > .trigger');
+        var participantList = toggler.siblings('.participant-list');
+        var wrapper = participantList.parent();
+        if (wrapper.hasClass('collapsed')) {
+            var newHeight = participantList.height();
+            participantList.height(initialHeight);
+            wrapper.find('.gradient-layer').fadeOut();
+            wrapper.removeClass('collapsed');
+            wrapper.animate({
+                height: newHeight
+            }, {
+                duration: 'fast',
+                start: function() {
+                    toggler.addClass('icon-collapse').removeClass('icon-expand');
+                },
+                complete: function() {
+                    participantList.height(newHeight);
+                }
+            });
+        } else {
+            wrapper.find('.gradient-layer').fadeIn();
+            wrapper.animate({
+                height: initialHeight,
+            }, {
+                duration: 'fast',
+                start: function() {
+                    toggler.removeClass('icon-collapse').addClass('icon-expand');
+                },
+                complete: function(){
+                    wrapper.addClass('collapsed');
+                }
+            });
+        }
     });
 
     function toggleNote(element, visible, immediate) {
