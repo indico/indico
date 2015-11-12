@@ -89,7 +89,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
             )
         else:
             criteria = RegistrationForm.is_scheduled
-        regforms = regforms.filter(criteria).all()
+        regforms = regforms.filter(criteria).order_by(db.func.lower(RegistrationForm.title)).all()
         if len(regforms) == 1:
             return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self.event, event=self.event,
