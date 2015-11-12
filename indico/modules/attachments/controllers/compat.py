@@ -27,6 +27,8 @@ from MaKaC.webinterface.rh.base import RHSimple
 
 
 def _clean_args(kwargs):
+    if 'event_id' not in kwargs:
+        raise NotFound
     if is_legacy_id(kwargs['event_id']):
         mapping = LegacyEventMapping.find(legacy_event_id=kwargs['event_id']).first_or_404()
         kwargs['event_id'] = mapping.event_id
