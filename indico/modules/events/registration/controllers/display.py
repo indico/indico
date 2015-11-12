@@ -86,7 +86,6 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
             criteria = db.or_(
                 RegistrationForm.is_scheduled,
                 RegistrationForm.registrations.any((Registration.user == session.user) & Registration.is_active),
-                RegistrationForm.invitations.any(RegistrationInvitation.email.in_(session.user.all_emails))
             )
         else:
             criteria = RegistrationForm.is_scheduled
