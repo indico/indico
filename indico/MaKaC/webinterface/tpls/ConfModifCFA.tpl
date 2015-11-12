@@ -152,6 +152,9 @@ $(function() {
                     new AbstractFieldDialogFactory().makeDialog(fieldType, ${confId}).open();
                 });
             }
+        },
+        style: {
+            classes: 'add-field-qtip'
         }
     });
 

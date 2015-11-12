@@ -74,7 +74,7 @@ ndRegForm.directive('ndFieldPicker', function($http, $compile, $templateCache, u
                         },
 
                         style: {
-                            classes: 'regform-add-field-qtip',
+                            classes: 'add-field-qtip',
                             name: 'light'
                         },
 
