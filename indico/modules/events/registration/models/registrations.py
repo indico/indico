@@ -398,7 +398,7 @@ class Registration(db.Model):
         return personal_data
 
     def render_price(self):
-        currency = event_payment_settings.get(self.registration_form.event, 'currency')
+        currency = event_payment_settings.get(self.registration_form.event, 'currency', '')
         return format_currency(self.price, currency, locale=session.lang or 'en_GB')
 
     def sync_state(self, _skip_moderation=True):
@@ -565,7 +565,7 @@ class RegistrationData(StoredFileMixin, db.Model):
         return Config.getInstance().getAttachmentStorage(), path
 
     def render_price(self):
-        currency = event_payment_settings.get(self.registration.registration_form.event, 'currency')
+        currency = event_payment_settings.get(self.registration.registration_form.event, 'currency', '')
         return format_currency(self.price, currency, locale=session.lang or 'en_GB')
 
 
