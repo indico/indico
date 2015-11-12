@@ -154,7 +154,9 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
             form.populate_obj(self.attachment, skip={'acl', 'file'})
             self.attachment.folder = folder
             if self.attachment.is_protected:
-                self.attachment.acl = form.acl.data
+                # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
+                self.attachment.acl |= form.acl.data
+                self.attachment.acl &= form.acl.data
             # files need special handling; links are already updated in `populate_obj`
             if self.attachment.type == AttachmentType.file:
                 file = request.files['file'] if request.files else None
@@ -203,7 +205,9 @@ class EditFolderMixin(SpecificFolderMixin):
         if form.validate_on_submit():
             form.populate_obj(self.folder, skip={'acl'})
             if self.folder.is_protected:
-                self.folder.acl = form.acl.data
+                # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
+                self.folder.acl |= form.acl.data
+                self.folder.acl &= form.acl.data
             logger.info('Folder {} edited by {}'.format(self.folder, session.user))
             signals.attachments.folder_updated.send(self.folder, user=session.user)
             flash(_("Folder \"{name}\" updated").format(name=self.folder.title), 'success')
