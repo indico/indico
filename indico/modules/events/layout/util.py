@@ -202,6 +202,10 @@ def get_menu_entry_by_name(name, event):
     return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
 
 
+def is_menu_entry_enabled(name, event):
+    return get_menu_entry_by_name(name, event).is_enabled
+
+
 def get_images_for_event(event):
     """Return all non-deleted images uploaded to a specific event
     """

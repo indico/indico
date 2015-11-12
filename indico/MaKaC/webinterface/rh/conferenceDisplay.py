@@ -16,9 +16,11 @@
 
 from datetime import datetime
 from flask import session
+from werkzeug.exceptions import Forbidden
 import os
 import pytz
 
+from indico.modules.events.layout.util import is_menu_entry_enabled
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
@@ -74,9 +76,6 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
 
     def _checkParams( self, params ):
         RHConferenceBase._checkParams( self, params )
-
-    def _checkProtection(self):
-        RHDisplayBaseProtected._checkProtection(self)
 
 
 class RHConferenceDisplay(RHConferenceBaseDisplay):
@@ -233,6 +232,7 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
         postURL = urlHandlers.UHConferenceSendEmail.getURL(self._emailto)
         p=conferences.WPEMail(self, self._target)
         return p.display(emailto=[self._emailto], postURL=postURL)
+
 
 class RHConferenceSendEmail (RHConferenceBaseDisplay, base.RHProtected):
     _uh = urlHandlers.UHConferenceSendEmail
@@ -485,6 +485,10 @@ class RHContributionList( RHConferenceBaseDisplay ):
         self._filterCrit.getField("track").setShowNoValue( trackShowNoValue )
         self._filterCrit.getField("session").setShowNoValue( sessionShowNoValue )
 
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        if not is_menu_entry_enabled('contributions', self._conf):
+            raise Forbidden()
 
     def _process( self ):
         p = conferences.WPContributionList( self, self._target )
@@ -497,9 +501,15 @@ class RHAuthorIndex(RHConferenceBaseDisplay):
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
 
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        if not is_menu_entry_enabled('author_index', self._conf):
+            raise Forbidden()
+
     def _process(self):
         p=conferences.WPAuthorIndex(self,self._target)
         return p.display()
+
 
 class RHSpeakerIndex(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHConfSpeakerIndex
@@ -507,9 +517,15 @@ class RHSpeakerIndex(RHConferenceBaseDisplay):
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
 
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        if not is_menu_entry_enabled('speaker_index', self._conf):
+            raise Forbidden()
+
     def _process(self):
         p=conferences.WPSpeakerIndex(self,self._target)
         return p.display()
+
 
 class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuff
