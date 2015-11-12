@@ -168,7 +168,7 @@ class InvitationFormNew(InvitationFormBase):
     def validate_email(self, field):
         if RegistrationInvitation.find(email=field.data).with_parent(self.regform).count():
             raise ValidationError(_("There is already an invitation with this email address."))
-        if Registration.find(email=field.data, is_deleted=False).with_parent(self.regform).count():
+        if Registration.find(email=field.data, is_active=True).with_parent(self.regform).count():
             raise ValidationError(_("There is already a registration with this email address."))
 
 
@@ -192,7 +192,7 @@ class InvitationFormExisting(InvitationFormBase):
             raise ValidationError(_("There are already invitations for the following email addresses: {emails}")
                                   .format(emails=', '.join(sorted(existing))))
         # registrations
-        existing = {x.email for x in self.regform.registrations} & emails
+        existing = {x.email for x in self.regform.registrations if x.is_active} & emails
         if existing:
             raise ValidationError(_("There are already registrations with the following email addresses: {emails}")
                                   .format(emails=', '.join(sorted(existing))))
