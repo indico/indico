@@ -45,7 +45,6 @@ from indico.modules.events.registration.models.items import (RegistrationFormSec
                                                              RegistrationFormPersonalDataSection, RegistrationFormText)
 from indico.modules.events.registration.models.legacy_mapping import LegacyRegistrationMapping
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState, RegistrationData
-from indico.modules.payment import settings as payment_settings
 from indico.modules.payment.models.transactions import TransactionStatus, PaymentTransaction
 from indico.modules.users import User
 from indico.util.caching import memoize
@@ -968,7 +967,6 @@ class EventRegformImporter(LocalFileImporterMixin, Importer):
 
     def load_data(self):
         self.print_step("Loading some data")
-        self.default_currency = payment_settings.get('currency')
         self.all_users_by_email = {}
         for user in User.query.options(joinedload('_all_emails')):
             if user.is_deleted:
