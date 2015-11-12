@@ -2,31 +2,33 @@
 
 {% macro render_regform_info(regform, currency) %}
     <div class="infogrid condensed">
-        <div class="infoline date">
-            <i class="icon icon-time"></i>
-            <div class="text">
-                <div>
-                    <span class="label">
-                        {% trans %}From{% endtrans %}
-                    </span>
-                    <span class="datetime">
-                        {{ regform.start_dt|format_date }}
-                    </span>
-                </div>
-                <div>
-                    <span class="label">
-                        {% trans %}To{% endtrans %}
-                    </span>
-                    <span class="datetime">
-                        {% if regform.end_dt %}
-                            {{ regform.end_dt|format_date }}
-                        {% else %}
-                            <em>{% trans %}Not specified{% endtrans %}</em>
-                        {% endif %}
-                    </span>
+        {% if regform.is_scheduled %}
+            <div class="infoline date">
+                <i class="icon icon-time"></i>
+                <div class="text">
+                    <div>
+                        <span class="label">
+                            {% trans %}From{% endtrans %}
+                        </span>
+                        <span class="datetime">
+                            {{ regform.start_dt|format_date }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="label">
+                            {% trans %}To{% endtrans %}
+                        </span>
+                        <span class="datetime">
+                            {% if regform.end_dt %}
+                                {{ regform.end_dt|format_date }}
+                            {% else %}
+                                <em>{% trans %}Not specified{% endtrans %}</em>
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         {% if regform.base_price -%}
             <div class="infoline">
                 <i class="icon icon-coins"></i>
