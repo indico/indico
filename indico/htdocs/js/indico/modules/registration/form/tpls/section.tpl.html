@@ -44,25 +44,8 @@
         </table>
     </div>
 
-    <div ng-switch="section.id" class="i-box-content">
-        <div ng-switch-default
-            ng-include="getTpl('sections/general.tpl.html')">
-        </div>
-        <div ng-switch-when="accommodation"
-            ng-include="getTpl('sections/accomodation.tpl.html')">
-        </div>
-        <div ng-switch-when="furtherInformation"
-            ng-include="getTpl('sections/furtherinfo.tpl.html')">
-        </div>
-        <div ng-switch-when="reasonParticipation"
-            ng-include="getTpl('sections/reason.tpl.html')">
-        </div>
-        <div ng-switch-when="sessions"
-            ng-include="getTpl('sections/sessions_{0}.tpl.html'.format(section.type))">
-        </div>
-        <div ng-switch-when="socialEvents"
-            ng-include="getTpl('sections/socialevents.tpl.html')">
-        </div>
+    <div class="i-box-content">
+        <div ng-include="getTpl('sections/general.tpl.html')"></div>
     </div>
 
     <nd-dialog nd-section-dialog
