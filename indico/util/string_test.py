@@ -20,7 +20,7 @@ import pytest
 from enum import Enum
 
 from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
-                                camelize, camelize_keys, snakify_keys, crc32, normalize_phone_number)
+                                camelize, camelize_keys, snakify_keys, crc32, normalize_phone_number, sanitize_email)
 
 
 def test_seems_html():
@@ -174,3 +174,15 @@ def test_crc32():
 ))
 def test_normalize_phone_number(input, output):
     assert normalize_phone_number(input) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('', ''),
+    ('foo', 'foo'),
+    ('foo@bar.fb', 'foo@bar.fb'),
+    ('<foo@bar.fb>', 'foo@bar.fb'),
+    ('foobar <foo@bar.fb> asdf', 'foo@bar.fb'),
+    ('foobar <foo@bar.fb> <test@test.com>', 'foo@bar.fb')
+))
+def test_sanitize_email(input, output):
+    assert sanitize_email(input) == output

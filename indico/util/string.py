@@ -482,3 +482,10 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
     full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name, last_name)
     return full_name if not show_title or not title else u'{} {}'.format(title, full_name)
+
+
+def sanitize_email(email):
+    if '<' not in email:
+        return email
+    m = re.search(r'<([^>]+)>', email)
+    return email if m is None else m.group(1)

@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import re
 from operator import attrgetter
 
 import click
@@ -28,17 +27,10 @@ from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.users import User
 from indico.util.console import verbose_iterator, cformat
-from indico.util.string import is_valid_mail
+from indico.util.string import is_valid_mail, sanitize_email
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import patch_default_group_provider, convert_principal
-
-
-def _sanitize_email(email):
-    if '<' not in email:
-        return email
-    m = re.search(r'<([^>]+)>', email)
-    return email if m is None else m.group(1)
 
 
 class EventManagerImporter(Importer):
@@ -110,7 +102,7 @@ class EventManagerImporter(Importer):
         return principal
 
     def process_emails(self, event, principals, emails, name, color, full_access=None, roles=None):
-        emails = {_sanitize_email(convert_to_unicode(email).lower()) for email in emails}
+        emails = {sanitize_email(convert_to_unicode(email).lower()) for email in emails}
         emails = {email for email in emails if is_valid_mail(email, False)}
         for email in emails:
             self.process_principal(event, principals, email, name, color, full_access, roles)

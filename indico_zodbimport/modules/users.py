@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import re
 from contextlib import contextmanager
 from datetime import timedelta
 from uuid import uuid4
@@ -36,7 +35,7 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.caching import memoize
 from indico.util.console import cformat
 from indico.util.i18n import get_all_locales
-from indico.util.string import is_valid_mail
+from indico.util.string import is_valid_mail, sanitize_email
 from indico.util.struct.iterables import committing_iterator, grouper
 
 from indico_zodbimport import Importer, convert_to_unicode
@@ -50,13 +49,6 @@ SYNCED_FIELD_MAP = {
     'address': 'address',
     'phone': 'phone'
 }
-
-
-def _sanitize_email(email):
-    if '<' not in email:
-        return email
-    m = re.search(r'<([^>]+)>', email)
-    return email if m is None else m.group(1)
 
 
 @memoize
@@ -307,8 +299,8 @@ class UserImporter(Importer):
                             'registration', 'registrant')
 
     def _user_from_avatar(self, avatar, **kwargs):
-        email = _sanitize_email(convert_to_unicode(avatar.email).lower().strip())
-        secondary_emails = {_sanitize_email(convert_to_unicode(x).lower().strip()) for x in avatar.secondaryEmails}
+        email = sanitize_email(convert_to_unicode(avatar.email).lower().strip())
+        secondary_emails = {sanitize_email(convert_to_unicode(x).lower().strip()) for x in avatar.secondaryEmails}
         secondary_emails = {x for x in secondary_emails if x and is_valid_mail(x, False) and x != email}
         # we handle deletion later. otherwise it might be set before secondary_emails which would
         # result in those emails not being marked as deleted
