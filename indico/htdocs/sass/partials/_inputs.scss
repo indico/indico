@@ -380,6 +380,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 color: $black;
                 width: 400px;
                 .form-field-description {
+                    font-style: italic;
                     color: $light-black;
                 }
             }
@@ -476,7 +477,9 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         }
 
         .form-field-description {
+            font-style: italic;
             margin-top: 0.25em;
+            margin-bottom: 0.5em;
             width: 400px;
         }
 

@@ -40,7 +40,7 @@
             {{ caller() }}
         {%- endif -%}
         {% if field.description %}
-            <p class="form-field-description"><em>{{ field.description | safe }}</em></p>
+            <div class="form-field-description">{{ field.description | safe }}</div>
         {% endif %}
     </div>
 {%- endmacro %}
