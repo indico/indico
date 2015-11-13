@@ -130,6 +130,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             eventEndDate: '@',
             userInfo: '@',
             registrationData: '@',
+            registrationMetaData: '@',
             registrationUuid: '@',
             csrfToken: '&',
             editMode: '=',
@@ -143,6 +144,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $scope.sections = angular.fromJson($scope.confSections);
             $scope.userInfo = angular.fromJson($scope.userInfo);
             $scope.registrationData = angular.fromJson($scope.registrationData);
+            $scope.registrationMetaData = angular.fromJson($scope.registrationMetaData);
             $scope.registrationUuid = $scope.registrationUuid;
 
             $rootScope.confId = $scope.confId;
@@ -271,6 +273,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         link: function(scope, element) {
             scope.validationStarted = false;
             scope.currency = scope.confCurrency;
+            scope.regMetadata = {};
 
             scope.animations = {
                 recoverSectionButton: '',
@@ -284,6 +287,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 scope.userdata = _.extend({}, scope.userInfo);
             } else {
                 scope.userdata = _.extend({}, scope.registrationData);
+                scope.regMetadata = _.extend({}, scope.registrationMetaData);
             }
 
             element.on('submit', function(e) {

@@ -4,7 +4,7 @@
             <input type="radio" name="radio-field-{{ fieldName }}" value=""
                    ng-model="radioValue.id"
                    ng-click="onSingleFieldItemChange({'': 1})"
-                   ng-disabled="field.billableDisabled || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
+                   ng-disabled="field.billableDisabled || paymentBlocked(item, userdata, regMetadata) || anyBillableItemPayed(userdata)"/>
             {{ 'None' | i18n }}
         </li>
         <li ng-repeat="item in field.choices">
@@ -14,7 +14,7 @@
                 value="{{ item.id }}"
                 ng-model="radioValue.id"
                 ng-required="field.isRequired && radioValue.id === undefined"
-                ng-disabled="isDisabled(item, getUserdataValue()) || !userdata.manager && (paymentBlocked(item, userdata) || selectedItemIsBillable(userdata))"
+                ng-disabled="isDisabled(item, getUserdataValue()) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || selectedItemIsBillable(userdata, regMetadata))"
                 ng-click="onSingleFieldItemChange(item)"/>
             <label ng-class="{'text-error': validationStarted && nestedForm.$invalid}" for="field-{{ section.id }}-{{ field.id }}-{{ item.id }}">
                 {{ item.caption }}
@@ -32,7 +32,7 @@
                     [{{ getPlacesLeft(item, getUserdataValue(), radioValue.id) }} {{ 'place(s) left' | i18n }}]
                 </span>
             </span>
-            <span ng-if="!userdata.manager && !field.billableDisabled &&(paymentBlocked(item, userdata) || selectedItemIsBillable(userdata))"
+            <span ng-if="!regMetadata.manager && !field.billableDisabled &&(paymentBlocked(item, userdata, regMetadata) || selectedItemIsBillable(userdata, regMetadata))"
                   class="icon-warning billable-items-warning"
                   data-qtip-style="error"
                   title="{{ 'This option could trigger a price change and has been blocked.' | i18n }}">

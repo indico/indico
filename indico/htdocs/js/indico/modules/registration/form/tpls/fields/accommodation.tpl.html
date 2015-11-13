@@ -29,7 +29,7 @@
                         value="{{ item.id }}"
                         ng-checked="userdata[fieldName].choice == item.id"
                         ng-model="accommodation.choice"
-                        ng-disabled="isDisabled(item, userdata.accommodation.choice) || !userdata.manager && (paymentBlocked(item, userdata) || billableOptionPayed(userdata))"
+                        ng-disabled="isDisabled(item, userdata.accommodation.choice) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || billableOptionPayed(userdata, regMetadata))"
                         ng-required="field.isRequired"/>
                     {{ item.caption }}
 
@@ -59,7 +59,7 @@
                     </span>
                 </td>
                 <td>
-                    <span ng-if="!userdata.manager && (paymentBlocked(item, userdata) || billableOptionPayed(userdata))"
+                    <span ng-if="!regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || billableOptionPayed(userdata, regMetadata))"
                           class="icon-warning billable-items-warning"
                           data-qtip-style="error"
                           title="{{ 'This option could trigger a price change and has been blocked.' | i18n }}">
@@ -88,7 +88,7 @@
                         id="arrivalDate"
                         ng-model="accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
-                        ng-disabled="(!userdata.manager && billableOptionPayed(userdata)) || !accommodation.choice"
+                        ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) || !accommodation.choice"
                         ng-required="field.isRequired || accommodation.choice">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.arrivalDates" value="{{ date[0] }}"
@@ -110,7 +110,7 @@
                         id="departureDate"
                         ng-model="accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
-                        ng-disabled="(!userdata.manager && billableOptionPayed(userdata)) || !accommodation.choice"
+                        ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) || !accommodation.choice"
                         ng-required="field.isRequired || accommodation.choice">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.departureDates" value="{{ date[0] }}"

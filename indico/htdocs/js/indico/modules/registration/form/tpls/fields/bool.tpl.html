@@ -3,8 +3,8 @@
         <select
             id="field-{{ section.id }}-{{ field.id }}"
             name="{{ fieldName }}"
-            ng-required="field.isRequired || paymentBlocked(field, userdata) == false"
-            ng-disabled="!userdata.manager && paymentBlocked(field, userdata)"
+            ng-required="field.isRequired || paymentBlocked(field, userdata, regMetadata) == false"
+            ng-disabled="!regMetadata.manager && paymentBlocked(field, userdata, regMetadata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option ng-if="!field.isRequired" value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option value="yes"

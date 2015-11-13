@@ -281,14 +281,14 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         return false;
     };
 
-    $scope.paymentBlocked = function(item, userdata, validation) {
+    $scope.paymentBlocked = function(item, userdata, registrationMetaData, validation) {
         item = item || {};
         userdata = userdata || {};
 
         if (validation !== undefined) {
-            return ($scope.changesPrice(item) && userdata.paid) || validation(userdata);
+            return ($scope.changesPrice(item) && registrationMetaData.paid) || validation(userdata);
         } else {
-            return $scope.changesPrice(item) && userdata.paid;
+            return $scope.changesPrice(item) && registrationMetaData.paid;
         }
     };
 
@@ -326,9 +326,9 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
 
                 // After the field is loaded, we can check whether it's billable, etc
                 // and disable it if needed
-                scope.field.billableDisabled = !scope.userdata.manager && (scope.userdata.paid &&
+                scope.field.billableDisabled = !scope.regMetadata.manager && (scope.regMetadata.paid &&
                     (scope.field.isBillable && scope.field.price > 0)) ||
-                    (scope.selectedItemIsBillable && scope.selectedItemIsBillable(scope.userdata));
+                    (scope.selectedItemIsBillable && scope.selectedItemIsBillable(scope.userdata, scope.regMetadata));
             });
         }
     };
@@ -548,8 +548,8 @@ var ndSelectController = function($scope) {
         }
     };
 
-    $scope.selectedItemIsBillable = function(userdata) {
-        if (userdata.paid) {
+    $scope.selectedItemIsBillable = function(userdata, registrationMetaData) {
+        if (registrationMetaData.paid) {
             var item = _.find($scope.field.choices, function(item) {
                 return userdata[$scope.field.htmlName] ? !!userdata[$scope.field.htmlName][item.id] : false;
             }) || {};
@@ -898,12 +898,12 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 }
             });
 
-            scope.billableOptionPayed = function(userdata) {
+            scope.billableOptionPayed = function(userdata, registrationMetaData) {
                 if (userdata[scope.field.htmlName] !== undefined) {
                     var choice = _.find(scope.field.choices, function(choice) {
                         return userdata[scope.field.htmlName].choice == choice.id;
                     });
-                    return choice && choice.isBillable && userdata.paid;
+                    return choice && choice.isBillable && registrationMetaData.paid;
                 }
 
                 return false;

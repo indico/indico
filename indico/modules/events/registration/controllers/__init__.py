@@ -60,13 +60,14 @@ class RegistrationEditMixin:
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
 
-        registration_data.update({
+        registration_metadata = {
             'paid': self.registration.is_paid,
             'manager': self.management
-        })
+        }
 
         return self.view_class.render_template(self.template_file, self.event, event=self.event,
                                                sections=section_data, regform=self.regform,
                                                currency=payment_event_settings.get(self.event, 'currency'),
                                                registration_data=registration_data,
+                                               registration_metadata=registration_metadata,
                                                registration=self.registration)

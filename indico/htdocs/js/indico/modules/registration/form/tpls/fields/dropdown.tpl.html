@@ -3,14 +3,14 @@
         id="{{ field.id }}"
         ng-model="input"
         ng-required="field.isRequired"
-        ng-disabled="!userdata.manager && selectedItemIsBillable(userdata)"
+        ng-disabled="!regMetadata.manager && selectedItemIsBillable(userdata, regMetadata)"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-change="selectedItem = getSelectedItem(input) || {}; onSingleFieldItemChange(selectedItem);">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.choices | filter:isVisible"
             id="{{ item.id }}"
             value="{{ item.id }}"
-            ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || (!userdata.manager && paymentBlocked(item, userdata))"
+            ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
             ng-selected="item.id == getId(fieldName)">
             {{ item.caption }}
             {{ getBillableStr(item, getUserdataValue()) }}
@@ -20,7 +20,7 @@
           data-qtip-style="error"
           title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
     </span>
-    <span ng-if="!userdata.manager && userdata.paid && !field.billableDisabled && hasBillableOptions(field)"
+    <span ng-if="!regMetadata.manager && regMetadata.paid && !field.billableDisabled && hasBillableOptions(field)"
           class="icon-warning billable-items-warning right"
           data-qtip-style="error"
           title="{{ 'There are options that could trigger a price change and have been blocked.' | i18n }}">

@@ -4,11 +4,11 @@
             <li ng-repeat="item in field.choices | filter:{isEnabled: true}" ng-required="field.isRequired"
                 ng-class="{hasError: validationStarted && nestedForm.$invalid}">
                 <input id="{{ item.id }}" type="checkbox" ng-click="multiFieldItemChecked($event)"
-                       ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || (!userdata.manager && paymentBlocked(item, userdata))"
+                       ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
                        ng-model="itemChecked"
                        ng-init="itemChecked=userdata[fieldName][item.id] ? true : false"
-                       data-paid="{{ userdata.paid }}"
-                       data-blocked="{{ paymentBlocked(item, userdata) }}"
+                       data-paid="{{ regMetadata.paid }}"
+                       data-blocked="{{ paymentBlocked(item, userdata, regMetadata) }}"
                        ng-checked="userdata[fieldName][item.id]">
                 <label for="{{ item.id }}">{{ field.captions[item.id] }}</label>
                 <span ng-if="changesPrice(item)" class="regFormPrice">{{ item.price }}</span>
@@ -33,7 +33,7 @@
                         {{ getPlacesLeft(item, userdata[fieldName], itemChecked) }} {{ 'place(s) left' | i18n }}
                     </span>
                 </span>
-                <span ng-if="!userdata.manager && userdata.paid && changesPrice(item)"
+                <span ng-if="!regMetadata.manager && regMetadata.paid && changesPrice(item)"
                       class="icon-warning billable-items-warning"
                       data-qtip-style="error"
                       title="{{ 'This option would result in a price change and has been blocked.' | i18n }}">
