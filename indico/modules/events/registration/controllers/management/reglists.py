@@ -260,9 +260,7 @@ def _render_registration_list(regform, registrations):
 def _render_registration_details(registration):
     event = registration.registration_form.event
     tpl = get_template_module('events/registration/management/_registration_details.html')
-    return tpl.render_registration_details(registration=registration,
-                                           currency=payment_event_settings.get(event, 'currency'),
-                                           payment_enabled=event.has_feature('payment'))
+    return tpl.render_registration_details(registration=registration, payment_enabled=event.has_feature('payment'))
 
 
 def _generate_zip_file(attachments, regform):

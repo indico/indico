@@ -63,7 +63,7 @@
 </div>
 
 {{ render_registration_summary(registration) }}
-{% call render_invoice(registration, payment_enabled, currency, payment_conditions) %}
+{% call render_invoice(registration, payment_enabled, payment_conditions) %}
     {% if payment_enabled and registration.state.name == 'unpaid' %}
         <table class="regform-done-footer" width="100%" cellpadding="0" cellspacing="0">
             <tr>

@@ -397,9 +397,18 @@ class Registration(db.Model):
         personal_data.setdefault('email', self.email)
         return personal_data
 
-    def render_price(self):
+    def _render_price(self, price):
         currency = event_payment_settings.get(self.registration_form.event, 'currency', '')
-        return format_currency(self.price, currency, locale=session.lang or 'en_GB')
+        return format_currency(price, currency, locale=session.lang or 'en_GB')
+
+    def render_price(self):
+        return self._render_price(self.price)
+
+    def render_base_price(self):
+        return self._render_price(self.base_price)
+
+    def render_price_adjustment(self):
+        return self._render_price(self.price_adjustment)
 
     def sync_state(self, _skip_moderation=True):
         """Sync the state of the registration"""

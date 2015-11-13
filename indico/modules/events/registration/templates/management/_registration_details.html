@@ -1,7 +1,7 @@
 {% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
                                                                                render_invoice %}
 
-{% macro render_registration_details(registration, payment_enabled, currency) %}
+{% macro render_registration_details(registration, payment_enabled) %}
     <div id="registration-details">
         <div class="action-box">
            <div class="section">
@@ -22,7 +22,7 @@
         </div>
 
         {{ render_registration_summary(registration, from_management=True) }}
-        {% call render_invoice(registration, payment_enabled, currency) %}
+        {% call render_invoice(registration, payment_enabled) %}
             <table class="regform-done-footer registration-info">
                 <tr>
                     <td>

@@ -81,7 +81,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_invoice(registration, payment_enabled, currency, payment_conditions=false) %}
+{% macro render_invoice(registration, payment_enabled, payment_conditions=false) %}
     {% if registration.price %}
         <div id="payment-summary" class="regform-done">
             <div class="i-box-header">
@@ -138,7 +138,7 @@
                                    {{ item.friendly_data }}
                                 {% endif %}
                             </td>
-                            <td class="text-right">{{ item.price }} {{ currency }}</td>
+                            <td class="text-right">{{ item.render_price() }}</td>
                         </tr>
                     {% endfor %}
                     {% if registration.base_price %}
@@ -148,7 +148,7 @@
                             </td>
                             <td></td>
                             <td class="text-right">
-                                {{ registration.base_price }} {{ currency }}
+                                {{ registration.render_base_price() }}
                             </td>
                         </tr>
                     {% endif %}
@@ -159,7 +159,7 @@
                             </td>
                             <td></td>
                             <td class="text-right">
-                                {{ registration.price_adjustment }} {{ currency }}
+                                {{ registration.render_price_adjustment() }}
                             </td>
                         </tr>
                     {% endif %}
