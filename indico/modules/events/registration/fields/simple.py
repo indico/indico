@@ -580,6 +580,10 @@ def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
 
 
+def _hashable_choice(choice):
+    return frozenset(choice.iteritems())
+
+
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
 
@@ -604,57 +608,59 @@ class MultiChoiceField(ChoiceBaseField):
 
         return_value = {}
 
-        if old_data:
-            old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
-            new_choices_mapping = {x['id']: x for x in self.form_item.versioned_data['choices']}
+        if old_data is not None:
+            # in case nothing changed we can skip all checks
+            if old_data.data == value:
+                return {}
 
-            # choices that have been removed but are still selected
-            revoked_selected_choice_ids = value.viewkeys() - new_choices_mapping.viewkeys()
-            # choices that had their price updated
-            updated_selected_choice_ids = {
-                x for x in value
-                if (x in old_choices_mapping and x in new_choices_mapping and
-                    (old_choices_mapping[x]['is_billable'] != new_choices_mapping[x]['is_billable'] or
-                     old_choices_mapping[x]['price'] != new_choices_mapping[x]['price']))
-            }
-            # if the user selected a new item that doesn't exist in the current version yet
-            new_items_selected = any(x not in old_choices_mapping for x in value)
-            # if all selected options exist in the old data version
-            all_choices_in_old = value.viewkeys() <= old_choices_mapping.viewkeys()
-
-            if all_choices_in_old:
+            selected_choice_hashes = {c['id']: _hashable_choice(c)
+                                      for c in old_data.field_data.versioned_data['choices']
+                                      if c['id'] in value}
+            selected_choice_hashes.update({c['id']: _hashable_choice(c)
+                                           for c in self.form_item.versioned_data['choices']
+                                           if c['id'] in value and c['id'] not in selected_choice_hashes})
+            selected_choice_hashes = set(selected_choice_hashes.itervalues())
+            existing_version_hashes = {c['id']: _hashable_choice(c)
+                                       for c in old_data.field_data.versioned_data['choices']}
+            latest_version_hashes = {c['id']: _hashable_choice(c) for c in self.form_item.versioned_data['choices']}
+            deselected_ids = old_data.data.viewkeys() - value.viewkeys()
+            modified_deselected = any(latest_version_hashes.get(id_) != existing_version_hashes.get(id_)
+                                      for id_ in deselected_ids)
+            if selected_choice_hashes <= set(latest_version_hashes.itervalues()):
+                # all choices available in the latest version - upgrade to that version
+                return_value['field_data'] = self.form_item.current_data
+            elif not modified_deselected and selected_choice_hashes <= set(existing_version_hashes.itervalues()):
+                # all choices available in the previously selected version - stay with it
                 return_value['field_data'] = old_data.field_data
-            elif new_items_selected:
-                # XXX: should we create a new version when deselecting a removed item
-                if not revoked_selected_choice_ids and not updated_selected_choice_ids:
-                    # only new choices selected, so just upgrade to the latest version
-                    return_value['field_data'] = self.form_item.current_data
-                else:
-                    # Create a new data version where the removed/updated items  have been added back.
-                    new_data_version = deepcopy(self.form_item.current_data.versioned_data)
-                    new_data_version['choices'].extend(old_choices_mapping[x] for x in revoked_selected_choice_ids)
-                    for i, data in enumerate(new_data_version['choices']):
-                        if data['id'] in updated_selected_choice_ids:
-                            new_data_version['choices'][i] = dict(old_choices_mapping[data['id']])
-                    data_version = RegistrationFormFieldData(field=self.form_item, versioned_data=new_data_version)
-                    return_value['field_data'] = data_version
-            else:  # pragma: no cover
-                raise Exception('Unexpected state - not all choices in old version but nothing new selected')
+            else:
+                # create a new version containing selected choices from the previously
+                # selected version and everything else from the latest version
+                new_choices = []
+                used_ids = set()
+                for choice in old_data.field_data.versioned_data['choices']:
+                    # copy all old choices that are currently selected
+                    if choice['id'] in value:
+                        used_ids.add(choice['id'])
+                        new_choices.append(choice)
+                for choice in self.form_item.versioned_data['choices']:
+                    # copy all new choices unless we already got them from the old version
+                    if choice['id'] not in used_ids:
+                        used_ids.add(choice['id'])
+                        new_choices.append(choice)
+                data_version = RegistrationFormFieldData(field=self.form_item, versioned_data={'choices': new_choices})
+                return_value['field_data'] = data_version
+            new_choices = return_value['field_data'].versioned_data['choices']
 
         if not billable_items_locked:
             processed_data = super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
             return {key: return_value.get(key, value) for key, value in processed_data.iteritems()}
-        if old_data.data == value:
-            # nothing changed
-            # XXX: should we ignore slot changes if extra slots don't pay?
-            # probably that needs a js update to keep the slots choice
-            # enabled even if the item is paid...
-            return return_value
         # XXX: This code still relies on the client sending data for the disabled fields.
         # This is pretty ugly but especially in case of non-billable extra slots it makes
         # sense to keep it like this.  If someone tampers with the list of billable fields
         # we detect it any reject the change to the field's data anyway.
-        if old_data:
+        if old_data is not None:
+            old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
+            new_choices_mapping = {x['id']: x for x in new_choices}
             old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
                             if old_choices_mapping[uuid]['is_billable'] and old_choices_mapping[uuid]['price']}
             new_billable = {uuid: num for uuid, num in value.iteritems()
