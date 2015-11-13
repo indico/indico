@@ -97,6 +97,15 @@ def instanceof(value, type_):
     return isinstance(value, type_)
 
 
+def subclassof(value, type_):
+    """Checks if `value` is a subclass of `type_`
+
+    :param value: a type
+    :param type_: a type
+    """
+    return issubclass(value, type_)
+
+
 def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''):
     """Returns template names for templates that may be overridden in a plugin.
 

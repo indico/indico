@@ -58,7 +58,7 @@ from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         call_template_hook, groupby, strip_tags)
+                                         subclassof, call_template_hook, groupby, strip_tags)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper, discover_blueprints)
 from indico.web.flask.wrappers import IndicoFlask
@@ -200,6 +200,7 @@ def setup_jinja(app):
     app.add_template_filter(alpha_enum)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
+    app.add_template_test(subclassof)  # only use this test if you really have to!
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
