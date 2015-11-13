@@ -16,10 +16,14 @@
 
 from __future__ import unicode_literals
 
+import re
+from operator import attrgetter
+
 from flask import render_template
 from markupsafe import escape, Markup
 
 from indico.core import signals
+from indico.util.decorators import classproperty
 from indico.util.signals import named_objects_from_signal
 
 
@@ -38,6 +42,31 @@ class Placeholder(object):
     required = False
     #: A short description of the placeholder.
     description = None
+    #: Whether the placeholder should not be shown by default
+    advanced = False
+
+    @classproperty
+    @classmethod
+    def friendly_name(cls):
+        return '{%s}' % cls.name
+
+    @classmethod
+    def get_regex(cls, **kwargs):
+        return re.compile(r'\{%s}' % re.escape(cls.name))
+
+    @classmethod
+    def replace(cls, text, **kwargs):
+        """Replaces all occurrences of the placeholder in a string
+
+        :param text: The text to replace placeholders in
+        :param kwargs: arguments specific to the placeholder's context
+        """
+        return cls.get_regex(**kwargs).sub(escape(cls.render(**kwargs)), text)
+
+    @classmethod
+    def is_in(cls, text, **kwargs):
+        """Checks whether the placeholder is used in a string"""
+        return cls.get_regex(**kwargs).search(text) is not None
 
     @classmethod
     def render(cls, **kwargs):
@@ -50,8 +79,59 @@ class Placeholder(object):
         Subclasses are encouraged to explicitly specify the arguments
         they expect instead of using ``**kwargs``.
 
-        :param kwargs: arguments specific to placeholder's context
+        :param kwargs: arguments specific to the placeholder's context
         """
+        raise NotImplementedError
+
+
+class ParametrizedPlaceholder(Placeholder):
+    """Base class for placeholders that can take an argument
+
+    Such placeholders are used like this: ``{something:arg}`` with
+    ``:arg`` being optional; if omitted the argument will be ``None``.
+
+    If you use `iter_param_info` to show parameter-specific
+    descriptions and do not want a generic info line (with just the
+    `param_friendl_name` in place of an actual param), set the
+    `description` of the placeholder to ``None``.
+    """
+
+    #: Whether the param is required
+    param_required = False
+    #: The human-friendly name of the param
+    param_friendly_name = 'param'
+    #: Whether only params defined in ``iter_param_info`` are allowed
+    param_restricted = False
+
+    @classproperty
+    @classmethod
+    def friendly_name(cls):
+        fmt = '{%s:%s}' if cls.param_required else '{%s[:%s]}'
+        return fmt % (cls.name, cls.param_friendly_name)
+
+    @classmethod
+    def get_regex(cls, **kwargs):
+        param_regex = ('|'.join(re.escape(x[0]) for x in cls.iter_param_info(**kwargs))
+                       if cls.param_restricted else '[^}]+')
+        regex = r'\{%s:(%s)}' if cls.param_required else r'\{%s(?::(%s))?}'
+        return re.compile(regex % (re.escape(cls.name), param_regex))
+
+    @classmethod
+    def iter_param_info(cls, **kwargs):
+        """Yields information for known params.
+
+        Each item yielded must be a ``(value, description)`` tuple.
+
+        :param kwargs: arguments specific to the placeholder's context
+        """
+        return iter([])
+
+    @classmethod
+    def replace(cls, text, **kwargs):
+        return cls.get_regex(**kwargs).sub(lambda m: escape(cls.render(m.group(1), **kwargs)), text)
+
+    @classmethod
+    def render(cls, param, **kwargs):
         raise NotImplementedError
 
 
@@ -60,17 +140,14 @@ def _get_placeholders(context, **kwargs):
 
 
 def replace_placeholders(context, text, **kwargs):
-    """Replaces placeholders in a stringt.
+    """Replaces placeholders in a string.
 
     :param context: the context where the placeholders are used
     :param text: the text to replace placeholders in
     :param kwargs: arguments specific to the context
     """
     for name, placeholder in _get_placeholders(context, **kwargs).iteritems():
-        p = '{%s}' % name
-        if p not in text:
-            continue
-        text = text.replace(p, escape(placeholder.render(**kwargs)))
+        text = placeholder.replace(text, **kwargs)
     return text
 
 
@@ -81,10 +158,8 @@ def get_missing_placeholders(context, text, **kwargs):
     :param text: the text to check
     :param kwargs: arguments specific to the context
     """
-    placeholders = {'{%s}' % name
-                    for name, placeholder in _get_placeholders(context, **kwargs).iteritems()
-                    if placeholder.required}
-    return {p for p in placeholders if p not in text}
+    placeholders = {p for p in _get_placeholders(context, **kwargs).itervalues() if p.required}
+    return {p.friendly_name for p in placeholders if not p.is_in(text, **kwargs)}
 
 
 def render_placeholder_info(context, **kwargs):
@@ -93,4 +168,6 @@ def render_placeholder_info(context, **kwargs):
     :param context: the context where the placeholders are used
     :param kwargs: arguments specific to the context
     """
-    return Markup(render_template('placeholder_info.html', placeholders=_get_placeholders(context, **kwargs)))
+    placeholders = sorted(_get_placeholders(context, **kwargs).values(), key=attrgetter('name'))
+    return Markup(render_template('placeholder_info.html', placeholder_kwargs=kwargs, placeholders=placeholders,
+                                  ParametrizedPlaceholder=ParametrizedPlaceholder))
