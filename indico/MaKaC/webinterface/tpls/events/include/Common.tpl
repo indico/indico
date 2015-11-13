@@ -1,9 +1,5 @@
 <%def name="renderDescription(text)">
-    % if isStringHTML(text):
-        <span itemprop="description">${text}</span>
-    % else:
-        <pre itemprop="description">${text}</pre>
-    % endif
+    <span itemprop="description">${text}</span>
 </%def>
 
 <%def name="renderLocation(item, parent=None, span='')">
