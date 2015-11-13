@@ -71,6 +71,11 @@
                           data-qtip-style="error"
                           title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
                     </span>
+                    <span ng-if="field.modifiedChoice && field.modifiedChoice.indexOf(item.id) != -1"
+                          class="icon-warning deleted-option-warning right"
+                          data-qtip-style="error"
+                          title="{{ 'The currently chosen option has been modified. If you unselect it you may not be able to select it again for the same price' | i18n }}">
+                    </span>
                 </td>
             </tr>
         </table>
