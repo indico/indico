@@ -31,20 +31,28 @@ from wtforms.validators import NumberRange, ValidationError, InputRequired
 from indico.core.db import db
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date, iterdays, strftime_all_years
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
-from indico.util.string import normalize_phone_number, snakify_keys
+from indico.util.string import normalize_phone_number, snakify_keys, camelize_keys
 from indico.web.forms.fields import IndicoRadioField, JSONField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
+
+
+def _get_choice_by_id(choice_id, choices):
+    for choice in choices:
+        if choice['id'] == choice_id:
+            return choice
 
 
 def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
     result = deepcopy(field.view_data)
     result['deletedChoice'] = []
+    result['modifiedChoice'] = []
     if not rdata or not rdata.data:
         return result
     values = [rdata.data['choice']] if 'choice' in rdata.data else rdata.data.keys()
@@ -57,6 +65,15 @@ def get_field_merged_options(field, registration_data):
             if missing_option:
                 result['choices'].append(missing_option)
                 result['deletedChoice'].append(missing_option['id'])
+        else:
+            current_choice_data = _get_choice_by_id(val, result['choices'])
+            registration_choice_data = dict(camelize_keys(
+                _get_choice_by_id(val, rdata.field_data.versioned_data.get('choices', {}))),
+                caption=current_choice_data['caption'])
+            if current_choice_data != registration_choice_data:
+                pos = result['choices'].index(current_choice_data)
+                result['choices'][pos] = registration_choice_data
+                result['modifiedChoice'].append(val)
     return result
 
 
@@ -123,11 +140,13 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             captions = self.form_item.data['captions']
             for k in field.data:
                 choice = next((x for x in choices if x['id'] == k), None)
-                places_limit = choice.get('places_limit')
-                places_used_dict = self.get_places_used()
-                places_used_dict.update(field.data)
-                if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
-                    raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
+                # Need to check the selected choice, because it might have been deleted.
+                if choice:
+                    places_limit = choice.get('places_limit')
+                    places_used_dict = self.get_places_used()
+                    places_used_dict.update(field.data)
+                    if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
+                        raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
     @classmethod
@@ -561,6 +580,10 @@ def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
 
 
+def _hashable_choice(choice):
+    return frozenset(choice.iteritems())
+
+
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
 
@@ -579,38 +602,82 @@ class MultiChoiceField(ChoiceBaseField):
         return sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.iteritems())
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
-        # TODO: create new data version here if an item from old_data's version
-        # was already chosen but doesn't exist anymore (or has a new price) and
-        # the user also selected a new item that doesn't exist in the current
-        # version yet.
-
         # always store no-option as empty dict
         if value is None:
             value = {}
+
+        return_value = {}
+
+        if old_data is not None:
+            # in case nothing changed we can skip all checks
+            if old_data.data == value:
+                return {}
+
+            selected_choice_hashes = {c['id']: _hashable_choice(c)
+                                      for c in old_data.field_data.versioned_data['choices']
+                                      if c['id'] in value}
+            selected_choice_hashes.update({c['id']: _hashable_choice(c)
+                                           for c in self.form_item.versioned_data['choices']
+                                           if c['id'] in value and c['id'] not in selected_choice_hashes})
+            selected_choice_hashes = set(selected_choice_hashes.itervalues())
+            existing_version_hashes = {c['id']: _hashable_choice(c)
+                                       for c in old_data.field_data.versioned_data['choices']}
+            latest_version_hashes = {c['id']: _hashable_choice(c) for c in self.form_item.versioned_data['choices']}
+            deselected_ids = old_data.data.viewkeys() - value.viewkeys()
+            modified_deselected = any(latest_version_hashes.get(id_) != existing_version_hashes.get(id_)
+                                      for id_ in deselected_ids)
+            if selected_choice_hashes <= set(latest_version_hashes.itervalues()):
+                # all choices available in the latest version - upgrade to that version
+                return_value['field_data'] = self.form_item.current_data
+            elif not modified_deselected and selected_choice_hashes <= set(existing_version_hashes.itervalues()):
+                # all choices available in the previously selected version - stay with it
+                return_value['field_data'] = old_data.field_data
+            else:
+                # create a new version containing selected choices from the previously
+                # selected version and everything else from the latest version
+                new_choices = []
+                used_ids = set()
+                for choice in old_data.field_data.versioned_data['choices']:
+                    # copy all old choices that are currently selected
+                    if choice['id'] in value:
+                        used_ids.add(choice['id'])
+                        new_choices.append(choice)
+                for choice in self.form_item.versioned_data['choices']:
+                    # copy all new choices unless we already got them from the old version
+                    if choice['id'] not in used_ids:
+                        used_ids.add(choice['id'])
+                        new_choices.append(choice)
+                new_choices_hash = {_hashable_choice(x) for x in new_choices}
+                for data_version in self.form_item.data_versions:
+                    if {_hashable_choice(x) for x in data_version.versioned_data['choices']} == new_choices_hash:
+                        break
+                else:
+                    data_version = RegistrationFormFieldData(field=self.form_item,
+                                                             versioned_data={'choices': new_choices})
+                return_value['field_data'] = data_version
+            new_choices = return_value['field_data'].versioned_data['choices']
+
         if not billable_items_locked:
-            return super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
-        if old_data.data == value:
-            # nothing changed
-            # XXX: should we ignore slot changes if extra slots don't pay?
-            # probably that needs a js update to keep the slots choice
-            # enabled even if the item is paid...
-            return {}
+            processed_data = super(RegistrationFormBillableField, self).process_form_data(registration, value, old_data)
+            return {key: return_value.get(key, value) for key, value in processed_data.iteritems()}
         # XXX: This code still relies on the client sending data for the disabled fields.
         # This is pretty ugly but especially in case of non-billable extra slots it makes
         # sense to keep it like this.  If someone tampers with the list of billable fields
         # we detect it any reject the change to the field's data anyway.
-        old_choices = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
-        new_choices = {x['id']: x for x in self.form_item.versioned_data['choices']}
-        old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
-                        if old_choices[uuid]['is_billable'] and old_choices[uuid]['price']}
-        new_billable = {uuid: num for uuid, num in value.iteritems()
-                        if new_choices[uuid]['is_billable'] and new_choices[uuid]['price']}
-        if old_billable != new_billable:
+        if old_data is not None:
+            old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
+            new_choices_mapping = {x['id']: x for x in new_choices}
+            old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
+                            if old_choices_mapping[uuid]['is_billable'] and old_choices_mapping[uuid]['price']}
+            new_billable = {uuid: num for uuid, num in value.iteritems()
+                            if new_choices_mapping[uuid]['is_billable'] and new_choices_mapping[uuid]['price']}
+        if old_data and old_billable != new_billable:
             # preserve existing data
-            return {}
+            return return_value
         else:
             # nothing price-related changed
             # TODO: check item prices (in case there's a change between old/new version)
             # for now we simply ignore field changes in this case (since the old/new price
             # check in the base method will fail)
-            return super(MultiChoiceField, self).process_form_data(registration, value, old_data, True)
+            processed_data = super(MultiChoiceField, self).process_form_data(registration, value, old_data, True)
+            return {key: return_value.get(key, value) for key, value in processed_data.iteritems()}
