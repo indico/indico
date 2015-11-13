@@ -36,7 +36,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.date_time import format_date, iterdays, strftime_all_years
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
-from indico.util.string import normalize_phone_number, snakify_keys
+from indico.util.string import normalize_phone_number, snakify_keys, camelize_keys
 from indico.web.forms.fields import IndicoRadioField, JSONField
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.webinterface.common.countries import CountryHolder
@@ -52,6 +52,7 @@ def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
     result = deepcopy(field.view_data)
     result['deletedChoice'] = []
+    result['modifiedChoice'] = []
     if not rdata or not rdata.data:
         return result
     values = [rdata.data['choice']] if 'choice' in rdata.data else rdata.data.keys()
@@ -65,8 +66,14 @@ def get_field_merged_options(field, registration_data):
                 result['choices'].append(missing_option)
                 result['deletedChoice'].append(missing_option['id'])
         else:
-            result['choices'].remove(_get_choice_by_id(val, result['choices']))
-            result['choices'].append(_get_choice_by_id(val, rdata.field_data.versioned_data.get('choices', {})))
+            current_choice_data = _get_choice_by_id(val, result['choices'])
+            registration_choice_data = dict(camelize_keys(
+                _get_choice_by_id(val, rdata.field_data.versioned_data.get('choices', {}))),
+                caption=current_choice_data['caption'])
+            if current_choice_data != registration_choice_data:
+                pos = result['choices'].index(current_choice_data)
+                result['choices'][pos] = registration_choice_data
+                result['modifiedChoice'].append(val)
     return result
 
 
