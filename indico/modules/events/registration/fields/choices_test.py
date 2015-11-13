@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from copy import deepcopy
 
 import pytest
+
+from indico.modules.events.registration.fields.simple import _hashable_choice
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 
@@ -54,6 +56,11 @@ def _update_data(data, changes):
         else:
             refs[id_].update(item_changes)
     return data
+
+
+def _assert_same_choices(a, b):
+    __tracebackhide__ = True
+    assert {_hashable_choice(x) for x in a} == {_hashable_choice(x) for x in b}
 
 
 def test_multi_choice_field_process_form_data_no_old(multi_choice_field):
@@ -92,13 +99,13 @@ def test_multi_choice_field_process_form_data_item_removed(multi_choice_field):
 
 def test_multi_choice_field_process_form_data_item_removed_deselected(multi_choice_field):
     # reg linked to old version, one selected item removed from there and deselected
-    # in this case everything should remain linked to the old version
+    # since all other items are available in the latest version we upgrade to it
     old_version = multi_choice_field.current_data
     old_data = RegistrationData(field_data=old_version, data={_id(1): 1, _id(2): 1})
     multi_choice_field.versioned_data = _update_data(multi_choice_field.versioned_data, {_id(1): None})
     form_data = {_id(2): 1}
     rv = multi_choice_field.field_impl.process_form_data(None, form_data, old_data)
-    assert rv['field_data'] == old_version
+    assert rv['field_data'] == multi_choice_field.current_data
     assert rv['data'] == form_data
 
 
@@ -125,7 +132,7 @@ def test_multi_choice_field_process_form_data_mixed(multi_choice_field):
     assert rv['field_data'] not in {multi_choice_field.current_data, old_version}
     assert rv['data'] == form_data
     combined = multi_choice_field.versioned_data['choices'] + [old_version.versioned_data['choices'][0]]
-    assert rv['field_data'].versioned_data['choices'] == combined
+    _assert_same_choices(rv['field_data'].versioned_data['choices'], combined)
 
 
 def test_multi_choice_field_process_form_data_mixed_price_change(multi_choice_field):
@@ -142,4 +149,32 @@ def test_multi_choice_field_process_form_data_mixed_price_change(multi_choice_fi
     old_choices = old_version.versioned_data['choices']
     new_choices = multi_choice_field.versioned_data['choices']
     combined = new_choices[:2] + [old_choices[2]] + [new_choices[-1]]
-    assert rv['field_data'].versioned_data['choices'] == combined
+    _assert_same_choices(rv['field_data'].versioned_data['choices'], combined)
+
+
+def test_multi_choice_field_process_form_data_price_change_deselected(multi_choice_field):
+    # reg linked to old version, a currently selected item had its price changed and another changed
+    # item was deselected.
+    # field data should be upgraded to a new version containing both the new items and the old-priced one
+    multi_choice_field.versioned_data = _update_data(multi_choice_field.versioned_data,
+                                                     {_id(2): {'is_billable': True, 'price': 100},
+                                                      _id(3): {'price': 500}})
+    old_version = multi_choice_field.current_data
+    old_data = RegistrationData(field_data=old_version, data={_id(2): 1, _id(3): 1})
+    assert old_data.price == 600
+    multi_choice_field.versioned_data = _update_data(multi_choice_field.versioned_data, {_id(2): {'price': 10},
+                                                                                         _id(3): {'price': 50}})
+    form_data = {_id(3): 1}
+    rv = multi_choice_field.field_impl.process_form_data(None, form_data, old_data)
+    assert rv['field_data'] not in {multi_choice_field.current_data, old_version}
+    assert rv['data'] == form_data
+    new_data = RegistrationData(**rv)
+    assert new_data.price == 500
+    old_choices = old_version.versioned_data['choices']
+    new_choices = multi_choice_field.versioned_data['choices']
+    combined = [old_choices[-1]] + new_choices[:-1]
+    _assert_same_choices(rv['field_data'].versioned_data['choices'], combined)
+    # now we re-check the previously deselected option and should get the NEW price
+    form_data = {_id(2): 1, _id(3): 1}
+    rv = multi_choice_field.field_impl.process_form_data(None, form_data, new_data)
+    assert RegistrationData(**rv).price == 510
