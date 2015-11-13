@@ -129,6 +129,12 @@ class RegistrationFormFieldBase(object):
     def get_friendly_data(self, registration_data):
         return registration_data.data
 
+    def iter_placeholder_info(self):
+        yield None, 'Value of "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+
+    def render_placeholder(self, data, key=None):
+        return self.get_friendly_data(data)
+
     def get_places_used(self):
         """Returns the number of used places for the field"""
         return 0

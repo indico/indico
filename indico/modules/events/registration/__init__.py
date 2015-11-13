@@ -158,17 +158,18 @@ def _get_invitation_placeholders(sender, invitation, **kwargs):
 
 
 @signals.get_placeholders.connect_via('registration-email')
-def _get_registration_placeholders(sender, registration, **kwargs):
+def _get_registration_placeholders(sender, regform, registration, **kwargs):
     from indico.modules.events.registration.placeholders.registrations import (IDPlaceholder, LastNamePlaceholder,
                                                                                FirstNamePlaceholder, LinkPlaceholder,
                                                                                EventTitlePlaceholder,
-                                                                               EventLinkPlaceholder)
+                                                                               EventLinkPlaceholder, FieldPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
     yield IDPlaceholder
     yield LinkPlaceholder
+    yield FieldPlaceholder
 
 
 @signals.event.get_feature_definitions.connect

@@ -427,7 +427,8 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 
     def _process(self):
         registration = self.registrations[0]
-        email_body = replace_placeholders('registration-email', request.form['body'], registration=registration)
+        email_body = replace_placeholders('registration-email', request.form['body'], regform=self.regform,
+                                          registration=registration)
         tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=request.form['subject'],
                                   email_body=email_body)
         html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
@@ -444,7 +445,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
 
     def _send_emails(self, form):
         for registration in self.registrations:
-            email_body = replace_placeholders('registration-email', form.body.data, registration=registration)
+            email_body = replace_placeholders('registration-email', form.body.data, regform=self.regform,
+                                              registration=registration)
             template = get_template_module('events/registration/emails/custom_email.html',
                                            email_subject=form.subject.data, email_body=email_body)
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
@@ -454,7 +456,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     def _process(self):
         tpl = get_template_module('events/registration/emails/custom_email_default.html', event=self.event)
         default_body = tpl.get_html_body()
-        form = EmailRegistrantsForm(body=default_body)
+        form = EmailRegistrantsForm(body=default_body, regform=self.regform)
         if form.validate_on_submit():
             self._send_emails(form)
             num_emails_sent = len(self.registrations)

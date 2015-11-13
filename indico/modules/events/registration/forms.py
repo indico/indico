@@ -206,14 +206,15 @@ class EmailRegistrantsForm(IndicoForm):
     body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
 
     def __init__(self, *args, **kwargs):
+        self.regform = kwargs.pop('regform')
         super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
         self.from_address.choices = zip(from_addresses, from_addresses)
-        self.body.description = render_placeholder_info('registration-email', registration=None)
+        self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
     def validate_body(self, field):
-        missing = get_missing_placeholders('registration-email', field.data, registration=None)
+        missing = get_missing_placeholders('registration-email', field.data, regform=self.regform, registration=None)
         if missing:
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 

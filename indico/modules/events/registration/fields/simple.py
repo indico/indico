@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import mimetypes
 from collections import Counter
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, date
 from operator import itemgetter
 from uuid import uuid4
 
@@ -535,6 +535,22 @@ class AccommodationField(RegistrationFormBillableItemsField):
                 continue
             places_used.update((data['choice'],))
         return dict(places_used)
+
+    def iter_placeholder_info(self):
+        yield 'name', 'Accommodation name for "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+        yield 'nights', 'Number of nights for "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+        yield 'arrival', 'Arrival date for "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+        yield 'departure', 'Departure date for "{}" ({})'.format(self.form_item.title, self.form_item.parent.title)
+
+    def render_placeholder(self, data, key=None):
+        mapping = {'name': 'choice',
+                   'nights': 'nights',
+                   'arrival': 'arrival_date',
+                   'departure': 'departure_date'}
+        rv = self.get_friendly_data(data).get(mapping[key], '')
+        if isinstance(rv, date):
+            rv = format_date(rv).decode('utf-8')
+        return rv
 
 
 def _to_machine_date(date):
