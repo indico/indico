@@ -22,19 +22,21 @@
     </div>
 {% endmacro %}
 
+
 {% macro scatter_plot(id, data) %}
-        <div id="{{ id }}" class="plot" style="height:100%;"
-            data-title="{{ title }}"
-            data-min-x="{{ data.min_x }}"
-            data-max-x="{{ data.max_x }}"
-            data-min-y="{{ data.min_y}}"
-            data-max-y="{{ data.max_y }}"
-            data-label-yaxis="{{ data.label_y }}"
-            data-label-xaxis="{{ data.label_x }}"
-            data-tooltip="{{ data.tooltip }}"
-            data-values="{{ data['values']|tojson|forceescape }}">
-        </div>
+    <div id="{{ id }}" class="plot" style="height:100%;"
+        data-title="{{ title }}"
+        data-min-x="{{ data.min_x }}"
+        data-max-x="{{ data.max_x }}"
+        data-min-y="{{ data.min_y}}"
+        data-max-y="{{ data.max_y }}"
+        data-label-yaxis="{{ data.label_y }}"
+        data-label-xaxis="{{ data.label_x }}"
+        data-tooltip="{{ data.tooltip }}"
+        data-values="{{ data['values']|tojson|forceescape }}">
+    </div>
 {% endmacro %}
+
 
 {% macro stats_badge(label, value) %}
     <div class="i-badge">
@@ -49,6 +51,7 @@
     </div>
 {% endmacro %}
 
+
 {% macro stats_badges(badges, classes='') %}
     <div class="i-badges-list{% if classes %} {{ classes }}{%  endif %}">
         {% for label, value in badges %}
@@ -56,105 +59,3 @@
         {% endfor %}
     </div>
 {% endmacro %}
-
-{% macro stats_table(table) -%}
-    {% set cell_macros = {
-        'currency': _currency_cell,
-        'icon': _icon_cell,
-        'progress': _progress_cell,
-        'progress-stacked': _progress_stacked_cell,
-        'str': _str_cell,
-        'default': _default_cell,
-    }  %}
-    <table class="registrant-stats">
-        {%- if table.head %}
-            <thead>
-                <tr>
-                {%- for head in table.head %}
-                    {% if head.type == 'str' -%}
-                        <th {%- if head.colspan > 1 %} colspan="{{ head.colspan }}"{% endif %}>{{ head.data }}</th>
-                    {%- endif -%}
-                {% endfor %}
-                </tr>
-            </thead>
-        {%- endif %}
-        {%- if table.rows %}
-            <tbody>
-            {%- for row_type, row in table.rows %}
-                <tr class="{{ row_type }}">
-                    {%- for cell in row -%}
-                        {{ cell.render(cell_macros) }}
-                    {%- endfor -%}
-                </tr>
-            {% endfor %}
-            </tbody>
-        {% endif %}
-    </table>
-{%- endmacro %}
-
-{% macro _generate_cell(cell) %}
-    <td
-        {%- if cell.colspan > 1 %} colspan="{{cell.colspan}}" {%- endif -%}
-        {%- if cell.qtip %} title="{{ cell.qtip }}" {%- endif -%}
-        {%- if cell.classes %} class="{{ ' '.join(cell.classes) }}" {%- endif -%}>
-    {{- caller() -}}
-    </td>
-{%- endmacro %}
-
-## Cell macros
-
-## currency cell
-{%- macro _currency_cell(cell) -%}
-    {%- call _generate_cell(cell) -%}
-        <span>{{ format_currency(cell.data, '', locale=session.lang) }}</span>
-    {%- endcall -%}
-{%- endmacro -%}
-
-## icon cell
-{% macro _icon_cell(cell) -%}
-    {%- call _generate_cell(cell) -%}
-        <span><i class="icon-{{ cell.data }}"></i></span>
-    {%- endcall -%}
-{%- endmacro %}
-
-## progress cell
-{% macro _progress_cell(cell) %}
-    {%- call _generate_cell(cell) %}
-        <span class="i-progress
-                     {%- if cell.data[1]|length < 10 %} i-progress-small
-                     {%- elif cell.data[1]|length > 14 %} i-progress-large
-                     {%- endif -%}">
-            <span class="i-progress-bar" data-progress="{{ '{:%}'.format(cell.data[0]) }}"></span>
-            <span class="i-progress-label">{{ cell.data[1] }}</span>
-        </span>
-    {% endcall -%}
-{% endmacro %}
-
-## progress-stacked cell
-{% macro _progress_stacked_cell(cell) %}
-    {%- call _generate_cell(cell) %}
-        <span class="i-progress
-                     {%- if cell.data[1]|length < 10 %} i-progress-small
-                     {%- elif cell.data[1]|length > 14 %} i-progress-large
-                     {%- endif -%}">
-            {% for width in cell.data[0] -%}
-                <span class="i-progress-bar" data-progress="{{ '{:%}'.format(width) }}"></span>
-            {%- endfor %}
-            <span class="i-progress-label">{{ cell.data[1] }}</span>
-        </span>
-    {% endcall -%}
-{% endmacro %}
-
-## str cell
-{%- macro _str_cell(cell) -%}
-    {%- call _generate_cell(cell) -%}
-        <span>{{ cell.data }}</span>
-    {%- endcall -%}
-{%- endmacro -%}
-
-## default cell
-{%- macro _default_cell(cell) -%}
-    {%- call _generate_cell(cell) -%}
-        <span class="no-stats-data" style="display: block; text-align:center;">&mdash;</i></span>
-    {%- endcall -%}
-{%- endmacro -%}
