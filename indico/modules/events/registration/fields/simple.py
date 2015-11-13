@@ -647,7 +647,13 @@ class MultiChoiceField(ChoiceBaseField):
                     if choice['id'] not in used_ids:
                         used_ids.add(choice['id'])
                         new_choices.append(choice)
-                data_version = RegistrationFormFieldData(field=self.form_item, versioned_data={'choices': new_choices})
+                new_choices_hash = {_hashable_choice(x) for x in new_choices}
+                for data_version in self.form_item.data_versions:
+                    if {_hashable_choice(x) for x in data_version.versioned_data['choices']} == new_choices_hash:
+                        break
+                else:
+                    data_version = RegistrationFormFieldData(field=self.form_item,
+                                                             versioned_data={'choices': new_choices})
                 return_value['field_data'] = data_version
             new_choices = return_value['field_data'].versioned_data['choices']
 
