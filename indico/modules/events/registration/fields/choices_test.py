@@ -20,7 +20,7 @@ from copy import deepcopy
 
 import pytest
 
-from indico.modules.events.registration.fields.simple import _hashable_choice
+from indico.modules.events.registration.fields.choices import _hashable_choice
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 
