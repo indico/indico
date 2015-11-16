@@ -103,6 +103,11 @@ class PaymentPluginMixin(object):
                                                ~RegistrationForm.is_deleted).all()
         return invalid_regforms
 
+    def supports_currency(self, currency):
+        if self.valid_currencies is None:
+            return True
+        return currency in self.valid_currencies
+
     def get_method_name(self, event):
         """Returns the (customized) name of the payment method."""
         return self.event_settings.get(event, 'method_name')

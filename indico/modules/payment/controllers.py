@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import redirect, flash, request, session, jsonify
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.plugins.controllers import RHPluginDetails
 from indico.modules.payment import settings, event_settings
@@ -138,11 +138,12 @@ class RHPaymentCheckout(RHPaymentBase):
             flash(_("The registration doesn't need to be paid"), 'error')
             return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
         plugins = get_active_payment_plugins(self.event)
-        force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
+        valid_plugins = {k: v for k, v in plugins.iteritems() if v.supports_currency(self.registration.currency)}
+        force_plugin = valid_plugins.items()[0] if len(valid_plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', self.event, event=self.event,
                                               registration=self.registration,
                                               regform=self.registration.registration_form,
-                                              plugins=plugins.items(), force_plugin=force_plugin)
+                                              plugins=valid_plugins.items(), force_plugin=force_plugin)
 
 
 class RHPaymentForm(RHPaymentBase):
@@ -154,6 +155,9 @@ class RHPaymentForm(RHPaymentBase):
             self.plugin = get_active_payment_plugins(self._conf)[request.args['method']]
         except KeyError:
             raise NotFound
+        if not self.plugin.supports_currency(self.registration.currency):
+            raise BadRequest("Payment method incompatible with registration currency {}"
+                             .format(self.registration.currency))
 
     def _process(self):
         with self.plugin.plugin_context():
