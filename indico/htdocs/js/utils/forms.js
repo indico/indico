@@ -81,6 +81,21 @@
             $this.find('[data-disabled-until-change]').prop('disabled', untouched);
             $this.closest('form').data('fieldsChanged', !untouched);
         });
+
+        forms.find('fieldset.collapsible > legend').on('click', function(evt) {
+            evt.preventDefault();
+            var $this = $(this),
+                collapseIcon = $this.find('div > span');
+            $this.next('.fieldset-content').slideToggle();
+            collapseIcon.toggleClass('icon-next icon-expand');
+        });
+
+        forms.find('fieldset.collapsible.initially-collapsed').each(function() {
+            var $this = $(this);
+            if ($this.find('div.form-block[data-error]').length) {
+                $this.find('legend').trigger('click');
+            }
+        });
     };
 
     global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection, folderField, folderProtection) {

@@ -567,6 +567,14 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         & + .form-group-footer {
             margin-top: -1em;
         }
+
+        &.collapsible legend {
+            cursor: pointer;
+        }
+
+        &.initially-collapsed div.fieldset-content {
+            display: none;
+        }
     }
 
     &.no-block-padding {
