@@ -679,5 +679,6 @@ class MultiChoiceField(ChoiceBaseField):
             # TODO: check item prices (in case there's a change between old/new version)
             # for now we simply ignore field changes in this case (since the old/new price
             # check in the base method will fail)
-            processed_data = super(MultiChoiceField, self).process_form_data(registration, value, old_data, True)
+            processed_data = super(MultiChoiceField, self).process_form_data(registration, value, old_data, True,
+                                                                             return_value.get('field_data'))
             return {key: return_value.get(key, value) for key, value in processed_data.iteritems()}
