@@ -65,7 +65,8 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
-PERSONAL_COLUMNS = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'address', 'phone', 'column')
+PERSONAL_COLUMNS = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address', 'phone',
+                    'country')
 SPECIAL_COLUMNS = ('reg_date', 'price', 'state', 'checked_in', 'checked_in_date')
 
 SPECIAL_COLUMN_LABELS = OrderedDict([
