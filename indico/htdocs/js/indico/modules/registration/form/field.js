@@ -249,10 +249,10 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
             if (uservalue) places += 1;
         } else if ($scope.field.inputType == 'single_choice' || $scope.field.inputType == 'accommodation') {
             places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue) places += 1;
+            if (uservalue && item.id === uservalue) places += 1;
         } else if ($scope.field.inputType == 'multi_choice') {
             places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue) places += 1;
+            if (uservalue && item.id === uservalue) places += 1;
         }
         return places;
     };
