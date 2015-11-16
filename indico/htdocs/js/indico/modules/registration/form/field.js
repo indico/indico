@@ -862,17 +862,16 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             scope.settings.accommodationField = true;
             scope.settings.fieldName = $T("Accommodation");
 
-            scope.userdata.accommodation = scope.userdata[scope.field.htmlName] || {};
             scope.accommodation = {};
 
-            scope.$watch('userdata.accommodation', function() {
-                if (scope.userdata.accommodation === undefined ||
-                    scope.userdata.accommodation.choice === null) {
+            scope.$watch('userdata[fieldName]', function() {
+                var accUserData = scope.userdata[scope.field.htmlName];
+                if (accUserData === undefined || accUserData.choice === null) {
                     return;
                 }
-                scope.accommodation.choice = scope.userdata.accommodation.choice;
-                scope.accommodation.arrivalDate = scope.userdata.accommodation.arrivalDate;
-                scope.accommodation.departureDate = scope.userdata.accommodation.departureDate;
+                scope.accommodation.choice = accUserData.choice;
+                scope.accommodation.arrivalDate = accUserData.arrivalDate;
+                scope.accommodation.departureDate = accUserData.departureDate;
             });
 
             function updateAccommodationPostData(fieldName, value) {

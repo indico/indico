@@ -145,7 +145,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $scope.userInfo = angular.fromJson($scope.userInfo);
             $scope.registrationData = angular.fromJson($scope.registrationData);
             $scope.registrationMetaData = angular.fromJson($scope.registrationMetaData);
-            $scope.registrationUuid = $scope.registrationUuid;
 
             $rootScope.confId = $scope.confId;
             $rootScope.confFormId = $scope.confFormId;

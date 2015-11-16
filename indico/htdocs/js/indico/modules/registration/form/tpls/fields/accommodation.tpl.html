@@ -29,30 +29,30 @@
                         value="{{ item.id }}"
                         ng-checked="userdata[fieldName].choice == item.id"
                         ng-model="accommodation.choice"
-                        ng-disabled="isDisabled(item, userdata.accommodation.choice) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || billableOptionPayed(userdata, regMetadata))"
+                        ng-disabled="isDisabled(item, userdata[fieldName].choice) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || billableOptionPayed(userdata, regMetadata))"
                         ng-required="field.isRequired"/>
                     {{ item.caption }}
 
-                    <span class="unavailable-text" ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.choice)">
+                    <span class="unavailable-text" ng-if="item.cancelled && !hasPlacesLeft(item, userdata[fieldName].choice)">
                         ({{ 'currently not available' | i18n }})
                     </span>
                     <span ng-if="hasPlacesLimit(item)">
-                        <span class="unavailable-text" ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.choice)">
+                        <span class="unavailable-text" ng-if="!item.cancelled && !hasPlacesLeft(item, userdata[fieldName].choice)">
                             ({{ 'no places left' | i18n }})
                         </span>
-                        <span class="available-text" ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.choice)">
-                            [{{ getPlacesLeft(item, userdata.accommodation.choice, accommodation.choice) }} {{ "place(s) left" | i18n }}]
+                        <span class="available-text" ng-if="!item.cancelled && hasPlacesLeft(item, userdata[fieldName].choice)">
+                            [{{ getPlacesLeft(item, userdata[fieldName].choice, accommodation.choice) }} {{ "place(s) left" | i18n }}]
                         </span>
                     </span>
                 </td>
                 <td align="right">
-                    <span ng-if="item.id == accommodation.choice && userdata.accommodation.isBillable">
-                        <span class="regFormPrice">{{ userdata.accommodation.price }}</span>
+                    <span ng-if="item.id == accommodation.choice && userdata[fieldName].isBillable">
+                        <span class="regFormPrice">{{ userdata[fieldName].price }}</span>
                         <nd-currency currency="currency"></nd-currency>
                         <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
                     </span>
 
-                    <span ng-if="!userdata.accommodation.isBillable && item.isBillable">
+                    <span ng-if="!userdata[fieldName].isBillable && item.isBillable">
                         <span class="regFormPrice">{{ item.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
                         <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
