@@ -263,7 +263,7 @@ def install_jquery():
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'jquery')):
             local('npm install')
-            local('grunt')
+            local('grunt uglify dist')
             dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
