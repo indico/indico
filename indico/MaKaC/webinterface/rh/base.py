@@ -297,6 +297,20 @@ class RH(RequestHandlerBase):
 
         :return: ``None`` or a redirect response
         """
+        if current_app.debug and self.normalize_url_spec is RH.normalize_url_spec:
+            # in case of ``class SomeRH(RH, MixinWithNormalization)``
+            # the default value from `RH` overwrites the normalization
+            # rule from ``MixinWithNormalization``.  this is never what
+            # the developer wants so we fail if it happens.  the proper
+            # solution is ``class SomeRH(MixinWithNormalization, RH)``
+            cls = next((x
+                        for x in inspect.getmro(self.__class__)
+                        if (x is not RH and x is not self.__class__ and hasattr(x, 'normalize_url_spec') and
+                            getattr(x, 'normalize_url_spec', None) is not RH.normalize_url_spec)),
+                       None)
+            if cls is not None:
+                raise Exception('Normalization rule of {} in {} is overwritten by base RH. Put mixins with class-level '
+                                'attributes on the left of the base class'.format(cls, self.__class__))
         if not self.normalize_url_spec or not any(self.normalize_url_spec.itervalues()):
             return
         spec = {
