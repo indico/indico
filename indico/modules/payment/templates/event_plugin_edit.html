@@ -13,9 +13,23 @@
             {{ template_hook('event-manage-payment-plugin-cannot-modify', plugin=plugin, event=event) }}
         {% endcall %}
     {% endif %}
-    {% for type, text in messages %}
-        {{ message_box(type, text, fixed_width=true) }}
-    {% endfor %}
+
+    {% if invalid_regforms %}
+        {% call message_box('warning', fixed_width=true) %}
+            {% trans -%}
+                This payment method only supports these currencies:
+            {%- endtrans %}
+            <em>{{ plugin.valid_currencies|join(', ') }}</em>.<br>
+            {% trans -%}
+                The following registration forms won't be able to use this method:
+            {%- endtrans %}
+            <ul>
+                {% for regform in invalid_regforms %}
+                    <li>{{ regform.title }} (<em>{{ regform.currency }}</em>)</li>
+                {% endfor %}
+            </ul>
+        {% endcall %}
+    {% endif %}
 
     {{ form_header(form) }}
     {{ form_rows(form, widget_attrs=widget_attrs) }}

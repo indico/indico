@@ -93,6 +93,16 @@ class PaymentPluginMixin(object):
         if session.user and self.can_be_modified(session.user, event):
             return url_for('payment.event_plugin_edit', event, method=re.sub(r'^payment_', '', self.name))
 
+    def get_invalid_regforms(self, event):
+        """Return registration forms with incompatible currencies"""
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        invalid_regforms = []
+        if self.valid_currencies is not None:
+            regforms = event.as_event.registration_forms
+            invalid_regforms = regforms.filter(~RegistrationForm.currency.in_(self.valid_currencies),
+                                               ~RegistrationForm.is_deleted).all()
+        return invalid_regforms
+
     def get_method_name(self, event):
         """Returns the (customized) name of the payment method."""
         return self.event_settings.get(event, 'method_name')
