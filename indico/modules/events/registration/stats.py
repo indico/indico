@@ -315,6 +315,8 @@ class OverviewStats(StatsBase):
     def _get_countries(self):
         countries = defaultdict(int)
         for country, regs in groupby(self.regform.active_registrations, lambda x: x.get_personal_data().get('country')):
+            if country is None:
+                continue
             countries[country] += sum(1 for x in regs)
         if not countries:
             return [], 0
