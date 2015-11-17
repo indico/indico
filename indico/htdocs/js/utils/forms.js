@@ -37,7 +37,7 @@
             field.closest('.form-group').toggle(active);
             if (!field.is(':input')) {
                 field.find(':input').prop('disabled', !active);
-            } else {
+            } else if(!field.data('initiallyDisabled')) {
                 field.prop('disabled', !active);
             }
         });
@@ -52,6 +52,7 @@
         });
 
         // HiddenUnless validator
+        forms.find(':input[data-hidden-unless]:disabled').data('initiallyDisabled', true);
         forms.find(':input[data-hidden-unless]').each(function() {
             var field = $(this);
             var data = field.data('hidden-unless');
