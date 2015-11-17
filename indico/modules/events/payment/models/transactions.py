@@ -204,7 +204,7 @@ class PaymentTransaction(db.Model):
 
     @property
     def plugin(self):
-        from indico.modules.payment.util import get_payment_plugins
+        from indico.modules.events.payment.util import get_payment_plugins
         return get_payment_plugins().get(self.provider)
 
     @property

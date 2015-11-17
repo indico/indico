@@ -22,8 +22,8 @@ from indico.core import signals
 from indico.core.settings import SettingsProxy
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.settings import EventSettingsProxy
-from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
-                                            PaymentEventSettingsFormBase)
+from indico.modules.events.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
+                                                   PaymentEventSettingsFormBase)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem

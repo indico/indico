@@ -16,7 +16,7 @@
 
 import pytest
 
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionStatus
 
 
 @pytest.fixture

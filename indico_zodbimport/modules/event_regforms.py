@@ -45,7 +45,7 @@ from indico.modules.events.registration.models.items import (RegistrationFormSec
                                                              RegistrationFormPersonalDataSection, RegistrationFormText)
 from indico.modules.events.registration.models.legacy_mapping import LegacyRegistrationMapping
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState, RegistrationData
-from indico.modules.payment.models.transactions import TransactionStatus, PaymentTransaction
+from indico.modules.events.payment.models.transactions import TransactionStatus, PaymentTransaction
 from indico.modules.users import User
 from indico.util.caching import memoize
 from indico.util.console import verbose_iterator, cformat

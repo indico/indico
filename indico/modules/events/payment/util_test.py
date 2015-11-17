@@ -17,8 +17,8 @@
 import pytest
 from mock import MagicMock
 
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
-from indico.modules.payment.util import register_transaction
+from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.events.payment.util import register_transaction
 
 
 @pytest.mark.parametrize(('new', 'double', 'status'), (
@@ -28,9 +28,9 @@ from indico.modules.payment.util import register_transaction
     (True,  False, TransactionStatus.pending)
 ))
 def test_register_transaction(mocker, new, double, status):
-    mocker.patch('indico.modules.payment.util.db')
-    mocker.patch('indico.modules.payment.util.notify_registration_state_update')
-    ndp = mocker.patch('indico.modules.payment.util.notify_double_payment')
+    mocker.patch('indico.modules.events.payment.util.db')
+    mocker.patch('indico.modules.events.payment.util.notify_registration_state_update')
+    ndp = mocker.patch('indico.modules.events.payment.util.notify_double_payment')
     cn = mocker.patch.object(PaymentTransaction, 'create_next')
     registration = MagicMock()
     db_transaction = MagicMock(status=status) if new else None

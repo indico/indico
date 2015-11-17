@@ -35,7 +35,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
-from indico.modules.payment.models.transactions import TransactionStatus
+from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from indico.util.i18n import L_

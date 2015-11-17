@@ -29,7 +29,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
 from indico.modules.events.registration.views import WPManageRegistration, WPManageParticipants
-from indico.modules.payment import settings as payment_global_settings
+from indico.modules.events.payment import settings as payment_global_settings
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _

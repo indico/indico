@@ -20,10 +20,10 @@ from flask import redirect, flash, request, session, jsonify
 from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.plugins.controllers import RHPluginDetails
-from indico.modules.payment import settings, event_settings
-from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
-from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins
-from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
+from indico.modules.events.payment import settings, event_settings
+from indico.modules.events.payment.forms import AdminSettingsForm, EventSettingsForm
+from indico.modules.events.payment.util import get_payment_plugins, get_active_payment_plugins
+from indico.modules.events.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.i18n import _

@@ -27,12 +27,12 @@ from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.payment import settings as payment_global_settings
+from indico.modules.events.payment import settings as payment_global_settings
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField
-from indico.web.forms.validators import HiddenUnless, DateTimeRange, LinkedDateTime, IndicoEmail
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, IndicoEmail
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
 

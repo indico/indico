@@ -17,14 +17,14 @@
 import pytest
 from mock import MagicMock
 
-from indico.modules.payment.models.transactions import (PaymentTransaction, TransactionAction, TransactionStatus,
-                                                        TransactionStatusTransition, IgnoredTransactionAction,
-                                                        InvalidManualTransactionAction, InvalidTransactionAction,
-                                                        DoublePaymentTransaction, InvalidTransactionStatus)
+from indico.modules.events.payment.models.transactions import (PaymentTransaction, TransactionAction, TransactionStatus,
+                                                               TransactionStatusTransition, IgnoredTransactionAction,
+                                                               InvalidManualTransactionAction, InvalidTransactionAction,
+                                                               DoublePaymentTransaction, InvalidTransactionStatus)
 from indico.testing.util import extract_logs
 
 
-pytest_plugins = 'indico.modules.payment.testing.fixtures'
+pytest_plugins = 'indico.modules.events.payment.testing.fixtures'
 
 
 @pytest.fixture

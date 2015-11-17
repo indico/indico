@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.payment.controllers import (RHPaymentAdminSettings, RHPaymentSettings,
-                                                RHPaymentSettingsEdit, RHPaymentPluginEdit,
-                                                RHPaymentCheckout, RHPaymentForm,
-                                                RHPaymentAdminPluginSettings, RHPaymentConditions)
+from indico.modules.events.payment.controllers import (RHPaymentAdminSettings, RHPaymentSettings,
+                                                       RHPaymentSettingsEdit, RHPaymentPluginEdit,
+                                                       RHPaymentCheckout, RHPaymentForm,
+                                                       RHPaymentAdminPluginSettings, RHPaymentConditions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('payment', __name__, template_folder='templates', virtual_template_folder='payment')

@@ -20,7 +20,7 @@ from wtforms.fields.core import SelectField, IntegerField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError, NumberRange
 
-from indico.modules.payment import settings
+from indico.modules.events.payment import settings
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField

@@ -50,8 +50,8 @@ from indico.modules.events.registration.notifications import notify_registration
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_csv_from_registrations)
-from indico.modules.payment.models.transactions import TransactionAction
-from indico.modules.payment.util import register_transaction
+from indico.modules.events.payment.models.transactions import TransactionAction
+from indico.modules.events.payment.util import register_transaction
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext

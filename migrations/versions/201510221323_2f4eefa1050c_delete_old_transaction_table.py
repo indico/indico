@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy import UTCDateTime
-from indico.modules.payment.models.transactions import TransactionStatus
+from indico.modules.events.payment.models.transactions import TransactionStatus
 
 
 # revision identifiers, used by Alembic.
