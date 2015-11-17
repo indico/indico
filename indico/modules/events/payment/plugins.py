@@ -150,5 +150,5 @@ class PaymentPluginMixin(object):
         """
         # Try using the template in the plugin first in case it extends the default one
         return render_template(['{}:transaction_details.html'.format(transaction.plugin.name),
-                                'payment/transaction_details.html'],
+                                'events/payment/transaction_details.html'],
                                plugin=transaction.plugin, transaction=transaction)

@@ -20,15 +20,15 @@ from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase,
 
 
 class WPPaymentJinjaMixin(WPJinjaMixin):
-    template_prefix = 'payment/'
+    template_prefix = 'events/payment/'
 
 
 class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'payment'
+    sidemenu_option = 'events/payment'
 
 
 class WPPaymentEventManagement(WPConferenceModifBase, WPPaymentJinjaMixin):
-    template_prefix = 'payment/'
+    template_prefix = 'events/payment/'
     sidemenu_option = 'payment'
 
     def _getPageContent(self, params):

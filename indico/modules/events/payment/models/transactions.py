@@ -220,7 +220,7 @@ class PaymentTransaction(db.Model):
     def render_details(self):
         """Renders the transaction details"""
         if self.is_manual:
-            return render_template('payment/transaction_details_manual.html', transaction=self)
+            return render_template('events/payment/transaction_details_manual.html', transaction=self)
         plugin = self.plugin
         if plugin is None:
             return '[plugin not loaded: {}]'.format(self.provider)

@@ -22,7 +22,7 @@ from indico.modules.events.payment.controllers import (RHPaymentAdminSettings, R
                                                        RHPaymentAdminPluginSettings, RHPaymentConditions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
-_bp = IndicoBlueprint('payment', __name__, template_folder='templates', virtual_template_folder='payment')
+_bp = IndicoBlueprint('payment', __name__, template_folder='templates', virtual_template_folder='events/payment')
 
 # Admin
 _bp.add_url_rule('/admin/payment/', 'admin_settings', RHPaymentAdminSettings, methods=('GET', 'POST'))
