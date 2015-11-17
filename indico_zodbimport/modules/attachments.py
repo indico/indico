@@ -93,7 +93,7 @@ class AttachmentImporter(LocalFileImporterMixin, Importer):
         return command
 
     def has_data(self):
-        return AttachmentFolder.has_rows or Attachment.has_rows
+        return AttachmentFolder.has_rows() or Attachment.has_rows()
 
     def migrate(self):
         # disable onupdate for attachment lastmod timestamp

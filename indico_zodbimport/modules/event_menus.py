@@ -176,7 +176,7 @@ def _sanitize_title(title):
 
 class EventMenuImporter(Importer):
     def has_data(self):
-        return MenuEntry.has_rows
+        return MenuEntry.has_rows()
 
     def migrate(self):
         self.migrate_event_menus()

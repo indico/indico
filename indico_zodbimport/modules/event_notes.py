@@ -45,7 +45,7 @@ class EventNoteImporter(Importer):
         return command
 
     def has_data(self):
-        return EventNote.has_rows
+        return EventNote.has_rows()
 
     def migrate(self):
         self.migrate_event_notes()
