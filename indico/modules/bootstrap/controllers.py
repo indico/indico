@@ -44,7 +44,7 @@ class RHBootstrap(RH):
     CSRF_ENABLED = True
 
     def _process_GET(self):
-        if User.has_rows:
+        if User.has_rows():
             return redirect(url_for('misc.index'))
         return render_template('bootstrap/bootstrap.html',
                                selected_lang_name=parse_locale(get_current_locale()).language_name,
@@ -55,7 +55,7 @@ class RHBootstrap(RH):
                                python_version=python_version())
 
     def _process_POST(self):
-        if User.has_rows:
+        if User.has_rows():
             return redirect(url_for('misc.index'))
         setup_form = BootstrapForm(request.form)
         if not setup_form.validate():

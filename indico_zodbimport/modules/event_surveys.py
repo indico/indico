@@ -44,7 +44,7 @@ def _sanitize(title):
 
 class SurveyImporter(Importer):
     def has_data(self):
-        return Survey.has_rows
+        return Survey.has_rows()
 
     def migrate(self):
         self.migrate_surveys()

@@ -48,7 +48,7 @@ class EventManagerImporter(Importer):
         return command
 
     def has_data(self):
-        return EventPrincipal.has_rows
+        return EventPrincipal.has_rows()
 
     def migrate(self):
         self.janitor = User.get_one(self.janitor_user_id)

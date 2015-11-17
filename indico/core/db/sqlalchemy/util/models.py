@@ -26,7 +26,6 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core import signals
-from indico.util.decorators import strict_classproperty
 
 
 class IndicoModel(Model):
@@ -74,7 +73,6 @@ class IndicoModel(Model):
             raise NoResultFound()
         return obj
 
-    @strict_classproperty
     @classmethod
     def has_rows(cls):
         """Checks if the underlying table has any rows.

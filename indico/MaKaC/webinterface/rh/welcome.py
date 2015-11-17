@@ -31,7 +31,7 @@ class RHWelcome(base.RHDisplayBaseProtected):
         self._target = conference.CategoryManager().getRoot()
 
     def _process(self):
-        if not User.has_rows:
+        if not User.has_rows():
             self._redirect(url_for('bootstrap.index'))
         else:
             wfReg = webFactoryRegistry.WebFactoryRegistry()

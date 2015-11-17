@@ -50,7 +50,7 @@ class EventImageImporter(LocalFileImporterMixin, Importer):
         return command
 
     def has_data(self):
-        return ImageFile.has_rows
+        return ImageFile.has_rows()
 
     def migrate(self):
         self.migrate_event_images()
