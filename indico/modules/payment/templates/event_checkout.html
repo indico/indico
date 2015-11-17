@@ -8,11 +8,17 @@
 {% block content %}
     <div class="info-message-box">
         <div class="message-text">
-            You need to pay {{ registration.render_price() }} for your registration.
+            {% trans price=registration.render_price() -%}
+                You need to pay {{ price }} for your registration.
+            {%- endtrans %}
             {% if force_plugin %}
-                You can pay using <strong>{{ force_plugin[1].get_method_name(event) }}</strong>.
+                {% trans payment_method=force_plugin[1].get_method_name(event) -%}
+                    You can pay using <strong>{{ payment_method }}</strong>.
+                {%- endtrans %}
             {% else %}
-                Please select a payment method below to see the final price.
+                {% trans -%}
+                    Please select a payment method below to see the final price.
+                {%- endtrans %}
             {% endif %}
         </div>
     </div>
