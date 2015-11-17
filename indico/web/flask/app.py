@@ -234,6 +234,7 @@ def configure_db(app):
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
         # DB options
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
         app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
         app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
         app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
