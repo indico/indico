@@ -119,11 +119,8 @@ class RHEditReminder(RHSpecificReminderBase):
                       'success')
             return redirect(url_for('.list', self.event))
 
-        widget_attrs = ({field.short_name: {'disabled': True} for field in form}
-                        if reminder.is_sent
-                        else form.default_widget_attrs)
         return WPReminders.render_template('edit_reminder.html', self.event, event=self.event, reminder=reminder,
-                                           form=form, widget_attrs=widget_attrs)
+                                           form=form)
 
 
 class RHAddReminder(RHRemindersBase):

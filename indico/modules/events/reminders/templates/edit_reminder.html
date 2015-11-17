@@ -1,6 +1,8 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_rows %}
 {% from 'message_box.html' import message_box %}
 {% set editable = not reminder or not reminder.is_sent %}
+{% set disabled_fields = () if editable else form._fields.viewkeys() %}
+{% set widget_attrs = form.default_widget_attrs %}
 
 <div class="reminders">
     {% if reminder and reminder.is_overdue %}
@@ -25,13 +27,13 @@
             <div class="i-box-content">
                 {{ form_header(form, id='reminder-form') }}
                 {% call form_fieldset(_('Schedule')) %}
-                    {{ form_rows(form, fields=form.schedule_fields, widget_attrs=widget_attrs) }}
+                    {{ form_rows(form, fields=form.schedule_fields, widget_attrs=widget_attrs, disable=disabled_fields) }}
                 {% endcall %}
                 {% call form_fieldset(_('Recipients')) %}
-                    {{ form_rows(form, fields=form.recipient_fields, widget_attrs=widget_attrs) }}
+                    {{ form_rows(form, fields=form.recipient_fields, widget_attrs=widget_attrs, disable=disabled_fields) }}
                 {% endcall %}
                 {% call form_fieldset(_('Misc')) %}
-                    {{ form_rows(form, skip=form.schedule_recipient_fields, widget_attrs=widget_attrs) }}
+                    {{ form_rows(form, skip=form.schedule_recipient_fields, widget_attrs=widget_attrs, disable=disabled_fields) }}
                 {% endcall %}
                 {% call form_footer(form) %}
                     {% if editable %}
