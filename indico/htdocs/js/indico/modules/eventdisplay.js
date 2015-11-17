@@ -55,7 +55,7 @@ $(document).ready(function() {
         } else {
             wrapper.find('.gradient-layer').fadeIn();
             wrapper.animate({
-                height: initialHeight,
+                height: initialHeight
             }, {
                 duration: 'fast',
                 start: function() {
