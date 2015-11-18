@@ -3,7 +3,7 @@
 
 <div class="toolbar right vc-toolbar">
     <div class="group">
-        <span class="i-button i-button-small label vc-room-info" id="vc-room-{{ vc_room.id }}"><img src="{{ vc_room.plugin.icon_url }}" style="width: 18px;"></span>
+        <span class="i-button i-button-small label vc-room-info" id="vc-room-{{ event_vc_room.id }}"><img src="{{ vc_room.plugin.icon_url }}" style="width: 18px;"></span>
         {% block buttons %}{% endblock %}
     </div>
     {{ template_hook('event-timetable-vc-extra-buttons', event_vc_room=event_vc_room) }}
@@ -12,9 +12,9 @@
     <span>{{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}</span>
 </div>
 <script>
-    $('#vc-room-{{ vc_room.id }}').qtip({
+    $('#vc-room-{{ event_vc_room.id }}').qtip({
         content: {
-            text: $('#vc-room-{{ vc_room.id }}').closest('.toolbar.right.vc-toolbar').next('div')
+            text: $('#vc-room-{{ event_vc_room.id }}').closest('.toolbar.right.vc-toolbar').next('div')
         },
         position: {
             my: 'top middle',
