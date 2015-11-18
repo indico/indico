@@ -108,8 +108,6 @@ class RHCompileNotes(RHEditNote):
     """Handle note edits a note attached to an object inside an event"""
 
     def _process(self):
-        if self.event.note:
-            raise NoReportError(_("This event already has a note attached."))
         source = render_template('events/notes/compiled_notes.html', notes=self.event.scheduled_notes)
         form = self._make_form(source=source)
         return self._process_form(form, is_compilation=True)
