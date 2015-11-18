@@ -94,7 +94,7 @@
     </form>
 {% endmacro %}
 
-{% macro form_fieldset(legend, description=none, disabled=false, render_as_fieldset=true, collapsible=true, initially_collapsed=true) %}
+{% macro form_fieldset(legend, description=none, disabled=false, render_as_fieldset=true, collapsible=false, initially_collapsed=true) %}
     {% if not render_as_fieldset %}
         {#
         This is sugar for cases where you sometimes want the fieldset
