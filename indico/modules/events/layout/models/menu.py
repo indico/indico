@@ -316,6 +316,9 @@ class MenuEntry(MenuEntryMixin, db.Model):
         ),
     )
 
+    # relationship backrefs:
+    # - parent (MenuEntry.children)
+
     @property
     def is_root(self):
         return self.parent_id is None
@@ -394,6 +397,8 @@ class EventPage(db.Model):
     )
 
     # relationship backrefs:
+    # - _default_page_of_event (Event.default_page)
+    # - legacy_mapping (LegacyPageMapping.page)
     # - menu_entry (MenuEntry.page)
 
     @property

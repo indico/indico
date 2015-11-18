@@ -45,6 +45,9 @@ class UserAffiliation(db.Model):
         index=True
     )
 
+    # relationship backrefs:
+    # - user (User._affiliation)
+
     @return_ascii
     def __repr__(self):
         return '<UserAffiliation({}, {}, {})>'.format(self.id, self.name, self.user)

@@ -83,6 +83,9 @@ class ReservationOccurrence(db.Model, Serializer):
         db.String
     )
 
+    # relationship backrefs:
+    # - reservation (Reservation.occurrences)
+
     @hybrid_property
     def date(self):
         return self.start_dt.date()

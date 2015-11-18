@@ -50,6 +50,9 @@ class RoomAttributeAssociation(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - room (Room.attributes)
+
     @return_ascii
     def __repr__(self):
         return u'<RoomAttributeAssociation({0}, {1}, {2})>'.format(self.room_id, self.attribute.name, self.value)
@@ -102,6 +105,11 @@ class RoomAttribute(db.Model):
             remote_side=[id]
         )
     )
+
+    # relationship backrefs:
+    # - location (Location.attributes)
+    # - parent (RoomAttribute.children)
+    # - room_associations (RoomAttributeAssociation.attribute)
 
     @return_ascii
     def __repr__(self):

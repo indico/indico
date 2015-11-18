@@ -50,6 +50,9 @@ class ReservationEditLog(db.Model):
         index=True
     )
 
+    # relationship backrefs:
+    # - reservation (Reservation.edit_logs)
+
     @return_ascii
     def __repr__(self):
         return u'<ReservationEditLog({0}, {1}, {2}, {3})>'.format(

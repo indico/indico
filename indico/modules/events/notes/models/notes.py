@@ -218,6 +218,9 @@ class EventNoteRevision(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - note (EventNote.revisions)
+
     @return_ascii
     def __repr__(self):
         render_mode = self.render_mode.name if self.render_mode is not None else None

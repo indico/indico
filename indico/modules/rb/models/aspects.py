@@ -67,6 +67,9 @@ class Aspect(db.Model, Serializer):
         nullable=False
     )
 
+    # relationship backrefs:
+    # - location (Location.aspects)
+
     @return_ascii
     def __repr__(self):
         return u'<Aspect({0}, {1}, {2})>'.format(

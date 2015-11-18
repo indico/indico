@@ -74,6 +74,9 @@ class SurveySubmission(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - survey (Survey.submissions)
+
     @property
     def locator(self):
         return dict(self.survey.locator, submission_id=self.id)

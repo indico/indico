@@ -35,6 +35,9 @@ class Photo(db.Model):
         nullable=True
     )
 
+    # relationship backrefs:
+    # - room (Room.photo)
+
     @return_ascii
     def __repr__(self):
         return u'<Photo({0})>'.format(self.id)

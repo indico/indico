@@ -100,6 +100,9 @@ class VCRoom(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - events (VCRoomEventAssociation.vc_room)
+
     @property
     def plugin(self):
         from indico.modules.vc.util import get_vc_plugins
@@ -139,12 +142,6 @@ class VCRoomEventAssociation(db.Model):
         index=True,
         nullable=False
     )
-    #: The associated :class:VCRoom
-    vc_room = db.relationship(
-        'VCRoom',
-        lazy=False,
-        backref=db.backref('events', cascade='all, delete-orphan')
-    )
     #: Link type of the vc_room to a event/contribution/session
     link_type = db.Column(
         PyIntEnum(VCRoomLinkType),
@@ -167,6 +164,12 @@ class VCRoomEventAssociation(db.Model):
         nullable=False
     )
 
+    #: The associated :class:VCRoom
+    vc_room = db.relationship(
+        'VCRoom',
+        lazy=False,
+        backref=db.backref('events', cascade='all, delete-orphan')
+    )
     #: The associated Event
     event_new = db.relationship(
         'Event',

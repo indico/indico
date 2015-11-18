@@ -270,6 +270,9 @@ class Reservation(Serializer, db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - room (Room.reservations)
+
     @hybrid_property
     def is_archived(self):
         return self.end_dt < datetime.now()

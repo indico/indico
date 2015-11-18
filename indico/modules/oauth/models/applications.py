@@ -97,6 +97,9 @@ class OAuthApplication(db.Model):
         default=False
     )
 
+    # relationship backrefs:
+    # - tokens (OAuthToken.application)
+
     @property
     def client_type(self):
         return 'public'

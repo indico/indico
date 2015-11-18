@@ -251,6 +251,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         )
     )
 
+    # relationship backrefs:
+    # - location (Location.rooms)
+
     @hybrid_property
     def is_auto_confirm(self):
         return not self.reservations_need_confirmation

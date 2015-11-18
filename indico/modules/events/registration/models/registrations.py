@@ -230,10 +230,10 @@ class Registration(db.Model):
     )
 
     # relationship backrefs:
-    # - registration_form (RegistrationForm.registrations)
     # - invitation (RegistrationInvitation.registration)
-    # - transactions (PaymentTransaction.registration)
     # - legacy_mapping (LegacyRegistrationMapping.registration)
+    # - registration_form (RegistrationForm.registrations)
+    # - transactions (PaymentTransaction.registration)
 
     @classmethod
     def get_all_for_event(cls, event):

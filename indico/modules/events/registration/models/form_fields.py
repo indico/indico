@@ -51,8 +51,8 @@ class RegistrationFormFieldData(db.Model):
     )
 
     # relationship backrefs:
-    # - registration_data (RegistrationData.field_data)
     # - field (RegistrationFormItem.data_versions)
+    # - registration_data (RegistrationData.field_data)
 
     @return_ascii
     def __repr__(self):

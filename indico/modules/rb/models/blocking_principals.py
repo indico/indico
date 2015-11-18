@@ -37,6 +37,9 @@ class BlockingPrincipal(PrincipalMixin, db.Model):
         nullable=False
     )
 
+    # relationship backrefs:
+    # - blocking (Blocking._allowed)
+
     @return_ascii
     def __repr__(self):
         return '<BlockingPrincipal({}, {}, {})>'.format(

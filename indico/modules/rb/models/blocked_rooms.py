@@ -69,6 +69,10 @@ class BlockedRoom(db.Model):
         index=True
     )
 
+    # relationship backrefs:
+    # - blocking (Blocking.blocked_rooms)
+    # - room (Room.blocked_rooms)
+
     @property
     def state_name(self):
         return BlockedRoomState(self.state).title

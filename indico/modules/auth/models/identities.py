@@ -82,6 +82,9 @@ class Identity(db.Model):
         INET
     )
 
+    # relationship backrefs:
+    # - user (User.identities)
+
     @property
     def data(self):
         data = MultiDict()

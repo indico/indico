@@ -60,6 +60,9 @@ class UserEmail(db.Model):
         default=False
     )
 
+    # relationship backrefs:
+    # - user (User._all_emails)
+
     @return_ascii
     def __repr__(self):
         return '<UserEmail({}, {}, {})>'.format(self.id, self.email, self.is_primary, self.user)

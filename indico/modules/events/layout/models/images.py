@@ -55,6 +55,9 @@ class ImageFile(StoredFileMixin, db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - legacy_mapping (LegacyImageMapping.image)
+
     @property
     def locator(self):
         return dict(self.event_new.locator, image_id=self.id, filename=self.filename)

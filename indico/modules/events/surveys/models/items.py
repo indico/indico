@@ -146,6 +146,7 @@ class SurveyItem(db.Model):
     )
 
     # relationship backrefs:
+    # - parent (SurveySection.children)
     # - survey (Survey.items)
 
 

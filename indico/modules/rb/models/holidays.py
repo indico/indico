@@ -41,6 +41,9 @@ class Holiday(db.Model):
         nullable=False
     )
 
+    # relationship backrefs:
+    # - location (Location.holidays)
+
     @return_ascii
     def __repr__(self):
         return u'<Holiday({}, {}, {}, {})>'.format(self.id, self.date, self.name or 'n/a', self.location.name)

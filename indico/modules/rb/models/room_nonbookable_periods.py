@@ -39,6 +39,9 @@ class NonBookablePeriod(db.Model):
         nullable=False
     )
 
+    # relationship backrefs:
+    # - room (Room.nonbookable_periods)
+
     @return_ascii
     def __repr__(self):
         return u'<NonBookablePeriod({0}, {1}, {2})>'.format(

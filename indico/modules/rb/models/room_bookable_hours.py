@@ -41,6 +41,9 @@ class BookableHours(db.Model):
         nullable=False
     )
 
+    # relationship backrefs:
+    # - room (Room.bookable_hours)
+
     @return_ascii
     def __repr__(self):
         return u'<BookableHours({0}, {1}, {2})>'.format(

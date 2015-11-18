@@ -298,6 +298,7 @@ class RegistrationFormItem(db.Model):
     )
 
     # relationship backrefs:
+    # - parent (RegistrationFormItem.children)
     # - registration_form (RegistrationForm.form_items)
 
     @property

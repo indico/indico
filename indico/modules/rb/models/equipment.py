@@ -87,6 +87,12 @@ class EquipmentType(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - location (Location.equipment_types)
+    # - parent (EquipmentType.children)
+    # - reservations (Reservation.used_equipment)
+    # - rooms (Room.available_equipment)
+
     @return_ascii
     def __repr__(self):
         return u'<EquipmentType({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
