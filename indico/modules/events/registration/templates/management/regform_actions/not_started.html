@@ -29,16 +29,6 @@
             {% endif %}
         </a>
     </div>
-    {% if regform.is_scheduled %}
-        <div class="group">
-            <a href="#" class="i-button" data-method="POST"
-               data-href="{{ url_for('.unschedule_regform', regform) }}"
-               data-title="{% trans %}Unschedule registrations{% endtrans %}"
-               data-confirm="{% trans %}Unscheduling will hide the registration on the event pages. Are you sure you want to proceed?{% endtrans %}">
-                {% trans -%}Unschedule{%- endtrans %}
-            </a>
-        </div>
-    {% endif %}
     <div class="group">
         <a href="#" data-href="{{ url_for('.open_regform', regform) }}" data-method="POST" class="i-button highlight">
             {% trans %}Start now{% endtrans %}
