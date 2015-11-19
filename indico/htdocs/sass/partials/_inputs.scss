@@ -57,6 +57,15 @@ input[type=time] {
     }
 }
 
+input[type=time] {
+    // Disable arrows
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button,
+    &::-webkit-clear-button {
+        -webkit-appearance: none;
+    }
+}
+
 input[type=file] {
     &.hasError {
         @include border-all($red);
