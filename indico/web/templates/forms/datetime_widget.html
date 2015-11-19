@@ -13,7 +13,7 @@
                {% if disabled %}disabled{% endif %}>{#--#}
         <i class="timezone" title="{{ field.timezone }}"></i>{#--#}
         <span id="{{ field.id }}-reset"
-              class="icon-close clear-pickers"
+              class="icon-close clear-pickers" style="display: none;"
               title="{% trans %}Clear date and time{% endtrans %}"></span>
     </div>
 {% endblock %}
@@ -25,7 +25,7 @@
 
             var dateField = $('#{{ field.id }}-date');
             var timeField = $('#{{ field.id }}-time');
-            var resetField = $('#{{ field.id }}-reset');
+            var resetFieldAction = $('#{{ field.id }}-reset');
             var initialDate;
             var initialTime;
 
@@ -35,6 +35,11 @@
 
             function updateTimeRequired(e) {
                 timeField.prop('required', e.target.value !== '');
+            }
+
+            function updateResetFieldAction() {
+                var isVisible = !!(dateField.val() || timeField.val());
+                resetFieldAction.toggle(isVisible)
             }
 
             dateField.datepicker({
@@ -48,20 +53,24 @@
                 function() {
                     dateField.trigger('change');
                 }
-            ]).on('change', updateTimeRequired);
+            ]).on('change', function(e) {
+                updateTimeRequired(e);
+                updateResetFieldAction();
+            });
 
             timeField.on('change', function applyOnChangeHandlers() {
                 var handlers = $(this).data('onChangeHandlers');
                 for (var i = 0; i < handlers.length; i++) {
                     handlers[i].apply(this, arguments);
                 }
-            }).data('onChangeHandlers', [updateDateRequired]);
+            }).data('onChangeHandlers', [updateDateRequired, updateResetFieldAction]);
 
             {% if field.data %}
                 initialDate = dateField.val() || undefined;
                 initialTime = timeField.val() || undefined;
                 dateField.datepicker('setDate', initialDate);
                 dateField.trigger('change');
+                timeField.trigger('change');
             {% endif %}
 
             {% if field.earliest_dt or field.latest_dt %}
@@ -123,7 +132,7 @@
                 updateDateLimits(linkedDateField.datepicker('getDate'));
             {% endif %}
 
-            resetField.on('click', function resetDateTime() {
+            resetFieldAction.on('click', function resetDateTime() {
                 dateField.datepicker('setDate', null);
                 timeField.val('');
                 dateField.trigger('change');
