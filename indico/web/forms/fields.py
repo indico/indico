@@ -26,6 +26,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, Select
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
+from wtforms.validators import StopValidation
 
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
@@ -466,14 +467,25 @@ class IndicoDateTimeField(DateTimeField):
 
     def __init__(self, *args, **kwargs):
         self._timezone = kwargs.pop('timezone', None)
+        self.date_missing = False
+        self.time_missing = False
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
 
     def pre_validate(self, form):
+        if self.date_missing:
+            raise StopValidation(_("Date must be specified"))
+        if self.time_missing:
+            raise StopValidation(_("Time must be specified"))
         if self.object_data:
             # Normalize datetime resolution of passed data
             self.object_data = self.object_data.replace(second=0, microsecond=0)
 
     def process_formdata(self, valuelist):
+        if any(valuelist):
+            if not valuelist[0]:
+                self.date_missing = True
+            if not valuelist[1]:
+                self.time_missing = True
         if valuelist:
             valuelist = [' '.join(valuelist).strip()]
         super(IndicoDateTimeField, self).process_formdata(valuelist)

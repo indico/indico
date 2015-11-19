@@ -5,10 +5,11 @@
     <div class="form-row datetime-widget">
         <input type="hidden" autofocus>
         <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker" readonly
-               {% if field.data %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}
+               {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}
+               {% if required %}required{% endif %}
                {% if disabled %}disabled{% endif %}>{#--#}
         <input type="time" name="{{ field.name }}" id="{{ field.id }}-time" class="timepicker"
-               {% if field.data %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
+               {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
                {% if disabled %}disabled{% endif %}>{#--#}
         <i class="timezone" title="{{ field.timezone }}"></i>{#--#}
         <span id="{{ field.id }}-reset"
@@ -28,6 +29,14 @@
             var initialDate;
             var initialTime;
 
+            function updateDateRequired(e) {
+                dateField.prop('required', e.target.value !== '');
+            }
+
+            function updateTimeRequired(e) {
+                timeField.prop('required', e.target.value !== '');
+            }
+
             dateField.datepicker({
                 onSelect: function applyOnSelectHandlers() {
                     var handlers = $(this).data('onSelectHandlers');
@@ -36,31 +45,26 @@
                     }
                 }
             }).data('onSelectHandlers', [
-                requireTime,
                 function() {
                     dateField.trigger('change');
                 }
-            ]);
+            ]).on('change', updateTimeRequired);
 
-            function requireTime() {
-                timeField.prop('required', true);
-            }
+            timeField.on('change', function applyOnChangeHandlers() {
+                var handlers = $(this).data('onChangeHandlers');
+                for (var i = 0; i < handlers.length; i++) {
+                    handlers[i].apply(this, arguments);
+                }
+            }).data('onChangeHandlers', [updateDateRequired]);
 
             {% if field.data %}
-                initialDate = {{ field.data | format_date('code', timezone=field.timezone) | tojson }}
-                initialTime = {{ field.data | format_time('code', timezone=field.timezone) | tojson }}
+                initialDate = dateField.val() || undefined;
+                initialTime = timeField.val() || undefined;
                 dateField.datepicker('setDate', initialDate);
-                requireTime();
+                dateField.trigger('change');
             {% endif %}
 
             {% if field.earliest_dt or field.latest_dt %}
-                timeField.on('change', function applyOnChangeHandlers() {
-                    var handlers = $(this).data('onChangeHandlers');
-                    for (var i = 0; i < handlers.length; i++) {
-                        handlers[i].apply(this, arguments);
-                    }
-                }).data('onChangeHandlers', []);
-
                 function updateTimeLimits(selectedDate, limitDate, limitTime, attr) {
                     var selectedTime = timeField.val();
                     if (selectedDate !== limitDate || (selectedDate === initialDate && selectedTime === initialTime)) {
@@ -121,7 +125,6 @@
 
             resetField.on('click', function resetDateTime() {
                 dateField.datepicker('setDate', null);
-                timeField.prop('required', false);
                 timeField.val('');
                 dateField.trigger('change');
                 timeField.trigger('change');
