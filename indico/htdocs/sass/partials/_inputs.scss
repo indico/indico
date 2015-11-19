@@ -322,6 +322,16 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 }
             }
 
+            > .form-row .i-button {
+                height: 2.5em;
+                line-height: 1.5em;
+
+                &:before {
+                    vertical-align: middle;
+                    font-size: 1.3em;
+                }
+            }
+
             > .enable-input {
                 &, > span {
                     display: inline-block;
@@ -703,8 +713,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         @include border-top-right-radius(0 !important);
     }
 
-
-    > textarea, > input, > .i-button {
+    > textarea, > input {
         height: 2.5em;
         vertical-align: middle;
         line-height: 1.2em;
@@ -717,7 +726,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         top: 0;
         border-left: 0;
     }
-
 
     +  .i-has-action-message {
         display: inline-block;
