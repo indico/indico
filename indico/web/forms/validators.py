@@ -182,6 +182,8 @@ class LinkedDateTime(object):
         if field.data is None:
             return
         linked_field = form[self.linked_field]
+        if linked_field.data is None:
+            return
         linked_field_dt = as_utc(linked_field.data)
         field_dt = as_utc(field.data)
         if self.not_before and field_dt < linked_field_dt:
