@@ -640,7 +640,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 .datetime-widget {
     .datepicker {
-        width: 50%;
+        width: 40%;
     }
 
     .timepicker {
@@ -649,10 +649,20 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
     .timezone {
         @include icon-before('icon-earth');
+        color: $light-black;
+        position: relative;
+        right: 24px;
+        top: 2px;
+    }
+
+    .clear-pickers {
         font-size: 1.3em;
         vertical-align: sub;
-        margin-left: 0.5em;
-        line-height: 1.5em;
+
+        &:hover {
+            color: $red;
+            cursor: pointer;
+        }
     }
 }
 
