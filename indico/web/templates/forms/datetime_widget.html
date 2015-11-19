@@ -29,6 +29,10 @@
             var initialDate;
             var initialTime;
 
+            function clearDate() {
+                dateField.datepicker('setDate', null).trigger('change');
+            }
+
             function updateDateRequired(e) {
                 dateField.prop('required', e.target.value !== '');
             }
@@ -56,6 +60,11 @@
             ]).on('change', function(e) {
                 updateTimeRequired(e);
                 updateResetFieldAction();
+            }).on('keydown', function(e) {
+                e.preventDefault();
+                if (e.which == K.BACKSPACE) {
+                    clearDate();
+                }
             });
 
             timeField.on('change', function applyOnChangeHandlers() {
@@ -133,10 +142,8 @@
             {% endif %}
 
             resetFieldAction.on('click', function resetDateTime() {
-                dateField.datepicker('setDate', null);
-                timeField.val('');
-                dateField.trigger('change');
-                timeField.trigger('change');
+                timeField.val('').trigger('change');
+                clearDate();
             });
         })();
     </script>
