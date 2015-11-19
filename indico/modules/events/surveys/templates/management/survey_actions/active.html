@@ -29,25 +29,10 @@
     </div>
     {% block now_button %}
         <div class="group">
-            <a href="#" class="i-button icon-close arrow js-dropdown" data-toggle="dropdown">
-                {% trans -%}Close the survey{%- endtrans %}
+            <a href="#" data-href="{{ url_for('.close_survey', survey) }}" data-method="POST"
+               class="i-button highlight">
+                {% trans %}Close now{% endtrans %}
             </a>
-            <ul class="dropdown">
-                <li>
-                    <a href="#" data-href="{{ url_for('.close_survey', survey) }}" data-method="POST">
-                        {% trans %}Close now{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    {% if survey.is_scheduled %}
-                        <a href="#" data-method="POST" data-href="{{ url_for('.unschedule_survey', survey) }}"
-                           data-title="{% trans %}Unschedule survey{% endtrans %}"
-                           data-confirm="{% trans %}Unscheduling will close the current survey. Are you sure you want to proceed?{% endtrans %}">
-                            {% trans %}Unschedule{% endtrans %}
-                        </a>
-                    {% endif %}
-                </li>
-            </ul>
         </div>
     {% endblock %}
 {% endblock %}

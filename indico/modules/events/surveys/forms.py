@@ -76,7 +76,7 @@ class SurveyForm(IndicoForm):
 
 
 class ScheduleSurveyForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), DataRequired(),
+    start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), Optional(),
                                                 DateTimeRange(earliest='now')],
                                    description=_("Moment when the survey will open for submissions"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],

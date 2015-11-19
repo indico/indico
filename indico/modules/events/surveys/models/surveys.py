@@ -227,10 +227,6 @@ class Survey(db.Model):
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
-    @property
-    def is_scheduled(self):
-        return not self.is_deleted and self.start_dt is not None
-
     @hybrid_property
     def is_active(self):
         return not self.is_deleted and self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean}
@@ -281,10 +277,6 @@ class Survey(db.Model):
         email = make_email(bcc_list=self.new_submission_emails, template=template_module)
         send_email(email, event=self.event, module='Surveys')
         logger.info('Sending submission notification for survey {}'.format(self))
-
-    def unschedule(self):
-        self.start_dt = None
-        self.end_dt = None
 
 
 @listens_for(Survey.questions, 'append')

@@ -29,8 +29,7 @@ from indico.modules.events.surveys.controllers.management.results import (RHSurv
                                                                           RHDeleteSubmissions, RHDisplaySubmission)
 from indico.modules.events.surveys.controllers.management.survey import (RHManageSurveys, RHManageSurvey, RHEditSurvey,
                                                                          RHDeleteSurvey, RHCreateSurvey,
-                                                                         RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey,
-                                                                         RHUnscheduleSurvey)
+                                                                         RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -52,8 +51,6 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/delete', 'delete_survey', RHDe
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/edit', 'edit_survey', RHEditSurvey, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/schedule', 'schedule_survey', RHScheduleSurvey,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/unschedule', 'unschedule_survey', RHUnscheduleSurvey,
-                 methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/open', 'open_survey', RHOpenSurvey, methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/close', 'close_survey', RHCloseSurvey, methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions.csv', 'export_submissions', RHExportSubmissions,

@@ -142,11 +142,3 @@ class RHOpenSurvey(RHManageSurveyBase):
         flash(_("Survey is now open"), 'success')
         logger.info("Survey {} opened by {}".format(self.survey, session.user))
         return redirect(url_for('.manage_survey', self.survey))
-
-
-class RHUnscheduleSurvey(RHManageSurveyBase):
-    """Unschedule the survey"""
-
-    def _process(self):
-        self.survey.unschedule()
-        return redirect(url_for('.manage_survey', self.survey))
