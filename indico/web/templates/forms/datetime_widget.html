@@ -33,6 +33,12 @@
                 dateField.datepicker('setDate', null).trigger('change');
             }
 
+            function initTime() {
+                if (timeField.val() === '') {
+                    timeField.val({{ field.default_time | format_time('code', timezone=field.timezone) | tojson }});
+                }
+            }
+
             function updateDateRequired(e) {
                 dateField.prop('required', e.target.value !== '');
             }
@@ -54,6 +60,7 @@
                     }
                 }
             }).data('onSelectHandlers', [
+                initTime,
                 function() {
                     dateField.trigger('change');
                 }
