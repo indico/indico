@@ -14,16 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from indico.modules.events.timetable.controllers import RHManageTimetable
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-# Timetable
-event_mgmt.add_url_rule('/timetable-old/', 'confModifSchedule', conferenceModif.RHConfModifSchedule,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/timetable-old/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/timetable-old/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
-                        methods=('GET', 'POST'))
+_bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtual_template_folder='events/timetable',
+                      url_prefix='/event/<confId>')
 
-# Session timetable - see the "sessions" module
+_bp.add_url_rule('/manage/timetable', 'timetable', RHManageTimetable)
