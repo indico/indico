@@ -14,16 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 
-# Timetable
-event_mgmt.add_url_rule('/timetable-old/', 'confModifSchedule', conferenceModif.RHConfModifSchedule,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/timetable-old/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/timetable-old/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
-                        methods=('GET', 'POST'))
+class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
+    template_prefix = 'events/timetable/'
+    sidemenu_option = 'timetable'
 
-# Session timetable - see the "sessions" module
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['timetable_sass'].urls()

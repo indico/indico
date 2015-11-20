@@ -14,16 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from indico.core import signals
+from indico.core.logger import Logger
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
-# Timetable
-event_mgmt.add_url_rule('/timetable-old/', 'confModifSchedule', conferenceModif.RHConfModifSchedule,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/timetable-old/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/timetable-old/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
-                        methods=('GET', 'POST'))
+logger = Logger.get('events.timetable')
 
-# Session timetable - see the "sessions" module
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    return SideMenuItem('timetable', _('Timetable'), url_for('timetable.timetable', event), weight=80, icon='calendar')

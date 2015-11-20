@@ -14,16 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.blueprints.event.management import event_mgmt
+from __future__ import unicode_literals
+
+from indico.modules.events.timetable.views import WPManageTimetable
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-# Timetable
-event_mgmt.add_url_rule('/timetable-old/', 'confModifSchedule', conferenceModif.RHConfModifSchedule,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/timetable-old/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/timetable-old/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
-                        methods=('GET', 'POST'))
+class RHManageTimetableBase(RHConferenceModifBase):
+    """Base class for all timetable management RHs"""
 
-# Session timetable - see the "sessions" module
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.event = self._conf
+
+
+class RHManageTimetable(RHManageTimetableBase):
+    """Display timetable management page"""
+
+    def _process(self):
+        return WPManageTimetable.render_template('management/timetable.html', self.event)
