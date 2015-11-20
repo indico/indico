@@ -66,7 +66,7 @@ def _sidemenu_items(sender, event, **kwargs):
                            90,
                            icon='settings')
         if not is_lecture:
-            yield SideMenuItem('timetable', _('Timetable'),
+            yield SideMenuItem('timetable_old', _('Timetable (Old)'),
                                url_for('event_mgmt.confModifSchedule', event),
                                80,
                                icon='calendar')
