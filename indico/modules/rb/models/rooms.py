@@ -252,7 +252,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     )
 
     # relationship backrefs:
+    # - contributions (Contribution.own_room)
+    # - events (Event.own_room)
     # - location (Location.rooms)
+    # - session_blocks (SessionBlock.own_room)
+    # - sessions (Session.own_room)
 
     @hybrid_property
     def is_auto_confirm(self):
