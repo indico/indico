@@ -64,24 +64,34 @@ Version 2.1: (August 2013)
   * Update math delimiters
 """
 
+from __future__ import absolute_import
+
 __version__ = '2.1'
 
-# do some fancy importing stuff to allow use to override things in this module
-# in this file while still importing * for use in our own classes
 import re
+import requests
 import sys
+import textwrap
+from io import BytesIO
+from mimetypes import guess_extension
+from tempfile import NamedTemporaryFile
+from urlparse import urlparse
+
 import markdown
 import xml.dom.minidom
-from urlparse import urlparse
-import httplib
-import os
-import tempfile
-import urllib
+from PIL import Image
 
 
 start_single_quote_re = re.compile("(^|\s|\")'")
 start_double_quote_re = re.compile("(^|\s|'|`)\"")
 end_double_quote_re = re.compile("\"(,|\.|\s|$)")
+
+Image.init()
+IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.viewitems()}
+
+
+class ImageURLException(Exception):
+    pass
 
 
 def unescape_html_entities(text):
@@ -149,6 +159,76 @@ def unescape_latex_entities(text):
     return out
 
 
+def latex_render_error(message):
+    """
+    Generate nice error box in LaTeX document.
+
+    :param message: The error message
+    :returns: LaTeX code for error box
+    """
+    return textwrap.dedent(r"""
+       \begin{tcolorbox}[width=\textwidth,colback=red!5!white,colframe=red!75!black,
+                         title={Indico rendering error}]
+          \begin{verbatim}
+            %s
+          \end{verbatim}
+       \end{tcolorbox}""" % message)
+
+
+def latex_render_image(src, alt, strict=False):
+    """
+    Generate LaTeX code that includes an arbitrary image from a URL.
+
+    This involves fetching the image from a web server and figuring out its
+    MIME type. A temporary file will be created, which is not immediately
+    deleted since it has to be included in the LaTeX code. It should be handled
+    by the enclosing code.
+
+    :param src: source URL of the image
+    :param alt: text to use as ``alt="..."``
+    :param strict: whether a faulty URL should break the whole process
+    :returns: a ``(latex_code, file_path)`` tuple, containing the LaTeX code
+              and path to the temporary image file.
+    """
+    try:
+        if urlparse(src).scheme not in ('http', 'https'):
+            raise ImageURLException("URL scheme not supported: {}".format(src))
+        else:
+            resp = requests.get(src, verify=False)
+            extension = None
+
+            if resp.status_code != 200:
+                raise ImageURLException("[{}] Error fetching image".format(resp.status_code))
+
+            if resp.headers.get('content-type'):
+                extension = guess_extension(resp.headers['content-type'])
+                # as incredible as it might seem, '.jpe' will be the answer in some Python environments
+                if extension == '.jpe':
+                    extension = '.jpg'
+            if not extension:
+                # Try to use PIL to get file type
+                image = Image.open(BytesIO(resp.content))
+                # Worst case scenario, assume it's PNG
+                extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
+
+            with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, delete=False) as tempfile:
+                tempfile.write(resp.content)
+    except ImageURLException, e:
+        if strict:
+            raise
+        else:
+            return (latex_render_error("Could not include image: {}".format(e.message)), None)
+
+    # Using graphicx and ajustbox package for *max width*
+    return (textwrap.dedent(r"""
+        \begin{figure}[H]
+          \centering
+          \includegraphics[max width=\linewidth]{%s}
+          \caption{%s}
+        \end{figure}
+        """ % (tempfile.name, alt)), tempfile.name)
+
+
 def makeExtension(configs=None):
     return LaTeXExtension(configs=configs)
 
@@ -170,14 +250,12 @@ class LaTeXExtension(markdown.Extension):
         latex_tp = LaTeXTreeProcessor()
         math_pp = MathTextPostProcessor()
         table_pp = TableTextPostProcessor()
-        image_pp = ImageTextPostProcessor()
         link_pp = LinkTextPostProcessor()
         unescape_html_pp = UnescapeHtmlTextPostProcessor()
 
         md.treeprocessors['latex'] = latex_tp
         md.postprocessors['unescape_html'] = unescape_html_pp
         md.postprocessors['math'] = math_pp
-        md.postprocessors['image'] = image_pp
         md.postprocessors['table'] = table_pp
         md.postprocessors['link'] = link_pp
 
@@ -239,9 +317,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
 """ % subcontent.strip()
         # ignore 'code' when inside pre tags
         # (mkdn produces <pre><code></code></pre>)
-        elif (ournode.tag == 'pre' or
-                             # TODO: Take a look here
-             (ournode.tag == 'pre' and ournode.parentNode.tag != 'pre')):
+        elif (ournode.tag == 'pre' or (ournode.tag == 'pre' and ournode.parentNode.tag != 'pre')):
             buffer += """
 \\begin{verbatim}
 %s
@@ -269,11 +345,9 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'td':
             buffer += '<td>%s</td>' % subcontent
         elif ournode.tag == 'img':
-            buffer += '<img src=\"%s\" alt=\"%s\" />' % (ournode.get('src'),
-                      ournode.get('alt'))
+            buffer += latex_render_image(ournode.get('src'), ournode.get('alt'))[0]
         elif ournode.tag == 'a':
-            buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'),
-                      subcontent)
+            buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
         else:
             buffer = subcontent
 
@@ -460,60 +534,6 @@ class Table2Latex:
             \\end{table}
             """ % (colformatting, core, caption)
         return table_latex
-
-
-# ========================= IMAGES =================================
-
-class ImageTextPostProcessor(markdown.postprocessors.Postprocessor):
-
-    def run(self, instr):
-        """Process all img tags
-
-        Similar to process_tables this is not very sophisticated and for it
-        to work it is expected that img tags are put in a section of their own
-        (that is separated by at least one blank line above and below).
-        """
-        converter = Img2Latex()
-        new_blocks = []
-        for block in instr.split("\n\n"):
-            stripped = block.strip()
-            # <table catches modified verions (e.g. <table class="..">
-            if stripped.startswith('<img'):
-                latex_img = converter.convert(stripped).strip()
-                new_blocks.append(latex_img)
-            else:
-                new_blocks.append(block)
-        return '\n\n'.join(new_blocks)
-
-
-class Img2Latex(object):
-    def convert(self, instr):
-        dom = xml.dom.minidom.parseString(instr)
-        img = dom.documentElement
-        src = img.getAttribute('src')
-
-        if urlparse(src).scheme != '':
-            src_urlparse = urlparse(src)
-            conn = httplib.HTTPConnection(src_urlparse.netloc)
-            conn.request('HEAD', src_urlparse.path)
-            response = conn.getresponse()
-            conn.close()
-            if response.status == 200:
-                filename = os.path.join(tempfile.mkdtemp(), src.split('/')[-1])
-                urllib.urlretrieve(src, filename)
-                src = filename
-
-        alt = img.getAttribute('alt')
-	# Using graphicx and ajustbox package for *max width*
-        out = \
-            """
-            \\begin{figure}[H]
-            \\centering
-            \\includegraphics[max width=\\linewidth]{%s}
-            \\caption{%s}
-            \\end{figure}
-            """ % (src, alt)
-        return out
 
 
 # ========================== LINKS =================================
