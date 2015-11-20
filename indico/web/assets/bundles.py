@@ -397,7 +397,10 @@ module_js = {
                                'js/indico/modules/registration/invitations.js',
                                'js/indico/modules/registration/reglists.js',
                                *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
-                                          'sectiontoolbar.js', 'table.js'))
+                                          'sectiontoolbar.js', 'table.js')),
+    'timetable': rjs_bundle('modules_timetable',
+                            *namespace('js/indico/modules/timetable/timetable', 'Base.js', 'DragAndDrop.js', 'Draw.js',
+                                       'Filter.js', 'Layout.js', 'Management.js', 'Undo.js'))
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",
@@ -432,6 +435,7 @@ news_sass = sass_module_bundle('news')
 users_sass = sass_module_bundle('users')
 auth_sass = sass_module_bundle('auth')
 surveys_sass = sass_module_bundle('surveys')
+timetable_sass = sass_module_bundle('timetable')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -519,6 +523,7 @@ def register_all_css(env, main_css_file):
     env.register('fonts_sass', fonts_sass)
     env.register('payment_sass', payment_sass)
     env.register('surveys_sass', surveys_sass)
+    env.register('timetable_sass', timetable_sass)
 
 
 core_env = IndicoEnvironment()
