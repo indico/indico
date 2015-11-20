@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import time
+
 from markupsafe import escape
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.fields.html5 import IntegerField
@@ -78,8 +80,10 @@ class SurveyForm(IndicoForm):
 class ScheduleSurveyForm(IndicoForm):
     start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), Optional(),
                                                 DateTimeRange(earliest='now')],
+                                   default_time=time(0, 0),
                                    description=_("Moment when the survey will open for submissions"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
+                                 default_time=time(23, 59),
                                  description=_("Moment when the survey will close"))
     resend_start_notification = BooleanField(_('Resend start notification'), widget=SwitchWidget(),
                                              description=_("Resend the survey start notification."))

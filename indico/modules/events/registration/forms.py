@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import time
+
 from flask import session
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField
 from wtforms.fields.html5 import EmailField, DecimalField
@@ -106,9 +108,9 @@ class RegistrationFormForm(IndicoForm):
 
 
 class RegistrationFormScheduleForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [Optional()],
+    start_dt = IndicoDateTimeField(_("Start"), [Optional()], default_time=time(0, 0),
                                    description=_("Moment when registrations will be open"))
-    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
+    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
                                  description=_("Moment when registrations will be closed"))
 
     def __init__(self, *args, **kwargs):
