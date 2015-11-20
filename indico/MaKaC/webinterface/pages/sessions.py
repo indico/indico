@@ -123,7 +123,7 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
                self._includeJSPackage('Timetable')
 
 class WPSessionModifBase(WPConferenceModifBase):
-    sidemenu_option = 'timetable'
+    sidemenu_option = 'timetable_old'
 
     def __init__(self, rh, session, **kwargs):
         WPConferenceModifBase.__init__(self, rh, session.getConference(), **kwargs)
