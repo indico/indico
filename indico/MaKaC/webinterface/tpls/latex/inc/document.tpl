@@ -22,6 +22,7 @@
 \usepackage[usenames,dvipsnames]{xcolor} %% named colors
 \usepackage{sectsty} %% style sections
 \usepackage{xstring}
+\usepackage{tcolorbox}
 \usepackage[inline]{enumitem}
 \usepackage[breakall]{truncate}
 
