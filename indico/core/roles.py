@@ -45,7 +45,7 @@ def get_available_roles(type_):
 
 def check_roles(type_):
     """
-    Retrieves the roles for an objent type and ensures they are
+    Retrieves the roles for an object type and ensures they are
     defined properly.
 
     This function should be executed from a function connected to the
