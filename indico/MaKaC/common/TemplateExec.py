@@ -43,7 +43,7 @@ FILTER_IMPORTS = [
     'from indico.util.string import encode_if_unicode',
     'from indico.util.string import html_line_breaks as html_breaks',
     'from indico.util.string import remove_tags',
-    'from indico.util.string import render_markdown as m',
+    'from indico.util.string import render_markdown_utf8 as m',
     'from indico.util.i18n import _'
 ]
 
