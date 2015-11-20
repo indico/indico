@@ -18,10 +18,13 @@ from __future__ import unicode_literals
 
 from contextlib import contextmanager
 
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
@@ -29,7 +32,7 @@ from indico.util.string import return_ascii, to_unicode, format_repr
 from indico.web.flask.util import url_for
 
 
-class Event(ProtectionManagersMixin, db.Model):
+class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
@@ -38,13 +41,19 @@ class Event(ProtectionManagersMixin, db.Model):
     view access!
     """
     __tablename__ = 'events'
-    __table_args__ = (db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
-                      db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
-                                         'valid_stylesheet'),
-                      {'schema': 'events'})
+    __auto_table_args = (db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
+                         db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
+                                            'valid_stylesheet'),
+                         {'schema': 'events'})
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+    location_backref_name = 'events'
+    allow_location_inheritance = False
     __logging_disabled = False
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls)
 
     #: The ID of the event
     id = db.Column(
@@ -100,6 +109,20 @@ class Event(ProtectionManagersMixin, db.Model):
         nullable=False,
         default=0
     ))
+    #: The last user-friendly contribution ID
+    _last_friendly_contribution_id = db.deferred(db.Column(
+        'last_friendly_contribution_id',
+        db.Integer,
+        nullable=False,
+        default=0
+    ))
+    #: The last user-friendly session ID
+    _last_friendly_session_id = db.deferred(db.Column(
+        'last_friendly_session_id',
+        db.Integer,
+        nullable=False,
+        default=0
+    ))
 
     #: The user who created the event
     creator = db.relationship(
@@ -126,10 +149,22 @@ class Event(ProtectionManagersMixin, db.Model):
         cascade='all, delete-orphan',
         collection_class=set
     )
+    #: External references associated with this event
+    references = db.relationship(
+        'EventReference',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'event_new',
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - agreements (Agreement.event_new)
     # - attachment_folders (AttachmentFolder.event_new)
+    # - contribution_fields (ContributionField.event_new)
+    # - contributions (Contribution.event_new)
     # - custom_pages (EventPage.event_new)
     # - layout_images (ImageFile.event_new)
     # - legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event_new)
@@ -143,6 +178,7 @@ class Event(ProtectionManagersMixin, db.Model):
     # - reminders (EventReminder.event_new)
     # - requests (Request.event_new)
     # - reservations (Reservation.event_new)
+    # - sessions (Session.event_new)
     # - settings (EventSetting.event_new)
     # - settings_principals (EventSettingPrincipal.event_new)
     # - static_sites (StaticSite.event_new)

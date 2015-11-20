@@ -55,8 +55,11 @@ class LocalGroup(db.Model):
     # - in_attachment_acls (AttachmentPrincipal.local_group)
     # - in_attachment_folder_acls (AttachmentFolderPrincipal.local_group)
     # - in_blocking_acls (BlockingPrincipal.local_group)
+    # - in_contribution_acls (ContributionPrincipal.local_group)
     # - in_event_acls (EventPrincipal.local_group)
     # - in_event_settings_acls (EventSettingPrincipal.local_group)
+    # - in_session_acls (SessionPrincipal.local_group)
+    # - in_session_block_acls (SessionBlockPrincipal.local_group)
     # - in_settings_acls (SettingPrincipal.local_group)
 
     @return_ascii

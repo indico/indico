@@ -16,9 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask import flash
+
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.util.i18n import _
+from indico.core.roles import ManagementRole, check_roles
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -30,3 +34,37 @@ logger = Logger.get('events.contributions')
 def _extend_event_management_menu(sender, event, **kwargs):
     return SideMenuItem('contributions', _('Contributions'), url_for('contributions.manage_contributions', event),
                         section='organization')
+
+
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    from indico.modules.events.contributions.models.principals import ContributionPrincipal
+    ContributionPrincipal.merge_users(target, source, 'contribution')
+
+
+@signals.users.registered.connect
+@signals.users.email_added.connect
+def _convert_email_principals(user, **kwargs):
+    from indico.modules.events.contributions.models.principals import ContributionPrincipal
+    contributions = ContributionPrincipal.replace_email_with_user(user, 'contribution')
+    if contributions:
+        num = len(contributions)
+        flash(ngettext("You have been granted manager/submission privileges for a contribution.",
+                       "You have been granted manager/submission privileges for {} contributions.", num).format(num),
+              'info')
+
+
+@signals.app_created.connect
+def _check_roles(app, **kawrgs):
+    check_roles(Contribution)
+
+
+@signals.acl.get_management_roles.connect_via(Contribution)
+def _get_management_roles(sender, **kwargs):
+    return SubmitterRole
+
+
+class SubmitterRole(ManagementRole):
+    name = 'submit'
+    friendly_name = _('Submission')
+    description = _('Grants access to materials and minutes.')
