@@ -13,7 +13,7 @@
                 name="radio-field-{{ fieldName }}"
                 value="{{ item.id }}"
                 ng-model="radioValue.id"
-                ng-required="field.isRequired && radioValue.id === undefined"
+                ng-required="field.isRequired"
                 ng-disabled="isDisabled(item, getUserdataValue()) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || selectedItemIsBillable(userdata, regMetadata))"
                 ng-click="onSingleFieldItemChange(item)"/>
             <label ng-class="{'text-error': validationStarted && nestedForm.$invalid}" for="field-{{ section.id }}-{{ field.id }}-{{ item.id }}">
@@ -59,6 +59,9 @@
             </select>
         </span>
     </div>
-
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired"
+          class="error-message-tag">
+        {{ 'Field is mandatory' | i18n }}
+    </span>
     <input type="hidden" name="{{ fieldName }}" value="{{ userdata[fieldName] }}">
 </ng-form>

@@ -531,10 +531,18 @@ var ndSelectController = function($scope) {
         var valueElement = $('input[name={0}]'.format($scope.field.htmlName)),
             data = JSON.parse(valueElement.val() || '{}'),
             target = $(event.target);
+        if (!$scope.checkedIds) {
+            $scope.checkedIds = [];
+        }
         if (target.prop('checked')) {
             data[target.prop('id')] = (+$('#extraSlotsSelect-{0}'.format(target.prop('id'))).val() + 1) || 1;
+            $scope.checkedIds.push(target.prop('id'));
         } else {
             delete data[target.prop('id')];
+            $scope.checkedIds.splice($scope.checkedIds.indexOf(target.prop('id')), 1);
+        }
+        if ($scope.checkedIds.length === 0) {
+            delete $scope.checkedIds;
         }
         valueElement.val(JSON.stringify(data));
     };
@@ -997,6 +1005,9 @@ ndRegForm.directive('ndMultiChoiceField', function(url) {
             scope.settings.fieldName = $T("Multi choice");
             scope.settings.itemtable = true;
             scope.settings.withExtraSlots = true;
+            if (scope.userdata[scope.fieldName]) {
+                scope.checkedIds = _.keys(scope.userdata[scope.fieldName]);
+            }
 
             scope.settings.editionTable = {
                 sortable: false,
