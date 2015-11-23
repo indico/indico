@@ -279,7 +279,7 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
     :param special_items: Registration form information as extra columns
     """
 
-    field_names = ['name']
+    field_names = ['ID', 'Name']
     special_item_mapping = OrderedDict([
         ('reg_date', ('Registration date', lambda x: format_datetime(x.submitted_dt))),
         ('state', ('Registration state', lambda x: x.state.title)),
@@ -299,7 +299,8 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
     for registration in registrations:
         data = registration.data_by_field
         registration_dict = {
-            'name': "{} {}".format(registration.first_name, registration.last_name).encode('utf-8')
+            'ID': registration.friendly_id,
+            'Name': "{} {}".format(registration.first_name, registration.last_name).encode('utf-8')
         }
         for item in regform_items:
             key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
