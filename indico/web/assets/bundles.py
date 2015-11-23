@@ -117,7 +117,6 @@ indico_management = rjs_bundle(
                'Timetable.js',
                'AbstractReviewing.js',
                'NotificationTPL.js',
-               'Registration.js',
                'Contributions.js',
                'Sessions.js',
                'CFA.js',
