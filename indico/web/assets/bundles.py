@@ -397,6 +397,8 @@ module_js = {
                                'js/indico/modules/registration/reglists.js',
                                *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
                                           'sectiontoolbar.js', 'table.js')),
+    'contributions': rjs_bundle('modules_contributions',
+                                *namespace('js/indico/modules/contributions', 'common.js', 'userlists.js')),
     'timetable': rjs_bundle('modules_timetable',
                             *namespace('js/indico/modules/timetable/timetable', 'Base.js', 'DragAndDrop.js', 'Draw.js',
                                        'Filter.js', 'Layout.js', 'Management.js', 'Undo.js'))
