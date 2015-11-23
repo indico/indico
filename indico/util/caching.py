@@ -47,7 +47,7 @@ def memoize_request(f):
     """Memoizes a function during the current request"""
     @wraps(f)
     def memoizer(*args, **kwargs):
-        if not has_request_context() or current_app.config['TESTING']:
+        if not has_request_context() or current_app.config['TESTING'] or current_app.config.get('REPL'):
             # No memoization outside request context
             return f(*args, **kwargs)
 

@@ -95,6 +95,7 @@ class IndicoShell(Shell):
             return self.run(*args, **kwargs)
 
     def run(self, no_ipython, use_bpython, quiet):
+        current_app.config['REPL'] = True  # disables e.g. memoize_request
         context = self.get_context()
         if not quiet:
             self.banner = '\n'.join(self._info + ['', self.banner])
