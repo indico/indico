@@ -229,7 +229,7 @@
                 if (this !== ui.item.parent()[0]) {
                     return;
                 }
-                var itemIds = $this.find('.js-sortable-survey-item').map(function() {
+                var itemIds = $this.find('.survey-item').map(function() {
                     return $(this).data('itemId');
                 }).get();
                 _save('items', {

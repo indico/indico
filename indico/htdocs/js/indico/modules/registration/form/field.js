@@ -782,7 +782,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
 
             $scope.areDepartureDatesValid = function(data) {
                 return moment(data['departureDateTo'], "DD/MM/YYYY")
-                        .isAfter(moment(data['departureDateFrom'], "DD/MM/YYYY"))
+                        .isAfter(moment(data['departureDateFrom'], "DD/MM/YYYY"));
             };
 
             $scope.areAccommodationOptionsDefined = function(data) {
@@ -985,7 +985,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 ]
             };
         }
-    }
+    };
 });
 
 ndRegForm.directive('ndMultiChoiceField', function(url) {

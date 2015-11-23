@@ -72,6 +72,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationsExportAttachments,
                                                                                 RHRegistrationCheckIn,
                                                                                 RHRegistrationBulkCheckIn)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -213,3 +214,7 @@ _bp_participation.add_url_rule('/manage/participants/', 'manage', RHManagePartic
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('/registration/', 'registration', compat_registration)
 _compat_bp.add_url_rule('/registration/<path:path>', 'registration', compat_registration)
+_compat_bp.add_url_rule('/registration/registrants', 'registrants',
+                        make_compat_redirect_func(_bp, 'participant_list', view_args_conv={'event_id': 'confId'}))
+_compat_bp.add_url_rule('!/confRegistrantsDisplay.py/list', 'registrants_modpython',
+                        make_compat_redirect_func(_bp, 'participant_list'))

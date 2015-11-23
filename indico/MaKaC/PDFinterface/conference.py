@@ -1462,7 +1462,7 @@ class RegistrantToPDF(PDFBase):
             text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption.encode('utf-8'), field_value=value)
             _append_text_to_story(text)
 
-        text = _('Registrant ID: {id}').format(id=registration.id)
+        text = _('Registrant ID: {id}').format(id=registration.friendly_id)
         _append_text_to_story(text, space=0.5)
 
         style = ParagraphStyle({})
@@ -1605,6 +1605,7 @@ class RegistrantsListToPDF(PDFBase):
                         ('ALIGN',(0,1),(-1,-1),"LEFT") ] )
         l = []
         lp = []
+        lp.append(Paragraph('<b>{}</b>'.format(_('ID')), text_format))
         lp.append(Paragraph('<b>{}</b>'.format(_('Name')), text_format))
 
         accommodation_col_counter = 0
@@ -1630,6 +1631,7 @@ class RegistrantsListToPDF(PDFBase):
 
         for registration in self._regList:
             lp = []
+            lp.append(Paragraph(registration.friendly_id, text_format))
             lp.append(Paragraph("{} {}".format(registration.first_name.encode('utf-8'),
                                                registration.last_name.encode('utf-8')), text_format))
             data = registration.data_by_field
@@ -1669,7 +1671,7 @@ class RegistrantsListToPDF(PDFBase):
                 check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
                 lp.append(Paragraph(check_in_date, text_format))
             l.append(lp)
-        noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 1)
+        noneList = (None,) * (len(self._display) + len(self.special_items) + (accommodation_col_counter * 2) + 2)
         t = Table(l, colWidths=noneList, style=tsRegs)
         self._story.append(t)
         return story
