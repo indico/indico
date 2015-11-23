@@ -206,11 +206,13 @@ def latex_render_image(src, alt, strict=False):
                 if extension == '.jpe':
                     extension = '.jpg'
             if not extension:
-                # Try to use PIL to get file type
-                image = Image.open(BytesIO(resp.content))
-                # Worst case scenario, assume it's PNG
-                extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
-
+                try:
+                    # Try to use PIL to get file type
+                    image = Image.open(BytesIO(resp.content))
+                    # Worst case scenario, assume it's PNG
+                    extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
+                except IOError:
+                    raise ImageURLException("Cannot read image data. Maybe not an image file?")
             with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, delete=False) as tempfile:
                 tempfile.write(resp.content)
     except ImageURLException, e:
