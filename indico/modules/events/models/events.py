@@ -61,7 +61,8 @@ class Event(ProtectionManagersMixin, db.Model):
     creator_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
