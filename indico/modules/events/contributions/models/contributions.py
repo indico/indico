@@ -186,6 +186,16 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
             lazy=True
         )
     )
+    #: Persons associated with this contribution
+    person_links = db.relationship(
+        'ContributionPersonLink',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'contribution',
+            lazy=True
+        )
+    )
     #: Data stored in abstract/contribution fields
     field_values = db.relationship(
         'ContributionFieldValue',
