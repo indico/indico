@@ -173,6 +173,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     # - log_entries (EventLogEntry.event_new)
     # - menu_entries (MenuEntry.event_new)
     # - notes (EventNote.event_new)
+    # - persons (EventPerson.event_new)
     # - registration_forms (RegistrationForm.event_new)
     # - registrations (Registration.event_new)
     # - reminders (EventReminder.event_new)
