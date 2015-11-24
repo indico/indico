@@ -1,8 +1,8 @@
 <div ng-controller="BillableCtrl">
     <ng-form name="nestedForm">
-        <ul>
-            <li ng-repeat="item in field.choices | filter:{isEnabled: true}" ng-required="field.isRequired"
-                ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+        <ul ng-class="{hasError: validationStarted && nestedForm.$invalid}" ng-model="checkedIds"
+            ng-required="field.isRequired">
+            <li ng-repeat="item in field.choices | filter:{isEnabled: true}">
                 <input id="{{ item.id }}" type="checkbox" ng-click="multiFieldItemChecked($event)"
                        ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
                        ng-model="itemChecked"
