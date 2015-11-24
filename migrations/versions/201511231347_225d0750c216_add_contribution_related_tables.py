@@ -12,6 +12,8 @@ from sqlalchemy.dialects import postgresql as pg
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.users.models.users import UserTitle
 
 
 # revision identifiers, used by Alembic.
@@ -343,6 +345,39 @@ def upgrade():
         schema='events'
     )
 
+    # EventPerson
+    op.create_table(
+        'persons',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('user_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('first_name', sa.String(), nullable=False),
+        sa.Column('last_name', sa.String(), nullable=False),
+        sa.Column('email', sa.String(), nullable=False),
+        sa.Column('title', PyIntEnum(UserTitle), nullable=False),
+        sa.Column('affiliation', sa.String(), nullable=False),
+        sa.Column('address', sa.Text(), nullable=False),
+        sa.Column('phone', sa.String(), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='events'
+    )
+
+    # ContributionPersonLink
+    op.create_table(
+        'contribution_person_links',
+        sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('is_speaker', sa.Boolean(), nullable=False),
+        sa.Column('author_type', PyIntEnum(AuthorType), nullable=False),
+        sa.Column('person_id', sa.Integer(), nullable=False, index=True),
+        sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
+        sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
+        sa.UniqueConstraint('person_id', 'contribution_id'),
+        sa.PrimaryKeyConstraint('contribution_id', 'person_id'),
+        schema='events'
+    )
+
     # LegacyContributionMapping
     op.create_table(
         'legacy_contribution_id_map',
@@ -383,6 +418,8 @@ def downgrade():
     op.drop_column('events', 'last_friendly_contribution_id', schema='events')
     op.drop_table('legacy_session_id_map', schema='events')
     op.drop_table('legacy_contribution_id_map', schema='events')
+    op.drop_table('contribution_person_links', schema='events')
+    op.drop_table('persons', schema='events')
     op.drop_table('event_references', schema='events')
     op.drop_table('contribution_references', schema='events')
     op.drop_table('subcontribution_references', schema='events')
