@@ -252,6 +252,7 @@ class User(db.Model):
     # - created_events (Event.creator)
     # - event_log_entries (EventLogEntry.user)
     # - event_notes_revisions (EventNoteRevision.user)
+    # - event_persons (EventPerson.user)
     # - event_reminders (EventReminder.creator)
     # - favorite_of (User.favorite_users)
     # - in_attachment_acls (AttachmentPrincipal.user)
