@@ -252,7 +252,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
             if (uservalue && item.id === uservalue) places += 1;
         } else if ($scope.field.inputType == 'multi_choice') {
             places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue && item.id === uservalue) places += 1;
+            if (uservalue && uservalue[item.id]) places += 1;
         }
         return places;
     };
