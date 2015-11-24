@@ -472,7 +472,7 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     Note: Do not use positional arguments (except for the names/title)
     when calling this method.  Always use keyword arguments!
 
-    :param first_name: The first name
+    :param first_name: The first name (may be empty)
     :param last_name: The last name
     :param title: The title (may be empty/None)
     :param last_name_first: if "lastname, firstname" instead of
@@ -484,8 +484,12 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     """
     if last_name_upper:
         last_name = last_name.upper()
-    first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
-    full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name, last_name)
+    if not first_name:
+        full_name = last_name
+    else:
+        first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
+        full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name,
+                                                                                                    last_name)
     return full_name if not show_title or not title else u'{} {}'.format(title, full_name)
 
 
