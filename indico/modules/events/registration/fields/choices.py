@@ -221,7 +221,7 @@ class MultiChoiceField(ChoiceBaseField):
 
         return_value = {}
 
-        if old_data is not None:
+        if old_data is not None and old_data.data is not None:
             # in case nothing changed we can skip all checks
             if old_data.data == value:
                 return {}
