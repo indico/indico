@@ -37,6 +37,7 @@ from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import strip_ansi, cformat
+from indico.util.date_time import now_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
 from MaKaC.common import HelperMaKaCInfo
@@ -158,6 +159,7 @@ class IndicoShell(Shell):
             add_to_context(DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
             add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
             add_to_context(transaction, doc='transaction module', color='cyan!')
+            add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
             add_to_context(current_app, 'app', doc='flask app')
             add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id (Conference)')
