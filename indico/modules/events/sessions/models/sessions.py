@@ -68,6 +68,16 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
         db.String,
         nullable=False
     )
+    description = db.Column(
+        db.Text,
+        nullable=True,
+        default=''
+    )
+    code = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     default_contribution_duration = db.Column(
         db.Interval,
         nullable=False,
