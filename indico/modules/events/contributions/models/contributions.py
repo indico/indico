@@ -209,6 +209,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
 
     # relationship backrefs:
     # - legacy_mapping (LegacyContributionMapping.contribution)
+    # - timetable_entry (TimetableEntry.contribution)
 
     @property
     def location_parent(self):

@@ -252,6 +252,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     )
 
     # relationship backrefs:
+    # - breaks (Break.own_room)
     # - contributions (Contribution.own_room)
     # - events (Event.own_room)
     # - location (Location.rooms)

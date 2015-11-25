@@ -184,6 +184,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     # - settings_principals (EventSettingPrincipal.event_new)
     # - static_sites (StaticSite.event_new)
     # - surveys (Survey.event_new)
+    # - timetable_entries (TimetableEntry.event_new)
     # - vc_room_associations (VCRoomEventAssociation.event_new)
 
     @property

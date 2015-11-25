@@ -16,21 +16,19 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.colors import ColorMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
-from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import format_repr, return_ascii
 
 
-class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
-    __tablename__ = 'session_blocks'
-    __auto_table_args = (db.UniqueConstraint('id', 'session_id'),  # useless but needed for the compound fkey
-                         {'schema': 'events'})
-    location_backref_name = 'session_blocks'
-    disallowed_protection_modes = frozenset({ProtectionMode.public, ProtectionMode.protected})
+class Break(ColorMixin, LocationMixin, db.Model):
+    __tablename__ = 'breaks'
+    __auto_table_args = {'schema': 'events'}
+    location_backref_name = 'breaks'
 
     @declared_attr
     def __table_args__(cls):
@@ -40,14 +38,12 @@ class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
         db.Integer,
         primary_key=True
     )
-    session_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.sessions.id'),
-        index=True,
-        nullable=False
-    )
     title = db.Column(
         db.String,
+        nullable=False
+    )
+    description = db.Column(
+        db.Text,
         nullable=False,
         default=''
     )
@@ -56,27 +52,15 @@ class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
         nullable=False
     )
 
-    acl_entries = db.relationship(
-        'SessionBlockPrincipal',
-        lazy=True,
-        cascade='all, delete-orphan',
-        collection_class=set,
-        backref='session_block'
-    )
-
     # relationship backrefs:
-    # - contributions (Contribution.session_block)
-    # - session (Session.blocks)
-    # - timetable_entry (TimetableEntry.session_block)
+    # - timetable_entry (TimetableEntry.break_)
 
     @property
     def location_parent(self):
-        return self.session
-
-    @property
-    def protection_parent(self):
-        return self.session
+        return (self.timetable_entry.event_new
+                if self.timetable_entry.parent_id is None
+                else self.timetable_entry.parent.session_block)
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title or None)
+        return format_repr(self, 'id', _text=self.title)
