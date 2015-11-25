@@ -78,4 +78,4 @@ class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', _text=self.title or None)
