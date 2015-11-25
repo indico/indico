@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db.sqlalchemy.colors import ColorMixin
@@ -66,6 +68,16 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
         db.String,
         nullable=False
     )
+    default_contribution_duration = db.Column(
+        db.Interval,
+        nullable=False,
+        default=timedelta(minutes=20)
+    )
+    is_poster = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     is_deleted = db.Column(
         db.Boolean,
         nullable=False,
@@ -112,4 +124,4 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', is_deleted=False, _text=self.title)
+        return format_repr(self, 'id', is_poster=False, is_deleted=False, _text=self.title)
