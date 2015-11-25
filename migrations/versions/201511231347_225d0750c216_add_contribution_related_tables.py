@@ -57,6 +57,8 @@ def upgrade():
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.Column('text_color', sa.String(), nullable=False),
+        sa.Column('background_color', sa.String(), nullable=False),
         sa.Column('protection_mode', PyIntEnum(ProtectionMode), nullable=False),
         sa.Column('room_name', sa.String(), nullable=False),
         sa.Column('inherit_location', sa.Boolean(), nullable=False),
