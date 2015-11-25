@@ -23,6 +23,7 @@ from functools import partial
 from operator import itemgetter, attrgetter
 
 import transaction
+import sqlalchemy.orm
 from flask import current_app
 from flask_script import Shell, Option
 from werkzeug.local import LocalProxy
@@ -127,7 +128,10 @@ class IndicoShell(Shell):
             add_to_context_smart = partial(_add_to_context_smart, context, self._info)
             # Common stdlib modules
             self._info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
-            add_to_context_multi([getattr(datetime, attr) for attr in ('date', 'time', 'datetime', 'timedelta')] +
+            DATETIME_ATTRS = ('date', 'time', 'datetime', 'timedelta')
+            ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload')
+            add_to_context_multi([getattr(datetime, attr) for attr in DATETIME_ATTRS] +
+                                 [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
                                  [itertools, re, sys, os],
                                  color='yellow')
             # Legacy Indico
