@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 import string
-
 from collections import namedtuple
+
+from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 
@@ -64,16 +65,21 @@ class ColorMixin(object):
     holding text color and background color.
     """
 
-    text_color = db.Column(
-        db.String,
-        nullable=False,
-        default=''
-    )
-    background_color = db.Column(
-        db.String,
-        nullable=False,
-        default=''
-    )
+    @declared_attr
+    def text_color(cls):
+        return db.Column(
+            db.String,
+            nullable=False,
+            default=''
+        )
+
+    @declared_attr
+    def background_color(cls):
+        return db.Column(
+            db.String,
+            nullable=False,
+            default=''
+        )
 
     @property
     def colors(self):
