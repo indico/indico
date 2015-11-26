@@ -37,7 +37,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.modules.events import Event, EventSetting
 from indico.modules.events.features.util import set_feature_enabled
-from indico.modules.events.layout.models import MenuEntry
+from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
                                                                    RegistrationFormField, RegistrationFormFieldData)
 from indico.modules.events.registration.models.forms import RegistrationForm, ModificationMode
