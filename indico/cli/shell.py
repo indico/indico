@@ -130,7 +130,7 @@ class IndicoShell(Shell):
             # Common stdlib modules
             self._info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
             DATETIME_ATTRS = ('date', 'time', 'datetime', 'timedelta')
-            ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload')
+            ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload', 'subqueryload')
             add_to_context_multi([getattr(datetime, attr) for attr in DATETIME_ATTRS] +
                                  [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
                                  [itertools, re, sys, os],
