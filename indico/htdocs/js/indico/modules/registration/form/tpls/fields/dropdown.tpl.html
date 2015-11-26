@@ -10,7 +10,7 @@
         <option ng-repeat="item in field.choices | filter:isVisible"
             id="{{ item.id }}"
             value="{{ item.id }}"
-            ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
+            ng-disabled="(!hasPlacesLeft(item, getUserdataValue()) && !userdata[fieldName][item.id]) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
             ng-selected="item.id == getId(fieldName)">
             {{ item.caption }}
             {{ getBillableStr(item, getUserdataValue()) }}
@@ -30,9 +30,9 @@
           title="{{ 'There are options that could trigger a price change and have been blocked.' | i18n }}">
     </span>
     <div ng-repeat="item in field.choices | filter:isVisible" style="margin-top: 10px;">
-        <span ng-if="field.withExtraSlots && item.maxExtraSlots && input==item.id">
+        <span ng-if="showExtraSlotsInput(item, userdata[fieldName], input==item.id, getPlacesLeft(item))">
             <select id="extraSlotsSelect-{{ item.id }}"
-                    ng-init="numberOfExtraSlotsUsed=(userdata[fieldName][item.id] > 1 ? userdata[fieldName][item.id] - 1: 1)"
+                    ng-init="numberOfExtraSlotsUsed=userdata[fieldName][item.id] || 1"
                     ng-model="numberOfExtraSlotsUsed"
                     ng-options="n for n in [] | range:1:getNumberOfSlots(item)"
                     ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">

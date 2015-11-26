@@ -103,6 +103,17 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         return item.maxExtraSlots + 1;
     };
 
+    $scope.showExtraSlotsInput = function(item, userdata, itemChecked, placesLeft) {
+        var field = $scope.field,
+            showExtraSlots = field.withExtraSlots && item.maxExtraSlots && itemChecked;
+
+        if (!placesLeft && itemChecked && userdata && userdata[item.id] === 1) {
+            return false;
+        }
+
+        return showExtraSlots;
+    };
+
     $scope.settings = {
         isBillable: false,
         date: false,
@@ -246,13 +257,10 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         var places = item.placesLimit;
         if ($scope.field.inputType == 'checkbox' || $scope.field.inputType == 'bool') {
             places -= ($scope.field.placesUsed || 0);
-            if (uservalue) places += 1;
         } else if ($scope.field.inputType == 'single_choice' || $scope.field.inputType == 'accommodation') {
             places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue && item.id === uservalue) places += 1;
         } else if ($scope.field.inputType == 'multi_choice') {
             places -= ($scope.field.placesUsed[item.id] || 0);
-            if (uservalue && uservalue[item.id]) places += 1;
         }
         return places;
     };
@@ -535,7 +543,7 @@ var ndSelectController = function($scope) {
             $scope.checkedIds = [];
         }
         if (target.prop('checked')) {
-            data[target.prop('id')] = (+$('#extraSlotsSelect-{0}'.format(target.prop('id'))).val() + 1) || 1;
+            data[target.prop('id')] = (+$('#extraSlotsSelect-{0}'.format(target.prop('id'))).val()) || 1;
             $scope.checkedIds.push(target.prop('id'));
         } else {
             delete data[target.prop('id')];
@@ -551,7 +559,7 @@ var ndSelectController = function($scope) {
         var valueElement = $('[name={0}]'.format($scope.field.htmlName)),
             data = JSON.parse(valueElement.val() || '{}');
         if (data[item.id]) {
-            data[item.id] = value + 1;
+            data[item.id] = value;
             valueElement.val(JSON.stringify(data));
         }
     };
