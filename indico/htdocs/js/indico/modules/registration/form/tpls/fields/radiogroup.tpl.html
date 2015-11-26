@@ -14,7 +14,7 @@
                 value="{{ item.id }}"
                 ng-model="radioValue.id"
                 ng-required="field.isRequired"
-                ng-disabled="isDisabled(item, getUserdataValue()) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || selectedItemIsBillable(userdata, regMetadata))"
+                ng-disabled="(isDisabled(item, getUserdataValue()) && !userdata[fieldName][item.id]) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || selectedItemIsBillable(userdata, regMetadata))"
                 ng-click="onSingleFieldItemChange(item)"/>
             <label ng-class="{'text-error': validationStarted && nestedForm.$invalid}" for="field-{{ section.id }}-{{ field.id }}-{{ item.id }}">
                 {{ item.caption }}
@@ -50,9 +50,9 @@
         </li>
     </ul>
     <div ng-repeat="item in field.choices | filter:isVisible" style="margin-top: 10px;">
-        <span ng-if="field.withExtraSlots && item.maxExtraSlots && radioValue.id==item.id">
+        <span ng-if="showExtraSlotsInput(item, userdata[fieldName], radioValue.id==item.id, getPlacesLeft(item))">
             <select id="extraSlotsSelect-{{ item.id }}"
-                    ng-init="numberOfExtraSlotsUsed=(userdata[fieldName][item.id] > 1 ? userdata[fieldName][item.id] - 1: 1)"
+                    ng-init="numberOfExtraSlotsUsed=userdata[fieldName][item.id] || 1"
                     ng-model="numberOfExtraSlotsUsed"
                     ng-options="n for n in [] | range:1:getNumberOfSlots(item)"
                     ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">
