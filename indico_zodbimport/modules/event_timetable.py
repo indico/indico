@@ -17,81 +17,143 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from indico.core.db import db
-from indico.util.console import cformat
-from indico.modules.events.models.events import Event
+from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.models.events import Event
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.util.console import cformat, verbose_iterator
+from indico.util.struct.iterables import committing_iterator
 
-from indico_zodbimport import Importer
+from indico_zodbimport import Importer, convert_to_unicode
+
+
+class TimetableMigration(object):
+    def __init__(self, importer, old_event, event):
+        self.importer = importer
+        self.old_event = old_event
+        self.event = event
+        self.legacy_session_map = {}
+        self.legacy_contribution_map = {}
+
+    def __repr__(self):
+        return '<TimetableMigration({})>'.format(self.event)
+
+    def run(self):
+        self.importer.print_success('Importing {}'.format(self.old_event), event_id=self.event.id)
+        self._migrate_sessions()
+        self._migrate_contributions()
+        self._migrate_timetable()
+
+    def _migrate_sessions(self):
+        for old_session in self.old_event.sessions.itervalues():
+            session = Session(event_new=self.event, title=convert_to_unicode(old_session.title),
+                              colors=ColorTuple(old_session._textColor, old_session._color),
+                              default_contribution_duration=old_session._contributionDuration)
+            if not self.importer.quiet:
+                self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
+            self.legacy_session_map[old_session] = session
+
+    def _migrate_contributions(self):
+        for old_contrib in self.old_event.contributions.itervalues():
+            contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
+                                   description=convert_to_unicode(old_contrib.description),
+                                   duration=old_contrib.duration)
+            if not self.importer.quiet:
+                self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
+            self.legacy_contribution_map[old_contrib] = contrib
+            contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
+                                        for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
+
+    def _migrate_subcontribution(self, old_subcontrib, position):
+        subcontrib = SubContribution(position=position, friendly_id=position, duration=old_subcontrib.duration,
+                                     title=convert_to_unicode(old_subcontrib.title),
+                                     description=convert_to_unicode(old_subcontrib.description))
+        if not self.importer.quiet:
+            self.importer.print_info(cformat('  %{cyan!}SubContribution%{reset} {}').format(subcontrib.title))
+        return subcontrib
+
+    def _migrate_timetable(self):
+        self._migrate_timetable_entries(self.old_event._Conference__schedule._entries)
+
+    def _migrate_timetable_entries(self, old_entries, session_block=None):
+        for old_entry in old_entries:
+            item_type = old_entry.__class__.__name__
+            if item_type == 'ContribSchEntry':
+                self._migrate_contribution_timetable_entry(old_entry, session_block)
+            elif item_type == 'BreakTimeSchEntry':
+                self._migrate_break_timetable_entry(old_entry, session_block)
+            elif item_type == 'LinkedTimeSchEntry':
+                parent = old_entry._LinkedTimeSchEntry__owner
+                parent_type = parent.__class__.__name__
+                if parent_type == 'Contribution':
+                    self.importer.print_warning(cformat('%{yellow!}Found LinkedTimeSchEntry for contribution'),
+                                                event_id=self.event.id)
+                    self._migrate_contribution_timetable_entry(old_entry, session_block)
+                    continue
+                elif parent_type != 'SessionSlot':
+                    self.importer.print_error(cformat('%{red!}Found LinkedTimeSchEntry for {}').format(parent_type),
+                                              event_id=self.event.id)
+                    continue
+                assert session_block is None
+                self._migrate_block_timetable_entry(old_entry)
+            else:
+                raise ValueError('Unexpected item type: ' + item_type)
+
+    def _migrate_contribution_timetable_entry(self, old_entry, session_block=None):
+        old_contrib = old_entry._LinkedTimeSchEntry__owner
+        contrib = self.legacy_contribution_map[old_contrib]
+        contrib.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_contrib.startDate)
+        if session_block:
+            contrib.session = session_block.session
+            contrib.session_block = session_block
+            contrib.timetable_entry.parent = session_block.timetable_entry
+
+    def _migrate_break_timetable_entry(self, old_entry, session_block=None):
+        break_ = Break(title=convert_to_unicode(old_entry.title), description=convert_to_unicode(old_entry.description),
+                       duration=old_entry.duration)
+        break_.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_entry.startDate)
+        if session_block:
+            break_.timetable_entry.parent = session_block.timetable_entry
+
+    def _migrate_block_timetable_entry(self, old_entry):
+        old_block = old_entry._LinkedTimeSchEntry__owner
+        session = self.legacy_session_map[old_block.session]
+        session_block = SessionBlock(session=session, title=convert_to_unicode(old_block.title),
+                                     duration=old_block.duration)
+        session_block.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_block.startDate)
+        self._migrate_timetable_entries(old_block._schedule._entries, session_block)
 
 
 class EventTimetableImporter(Importer):
     def has_data(self):
-        pass
+        models = (TimetableEntry, Break, Session, SessionBlock, Contribution)
+        return any(x.has_rows() for x in models)
 
     def migrate(self):
-        self.migrate_timetable()
+        self.migrate_events()
 
-    def migrate_timetable(self):
-        print cformat('%{white!}migrating timetable')
+    def migrate_events(self):
+        for old_event, event in committing_iterator(self._iter_events()):
+            mig = TimetableMigration(self, old_event, event)
+            with db.session.no_autoflush:
+                mig.run()
+            db.session.flush()
 
-        event = self.zodb_root['conferences']['304944']
-        event_new = Event.get(event.id)
-        legacy_session_mapping = {}
-
-        # Import sessions
-        for legacy_session in event.sessions.itervalues():
-            session = Session(event_new=event_new, title=legacy_session.title,
-                              colors=(legacy_session._textColor, legacy_session._color),
-                              default_contribution_duration=legacy_session._contributionDuration)
-            event_new.sessions.append(session)
-            legacy_session_mapping[legacy_session] = session
-            self.print_success(cformat('- %{cyan}[Session] {}').format(session.title), event_id=event.id)
-
-        # Import session blocks and breaks
-        self._process_entries(event._Conference__schedule._entries, event_new, legacy_session_mapping)
-
-        db.session.flush()
-        db.session.commit()
-
-    def _process_entries(self, entries, event_new, legacy_session_mapping, session_block=None):
-        for entry in entries:
-            item_type = getattr(entry, 'ITEM_TYPE', None)
-            if item_type and item_type == 'contribution':
-                # Contribution
-                legacy_contrib = entry._LinkedTimeSchEntry__owner
-                contribution = Contribution(title=legacy_contrib.title, description=legacy_contrib.description,
-                                            duration=legacy_contrib.duration, event_new=event_new)
-                tt_entry = TimetableEntry(event_new=event_new, start_dt=legacy_contrib.startDate,
-                                          contribution=contribution)
-                if session_block:
-                    contribution.session = session_block.session
-                    contribution.session_block = session_block
-                    tt_entry.parent = session_block.timetable_entry
-
-                event_new.timetable_entries.append(tt_entry)
-                self.print_success(cformat('- %{yellow}[Contribution] {}').format(contribution.title),
-                                   event_id=event_new.id)
-            elif item_type and item_type == 'break':
-                # Break
-                break_ = Break(title=entry.title, description=entry.description, duration=entry.duration)
-                tt_entry = TimetableEntry(event_new=event_new, break_=break_, start_dt=entry.startDate)
-                if session_block:
-                    tt_entry.parent = session_block.timetable_entry
-                self.print_success(cformat('- %{white}[Break] {}').format(break_.title), event_id=event_new.id)
-            else:
-                # Session block
-                legacy_block = entry._LinkedTimeSchEntry__owner
-                parent_session = legacy_session_mapping[legacy_block.session]
-                block = SessionBlock(session=parent_session, title=legacy_block.title, duration=legacy_block.duration)
-                tt_entry = TimetableEntry(event_new=event_new, session_block=block, start_dt=legacy_block.startDate)
-                parent_session.blocks.append(block)
-                self.print_success(cformat('- %{red}[Session block] {}').format(block.title), event_id=event_new.id)
-
-                # Import session block timetable entries
-                self._process_entries(legacy_block._schedule._entries, event_new, legacy_session_mapping,
-                                      session_block=block)
+    def _iter_events(self):
+        it = self.zodb_root['conferences'].itervalues()
+        if self.quiet:
+            it = verbose_iterator(it, len(self.zodb_root['conferences']), attrgetter('id'), attrgetter('title'))
+        all_events = {e.id: e for e in Event.find_all(is_deleted=False)}
+        for old_event in self.flushing_iterator(it):
+            event = all_events.get(int(old_event.id))
+            if event is None:
+                self.print_error(cformat('%{red!}Event is only in ZODB but not in SQL'), event_id=old_event.id)
+                continue
+            yield old_event, event
