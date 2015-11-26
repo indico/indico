@@ -100,6 +100,7 @@ class Importer(object):
         app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
         app.config['PLUGINENGINE_PLUGINS'] = self.plugins
         app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_uri
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
         plugin_engine.init_app(app)
         if not plugin_engine.load_plugins(app):
             print(cformat('%{red!}Could not load some plugins: {}%{reset}').format(
