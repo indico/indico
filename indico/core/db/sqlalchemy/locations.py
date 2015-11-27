@@ -173,16 +173,19 @@ class LocationMixin(object):
     def location_data(self):
         """All location data for the item.
 
-        Returns a dict containing ``source``, ``room``, ``room_name``,
-        ``location_name`` and ``address``.  The ``source`` is the
-        object the location data is taken from, i.e. either the item
-        itself or the object the location data is inherited from.
+        Returns a dict containing ``source``, ``inheriting``, ``room``,
+        ``room_name``, ``location_name`` and ``address``.  The
+        ``source`` is the object the location data is taken from, i.e.
+        either the item itself or the object the location data is
+        inherited from.
         """
         data_source = self
         while data_source and data_source.inherit_location:
             data_source = data_source.location_parent
         if data_source is None:
-            return {'source': None, 'room': None, 'room_name': '', 'location_name': '', 'address': ''}
+            return {'source': None, 'room': None, 'room_name': '', 'location_name': '', 'address': '',
+                    'inheriting': False}
         else:
             return {'source': data_source, 'room': data_source.room, 'room_name': data_source.room_name,
-                    'location_name': data_source.location_name, 'address': data_source.address}
+                    'location_name': data_source.location_name, 'address': data_source.address,
+                    'inheriting': self.inherit_location}
