@@ -29,7 +29,9 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.console import cformat, verbose_iterator
+from indico.util.string import fix_broken_string
 from indico.util.struct.iterables import committing_iterator
+from MaKaC.conference import _get_room_mapping
 
 from indico_zodbimport import Importer, convert_to_unicode
 
@@ -110,6 +112,7 @@ class TimetableMigration(object):
         old_contrib = old_entry._LinkedTimeSchEntry__owner
         contrib = self.legacy_contribution_map[old_contrib]
         contrib.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_contrib.startDate)
+        self._migrate_location(old_contrib, contrib)
         if session_block:
             contrib.session = session_block.session
             contrib.session_block = session_block
@@ -119,6 +122,7 @@ class TimetableMigration(object):
         break_ = Break(title=convert_to_unicode(old_entry.title), description=convert_to_unicode(old_entry.description),
                        duration=old_entry.duration)
         break_.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_entry.startDate)
+        self._migrate_location(old_entry, break_)
         if session_block:
             break_.timetable_entry.parent = session_block.timetable_entry
 
@@ -128,7 +132,30 @@ class TimetableMigration(object):
         session_block = SessionBlock(session=session, title=convert_to_unicode(old_block.title),
                                      duration=old_block.duration)
         session_block.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_block.startDate)
+        self._migrate_location(old_block, session_block)
         self._migrate_timetable_entries(old_block._schedule._entries, session_block)
+
+    def _migrate_location(self, old_entry, new_entry):
+        custom_location = (old_entry.places[0] if getattr(old_entry, 'places', None)
+                           else getattr(old_entry, 'place', None))
+        custom_room = (old_entry.rooms[0] if getattr(old_entry, 'rooms', None)
+                       else getattr(old_entry, 'room', None))
+        new_entry.inherit_location = not custom_location
+        if new_entry.inherit_location:
+            return
+        # we don't inherit, so let's migrate the data we have
+        # address is always allowed
+        new_entry.address = fix_broken_string(custom_location.address, True) if custom_location.address else ''
+        location_name = fix_broken_string(custom_location.name, True)
+        if custom_room:
+            room_name = fix_broken_string(custom_room.name, True)
+            rb_room = self.importer.room_mapping.get((location_name, room_name))
+            # if we have a room from the rb module, we only link this, otherwise we use the (custom) names
+            if rb_room:
+                new_entry.room = rb_room
+            else:
+                new_entry.location_name = location_name
+                new_entry.room_name = room_name
 
 
 class EventTimetableImporter(Importer):
@@ -136,7 +163,11 @@ class EventTimetableImporter(Importer):
         models = (TimetableEntry, Break, Session, SessionBlock, Contribution)
         return any(x.has_rows() for x in models)
 
+    def _load_data(self):
+        self.room_mapping = _get_room_mapping()
+
     def migrate(self):
+        self._load_data()
         self.migrate_events()
 
     def migrate_events(self):
