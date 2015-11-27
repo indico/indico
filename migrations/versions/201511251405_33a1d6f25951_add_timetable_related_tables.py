@@ -34,7 +34,7 @@ def upgrade():
         sa.Column('room_id', sa.Integer(), nullable=True, index=True),
         sa.CheckConstraint("(room_id IS NULL) OR (location_name = '' AND room_name = '')",
                            name='no_custom_location_if_room'),
-        sa.CheckConstraint("inherit_location = (room_id IS NULL AND location_name = '' AND room_name = '' AND "
+        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND room_name = '' AND "
                            "address = '')", name='inherited_location'),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
         sa.PrimaryKeyConstraint('id'),
