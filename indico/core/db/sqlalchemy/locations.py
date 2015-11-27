@@ -46,7 +46,7 @@ class LocationMixin(object):
         checks = [db.CheckConstraint("(room_id IS NULL) OR (location_name = '' AND room_name = '')",
                                      'no_custom_location_if_room')]
         if cls.allow_location_inheritance:
-            checks.append(db.CheckConstraint("inherit_location = (room_id IS NULL AND location_name = '' AND "
+            checks.append(db.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND "
                                              "room_name = '' AND address = '')", 'inherited_location'))
         return tuple(checks)
 
