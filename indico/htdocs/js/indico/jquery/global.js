@@ -142,6 +142,7 @@ $(document).ready(function() {
         var method = $this.data('method').toUpperCase();
         var params = $this.data('params') || {};
         var update = $this.data('update');
+        var dialog = $this.data('ajax-dialog') !== undefined;
         if (!$.isPlainObject(params)) {
             throw new Error('Invalid params. Must be valid JSON if set.');
         }
@@ -152,6 +153,21 @@ $(document).ready(function() {
 
             // Handle custom code
             if (evt.isDefaultPrevented()) {
+                return;
+            }
+
+            // Handle AJAX dialog
+            if (dialog) {
+                ajaxDialog({
+                    trigger: $this,
+                    url: url,
+                    title: $this.data('title'),
+                    onClose: function(data) {
+                        if (data && update) {
+                            $(update).html(data.html);
+                        }
+                    }
+                });
                 return;
             }
 
