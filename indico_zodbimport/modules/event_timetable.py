@@ -55,12 +55,16 @@ class TimetableMigration(object):
 
     def _migrate_sessions(self):
         for old_session in self.old_event.sessions.itervalues():
-            session = Session(event_new=self.event, title=convert_to_unicode(old_session.title),
-                              colors=ColorTuple(old_session._textColor, old_session._color),
-                              default_contribution_duration=old_session._contributionDuration)
-            if not self.importer.quiet:
-                self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
-            self.legacy_session_map[old_session] = session
+            self._migrate_session(old_session)
+
+    def _migrate_session(self, old_session):
+        session = Session(event_new=self.event, title=convert_to_unicode(old_session.title),
+                          colors=ColorTuple(old_session._textColor, old_session._color),
+                          default_contribution_duration=old_session._contributionDuration)
+        if not self.importer.quiet:
+            self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
+        self.legacy_session_map[old_session] = session
+        return session
 
     def _migrate_contributions(self):
         for old_contrib in self.old_event.contributions.itervalues():
@@ -128,7 +132,12 @@ class TimetableMigration(object):
 
     def _migrate_block_timetable_entry(self, old_entry):
         old_block = old_entry._LinkedTimeSchEntry__owner
-        session = self.legacy_session_map[old_block.session]
+        try:
+            session = self.legacy_session_map[old_block.session]
+        except KeyError:
+            self.importer.print_warning(cformat('%{yellow!}Found zombie session {}').format(old_block.session),
+                                        event_id=self.event.id)
+            session = self._migrate_session(old_block.session)
         session_block = SessionBlock(session=session, title=convert_to_unicode(old_block.title),
                                      duration=old_block.duration)
         session_block.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_block.startDate)
