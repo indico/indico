@@ -54,34 +54,3 @@ class SessionPrincipal(PrincipalRolesMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'session_id', 'principal', read_access=False, full_access=False, roles=[])
-
-
-class SessionBlockPrincipal(PrincipalRolesMixin, db.Model):
-    __tablename__ = 'session_block_principals'
-    principal_backref_name = 'in_session_block_acls'
-    principal_for = 'SessionBlock'
-    unique_columns = ('session_block_id',)
-
-    @declared_attr
-    def __table_args__(cls):
-        return auto_table_args(cls, schema='events')
-
-    #: The ID of the acl entry
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    #: The ID of the associated session block
-    session_block_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.session_blocks.id'),
-        nullable=False,
-        index=True
-    )
-
-    # relationship backrefs:
-    # - session_block (SessionBlock.acl_entries)
-
-    @return_ascii
-    def __repr__(self):
-        return format_repr(self, 'id', 'session_block_id', 'principal', read_access=False, full_access=False, roles=[])
