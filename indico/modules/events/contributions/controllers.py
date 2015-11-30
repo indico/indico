@@ -16,8 +16,23 @@
 
 from __future__ import unicode_literals
 
+from flask import flash, redirect, request, session
+
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
+from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.contributions.views import WPManageContributions
+from indico.web.flask.templating import get_template_module
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_template
+from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+def _render_contribution_list(event):
+    contribs = Contribution.find_all(event_id=event.id, is_deleted=False)
+    tpl = get_template_module('events/contributions/management/_contribution_list.html')
+    return tpl.render_contribution_list(contribs=contribs)
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -34,4 +49,47 @@ class RHManageContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        return WPManageContributions.render_template('management/contributions.html', self.event)
+        contribs = Contribution.find_all(event_id=self.event.id, is_deleted=False)
+        return WPManageContributions.render_template('management/contributions.html', self.event, event=self.event,
+                                                     contribs=contribs)
+
+
+class RHManageContributionBase(RHManageContributionsBase):
+    """Base class for a specific contribution"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.contrib
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageContributionsBase._checkParams(self, params)
+        self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
+
+
+class RHManageContributionCreate(RHManageContributionsBase):
+    def _process(self):
+        form = ContributionForm()
+        if form.validate_on_submit():
+            contrib = create_contribution(self.event.as_event, form.data)
+            flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
+            return jsonify_data(html=_render_contribution_list(self.event))
+        return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
+
+
+class RHManageContributionUpdate(RHManageContributionBase):
+    def _process(self):
+        form = ContributionForm(obj=FormDefaults(self.contrib))
+        if form.validate_on_submit():
+            update_contribution(self.contrib, form.data)
+            flash(_("Contribution '{}' successfully updated").format(self.contrib), 'success')
+            return jsonify_data(html=_render_contribution_list(self.event))
+        return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
+
+
+class RHManageContributionDelete(RHManageContributionBase):
+    def _process(self):
+        delete_contribution(self.contrib)
+        flash(_("Contribution '{}' successfully deleted").format(self.contrib), 'success')
+        return jsonify_data(html=_render_contribution_list(self.event))
