@@ -60,3 +60,26 @@ class ContributionPersonLink(PersonLinkBase):
     def __repr__(self):
         return format_repr(self, 'contribution_id', 'person_id', is_speaker=False, author_type=AuthorType.none,
                            _text=self.person.full_name)
+
+
+class SubContributionPersonLink(PersonLinkBase):
+    """Association between EventPerson and SubContribution."""
+
+    __tablename__ = 'subcontribution_person_links'
+    __auto_table_args = {'schema': 'events'}
+    person_link_backref_name = 'subcontribution_links'
+    person_link_unique_columns = ('subcontribution_id',)
+
+    subcontribution_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.subcontributions.id'),
+        primary_key=True,
+        index=True
+    )
+
+    # relationship backrefs:
+    # - subcontribution (SubContribution.person_links)
+
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'subcontribution_id', 'person_id', _text=self.person.full_name)

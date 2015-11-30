@@ -382,6 +382,18 @@ def upgrade():
         schema='events'
     )
 
+    # SubContributionPersonLink
+    op.create_table(
+        'subcontribution_person_links',
+        sa.Column('subcontribution_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('person_id', sa.Integer(), nullable=False, index=True),
+        sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
+        sa.ForeignKeyConstraint(['subcontribution_id'], ['events.subcontributions.id']),
+        sa.UniqueConstraint('person_id', 'subcontribution_id'),
+        sa.PrimaryKeyConstraint('subcontribution_id', 'person_id'),
+        schema='events'
+    )
+
     # LegacyContributionMapping
     op.create_table(
         'legacy_contribution_id_map',
@@ -422,6 +434,7 @@ def downgrade():
     op.drop_column('events', 'last_friendly_contribution_id', schema='events')
     op.drop_table('legacy_session_id_map', schema='events')
     op.drop_table('legacy_contribution_id_map', schema='events')
+    op.drop_table('subcontribution_person_links', schema='events')
     op.drop_table('contribution_person_links', schema='events')
     op.drop_table('persons', schema='events')
     op.drop_table('event_references', schema='events')
