@@ -100,6 +100,10 @@
                             - ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, spanClass='speakerList',italicAffilation=False, separator=' ')}
                       % endif
                   &nbsp;
+                  % if getLocationInfo(item) != getLocationInfo(item.getConference()):
+                      (${getLocationInfo(item)[1]})
+                  % endif
+
                   <div style="float:right">
                       <div style="float:left">
                           ${ render_template('attachments/mako_compat/attachments_inline.html', item=item) }
@@ -149,6 +153,8 @@
     ${conf.getTitle()}
     </span><br/>
     ${common.renderEventTimeCompact(startDate, endDate)}
+    <br>
+    ${common.renderLocation(conf)}
     <br/><br/>
     </td>
     <td style="width: 1%; white-space: nowrap;">
