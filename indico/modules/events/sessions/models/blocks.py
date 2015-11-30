@@ -20,17 +20,15 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import format_repr, return_ascii
 
 
-class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
+class SessionBlock(LocationMixin, db.Model):
     __tablename__ = 'session_blocks'
     __auto_table_args = (db.UniqueConstraint('id', 'session_id'),  # useless but needed for the compound fkey
                          {'schema': 'events'})
     location_backref_name = 'session_blocks'
-    disallowed_protection_modes = frozenset({ProtectionMode.public, ProtectionMode.protected})
 
     @declared_attr
     def __table_args__(cls):
@@ -56,12 +54,15 @@ class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
         nullable=False
     )
 
-    acl_entries = db.relationship(
-        'SessionBlockPrincipal',
+    #: Persons associated with this contribution
+    person_links = db.relationship(
+        'SessionBlockPersonLink',
         lazy=True,
         cascade='all, delete-orphan',
-        collection_class=set,
-        backref='session_block'
+        backref=db.backref(
+            'session_block',
+            lazy=True
+        )
     )
 
     # relationship backrefs:
@@ -71,10 +72,6 @@ class SessionBlock(ProtectionManagersMixin, LocationMixin, db.Model):
 
     @property
     def location_parent(self):
-        return self.session
-
-    @property
-    def protection_parent(self):
         return self.session
 
     @return_ascii

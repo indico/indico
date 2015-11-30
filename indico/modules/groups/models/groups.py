@@ -59,7 +59,6 @@ class LocalGroup(db.Model):
     # - in_event_acls (EventPrincipal.local_group)
     # - in_event_settings_acls (EventSettingPrincipal.local_group)
     # - in_session_acls (SessionPrincipal.local_group)
-    # - in_session_block_acls (SessionBlockPrincipal.local_group)
     # - in_settings_acls (SettingPrincipal.local_group)
 
     @return_ascii
