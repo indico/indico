@@ -24,6 +24,7 @@ from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
@@ -223,6 +224,10 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     @property
     def protection_parent(self):
         return self.session if self.session_id is not None else self.event_new
+
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, contrib_id=self.id)
 
     @return_ascii
     def __repr__(self):
