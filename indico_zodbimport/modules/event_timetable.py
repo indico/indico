@@ -20,21 +20,36 @@ from __future__ import unicode_literals
 import traceback
 from operator import attrgetter
 
+import click
+from sqlalchemy.orm import joinedload
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.users import User
 from indico.util.console import cformat, verbose_iterator
-from indico.util.string import fix_broken_string
+from indico.util.string import fix_broken_string, sanitize_email, is_valid_mail
 from indico.util.struct.iterables import committing_iterator
 from MaKaC.conference import _get_room_mapping
 
 from indico_zodbimport import Importer, convert_to_unicode
+from indico_zodbimport.util import convert_principal, patch_default_group_provider
+
+
+PROTECTION_MODE_MAP = {
+    -1: ProtectionMode.public,
+    0: ProtectionMode.inheriting,
+    1: ProtectionMode.protected,
+}
 
 
 class TimetableMigration(object):
@@ -54,6 +69,63 @@ class TimetableMigration(object):
         self._migrate_contributions()
         self._migrate_timetable()
 
+    def _convert_principal(self, old_principal):
+        principal = convert_principal(old_principal)
+        if (principal is None and old_principal.__class__.__name__ in ('Avatar', 'AvatarUserWrapper') and
+                'email' in old_principal.__dict__):
+            email = old_principal.__dict__['email'].lower()
+            principal = self.importer.all_users_by_email.get(email)
+            if principal is not None:
+                self.importer.print_warning('Using {} for {} (matched via {})'.format(principal, old_principal, email),
+                                            always=False)
+        return principal
+
+    def _process_principal(self, principal_cls, principals, legacy_principal, name, read_access=None, full_access=None,
+                           roles=None):
+        if isinstance(legacy_principal, basestring):
+            user = self.importer.all_users_by_email.get(legacy_principal)
+            principal = user or EmailPrincipal(legacy_principal)
+        else:
+            principal = self._convert_principal(legacy_principal)
+        if principal is None:
+            self.importer.print_warning(cformat('%{yellow}{} does not exist:%{reset} {}')
+                                        .format(name, legacy_principal), event_id=self.event.id)
+            return
+        try:
+            entry = principals[principal]
+        except KeyError:
+            entry = principal_cls(principal=principal, full_access=False, roles=[])
+            principals[principal] = entry
+        if read_access:
+            entry.read_access = True
+        if full_access:
+            entry.full_access = True
+        if roles:
+            entry.roles = sorted(set(entry.roles) | set(roles))
+        if not self.importer.quiet:
+            self.importer.print_info(' - [{}] {}'.format(name.lower(), principal))
+
+    def _process_principal_emails(self, principal_cls, principals, emails, name, read_access=None, full_access=None,
+                                  roles=None):
+        emails = {sanitize_email(convert_to_unicode(email).lower()) for email in emails}
+        emails = {email for email in emails if is_valid_mail(email, False)}
+        for email in emails:
+            self._process_principal(principal_cls, principals, email, name, read_access, full_access, roles)
+
+    def _process_ac(self, principal_cls, principals, ac):
+        # read access
+        for principal in ac.allowed:
+            self._process_principal(principal_cls, principals, principal, 'Access', read_access=True)
+        # email-based read access
+        emails = getattr(ac, 'allowedEmail', [])
+        self._process_principal_emails(principal_cls, principals, emails, 'Access', read_access=True)
+        # managers
+        for manager in ac.managers:
+            self._process_principal(principal_cls, principals, manager, 'Manager', full_access=True)
+        # email-based managers
+        emails = getattr(ac, 'managersEmail', [])
+        self._process_principal_emails(principal_cls, principals, emails, 'Manager', full_access=True)
+
     def _migrate_sessions(self):
         for old_session in self.old_event.sessions.itervalues():
             self._migrate_session(old_session)
@@ -69,14 +141,27 @@ class TimetableMigration(object):
 
     def _migrate_contributions(self):
         for old_contrib in self.old_event.contributions.itervalues():
-            contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
-                                   description=convert_to_unicode(old_contrib.description),
-                                   duration=old_contrib.duration)
-            if not self.importer.quiet:
-                self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
-            self.legacy_contribution_map[old_contrib] = contrib
-            contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
-                                        for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
+            self._migrate_contribution(old_contrib)
+
+    def _migrate_contribution(self, old_contrib):
+        ac = old_contrib._Contribution__ac
+        contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
+                               description=convert_to_unicode(old_contrib.description), duration=old_contrib.duration,
+                               protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
+        if not self.importer.quiet:
+            self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
+        self.legacy_contribution_map[old_contrib] = contrib
+        principals = {}
+        # managers / read access
+        self._process_ac(ContributionPrincipal, principals, ac)
+        # submitters
+        for submitter in old_contrib._submitters:
+            self._process_principal(ContributionPrincipal, principals, submitter, 'Submitter', roles={'submit'})
+        self._process_principal_emails(ContributionPrincipal, principals, getattr(old_contrib, '_submittersEmail', []),
+                                       'Submitter', roles={'submit'})
+        contrib.acl_entries = set(principals.itervalues())
+        contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
+                                    for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
 
     def _migrate_subcontribution(self, old_subcontrib, position):
         subcontrib = SubContribution(position=position, friendly_id=position, duration=old_subcontrib.duration,
@@ -169,16 +254,34 @@ class TimetableMigration(object):
 
 
 class EventTimetableImporter(Importer):
+    def __init__(self, **kwargs):
+        self.default_group_provider = kwargs.pop('default_group_provider')
+        super(EventTimetableImporter, self).__init__(**kwargs)
+
+    @staticmethod
+    def decorate_command(command):
+        command = click.option('--default-group-provider', default='legacy-ldap',
+                               help="Name of the default group provider")(command)
+        return command
+
     def has_data(self):
         models = (TimetableEntry, Break, Session, SessionBlock, Contribution)
         return any(x.has_rows() for x in models)
 
     def _load_data(self):
+        self.print_step("Loading some data")
         self.room_mapping = _get_room_mapping()
+        self.all_users_by_email = {}
+        for user in User.query.options(joinedload('_all_emails')):
+            if user.is_deleted:
+                continue
+            for email in user.all_emails:
+                self.all_users_by_email[email] = user
 
     def migrate(self):
         self._load_data()
-        self.migrate_events()
+        with patch_default_group_provider(self.default_group_provider):
+            self.migrate_events()
 
     def migrate_events(self):
         for old_event, event in committing_iterator(self._iter_events()):
