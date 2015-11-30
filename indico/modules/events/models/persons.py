@@ -105,6 +105,7 @@ class EventPerson(db.Model):
 
     # relationship backrefs:
     # - contribution_links (ContributionPersonLink.person)
+    # - subcontribution_links (SubContributionPersonLink.person)
 
     @hybrid_property
     def title(self):
