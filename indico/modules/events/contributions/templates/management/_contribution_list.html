@@ -1,0 +1,18 @@
+{% macro render_contribution_list(contribs) %}
+    {% for contrib in contribs %}
+        <div>
+        {{ contrib }}
+        <a href="#" data-ajax-dialog
+           data-title="{% trans title=contrib.title %}Edit contribution {{ title }}{% endtrans %}"
+           data-update="#contribution-list"
+           data-method="GET"
+           data-href="{{ url_for('.manage_update_contrib', contrib) }}">edit</a>
+        <a href="#"
+           data-title="{% trans title=contrib.title %}Delete contribution {{ title }}?{% endtrans %}"
+           data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
+           data-update="#contribution-list"
+           data-method="DELETE"
+           data-href="{{ url_for('.manage_delete_contrib', contrib) }}">delete</a>
+        </div>
+    {% endfor %}
+{% endmacro %}
