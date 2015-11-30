@@ -418,15 +418,14 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
         ids = set(request.form.getlist('registration_id'))
         self.registrations = (Registration
                               .find(Registration.id.in_(ids), ~Registration.is_deleted)
-                              .with_parent(self.regform)
-                              .all())
+                              .with_parent(self.regform))
 
 
 class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
     """Previews the email that will be sent to registrants"""
 
     def _process(self):
-        registration = self.registrations[0]
+        registration = self.registrations.find_first()
         email_body = replace_placeholders('registration-email', request.form['body'], regform=self.regform,
                                           registration=registration)
         tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=request.form['subject'],
@@ -459,7 +458,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
         form = EmailRegistrantsForm(body=default_body, regform=self.regform)
         if form.validate_on_submit():
             self._send_emails(form)
-            num_emails_sent = len(self.registrations)
+            num_emails_sent = self.registrations.count()
             flash(ngettext("The email was sent.",
                            "{num} emails were sent.", num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
@@ -474,7 +473,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration)
             logger.info('Registration %s deleted by %s', registration, session.user)
-        num_reg_deleted = len(self.registrations)
+        num_reg_deleted = self.registrations.count()
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()
@@ -520,7 +519,8 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style"""
 
     def _process(self):
-        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.regform_items,
+        sorted_registrations = self.registrations.order_by(*Registration.order_by_name).all()
+        pdf = RegistrantsListToPDF(self.event, reglist=sorted_registrations, display=self.regform_items,
                                    special_items=self.special_item_ids)
         try:
             data = pdf.getPDFBin()
@@ -536,7 +536,8 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style"""
 
     def _process(self):
-        pdf = RegistrantsListToBookPDF(self.event, reglist=self.registrations, display=self.regform_items,
+        sorted_registrations = self.registrations.order_by(*Registration.order_by_name).all()
+        pdf = RegistrantsListToBookPDF(self.event, reglist=sorted_registrations, display=self.regform_items,
                                        special_items=self.special_item_ids)
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
 
@@ -545,7 +546,7 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
     """Export registration list to a CSV file"""
 
     def _process(self):
-        csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.special_item_ids)
+        csv_file = generate_csv_from_registrations(self.registrations.all(), self.regform_items, self.special_item_ids)
         return send_file('registrations.csv', csv_file, 'text/csv')
 
 
@@ -561,7 +562,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 
         return WPManageRegistration.render_template('management/print_badges.html', self.event, regform=self.regform,
                                                     templates=badge_templates, pdf_options=pdf_options,
-                                                    registrations=self.registrations,
+                                                    registrations=self.registrations.all(),
                                                     registration_ids=[x.id for x in self.registrations],
                                                     badge_design_url=badge_design_url, create_pdf_url=create_pdf_url)
 
