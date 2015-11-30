@@ -419,6 +419,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
         self.registrations = (Registration
                               .find(Registration.id.in_(ids), ~Registration.is_deleted)
                               .with_parent(self.regform)
+                              .order_by(*Registration.order_by_name)
                               .all())
 
 
