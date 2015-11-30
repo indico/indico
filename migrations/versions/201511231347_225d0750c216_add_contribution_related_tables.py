@@ -122,9 +122,6 @@ def upgrade():
         sa.Column('session_id', sa.Integer(), nullable=False, index=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('duration', sa.Interval(), nullable=False),
-        sa.Column('protection_mode', PyIntEnum(ProtectionMode, exclude_values={ProtectionMode.public,
-                                                                               ProtectionMode.protected}),
-                  nullable=False),
         sa.Column('room_name', sa.String(), nullable=False),
         sa.Column('inherit_location', sa.Boolean(), nullable=False),
         sa.Column('address', sa.Text(), nullable=False),
@@ -140,45 +137,6 @@ def upgrade():
         sa.UniqueConstraint('id', 'session_id'),
         schema='events'
     )
-
-    # SessionBlockPrincipal
-    op.create_table(
-        'session_block_principals',
-        sa.Column('mp_group_provider', sa.String(), nullable=True),
-        sa.Column('mp_group_name', sa.String(), nullable=True),
-        sa.Column('read_access', sa.Boolean(), nullable=False),
-        sa.Column('full_access', sa.Boolean(), nullable=False),
-        sa.Column('roles', pg.ARRAY(sa.String()), nullable=False),
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('session_block_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('local_group_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('user_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('type', PyIntEnum(PrincipalType, exclude_values={PrincipalType.email}), nullable=True),
-        sa.CheckConstraint('read_access OR full_access OR array_length(roles, 1) IS NOT NULL', name='has_privs'),
-        sa.CheckConstraint('type != 1 OR (local_group_id IS NULL AND mp_group_provider IS NULL AND '
-                           'mp_group_name IS NULL AND user_id IS NOT NULL)',
-                           name='valid_user'),
-        sa.CheckConstraint('type != 2 OR (user_id IS NULL AND mp_group_provider IS NULL AND mp_group_name IS NULL AND '
-                           'local_group_id IS NOT NULL)',
-                           name='valid_local_group'),
-        sa.CheckConstraint('type != 3 OR (local_group_id IS NULL AND user_id IS NULL AND '
-                           'mp_group_provider IS NOT NULL AND mp_group_name IS NOT NULL)',
-                           name='valid_multipass_group'),
-        sa.ForeignKeyConstraint(['local_group_id'], ['users.groups.id']),
-        sa.ForeignKeyConstraint(['session_block_id'], ['events.session_blocks.id']),
-        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.PrimaryKeyConstraint('id'),
-        schema='events'
-    )
-    op.create_index(None, 'session_block_principals', ['mp_group_provider', 'mp_group_name'], schema='events')
-    op.create_index('ix_uq_session_block_principals_local_group', 'session_block_principals',
-                    ['local_group_id', 'session_block_id'], unique=True, schema='events',
-                    postgresql_where=sa.text('type = 2'))
-    op.create_index('ix_uq_session_block_principals_mp_group', 'session_block_principals',
-                    ['mp_group_provider', 'mp_group_name', 'session_block_id'], unique=True, schema='events',
-                    postgresql_where=sa.text('type = 3'))
-    op.create_index('ix_uq_session_block_principals_user', 'session_block_principals', ['user_id', 'session_block_id'],
-                    unique=True, schema='events', postgresql_where=sa.text('type = 1'))
 
     # ContributionType
     op.create_table(
@@ -368,6 +326,18 @@ def upgrade():
         schema='events'
     )
 
+    # SessionBlockPersonLink
+    op.create_table(
+        'session_block_person_links',
+        sa.Column('session_block_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('person_id', sa.Integer(), nullable=False, index=True),
+        sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
+        sa.ForeignKeyConstraint(['session_block_id'], ['events.session_blocks.id']),
+        sa.UniqueConstraint('person_id', 'session_block_id'),
+        sa.PrimaryKeyConstraint('session_block_id', 'person_id'),
+        schema='events'
+    )
+
     # ContributionPersonLink
     op.create_table(
         'contribution_person_links',
@@ -436,6 +406,7 @@ def downgrade():
     op.drop_table('legacy_contribution_id_map', schema='events')
     op.drop_table('subcontribution_person_links', schema='events')
     op.drop_table('contribution_person_links', schema='events')
+    op.drop_table('session_block_person_links', schema='events')
     op.drop_table('persons', schema='events')
     op.drop_table('event_references', schema='events')
     op.drop_table('contribution_references', schema='events')
@@ -445,7 +416,6 @@ def downgrade():
     op.drop_table('contribution_principals', schema='events')
     op.drop_table('contributions', schema='events')
     op.drop_table('contribution_types', schema='events')
-    op.drop_table('session_block_principals', schema='events')
     op.drop_table('session_blocks', schema='events')
     op.drop_table('session_principals', schema='events')
     op.drop_table('sessions', schema='events')
