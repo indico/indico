@@ -82,14 +82,20 @@ class TimetableMigration(object):
         return principal
 
     def _process_principal(self, principal_cls, principals, legacy_principal, name, read_access=None, full_access=None,
-                           roles=None):
-        if isinstance(legacy_principal, basestring):
+                           roles=None, allow_emails=True):
+        if legacy_principal is None:
+            return
+        elif isinstance(legacy_principal, basestring):
             user = self.importer.all_users_by_email.get(legacy_principal)
             principal = user or EmailPrincipal(legacy_principal)
         else:
             principal = self._convert_principal(legacy_principal)
         if principal is None:
             self.importer.print_warning(cformat('%{yellow}{} does not exist:%{reset} {}')
+                                        .format(name, legacy_principal), event_id=self.event.id)
+            return
+        elif not allow_emails and isinstance(principal, EmailPrincipal):
+            self.importer.print_warning(cformat('%{yellow}{} cannot be an email principal:%{reset} {}')
                                         .format(name, legacy_principal), event_id=self.event.id)
             return
         try:
@@ -107,25 +113,30 @@ class TimetableMigration(object):
             self.importer.print_info(' - [{}] {}'.format(name.lower(), principal))
 
     def _process_principal_emails(self, principal_cls, principals, emails, name, read_access=None, full_access=None,
-                                  roles=None):
+                                  roles=None, allow_emails=True):
         emails = {sanitize_email(convert_to_unicode(email).lower()) for email in emails}
         emails = {email for email in emails if is_valid_mail(email, False)}
         for email in emails:
-            self._process_principal(principal_cls, principals, email, name, read_access, full_access, roles)
+            self._process_principal(principal_cls, principals, email, name, read_access, full_access, roles,
+                                    allow_emails=allow_emails)
 
-    def _process_ac(self, principal_cls, principals, ac):
+    def _process_ac(self, principal_cls, principals, ac, allow_emails=True):
         # read access
         for principal in ac.allowed:
-            self._process_principal(principal_cls, principals, principal, 'Access', read_access=True)
+            self._process_principal(principal_cls, principals, principal, 'Access', read_access=True,
+                                    allow_emails=allow_emails)
         # email-based read access
         emails = getattr(ac, 'allowedEmail', [])
-        self._process_principal_emails(principal_cls, principals, emails, 'Access', read_access=True)
+        self._process_principal_emails(principal_cls, principals, emails, 'Access', read_access=True,
+                                       allow_emails=allow_emails)
         # managers
         for manager in ac.managers:
-            self._process_principal(principal_cls, principals, manager, 'Manager', full_access=True)
+            self._process_principal(principal_cls, principals, manager, 'Manager', full_access=True,
+                                    allow_emails=allow_emails)
         # email-based managers
         emails = getattr(ac, 'managersEmail', [])
-        self._process_principal_emails(principal_cls, principals, emails, 'Manager', full_access=True)
+        self._process_principal_emails(principal_cls, principals, emails, 'Manager', full_access=True,
+                                       allow_emails=allow_emails)
 
     def _migrate_sessions(self):
         for old_session in self.old_event.sessions.itervalues():
@@ -142,12 +153,12 @@ class TimetableMigration(object):
         self.legacy_session_map[old_session] = session
         principals = {}
         # managers / read access
-        self._process_ac(SessionPrincipal, principals, ac)
+        self._process_ac(SessionPrincipal, principals, ac, allow_emails=False)
         # coordinators
         for submitter in old_session._coordinators.itervalues():
             self._process_principal(SessionPrincipal, principals, submitter, 'Coordinator', roles={'coordinate'})
         self._process_principal_emails(SessionPrincipal, principals, getattr(old_session, '_coordinatorsEmail', []),
-                                       'Coordinator', roles={'coordinate'})
+                                       'Coordinator', roles={'coordinate'}, allow_emails=False)
         session.acl_entries = set(principals.itervalues())
         return session
 
