@@ -262,7 +262,6 @@ class User(db.Model):
     # - in_event_acls (EventPrincipal.user)
     # - in_event_settings_acls (EventSettingPrincipal.user)
     # - in_session_acls (SessionPrincipal.user)
-    # - in_session_block_acls (SessionBlockPrincipal.user)
     # - in_settings_acls (SettingPrincipal.user)
     # - local_groups (LocalGroup.members)
     # - merged_from_users (User.merged_into_user)
