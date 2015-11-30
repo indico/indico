@@ -105,6 +105,7 @@ class EventPerson(db.Model):
 
     # relationship backrefs:
     # - contribution_links (ContributionPersonLink.person)
+    # - session_block_links (SessionBlockPersonLink.person)
     # - subcontribution_links (SubContributionPersonLink.person)
 
     @hybrid_property
