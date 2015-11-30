@@ -30,14 +30,18 @@ from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
+                                                                AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.users import User
+from indico.modules.users.models.users import UserTitle
 from indico.util.console import cformat, verbose_iterator
 from indico.util.string import fix_broken_string, sanitize_email, is_valid_mail
 from indico.util.struct.iterables import committing_iterator
@@ -53,6 +57,16 @@ PROTECTION_MODE_MAP = {
     1: ProtectionMode.protected,
 }
 
+USER_TITLE_MAP = {x.title: x for x in UserTitle}
+
+PERSON_INFO_MAP = {
+    '_address': 'address',
+    '_affiliation': 'affiliation',
+    '_firstName': 'first_name',
+    '_surName': 'last_name',
+    '_phone': 'phone'
+}
+
 
 class TimetableMigration(object):
     def __init__(self, importer, old_event, event):
@@ -61,6 +75,7 @@ class TimetableMigration(object):
         self.event = event
         self.legacy_session_map = {}
         self.legacy_contribution_map = {}
+        self.legacy_contribution_person_map = {}
 
     def __repr__(self):
         return '<TimetableMigration({})>'.format(self.event)
@@ -79,7 +94,7 @@ class TimetableMigration(object):
             principal = self.importer.all_users_by_email.get(email)
             if principal is not None:
                 self.importer.print_warning('Using {} for {} (matched via {})'.format(principal, old_principal, email),
-                                            always=False)
+                                            always=False, event_id=self.event.id)
         return principal
 
     def _process_principal(self, principal_cls, principals, legacy_principal, name, read_access=None, full_access=None,
@@ -184,6 +199,8 @@ class TimetableMigration(object):
         self._process_principal_emails(ContributionPrincipal, principals, getattr(old_contrib, '_submittersEmail', []),
                                        'Submitter', roles={'submit'})
         contrib.acl_entries = set(principals.itervalues())
+        # speakers, authors and co-authors
+        contrib.person_links = list(self._migrate_contribution_persons(old_contrib))
         contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
                                     for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
 
@@ -193,7 +210,78 @@ class TimetableMigration(object):
                                      description=convert_to_unicode(old_subcontrib.description))
         if not self.importer.quiet:
             self.importer.print_info(cformat('  %{cyan!}SubContribution%{reset} {}').format(subcontrib.title))
+        subcontrib.person_links = list(self._migrate_subcontribution_persons(old_subcontrib))
         return subcontrib
+
+    def _migrate_contribution_persons(self, old_entry):
+        person_link_map = {}
+        for speaker in getattr(old_entry, '_speakers', []):
+            person = self._migrate_contribution_person(speaker)
+            link = person_link_map.get(person)
+            if link:
+                link.is_speaker = True
+            else:
+                link = ContributionPersonLink(person=person, is_speaker=True)
+                person_link_map[person] = link
+                yield link
+        for author in getattr(old_entry, '_primaryAuthors', []):
+            person = self._migrate_contribution_person(author)
+            link = person_link_map.get(person)
+            if link:
+                link.author_type = AuthorType.primary
+            else:
+                link = ContributionPersonLink(person=person, author_type=AuthorType.primary)
+                person_link_map[person] = link
+                yield link
+        for coauthor in getattr(old_entry, '_coAuthors', []):
+            person = self._migrate_contribution_person(coauthor)
+            link = person_link_map.get(person)
+            if link:
+                if link.author_type == AuthorType.primary:
+                    self.importer.print_warning('Primary author "{}" is also co-author'.format(person.full_name),
+                                                event_id=self.event.id)
+                else:
+                    link.author_type = AuthorType.secondary
+            else:
+                link = ContributionPersonLink(person=person, author_type=AuthorType.secondary)
+                person_link_map[person] = link
+                yield link
+
+    def _migrate_subcontribution_persons(self, old_entry):
+        for speaker in getattr(old_entry, 'speakers', []):
+            person = self._migrate_contribution_person(speaker)
+            yield SubContributionPersonLink(person=person)
+
+    def _migrate_contribution_person(self, old_person):
+        first_name = convert_to_unicode(getattr(old_person, '_firstName', ''))
+        last_name = convert_to_unicode(getattr(old_person, '_surName', ''))
+        email = getattr(old_person, '_email', '')
+        affiliation = convert_to_unicode(getattr(old_person, '_affiliation', ''))
+        key = (first_name, last_name, email, affiliation)
+        existing_person = self.legacy_contribution_person_map.get(key)
+        if existing_person:
+            self._build_person(old_person, existing_person, key)
+            return existing_person
+        person = EventPerson(event_new=self.event)
+        self._build_person(old_person, person, key)
+        if not self.importer.quiet:
+            self.importer.print_info(cformat(' %{magenta!}- [event_person]%{reset} {}').format(person.full_name))
+        if person.email:
+            user = self.importer.all_users_by_email.get(person.email)
+            if user:
+                person.user = user
+        return person
+
+    def _build_person(self, old_person, person, map_key):
+        for old_attr, new_attr in PERSON_INFO_MAP.iteritems():
+            if not getattr(person, new_attr, None):
+                setattr(person, new_attr, convert_to_unicode(getattr(old_person, old_attr, '')))
+        if not person._title:
+            person.title = USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none)
+        if not person.email:
+            email = getattr(old_person, '_email', '')
+            person.email = sanitize_email(convert_to_unicode(email).lower()) if email else ''
+        self.legacy_contribution_person_map[map_key] = person
 
     def _migrate_timetable(self):
         self._migrate_timetable_entries(self.old_event._Conference__schedule._entries)
