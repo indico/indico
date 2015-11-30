@@ -32,6 +32,7 @@ from indico.modules.events.contributions.models.principals import ContributionPr
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -131,12 +132,23 @@ class TimetableMigration(object):
             self._migrate_session(old_session)
 
     def _migrate_session(self, old_session):
+        ac = old_session._Session__ac
         session = Session(event_new=self.event, title=convert_to_unicode(old_session.title),
                           colors=ColorTuple(old_session._textColor, old_session._color),
-                          default_contribution_duration=old_session._contributionDuration)
+                          default_contribution_duration=old_session._contributionDuration,
+                          protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
         self.legacy_session_map[old_session] = session
+        principals = {}
+        # managers / read access
+        self._process_ac(SessionPrincipal, principals, ac)
+        # coordinators
+        for submitter in old_session._coordinators.itervalues():
+            self._process_principal(SessionPrincipal, principals, submitter, 'Coordinator', roles={'coordinate'})
+        self._process_principal_emails(SessionPrincipal, principals, getattr(old_session, '_coordinatorsEmail', []),
+                                       'Coordinator', roles={'coordinate'})
+        session.acl_entries = set(principals.itervalues())
         return session
 
     def _migrate_contributions(self):
