@@ -91,6 +91,16 @@ class SubContribution(db.Model):
             lazy=True
         )
     )
+    #: Persons associated with this contribution
+    person_links = db.relationship(
+        'SubContributionPersonLink',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'subcontribution',
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - contribution (Contribution.subcontributions)
