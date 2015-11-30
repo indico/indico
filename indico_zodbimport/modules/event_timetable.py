@@ -17,6 +17,7 @@
 
 from __future__ import unicode_literals
 
+import traceback
 from operator import attrgetter
 
 from indico.core.db import db
@@ -182,9 +183,14 @@ class EventTimetableImporter(Importer):
     def migrate_events(self):
         for old_event, event in committing_iterator(self._iter_events()):
             mig = TimetableMigration(self, old_event, event)
-            with db.session.no_autoflush:
-                mig.run()
-            db.session.flush()
+            try:
+                with db.session.begin_nested():
+                    with db.session.no_autoflush:
+                        mig.run()
+                        db.session.flush()
+            except Exception:
+                self.print_error(cformat('%{red!}MIGRATION FAILED!'), event_id=event.id)
+                traceback.print_exc()
 
     def _iter_events(self):
         it = self.zodb_root['conferences'].itervalues()
