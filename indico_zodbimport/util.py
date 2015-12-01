@@ -86,7 +86,7 @@ def get_storage(zodb_uri):
     return storage
 
 
-def convert_to_unicode(val, _control_char_re=re.compile(ur'[\x00-\x08\x0b-\x0c\x0e-\x1f]')):
+def convert_to_unicode(val, strip=True, _control_char_re=re.compile(ur'[\x00-\x08\x0b-\x0c\x0e-\x1f]')):
     if isinstance(val, str):
         try:
             rv = unicode(val, 'utf-8')
@@ -103,6 +103,8 @@ def convert_to_unicode(val, _control_char_re=re.compile(ur'[\x00-\x08\x0b-\x0c\x
     # get rid of hard tabs and control chars
     rv = rv.replace(u'\t', u' ' * 4)
     rv = _control_char_re.sub(u'', rv)
+    if strip:
+        rv = rv.strip()
     return rv
 
 
