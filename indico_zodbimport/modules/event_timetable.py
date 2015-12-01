@@ -15,9 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
 
 import traceback
+from math import ceil
 from operator import attrgetter
 
 import click
@@ -279,12 +280,27 @@ class TimetableMigration(object):
 class EventTimetableImporter(Importer):
     def __init__(self, **kwargs):
         self.default_group_provider = kwargs.pop('default_group_provider')
+        self.parallel = kwargs.pop('parallel')
         super(EventTimetableImporter, self).__init__(**kwargs)
 
     @staticmethod
     def decorate_command(command):
+        def _process_parallel(ctx, param, value):
+            if value is None:
+                return None
+            n, i = map(int, value.split(':', 1))
+            if n <= 1:
+                raise click.BadParameter('N must be >1')
+            if i not in range(n):
+                raise click.BadParameter('I must be in [0..{})'.format(n))
+            return n, i
+
         command = click.option('--default-group-provider', default='legacy-ldap',
                                help="Name of the default group provider")(command)
+        command = click.option('-P', '--parallel', metavar='N:I', callback=_process_parallel,
+                               help='Parallel mode - migrates only events with `ID mod N = I`. '
+                                    'When using this, you need to run the script N times with '
+                                    'I being in [0..N)')(command)
         return command
 
     def has_data(self):
@@ -320,9 +336,16 @@ class EventTimetableImporter(Importer):
 
     def _iter_events(self):
         it = self.zodb_root['conferences'].itervalues()
+        total = len(self.zodb_root['conferences'])
+        all_events_query = Event.find(is_deleted=False)
+        if self.parallel:
+            n, i = self.parallel
+            it = (e for e in it if int(e.id) % n == i)
+            total = int(ceil(total / n))
+            all_events_query = all_events_query.filter(Event.id % n == i)
         if self.quiet:
-            it = verbose_iterator(it, len(self.zodb_root['conferences']), attrgetter('id'), attrgetter('title'))
-        all_events = {e.id: e for e in Event.find_all(is_deleted=False)}
+            it = verbose_iterator(it, total, attrgetter('id'), attrgetter('title'))
+        all_events = {e.id: e for e in all_events_query}
         for old_event in self.flushing_iterator(it):
             event = all_events.get(int(old_event.id))
             if event is None:
