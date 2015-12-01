@@ -158,7 +158,11 @@ class TimetableMigration(object):
                                        allow_emails=allow_emails)
 
     def _process_references(self, reference_cls, old_object):
-        for name, values in old_object._reportNumberHolder._reports.iteritems():
+        try:
+            rnh = old_object._reportNumberHolder
+        except AttributeError:
+            return
+        for name, values in rnh._reports.iteritems():
             try:
                 reference_type = self.importer.reference_type_map[name]
             except KeyError:
