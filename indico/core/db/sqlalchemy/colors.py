@@ -36,7 +36,7 @@ class ColorTuple(namedtuple('ColorTuple', ('text', 'background'))):
     """
 
     def __new__(cls, text, background):
-        colors = [text, background]
+        colors = [text or '', background or '']
         for i, color in enumerate(colors):
             if color.startswith('#'):
                 color = color[1:]
@@ -83,7 +83,9 @@ class ColorMixin(object):
 
     @property
     def colors(self):
-        return ColorTuple(self.text_color, self.background_color)
+        """The current set of colors or None if no colors are set"""
+        colors = ColorTuple(self.text_color, self.background_color)
+        return colors or None
 
     @colors.setter
     def colors(self, value):
