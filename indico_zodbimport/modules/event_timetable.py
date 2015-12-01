@@ -184,8 +184,10 @@ class TimetableMigration(object):
 
     def _migrate_contribution(self, old_contrib):
         ac = old_contrib._Contribution__ac
+        description = old_contrib._fields['content']
+        description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
         contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
-                               description=convert_to_unicode(old_contrib.description), duration=old_contrib.duration,
+                               description=description, duration=old_contrib.duration,
                                protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
