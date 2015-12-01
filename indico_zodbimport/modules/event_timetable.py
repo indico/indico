@@ -170,6 +170,9 @@ class TimetableMigration(object):
                     self.importer.print_info(cformat(' - %{magenta}{}: %{green!}{}').format(name, value))
                 yield reference_cls(reference_type=reference_type, value=value)
 
+    def _process_keywords(self, keywords):
+        return map(convert_to_unicode, keywords.splitlines())
+
     def _migrate_sessions(self):
         for old_session in self.old_event.sessions.itervalues():
             self._migrate_session(old_session)
@@ -204,7 +207,8 @@ class TimetableMigration(object):
         description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
         contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
                                description=description, duration=old_contrib.duration,
-                               protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
+                               protection_mode=PROTECTION_MODE_MAP[ac._accessProtection],
+                               keywords=self._process_keywords(old_contrib._keywords))
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
         self.legacy_contribution_map[old_contrib] = contrib
