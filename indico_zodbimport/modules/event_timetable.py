@@ -250,9 +250,19 @@ class TimetableMigration(object):
                 yield link
 
     def _migrate_subcontribution_persons(self, old_entry):
+        person_link_map = {}
         for speaker in getattr(old_entry, 'speakers', []):
             person = self._migrate_contribution_person(speaker)
-            yield SubContributionPersonLink(person=person)
+            link = person_link_map.get(person)
+            if link:
+                self.importer.print_warning(
+                    cformat('%{yellow!}Duplicated speaker {} for sub-contribution').format(person.full_name),
+                    event_id=self.event.id
+                )
+            else:
+                link = SubContributionPersonLink(person=person)
+                person_link_map[person] = link
+                yield link
 
     def _migrate_contribution_person(self, old_person):
         first_name = convert_to_unicode(getattr(old_person, '_firstName', ''))
