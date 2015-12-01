@@ -184,12 +184,17 @@ class TimetableMigration(object):
     def _migrate_session(self, old_session):
         ac = old_session._Session__ac
         session = Session(event_new=self.event, title=convert_to_unicode(old_session.title),
-                          colors=ColorTuple(old_session._textColor, old_session._color),
                           default_contribution_duration=old_session._contributionDuration,
                           protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
         self.legacy_session_map[old_session] = session
+        # colors
+        try:
+            session.colors = ColorTuple(old_session._textColor, old_session._color)
+        except AttributeError:
+            self.importer.print_warning(cformat('%{yellow!}Session has no colors: {}').format(session),
+                                        event_id=self.event.id)
         principals = {}
         # managers / read access
         self._process_ac(SessionPrincipal, principals, ac, allow_emails=False)
