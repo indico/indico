@@ -431,7 +431,9 @@ class EventTimetableImporter(Importer):
         return command
 
     def has_data(self):
-        models = (TimetableEntry, Break, Session, SessionBlock, Contribution, ReferenceType)
+        if self.parallel and self.parallel[1] == 0 and ReferenceType.has_rows():
+            return True
+        models = (TimetableEntry, Break, Session, SessionBlock, Contribution)
         return any(x.has_rows() for x in models)
 
     def _load_data(self):
@@ -451,6 +453,10 @@ class EventTimetableImporter(Importer):
             self.migrate_events()
 
     def migrate_reference_types(self):
+        if self.parallel and self.parallel[1]:
+            self.print_step("Loading reference types")
+            self.reference_type_map = {r.name: r for r in ReferenceType.query}
+            return
         self.print_step("Migrating reference types")
         for name in self.reference_types:
             self.reference_type_map[name] = reftype = ReferenceType(name=name)
