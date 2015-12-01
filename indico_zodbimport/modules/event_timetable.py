@@ -184,7 +184,7 @@ class TimetableMigration(object):
 
     def _migrate_contribution(self, old_contrib):
         ac = old_contrib._Contribution__ac
-        description = old_contrib._fields['content']
+        description = old_contrib._fields.get('content', '')
         description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
         contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
                                description=description, duration=old_contrib.duration,
