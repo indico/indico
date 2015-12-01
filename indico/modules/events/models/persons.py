@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
-from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.core.db.sqlalchemy.util.models import auto_table_args, get_default_values
 from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii, format_repr, format_full_name
@@ -112,6 +112,8 @@ class EventPerson(db.Model):
     @hybrid_property
     def title(self):
         """the title of the person"""
+        if self._title is None:
+            return get_default_values(type(self))['_title'].title
         return self._title.title
 
     @title.expression
