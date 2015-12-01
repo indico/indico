@@ -46,10 +46,10 @@ def upgrade():
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('url_template', sa.String(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
-        schema='events'
+        schema='indico'
     )
     op.create_index('ix_uq_reference_types_name_lower', 'reference_types', [sa.text('lower(name)')], unique=True,
-                    schema='events')
+                    schema='indico')
 
     # Session
     op.create_table(
@@ -279,7 +279,7 @@ def upgrade():
         sa.Column('value', sa.String(), nullable=False),
         sa.Column('subcontribution_id', sa.Integer(), nullable=False, index=True),
         sa.Column('reference_type_id', sa.Integer(), nullable=False, index=True),
-        sa.ForeignKeyConstraint(['reference_type_id'], ['events.reference_types.id']),
+        sa.ForeignKeyConstraint(['reference_type_id'], ['indico.reference_types.id']),
         sa.ForeignKeyConstraint(['subcontribution_id'], ['events.subcontributions.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
@@ -293,7 +293,7 @@ def upgrade():
         sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
         sa.Column('reference_type_id', sa.Integer(), nullable=False, index=True),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
-        sa.ForeignKeyConstraint(['reference_type_id'], ['events.reference_types.id']),
+        sa.ForeignKeyConstraint(['reference_type_id'], ['indico.reference_types.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
@@ -306,7 +306,7 @@ def upgrade():
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('reference_type_id', sa.Integer(), nullable=False, index=True),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
-        sa.ForeignKeyConstraint(['reference_type_id'], ['events.reference_types.id']),
+        sa.ForeignKeyConstraint(['reference_type_id'], ['indico.reference_types.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
@@ -423,5 +423,5 @@ def downgrade():
     op.drop_table('session_blocks', schema='events')
     op.drop_table('session_principals', schema='events')
     op.drop_table('sessions', schema='events')
-    op.drop_table('reference_types', schema='events')
+    op.drop_table('reference_types', schema='indico')
     op.drop_table('contribution_fields', schema='events')
