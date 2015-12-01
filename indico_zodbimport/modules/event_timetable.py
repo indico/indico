@@ -108,11 +108,11 @@ class TimetableMigration(object):
             principal = self._convert_principal(legacy_principal)
         if principal is None:
             self.importer.print_warning(cformat('%{yellow}{} does not exist:%{reset} {}')
-                                        .format(name, legacy_principal), event_id=self.event.id)
+                                        .format(name, legacy_principal), always=False, event_id=self.event.id)
             return
         elif not allow_emails and isinstance(principal, EmailPrincipal):
             self.importer.print_warning(cformat('%{yellow}{} cannot be an email principal:%{reset} {}')
-                                        .format(name, legacy_principal), event_id=self.event.id)
+                                        .format(name, legacy_principal), always=False, event_id=self.event.id)
             return
         try:
             entry = principals[principal]
