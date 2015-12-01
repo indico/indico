@@ -26,26 +26,19 @@ from indico.util.i18n import _, ngettext
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    from indico.modules.events.sessions.models.principals import SessionPrincipal, SessionBlockPrincipal
+    from indico.modules.events.sessions.models.principals import SessionPrincipal
     SessionPrincipal.merge_users(target, source, 'session')
-    SessionBlockPrincipal.merge_users(target, source, 'session')
 
 
 @signals.users.registered.connect
 @signals.users.email_added.connect
 def _convert_email_principals(user, **kwargs):
-    from indico.modules.events.sessions.models.principals import SessionPrincipal, SessionBlockPrincipal
+    from indico.modules.events.sessions.models.principals import SessionPrincipal
     sessions = SessionPrincipal.replace_email_with_user(user, 'session')
     if sessions:
         num = len(sessions)
         flash(ngettext("You have been granted manager/coordination privileges for a session.",
                        "You have been granted manager/coordination privileges for {} sessions.", num).format(num),
-              'info')
-    blocks = SessionBlockPrincipal.replace_email_with_user(user, 'session_block')
-    if blocks:
-        num = len(blocks)
-        flash(ngettext("You have been granted convener privileges for a session block.",
-                       "You have been granted convener privileges for {} session blocks.", num).format(num),
               'info')
 
 
