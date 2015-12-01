@@ -31,6 +31,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
@@ -321,6 +322,8 @@ class User(db.Model):
     @hybrid_property
     def title(self):
         """the title of the user"""
+        if self._title is None:
+            return get_default_values(type(self))['_title'].title
         return self._title.title
 
     @title.expression
