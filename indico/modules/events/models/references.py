@@ -28,7 +28,7 @@ class ReferenceType(db.Model):
     @declared_attr
     def __table_args__(cls):
         return (db.Index('ix_uq_reference_types_name_lower', db.func.lower(cls.name), unique=True),
-                {'schema': 'events'})
+                {'schema': 'indico'})
 
     #: The unique ID of the reference type
     id = db.Column(
@@ -75,7 +75,7 @@ class ReferenceModelBase(db.Model):
     def reference_type_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('events.reference_types.id'),
+            db.ForeignKey('indico.reference_types.id'),
             nullable=False,
             index=True
         )
