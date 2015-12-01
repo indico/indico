@@ -23,6 +23,13 @@ from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
 
 
+def _get_next_position(context):
+    """Get the next contribution field position for the event."""
+    event_id = context.current_parameters['event_id']
+    res = db.session.query(db.func.max(ContributionField.position)).filter_by(event_id=event_id).one()
+    return (res[0] or 0) + 1
+
+
 class ContributionField(db.Model):
     __tablename__ = 'contribution_fields'
     __table_args__ = {'schema': 'events'}
@@ -37,6 +44,11 @@ class ContributionField(db.Model):
         index=True,
         nullable=False
     )
+    position = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_position
+    )
     title = db.Column(
         db.String,
         nullable=False
@@ -50,6 +62,11 @@ class ContributionField(db.Model):
         db.Boolean,
         nullable=False,
         default=False
+    )
+    is_active = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
     )
     field_type = db.Column(
         db.String,
@@ -78,7 +95,7 @@ class ContributionField(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'field_type', is_required=False, _text=self.title)
+        return format_repr(self, 'id', 'field_type', is_required=False, is_active=True, _text=self.title)
 
 
 class ContributionFieldValueBase(db.Model):
