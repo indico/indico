@@ -32,9 +32,11 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
+from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
@@ -82,6 +84,7 @@ class TimetableMigration(object):
 
     def run(self):
         self.importer.print_success('Importing {}'.format(self.old_event), event_id=self.event.id)
+        self.event.references = list(self._process_references(EventReference, self.old_event))
         self._migrate_sessions()
         self._migrate_contributions()
         self._migrate_timetable()
@@ -154,6 +157,19 @@ class TimetableMigration(object):
         self._process_principal_emails(principal_cls, principals, emails, 'Manager', full_access=True,
                                        allow_emails=allow_emails)
 
+    def _process_references(self, reference_cls, old_object):
+        for name, values in old_object._reportNumberHolder._reports.iteritems():
+            try:
+                reference_type = self.importer.reference_type_map[name]
+            except KeyError:
+                self.importer.print_warning(cformat('%{yellow!}Unknown reference type: {}').format(name),
+                                            event_id=self.event.id)
+                continue
+            for value in map(convert_to_unicode, values):
+                if not self.importer.quiet:
+                    self.importer.print_info(cformat(' - %{magenta}{}: %{green!}{}').format(name, value))
+                yield reference_cls(reference_type=reference_type, value=value)
+
     def _migrate_sessions(self):
         for old_session in self.old_event.sessions.itervalues():
             self._migrate_session(old_session)
@@ -203,6 +219,7 @@ class TimetableMigration(object):
         contrib.acl_entries = set(principals.itervalues())
         # speakers, authors and co-authors
         contrib.person_links = list(self._migrate_contribution_persons(old_contrib))
+        contrib.references = list(self._process_references(ContributionReference, old_contrib))
         contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
                                     for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
 
@@ -212,6 +229,7 @@ class TimetableMigration(object):
                                      description=convert_to_unicode(old_subcontrib.description))
         if not self.importer.quiet:
             self.importer.print_info(cformat('  %{cyan!}SubContribution%{reset} {}').format(subcontrib.title))
+        subcontrib.references = list(self._process_references(SubContributionReference, old_subcontrib))
         subcontrib.person_links = list(self._migrate_subcontribution_persons(old_subcontrib))
         return subcontrib
 
@@ -381,7 +399,9 @@ class EventTimetableImporter(Importer):
     def __init__(self, **kwargs):
         self.default_group_provider = kwargs.pop('default_group_provider')
         self.parallel = kwargs.pop('parallel')
+        self.reference_types = kwargs.pop('reference_types')
         super(EventTimetableImporter, self).__init__(**kwargs)
+        self.reference_type_map = {}
 
     @staticmethod
     def decorate_command(command):
@@ -397,6 +417,9 @@ class EventTimetableImporter(Importer):
 
         command = click.option('--default-group-provider', default='legacy-ldap',
                                help="Name of the default group provider")(command)
+        command = click.option('-R', '--reference-type', 'reference_types', multiple=True,
+                               help="Reference types ('report numbers'). Can be used multiple times "
+                                    "to specify multiple reference types")(command)
         command = click.option('-P', '--parallel', metavar='N:I', callback=_process_parallel,
                                help='Parallel mode - migrates only events with `ID mod N = I`. '
                                     'When using this, you need to run the script N times with '
@@ -404,7 +427,7 @@ class EventTimetableImporter(Importer):
         return command
 
     def has_data(self):
-        models = (TimetableEntry, Break, Session, SessionBlock, Contribution)
+        models = (TimetableEntry, Break, Session, SessionBlock, Contribution, ReferenceType)
         return any(x.has_rows() for x in models)
 
     def _load_data(self):
@@ -419,10 +442,20 @@ class EventTimetableImporter(Importer):
 
     def migrate(self):
         self._load_data()
+        self.migrate_reference_types()
         with patch_default_group_provider(self.default_group_provider):
             self.migrate_events()
 
+    def migrate_reference_types(self):
+        self.print_step("Migrating reference types")
+        for name in self.reference_types:
+            self.reference_type_map[name] = reftype = ReferenceType(name=name)
+            db.session.add(reftype)
+            self.print_success(name)
+        db.session.commit()
+
     def migrate_events(self):
+        self.print_step("Migrating events")
         for old_event, event in committing_iterator(self._iter_events()):
             mig = TimetableMigration(self, old_event, event)
             try:
