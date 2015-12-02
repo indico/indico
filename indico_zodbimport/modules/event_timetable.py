@@ -426,6 +426,8 @@ class TimetableMigration(object):
         person_link_map = {}
         for speaker in getattr(old_entry, 'speakers', []):
             person = self._migrate_contribution_person(speaker)
+            if not person:
+                continue
             link = person_link_map.get(person)
             if link:
                 self.importer.print_warning(
@@ -442,6 +444,9 @@ class TimetableMigration(object):
         last_name = convert_to_unicode(getattr(old_person, '_surName', ''))
         email = getattr(old_person, '_email', '')
         affiliation = convert_to_unicode(getattr(old_person, '_affiliation', ''))
+        if not first_name and not last_name and (email or affiliation):
+            self.importer.print_warning(cformat('%{yellow!}Skipping nameless event person'), event_id=self.event.id)
+            return
         key = (first_name, last_name, email, affiliation)
         existing_person = self.legacy_contribution_person_map.get(key)
         if existing_person:
@@ -465,7 +470,12 @@ class TimetableMigration(object):
             person.title = USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none)
         if not person.email:
             email = getattr(old_person, '_email', '')
-            person.email = sanitize_email(convert_to_unicode(email).lower()) if email else ''
+            email = sanitize_email(convert_to_unicode(email).lower()) if email else ''
+            if is_valid_mail(email, False):
+                person.email = email
+            else:
+                self.importer.print_warning(cformat('%{yellow!}Skipping invalid email {}').format(email),
+                                            event_id=self.event.id)
         self.legacy_contribution_person_map[map_key] = person
 
     def _migrate_timetable(self):
