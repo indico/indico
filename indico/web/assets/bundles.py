@@ -179,6 +179,7 @@ indico_jquery = rjs_bundle(
     *namespace('js/indico/jquery',
                'defaults.js',
                'global.js',
+               'declarative.js',
                'errors.js',
                'ajaxcheckbox.js',
                'ajaxdialog.js',
