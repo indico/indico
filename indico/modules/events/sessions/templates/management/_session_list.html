@@ -33,11 +33,12 @@
                         </td>
                         <td class="i-table">
                             <div class="group">
-                                <span class="js-color-switch">
+                                <span class="js-color-switch"
+                                      data-colors="{{ default_colors | tojson | forceescape }}">
                                     <a class="i-button icon-palette switch-trigger"
                                        style="background: #{{ session.background_color }};
-                                              color: #{{ session.text_color }} !important"
-                                       data-href="#">
+                                              color: #{{ session.text_color }} !important;"
+                                       data-method="PATCH" data-href="{{ url_for('.modify_session', session) }}">
                                     </a>
                                 </span>
                             </div>
@@ -73,9 +74,7 @@
                     {% for block in session.blocks -%}
                         <tr class="i-table session-blocks-row" style="display: none;">
                             <td class="i-table" colspan="3"></td>
-                            <td class="i-table">
-                                {{- block.title or 'Default empty block' -}}
-                            </td>
+                            <td class="i-table">{{- block.title or 'Default empty block' -}}</td>
                             <td class="i-table">{{ block.duration }}</td>
                             <td class="i-table">{{ block.background_color }}</td>
                             <td class="i-table"></td>
@@ -90,18 +89,4 @@
             {% trans %}There are no sessions yet.{% endtrans %}
         {%- endcall %}
     {%- endif %}
-    <script>
-        $('.js-color-switch').colorswitch({
-            defaultColors: {{ default_colors | tojson }},
-            onSelect: function(background, text) {
-                $.ajax({
-                    url: $(this).data('href'),
-                    method: 'POST',
-                    data: {background: background, text: text},
-                    error: handleAjaxError,
-                    complete: IndicoUI.Dialogs.Util.progress()
-                });
-            }
-        });
-    </script>
 {%- endmacro %}

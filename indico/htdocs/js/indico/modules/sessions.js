@@ -19,16 +19,48 @@
         });
     }
 
+    function setupColorSwitches() {
+        $('.js-color-switch').each(function() {
+            var $this = $(this);
+            $this.colorswitch({
+                defaultColors: $this.data('colors'),
+                onSelect: function(background, text) {
+                    $.ajax({
+                        url: $(this).data('href'),
+                        method: $(this).data('method'),
+                        data: JSON.stringify({'colors': {'text': text, 'background': background}}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        traditional: true,
+                        error: handleAjaxError,
+                        complete: IndicoUI.Dialogs.Util.progress()
+                    });
+                }
+            });
+        });
+    }
+
     global.setupSessionsList = function setupSessionsList() {
         handleRowSelection();
         setupTableSorter();
+        setupColorSwitches();
 
-        $('.sessions').on('click', '#select-all', function() {
-            $('.sessions-wrapper table.i-table input.select-row').prop('checked', true).trigger('change');
-        });
-
-        $('.sessions').on('click', '#select-none', function() {
-            $('table.i-table input.select-row').prop('checked', false).trigger('change');
+        $(document).on('click', function(evt) {
+            var $target = $(evt.target);
+            if ($target.hasClass('switch-trigger')) {
+                if ($target.hasClass('active-color-switch')) {
+                    $('.switch-trigger:not(.active-color-switch) .color-palette').hide();
+                } else {
+                    var activeColorSwitch = $('.switch-trigger.active-color-switch');
+                    if (activeColorSwitch.length) {
+                        activeColorSwitch.removeClass('active-color-switch').next('.color-palette').hide();
+                    }
+                    $target.addClass('active-color-switch');
+                }
+            } else {
+                $('.switch-trigger').removeClass('active-color-switch');
+                $('.color-palette').hide();
+            }
         });
 
         $('.sessions .toolbar').on('click', '.disabled', function(evt) {
@@ -40,6 +72,7 @@
             if (data) {
                 $('.sessions-wrapper').html(data.session_list);
                 setupTableSorter();
+                setupColorSwitches();
             }
         }
 
