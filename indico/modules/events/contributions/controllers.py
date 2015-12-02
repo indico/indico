@@ -51,14 +51,6 @@ class RHManageContributionsBase(RHConferenceModifBase):
         self.event = self._conf
 
 
-class RHManageContributions(RHManageContributionsBase):
-    """Display contributions management page"""
-
-    def _process(self):
-        return WPManageContributions.render_template('management/contributions.html', self.event, event=self.event,
-                                                     **_get_contribution_list_args(self.event.as_event))
-
-
 class RHManageContributionBase(RHManageContributionsBase):
     """Base class for a specific contribution"""
 
@@ -73,7 +65,15 @@ class RHManageContributionBase(RHManageContributionsBase):
         self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
 
 
-class RHManageContributionCreate(RHManageContributionsBase):
+class RHContributions(RHManageContributionsBase):
+    """Display contributions management page"""
+
+    def _process(self):
+        return WPManageContributions.render_template('management/contributions.html', self.event, event=self.event,
+                                                     **_get_contribution_list_args(self.event.as_event))
+
+
+class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
         form = ContributionForm()
         if form.validate_on_submit():
@@ -83,7 +83,7 @@ class RHManageContributionCreate(RHManageContributionsBase):
         return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
 
 
-class RHManageContributionUpdate(RHManageContributionBase):
+class RHEditContribution(RHManageContributionBase):
     def _process(self):
         form = ContributionForm(obj=FormDefaults(self.contrib))
         if form.validate_on_submit():
@@ -93,7 +93,7 @@ class RHManageContributionUpdate(RHManageContributionBase):
         return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
 
 
-class RHManageContributionDelete(RHManageContributionBase):
+class RHDeleteContribution(RHManageContributionBase):
     def _process(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib), 'success')
