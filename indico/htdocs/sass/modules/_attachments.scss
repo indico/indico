@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/animation';
 @import 'base/palette';
 @import 'base/defaults';
 @import 'base/utilities';
@@ -184,9 +185,7 @@
 
                     font-weight: bold;
                     &:before {
-                        @include transition(transform 0.15s ease-out);
-
-                        -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                        @include rotate-transform(0.15s);
                     }
                     > span {
                         &:before {
