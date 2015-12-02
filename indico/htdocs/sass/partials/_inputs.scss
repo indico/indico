@@ -830,3 +830,44 @@ dd > .i-has-action {
         padding: 0.25em 0;
     }
 }
+
+
+.color-palette {
+    background: #FFF;
+    background-clip: padding-box;
+    border: thin solid lighten($gray, 10%);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px lighten($gray, 5%);
+    display: none;
+    margin-top: 0.5em;
+    padding: 3px;
+    position: absolute;
+    z-index: 200;
+
+    table {
+        border-spacing: 8px;
+    }
+
+    &:before {
+        transform: rotate(45deg);
+        content: '';
+        top: -0.2rem;
+        position: absolute;
+        width: .6em;
+        height: .6em;
+        box-shadow: -1px -1px 0 1px lighten($gray, 15%);
+        background: #FFF;
+        visibility: visible;
+        margin: 0 0 0 2em;
+    }
+
+    .palette-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 15px;
+    }
+
+    .text-box {
+        border-radius: 3px;
+    }
+}
