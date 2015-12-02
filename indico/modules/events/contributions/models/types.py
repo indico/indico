@@ -51,6 +51,16 @@ class ContributionType(db.Model):
         default=''
     )
 
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'contribution_types',
+            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+
     # relationship backrefs:
     # - contributions (Contribution.type)
 
