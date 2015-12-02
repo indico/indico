@@ -18,6 +18,8 @@
 /* Animation utility constructs */
 /* To be removed whenever we support a more recent version of Compass */
 
+@import 'compass';
+
 
 @mixin indico-animation($name, $duration, $timing-function, $count) {
     animation-name: $name;
@@ -35,4 +37,10 @@
     animation-iteration-count: $count;
     -webkit-animation-iteration-count: $count;
     -moz-animation-iteration-count: $count;
+}
+
+
+@mixin rotate-transform($delay) {
+    @include transition(transform $delay ease-out);
+    -webkit-transform-origin: 50% 51%; // improve blurry text on rotate with chrome
 }
