@@ -28,8 +28,8 @@
                 <a id="remove-selected-sessions"
                    class="i-button icon-remove js-requires-selected-row disabled"
                    data-title="{% trans %}Remove selected sessions{% endtrans %}"
-                   data-method="POST"
-                   data-href="#"
+                   data-method="DELETE"
+                   data-href="{{ url_for('.delete_sessions', event) }}"
                    data-confirm="{% trans %}Do you really want to delete the selected sessions?{% endtrans %}">
                     {%- trans %}Remove{% endtrans -%}
                 </a>
