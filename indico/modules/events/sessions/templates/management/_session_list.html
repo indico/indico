@@ -1,0 +1,106 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_session_list(event, sessions, default_colors) -%}
+    {% if sessions -%}
+        <table class="i-table tablesorter">
+            <thead>
+                <tr class="i-table">
+                    <th class="i-table checkbox-column" data-sorter="false"></th>
+                    <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
+                    <th class="i-table">{% trans %}Title{% endtrans %}</th>
+                    <th class="i-table">{% trans %}Code{% endtrans %}</th>
+                    <th class="i-table">{%- trans %}Type{% endtrans -%}</th>
+                    <th class="i-table" data-sorter="false">{% trans %}Colour{% endtrans %}</th>
+                    <th class="i-table" data-sorter="false">{% trans %}Blocks{% endtrans %}</th>
+                    <th data-sorter="false"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions -%}
+                    <tr class="i-table">
+                        <td class="i-table">
+                            <input class="select-row" type="checkbox" value="{{ session.id }}">
+                        </td>
+                        <td class="i-table">#{{ session.friendly_id }}</td>
+                        <td class="i-table">{{ session.title }}</td>
+                        <td class="i-table">{{ session.code }}</td>
+                        <td class="i-table">
+                            {%- if session.is_poster %}
+                                {%- trans %}Poster{% endtrans -%}
+                            {% else %}
+                                {%- trans %}Standard{% endtrans -%}
+                            {% endif -%}
+                        </td>
+                        <td class="i-table">
+                            <div class="group">
+                                <span class="js-color-switch">
+                                    <a class="i-button icon-palette switch-trigger"
+                                       style="background: #{{ session.background_color }};
+                                              color: #{{ session.text_color }} !important"
+                                       data-href="#">
+                                    </a>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="i-table">
+                            <span class="i-label show-session-blocks">
+                                {%- trans %}Session blocks {% endtrans -%}
+                                <span class="badge">{{ session.blocks | length }}</span>
+                            </span>
+                        </td>
+                        <td class="i-table">
+                            <div class="group right">
+                                <a class="icon-edit highlight edit-session action-icon"
+                                   title="{% trans %}Edit this session{% endtrans %}"
+                                   data-title="{% trans title=session.title %}Edit session {{ title }}{% endtrans %}"
+                                   data-href="#"></a>
+                                <a class="icon-users highlight session-persons-list"
+                                   data-title="{% trans title=session.title %}List of session persons{% endtrans %}"
+                                   data-href="#"></a>
+                                <a class="icon-time highlight action-icon"
+                                   title="{% trans %}Go to this session timetable{% endtrans %}"
+                                   data-href="#"
+                                   data-method="POST"></a>
+                                <a class="icon-remove highlight js-remove-session action-icon"
+                                   title="{% trans %}Remove this session{% endtrans %}"
+                                   data-method="DELETE"
+                                   data-href="#"
+                                   data-confirm="{% trans title=session.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% for block in session.blocks -%}
+                        <tr class="i-table session-blocks-row" style="display: none;">
+                            <td class="i-table" colspan="3"></td>
+                            <td class="i-table">
+                                {{- block.title or 'Default empty block' -}}
+                            </td>
+                            <td class="i-table">{{ block.duration }}</td>
+                            <td class="i-table">{{ block.background_color }}</td>
+                            <td class="i-table"></td>
+                            <td class="i-table"></td>
+                        </tr>
+                    {%- endfor %}
+                {%- endfor %}
+            </tbody>
+        </table>
+    {%- else %}
+        {%- call message_box('info') -%}
+            {% trans %}There are no sessions yet.{% endtrans %}
+        {%- endcall %}
+    {%- endif %}
+    <script>
+        $('.js-color-switch').colorswitch({
+            defaultColors: {{ default_colors | tojson }},
+            onSelect: function(background, text) {
+                $.ajax({
+                    url: $(this).data('href'),
+                    method: 'POST',
+                    data: {background: background, text: text},
+                    error: handleAjaxError,
+                    complete: IndicoUI.Dialogs.Util.progress()
+                });
+            }
+        });
+    </script>
+{%- endmacro %}
