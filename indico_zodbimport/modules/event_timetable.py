@@ -192,8 +192,8 @@ class TimetableMigration(object):
         # colors
         try:
             session.colors = ColorTuple(old_session._textColor, old_session._color)
-        except AttributeError:
-            self.importer.print_warning(cformat('%{yellow!}Session has no colors: {}').format(session),
+        except (AttributeError, ValueError) as e:
+            self.importer.print_warning(cformat('%{yellow}Session has no colors: "{}" [{}]').format(session.title, e),
                                         event_id=self.event.id)
         principals = {}
         # managers / read access
@@ -271,8 +271,8 @@ class TimetableMigration(object):
             link = person_link_map.get(person)
             if link:
                 if link.author_type == AuthorType.primary:
-                    self.importer.print_warning('Primary author "{}" is also co-author'.format(person.full_name),
-                                                event_id=self.event.id)
+                    self.importer.print_warning(cformat('%{yellow}!Primary author "{}" is also co-author')
+                                                .format(person.full_name), event_id=self.event.id)
                 else:
                     link.author_type = AuthorType.secondary
             else:
@@ -366,6 +366,11 @@ class TimetableMigration(object):
     def _migrate_break_timetable_entry(self, old_entry, session_block=None):
         break_ = Break(title=convert_to_unicode(old_entry.title), description=convert_to_unicode(old_entry.description),
                        duration=old_entry.duration)
+        try:
+            break_.colors = ColorTuple(old_entry._textColor, old_entry._color)
+        except (AttributeError, ValueError) as e:
+            self.importer.print_warning(cformat('%{yellow}Break has no colors: "{}" [{}]').format(break_.title, e),
+                                        event_id=self.event.id)
         break_.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_entry.startDate)
         self._migrate_location(old_entry, break_)
         if session_block:
