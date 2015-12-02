@@ -22,7 +22,7 @@ from math import ceil
 from operator import attrgetter
 
 import click
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -178,10 +178,28 @@ class TimetableMigration(object):
         return map(convert_to_unicode, keywords.splitlines())
 
     def _migrate_sessions(self):
+        sessions = []
+        friendly_id_map = {}
+        friendly_ids_used = set()
+        skipped = []
+        for id_, session in sorted(self.old_event.sessions.items(),
+                                   key=lambda x: (x[0].isdigit(), int(x[0]) if x[0].isdigit() else x[0])):
+            id_ = int(id_.lstrip('s'))  # legacy: s123
+            if id_ in friendly_ids_used:
+                skipped.append(session)
+                continue
+            friendly_id_map[session] = id_
+            friendly_ids_used.add(id_)
+        for i, session in enumerate(skipped, (max(friendly_ids_used) if friendly_ids_used else 0) + 1):
+            assert i not in friendly_ids_used
+            friendly_id_map[session] = i
+            friendly_ids_used.add(i)
         for old_session in self.old_event.sessions.itervalues():
-            self._migrate_session(old_session)
+            sessions.append(self._migrate_session(old_session, friendly_id_map[old_session]))
+        if sessions:
+            self.event._last_friendly_session_id = max(s.friendly_id for s in sessions)
 
-    def _migrate_session(self, old_session):
+    def _migrate_session(self, old_session, friendly_id=None):
         ac = old_session._Session__ac
         code = convert_to_unicode(old_session._code)
         if code == 'no code':
@@ -191,6 +209,12 @@ class TimetableMigration(object):
                           is_poster=(old_session._ttType == 'poster'), code=code,
                           default_contribution_duration=old_session._contributionDuration,
                           protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
+        if friendly_id is not None:
+            session.friendly_id = friendly_id
+        else:
+            # migrating a zombie session; we simply give it a new friendly id
+            self.event._last_friendly_session_id += 1
+            session.friendly_id = self.event._last_friendly_session_id
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
         self.legacy_session_map[old_session] = session
@@ -212,14 +236,37 @@ class TimetableMigration(object):
         return session
 
     def _migrate_contributions(self):
+        contribs = []
+        friendly_id_map = {}
+        friendly_ids_used = set()
+        skipped = []
+        for id_, contrib in sorted(self.old_event.contributions.items(),
+                                   key=lambda x: (not x[0].isdigit(), int(x[0]) if x[0].isdigit() else x[0])):
+            try:
+                id_ = int(id_)  # legacy: s1t2
+            except ValueError:
+                skipped.append(contrib)
+                continue
+            if id_ in friendly_ids_used:
+                skipped.append(contrib)
+                continue
+            friendly_id_map[contrib] = id_
+            friendly_ids_used.add(id_)
+        for i, contrib in enumerate(skipped, (max(friendly_ids_used) if friendly_ids_used else 0) + 1):
+            assert i not in friendly_ids_used
+            friendly_id_map[contrib] = i
+            friendly_ids_used.add(i)
         for old_contrib in self.old_event.contributions.itervalues():
-            self._migrate_contribution(old_contrib)
+            contribs.append(self._migrate_contribution(old_contrib, friendly_id_map[old_contrib]))
+        if contribs:
+            self.event._last_friendly_contribution_id = max(c.friendly_id for c in contribs)
 
-    def _migrate_contribution(self, old_contrib):
+    def _migrate_contribution(self, old_contrib, friendly_id):
         ac = old_contrib._Contribution__ac
         description = old_contrib._fields.get('content', '')
         description = convert_to_unicode(getattr(description, 'value', description))  # str or AbstractFieldContent
-        contrib = Contribution(event_new=self.event, title=convert_to_unicode(old_contrib.title),
+        contrib = Contribution(event_new=self.event, friendly_id=friendly_id,
+                               title=convert_to_unicode(old_contrib.title),
                                description=description, duration=old_contrib.duration,
                                protection_mode=PROTECTION_MODE_MAP[ac._accessProtection],
                                keywords=self._process_keywords(old_contrib._keywords))
@@ -240,6 +287,8 @@ class TimetableMigration(object):
         contrib.references = list(self._process_references(ContributionReference, old_contrib))
         contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
                                     for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
+        contrib._last_friendly_subcontribution_id = len(contrib.subcontributions)
+        return contrib
 
     def _migrate_subcontribution(self, old_subcontrib, position):
         subcontrib = SubContribution(position=position, friendly_id=position, duration=old_subcontrib.duration,
@@ -499,7 +548,8 @@ class EventTimetableImporter(Importer):
     def _iter_events(self):
         it = self.zodb_root['conferences'].itervalues()
         total = len(self.zodb_root['conferences'])
-        all_events_query = Event.find(is_deleted=False)
+        all_events_query = Event.find(is_deleted=False).options(undefer('_last_friendly_contribution_id'),
+                                                                undefer('_last_friendly_session_id'))
         if self.parallel:
             n, i = self.parallel
             it = (e for e in it if int(e.id) % n == i)
