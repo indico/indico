@@ -22,6 +22,8 @@ from indico.core import signals
 from indico.core.roles import ManagementRole, check_roles
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import _, ngettext
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 @signals.users.merged.connect
@@ -56,3 +58,8 @@ class CoordinatorRole(ManagementRole):
     name = 'coordinate'
     friendly_name = _('Coordination')
     description = _('Grants coordination access to the session.')
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
