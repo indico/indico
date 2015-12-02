@@ -35,6 +35,7 @@ from indico.modules.events.contributions.models.persons import (ContributionPers
                                                                 AuthorType)
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.references import ReferenceType, EventReference
@@ -79,6 +80,7 @@ class TimetableMigration(object):
         self.event = event
         self.legacy_session_map = {}
         self.legacy_contribution_map = {}
+        self.legacy_contribution_type_map = {}
         self.legacy_contribution_person_map = {}
 
     def __repr__(self):
@@ -87,6 +89,7 @@ class TimetableMigration(object):
     def run(self):
         self.importer.print_success('Importing {}'.format(self.old_event), event_id=self.event.id)
         self.event.references = list(self._process_references(EventReference, self.old_event))
+        self._migrate_contribution_types()
         self._migrate_sessions()
         self._migrate_contributions()
         self._migrate_timetable()
@@ -178,6 +181,15 @@ class TimetableMigration(object):
 
     def _process_keywords(self, keywords):
         return map(convert_to_unicode, keywords.splitlines())
+
+    def _migrate_contribution_types(self):
+        for old_ct in self.old_event._contribTypes.itervalues():
+            ct = ContributionType(name=convert_to_unicode(old_ct._name),
+                                  description=convert_to_unicode(old_ct._description))
+            if not self.importer.quiet:
+                self.importer.print_info(cformat('%{cyan}Contribution type%{reset} {}').format(ct.name))
+            self.legacy_contribution_type_map[old_ct] = ct
+            self.event.contribution_types.append(ct)
 
     def _migrate_sessions(self):
         sessions = []
@@ -277,10 +289,17 @@ class TimetableMigration(object):
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
         self.legacy_contribution_map[old_contrib] = contrib
         contrib.legacy_mapping = LegacyContributionMapping(event_new=self.event, legacy_contribution_id=old_contrib.id)
+        # contribution type
+        if old_contrib._type is not None:
+            try:
+                contrib.type = self.legacy_contribution_type_map[old_contrib._type]
+            except AttributeError:
+                self.importer.print_warning(cformat('%{yellow!}Invalid contrib type {}')
+                                            .format(convert_to_unicode(old_contrib._type._name)),
+                                            event_id=self.event.id)
+        # ACLs (managers, read access, submitters)
         principals = {}
-        # managers / read access
         self._process_ac(ContributionPrincipal, principals, ac)
-        # submitters
         for submitter in old_contrib._submitters:
             self._process_principal(ContributionPrincipal, principals, submitter, 'Submitter', roles={'submit'})
         self._process_principal_emails(ContributionPrincipal, principals, getattr(old_contrib, '_submittersEmail', []),
