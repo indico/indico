@@ -183,7 +183,12 @@ class TimetableMigration(object):
 
     def _migrate_session(self, old_session):
         ac = old_session._Session__ac
+        code = convert_to_unicode(old_session._code)
+        if code == 'no code':
+            code = ''
         session = Session(event_new=self.event, title=convert_to_unicode(old_session.title),
+                          description=convert_to_unicode(old_session.description),
+                          is_poster=(old_session._ttType == 'poster'), code=code,
                           default_contribution_duration=old_session._contributionDuration,
                           protection_mode=PROTECTION_MODE_MAP[ac._accessProtection])
         if not self.importer.quiet:
