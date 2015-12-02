@@ -20,7 +20,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.colors import ColorMixin
+from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.util.string import format_repr, return_ascii
 
@@ -29,6 +29,7 @@ class Break(ColorMixin, LocationMixin, db.Model):
     __tablename__ = 'breaks'
     __auto_table_args = {'schema': 'events'}
     location_backref_name = 'breaks'
+    default_colors = ColorTuple('#202020', '#90c0f0')
 
     @declared_attr
     def __table_args__(cls):
