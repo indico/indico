@@ -20,7 +20,7 @@ from datetime import timedelta
 
 from sqlalchemy.ext.declarative import declared_attr
 
-from indico.core.db.sqlalchemy.colors import ColorMixin
+from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
@@ -43,6 +43,7 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     __auto_table_args = {'schema': 'events'}
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
+    default_colors = ColorTuple('#202020', '#e3f2d3')
 
     @declared_attr
     def __table_args__(cls):
