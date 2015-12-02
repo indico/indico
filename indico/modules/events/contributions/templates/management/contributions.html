@@ -1,4 +1,4 @@
-{% extends 'layout/base.html' %}
+{% extends 'layout/full_content_base.html' %}
 {% from 'events/contributions/management/_contribution_list.html' import render_contribution_list %}
 
 {% block title %}
@@ -8,24 +8,43 @@
 {% block content %}
     <div class="toolbar">
         <div class="group">
-            <span class="icon-checkbox-checked i-button arrow left icon-only"
-                  title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></span>
+            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
             <ul class="dropdown">
-                <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
-                <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
+                <li><a href="#" data-select-all="#contribution-list input:checkbox">
+                    {% trans %}All{% endtrans %}
+                </a></li>
+                <li><a href="#" data-select-none="#contribution-list input:checkbox">
+                    {% trans %}None{% endtrans %}
+                </a></li>
             </ul>
         </div>
         <div class="group">
-            <button class="i-button"
+            <button class="i-button highlight"
                   data-title="{% trans %}Add new contribution{% endtrans %}"
                   data-href="{{ url_for('.manage_create_contrib', event) }}"
                   data-ajax-dialog data-method="GET"
                   data-update="#contribution-list">
-                {% trans %}Add new{% endtrans %}
+                {% trans %}Create{% endtrans %}
+            </button>
+        </div>
+        <div class="group">
+            <button class="i-button" disabled>{% trans %}Remove{% endtrans %}</button>
+            <button class="i-button" disabled>{% trans %}Move{% endtrans %}</button>
+            <button class="i-button" disabled>{% trans %}Download{% endtrans %}</button>
+            <button class="i-button" disabled>{% trans %}Export{% endtrans %}</button>
+        </div>
+        <div class="group right">
+            <span class="i-button label icon-search"></span>
+            <input type="text" id="search-input">
+        </div>
+        <div class="group right">
+            <button class="i-button icon-filter"
+                    data-title="{% trans %}Registration list configuration{% endtrans %}">
+                {% trans %}Filters{% endtrans %}
             </button>
         </div>
     </div>
     <div id="contribution-list">
-        {{ render_contribution_list(contribs) }}
+        {{ render_contribution_list(contribs, sessions, tracks) }}
     </div>
 {% endblock %}
