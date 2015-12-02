@@ -36,8 +36,25 @@
             evt.stopPropagation();
         });
 
+        function updateSessionsListOnSuccess(data) {
+            if (data) {
+                $('.sessions-wrapper').html(data.session_list);
+                setupTableSorter();
+            }
+        }
+
+        $('.sessions').on('click', '#add-new-session', function() {
+            var $this = $(this);
+            ajaxDialog({
+                url: $this.data('href'),
+                title: $this.data('title'),
+                onClose: updateSessionsListOnSuccess
+            });
+        });
+
         $('.sessions').on('click', '.js-show-sessions', function() {
             $(this).closest('tr').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
     }
+
 })(window);

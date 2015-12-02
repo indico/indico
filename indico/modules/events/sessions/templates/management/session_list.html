@@ -19,7 +19,7 @@
             </div>
             <div class="group left">
                 <a id="add-new-session" class="i-button highlight icon-plus"
-                   data-href="#"
+                   data-href="{{ url_for('.create_session', event) }}"
                    data-title="{% trans %}Add new session{% endtrans %}">
                     {% trans %}Add new session{% endtrans %}
                 </a>

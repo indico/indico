@@ -16,9 +16,21 @@
 
 from __future__ import unicode_literals
 
+import random
+
 from indico.modules.events.sessions.controllers.management import RHManageSessionsBase
+from indico.modules.events.sessions.forms import SessionForm
+from indico.modules.events.sessions.operations import create_session
 from indico.modules.events.sessions.util import get_colors, get_active_sessions
 from indico.modules.events.sessions.views import WPManageSessions
+from indico.web.flask.templating import get_template_module
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_template
+
+
+def _render_session_list(event):
+    tpl = get_template_module('events/sessions/management/_session_list.html')
+    return tpl.render_session_list(event, get_active_sessions(event), get_colors())
 
 
 class RHSessionsList(RHManageSessionsBase):
@@ -28,3 +40,19 @@ class RHSessionsList(RHManageSessionsBase):
         return WPManageSessions.render_template('management/session_list.html', self.event_new.as_legacy,
                                                 event=self.event_new, sessions=get_active_sessions(self.event_new),
                                                 default_colors=get_colors())
+
+
+class RHCreateSession(RHManageSessionsBase):
+    """Create a session in the event"""
+
+    def _get_random_color(self):
+        used_colors = {s.colors for s in self.event_new.sessions.filter_by(is_deleted=False)}
+        unused_colors = set(get_colors()) - used_colors
+        return random.choice(tuple(unused_colors) or get_colors())
+
+    def _process(self):
+        form = SessionForm(obj=FormDefaults(colors=self._get_random_color()))
+        if form.validate_on_submit():
+            create_session(self.event_new, form.data)
+            return jsonify_data(session_list=_render_session_list(self.event_new))
+        return jsonify_template('events/sessions/management/add_session.html', form=form)
