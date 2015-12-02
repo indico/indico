@@ -31,3 +31,11 @@ def create_session(event, data=None):
     event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
               'Session "{}" has been created'.format(event_session.title), session.user)
     return event_session
+
+
+def update_session(event_session, data):
+    """Update a session based on the information in the `data`"""
+    event_session.populate_from_dict(data)
+    db.session.flush()
+    event_session.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+                                'Session "{}" has been updated'.format(event_session.title), session.user)
