@@ -64,6 +64,37 @@
         $('.sessions').on('click', '.js-show-sessions', function() {
             $(this).closest('tr').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
+
+        $('.sessions').on('indico:confirmed', '#remove-selected-sessions', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var sessionIds = $('.sessions input:checkbox:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                error: handleAjaxError,
+                traditional: true,
+                data: {session_ids: sessionIds},
+                success: updateSessionsListOnSuccess
+            });
+        });
+
+        $('.sessions').on('indico:confirmed', '.js-remove-session', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+
+            $.ajax({
+                url: $this.data('href'),
+                method: $this.data('method'),
+                data: {session_ids: $this.data('session-id')},
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: updateSessionsListOnSuccess
+            });
+        });
     }
 
 })(window);
