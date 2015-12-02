@@ -47,6 +47,15 @@ class LegacyContributionMapping(db.Model):
         nullable=False
     )
 
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'legacy_contribution_mappings',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
     contribution = db.relationship(
         'Contribution',
         lazy=False,
