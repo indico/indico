@@ -95,8 +95,8 @@ class TimetableMigration(object):
         self.importer.print_success('Importing {}'.format(self.old_event), event_id=self.event.id)
         self.event.references = list(self._process_references(EventReference, self.old_event))
         self._migrate_contribution_types()
-        self._migrate_sessions()
         self._migrate_contribution_fields()
+        self._migrate_sessions()
         self._migrate_contributions()
         self._migrate_timetable()
 
@@ -258,8 +258,43 @@ class TimetableMigration(object):
 
     def _migrate_contribution_fields(self):
         fields = self.old_event.abstractMgr._abstractFieldsMgr._fields
+        pos = 0
         for field in fields:
-            self._migrate_contribution_field(field)
+            if field._id == 'content':
+                continue
+            pos += 1
+            self._migrate_contribution_field(field, pos)
+
+    def _migrate_contribution_field(self, old_field, position):
+        field_type = old_field.__class__.__name__
+        if field_type in ('AbstractTextAreaField', 'AbstractInputField'):
+            field_data = {
+                'max_length': int(old_field._maxLength) if old_field._limitation == 'chars' else None,
+                'max_words': int(old_field._maxLength) if old_field._limitation == 'words' else None,
+                'multiline': field_type == 'AbstractTextAreaField'
+            }
+            field_type = 'text'
+        elif field_type == 'AbstractSelectionField':
+            options = []
+            for opt in old_field._options:
+                uuid = unicode(uuid4())
+                self.legacy_field_option_id_map[old_field._id, int(opt.id)] = uuid
+                options.append({'option': convert_to_unicode(opt.value), 'id': uuid, 'is_deleted': False})
+            for opt in old_field._deleted_options:
+                uuid = unicode(uuid4())
+                self.legacy_field_option_id_map[old_field._id, int(opt.id)] = uuid
+                options.append({'option': convert_to_unicode(opt.value), 'id': uuid, 'is_deleted': True})
+            field_data = {'options': options, 'display_type': 'select'}
+            field_type = 'single_choice'
+        else:
+            self.importer.print_error('Unrecognized field type {}'.format(field_type), event_id=self.event.id)
+            return
+        field = ContributionField(event_new=self.event, field_type=field_type, is_active=old_field._active,
+                                  title=convert_to_unicode(old_field._caption), is_required=old_field._isMandatory,
+                                  field_data=field_data, position=position)
+        self.legacy_contribution_field_map[old_field._id] = field
+        if not self.importer.quiet:
+            self.importer.print_info(cformat('%{green}Contribution field%{reset} {}').format(field.title))
 
     def _migrate_contributions(self):
         contribs = []
@@ -318,7 +353,9 @@ class TimetableMigration(object):
         contrib.acl_entries = set(principals.itervalues())
         # speakers, authors and co-authors
         contrib.person_links = list(self._migrate_contribution_persons(old_contrib))
+        # references ("report numbers")
         contrib.references = list(self._process_references(ContributionReference, old_contrib))
+        # contribution/abstract fields
         contrib.field_values = list(self._migrate_contribution_field_values(old_contrib))
         contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
                                     for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
@@ -328,60 +365,33 @@ class TimetableMigration(object):
     def _migrate_contribution_field_values(self, old_contrib):
         fields = dict(old_contrib._fields)
         fields.pop('content', None)
-        for field_content in fields.itervalues():
-            new_field = self.legacy_contribution_field_map.get(field_content.field)
-            if not new_field:
+        for field_id, field_content in fields.iteritems():
+            value = convert_to_unicode(getattr(field_content, 'value', field_content))
+            if not value:
                 continue
-            new_value = self._process_contribution_field_value(field_content, new_field)
+            try:
+                new_field = self.legacy_contribution_field_map[field_id]
+            except KeyError:
+                self.importer.print_warning(cformat('%{yellow!}Contribution field "{}" does not exist')
+                                            .format(field_id),
+                                            event_id=self.event.id)
+                continue
+            new_value = self._process_contribution_field_value(field_id, value, new_field)
             if new_value:
+                if not self.importer.quiet:
+                    self.importer.print_info(cformat('%{green} - [field]%{reset} {}: {}').format(new_field.title,
+                                                                                                 new_value.data))
                 yield new_value
 
-    def _migrate_contribution_field(self, old_field):
-        if old_field._id == 'content' or self.legacy_contribution_field_map.get(old_field):
-            return
-        field_type = old_field.__class__.__name__
-        if field_type in ('AbstractTextAreaField', 'AbstractInputField'):
-            field_data = {
-                'max_length': int(old_field._maxLength) if old_field._limitation == 'chars' else None,
-                'max_words': int(old_field._maxLength) if old_field._limitation == 'words' else None,
-                'multiline': field_type == 'AbstractTextAreaField'
-            }
-            field_type = 'text'
-        elif field_type == 'AbstractSelectionField':
-            options = []
-            for opt in old_field._options:
-                uuid = unicode(uuid4())
-                self.legacy_field_option_id_map[old_field, int(opt.id)] = uuid
-                options.append({'option': convert_to_unicode(opt.value), 'id': uuid, 'is_deleted': False})
-            for deleted_opt in old_field._deleted_options:
-                uuid = unicode(uuid4())
-                self.legacy_field_option_id_map[old_field, int(opt.id)] = uuid
-                options.append({'option': convert_to_unicode(opt.value), 'id': uuid, 'is_deleted': True})
-            field_data = {'options': options, 'display_type': 'select'}
-            field_type = 'single_choice'
-        else:
-            self.importer.print_error('Unrecognized field type {}'.format(field_type), event_id=self.event.id)
-            return
-        field = ContributionField(event_new=self.event, field_type=field_type, is_active=old_field._active,
-                                  title=convert_to_unicode(old_field._caption), is_required=old_field._isMandatory,
-                                  field_data=field_data)
-        self.legacy_contribution_field_map[old_field] = field
-        if not self.importer.quiet:
-            self.importer.print_info(cformat('%{magenta} - [contribution_field]: {}').format(field.title))
-
-    def _process_contribution_field_value(self, old_data, new_field):
-        if not old_data.value:
-            return
-        field_type = old_data.field.__class__.__name__
-        if field_type in ('AbstractTextAreaField', 'AbstractInputField'):
-            data = convert_to_unicode(old_data.value)
+    def _process_contribution_field_value(self, old_field_id, old_value, new_field):
+        if new_field.field_type == 'text':
+            data = convert_to_unicode(old_value)
             return ContributionFieldValue(contribution_field=new_field, data=data)
-        elif field_type == 'AbstractSelectionField':
-            data = self.legacy_field_option_id_map[old_data.field, int(old_data.value)]
+        elif new_field.field_type == 'single_choice':
+            data = self.legacy_field_option_id_map[old_field_id, int(old_value)]
             return ContributionFieldValue(contribution_field=new_field, data=data)
         else:
-            self.importer.print_error('Unrecognized field type {}. Value not imported.'.format(field_type),
-                                      event_id=self.event.id)
+            raise ValueError('Unexpected field type: {}'.format(new_field.field_type))
 
     def _migrate_subcontribution(self, old_subcontrib, position):
         subcontrib = SubContribution(position=position, friendly_id=position, duration=old_subcontrib.duration,
@@ -424,7 +434,7 @@ class TimetableMigration(object):
             link = person_link_map.get(person)
             if link:
                 if link.author_type == AuthorType.primary:
-                    self.importer.print_warning(cformat('%{yellow}!Primary author "{}" is also co-author')
+                    self.importer.print_warning(cformat('%{yellow!}Primary author "{}" is also co-author')
                                                 .format(person.full_name), event_id=self.event.id)
                 else:
                     link.author_type = AuthorType.secondary
@@ -507,6 +517,8 @@ class TimetableMigration(object):
         self.legacy_person_map[map_key] = person
 
     def _migrate_timetable(self):
+        if not self.importer.quiet:
+            self.importer.print_info(cformat('%{green}Timetable...'))
         self._migrate_timetable_entries(self.old_event._Conference__schedule._entries)
 
     def _migrate_timetable_entries(self, old_entries, session_block=None):
