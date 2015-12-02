@@ -114,6 +114,16 @@ class IndicoModel(Model):
             id_ = db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table_name, col_name))).one()[0]
         setattr(self, attr_name, id_)
 
+    def populate_from_dict(self, data):
+        """Populates the object with values in a dictionary
+
+        :param data: a dict containing values to populate the object.
+        """
+        for key, value in data.iteritems():
+            if not hasattr(self, key):
+                raise ValueError("{} has no attribute '{}'".format(type(self).__name__, key))
+            setattr(self, key, value)
+
     def __committed__(self, change):
         """Called after a commit for this object.
 
