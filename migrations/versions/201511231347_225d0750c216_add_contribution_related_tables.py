@@ -75,6 +75,8 @@ def upgrade():
                            name='no_custom_location_if_room'),
         sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND room_name = '' AND "
                            "address = '')", name='inherited_location'),
+        sa.CheckConstraint("(text_color = '') = (background_color = '')", name='both_or_no_colors'),
+        sa.CheckConstraint("text_color != '' AND background_color != ''", name='colors_not_empty'),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
         sa.PrimaryKeyConstraint('id'),
