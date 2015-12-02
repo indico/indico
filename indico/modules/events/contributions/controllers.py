@@ -38,17 +38,13 @@ def _get_contribution_list_args(event):
 
 def _render_contribution_list(event):
     tpl = get_template_module('events/contributions/management/_contribution_list.html')
-    return tpl.render_contribution_list(**_get_contribution_list_args(event.as_event))
+    return tpl.render_contribution_list(**_get_contribution_list_args(event))
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
     """Base class for all contributions management RHs"""
 
     CSRF_ENABLED = True
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event = self._conf
 
 
 class RHManageContributionBase(RHManageContributionsBase):
@@ -69,17 +65,17 @@ class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        return WPManageContributions.render_template('management/contributions.html', self.event, event=self.event,
-                                                     **_get_contribution_list_args(self.event.as_event))
+        return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
+                                                     **_get_contribution_list_args(self.event_new))
 
 
 class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
         form = ContributionForm()
         if form.validate_on_submit():
-            contrib = create_contribution(self.event.as_event, form.data)
+            contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
-            return jsonify_data(html=_render_contribution_list(self.event))
+            return jsonify_data(html=_render_contribution_list(self.event_new))
         return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
 
 
@@ -89,7 +85,7 @@ class RHEditContribution(RHManageContributionBase):
         if form.validate_on_submit():
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib), 'success')
-            return jsonify_data(html=_render_contribution_list(self.event))
+            return jsonify_data(html=_render_contribution_list(self.event_new))
         return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
 
 
@@ -97,4 +93,4 @@ class RHDeleteContribution(RHManageContributionBase):
     def _process(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib), 'success')
-        return jsonify_data(html=_render_contribution_list(self.event))
+        return jsonify_data(html=_render_contribution_list(self.event_new))
