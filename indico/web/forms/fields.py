@@ -28,6 +28,7 @@ from wtforms.widgets.core import CheckboxInput, Select
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
+from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.users import User
@@ -540,3 +541,27 @@ class IndicoStaticTextField(Field):
 
     def _value(self):
         return self.text_value
+
+
+class IndicoColorSwitchField(JSONField):
+    """Field allowing user to pick a color from a set of predefined values"""
+
+    widget = JinjaWidget('forms/colorswitch_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.color_list = kwargs.pop('color_list')
+        super(IndicoColorSwitchField, self).__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        if self.data not in self.color_list:
+            raise ValueError(_('Invalid colors selected'))
+
+    def process_formdata(self, valuelist):
+        super(IndicoColorSwitchField, self).process_formdata(valuelist)
+        self.data = ColorTuple(self.data['text'], self.data['background'])
+
+    def populate_obj(self, obj, name):
+        setattr(obj, name, self.data)
+
+    def _value(self):
+        return self.data._asdict()
