@@ -1,0 +1,28 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    {% set colors = field._value() %}
+    <div class="group">
+        <span id="{{ field.id }}-color-switch" class="color-switch">
+            <a class="i-button icon-expand switch-trigger"
+               style="background: #{{ colors.background }};
+                      color: #{{ colors.text }} !important">
+                {%- trans %}Choose a color{% endtrans -%}
+            </a>
+        </span>
+        <input id="{{ field.id }}" type="hidden" name="{{ field.name }}"
+               value="{{ colors | tojson | forceescape}}">
+    </div>
+{% endblock %}
+
+{% block javascript -%}
+    <script>
+        $('#{{ field.id }}-color-switch').colorswitch({
+            defaultColors: {{ field.color_list | tojson }},
+            onSelect: function(background, text) {
+                var colorsValue = JSON.stringify({background: background, text: text});
+                $('#{{ field.id }}').val(colorsValue).trigger('change');
+            }
+        });
+    </script>
+{%- endblock %}

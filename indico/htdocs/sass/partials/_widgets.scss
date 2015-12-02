@@ -157,3 +157,21 @@ i.info-helper {
         display: table;
     }
 }
+
+.color-switch {
+    td {
+        .text-box {
+            width: 8px;
+            height: 8px;
+            margin: auto;
+        }
+
+        &.palette-color {
+            cursor: pointer;
+        }
+
+        .background-box {
+            text-align: center;
+        }
+    }
+}
