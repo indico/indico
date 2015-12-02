@@ -47,6 +47,15 @@ class LegacySessionMapping(db.Model):
         nullable=False
     )
 
+    event_new = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'legacy_session_mappings',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
     session = db.relationship(
         'Session',
         lazy=False,
