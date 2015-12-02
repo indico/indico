@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request, session
+from flask import flash, request
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
@@ -29,10 +29,16 @@ from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
+def _get_contribution_list_args(event):
+    contribs = event.contributions.filter_by(is_deleted=False).order_by(Contribution.id).all()
+    sessions = event.sessions.filter_by(is_deleted=False).all()
+    tracks = event.as_legacy.getTrackList()
+    return {'contribs': contribs, 'sessions': sessions, 'tracks': tracks}
+
+
 def _render_contribution_list(event):
-    contribs = Contribution.find_all(event_id=event.id, is_deleted=False)
     tpl = get_template_module('events/contributions/management/_contribution_list.html')
-    return tpl.render_contribution_list(contribs=contribs)
+    return tpl.render_contribution_list(**_get_contribution_list_args(event.as_event))
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -49,9 +55,8 @@ class RHManageContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        contribs = Contribution.find_all(event_id=self.event.id, is_deleted=False)
         return WPManageContributions.render_template('management/contributions.html', self.event, event=self.event,
-                                                     contribs=contribs)
+                                                     **_get_contribution_list_args(self.event.as_event))
 
 
 class RHManageContributionBase(RHManageContributionsBase):
