@@ -439,6 +439,7 @@ users_sass = sass_module_bundle('users')
 auth_sass = sass_module_bundle('auth')
 surveys_sass = sass_module_bundle('surveys')
 timetable_sass = sass_module_bundle('timetable')
+sessions_sass = sass_module_bundle('sessions')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -527,6 +528,7 @@ def register_all_css(env, main_css_file):
     env.register('payment_sass', payment_sass)
     env.register('surveys_sass', surveys_sass)
     env.register('timetable_sass', timetable_sass)
+    env.register('sessions_sass', sessions_sass)
 
 
 core_env = IndicoEnvironment()
