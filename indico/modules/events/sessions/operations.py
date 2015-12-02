@@ -16,12 +16,18 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.sessions.controllers.management.sessions import RHSessionsList, RHCreateSession
-from indico.web.flask.wrappers import IndicoBlueprint
+from flask import session
+
+from indico.core.db import db
+from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 
 
-_bp = IndicoBlueprint('sessions', __name__, template_folder='templates', virtual_template_folder='events/sessions',
-                      url_prefix='/event/<confId>')
-
-_bp.add_url_rule('/manage/sessions/', 'session_list', RHSessionsList)
-_bp.add_url_rule('/manage/sessions/create', 'create_session', RHCreateSession, methods=('GET', 'POST'))
+def create_session(event, data=None):
+    """Create a new session with the information passed in the `data` argument"""
+    event_session = Session(event_new=event)
+    event_session.populate_from_dict(data or {})
+    db.session.flush()
+    event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+              'Session "{}" has been created'.format(event_session.title), session.user)
+    return event_session
