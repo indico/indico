@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
@@ -27,5 +29,6 @@ from indico.util.i18n import _
 class ContributionForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    duration = TimeDeltaField(_("Duration"), [DataRequired()], units=('minutes', 'hours'),
+    duration = TimeDeltaField(_("Duration"), [DataRequired()], default=timedelta(minutes=20),
+                              units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))

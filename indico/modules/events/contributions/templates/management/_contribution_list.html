@@ -1,18 +1,113 @@
-{% macro render_contribution_list(contribs) %}
-    {% for contrib in contribs %}
-        <div>
-        {{ contrib }}
-        <a href="#" data-ajax-dialog
-           data-title="{% trans title=contrib.title %}Edit contribution {{ title }}{% endtrans %}"
-           data-update="#contribution-list"
-           data-method="GET"
-           data-href="{{ url_for('.manage_update_contrib', contrib) }}">edit</a>
-        <a href="#"
-           data-title="{% trans title=contrib.title %}Delete contribution {{ title }}?{% endtrans %}"
-           data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
-           data-update="#contribution-list"
-           data-method="DELETE"
-           data-href="{{ url_for('.manage_delete_contrib', contrib) }}">delete</a>
-        </div>
-    {% endfor %}
+{% from 'message_box.html' import message_box %}
+
+{% macro render_contribution_list(contribs, sessions, tracks) %}
+    {% if not contribs %}
+        {%- call message_box('info') -%}
+            {% trans %}There are no contributions yet.{% endtrans %}
+        {%- endcall %}
+    {% else %}
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            <table class="i-table tablesorter">
+                <thead>
+                    <tr class="i-table">
+                        <th class="i-table checkbox-column"></th>
+                        <th class="i-table id-column">
+                            {% trans %}ID{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Title{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Schedule{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Duration{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}People{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Type{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Session{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Track{% endtrans %}
+                        </th>
+                        <th>
+                            {# Actions #}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrib in contribs %}
+                        <tr id="contrib-{{ contrib.id }}" class="i-table">
+                            <td class="i-table">
+                                <input type="checkbox" class="select-row" name="contrib_id" value="{{ contrib.id }}">
+                            </td>
+                            <td class="i-table">
+                                <strong>
+                                    #{{ contrib.friendly_id }}
+                                </strong>
+                            </td>
+                            <td class="i-table">
+                                <strong>
+                                    {{ contrib.title }}
+                                </strong>
+                            </td>
+                            <td class="i-table">
+                                {# schedule #}
+                                TODO
+                            </td>
+                            <td class="i-table">
+                                {{ contrib.duration|format_timedelta(format='medium') }}
+                            </td>
+                            <td class="i-table">
+                                {# people #}
+                                TODO
+                            </td>
+                            <td class="i-table">
+                                {% if not contrib.type %}
+                                    {% trans %}n/a{% endtrans %}
+                                {% endif %}
+                            </td>
+                            <td class="i-table">
+                                <select>
+                                    <option>--No session--</option>
+                                    {% for section in sections %}
+                                        <option>{{ section.name }}</option>
+                                    {% endfor %}
+                                    <option>Add to new session...</option>
+                                </select>
+                            </td>
+                            <td class="i-table">
+                                <select>
+                                    <option>--No track--</option>
+                                    {% for track in tracks %}
+                                        <option>{{ track.getTitle() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="i-table" style="text-align: right;">
+                                <a href="#" class="icon-edit"
+                                   data-ajax-dialog data-method="GET"
+                                   data-href="{{ url_for('.manage_update_contrib', contrib) }}"
+                                   data-title="{% trans title=contrib.title %}Edit contribution {{ title }}{% endtrans %}"
+                                   data-update="#contribution-list">
+                                </a>
+                                <a href="#" class="icon-remove"
+                                   data-title="{% trans title=contrib.title %}Delete contribution {{ title }}?{% endtrans %}"
+                                   data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
+                                   data-update="#contribution-list"
+                                   data-method="DELETE"
+                                   data-href="{{ url_for('.manage_delete_contrib', contrib) }}"></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    {% endif %}
 {% endmacro %}
