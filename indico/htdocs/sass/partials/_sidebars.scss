@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/animation';
+
 .sideBar {
     float: right;
     width: 340px;
@@ -72,8 +74,7 @@
             cursor: pointer;
 
             &:before {
-                @include transition(transform 0.3s ease-out);
-                -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                @include rotate-transform(0.3s);
                 display: inline-block;
             }
         }
