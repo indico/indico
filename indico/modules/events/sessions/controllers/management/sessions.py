@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 import random
 
-from indico.modules.events.sessions.controllers.management import RHManageSessionsBase
+from indico.modules.events.sessions.controllers.management import RHManageSessionsBase, RHManageSessionBase
 from indico.modules.events.sessions.forms import SessionForm
-from indico.modules.events.sessions.operations import create_session
+from indico.modules.events.sessions.operations import create_session, update_session
 from indico.modules.events.sessions.util import get_colors, get_active_sessions
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.web.flask.templating import get_template_module
@@ -54,5 +54,16 @@ class RHCreateSession(RHManageSessionsBase):
         form = SessionForm(obj=FormDefaults(colors=self._get_random_color()))
         if form.validate_on_submit():
             create_session(self.event_new, form.data)
+            return jsonify_data(session_list=_render_session_list(self.event_new))
+        return jsonify_template('events/sessions/management/add_session.html', form=form)
+
+
+class RHModifySession(RHManageSessionBase):
+    """Modify a session"""
+
+    def _process(self):
+        form = SessionForm(obj=self.session)
+        if form.validate_on_submit():
+            update_session(self.session, form.data)
             return jsonify_data(session_list=_render_session_list(self.event_new))
         return jsonify_template('events/sessions/management/add_session.html', form=form)
