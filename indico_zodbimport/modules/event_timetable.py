@@ -29,6 +29,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.legacy_mapping import LegacyContributionMapping
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
@@ -38,6 +39,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.legacy_mapping import LegacySessionMapping
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
@@ -218,6 +220,7 @@ class TimetableMigration(object):
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
         self.legacy_session_map[old_session] = session
+        session.legacy_mapping = LegacySessionMapping(event_new=self.event, legacy_session_id=old_session.id)
         # colors
         try:
             session.colors = ColorTuple(old_session._textColor, old_session._color)
@@ -273,6 +276,7 @@ class TimetableMigration(object):
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
         self.legacy_contribution_map[old_contrib] = contrib
+        contrib.legacy_mapping = LegacyContributionMapping(event_new=self.event, legacy_contribution_id=old_contrib.id)
         principals = {}
         # managers / read access
         self._process_ac(ContributionPrincipal, principals, ac)
