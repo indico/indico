@@ -53,7 +53,7 @@
                                 <a class="icon-edit highlight edit-session action-icon"
                                    title="{% trans %}Edit this session{% endtrans %}"
                                    data-title="{% trans title=session.title %}Edit session {{ title }}{% endtrans %}"
-                                   data-href="#"></a>
+                                   data-href="{{ url_for('.modify_session', session) }}"></a>
                                 <a class="icon-users highlight session-persons-list"
                                    data-title="{% trans title=session.title %}List of session persons{% endtrans %}"
                                    data-href="#"></a>
