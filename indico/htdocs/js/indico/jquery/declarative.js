@@ -39,15 +39,13 @@
     function setupConfirmPopup() {
         $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href])', function() {
             var $this = $(this);
-            new ConfirmPopup($(this).data('title'), $(this).data('confirm'), function(confirmed) {
-                if (confirmed){
-                    if ($this.is('form')) {
-                        $this.submit();
-                    } else {
-                        window.location = $this.attr('href');
-                    }
+            confirmPrompt($(this).data('confirm'), $(this).data('title')).then(function() {
+                if ($this.is('form')) {
+                    $this.submit();
+                } else {
+                    window.location = $this.attr('href');
                 }
-            }).open();
+            });
             return false;
         });
     }
