@@ -43,6 +43,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.legacy_mapping import LegacySessionMapping
+from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
@@ -80,10 +81,10 @@ class TimetableMigration(object):
         self.importer = importer
         self.old_event = old_event
         self.event = event
+        self.legacy_person_map = {}
         self.legacy_session_map = {}
         self.legacy_contribution_map = {}
         self.legacy_contribution_type_map = {}
-        self.legacy_contribution_person_map = {}
         self.legacy_contribution_field_map = {}
 
     def __repr__(self):
@@ -391,7 +392,9 @@ class TimetableMigration(object):
     def _migrate_contribution_persons(self, old_entry):
         person_link_map = {}
         for speaker in getattr(old_entry, '_speakers', []):
-            person = self._migrate_contribution_person(speaker)
+            person = self._migrate_person(speaker)
+            if not person:
+                continue
             link = person_link_map.get(person)
             if link:
                 link.is_speaker = True
@@ -400,7 +403,9 @@ class TimetableMigration(object):
                 person_link_map[person] = link
                 yield link
         for author in getattr(old_entry, '_primaryAuthors', []):
-            person = self._migrate_contribution_person(author)
+            person = self._migrate_person(author)
+            if not person:
+                continue
             link = person_link_map.get(person)
             if link:
                 link.author_type = AuthorType.primary
@@ -409,7 +414,9 @@ class TimetableMigration(object):
                 person_link_map[person] = link
                 yield link
         for coauthor in getattr(old_entry, '_coAuthors', []):
-            person = self._migrate_contribution_person(coauthor)
+            person = self._migrate_person(coauthor)
+            if not person:
+                continue
             link = person_link_map.get(person)
             if link:
                 if link.author_type == AuthorType.primary:
@@ -425,13 +432,13 @@ class TimetableMigration(object):
     def _migrate_subcontribution_persons(self, old_entry):
         person_link_map = {}
         for speaker in getattr(old_entry, 'speakers', []):
-            person = self._migrate_contribution_person(speaker)
+            person = self._migrate_person(speaker)
             if not person:
                 continue
             link = person_link_map.get(person)
             if link:
                 self.importer.print_warning(
-                    cformat('%{yellow!}Duplicated speaker {} for sub-contribution').format(person.full_name),
+                    cformat('%{yellow!}Duplicated speaker "{}" for sub-contribution').format(person.full_name),
                     event_id=self.event.id
                 )
             else:
@@ -439,16 +446,33 @@ class TimetableMigration(object):
                 person_link_map[person] = link
                 yield link
 
-    def _migrate_contribution_person(self, old_person):
+    def _migrate_session_block_persons(self, old_entry):
+        person_link_map = {}
+        for convener in getattr(old_entry, '_conveners', []):
+            person = self._migrate_person(convener)
+            if not person:
+                continue
+            link = person_link_map.get(person)
+            if link:
+                self.importer.print_warning(
+                    cformat('%{yellow!}Duplicated session block convener "{}"').format(person.full_name),
+                    event_id=self.event.id
+                )
+            else:
+                link = SessionBlockPersonLink(person=person)
+                person_link_map[person] = link
+                yield link
+
+    def _migrate_person(self, old_person):
         first_name = convert_to_unicode(getattr(old_person, '_firstName', ''))
         last_name = convert_to_unicode(getattr(old_person, '_surName', ''))
-        email = getattr(old_person, '_email', '')
+        email = convert_to_unicode(getattr(old_person, '_email', ''))
         affiliation = convert_to_unicode(getattr(old_person, '_affiliation', ''))
         if not first_name and not last_name and (email or affiliation):
             self.importer.print_warning(cformat('%{yellow!}Skipping nameless event person'), event_id=self.event.id)
             return
         key = (first_name, last_name, email, affiliation)
-        existing_person = self.legacy_contribution_person_map.get(key)
+        existing_person = self.legacy_person_map.get(key)
         if existing_person:
             self._build_person(old_person, existing_person, key)
             return existing_person
@@ -476,7 +500,7 @@ class TimetableMigration(object):
             else:
                 self.importer.print_warning(cformat('%{yellow!}Skipping invalid email {}').format(email),
                                             event_id=self.event.id)
-        self.legacy_contribution_person_map[map_key] = person
+        self.legacy_person_map[map_key] = person
 
     def _migrate_timetable(self):
         self._migrate_timetable_entries(self.old_event._Conference__schedule._entries)
@@ -540,6 +564,7 @@ class TimetableMigration(object):
                                      duration=old_block.duration)
         session_block.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_block.startDate)
         self._migrate_location(old_block, session_block)
+        session_block.person_links = list(self._migrate_session_block_persons(old_block))
         self._migrate_timetable_entries(old_block._schedule._entries, session_block)
 
     def _migrate_location(self, old_entry, new_entry):
