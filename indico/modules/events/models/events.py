@@ -174,6 +174,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     # - agreements (Agreement.event_new)
     # - attachment_folders (AttachmentFolder.event_new)
     # - contribution_fields (ContributionField.event_new)
+    # - contribution_types (ContributionType.event_new)
     # - contributions (Contribution.event_new)
     # - custom_pages (EventPage.event_new)
     # - layout_images (ImageFile.event_new)
