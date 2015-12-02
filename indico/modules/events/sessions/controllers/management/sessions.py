@@ -18,7 +18,9 @@ from __future__ import unicode_literals
 
 import random
 from flask import request
+from werkzeug.exceptions import BadRequest
 
+from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.sessions.controllers.management import RHManageSessionsBase, RHManageSessionBase
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.sessions import Session
@@ -63,12 +65,24 @@ class RHCreateSession(RHManageSessionsBase):
 class RHModifySession(RHManageSessionBase):
     """Modify a session"""
 
-    def _process(self):
+    def _process_GET(self):
+        return jsonify_template('events/sessions/management/add_session.html', form=SessionForm(obj=self.session))
+
+    def _process_POST(self):
         form = SessionForm(obj=self.session)
         if form.validate_on_submit():
             update_session(self.session, form.data)
             return jsonify_data(session_list=_render_session_list(self.event_new))
-        return jsonify_template('events/sessions/management/add_session.html', form=form)
+
+    def _process_PATCH(self):
+        data = request.json
+        if 'colors' in data:
+            colors = ColorTuple(**data['colors'])
+            if colors not in get_colors():
+                raise BadRequest
+            data['colors'] = colors
+        update_session(self.session, data)
+        return jsonify_data()
 
 
 class RHDeleteSessions(RHManageSessionsBase):
