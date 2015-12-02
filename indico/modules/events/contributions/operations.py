@@ -24,8 +24,7 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 
 def create_contribution(event, data):
     contrib = Contribution(event_new=event)
-    for key, value in data.iteritems():
-        setattr(contrib, key, value)
+    contrib.populate_from_dict(data)
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
               'Contribution "{}" has been created'.format(contrib.title), session.user)
@@ -33,8 +32,7 @@ def create_contribution(event, data):
 
 
 def update_contribution(contrib, data):
-    for key, value in data.iteritems():
-        setattr(contrib, key, value)
+    contrib.populate_from_dict(data)
     db.session.flush()
     contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                           'Contribution "{}" has been updated'.format(contrib.title), session.user)
