@@ -39,3 +39,24 @@ def update_session(event_session, data):
     db.session.flush()
     event_session.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                                 'Session "{}" has been updated'.format(event_session.title), session.user)
+
+
+def _delete_session_timetable_entries(event_session):
+    for block in event_session.blocks:
+        for contribution in block.contributions:
+            if contribution.timetable_entry:
+                db.session.delete(contribution.timetable_entry)
+        if not block.timetable_entry:
+            continue
+        for child_block in block.timetable_entry.children:
+            db.session.delete(child_block)
+        db.session.delete(block.timetable_entry)
+
+
+def delete_session(event_session):
+    """Delete session from the event"""
+    event_session.is_deleted = True
+    for contribution in event_session.contributions:
+        contribution.session_block = None
+        contribution.session = None
+    _delete_session_timetable_entries(event_session)
