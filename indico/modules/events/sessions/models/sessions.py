@@ -27,6 +27,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 
 from indico.core.db import db
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
@@ -132,6 +133,10 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     @property
     def protection_parent(self):
         return self.event_new
+
+    @locator_property
+    def locator(self):
+        return dict(self.event_new.locator, session_id=self.id)
 
     @return_ascii
     def __repr__(self):
