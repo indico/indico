@@ -80,3 +80,17 @@ class RHDeleteSessions(RHManageSessionsBase):
         for sess in sessions:
             delete_session(sess)
         return jsonify_data(session_list=_render_session_list(self.event_new))
+
+
+class RHExportSessionsCSV(RHManageSessionsBase):
+    """Export list of sessions to a CSV"""
+
+    def _process(self):
+        pass
+
+
+class RHExportSessionsPDF(RHManageSessionsBase):
+    """Export list of sessions to a PDF"""
+
+    def _process(self):
+        pass
