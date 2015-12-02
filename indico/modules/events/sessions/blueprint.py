@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.sessions.controllers.management.sessions import (RHSessionsList, RHCreateSession,
-                                                                            RHModifySession)
+                                                                            RHModifySession, RHDeleteSessions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -26,5 +26,6 @@ _bp = IndicoBlueprint('sessions', __name__, template_folder='templates', virtual
 
 _bp.add_url_rule('/manage/sessions/', 'session_list', RHSessionsList)
 _bp.add_url_rule('/manage/sessions/create', 'create_session', RHCreateSession, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/sessions/delete', 'delete_sessions', RHDeleteSessions, methods=('DELETE',))
 _bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', RHModifySession,
                  methods=('GET', 'POST'))
