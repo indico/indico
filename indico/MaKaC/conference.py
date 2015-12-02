@@ -6543,8 +6543,9 @@ class Contribution(CommonObjectBase, Locatable):
             for f in afm.getFields():
                 id = f.getId()
                 field = self.getField(id)
-                if field.value:
-                    data['Abstract field {}'.format(field.field._caption)] = field.value
+                field_value = str(field.value)
+                if field_value:
+                    data['Abstract field {}'.format(field.field._caption)] = field_value
         data["start date"] = format_datetime(self.startDate, locale='en_GB', timezone=self.getConference().timezone)
         data["duration"] = format_human_timedelta(self.duration)
         if self._track is not None:
