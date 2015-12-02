@@ -52,6 +52,15 @@
             });
         });
 
+        $('.sessions').on('click', '.edit-session', function() {
+            var $this = $(this);
+            ajaxDialog({
+                url: $this.data('href'),
+                title: $this.data('title'),
+                onClose: updateSessionsListOnSuccess
+            });
+        });
+
         $('.sessions').on('click', '.js-show-sessions', function() {
             $(this).closest('tr').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
