@@ -50,7 +50,9 @@
                     'value': '#' + defaultColors[i].text
                 }));
 
-                td.on('click', function() {
+                td.on('click', function(evt) {
+                    evt.preventDefault();
+
                     var $this = $(this),
                         backgroundColor = $this.find('.background-box').val(),
                         textColor = $this.find('.text-box').val();
