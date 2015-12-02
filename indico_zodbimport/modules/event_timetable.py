@@ -86,6 +86,7 @@ class TimetableMigration(object):
         self.legacy_contribution_map = {}
         self.legacy_contribution_type_map = {}
         self.legacy_contribution_field_map = {}
+        self.legacy_field_option_id_map = {}
 
     def __repr__(self):
         return '<TimetableMigration({})>'.format(self.event)
@@ -95,6 +96,7 @@ class TimetableMigration(object):
         self.event.references = list(self._process_references(EventReference, self.old_event))
         self._migrate_contribution_types()
         self._migrate_sessions()
+        self._migrate_contribution_fields()
         self._migrate_contributions()
         self._migrate_timetable()
 
@@ -254,6 +256,11 @@ class TimetableMigration(object):
         session.acl_entries = set(principals.itervalues())
         return session
 
+    def _migrate_contribution_fields(self):
+        fields = self.old_event.abstractMgr._abstractFieldsMgr._fields
+        for field in fields:
+            self._migrate_contribution_field(field)
+
     def _migrate_contributions(self):
         contribs = []
         friendly_id_map = {}
@@ -312,28 +319,26 @@ class TimetableMigration(object):
         # speakers, authors and co-authors
         contrib.person_links = list(self._migrate_contribution_persons(old_contrib))
         contrib.references = list(self._process_references(ContributionReference, old_contrib))
-        contrib.field_values = list(self._migrate_contribution_fields(old_contrib))
+        contrib.field_values = list(self._migrate_contribution_field_values(old_contrib))
         contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
                                     for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
         contrib._last_friendly_subcontribution_id = len(contrib.subcontributions)
         return contrib
 
-    def _migrate_contribution_fields(self, old_contrib):
+    def _migrate_contribution_field_values(self, old_contrib):
         fields = dict(old_contrib._fields)
         fields.pop('content', None)
         for field_content in fields.itervalues():
-            legacy_field_option_id_map = {}
-            new_field = self._process_contribution_field(field_content.field, legacy_field_option_id_map)
+            new_field = self.legacy_contribution_field_map.get(field_content.field)
             if not new_field:
                 continue
-            new_value = self._process_contribution_field_value(field_content, new_field, legacy_field_option_id_map)
+            new_value = self._process_contribution_field_value(field_content, new_field)
             if new_value:
                 yield new_value
 
-    def _process_contribution_field(self, old_field, legacy_field_option_id_map):
-        field = self.legacy_contribution_field_map.get(old_field)
-        if field:
-            return field
+    def _migrate_contribution_field(self, old_field):
+        if old_field._id == 'content' or self.legacy_contribution_field_map.get(old_field):
+            return
         field_type = old_field.__class__.__name__
         if field_type in ('AbstractTextAreaField', 'AbstractInputField'):
             field_data = {
@@ -346,26 +351,25 @@ class TimetableMigration(object):
             options = []
             for opt in old_field._options:
                 uuid = unicode(uuid4())
-                legacy_field_option_id_map[opt.id] = uuid
+                self.legacy_field_option_id_map[old_field, int(opt.id)] = uuid
                 options.append({'option': convert_to_unicode(opt.value), 'id': uuid, 'is_deleted': False})
             for deleted_opt in old_field._deleted_options:
                 uuid = unicode(uuid4())
-                legacy_field_option_id_map[opt.id] = uuid
+                self.legacy_field_option_id_map[old_field, int(opt.id)] = uuid
                 options.append({'option': convert_to_unicode(opt.value), 'id': uuid, 'is_deleted': True})
             field_data = {'options': options, 'display_type': 'select'}
             field_type = 'single_choice'
         else:
             self.importer.print_error('Unrecognized field type {}'.format(field_type), event_id=self.event.id)
-            return None
+            return
         field = ContributionField(event_new=self.event, field_type=field_type, is_active=old_field._active,
                                   title=convert_to_unicode(old_field._caption), is_required=old_field._isMandatory,
                                   field_data=field_data)
         self.legacy_contribution_field_map[old_field] = field
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{magenta} - [contribution_field]: {}').format(field.title))
-        return field
 
-    def _process_contribution_field_value(self, old_data, new_field, legacy_field_option_id_map):
+    def _process_contribution_field_value(self, old_data, new_field):
         if not old_data.value:
             return
         field_type = old_data.field.__class__.__name__
@@ -373,7 +377,7 @@ class TimetableMigration(object):
             data = convert_to_unicode(old_data.value)
             return ContributionFieldValue(contribution_field=new_field, data=data)
         elif field_type == 'AbstractSelectionField':
-            data = legacy_field_option_id_map[old_data.value]
+            data = self.legacy_field_option_id_map[old_data.field, int(old_data.value)]
             return ContributionFieldValue(contribution_field=new_field, data=data)
         else:
             self.importer.print_error('Unrecognized field type {}. Value not imported.'.format(field_type),
