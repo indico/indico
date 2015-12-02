@@ -16,6 +16,7 @@
  */
 
 @import 'base';
+@import 'base/animation';
 @import 'compass';
 @import 'compass/css3/user-interface';
 @import 'compass/support';
@@ -1099,9 +1100,7 @@ textarea.regFormDescriptionInputMgmt {
 
                         border-bottom: 0;
                         &:before {
-                            @include transition(transform 0.15s ease-out);
-
-                            -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                            @include rotate-transform(0.15s);
                         }
                     }
                     &.collapsed td:first-child:before { @include rotate(-90deg); }
@@ -1323,8 +1322,7 @@ textarea.regFormDescriptionInputMgmt {
             }
 
             &:before {
-                @include transition(transform 0.3s ease-out);
-                -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                @include rotate-transform(0.3s);
                 display: inline-block;
             }
 
