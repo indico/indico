@@ -1,0 +1,72 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.color-palette {
+    background: #FFF;
+    background-clip: padding-box;
+    border: thin solid lighten($gray, 10%);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px lighten($gray, 5%);
+    display: none;
+    margin-top: 0.5em;
+    padding: 3px;
+    position: absolute;
+    z-index: 200;
+
+    table {
+        border-spacing: 8px;
+
+        td {
+            .text-box {
+                width: 8px;
+                height: 8px;
+                margin: auto;
+                border-radius: 3px;
+            }
+
+            &.palette-color {
+                cursor: pointer;
+                width: 20px;
+                height: 20px;
+                border-radius: 15px;
+            }
+
+            .background-box {
+                text-align: center;
+            }
+        }
+    }
+
+    &:before {
+        transform: rotate(45deg);
+        content: '';
+        top: -0.2rem;
+        position: absolute;
+        width: .6em;
+        height: .6em;
+        box-shadow: -1px -1px 0 1px lighten($gray, 15%);
+        background: #FFF;
+        visibility: visible;
+        margin: 0 0 0 1em;
+    }
+}
+
+a.switch-trigger.icon-palette {
+    &:before {
+        margin-right: 0 !important;
+    }
+}
