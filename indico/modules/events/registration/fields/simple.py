@@ -222,7 +222,7 @@ class CountryField(RegistrationFormFieldBase):
         return dict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data):
-        return CountryHolder.getCountries()[registration_data.data] if registration_data.data else ''
+        return CountryHolder.getCountryById(registration_data.data) if registration_data.data else ''
 
 
 class _DeletableFileField(wtforms.FileField):
