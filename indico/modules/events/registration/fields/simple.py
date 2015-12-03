@@ -111,6 +111,10 @@ class CheckboxField(RegistrationFormBillableField):
                     raise ValidationError(_('There are no places left for this option.'))
         return [_check_number_of_places]
 
+    @property
+    def default_value(self):
+        return None
+
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
@@ -169,6 +173,10 @@ class BooleanField(RegistrationFormBillableField):
                 if field.data and not places_left:
                     raise ValidationError(_('There are no places left for this option.'))
         return [_check_number_of_places]
+
+    @property
+    def default_value(self):
+        return None
 
     def get_places_used(self):
         places_used = 0
