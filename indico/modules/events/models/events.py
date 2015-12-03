@@ -159,6 +159,16 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
             lazy=True
         )
     )
+    #: Persons associated with this event
+    person_links = db.relationship(
+        'EventPersonLink',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'event',
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - agreements (Agreement.event_new)
