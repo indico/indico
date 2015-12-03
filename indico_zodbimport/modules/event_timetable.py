@@ -181,6 +181,8 @@ class TimetableMigration(object):
                 self.importer.print_warning(cformat('%{yellow!}Unknown reference type: {}').format(name),
                                             event_id=self.event.id)
                 continue
+            if isinstance(values, basestring):
+                values = [values]
             for value in map(convert_to_unicode, values):
                 if not self.importer.quiet:
                     self.importer.print_info(cformat(' - %{magenta}{}: %{green!}{}').format(name, value))
