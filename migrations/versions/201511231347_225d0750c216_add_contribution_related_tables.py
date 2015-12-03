@@ -172,6 +172,7 @@ def upgrade():
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
         sa.Column('duration', sa.Interval(), nullable=False),
+        sa.Column('board_number', sa.String(), nullable=False),
         sa.Column('keywords', pg.ARRAY(sa.String()), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.Column('last_friendly_subcontribution_id', sa.Integer(), nullable=False),
