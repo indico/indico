@@ -22,7 +22,7 @@
                             <input class="select-row" type="checkbox" value="{{ session.id }}">
                         </td>
                         <td class="i-table">#{{ session.friendly_id }}</td>
-                        <td class="i-table">{{ session.title }}</td>
+                        <td class="i-table"><strong>{{ session.title }}</strong></td>
                         <td class="i-table">{{ session.code }}</td>
                         <td class="i-table">
                             {%- if session.is_poster %}
@@ -73,12 +73,34 @@
                     </tr>
                     {% for block in session.blocks -%}
                         <tr class="i-table session-blocks-row" style="display: none;">
-                            <td class="i-table" colspan="3"></td>
-                            <td class="i-table">{{ block.title }}</td>
-                            <td class="i-table">{{ block.duration }}</td>
-                            <td class="i-table">{{ block.background_color }}</td>
-                            <td class="i-table"></td>
-                            <td class="i-table"></td>
+                            <td class="i-table" colspan="8">
+                                <table class="i-table no-margin">
+                                    <colgroup>
+                                        <col span="2"></col>
+                                        <col span="6"></col>
+                                    </colgroup>
+                                    <tr class="i-table content">
+                                        <td class="i-table caption">
+                                            {% trans %}Title{% endtrans %}
+                                        </td>
+                                        <td class="i-table value">{{ block.title }}</td>
+                                    </tr>
+                                    <tr class="i-table content">
+                                        <td class="i-table caption">
+                                            {% trans %}Duration{% endtrans %}
+                                        </td>
+                                        <td class="i-table value">{{ block.duration }}</td>
+                                    </tr>
+                                    <tr class="i-table content">
+                                        <td class="i-table caption">
+                                            {% trans %}Number of contributions{% endtrans %}
+                                        </td>
+                                        <td class="i-table value">
+                                            {{ block.contributions | length }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                     {%- endfor %}
                 {%- endfor %}

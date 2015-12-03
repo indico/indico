@@ -94,8 +94,8 @@
             });
         });
 
-        $('.sessions').on('click', '.js-show-sessions', function() {
-            $(this).closest('tr').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
+        $('.sessions').on('click', '.show-session-blocks', function() {
+            $(this).closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
 
         $('.sessions').on('indico:confirmed', '#remove-selected-sessions', function(evt) {
