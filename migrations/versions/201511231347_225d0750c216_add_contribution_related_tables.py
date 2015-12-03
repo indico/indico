@@ -44,6 +44,7 @@ def upgrade():
         'reference_types',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
+        sa.Column('scheme', sa.String(), nullable=False),
         sa.Column('url_template', sa.String(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         schema='indico'
