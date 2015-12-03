@@ -14,14 +14,73 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import flash, request
+
+from indico.core.db import db
 from indico.modules.events.views import WPReferenceTypes
+from indico.modules.events.forms import ReferenceTypeForm
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.operations import create_reference_type, update_reference_type, delete_reference_type
+from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.webinterface.rh.admins import RHAdminBase
+
+
+def _get_all_reference_types():
+    return ReferenceType.query.order_by(db.func.lower(ReferenceType.name)).all()
+
+
+def _render_reference_type_list():
+    tpl = get_template_module('events/references/_reference_type_list.html')
+    return tpl.render_reference_type_list(_get_all_reference_types())
+
+
+class RHManageReferenceTypeBase(RHAdminBase):
+    """Base class for a specific reference type"""
+
+    def _checkParams(self, params):
+        RHAdminBase._checkParams(self, params)
+        self.reference_type = ReferenceType.find_one(id=request.view_args['reference_type_id'])
 
 
 class RHReferenceTypes(RHAdminBase):
     """Manage reference types in server admin area"""
 
     def _process(self):
-        types = ReferenceType.find_all()
-        return WPReferenceTypes.render_template('reference_types.html', external_id_types=types)
+        types = _get_all_reference_types()
+        return WPReferenceTypes.render_template('references/reference_types.html', reference_types=types)
+
+
+class RHCreateReferenceType(RHAdminBase):
+    """Create a new reference type"""
+
+    def _process(self):
+        form = ReferenceTypeForm()
+        if form.validate_on_submit():
+            reference_type = create_reference_type(form.data)
+            flash(_("External ID type '{}' created successfully").format(reference_type.name), 'success')
+            return jsonify_data(html=_render_reference_type_list())
+        return jsonify_template('events/references/create_reference_type.html', form=form)
+
+
+class RHEditReferenceType(RHManageReferenceTypeBase):
+    """Edit an existing reference type"""
+
+    def _process(self):
+        form = ReferenceTypeForm(obj=FormDefaults(self.reference_type), reference_type=self.reference_type)
+        if form.validate_on_submit():
+            update_reference_type(self.reference_type, form.data)
+            flash(_("External ID type '{}' successfully updated").format(self.reference_type.name), 'success')
+            return jsonify_data(html=_render_reference_type_list())
+        return jsonify_template('events/references/create_reference_type.html', form=form)
+
+
+class RHDeleteReferenceType(RHManageReferenceTypeBase):
+    """Delete an existing reference type"""
+
+    def _process_DELETE(self):
+        delete_reference_type(self.reference_type)
+        flash(_("External ID type '{}' successfully deleted").format(self.reference_type.name), 'success')
+        return jsonify_data(html=_render_reference_type_list())
