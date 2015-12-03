@@ -308,13 +308,14 @@ class OverviewStats(StatsBase):
     def __init__(self, regform):
         super(OverviewStats, self).__init__(title=_("Overview"), subtitle="", type='overview')
         self.regform = regform
+        self.registrations = regform.active_registrations
         self.countries, self.num_countries = self._get_countries()
         self.availability = self._get_availibility()
-        self.days_left = (self.regform.end_dt - now_utc()).days if self.regform.end_dt else 0
+        self.days_left = max((self.regform.end_dt - now_utc()).days, 0) if self.regform.end_dt else 0
 
     def _get_countries(self):
         countries = defaultdict(int)
-        for country, regs in groupby(self.regform.active_registrations, lambda x: x.get_personal_data().get('country')):
+        for country, regs in groupby(self.registrations, lambda x: x.get_personal_data().get('country')):
             if country is None:
                 continue
             countries[country] += sum(1 for x in regs)
@@ -329,7 +330,7 @@ class OverviewStats(StatsBase):
         limit = self.regform.registration_limit
         if not limit or self.regform.limit_reached:
             return (0, 0, 0)
-        return (len(self.regform.active_registrations), limit, len(self.regform.active_registrations) / limit)
+        return (len(self.registrations), limit, len(self.registrations) / limit)
 
 
 class AccommodationStats(FieldStats, StatsBase):
