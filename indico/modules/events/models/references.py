@@ -40,6 +40,12 @@ class ReferenceType(db.Model):
         db.String,
         nullable=False
     )
+    #: The scheme used to build an URN for the reference
+    scheme = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     #: A URL template to build a link to a referenced entity
     url_template = db.Column(
         db.String,
@@ -103,6 +109,17 @@ class ReferenceModelBase(db.Model):
             return None
         # XXX: Should the value be urlencoded?
         return template.replace('{value}', self.value)
+
+    @property
+    def urn(self):
+        """The URN of the referenced entity.
+
+        ``None`` if no scheme is defined.
+        """
+        scheme = self.reference_type.scheme
+        if not scheme:
+            return None
+        return '{}:{}'.format(scheme, self.value)
 
 
 class EventReference(ReferenceModelBase):
