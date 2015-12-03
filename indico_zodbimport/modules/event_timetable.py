@@ -83,6 +83,7 @@ class TimetableMigration(object):
         self.event = event
         self.legacy_person_map = {}
         self.legacy_session_map = {}
+        self.legacy_session_ids_used = set()
         self.legacy_contribution_map = {}
         self.legacy_contribution_type_map = {}
         self.legacy_contribution_field_map = {}
@@ -245,7 +246,12 @@ class TimetableMigration(object):
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{blue!}Session%{reset} {}').format(session.title))
         self.legacy_session_map[old_session] = session
-        session.legacy_mapping = LegacySessionMapping(event_new=self.event, legacy_session_id=old_session.id)
+        if old_session.id not in self.legacy_session_ids_used:
+            session.legacy_mapping = LegacySessionMapping(event_new=self.event, legacy_session_id=old_session.id)
+            self.legacy_session_ids_used.add(old_session.id)
+        else:
+            self.importer.print_warning(cformat('%{yellow!}Duplicate session id; not adding legacy mapping for {}')
+                                        .format(old_session.id), event_id=self.event.id)
         # colors
         try:
             session.colors = ColorTuple(old_session._textColor, old_session._color)
