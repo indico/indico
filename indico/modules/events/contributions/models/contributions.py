@@ -108,6 +108,11 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
         db.Interval,
         nullable=False
     )
+    board_number = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     keywords = db.Column(
         ARRAY(db.String),
         nullable=False,
