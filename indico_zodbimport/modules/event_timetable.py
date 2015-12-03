@@ -384,7 +384,11 @@ class TimetableMigration(object):
         fields = dict(old_contrib._fields)
         fields.pop('content', None)
         for field_id, field_content in fields.iteritems():
-            value = convert_to_unicode(getattr(field_content, 'value', field_content))
+            value = getattr(field_content, 'value', field_content)
+            if isinstance(value, list):
+                # legacy data, apparently there was a 'keywords' abstract field type once
+                value = ', '.join(value)
+            value = convert_to_unicode(value)
             if not value:
                 continue
             try:
