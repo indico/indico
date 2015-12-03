@@ -16,11 +16,20 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.controllers.admin import RHReferenceTypes
+from indico.modules.events.controllers.admin import (RHReferenceTypes, RHCreateReferenceType, RHEditReferenceType,
+                                                     RHDeleteReferenceType)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('events', __name__, template_folder='templates', virtual_template_folder='events')
 
 # Admin
-_bp.add_url_rule('/admin/external-id-types', 'reference_types', RHReferenceTypes, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/external-id-types/', 'reference_types', RHReferenceTypes, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/external-id-types/create', 'create_reference_type', RHCreateReferenceType,
+                 methods=('GET', 'POST'))
+
+# Single reference type
+_bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>/edit', 'update_reference_type', RHEditReferenceType,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>', 'delete_reference_type', RHDeleteReferenceType,
+                 methods=('DELETE',))
