@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+{% from 'events/references/_reference_type_list.html' import render_reference_type_list %}
+
+
+{% block title %}{% trans %}External ID types{% endtrans %}{% endblock %}
+
+{%- block content %}
+    <div class="i-box titled no-padding">
+        <div class="i-box-header">
+            <div class="i-box-title">{%- trans %}Existing external ID types{% endtrans -%}</div>
+            <div class="i-box-buttons toolbar right">
+                <a href="#" class="i-button icon-plus"
+                   data-ajax-dialog data-method="GET"
+                   data-href="{{ url_for('.create_reference_type') }}"
+                   data-title="{% trans %}Create new external ID type{% endtrans %}"
+                   data-update="#external-id-types">
+                    {%- trans %}Create new type{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div id="external-id-types" class="i-box-content">
+            {{ render_reference_type_list(reference_types) }}
+        </div>
+    </div>
+{%- endblock %}
