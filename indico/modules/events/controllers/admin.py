@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.events.views import WPReferenceTypes
+from indico.modules.events.models.references import ReferenceType
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
@@ -22,4 +23,5 @@ class RHReferenceTypes(RHAdminBase):
     """Manage reference types in server admin area"""
 
     def _process(self):
-        return WPReferenceTypes.render_template('reference_types.html')
+        types = ReferenceType.find_all()
+        return WPReferenceTypes.render_template('reference_types.html', external_id_types=types)
