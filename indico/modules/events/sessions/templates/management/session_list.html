@@ -13,8 +13,16 @@
                 <a class="icon-checkbox-checked i-button arrow js-dropdown"
                    href="#" title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
                 <ul class="dropdown">
-                    <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
-                    <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
+                    <li>
+                        <a href="#" data-select-all=".sessions-wrapper input.select-row">
+                            {% trans %}All{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none=".sessions-wrapper input.select-row">
+                            {% trans %}None{% endtrans %}
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div class="group left">

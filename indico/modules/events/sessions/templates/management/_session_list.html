@@ -74,7 +74,7 @@
                     {% for block in session.blocks -%}
                         <tr class="i-table session-blocks-row" style="display: none;">
                             <td class="i-table" colspan="3"></td>
-                            <td class="i-table">{{- block.title or 'Default empty block' -}}</td>
+                            <td class="i-table">{{ block.title }}</td>
                             <td class="i-table">{{ block.duration }}</td>
                             <td class="i-table">{{ block.background_color }}</td>
                             <td class="i-table"></td>
