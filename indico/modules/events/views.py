@@ -16,11 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.controllers.admin import RHReferenceTypes
-from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.pages.admins import WPAdminsBase
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
-_bp = IndicoBlueprint('events', __name__, template_folder='templates', virtual_template_folder='events')
-
-# Admin
-_bp.add_url_rule('/admin/external-id-types', 'reference_types', RHReferenceTypes, methods=('GET', 'POST'))
+class WPReferenceTypes(WPJinjaMixin, WPAdminsBase):
+    template_prefix = 'events/'

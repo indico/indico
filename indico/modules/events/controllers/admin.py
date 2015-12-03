@@ -14,13 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-
-from indico.modules.events.controllers.admin import RHReferenceTypes
-from indico.web.flask.wrappers import IndicoBlueprint
+from indico.modules.events.views import WPReferenceTypes
+from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
-_bp = IndicoBlueprint('events', __name__, template_folder='templates', virtual_template_folder='events')
+class RHReferenceTypes(RHAdminBase):
+    """Manage reference types in server admin area"""
 
-# Admin
-_bp.add_url_rule('/admin/external-id-types', 'reference_types', RHReferenceTypes, methods=('GET', 'POST'))
+    def _process(self):
+        return WPReferenceTypes.render_template('reference_types.html')
