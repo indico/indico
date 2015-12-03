@@ -39,7 +39,7 @@ from indico.modules.events.contributions.models.references import ContributionRe
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.models.events import Event
-from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.legacy_mapping import LegacySessionMapping
@@ -95,6 +95,7 @@ class TimetableMigration(object):
     def run(self):
         self.importer.print_success('Importing {}'.format(self.old_event), event_id=self.event.id)
         self.event.references = list(self._process_references(EventReference, self.old_event))
+        self.event.person_links = list(self._migrate_event_persons())
         self._migrate_contribution_types()
         self._migrate_contribution_fields()
         self._migrate_sessions()
@@ -190,6 +191,23 @@ class TimetableMigration(object):
 
     def _process_keywords(self, keywords):
         return map(convert_to_unicode, keywords.splitlines())
+
+    def _migrate_event_persons(self):
+        person_link_map = {}
+        for chair in getattr(self.old_event, '_chairs', []):
+            person = self._migrate_person(chair)
+            if not person:
+                continue
+            link = person_link_map.get(person)
+            if link:
+                self.importer.print_warning(
+                    cformat('%{yellow!}Duplicated chair "{}" for event').format(person.full_name),
+                    event_id=self.event.id
+                )
+            else:
+                link = EventPersonLink(person=person)
+                person_link_map[person] = link
+                yield link
 
     def _migrate_contribution_types(self):
         name_map = {}
