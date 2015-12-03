@@ -333,6 +333,18 @@ def upgrade():
         schema='events'
     )
 
+    # EventPersonLink
+    op.create_table(
+        'event_person_links',
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('person_id', sa.Integer(), nullable=False, index=True),
+        sa.ForeignKeyConstraint(['person_id'], ['events.persons.id']),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.UniqueConstraint('person_id', 'event_id'),
+        sa.PrimaryKeyConstraint('event_id', 'person_id'),
+        schema='events'
+    )
+
     # SessionBlockPersonLink
     op.create_table(
         'session_block_person_links',
@@ -414,6 +426,7 @@ def downgrade():
     op.drop_table('subcontribution_person_links', schema='events')
     op.drop_table('contribution_person_links', schema='events')
     op.drop_table('session_block_person_links', schema='events')
+    op.drop_table('event_person_links', schema='events')
     op.drop_table('persons', schema='events')
     op.drop_table('event_references', schema='events')
     op.drop_table('contribution_references', schema='events')

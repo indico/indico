@@ -105,6 +105,7 @@ class EventPerson(db.Model):
 
     # relationship backrefs:
     # - contribution_links (ContributionPersonLink.person)
+    # - event_links (EventPersonLink.person)
     # - session_block_links (SessionBlockPersonLink.person)
     # - subcontribution_links (SubContributionPersonLink.person)
 
@@ -186,3 +187,28 @@ class PersonLinkBase(db.Model):
                 lazy='dynamic'
             )
         )
+
+
+class EventPersonLink(PersonLinkBase):
+    """Association between EventPerson and Event.
+
+    Chairperson or speaker (lecture)
+    """
+
+    __tablename__ = 'event_person_links'
+    __auto_table_args = {'schema': 'events'}
+    person_link_backref_name = 'event_links'
+    person_link_unique_columns = ('event_id',)
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        primary_key=True,
+        index=True
+    )
+
+    # relationship backrefs:
+
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'event_id', 'person_id', _text=self.person.full_name)
