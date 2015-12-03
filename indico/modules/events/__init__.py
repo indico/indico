@@ -31,6 +31,7 @@ from indico.modules.events.util import notify_pending
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem
 
 
 __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
@@ -199,3 +200,9 @@ class SubmitterRole(ManagementRole):
     name = 'submit'
     friendly_name = _('Submission')
     description = _('Grants access to materials and minutes.')
+
+
+@signals.menu.items.connect_via('admin-sidemenu')
+def _sidemenu_items(sender, **kwargs):
+    yield SideMenuItem('reference_types', _('External ID Types'), url_for('events.reference_types'),
+                       section='customization')
