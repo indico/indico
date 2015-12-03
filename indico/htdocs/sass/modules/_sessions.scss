@@ -15,39 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'base/animation';
-@import 'compass';
-@import 'partials/icons';
 
 .sessions {
-    thead {
-        th {
-            &:not(.sorter-false) {
-                cursor: pointer;
-            }
-
-            &:before {
-                @include rotate-transform(0.3s);
-                display: inline-block;
-            }
-
-            &.header-sort-desc {
-                @include icon-before('icon-arrow-down');
-            }
-
-            &.header-sort-asc {
-                @include icon-before('icon-arrow-down');
-
-                &:before {
-                    @include rotate(-180deg);
-                }
-            }
-        }
-    }
-
     .action-icon {
-        font-size: 18px;
+        font-size: 1.3em;
         margin-right: 3px;
     }
 }
