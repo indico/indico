@@ -277,11 +277,13 @@ class TimetableMigration(object):
 
     def _migrate_contribution_field(self, old_field, position):
         field_type = old_field.__class__.__name__
-        if field_type in ('AbstractTextAreaField', 'AbstractInputField'):
+        if field_type in ('AbstractTextAreaField', 'AbstractInputField', 'AbstractField'):
+            multiline = field_type == 'AbstractTextAreaField' or (field_type == 'AbstractField' and
+                                                                  getattr(old_field, '_type', 'textarea') == 'textarea')
             field_data = {
-                'max_length': int(old_field._maxLength) if old_field._limitation == 'chars' else None,
-                'max_words': int(old_field._maxLength) if old_field._limitation == 'words' else None,
-                'multiline': field_type == 'AbstractTextAreaField'
+                'max_length': int(old_field._maxLength) if getattr(old_field, '_limitation', None) == 'chars' else None,
+                'max_words': int(old_field._maxLength) if getattr(old_field, '_limitation', None) == 'words' else None,
+                'multiline': multiline
             }
             field_type = 'text'
         elif field_type == 'AbstractSelectionField':
