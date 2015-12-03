@@ -494,9 +494,10 @@ class TimetableMigration(object):
         last_name = convert_to_unicode(getattr(old_person, '_surName', ''))
         email = convert_to_unicode(getattr(old_person, '_email', ''))
         affiliation = convert_to_unicode(getattr(old_person, '_affiliation', ''))
-        if not first_name and not last_name and (email or affiliation):
-            self.importer.print_warning(cformat('%{yellow!}Skipping nameless event person'), event_id=self.event.id)
-            return
+        if not first_name and not last_name:
+            if email or affiliation:
+                self.importer.print_warning(cformat('%{yellow!}Skipping nameless event person'), event_id=self.event.id)
+            return None
         key = (first_name, last_name, email, affiliation)
         existing_person = self.legacy_person_map.get(key)
         if existing_person:
