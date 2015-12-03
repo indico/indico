@@ -189,9 +189,16 @@ class TimetableMigration(object):
         return map(convert_to_unicode, keywords.splitlines())
 
     def _migrate_contribution_types(self):
+        name_map = {}
         for old_ct in self.old_event._contribTypes.itervalues():
-            ct = ContributionType(name=convert_to_unicode(old_ct._name),
-                                  description=convert_to_unicode(old_ct._description))
+            name = convert_to_unicode(old_ct._name)
+            existing = name_map.get(name.lower())
+            if existing is not None:
+                self.importer.print_warning(cformat('%{yellow}Duplicate contribution type name: {}').format(name))
+                self.legacy_contribution_type_map[old_ct] = existing
+                continue
+            ct = ContributionType(name=name, description=convert_to_unicode(old_ct._description))
+            name_map[name.lower()] = ct
             if not self.importer.quiet:
                 self.importer.print_info(cformat('%{cyan}Contribution type%{reset} {}').format(ct.name))
             self.legacy_contribution_type_map[old_ct] = ct
