@@ -257,9 +257,12 @@ class TimetableMigration(object):
         return session
 
     def _migrate_contribution_fields(self):
-        fields = self.old_event.abstractMgr._abstractFieldsMgr._fields
+        try:
+            afm = self.old_event.abstractMgr._abstractFieldsMgr
+        except AttributeError:
+            return
         pos = 0
-        for field in fields:
+        for field in afm._fields:
             if field._id == 'content':
                 continue
             pos += 1
