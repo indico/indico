@@ -155,7 +155,6 @@
                 data: {
                     submission_ids: submissionIds
                 },
-                traditional: true,
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: function() {
@@ -182,7 +181,6 @@
                 url: container.data('sort-url'),
                 method: 'POST',
                 data: $.extend({mode: mode}, data),
-                traditional: true,
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError
             });

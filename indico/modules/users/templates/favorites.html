@@ -75,7 +75,6 @@
                     data: {
                         user_id: _.pluck(list, 'id')
                     },
-                    traditional: true,
                     error: handleAjaxError,
                     success: function(data) {
                         $.each(list, function(i, user) {

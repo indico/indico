@@ -217,7 +217,6 @@
                     url: action,
                     dataType: 'json',
                     data: options.getExtraData.call(this, options.trigger),
-                    traditional: true,
                     beforeSubmit: function() {
                         $this.trigger('ajaxDialog:beforeSubmit');
                     },

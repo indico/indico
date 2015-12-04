@@ -58,6 +58,7 @@ $.extend($.colorbox.settings, {
 
 
 $.ajaxSetup({
+    traditional: true,
     beforeSend: function(xhr, settings) {
         xhr._requestURL = settings.url;  // save the url in case we need it
         if (!/^https?:.*/.test(settings.url)) {

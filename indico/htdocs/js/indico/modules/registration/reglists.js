@@ -132,7 +132,6 @@
                 url: $this.data('href'),
                 method: $this.data('method'),
                 data: {registration_id: selectedRows},
-                traditional: true,
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: function() {
@@ -158,7 +157,6 @@
                     approve: $this.data('approve'),
                     check_in: $this.data('check-in')
                 },
-                traditional: true,
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: function(data) {

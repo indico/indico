@@ -86,8 +86,7 @@ $(function() {
             method: 'POST',
             dataType: 'json',
             data: {user_id: [user_id]},
-            error: handleAjaxError,
-            traditional: true
+            error: handleAjaxError
         }).done(function(result) {
             $('.favorite-user[data-id=' + user_id + ']').addClass('active');
             Indico.User.favorite_users[user_id] = result.users[0];
