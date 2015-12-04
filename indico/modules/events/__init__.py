@@ -21,6 +21,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.logger import Logger
 from indico.core.roles import check_roles, ManagementRole, get_available_roles
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
@@ -32,7 +33,8 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('Event', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
+__all__ = ('Event', 'event_management_object_url_prefixes', 'event_object_url_prefixes', 'logger')
+logger = Logger.get('events')
 
 #: URL prefixes for the various event objects (public area)
 #: All prefixes are expected to be used inside the '/event/<confId>'
