@@ -19,10 +19,10 @@
         });
     }
 
-    function setupColorSwitches() {
+    function setupPalettePickers() {
         $('.js-color-switch').each(function() {
             var $this = $(this);
-            $this.colorswitch({
+            $this.palettepicker({
                 availableColors: $this.data('colors'),
                 onSelect: function(background, text) {
                     $.ajax({
@@ -43,7 +43,7 @@
     global.setupSessionsList = function setupSessionsList() {
         handleRowSelection();
         setupTableSorter();
-        setupColorSwitches();
+        setupPalettePickers();
 
         $(document).on('click', function(evt) {
             var $target = $(evt.target);
@@ -51,9 +51,9 @@
                 if ($target.hasClass('active-color-switch')) {
                     $('.switch-trigger:not(.active-color-switch) .color-palette').hide();
                 } else {
-                    var activeColorSwitch = $('.switch-trigger.active-color-switch');
-                    if (activeColorSwitch.length) {
-                        activeColorSwitch.removeClass('active-color-switch').next('.color-palette').hide();
+                    var activePalettePicker = $('.switch-trigger.active-color-switch');
+                    if (activePalettePicker.length) {
+                        activePalettePicker.removeClass('active-color-switch').next('.color-palette').hide();
                     }
                     $target.addClass('active-color-switch');
                 }
@@ -72,7 +72,7 @@
             if (data) {
                 $('.sessions-wrapper').html(data.session_list);
                 setupTableSorter();
-                setupColorSwitches();
+                setupPalettePickers();
             }
         }
 

@@ -28,29 +28,6 @@
     position: absolute;
     z-index: 200;
 
-    table {
-        border-spacing: 8px;
-
-        td {
-            .text-box {
-                width: 8px;
-                height: 8px;
-                margin: auto;
-                border-radius: 3px;
-            }
-
-            &.palette-color {
-                cursor: pointer;
-                width: 20px;
-                height: 20px;
-                border-radius: 15px;
-            }
-
-            .background-box {
-                text-align: center;
-            }
-        }
-    }
 
     &:before {
         @include single-box-shadow();
@@ -66,7 +43,31 @@
     }
 }
 
-a.switch-trigger.icon-palette {
+table {
+    border-spacing: 8px;
+
+    td {
+        .text-box {
+            width: 8px;
+            height: 8px;
+            margin: auto;
+            border-radius: 3px;
+        }
+
+        &.palette-color {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            border-radius: 15px;
+        }
+
+        .background-box {
+            text-align: center;
+        }
+    }
+}
+
+a.palette-picker-trigger.icon-palette {
     &:before {
         margin-right: 0 !important;
     }
