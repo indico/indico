@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 
@@ -26,14 +27,16 @@ def create_contribution(event, data):
     contrib = Contribution(event_new=event)
     contrib.populate_from_dict(data)
     db.session.flush()
-    event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-              'Contribution "{}" has been created'.format(contrib.title), session.user)
+    logger.info('Contribution {} created by {}'.format(contrib, session.user))
+    contrib.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+                          'Contribution "{}" has been created'.format(contrib.title), session.user)
     return contrib
 
 
 def update_contribution(contrib, data):
     contrib.populate_from_dict(data)
     db.session.flush()
+    logger.info('Contribution {} updated by {}'.format(contrib, session.user))
     contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                           'Contribution "{}" has been updated'.format(contrib.title), session.user)
 
@@ -41,5 +44,6 @@ def update_contribution(contrib, data):
 def delete_contribution(contrib):
     contrib.is_deleted = True
     db.session.flush()
+    logger.info('Contribution {} deleted by {}'.format(contrib, session.user))
     contrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                           'Contribution "{}" has been deleted'.format(contrib.title), session.user)
