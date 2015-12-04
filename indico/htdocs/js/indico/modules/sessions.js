@@ -45,24 +45,6 @@
         setupTableSorter();
         setupPalettePickers();
 
-        $(document).on('click', function(evt) {
-            var $target = $(evt.target);
-            if ($target.hasClass('switch-trigger')) {
-                if ($target.hasClass('active-color-switch')) {
-                    $('.switch-trigger:not(.active-color-switch) .color-palette').hide();
-                } else {
-                    var activePalettePicker = $('.switch-trigger.active-color-switch');
-                    if (activePalettePicker.length) {
-                        activePalettePicker.removeClass('active-color-switch').next('.color-palette').hide();
-                    }
-                    $target.addClass('active-color-switch');
-                }
-            } else {
-                $('.switch-trigger').removeClass('active-color-switch');
-                $('.color-palette').hide();
-            }
-        });
-
         $('.sessions .toolbar').on('click', '.disabled', function(evt) {
             evt.preventDefault();
             evt.stopPropagation();
