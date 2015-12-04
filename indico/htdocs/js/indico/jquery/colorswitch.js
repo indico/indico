@@ -19,7 +19,7 @@
     $.widget('indico.colorswitch', {
 
         options: {
-            defaultColors: [],
+            availableColors: [],
             onSelect: null,
             numColumns: 5
         },
@@ -30,24 +30,24 @@
             var palette = $('<div>', {'class': 'color-palette', 'css': {'display': 'none'}});
             var paletteTable = $('<table>');
             var trigger = this.element.find('.switch-trigger');
-            var defaultColors = this.options.defaultColors;
+            var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
-            for (var i = 0; i < defaultColors.length; ++i) {
+            for (var i = 0; i < availableColors.length; ++i) {
                 var td = $('<td>', {
-                    'css': {'background': '#' + defaultColors[i].background},
+                    'css': {'background': '#' + availableColors[i].background},
                     'class': 'palette-color'
                 });
 
                 var colorBox = $('<div>', {
-                    'value': '#' + defaultColors[i].background,
+                    'value': '#' + availableColors[i].background,
                     'class': 'background-box'
                 });
 
                 colorBox.append($('<div>', {
-                    'css': {'background': '#' + defaultColors[i].text},
+                    'css': {'background': '#' + availableColors[i].text},
                     'class': 'text-box',
-                    'value': '#' + defaultColors[i].text
+                    'value': '#' + availableColors[i].text
                 }));
 
                 td.on('click', function(evt) {
