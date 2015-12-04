@@ -43,6 +43,7 @@ def update_contribution(contrib, data):
 
 def delete_contribution(contrib):
     contrib.is_deleted = True
+    contrib.timetable_entry = None
     db.session.flush()
     logger.info('Contribution {} deleted by {}'.format(contrib, session.user))
     contrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
