@@ -3,7 +3,7 @@
 {% block html %}
     {% set colors = field._value() %}
     <div class="group">
-        <span id="{{ field.id }}-color-switch" class="color-switch">
+        <span id="{{ field.id }}-palette-picker" class="color-switch">
             <a class="i-button icon-expand switch-trigger"
                style="background: #{{ colors.background }};
                       color: #{{ colors.text }} !important">
@@ -17,7 +17,7 @@
 
 {% block javascript -%}
     <script>
-        $('#{{ field.id }}-color-switch').colorswitch({
+        $('#{{ field.id }}-palette-picker').palettepicker({
             availableColors: {{ field.color_list | tojson }},
             onSelect: function(background, text) {
                 var colorsValue = JSON.stringify({background: background, text: text});
