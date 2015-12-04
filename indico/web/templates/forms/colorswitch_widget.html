@@ -18,7 +18,7 @@
 {% block javascript -%}
     <script>
         $('#{{ field.id }}-color-switch').colorswitch({
-            defaultColors: {{ field.color_list | tojson }},
+            availableColors: {{ field.color_list | tojson }},
             onSelect: function(background, text) {
                 var colorsValue = JSON.stringify({background: background, text: text});
                 $('#{{ field.id }}').val(colorsValue).trigger('change');
