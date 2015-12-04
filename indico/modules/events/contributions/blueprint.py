@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.contributions.controllers import (RHContributions, RHCreateContribution,
-                                                             RHEditContribution, RHDeleteContribution)
+                                                             RHEditContribution, RHDeleteContribution,
+                                                             RHDeleteContributions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -27,6 +28,8 @@ _bp = IndicoBlueprint('contributions', __name__, template_folder='templates',
 _bp.add_url_rule('/manage/contributions/', 'manage_contributions', RHContributions)
 _bp.add_url_rule('/manage/contributions/create',
                  'manage_create_contrib', RHCreateContribution, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/delete',
+                 'manage_delete_contribs', RHDeleteContributions, methods=('POST',))
 
 # Single contribution
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/edit',

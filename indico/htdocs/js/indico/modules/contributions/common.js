@@ -15,29 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-$(function() {
-    $('.information .trigger').click(function() {
-            var $this = $(this),
-            transition_opts = {
-                duration: 250,
-                easing: 'easeInQuad'
-            };
+(function(global) {
+    'use strict';
 
-        if ($this.data('hidden')) {
-            $this.siblings('.extra-parameters').slideDown(transition_opts);
-            $this.data('hidden', false).removeClass('icon-expand').addClass('icon-collapse');
-        } else {
-            $this.siblings('.extra-parameters').slideUp(transition_opts);
-            $this.data('hidden', true).removeClass('icon-collapse').addClass('icon-expand');
-        }
+    $(document).ready(function() {
+        setupContributionList();
     });
 
-    $('.icon-user, .track-assignment, .session-assignment').bind('mouseenter', function (){
-        var $this = $(this);
-        if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-            $this.attr('title', $this.text());
-        }
-    });
-
-    $('.content, h1').mathJax();
-});
+    function setupContributionList() {
+        enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+    }
+})(window);
