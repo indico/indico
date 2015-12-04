@@ -16,11 +16,12 @@
  */
 
 .color-palette {
+    @include border-radius();
+    @include single-box-shadow();
     background: #FFF;
     background-clip: padding-box;
-    border: thin solid lighten($gray, 10%);
-    border-radius: 4px;
-    box-shadow: 0 6px 12px lighten($gray, 5%);
+    border: thin solid lighten($gray, $color-variation);
+    box-shadow: 0 6px 12px lighten($gray, $color-variation);
     display: none;
     margin-top: 0.5em;
     padding: 3px;
@@ -52,13 +53,13 @@
     }
 
     &:before {
+        @include single-box-shadow();
         transform: rotate(45deg);
         content: '';
         top: -0.2rem;
         position: absolute;
         width: .6em;
         height: .6em;
-        box-shadow: -1px -1px 0 1px lighten($gray, 15%);
         background: #FFF;
         visibility: visible;
         margin: 0 0 0 1em;
