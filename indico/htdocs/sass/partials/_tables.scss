@@ -211,6 +211,10 @@ tr.i-table.content {
 
     a.action-icon {
         margin: 0 0.5em;
+
+        &:first-child {
+            margin-left: 0;
+        }
     }
 
     .toolbar {
