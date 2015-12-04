@@ -23,7 +23,7 @@
         $('.js-color-switch').each(function() {
             var $this = $(this);
             $this.colorswitch({
-                defaultColors: $this.data('colors'),
+                availableColors: $this.data('colors'),
                 onSelect: function(background, text) {
                     $.ajax({
                         url: $(this).data('href'),
