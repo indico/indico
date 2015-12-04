@@ -36,14 +36,14 @@
                 <a id="remove-selected-sessions"
                    class="i-button icon-remove js-requires-selected-row disabled"
                    data-title="{% trans %}Remove selected sessions{% endtrans %}"
-                   data-method="DELETE"
+                   data-method="POST"
                    data-href="{{ url_for('.delete_sessions', event) }}"
                    data-confirm="{% trans %}Do you really want to delete the selected sessions?{% endtrans %}">
                     {%- trans %}Remove{% endtrans -%}
                 </a>
             </div>
             <div class="group left">
-                <a class="i-button arrow button js-requires-selected-row disabled  js-dropdown"
+                <a class="i-button arrow button js-requires-selected-row disabled js-dropdown"
                    data-toggle="dropdown">
                     {%- trans %}Export{% endtrans -%}
                 </a>

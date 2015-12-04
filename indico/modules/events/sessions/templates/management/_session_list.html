@@ -38,7 +38,7 @@
                                     <a class="i-button icon-palette switch-trigger"
                                        style="background: #{{ session.background_color }};
                                               color: #{{ session.text_color }} !important;"
-                                       data-method="PATCH" data-href="{{ url_for('.modify_session', session) }}">
+                                       data-method="PATCH" data-href="{{ url_for('.session_rest', session) }}">
                                     </a>
                                 </span>
                             </div>
@@ -55,9 +55,6 @@
                                    title="{% trans %}Edit this session{% endtrans %}"
                                    data-title="{% trans title=session.title %}Edit session {{ title }}{% endtrans %}"
                                    data-href="{{ url_for('.modify_session', session) }}"></a>
-                                <a class="icon-users highlight session-persons-list"
-                                   data-title="{% trans title=session.title %}List of session persons{% endtrans %}"
-                                   data-href="#"></a>
                                 <a class="icon-time highlight action-icon"
                                    title="{% trans %}Go to this session timetable{% endtrans %}"
                                    data-href="#"
@@ -65,7 +62,7 @@
                                 <a class="icon-remove highlight js-remove-session action-icon"
                                    title="{% trans %}Remove this session{% endtrans %}"
                                    data-method="DELETE"
-                                   data-href="{{ url_for('.delete_sessions', session)}}"
+                                   data-href="{{ url_for('.session_rest', session)}}"
                                    data-session-id="{{ session.id }}"
                                    data-confirm="{% trans title=session.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
                             </div>
