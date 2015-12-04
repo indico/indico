@@ -16,8 +16,11 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core.db import db
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events import logger
 
 
 def create_reference_type(data):
@@ -25,14 +28,17 @@ def create_reference_type(data):
     reference_type.populate_from_dict(data)
     db.session.add(reference_type)
     db.session.flush()
+    logger.info('Reference type "%s" created by %s', reference_type, session.user)
     return reference_type
 
 
 def update_reference_type(reference_type, data):
     reference_type.populate_from_dict(data)
     db.session.flush()
+    logger.info('Reference type "%s" updated by %s', reference_type, session.user)
 
 
 def delete_reference_type(reference_type):
     db.session.delete(reference_type)
     db.session.flush()
+    logger.info('Reference type "%s" deleted by %s', reference_type, session.user)
