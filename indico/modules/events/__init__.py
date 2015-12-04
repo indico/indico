@@ -33,7 +33,8 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
+__all__ = ('Event', 'event_management_object_url_prefixes', 'event_object_url_prefixes', 'logger')
+
 logger = Logger.get('events')
 
 #: URL prefixes for the various event objects (public area)
