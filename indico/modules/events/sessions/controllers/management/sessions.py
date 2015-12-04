@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import random
 
-from flask import request
+from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -66,24 +66,12 @@ class RHCreateSession(RHManageSessionsBase):
 class RHModifySession(RHManageSessionBase):
     """Modify a session"""
 
-    def _process_GET(self):
-        return jsonify_template('events/sessions/management/add_session.html', form=SessionForm(obj=self.session))
-
-    def _process_POST(self):
+    def _process(self):
         form = SessionForm(obj=self.session)
         if form.validate_on_submit():
             update_session(self.session, form.data)
             return jsonify_data(session_list=_render_session_list(self.event_new))
-
-    def _process_PATCH(self):
-        data = request.json
-        if 'colors' in data:
-            colors = ColorTuple(**data['colors'])
-            if colors not in get_colors():
-                raise BadRequest
-            data['colors'] = colors
-        update_session(self.session, data)
-        return jsonify_data()
+        return jsonify_template('events/sessions/management/add_session.html', form=form)
 
 
 class RHDeleteSessions(RHManageSessionsBase):
@@ -109,3 +97,24 @@ class RHExportSessionsPDF(RHManageSessionsBase):
 
     def _process(self):
         pass
+
+
+class RHSessionREST(RHManageSessionBase):
+    """Perform update or removal of a session"""
+
+    def _process_DELETE(self):
+        delete_session(self.session)
+        return jsonify_data(session_list=_render_session_list(self.event_new))
+
+    def _process_PATCH(self):
+        data = request.json
+        updates = {}
+        if data.viewkeys() > {'colors'}:
+            raise BadRequest
+        if 'colors' in data:
+            colors = ColorTuple(**data['colors'])
+            if colors not in get_colors():
+                raise BadRequest
+            updates['colors'] = colors
+        update_session(self.session, updates)
+        return jsonify()
