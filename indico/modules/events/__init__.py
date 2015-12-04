@@ -26,7 +26,6 @@ from indico.core.roles import check_roles, ManagementRole, get_available_roles
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.modules.events.util import notify_pending
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
