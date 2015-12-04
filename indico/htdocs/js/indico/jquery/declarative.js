@@ -57,10 +57,22 @@
             var url = $this.data('href');
             var method = $this.data('method').toUpperCase();
             var params = $this.data('params') || {};
+            var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
             var dialog = $this.data('ajax-dialog') !== undefined;
             if (!$.isPlainObject(params)) {
                 throw new Error('Invalid params. Must be valid JSON if set.');
+            }
+
+            if (paramsSelector) {
+                var fieldParams = {};
+                $(paramsSelector).each(function() {
+                    if (!(this.name in fieldParams)) {
+                        fieldParams[this.name] = [];
+                    }
+                    fieldParams[this.name].push($(this).val());
+                });
+                params = $.extend({}, fieldParams, params);
             }
 
             function execute() {
