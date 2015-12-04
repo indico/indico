@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
 
 
@@ -57,6 +58,10 @@ class ReferenceType(db.Model):
     # - contribution_references (ContributionReference.reference_type)
     # - event_references (EventReference.reference_type)
     # - subcontribution_references (SubContributionReference.reference_type)
+
+    @locator_property
+    def locator(self):
+        return {'reference_type_id': self.id}
 
     @return_ascii
     def __repr__(self):
