@@ -543,21 +543,21 @@ class IndicoStaticTextField(Field):
         return self.text_value
 
 
-class IndicoColorSwitchField(JSONField):
+class IndicoPalettePickerField(JSONField):
     """Field allowing user to pick a color from a set of predefined values"""
 
-    widget = JinjaWidget('forms/colorswitch_widget.html')
+    widget = JinjaWidget('forms/palette_picker_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.color_list = kwargs.pop('color_list')
-        super(IndicoColorSwitchField, self).__init__(*args, **kwargs)
+        super(IndicoPalettePickerField, self).__init__(*args, **kwargs)
 
     def pre_validate(self, form):
         if self.data not in self.color_list:
             raise ValueError(_('Invalid colors selected'))
 
     def process_formdata(self, valuelist):
-        super(IndicoColorSwitchField, self).process_formdata(valuelist)
+        super(IndicoPalettePickerField, self).process_formdata(valuelist)
         self.data = ColorTuple(self.data['text'], self.data['background'])
 
     def populate_obj(self, obj, name):
