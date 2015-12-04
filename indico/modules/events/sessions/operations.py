@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from indico.modules.events.sessions import logger
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 
@@ -30,6 +31,7 @@ def create_session(event, data=None):
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
               'Session "{}" has been created'.format(event_session.title), session.user)
+    logger.info('Session %s created by %s', event_session, session.user)
     return event_session
 
 
@@ -39,6 +41,7 @@ def update_session(event_session, data):
     db.session.flush()
     event_session.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                                 'Session "{}" has been updated'.format(event_session.title), session.user)
+    logger.info('Session %s modified by %s', event_session, session.user)
 
 
 def _delete_session_timetable_entries(event_session):
@@ -60,3 +63,4 @@ def delete_session(event_session):
         contribution.session_block = None
         contribution.session = None
     _delete_session_timetable_entries(event_session)
+    logger.info('Session %s deleted by %s', event_session, session.user)
