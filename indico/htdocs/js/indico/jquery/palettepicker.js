@@ -16,7 +16,7 @@
  */
 
 (function($) {
-    $.widget('indico.colorswitch', {
+    $.widget('indico.palettepicker', {
 
         options: {
             availableColors: [],
