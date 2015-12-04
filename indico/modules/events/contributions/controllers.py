@@ -25,7 +25,7 @@ from indico.modules.events.contributions.views import WPManageContributions
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -61,6 +61,15 @@ class RHManageContributionBase(RHManageContributionsBase):
         self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
 
 
+class RHManageContributionsActionsBase(RHManageContributionsBase):
+    """Base class for classes performing actions on registrations"""
+
+    def _checkParams(self, params):
+        RHManageContributionsBase._checkParams(self, params)
+        ids = set(map(int, request.form.getlist('contribution_id')))
+        self.contribs = self.event_new.contributions.filter(Contribution.id.in_(ids), ~Contribution.is_deleted).all()
+
+
 class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
@@ -93,4 +102,14 @@ class RHDeleteContribution(RHManageContributionBase):
     def _process(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib), 'success')
+        return jsonify_data(html=_render_contribution_list(self.event_new))
+
+
+class RHDeleteContributions(RHManageContributionsActionsBase):
+    def _process(self):
+        for contrib in self.contribs:
+            delete_contribution(contrib)
+        deleted_count = len(self.contribs)
+        flash(ngettext("Contribution was deleted.",
+                       "{count} contributions were deleted.", deleted_count).format(count=deleted_count), 'success')
         return jsonify_data(html=_render_contribution_list(self.event_new))

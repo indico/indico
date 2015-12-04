@@ -28,10 +28,18 @@
             </button>
         </div>
         <div class="group">
-            <button class="i-button" disabled>{% trans %}Remove{% endtrans %}</button>
-            <button class="i-button" disabled>{% trans %}Move{% endtrans %}</button>
-            <button class="i-button" disabled>{% trans %}Download{% endtrans %}</button>
-            <button class="i-button" disabled>{% trans %}Export{% endtrans %}</button>
+            <button class="i-button js-enable-if-checked" disabled
+                    data-method="POST"
+                    data-href="{{ url_for('.manage_delete_contribs', event) }}"
+                    data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                    data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
+                    data-title="{% trans %}Confirm deletion{% endtrans %}"
+                    data-update="#contribution-list">
+                {% trans %}Remove{% endtrans %}
+            </button>
+            <button class="i-button js-enable-if-checked" disabled>{% trans %}Move{% endtrans %}</button>
+            <button class="i-button js-enable-if-checked" disabled>{% trans %}Download{% endtrans %}</button>
+            <button class="i-button js-enable-if-checked" disabled>{% trans %}Export{% endtrans %}</button>
         </div>
         <div class="group right">
             <span class="i-button label icon-search"></span>
