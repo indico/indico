@@ -91,6 +91,7 @@
                         url: url,
                         title: $this.data('title'),
                         onClose: function(data) {
+                            handleFlashes(data, true, $this);
                             if (data && update) {
                                 $(update).html(data.html);
                             }
@@ -108,6 +109,7 @@
                         error: handleAjaxError,
                         complete: IndicoUI.Dialogs.Util.progress(),
                         success: function(data) {
+                            handleFlashes(data, true, $this);
                             $(update).html(data.html);
                         }
                     });
