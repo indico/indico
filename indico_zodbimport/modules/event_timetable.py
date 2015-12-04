@@ -368,7 +368,7 @@ class TimetableMigration(object):
                                title=convert_to_unicode(old_contrib.title),
                                description=description, duration=old_contrib.duration,
                                protection_mode=PROTECTION_MODE_MAP[ac._accessProtection],
-                               board_number=convert_to_unicode(old_contrib._boardNumber),
+                               board_number=convert_to_unicode(getattr(old_contrib, '_boardNumber', '')),
                                keywords=self._process_keywords(old_contrib._keywords))
         if not self.importer.quiet:
             self.importer.print_info(cformat('%{cyan}Contribution%{reset} {}').format(contrib.title))
