@@ -70,11 +70,11 @@ def upgrade():
         sa.Column('room_name', sa.String(), nullable=False),
         sa.Column('inherit_location', sa.Boolean(), nullable=False),
         sa.Column('address', sa.Text(), nullable=False),
-        sa.Column('location_name', sa.String(), nullable=False),
+        sa.Column('venue_name', sa.String(), nullable=False),
         sa.Column('room_id', sa.Integer(), nullable=True, index=True),
-        sa.CheckConstraint("(room_id IS NULL) OR (location_name = '' AND room_name = '')",
+        sa.CheckConstraint("(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
                            name='no_custom_location_if_room'),
-        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND room_name = '' AND "
+        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND venue_name = '' AND room_name = '' AND "
                            "address = '')", name='inherited_location'),
         sa.CheckConstraint("(text_color = '') = (background_color = '')", name='both_or_no_colors'),
         sa.CheckConstraint("text_color != '' AND background_color != ''", name='colors_not_empty'),
@@ -132,11 +132,11 @@ def upgrade():
         sa.Column('room_name', sa.String(), nullable=False),
         sa.Column('inherit_location', sa.Boolean(), nullable=False),
         sa.Column('address', sa.Text(), nullable=False),
-        sa.Column('location_name', sa.String(), nullable=False),
+        sa.Column('venue_name', sa.String(), nullable=False),
         sa.Column('room_id', sa.Integer(), nullable=True, index=True),
-        sa.CheckConstraint("(room_id IS NULL) OR (location_name = '' AND room_name = '')",
+        sa.CheckConstraint("(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
                            name='no_custom_location_if_room'),
-        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND room_name = '' AND "
+        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND venue_name = '' AND room_name = '' AND "
                            "address = '')", name='inherited_location'),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
         sa.ForeignKeyConstraint(['session_id'], ['events.sessions.id']),
@@ -181,13 +181,13 @@ def upgrade():
         sa.Column('room_name', sa.String(), nullable=False),
         sa.Column('inherit_location', sa.Boolean(), nullable=False),
         sa.Column('address', sa.Text(), nullable=False),
-        sa.Column('location_name', sa.String(), nullable=False),
+        sa.Column('venue_name', sa.String(), nullable=False),
         sa.Column('room_id', sa.Integer(), nullable=True, index=True),
         sa.CheckConstraint("session_block_id IS NULL OR session_id IS NOT NULL",
                            name='session_block_if_session'),
-        sa.CheckConstraint("(room_id IS NULL) OR (location_name = '' AND room_name = '')",
+        sa.CheckConstraint("(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
                            name='no_custom_location_if_room'),
-        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND room_name = '' AND "
+        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND venue_name = '' AND room_name = '' AND "
                            "address = '')", name='inherited_location'),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
