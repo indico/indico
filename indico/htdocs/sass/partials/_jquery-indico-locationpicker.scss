@@ -1,0 +1,137 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.i-location-field {
+    max-width: 400px;
+
+    .wrapper {
+        float: left;
+        display: inline-block;
+
+        .typeahead-container,
+        .typeahead-field {
+            width: inherit;
+            display: inline-block;
+            position: relative;
+            z-index: 1030 !important;
+
+            .typeahead-results {
+                position: absolute;
+                left: 0;
+
+                .typeahead-list {
+                    @include box-shadow(none);
+                    margin: 0;
+                    padding: 0;
+                    overflow: auto;
+                    max-height: 30em;
+                    width: 20em;
+                    position: relative;
+                    border: none;
+                    border-radius: 0;
+
+                    > li {
+                        background: white;
+                    }
+
+                    &.empty {
+                        li:first-child {
+                            display: none;
+                        }
+                    }
+                }
+
+                .just-use-option {
+                    display: none;
+                    cursor: pointer;
+                    background-color: $light-gray;
+                    text-align: center;
+                    padding: 6px 20px;
+
+                    &:hover {
+                        background-color: #ebebeb;  // same as in typeahead
+                    }
+                }
+            }
+
+            &.backdrop {
+                .i-location-input-field {
+                    background-color: white;
+                    z-index: 1050 !important;
+                }
+
+                .just-use-option {
+                    display: block;
+                    border-top: 1px solid rgba(0, 0, 0, 0.15);  // same as in typeahead
+                }
+
+                z-index: 1060 !important;
+            }
+        }
+
+        input.i-location-input-field {
+            width: 11.5em;
+            background-color: inherit;
+            padding-right: 2em !important;
+
+            &.disabled {
+                @extend %tilted-strips-bg;
+            }
+
+            &.bring-to-front {
+                background: white;
+            }
+        }
+
+        .toggle-results-list {
+            position: absolute;
+            padding: 0.5em 1em;
+            top: 0;
+            right: 0;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        > textarea {
+            @extend %form-field;
+            width: 100%;
+            margin-top: 0.4em;
+
+            &.disabled {
+                @extend %tilted-strips-bg;
+            }
+        }
+    }
+}
+
+.backdrop-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    opacity: 0;
+}
+
+.close-backdrop-button {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    z-index: 1060;
+    display: none;
+}

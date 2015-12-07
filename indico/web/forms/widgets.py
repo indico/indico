@@ -198,6 +198,20 @@ class TypeaheadWidget(JinjaWidget):
                                                      search_url=self.search_url, choices=getattr(field, 'choices', []))
 
 
+class LocationWidget(JinjaWidget):
+    """Renders a collection of fields to represent location"""
+
+    def __init__(self):
+        super(LocationWidget, self).__init__('forms/location_widget.html', single_line=True)
+
+    def __call__(self, field, **kwargs):
+        rooms = {loc.name: {'data': [{'name': r.full_name, 'id': r.id, 'venue_id': r.location_id}
+                 for r in loc.rooms]} for loc in field.locations}
+        venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
+        venue_names = [v['name'] for v in venues['data']]
+        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, venue_names=venue_names)
+
+
 class ColorPickerWidget(JinjaWidget):
     """Renders a colorpicker input field"""
 
