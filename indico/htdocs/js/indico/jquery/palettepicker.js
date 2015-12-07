@@ -27,44 +27,45 @@
         _create: function() {
             var self = this;
             var element = this.element;
-            var palette = $('<div>', {'class': 'color-palette', 'css': {'display': 'none'}});
+            var palette = $('<div>', {'class': 'color-palette'});
             var paletteTable = $('<table>');
-            var trigger = this.element.find('.switch-trigger');
             var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
             for (var i = 0; i < availableColors.length; ++i) {
+                var uniqueId = _.uniqueId('palette-color');
                 var td = $('<td>', {
                     'css': {'background': '#' + availableColors[i].background},
-                    'class': 'palette-color'
+                    'class': 'palette-color',
+                    'id': uniqueId
+                });
+
+                $(document).on('click', '#' + uniqueId, function(evt) {
+                    evt.preventDefault();
+
+                    var $this = $(this),
+                        backgroundColor = $this.find('.background-box').data('value'),
+                        textColor = $this.find('.text-box').data('value');
+
+                    element.css({'background': backgroundColor, 'color': textColor + ' !important'});
+
+                    if (self.options.onSelect) {
+                        self.options.onSelect.call(element, backgroundColor, textColor);
+                    }
+
+                    element.qtip('hide');
                 });
 
                 var colorBox = $('<div>', {
-                    'value': '#' + availableColors[i].background,
+                    'data-value': '#' + availableColors[i].background,
                     'class': 'background-box'
                 });
 
                 colorBox.append($('<div>', {
                     'css': {'background': '#' + availableColors[i].text},
                     'class': 'text-box',
-                    'value': '#' + availableColors[i].text
+                    'data-value': '#' + availableColors[i].text
                 }));
-
-                td.on('click', function(evt) {
-                    evt.preventDefault();
-
-                    var $this = $(this),
-                        backgroundColor = $this.find('.background-box').val(),
-                        textColor = $this.find('.text-box').val();
-
-                    trigger.css({'background': backgroundColor, 'color': textColor + ' !important'});
-
-                    if (self.options.onSelect) {
-                        self.options.onSelect.call(trigger, backgroundColor, textColor);
-                    }
-
-                    palette.hide();
-                });
 
                 td.append(colorBox);
                 tr.append(td);
@@ -80,27 +81,31 @@
             }
 
             palette.append(paletteTable);
-            palette.appendTo(this.element);
 
-            trigger.on('click', function() {
-                palette.toggle();
-            });
-
-            $(document).on('click', function(evt) {
-                var $target = $(evt.target);
-                if ($target.hasClass('switch-trigger')) {
-                    if ($target.hasClass('active-color-switch')) {
-                        $('.switch-trigger:not(.active-color-switch) .color-palette').hide();
-                    } else {
-                        var activePalettePicker = $('.switch-trigger.active-color-switch');
-                        if (activePalettePicker.length) {
-                            activePalettePicker.removeClass('active-color-switch').next('.color-palette').hide();
-                        }
-                        $target.addClass('active-color-switch');
+            element.qtip({
+                prerender: false,
+                overwrite: false,
+                style: {
+                    classes: 'color-palette'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center',
+                    target: element,
+                    adjust: {
+                        mouse: false,
+                        scroll: false
                     }
-                } else {
-                    $('.switch-trigger').removeClass('active-color-switch');
-                    $('.color-palette').hide();
+                },
+                content: {
+                    text: palette.html()
+                },
+                show: {
+                    event: 'click',
+                    solo: true
+                },
+                hide: {
+                    event: 'unfocus'
                 }
             });
         },
