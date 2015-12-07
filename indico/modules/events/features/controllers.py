@@ -85,7 +85,7 @@ class RHSwitchFeature(RHFeaturesBase):
             changed = current - prev
             flash(ngettext('Feature enabled: {features}', 'Features enabled: {features}', len(changed))
                   .format(features=self._format_feature_names(changed)), 'success')
-            logger.info("Feature '{}' for event {} was enabled by {}".format(feature, self.event, session.user))
+            logger.info("Feature '%s' for event %s enabled by %s", feature, self.event, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
                            'Enabled {}'.format(feature.friendly_name), session.user)
         return jsonify_data(enabled=True, event_menu=self.render_event_menu(), changed=list(changed))
@@ -99,7 +99,7 @@ class RHSwitchFeature(RHFeaturesBase):
             changed = prev - current
             flash(ngettext('Feature disabled: {features}', 'Features disabled: {features}', len(changed))
                   .format(features=self._format_feature_names(changed)), 'warning')
-            logger.info("Feature '{}' for event {} was disabled by {}".format(feature, self.event, session.user))
+            logger.info("Feature '%s' for event %s disabled by %s", feature, self.event, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
                            'Disabled {}'.format(feature.friendly_name), session.user)
         return jsonify_data(enabled=False, event_menu=self.render_event_menu(), changed=list(changed))

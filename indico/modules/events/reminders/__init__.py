@@ -54,7 +54,7 @@ def _event_data_changed(event, **kwargs):
     for reminder in query:
         new_dt = event.getStartDate() - reminder.event_start_delta
         if reminder.scheduled_dt != new_dt:
-            logger.info('Changing start time of {} to {}'.format(reminder, new_dt))
+            logger.info('Changing start time of %s to %s', reminder, new_dt)
             reminder.scheduled_dt = new_dt
 
 
@@ -90,10 +90,10 @@ class ReminderCloner(EventCloner):
             # We ignore the time on purpose so cloning an event shortly before will
             # still trigger a reminder that's just a few hours overdue.
             if scheduled_dt.date() < now_utc().date():
-                logger.info('Not cloning reminder {} which would trigger at {}'.format(old_reminder, scheduled_dt))
+                logger.info('Not cloning reminder %s which would trigger at %s', old_reminder, scheduled_dt)
                 continue
             reminder = EventReminder(event=new_event, **{attr: getattr(old_reminder, attr) for attr in attrs})
             reminder.scheduled_dt = scheduled_dt
             db.session.add(reminder)
             db.session.flush()
-            logger.info('Added reminder during event cloning: {}'.format(reminder))
+            logger.info('Added reminder during event cloning: %s', reminder)

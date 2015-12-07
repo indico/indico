@@ -182,7 +182,7 @@ class RHLinkAccount(RH):
         identity = Identity(user=self.user, provider=self.identity_info['provider'],
                             identifier=self.identity_info['identifier'], data=self.identity_info['data'],
                             multipass_data=self.identity_info['multipass_data'])
-        logger.info('Created new identity for {}: {}'.format(self.user, identity))
+        logger.info('Created new identity for %s: %s', self.user, identity)
         del session['login_identity_info']
         db.session.flush()
         login_user(self.user, identity)
