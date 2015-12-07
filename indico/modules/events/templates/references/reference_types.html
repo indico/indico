@@ -10,7 +10,7 @@
             <div class="i-box-title">{%- trans %}Existing external ID types{% endtrans -%}</div>
             <div class="i-box-buttons toolbar right">
                 <a href="#" class="i-button icon-plus"
-                   data-ajax-dialog data-method="GET"
+                   data-ajax-dialog
                    data-href="{{ url_for('.create_reference_type') }}"
                    data-title="{% trans %}Create new external ID type{% endtrans %}"
                    data-update="#external-id-types">
