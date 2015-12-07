@@ -18,6 +18,7 @@ from __future__ import absolute_import
 
 import traceback
 from datetime import datetime, date
+from UserDict import UserDict
 
 from flask import current_app, session
 from persistent.dict import PersistentDict
@@ -46,7 +47,7 @@ class IndicoJSONEncoder(_json.JSONEncoder):
     def default(self, o):
         if isinstance(o, _LazyString):
             return o.value
-        elif isinstance(o, PersistentDict):
+        elif isinstance(o, (PersistentDict, UserDict)):
             return dict(o)
         elif isinstance(o, datetime):
             return {'date': str(o.date()), 'time': str(o.time()), 'tz': str(o.tzinfo)}
