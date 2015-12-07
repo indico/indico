@@ -91,9 +91,11 @@
                         url: url,
                         title: $this.data('title'),
                         onClose: function(data) {
-                            handleFlashes(data, true, $this);
-                            if (data && update) {
-                                $(update).html(data.html);
+                            if (data) {
+                                handleFlashes(data, true, $this);
+                                if (update) {
+                                    $(update).html(data.html);
+                                }
                             }
                         }
                     });
