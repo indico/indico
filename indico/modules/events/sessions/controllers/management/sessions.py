@@ -59,7 +59,7 @@ class RHCreateSession(RHManageSessionsBase):
         form = SessionForm(obj=FormDefaults(colors=self._get_random_color()))
         if form.validate_on_submit():
             create_session(self.event_new, form.data)
-            return jsonify_data(session_list=_render_session_list(self.event_new))
+            return jsonify_data(html=_render_session_list(self.event_new))
         return jsonify_template('events/sessions/management/add_session.html', form=form)
 
 
@@ -70,7 +70,7 @@ class RHModifySession(RHManageSessionBase):
         form = SessionForm(obj=self.session)
         if form.validate_on_submit():
             update_session(self.session, form.data)
-            return jsonify_data(session_list=_render_session_list(self.event_new))
+            return jsonify_data(html=_render_session_list(self.event_new))
         return jsonify_template('events/sessions/management/add_session.html', form=form)
 
 
@@ -82,7 +82,7 @@ class RHDeleteSessions(RHManageSessionsBase):
         sessions = self.event_new.sessions.filter(Session.id.in_(session_ids), ~Session.is_deleted)
         for sess in sessions:
             delete_session(sess)
-        return jsonify_data(session_list=_render_session_list(self.event_new))
+        return jsonify_data(html=_render_session_list(self.event_new))
 
 
 class RHExportSessionsCSV(RHManageSessionsBase):
@@ -104,7 +104,7 @@ class RHSessionREST(RHManageSessionBase):
 
     def _process_DELETE(self):
         delete_session(self.session)
-        return jsonify_data(session_list=_render_session_list(self.event_new))
+        return jsonify_data(html=_render_session_list(self.event_new))
 
     def _process_PATCH(self):
         data = request.json

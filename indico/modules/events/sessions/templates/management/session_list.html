@@ -28,7 +28,9 @@
             <div class="group left">
                 <a id="add-new-session" class="i-button highlight icon-plus"
                    data-href="{{ url_for('.create_session', event) }}"
-                   data-title="{% trans %}Add new session{% endtrans %}">
+                   data-title="{% trans %}Add new session{% endtrans %}"
+                   data-update=".sessions-wrapper"
+                   data-ajax-dialog>
                     {% trans %}Add new session{% endtrans %}
                 </a>
             </div>
