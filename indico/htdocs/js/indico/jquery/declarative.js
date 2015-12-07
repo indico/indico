@@ -98,7 +98,8 @@
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
-                                    $(update).html(data.html);
+                                    var elem = $(update);
+                                    elem.html(data.html).trigger('indico:htmlUpdated', [$this]);
                                 }
                             }
                         }
@@ -116,7 +117,8 @@
                         complete: IndicoUI.Dialogs.Util.progress(),
                         success: function(data) {
                             handleFlashes(data, true, $this);
-                            $(update).html(data.html);
+                            var elem = $(update);
+                            elem.html(data.html).trigger('indico:htmlUpdated', [$this]);
                         }
                     });
                     return;
