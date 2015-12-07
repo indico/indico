@@ -10,7 +10,7 @@
             {%- trans %}Choose a color{% endtrans -%}
         </a>
         <input id="{{ field.id }}" type="hidden" name="{{ field.name }}"
-               value="{{ colors | tojson | forceescape}}">
+               value="{{ colors | tojson | forceescape }}">
     </div>
 {% endblock %}
 
