@@ -44,6 +44,13 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
 
 
+class WPManageRegistrationStats(WPManageRegistration):
+    def getJSFiles(self):
+        return (WPManageRegistration.getJSFiles(self) +
+                self._asset_env['statistics_js'].urls() +
+                self._includeJSPackage('jqplot_js', prefix=''))
+
+
 class WPManageParticipants(WPManageRegistration):
     sidemenu_option = 'participants'
 

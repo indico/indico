@@ -111,6 +111,10 @@ class CheckboxField(RegistrationFormBillableField):
                     raise ValidationError(_('There are no places left for this option.'))
         return [_check_number_of_places]
 
+    @property
+    def default_value(self):
+        return None
+
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
@@ -170,6 +174,10 @@ class BooleanField(RegistrationFormBillableField):
                     raise ValidationError(_('There are no places left for this option.'))
         return [_check_number_of_places]
 
+    @property
+    def default_value(self):
+        return None
+
     def get_places_used(self):
         places_used = 0
         if self.form_item.data.get('places_limit'):
@@ -214,7 +222,7 @@ class CountryField(RegistrationFormFieldBase):
         return dict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data):
-        return CountryHolder.getCountries()[registration_data.data] if registration_data.data else ''
+        return CountryHolder.getCountryById(registration_data.data) if registration_data.data else ''
 
 
 class _DeletableFileField(wtforms.FileField):

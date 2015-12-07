@@ -4,7 +4,7 @@
             ng-required="field.isRequired">
             <li ng-repeat="item in field.choices | filter:{isEnabled: true}">
                 <input id="{{ item.id }}" type="checkbox" ng-click="multiFieldItemChecked($event)"
-                       ng-disabled="isDisabled(item, userdata[fieldName][item.id]) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
+                       ng-disabled="(isDisabled(item, userdata[fieldName]) && !userdata[fieldName][item.id]) || (!regMetadata.manager && paymentBlocked(item, userdata, regMetadata))"
                        ng-model="itemChecked"
                        ng-init="itemChecked=userdata[fieldName][item.id] ? true : false"
                        data-paid="{{ regMetadata.paid }}"
@@ -18,7 +18,7 @@
                 <span ng-if="field.withExtraSlots && item.maxExtraSlots && itemChecked"
                       style="margin-left: 10px;">
                     <select id="extraSlotsSelect-{{ item.id }}"
-                            ng-init="numberOfExtraSlotsUsed=(userdata[fieldName][item.id] ? userdata[fieldName][item.id] - 1: 1)"
+                            ng-init="numberOfExtraSlotsUsed=(userdata[fieldName][item.id] > 1 ? userdata[fieldName][item.id] - 1: 1)"
                             ng-model="numberOfExtraSlotsUsed"
                             ng-options="n for n in [] | range:1:getNumberOfSlots(item)"
                             ng-change="onExtraSlotsChanged(item, numberOfExtraSlotsUsed)">

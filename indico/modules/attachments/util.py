@@ -104,8 +104,11 @@ def can_manage_attachments(obj, user):
         return True
     if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
         return True
-    if isinstance(obj, Contribution) and obj.canUserSubmit(user.as_avatar):
-        return True
+    if isinstance(obj, Contribution):
+        if obj.canUserSubmit(user.as_avatar):
+            return True
+        if obj.getSession() and obj.getSession().canCoordinate(user.as_avatar, 'modifContribs'):
+            return True
     if isinstance(obj, SubContribution):
         return can_manage_attachments(obj.getContribution(), user)
     return obj.canModify(user.as_avatar)

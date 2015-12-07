@@ -27,8 +27,10 @@ from indico.modules.events.registration.controllers.management import (RHManageR
 from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.stats import OverviewStats, AccommodationStats
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
-from indico.modules.events.registration.views import WPManageRegistration, WPManageParticipants
+from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
+                                                      WPManageParticipants)
 from indico.modules.events.payment import settings as payment_global_settings
 from indico.web.util import jsonify_data, jsonify_template
 from indico.util.date_time import now_utc
@@ -180,3 +182,13 @@ class RHRegistrationFormModify(RHManageRegFormBase):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event, event=self.event_new,
                                                     sections=get_event_section_data(self.regform, management=True),
                                                     regform=self.regform)
+
+
+class RHRegistrationFormStats(RHManageRegFormBase):
+    """Display registration form stats page"""
+
+    def _process(self):
+        regform_stats = [OverviewStats(self.regform)]
+        regform_stats += [AccommodationStats(x) for x in self.regform.active_fields if x.input_type == 'accommodation']
+        return WPManageRegistrationStats.render_template('management/regform_stats.html', self.event,
+                                                         regform=self.regform, regform_stats=regform_stats)

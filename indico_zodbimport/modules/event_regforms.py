@@ -330,6 +330,7 @@ class RegformMigration(object):
             'title': PersonalDataType.title,
             'address': PersonalDataType.address,
             'phone': PersonalDataType.phone,
+            'country': PersonalDataType.country,
             'position': PersonalDataType.position
         }
         section = RegistrationFormPersonalDataSection(registration_form=self.regform, title=_sanitize(form._title),

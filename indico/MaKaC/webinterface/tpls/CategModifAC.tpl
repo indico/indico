@@ -16,6 +16,6 @@ var paramsMod = {categId: '${ categoryId }', kindOfList: 'modification'};
 
 var modificationControlManager = new ListOfUsersManagerProtection(null,
 		methodsMod, paramsMod, $E('inPlaceManagers'), "manager", "item-user", true, {}, {title: false, affiliation: false, email:true},
-        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j}, false, false, null, ${ self_._rh.getAW().getUser().isAdmin() | n,j});
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j}, false, false, null, true);
 
 </script>
