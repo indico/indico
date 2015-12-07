@@ -28,7 +28,7 @@
             var self = this;
             var element = this.element;
             var palette = $('<div>', {'class': 'color-palette'});
-            var paletteTable = $('<table>');
+            var paletteTable = $('<table>', {'class': 'palette-picker'});
             var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
