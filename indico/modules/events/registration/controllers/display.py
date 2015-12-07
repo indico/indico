@@ -196,7 +196,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                user_data=user_data, invitation=self.invitation,
-                                               registration=self.registration,
+                                               registration=self.registration, management=False,
                                                login_required=self.regform.require_login and not session.user)
 
 

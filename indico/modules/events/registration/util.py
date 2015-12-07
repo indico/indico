@@ -136,8 +136,8 @@ def make_registration_form(regform, management=False, registration=None):
     """Creates a WTForm based on registration form fields"""
 
     class RegistrationFormWTF(IndicoForm):
-        if management and registration:
-            notify_modification = BooleanField(_("Send email"), widget=SwitchWidget())
+        if management:
+            notify_user = BooleanField(_("Send email"), widget=SwitchWidget())
 
         def validate_email(self, field):
             status = check_registration_email(regform, field.data, registration, management=management)
@@ -190,7 +190,7 @@ def url_rule_to_angular(endpoint):
     return ''.join(segments).split('|', 1)[-1]
 
 
-def create_registration(regform, data, invitation=None, management=False):
+def create_registration(regform, data, invitation=None, management=False, notify_user=True):
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
                                 base_price=regform.base_price, currency=regform.currency)
     for form_item in regform.active_fields:
@@ -218,7 +218,7 @@ def create_registration(regform, data, invitation=None, management=False):
         invitation.registration = registration
     registration.sync_state(_skip_moderation=management)
     db.session.flush()
-    notify_registration_creation(registration)
+    notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, session.user)
     return registration
 
