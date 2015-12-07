@@ -110,6 +110,7 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         for contrib in self.contribs:
             delete_contribution(contrib)
         deleted_count = len(self.contribs)
-        flash(ngettext("Contribution was deleted.",
-                       "{count} contributions were deleted.", deleted_count).format(count=deleted_count), 'success')
+        flash(ngettext("The contribution has been deleted.",
+                       "{count} contributions have been deleted.", deleted_count)
+              .format(count=deleted_count), 'success')
         return jsonify_data(html=_render_contribution_list(self.event_new))
