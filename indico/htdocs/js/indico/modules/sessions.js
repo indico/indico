@@ -13,7 +13,7 @@
     }
 
     function setupPalettePickers() {
-        $('.js-color-switch').each(function() {
+        $('.palette-picker-trigger').each(function() {
             var $this = $(this);
             $this.palettepicker({
                 availableColors: $this.data('colors'),

@@ -23,24 +23,9 @@
     border: thin solid lighten($gray, $color-variation);
     box-shadow: 0 6px 12px lighten($gray, $color-variation);
     display: none;
-    margin-top: 0.5em;
     padding: 3px;
     position: absolute;
     z-index: 200;
-
-
-    &:before {
-        @include single-box-shadow();
-        transform: rotate(45deg);
-        content: '';
-        top: -0.2rem;
-        position: absolute;
-        width: .6em;
-        height: .6em;
-        background: #FFF;
-        visibility: visible;
-        margin: 0 0 0 1em;
-    }
 }
 
 table {
