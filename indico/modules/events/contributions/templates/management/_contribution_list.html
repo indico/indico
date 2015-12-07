@@ -58,8 +58,13 @@
                                 </strong>
                             </td>
                             <td class="i-table">
-                                {# schedule #}
-                                TODO
+                                {% if contrib.timetable_entry %}
+                                    {{ contrib.timetable_entry.start_dt|format_datetime('short') }}
+                                {% else %}
+                                    <em>
+                                        {% trans %}Not scheduled{% endtrans %}
+                                    </em>
+                                {% endif %}
                             </td>
                             <td class="i-table">
                                 {{ contrib.duration|format_timedelta(format='medium') }}
