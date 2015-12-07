@@ -15,17 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.color-palette {
+.palette-picker-qtip {
     @include border-radius();
     @include single-box-shadow();
     background: #FFF;
     background-clip: padding-box;
     border: thin solid lighten($gray, $color-variation);
     box-shadow: 0 6px 12px lighten($gray, $color-variation);
-    display: none;
     padding: 3px;
-    position: absolute;
-    z-index: 200;
 }
 
 table.palette-picker {
