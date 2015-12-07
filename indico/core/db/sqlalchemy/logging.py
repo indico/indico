@@ -110,13 +110,13 @@ def apply_db_loggers(app):
         total = time.time() - context._query_start_time
         source_line = _get_sql_line()
         source = source_line['items'] if source_line else None
-        logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
-                                                                            'req_path': (request.path
-                                                                                         if has_request_context()
-                                                                                         else None),
-                                                                            'sql_source': source,
-                                                                            'sql_duration': total,
-                                                                            'sql_verb': statement.split()[0]})
+        logger.debug('Query complete; total time: %s', total, extra={'sql_log_type': 'end',
+                                                                     'req_path': (request.path
+                                                                                  if has_request_context()
+                                                                                  else None),
+                                                                     'sql_source': source,
+                                                                     'sql_duration': total,
+                                                                     'sql_verb': statement.split()[0]})
         g.sql_query_count = g.get('sql_query_count', 0) + 1
 
     @request_started.connect_via(app)

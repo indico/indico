@@ -655,7 +655,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
         msg = 'checked-in' if check_in else 'not checked-in'
         for registration in self.registrations:
             registration.checked_in = check_in
-            logger.info('Registration {} was marked as {} by {}'.format(registration, msg, session.user))
+            logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
         reg_list_config = _get_reg_list_config(regform=self.regform)
         registrations_query = _query_registrations(self.regform)

@@ -105,7 +105,7 @@ class RHDeleteSubmissions(RHManageSurveyBase):
         for submission in self.survey.submissions[:]:
             if submission.id in submission_ids:
                 self.survey.submissions.remove(submission)
-                logger.info('Submission {} deleted from survey {}'.format(submission, self.survey))
+                logger.info('Submission %s deleted from survey %s', submission, self.survey)
                 self.event.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
                                'Submission removed from survey "{}"'.format(self.survey.title),
                                data={'Submitter': submission.user.full_name if submission.user else 'Anonymous'})
