@@ -60,4 +60,4 @@ def _no_ssl_required_on_debug(app, **kwargs):
 @signals.users.merged.connect
 def _delete_merged_user_tokens(target, source, **kwargs):
     source.oauth_tokens.delete()
-    logger.info("All tokens for the user {} were deleted.".format(source))
+    logger.info("All tokens for the user %s were deleted.", source)

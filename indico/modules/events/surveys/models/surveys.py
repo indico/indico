@@ -267,7 +267,7 @@ class Survey(db.Model):
         template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
         email = make_email(bcc_list=self.start_notification_recipients, template=template_module)
         send_email(email, event=self.event, module='Surveys')
-        logger.info('Sending start notification for survey {}'.format(self))
+        logger.info('Sending start notification for survey %s', self)
         self.start_notification_sent = True
 
     def send_submission_notification(self, submission):
@@ -276,7 +276,7 @@ class Survey(db.Model):
         template_module = get_template_module('events/surveys/emails/new_submission_email.txt', submission=submission)
         email = make_email(bcc_list=self.new_submission_emails, template=template_module)
         send_email(email, event=self.event, module='Surveys')
-        logger.info('Sending submission notification for survey {}'.format(self))
+        logger.info('Sending submission notification for survey %s', self)
 
 
 @listens_for(Survey.questions, 'append')

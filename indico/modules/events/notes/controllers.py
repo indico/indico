@@ -87,12 +87,12 @@ class RHEditNote(RHManageNoteBase):
             db.session.flush()
             if is_new:
                 signals.event.notes.note_added.send(note)
-                logger.info('Note {} created by {}'.format(note, session.user))
+                logger.info('Note %s created by %s', note, session.user)
                 self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
                                session.user, data=note.link_event_log_data)
             elif is_changed:
                 signals.event.notes.note_modified.send(note)
-                logger.info('Note {} modified by {}'.format(note, session.user))
+                logger.info('Note %s modified by %s', note, session.user)
                 self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
                                session.user, data=note.link_event_log_data)
             saved = is_new or is_changed
@@ -121,7 +121,7 @@ class RHDeleteNote(RHManageNoteBase):
         if note is not None:
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
-            logger.info('Note {} deleted by {}'.format(note, session.user))
+            logger.info('Note %s deleted by %s', note, session.user)
             self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
                            session.user, data=note.link_event_log_data)
         return redirect(url_for('event.conferenceDisplay', self.event))
