@@ -37,7 +37,7 @@
     }
 
     function setupConfirmPopup() {
-        $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href])', function() {
+        $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href]):not(a[data-ajax-dialog][data-href])', function() {
             var $this = $(this);
             confirmPrompt($(this).data('confirm'), $(this).data('title')).then(function() {
                 if ($this.is('form')) {
@@ -51,11 +51,15 @@
     }
 
     function setupActionLinks() {
-        $('body').on('click', 'button[data-method][data-href], input:button[data-method][data-href], a[data-method][data-href]', function(e) {
+        var selectors = [
+            'button[data-href][data-method]', 'input:button[data-href][data-method]', 'a[data-href][data-method]',
+            'button[data-href][data-ajax-dialog]', 'input:button[data-href][data-ajax-dialog]', 'a[data-href][data-ajax-dialog]'
+        ];
+        $('body').on('click', selectors.join(', '), function(e) {
             e.preventDefault();
             var $this = $(this);
             var url = $this.data('href');
-            var method = $this.data('method').toUpperCase();
+            var method = ($this.data('method') || 'GET').toUpperCase();
             var params = $this.data('params') || {};
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
