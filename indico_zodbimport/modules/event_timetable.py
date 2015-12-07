@@ -646,7 +646,7 @@ class TimetableMigration(object):
             if rb_room:
                 new_entry.room = rb_room
             else:
-                new_entry.location_name = location_name
+                new_entry.venue_name = location_name
                 new_entry.room_name = room_name
 
 

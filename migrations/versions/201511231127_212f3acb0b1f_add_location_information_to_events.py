@@ -15,10 +15,10 @@ down_revision = '105a2d606ff7'
 
 
 def upgrade():
-    not_null_cols = ('address', 'location_name', 'room_name')
+    not_null_cols = ('address', 'venue_name', 'room_name')
     op.add_column('events', sa.Column('address', sa.Text(), nullable=False, server_default=''),
                   schema='events')
-    op.add_column('events', sa.Column('location_name', sa.String(), nullable=False, server_default=''),
+    op.add_column('events', sa.Column('venue_name', sa.String(), nullable=False, server_default=''),
                   schema='events')
     op.add_column('events', sa.Column('room_id', sa.Integer(), nullable=True),
                   schema='events')
@@ -28,7 +28,7 @@ def upgrade():
     for col in not_null_cols:
         op.alter_column('events', col, server_default=None, schema='events')
     op.create_check_constraint('no_custom_location_if_room', 'events',
-                               "(room_id IS NULL) OR (location_name = '' AND room_name = '')",
+                               "(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
                                schema='events')
     op.create_foreign_key(None,
                           'events', 'rooms',
@@ -40,5 +40,5 @@ def downgrade():
     op.drop_constraint('ck_events_no_custom_location_if_room', 'events', schema='events')
     op.drop_column('events', 'room_name', schema='events')
     op.drop_column('events', 'room_id', schema='events')
-    op.drop_column('events', 'location_name', schema='events')
+    op.drop_column('events', 'venue_name', schema='events')
     op.drop_column('events', 'address', schema='events')

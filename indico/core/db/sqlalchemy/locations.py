@@ -43,10 +43,10 @@ class LocationMixin(object):
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        checks = [db.CheckConstraint("(room_id IS NULL) OR (location_name = '' AND room_name = '')",
+        checks = [db.CheckConstraint("(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
                                      'no_custom_location_if_room')]
         if cls.allow_location_inheritance:
-            checks.append(db.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND location_name = '' AND "
+            checks.append(db.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND venue_name = '' AND "
                                              "room_name = '' AND address = '')", 'inherited_location'))
         return tuple(checks)
 
@@ -79,9 +79,9 @@ class LocationMixin(object):
         )
 
     @declared_attr
-    def own_location_name(cls):
+    def own_venue_name(cls):
         return db.Column(
-            'location_name',
+            'venue_name',
             db.String,
             nullable=False,
             default=''
@@ -131,18 +131,18 @@ class LocationMixin(object):
         self.own_room = room
 
     @property
-    def location_name(self):
+    def venue_name(self):
         """The name of the location where this item is located."""
         if self.inherit_location and self.location_parent is None:
             return ''
         room = self.room
         if room is not None:
             return room.location.name
-        return self.own_location_name if not self.inherit_location else self.location_parent.location_name
+        return self.own_venue_name if not self.inherit_location else self.location_parent.venue_name
 
-    @location_name.setter
-    def location_name(self, location_name):
-        self.own_location_name = location_name
+    @venue_name.setter
+    def venue_name(self, venue_name):
+        self.own_venue_name = venue_name
 
     @property
     def room_name(self):
@@ -174,7 +174,7 @@ class LocationMixin(object):
         """All location data for the item.
 
         Returns a dict containing ``source``, ``inheriting``, ``room``,
-        ``room_name``, ``location_name`` and ``address``.  The
+        ``room_name``, ``venue_name`` and ``address``.  The
         ``source`` is the object the location data is taken from, i.e.
         either the item itself or the object the location data is
         inherited from.
@@ -183,9 +183,9 @@ class LocationMixin(object):
         while data_source and data_source.inherit_location:
             data_source = data_source.location_parent
         if data_source is None:
-            return {'source': None, 'room': None, 'room_name': '', 'location_name': '', 'address': '',
+            return {'source': None, 'room': None, 'room_name': '', 'venue_name': '', 'address': '',
                     'inheriting': False}
         else:
             return {'source': data_source, 'room': data_source.room, 'room_name': data_source.room_name,
-                    'location_name': data_source.location_name, 'address': data_source.address,
+                    'venue_name': data_source.venue_name, 'address': data_source.address,
                     'inheriting': self.inherit_location}
