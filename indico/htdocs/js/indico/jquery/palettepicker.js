@@ -27,20 +27,17 @@
         _create: function() {
             var self = this;
             var element = this.element;
-            var palette = $('<div>', {'class': 'color-palette'});
             var paletteTable = $('<table>', {'class': 'palette-picker'});
             var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
             for (var i = 0; i < availableColors.length; ++i) {
-                var uniqueId = _.uniqueId('palette-color');
                 var td = $('<td>', {
                     'css': {'background': '#' + availableColors[i].background},
-                    'class': 'palette-color',
-                    'id': uniqueId
+                    'class': 'palette-color'
                 });
 
-                $(document).on('click', '#' + uniqueId, function(evt) {
+                td.on('click', function(evt) {
                     evt.preventDefault();
 
                     var $this = $(this),
@@ -80,13 +77,11 @@
                 paletteTable.append(tr);
             }
 
-            palette.append(paletteTable);
-
             element.qtip({
                 prerender: false,
                 overwrite: false,
                 style: {
-                    classes: 'color-palette'
+                    classes: 'palette-picker-qtip'
                 },
                 position: {
                     my: 'top center',
@@ -98,7 +93,7 @@
                     }
                 },
                 content: {
-                    text: palette.html()
+                    text: $(paletteTable)
                 },
                 show: {
                     event: 'click',
