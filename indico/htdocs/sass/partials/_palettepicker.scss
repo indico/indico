@@ -28,22 +28,22 @@
     z-index: 200;
 }
 
-table {
+table.palette-picker {
     border-spacing: 8px;
 
     td {
-        .text-box {
-            width: 8px;
-            height: 8px;
-            margin: auto;
-            border-radius: 3px;
-        }
-
         &.palette-color {
             cursor: pointer;
             width: 20px;
             height: 20px;
             border-radius: 15px;
+        }
+
+        .text-box {
+            width: 8px;
+            height: 8px;
+            margin: auto;
+            border-radius: 3px;
         }
 
         .background-box {
