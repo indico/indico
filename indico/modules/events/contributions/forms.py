@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.fields import ContributionPersonListField
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoEnumRadioField
+from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoEnumRadioField, IndicoLocationField
 from indico.web.forms.validators import UsedIf
 from indico.util.i18n import _
 
@@ -36,6 +36,7 @@ class ContributionForm(IndicoForm):
                               units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
     person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
+    location_data = IndicoLocationField(_("Location"), description=_("Location"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

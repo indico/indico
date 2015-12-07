@@ -1,0 +1,331 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="i-location-field">
+        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
+               value="{{ field._value() | tojson | forceescape }}">
+        <div class="wrapper">
+            <div class="typeahead-container">
+                <div class="typeahead-field">
+                    <a class="i-button highlight icon-close close-backdrop-button">
+                        {%- trans %}Leave empty{% endtrans -%}
+                    </a>
+                    <input id="location-venue-{{ field.id }}"
+                           class="i-location-input-field"
+                           name="location-venue-{{ field.name }}"
+                           type="text"
+                           placeholder="{% trans %}Venue{% endtrans %}"
+                           autocomplete="off"
+                           tabindex="-1">
+                    <span class="toggle-results-list icon-arrow-down"></span>
+                    <div class="typeahead-results">
+                        <div class="results-list-container" id="location-venue-{{ field.id }}-results"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="typeahead-container">
+                <div class="typeahead-field">
+                    <a class="i-button highlight icon-close close-backdrop-button">
+                        {%- trans %}Leave empty{% endtrans -%}
+                    </a>
+                    <input id="location-room-{{ field.id }}"
+                           class="i-location-input-field"
+                           name="location-room-{{ field.name }}"
+                           type="text"
+                           placeholder="{% trans %}Room{% endtrans %}"
+                           autocomplete="off"
+                           tabindex="-1">
+                    <span class="toggle-results-list icon-arrow-down"></span>
+                    <div class="typeahead-results">
+                        <div class="results-list-container" id="location-room-{{ field.id }}-results"></div>
+                    </div>
+                </div>
+            </div>
+            <input id="location-inheritance-{{ field.id }}"
+                   name="location-inheritance-{{ field.name }}"
+                   type="checkbox">
+            <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
+            <textarea id="location-address-{{ field.id }}" name="location-address"
+                      placeholder="{% trans %}Address{% endtrans %}"></textarea>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var field = $('#{{ field.id }}');
+            var description = field.closest('.form-field').find('.form-field-description');
+            var venueInput = $('#location-venue-{{ field.id }}');
+            var roomInput = $('#location-room-{{ field.id }}');
+            var address = $('#location-address-{{ field.id }}');
+            var usingDefault = $('#location-inheritance-{{ field.id }}');
+            var venues = {{ venues | tojson }};
+            var venueNames = {{ venue_names | tojson }};
+            var rooms = {{ rooms | tojson }};
+            var hiddenData = field.val() ? JSON.parse(field.val()) : {};
+            var latestUsedField = '';
+            var latestSelectedOption = {field: '', value: ''};
+
+            if (hiddenData.inheriting) {
+                usingDefault.prop('checked', hiddenData.inheriting);
+            }
+            if (hiddenData.address) {
+                address.val(hiddenData.address);
+            }
+            if (hiddenData.room_name) {
+                roomInput.val(hiddenData.room_name);
+            }
+            if (hiddenData.venue_name) {
+                venueInput.val(hiddenData.venue_name);
+            }
+
+            function toggleDefaultLocation(isChecked) {
+                // TODO: complete description message
+                var text = isChecked ? 'Using default location from: TODO' : 'Using custom location';
+                description.html(text);
+                venueInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
+                roomInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
+                address.prop('disabled', isChecked).toggleClass('disabled', isChecked);
+
+                hiddenData.inheriting = isChecked;
+                field.val(JSON.stringify(hiddenData)).trigger('change');
+            };
+
+            function reorderCategories(item) {
+                var groupOrder = [item.name];
+                for (var i = venueNames.length - 1; i >= 0; i--) {
+                    if (!~groupOrder.indexOf(venueNames[i])) {
+                        groupOrder.push(venueNames[i]);
+                    }
+                }
+                Typeahead[roomInput.selector].options.groupOrder = groupOrder;
+            }
+
+            function updateVenueOnRoomChange(item) {
+                if (item.venue_id != hiddenData.venue_id) {
+                    var data = {item_name: item.group, venue_id: item.venue_id, room_id: item.id};
+                    venueInput.trigger('typeahead:click-on-option', data);
+                }
+            }
+
+            function updateResultsList(node, resultHtmlList) {
+                var resultsWrapper = node.siblings('.typeahead-results');
+                resultsWrapper.css('top', node.outerHeight() + 'px');
+                var justUse = node.parent().find('.just-use-option');
+                if (node.val().length > 0) {
+                    if (justUse.length === 0) {
+                        justUse = $('<div>').attr({
+                                'class': 'just-use-option'
+                            })
+                            .on('click', function() {
+                                node.trigger('indico:click-on-custom-option', {item_name: node.val()});
+                            });
+                        resultsWrapper.append(justUse);
+                    }
+                    justUse.text('Just use "' + node.val() + '"');
+                } else if (justUse.length != 0) {
+                    justUse.remove();
+                }
+                return resultHtmlList;
+            }
+
+            function buildBackdrop() {
+                var wrapper = $('.backdrop-wrapper');
+                var wrapperCloseButton = latestUsedField.parent().find('.close-backdrop-button');
+                if (wrapper.length === 0) {
+                    var backdropWrapper = $('<div>').attr({
+                        'class': 'backdrop-wrapper'
+                    }).on('click keydown', function(e) {
+                        if (latestUsedField.val() != "") {
+                            e.stopPropagation();
+                        } else {
+                            $(this).hide();
+                            latestUsedField.parent().find('.close-backdrop-button').hide();
+                        }
+                    });
+                    var closeButton = $('<a>').attr({
+                        'class': 'icon-close close-button'
+                    }).on('click', function() {
+                        $(this).parent().hide();
+                    });
+                    backdropWrapper.append(closeButton);
+                    latestUsedField.closest('.i-location-field').append(backdropWrapper);
+                    wrapperCloseButton.show();
+                } else {
+                    wrapper.show();
+                    wrapperCloseButton.show();
+                }
+            }
+
+            function postSelectionActions(inputField, value) {
+                inputField.val(value);
+                field.val(JSON.stringify(hiddenData)).trigger('change');
+                inputField.trigger('typeahead:close-results-list');
+            }
+
+            function cleanQuery(query) {
+                return query ? query.trim() : '';
+            }
+
+            usingDefault.on('click', function() {
+                toggleDefaultLocation($(this).prop('checked'));
+            });
+
+            toggleDefaultLocation(usingDefault.prop('checked'));
+
+            venueInput.typeahead({
+                source: venues,
+                minLength: 0,
+                searchOnFocus: true,
+                resultContainer: '#' + venueInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
+                template: {% raw %}'<span>{{name}}</span>'{% endraw %},
+                emptyTemplate: function (query) {
+                    return "";
+                },
+                display: 'name',
+                backdrop: true,
+                callback: {
+                    onClickAfter: function(node, a, item, event) {
+                        reorderCategories(item);
+                        venueInput.trigger('typeahead:click-on-option', {item_name: item.name, venue_id: item.id});
+                        venueInput.trigger('blur');
+                        latestSelectedOption = {field: node.attr('id'), value: item.name}
+                    },
+                    onLayoutBuiltBefore: function(node, query, result, resultHtmlList) {
+                        return updateResultsList(node, resultHtmlList);
+                    },
+                    onSearch: function(node, query) {
+                        this.query = cleanQuery(query);
+                    }
+                }
+            });
+
+            roomInput.typeahead({
+                source: rooms,
+                minLength: 0,
+                searchOnFocus: true,
+                group: true,
+                maxItem: 0,
+                resultContainer: '#' + roomInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
+                template: {% raw %}'<span>{{name}}</span>'{% endraw %},
+                emptyTemplate: function (query) {
+                    return "No results for \"" + query + "\"";
+                },
+                display: 'name',
+                backdrop: true,
+                callback: {
+                    onClickAfter: function(node, a, item, event) {
+                        updateVenueOnRoomChange(item);
+
+                        hiddenData.room_id = item.id;
+                        delete hiddenData.room_name;
+
+                        postSelectionActions(roomInput, item.name);
+                        roomInput.trigger('blur');
+                        latestSelectedOption = {field: node.attr('id'), value: item.name}
+                    },
+                    onLayoutBuiltBefore: function(node, query, result, resultHtmlList) {
+                        return updateResultsList(node, resultHtmlList);
+                    },
+                    onSearch: function(node, query) {
+                        this.query = cleanQuery(query);
+                    }
+                }
+            });
+
+            venueInput.on('typeahead:click-on-option', function(e, data) {
+                if (hiddenData.venue_id && data.venue_id != hiddenData.venue_id) {
+                    delete hiddenData.room_id;
+                    roomInput.val('');
+                }
+                hiddenData.venue_name = data.item_name;
+                hiddenData.venue_id = data.venue_id;
+                postSelectionActions(venueInput, data.item_name);
+            })
+            .on('typeahead:click-on-custom-option', function(e, data) {
+                if (hiddenData.room_id) {
+                    delete hiddenData.room_id;
+                    roomInput.val('');
+                }
+                delete hiddenData.venue_id;
+                hiddenData.venue_name = data.item_name;
+                postSelectionActions(venueInput, data.item_name);
+            })
+            .on('typeahead:click-on-clear-button', function() {
+                delete hiddenData.venue_name;
+                delete hiddenData.venue_id;
+                if (hiddenData.room_id) {
+                    delete hiddenData.room_id;
+                    postSelectionActions(roomInput, "");
+                }
+                postSelectionActions(venueInput, "");
+            });
+
+            roomInput.on('typeahead:click-on-custom-option', function(e, data) {
+                delete hiddenData.room_id;
+                hiddenData.room_name = data.item_name;
+                postSelectionActions(roomInput, data.item_name);
+            })
+            .on('typeahead:click-on-clear-button', function() {
+                delete hiddenData.room_name;
+                delete hiddenData.room_id;
+                postSelectionActions(roomInput, "");
+            });
+
+
+            $('.i-location-input-field').on('typeahead:close-results-list', function() {
+                Typeahead["#" + this.id].hideLayout();
+                $('.backdrop-wrapper').hide();
+                $('.close-backdrop-button').hide();
+                $(this).trigger('blur');
+            })
+            .on('focus.typeahead', function() {
+                $(this).trigger('input.typeahead');
+                $('.ui-dialog-content').css('overflow', 'inherit');
+                latestUsedField = $(this);
+                buildBackdrop();
+            })
+            .on('keydown', function(e) {
+                var $this = $(this);
+                if (e.keyCode == 9) { // on tab
+                    e.preventDefault();
+                    $this.trigger('typeahead:close-results-list')
+                } else if (e.keyCode == 27) { // on esc
+                    e.preventDefault();
+                    latestUsedField.trigger('typeahead:click-on-clear-button');
+                } else if (e.keyCode == 13) { // on enter
+                    if (latestSelectedOption != '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
+                        $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
+                    }
+                }
+            });
+
+            $('.toggle-results-list').on('click', function() {
+                var container = $(this).parent().parent();
+                var input = container.find('.i-location-input-field');
+                if (container.hasClass('result')) {
+                    if (!input.val()) {
+                        input.trigger('typeahead:close-results-list');
+                    }
+                } else {
+                    input.trigger('focus.typeahead');
+                }
+            });
+
+            $('.close-backdrop-button').on('click', function() {
+                var inputField = $(this).parent().find('.i-location-input-field');
+                inputField.trigger('typeahead:click-on-clear-button');
+                $(this).closest('.i-location-field').find('.backdrop-wrapper').trigger('click');
+            });
+
+            address.on('keyup', function() {
+                hiddenData.address = address.val();
+                field.val(JSON.stringify(hiddenData)).trigger('change');
+            });
+        })();
+    </script>
+{% endblock %}

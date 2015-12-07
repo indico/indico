@@ -248,3 +248,21 @@ class LocationMixin(object):
             return {'source': data_source, 'venue': data_source.venue, 'room': data_source.room,
                     'room_name': data_source.room_name, 'venue_name': data_source.venue_name,
                     'address': data_source.address, 'inheriting': self.inherit_location}
+
+    @location_data.setter
+    def location_data(self, data):
+        self.inherit_location = data['inheriting']
+        if self.inherit_location:
+            self.room = None
+            self.venue_name = ''
+            self.room_name = ''
+            self.address = ''
+        else:
+            self.room = data['room']
+            self.address = data['address']
+            if self.room:
+                self.venue_name = ''
+                self.room_name = ''
+            else:
+                self.venue_name = data['venue_name']
+                self.room_name = data['room_name']

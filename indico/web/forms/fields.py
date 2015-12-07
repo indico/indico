@@ -28,20 +28,23 @@ from wtforms.widgets.core import CheckboxInput, Select, RadioInput
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.modules.users.models.users import User, UserTitle
 from indico.modules.users.util import serialize_user
 from indico.util.date_time import localize_as_utc
 from indico.util.i18n import _
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail, sanitize_email
-from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
+from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs, LocationWidget
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
@@ -114,6 +117,36 @@ class HiddenFieldList(HiddenField):
 
     def _value(self):
         return self.data
+
+
+class IndicoLocationField(JSONField):
+
+    CAN_POPULATE = True
+    widget = LocationWidget()
+
+    def __init__(self, *args, **kwargs):
+        self.locations = Location.query.order_by(db.func.lower(Location.name)).all()
+        super(IndicoLocationField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        super(IndicoLocationField, self).process_formdata(valuelist)
+        self.data['room'] = Room.query.get(int(self.data['room_id'])) if self.data.get('room_id') else None
+
+    def _value(self):
+        if not self.data:
+            return {}
+        result = {
+            'address': self.data['address'],
+            'venue_name': self.data['venue_name'],
+            'inheriting': self.data['inheriting'],
+        }
+        if self.data['room']:
+            result['room_id'] = self.data['room'].id
+            result['venue_id'] = self.data['room'].location.id
+            result['room_name'] = self.data['room'].name
+        else:
+            result['room_name'] = self.data['room_name']
+        return result
 
 
 class TextListField(TextAreaField):

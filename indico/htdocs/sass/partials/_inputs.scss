@@ -331,7 +331,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         lighten($pastel-gray, 0.5*$color-variation) 10px,
         lighten($pastel-gray, 0.7*$color-variation) 10px,
         lighten($pastel-gray, 0.7*$color-variation) 20px
-    );
+    ) !important;
     font-style: italic;
     color: $dark-gray !important;
 }
