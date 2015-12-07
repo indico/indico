@@ -1,13 +1,6 @@
 (function(global) {
     'use strict';
 
-    function handleRowSelection() {
-        $('.sessions-wrapper').on('change', '.select-row', function() {
-            $(this).closest('tr').toggleClass('selected', this.checked);
-            $('.js-requires-selected-row').toggleClass('disabled', !$('.sessions input:checkbox:checked').length);
-        }).trigger('change');
-    }
-
     function setupTableSorter() {
         $('.sessions .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
@@ -41,7 +34,7 @@
     }
 
     global.setupSessionsList = function setupSessionsList() {
-        handleRowSelection();
+        enableIfChecked('.sessions-wrapper', '.select-row', '.js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
 
