@@ -20,6 +20,12 @@
         if (!window.indicoOfflineSite) {
             setupAttachmentPreview();
         }
+
+        $('[data-attachment-editor]').on('click', function(e) {
+            e.preventDefault();
+            var locator = $(this).data('locator');
+            openAttachmentManager(locator);
+        });
     });
 
     global.setupAttachmentPreview = function setupAttachmentPreview() {
