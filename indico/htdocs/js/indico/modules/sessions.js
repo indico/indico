@@ -24,7 +24,6 @@
                         data: JSON.stringify({'colors': {'text': text, 'background': background}}),
                         dataType: 'json',
                         contentType: 'application/json',
-                        traditional: true,
                         error: handleAjaxError,
                         complete: IndicoUI.Dialogs.Util.progress()
                     });
@@ -84,7 +83,6 @@
                 url: $this.data('href'),
                 method: $this.data('method'),
                 error: handleAjaxError,
-                traditional: true,
                 data: {session_ids: sessionIds},
                 success: updateSessionsListOnSuccess
             });
@@ -114,7 +112,6 @@
             $.ajax({
                 url: $this.data('href'),
                 method: 'POST',
-                traditional: true,
                 error: handleAjaxError,
                 data: {session_ids: checkedItems}
             });
