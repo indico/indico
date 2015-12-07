@@ -52,16 +52,18 @@
                                 <a class="icon-edit highlight edit-session action-icon"
                                    title="{% trans %}Edit this session{% endtrans %}"
                                    data-title="{% trans title=session.title %}Edit session {{ title }}{% endtrans %}"
-                                   data-href="{{ url_for('.modify_session', session) }}"></a>
-                                <a class="icon-time highlight action-icon"
+                                   data-href="{{ url_for('.modify_session', session) }}"
+                                   data-update=".sessions-wrapper"
+                                   data-ajax-dialog></a>
+                                <a href="#" class="icon-time highlight action-icon"
                                    title="{% trans %}Go to this session timetable{% endtrans %}"
-                                   data-href="#"
                                    data-method="POST"></a>
-                                <a class="icon-remove highlight js-remove-session action-icon"
+                                <a class="icon-remove highlight action-icon"
                                    title="{% trans %}Remove this session{% endtrans %}"
                                    data-method="DELETE"
                                    data-href="{{ url_for('.session_rest', session)}}"
-                                   data-session-id="{{ session.id }}"
+                                   data-params="{{ dict(sessions_ids=session.id) | tojson | forceescape }}"
+                                   data-update=".sessions-wrapper"
                                    data-confirm="{% trans title=session.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
                             </div>
                         </td>

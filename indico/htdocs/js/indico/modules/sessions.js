@@ -44,28 +44,15 @@
 
         function updateSessionsListOnSuccess(data) {
             if (data) {
-                $('.sessions-wrapper').html(data.session_list);
+                $('.sessions-wrapper').html(data.html);
                 setupTableSorter();
                 setupPalettePickers();
             }
         }
 
-        $('.sessions').on('click', '#add-new-session', function() {
-            var $this = $(this);
-            ajaxDialog({
-                url: $this.data('href'),
-                title: $this.data('title'),
-                onClose: updateSessionsListOnSuccess
-            });
-        });
-
-        $('.sessions').on('click', '.edit-session', function() {
-            var $this = $(this);
-            ajaxDialog({
-                url: $this.data('href'),
-                title: $this.data('title'),
-                onClose: updateSessionsListOnSuccess
-            });
+        $('.sessions').on('indico:htmlUpdated', function() {
+            setupTableSorter();
+            setupPalettePickers();
         });
 
         $('.sessions').on('click', '.show-session-blocks', function() {
@@ -84,20 +71,6 @@
                 method: $this.data('method'),
                 error: handleAjaxError,
                 data: {session_ids: sessionIds},
-                success: updateSessionsListOnSuccess
-            });
-        });
-
-        $('.sessions').on('indico:confirmed', '.js-remove-session', function(evt) {
-            evt.preventDefault();
-            var $this = $(this);
-
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                data: {session_ids: $this.data('session-id')},
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
                 success: updateSessionsListOnSuccess
             });
         });
