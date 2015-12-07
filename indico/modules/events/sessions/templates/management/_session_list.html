@@ -33,14 +33,12 @@
                         </td>
                         <td class="i-table">
                             <div class="group">
-                                <span class="js-color-switch"
-                                      data-colors="{{ default_colors | tojson | forceescape }}">
-                                    <a class="i-button icon-palette switch-trigger"
-                                       style="background: #{{ session.background_color }};
-                                              color: #{{ session.text_color }} !important;"
-                                       data-method="PATCH" data-href="{{ url_for('.session_rest', session) }}">
-                                    </a>
-                                </span>
+                                <a class="i-button icon-palette palette-picker-trigger"
+                                   style="background: #{{ session.background_color }};
+                                          color: #{{ session.text_color }} !important;"
+                                   data-method="PATCH" data-href="{{ url_for('.session_rest', session) }}"
+                                   data-colors="{{ default_colors | tojson | forceescape }}">
+                                </a>
                             </div>
                         </td>
                         <td class="i-table">
