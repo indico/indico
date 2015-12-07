@@ -33,7 +33,7 @@ def send_event_reminders():
                                        _join=EventReminder.event_new)
     try:
         for reminder in reminders:
-            logger.info('Sending event reminder: {}'.format(reminder))
+            logger.info('Sending event reminder: %s', reminder)
             reminder.send()
     finally:
         # If we fail at any point during the loop, we'll still commit

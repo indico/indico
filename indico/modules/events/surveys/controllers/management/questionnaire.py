@@ -107,7 +107,7 @@ class RHAddSurveySection(RHManageSurveyBase):
             db.session.add(section)
             db.session.flush()
             flash(_('Section "{title}" added').format(title=section.title), 'success')
-            logger.info('Survey section {} added by {}'.format(section, session.user))
+            logger.info('Survey section %s added by %s', section, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -122,7 +122,7 @@ class RHEditSurveySection(RHManageSurveySectionBase):
             form.populate_obj(self.section)
             db.session.flush()
             flash(_('Section "{title}" updated').format(title=old_title), 'success')
-            logger.info('Survey section {} modified by {}'.format(self.section, session.user))
+            logger.info('Survey section %s modified by %s', self.section, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -134,7 +134,7 @@ class RHDeleteSurveySection(RHManageSurveySectionBase):
         db.session.delete(self.section)
         db.session.flush()
         flash(_('Section "{title}" deleted').format(title=self.section.title), 'success')
-        logger.info('Survey section {} deleted by {}'.format(self.section, session.user))
+        logger.info('Survey section %s deleted by %s', self.section, session.user)
         return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
 
 
@@ -149,7 +149,7 @@ class RHAddSurveyText(RHManageSurveySectionBase):
             self.section.children.append(text)
             db.session.flush()
             flash(_('Text item added'), 'success')
-            logger.info('Survey text item {} added by {}'.format(text, session.user))
+            logger.info('Survey text item %s added by %s', text, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -163,7 +163,7 @@ class RHEditSurveyText(RHManageSurveyTextBase):
             form.populate_obj(self.text)
             db.session.flush()
             flash(_('Text item updated'), 'success')
-            logger.info('Survey text item {} modified by {}'.format(self.text, session.user))
+            logger.info('Survey text item %s modified by %s', self.text, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -175,7 +175,7 @@ class RHDeleteSurveyText(RHManageSurveyTextBase):
         db.session.delete(self.text)
         db.session.flush()
         flash(_('Text item deleted'), 'success')
-        logger.info('Survey question {} deleted by {}'.format(self.text, session.user))
+        logger.info('Survey question %s deleted by %s', self.text, session.user)
         return jsonify_data(questionnaire=_render_questionnaire_preview(self.text.survey))
 
 
@@ -195,7 +195,7 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
             self.section.children.append(question)
             db.session.flush()
             flash(_('Question "{title}" added').format(title=question.title), 'success')
-            logger.info('Survey question {} added by {}'.format(question, session.user))
+            logger.info('Survey question %s added by %s', question, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -210,7 +210,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
             self.question.field.save_config(form)
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=old_title), 'success')
-            logger.info('Survey question {} modified by {}'.format(self.question, session.user))
+            logger.info('Survey question %s modified by %s', self.question, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -222,7 +222,7 @@ class RHDeleteSurveyQuestion(RHManageSurveyQuestionBase):
         db.session.delete(self.question)
         db.session.flush()
         flash(_('Question "{title}" deleted').format(title=self.question.title), 'success')
-        logger.info('Survey question {} deleted by {}'.format(self.question, session.user))
+        logger.info('Survey question %s deleted by %s', self.question, session.user)
         return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
 
 
@@ -234,7 +234,7 @@ class RHSortSurveyItems(RHManageSurveyBase):
         section_ids = map(int, request.form.getlist('section_ids'))
         for position, section_id in enumerate(section_ids, 1):
             sections[section_id].position = position
-        logger.info('Sections in {} reordered by {}'.format(self.survey, session.user))
+        logger.info('Sections in %s reordered by %s', self.survey, session.user)
 
     def _sort_items(self):
         section = SurveySection.find_one(survey=self.survey, id=request.form['section_id'],
@@ -252,8 +252,8 @@ class RHSortSurveyItems(RHManageSurveyBase):
                 changed_section = item.parent
                 item.position = position
                 item.parent = section
-                logger.info('Item {} moved to section {} by {}'.format(item, section, session.user))
-        logger.info('Items in {} reordered by {}'.format(section, session.user))
+                logger.info('Item %s moved to section %s by %s', item, section, session.user)
+        logger.info('Items in %s reordered by %s', section, session.user)
         if changed_section is not None:
             for position, item in enumerate(changed_section.children, 1):
                 item.position = position

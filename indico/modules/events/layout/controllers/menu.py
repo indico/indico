@@ -78,8 +78,8 @@ class RHMenuToggleCustom(RHMenuBase):
                 db.session.delete(entry)
             flash(_('Menu customization has been disabled.'), 'success')
         layout_settings.set(self._conf, 'use_custom_menu', enabled)
-        logger.info('Menu customization for {} {} by {}'.format(self._conf, 'enabled' if enabled else 'disabled',
-                                                                session.user))
+        logger.info('Menu customization for %s %s by %s', self._conf, 'enabled' if enabled else 'disabled',
+                    session.user)
         return jsonify(enabled=enabled)
 
 

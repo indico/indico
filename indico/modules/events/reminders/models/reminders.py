@@ -174,7 +174,7 @@ class EventReminder(db.Model):
         self.is_sent = True
         recipients = self.all_recipients
         if not recipients:
-            logger.info('Notification {} has no recipients; not sending anything'.format(self))
+            logger.info('Notification %s has no recipients; not sending anything', self)
             return
         email_tpl = make_reminder_email(event, self.include_summary, self.message)
         email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
