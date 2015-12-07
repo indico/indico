@@ -3,13 +3,12 @@
 {% block html %}
     {% set colors = field._value() %}
     <div class="group">
-        <span id="{{ field.id }}-palette-picker" class="color-switch">
-            <a class="i-button icon-expand switch-trigger"
-               style="background: #{{ colors.background }};
-                      color: #{{ colors.text }} !important">
-                {%- trans %}Choose a color{% endtrans -%}
-            </a>
-        </span>
+        <a id="{{ field.id }}-palette-picker"
+           class="i-button icon-expand palette-picker-trigger"
+           style="background: #{{ colors.background }};
+                  color: #{{ colors.text }} !important">
+            {%- trans %}Choose a color{% endtrans -%}
+        </a>
         <input id="{{ field.id }}" type="hidden" name="{{ field.name }}"
                value="{{ colors | tojson | forceescape}}">
     </div>
