@@ -65,8 +65,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         if user:
             self._old_id = self.id
             self.id = str(user.id)
-            logger.info("Updated legacy user id ({} => {})"
-                        .format(self._old_id, self.id))
+            logger.info("Updated legacy user id (%s => %s)", self._old_id, self.id)
         return user
 
     @property
