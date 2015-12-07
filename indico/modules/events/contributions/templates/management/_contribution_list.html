@@ -102,6 +102,11 @@
                                    data-title="{% trans title=contrib.title %}Edit contribution {{ title }}{% endtrans %}"
                                    data-update="#contribution-list">
                                 </a>
+                                <a href="#" class="icon-attachment"
+                                    data-attachment-editor
+                                    data-title="{% trans title=contrib.title %}Manage attachments for '{{ title }}'{% endtrans %}"
+                                    data-locator="{{ contrib.locator|tojson|forceescape }}">
+                                </a>
                                 <a href="#" class="icon-remove"
                                    data-title="{% trans title=contrib.title %}Delete contribution {{ title }}?{% endtrans %}"
                                    data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
