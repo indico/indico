@@ -41,7 +41,7 @@ def build_static_site(static_site):
     static_site.state = StaticSiteState.running
     db.session.commit()
     try:
-        logger.info('Building static site: {}'.format(static_site))
+        logger.info('Building static site: %s', static_site)
         session.lang = static_site.creator.settings.get('lang')
         rh = RHCustomizable()
         rh._aw = AccessWrapper()
@@ -61,12 +61,12 @@ def build_static_site(static_site):
         static_site.state = StaticSiteState.success
         db.session.commit()
 
-        logger.info('Building static site successful: {}'.format(static_site))
+        logger.info('Building static site successful: %s', static_site)
         ContextManager.set('offlineMode', False)
         ContextManager.set('currentRH', None)
         notify_static_site_success(static_site)
     except Exception:
-        logger.exception('Building static site failed: {}'.format(static_site))
+        logger.exception('Building static site failed: %s', static_site)
         static_site.state = StaticSiteState.failed
         db.session.commit()
         raise
@@ -91,12 +91,12 @@ def static_sites_cleanup(days=30):
     """
     expired_sites = StaticSite.find_all(StaticSite.requested_dt < (now_utc() - timedelta(days=days)),
                                         StaticSite.state == StaticSiteState.success)
-    logger.info('Removing {0} expired static sites from the past {1} days'.format(len(expired_sites), days))
+    logger.info('Removing %d expired static sites from the past %d days', len(expired_sites), days)
     try:
         for site in expired_sites:
             site.delete_file()
             site.path = None
             site.state = StaticSiteState.expired
-            logger.info('Removed static site {}'.format(site))
+            logger.info('Removed static site %s', site)
     finally:
         db.session.commit()

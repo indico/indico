@@ -233,8 +233,8 @@ def merge_users(source, target, force=False):
 
     # Move emails to the target user
     primary_source_email = source.email
-    logger.info("Target {} initial emails: {}".format(target, ', '.join(target.all_emails)))
-    logger.info("Source {} emails to be linked to target {}: {}".format(source, target, ', '.join(source.all_emails)))
+    logger.info("Target %s initial emails: %s", target, ', '.join(target.all_emails))
+    logger.info("Source %s emails to be linked to target %s: %s", source, target, ', '.join(source.all_emails))
     UserEmail.find(user_id=source.id).update({
         UserEmail.user_id: target.id,
         UserEmail.is_primary: False
@@ -270,4 +270,4 @@ def merge_users(source, target, force=False):
     source.email = primary_source_email
     db.session.flush()
 
-    logger.info("Successfully merged {} into {}".format(source, target))
+    logger.info("Successfully merged %s into %s", source, target)

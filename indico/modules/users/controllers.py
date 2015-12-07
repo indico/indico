@@ -245,7 +245,7 @@ class RHUserEmailsVerify(RHUserBase):
             self.token_storage.delete(token)
 
             if existing and existing.is_pending:
-                logger.info("Found pending user {} to be merged into {}".format(existing, self.user))
+                logger.info("Found pending user %s to be merged into %s", existing, self.user)
                 merge_users(existing, self.user)
                 flash(_("Merged data from existing '{}' identity").format(existing.email))
                 existing.is_pending = False
@@ -354,10 +354,10 @@ class RHUsersAdminMerge(RHAdminBase):
             if errors:
                 raise BadRequest(_('Merge aborted due to failed sanity check'))
             if warnings:
-                logger.info("User {} initiated merge of {} into {} (with {} warnings)".format(session.user, source,
-                                                                                              target, len(warnings)))
+                logger.info("User %s initiated merge of %s into %s (with %d warnings)",
+                            session.user, source, target, len(warnings))
             else:
-                logger.info("User {} initiated merge of {} into {}".format(session.user, source, target))
+                logger.info("User %s initiated merge of %s into %s", session.user, source, target)
             merge_users(source, target)
             flash(_('The users have been successfully merged.'), 'success')
             return redirect(url_for('.user_profile', user_id=target.id))

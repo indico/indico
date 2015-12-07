@@ -270,7 +270,7 @@ def handler(prefix, path):
 
         # Log successful POST api requests
         if error is None and request.method == 'POST':
-            logger.info('API request: %s?%s' % (path, query))
+            logger.info('API request: %s?%s', path, query)
 
         serializer = Serializer.create(dformat, query_params=queryParams, pretty=pretty, typeMap=typeMap,
                                        **hook.serializer_args)
@@ -291,5 +291,5 @@ def handler(prefix, path):
             serializer.set_headers(responseUtil)
             return responseUtil.make_response(data)
         except:
-            logger.exception('Serialization error in request %s?%s' % (path, query))
+            logger.exception('Serialization error in request %s?%s', path, query)
             raise

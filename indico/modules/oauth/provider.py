@@ -112,7 +112,7 @@ def save_token(token_data, request, *args, **kwargs):
         token.access_token = token_data['access_token']
         token.scopes = requested_scopes
     elif requested_scopes - token.scopes:
-        logger.info('Added scopes to {}: {}'.format(token, requested_scopes - token.scopes))
+        logger.info('Added scopes to %s: %s', token, requested_scopes - token.scopes)
         # use the new access_token when extending scopes
         token.access_token = token_data['access_token']
         token.scopes |= requested_scopes

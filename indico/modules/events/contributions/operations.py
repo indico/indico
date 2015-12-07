@@ -27,7 +27,7 @@ def create_contribution(event, data):
     contrib = Contribution(event_new=event)
     contrib.populate_from_dict(data)
     db.session.flush()
-    logger.info('Contribution {} created by {}'.format(contrib, session.user))
+    logger.info('Contribution %s created by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
                           'Contribution "{}" has been created'.format(contrib.title), session.user)
     return contrib
@@ -36,7 +36,7 @@ def create_contribution(event, data):
 def update_contribution(contrib, data):
     contrib.populate_from_dict(data)
     db.session.flush()
-    logger.info('Contribution {} updated by {}'.format(contrib, session.user))
+    logger.info('Contribution %s updated by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                           'Contribution "{}" has been updated'.format(contrib.title), session.user)
 
@@ -45,6 +45,6 @@ def delete_contribution(contrib):
     contrib.is_deleted = True
     contrib.timetable_entry = None
     db.session.flush()
-    logger.info('Contribution {} deleted by {}'.format(contrib, session.user))
+    logger.info('Contribution %s deleted by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                           'Contribution "{}" has been deleted'.format(contrib.title), session.user)

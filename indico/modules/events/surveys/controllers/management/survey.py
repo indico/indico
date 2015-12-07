@@ -59,7 +59,7 @@ class RHEditSurvey(RHManageSurveyBase):
             form.populate_obj(self.survey)
             db.session.flush()
             flash(_('Survey modified'), 'success')
-            logger.info('Survey {} modified by {}'.format(self.survey, session.user))
+            logger.info('Survey %s modified by %s', self.survey, session.user)
             return redirect(url_for('.manage_survey', self.survey))
         return WPManageSurvey.render_template('management/edit_survey.html', self.event, event=self.event, form=form,
                                               survey=self.survey)
@@ -71,7 +71,7 @@ class RHDeleteSurvey(RHManageSurveyBase):
     def _process(self):
         self.survey.is_deleted = True
         flash(_('Survey deleted'), 'success')
-        logger.info('Survey {} deleted by {}'.format(self.survey, session.user))
+        logger.info('Survey %s deleted by %s', self.survey, session.user)
         return redirect(url_for('.manage_survey_list', self.event))
 
 
@@ -88,7 +88,7 @@ class RHCreateSurvey(RHManageSurveysBase):
             db.session.add(survey)
             db.session.flush()
             flash(_('Survey created'), 'success')
-            logger.info('Survey {} created by {}'.format(survey, session.user))
+            logger.info('Survey %s created by %s', survey, session.user)
             return redirect(url_for('.manage_survey', survey))
         return WPManageSurvey.render_template('management/edit_survey.html',
                                               self.event, event=self.event, form=form, survey=None)
@@ -112,7 +112,7 @@ class RHScheduleSurvey(RHManageSurveyBase):
                     self.survey.start_notification_sent = not form.resend_start_notification.data
             self.survey.end_dt = form.end_dt.data
             flash(_('Survey was scheduled'), 'success')
-            logger.info('Survey {} scheduled by {}'.format(self.survey, session.user))
+            logger.info('Survey %s scheduled by %s', self.survey, session.user)
             return jsonify_data(flash=False)
         disabled_fields = ('start_dt',) if not allow_reschedule_start else ()
         return jsonify_template('events/surveys/management/schedule_survey.html',
@@ -125,7 +125,7 @@ class RHCloseSurvey(RHManageSurveyBase):
     def _process(self):
         self.survey.close()
         flash(_("Survey is now closed"), 'success')
-        logger.info("Survey {} closed by {}".format(self.survey, session.user))
+        logger.info("Survey %s closed by %s", self.survey, session.user)
         return redirect(url_for('.manage_survey', self.survey))
 
 
@@ -140,5 +140,5 @@ class RHOpenSurvey(RHManageSurveyBase):
             self.survey.open()
         self.survey.send_start_notification()
         flash(_("Survey is now open"), 'success')
-        logger.info("Survey {} opened by {}".format(self.survey, session.user))
+        logger.info("Survey %s opened by %s", self.survey, session.user)
         return redirect(url_for('.manage_survey', self.survey))

@@ -37,7 +37,7 @@ logger = Logger.get('auth')
 
 @multipass.identity_handler
 def process_identity(identity_info):
-    logger.info('Received identity info: {}'.format(identity_info))
+    logger.info('Received identity info: %s', identity_info)
     identity = Identity.query.filter_by(provider=identity_info.provider.name,
                                         identifier=identity_info.identifier).first()
     if identity is None:
@@ -55,12 +55,12 @@ def process_identity(identity_info):
         save_identity_info(identity_info, user if user and not user.is_pending else None)
         if not user or user.is_pending:
             if user and user.is_pending:
-                logger.info('Found pending user with matching email: {}'.format(user))
+                logger.info('Found pending user with matching email: %s', user)
             else:
                 logger.info('Email search did not find an existing user')
             return redirect(url_for('auth.register', provider=identity_info.provider.name))
         else:
-            logger.info('Found user with matching email: {}'.format(user))
+            logger.info('Found user with matching email: %s', user)
             return redirect(url_for('auth.link_account', provider=identity_info.provider.name))
     elif identity.user.is_deleted:
         raise MultipassException(_('Your Indico profile has been deleted.'))
@@ -69,13 +69,13 @@ def process_identity(identity_info):
         if user.is_pending:
             # This should never happen!
             raise ValueError('Got identity for pending user')
-        logger.info('Found existing identity {} for user {}'.format(identity, user))
+        logger.info('Found existing identity %s for user %s', identity, user)
     # Update the identity with the latest information
     if identity.multipass_data != identity_info.multipass_data:
-        logger.info('Updated multipass data'.format(identity, user))
+        logger.info('Updated multipass data of identity %s for user %s', identity, user)
         identity.multipass_data = identity_info.multipass_data
     if identity.data != identity_info.data:
-        logger.info('Updated data'.format(identity, user))
+        logger.info('Updated data of identity %s for user %s', identity, user)
         identity.data = identity_info.data
     if user.is_blocked:
         raise MultipassException(_('Your Indico profile has been blocked.'))

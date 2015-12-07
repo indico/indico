@@ -74,7 +74,7 @@ class RHImageUpload(RHManageImagesBase):
             image.save(data)
             db.session.add(image)
             db.session.flush()
-            logger.info('Image {} uploaded by {}'.format(image, session.user))
+            logger.info('Image %s uploaded by %s', image, session.user)
             signals.event_management.image_created.send(image, user=session.user)
         flash(ngettext("The image has been uploaded", "{count} images have been uploaded", len(files))
               .format(count=len(files)), 'success')

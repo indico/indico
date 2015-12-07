@@ -96,7 +96,7 @@ class AddAttachmentFilesMixin:
                 attachment.file.save(f.file)
                 db.session.add(attachment)
                 db.session.flush()
-                logger.info('Attachment {} uploaded by {}'.format(attachment, session.user))
+                logger.info('Attachment %s uploaded by %s', attachment, session.user)
                 signals.attachments.attachment_created.send(attachment, user=session.user)
             flash(ngettext("The attachment has been uploaded", "{count} attachments have been uploaded", len(files))
                   .format(count=len(files)), 'success')
@@ -120,7 +120,7 @@ class AddAttachmentLinkMixin:
             link.folder = folder
 
             db.session.flush()
-            logger.info('Attachment {} added by {}'.format(link, session.user))
+            logger.info('Attachment %s added by %s', link, session.user)
             signals.attachments.attachment_created.send(link, user=session.user)
             flash(_("The link has been added"), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
@@ -150,7 +150,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
 
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
-            logger.info('Attachment {} edited by {}'.format(self.attachment, session.user))
+            logger.info('Attachment %s edited by %s', self.attachment, session.user)
             form.populate_obj(self.attachment, skip={'acl', 'file'})
             self.attachment.folder = folder
             if self.attachment.is_protected:
@@ -188,7 +188,7 @@ class CreateFolderMixin:
             if folder.is_protected:
                 folder.acl = form.acl.data
             db.session.add(folder)
-            logger.info('Folder {} created by {}'.format(folder, session.user))
+            logger.info('Folder %s created by %s', folder, session.user)
             signals.attachments.folder_created.send(folder, user=session.user)
             flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
@@ -208,7 +208,7 @@ class EditFolderMixin(SpecificFolderMixin):
                 # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
                 self.folder.acl |= form.acl.data
                 self.folder.acl &= form.acl.data
-            logger.info('Folder {} edited by {}'.format(self.folder, session.user))
+            logger.info('Folder %s edited by %s', self.folder, session.user)
             signals.attachments.folder_updated.send(self.folder, user=session.user)
             flash(_("Folder \"{name}\" updated").format(name=self.folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
@@ -221,7 +221,7 @@ class DeleteFolderMixin(SpecificFolderMixin):
 
     def _process(self):
         self.folder.is_deleted = True
-        logger.info('Folder {} deleted by {}'.format(self.folder, session.user))
+        logger.info('Folder %s deleted by %s', self.folder, session.user)
         signals.attachments.folder_deleted.send(self.folder, user=session.user)
         flash(_("Folder \"{name}\" deleted").format(name=self.folder.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
@@ -232,7 +232,7 @@ class DeleteAttachmentMixin(SpecificAttachmentMixin):
 
     def _process(self):
         self.attachment.is_deleted = True
-        logger.info('Attachment {} deleted by {}'.format(self.attachment, session.user))
+        logger.info('Attachment %s deleted by %s', self.attachment, session.user)
         signals.attachments.attachment_deleted.send(self.attachment, user=session.user)
         flash(_("Attachment \"{name}\" deleted").format(name=self.attachment.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
