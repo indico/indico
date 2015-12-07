@@ -24,7 +24,8 @@
         $('[data-attachment-editor]').on('click', function(e) {
             e.preventDefault();
             var locator = $(this).data('locator');
-            openAttachmentManager(locator);
+            var title = $(this).data('title');
+            openAttachmentManager(locator, title);
         });
     });
 
@@ -189,10 +190,10 @@
             });
     };
 
-    global.openAttachmentManager = function openAttachmentManager(itemLocator) {
+    global.openAttachmentManager = function openAttachmentManager(itemLocator, title) {
         ajaxDialog({
             url: build_url(Indico.Urls.AttachmentManager, itemLocator),
-            title: $T.gettext("Manage material"),
+            title: title || $T.gettext("Manage material"),
             confirmCloseUnsaved: false,
             hidePageHeader: true,
             onClose: function(callbackData, customData) {
