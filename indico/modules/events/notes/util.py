@@ -72,13 +72,15 @@ def can_edit_note(obj, user):
     from MaKaC.conference import Contribution, Session, SubContribution
     if not user:
         return False
-    elif isinstance(obj, Conference) and obj.as_event.can_manage(user, 'submit'):
+    if isinstance(obj, Conference) and obj.as_event.can_manage(user, 'submit'):
         return True
-    elif isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
+    if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
         return True
-    elif isinstance(obj, Contribution) and obj.canUserSubmit(user.as_avatar):
-        return True
-    elif isinstance(obj, SubContribution):
+    if isinstance(obj, Contribution):
+        if obj.canUserSubmit(user.as_avatar):
+            return True
+        if obj.getSession() and obj.getSession().canCoordinate(user.as_avatar, 'modifContribs'):
+            return True
+    if isinstance(obj, SubContribution):
         return can_edit_note(obj.getContribution(), user)
-    else:
-        return obj.canModify(user.as_avatar)
+    return obj.canModify(user.as_avatar)
