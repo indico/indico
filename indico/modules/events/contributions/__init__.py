@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash
+from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -32,6 +32,8 @@ logger = Logger.get('events.contributions')
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
+    if not event.can_manage(session.user, allow_key=True):
+        return
     return SideMenuItem('contributions', _('Contributions'), url_for('contributions.manage_contributions', event),
                         section='organization')
 
