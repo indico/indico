@@ -24,10 +24,10 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 
 
-def create_session(event, data=None):
+def create_session(event, data):
     """Create a new session with the information passed in the `data` argument"""
     event_session = Session(event_new=event)
-    event_session.populate_from_dict(data or {})
+    event_session.populate_from_dict(data)
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
               'Session "{}" has been created'.format(event_session.title), session.user)
