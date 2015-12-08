@@ -266,7 +266,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     def can_manage(self, user, role=None, allow_key=False, *args, **kwargs):
         # XXX: Remove this method once modification keys are gone!
         return (super(Event, self).can_manage(user, role, *args, **kwargs) or
-                (allow_key and self.as_legacy.canKeyModify()))
+                bool(allow_key and user and self.as_legacy.canKeyModify()))
 
     @memoize_request
     def has_feature(self, feature):
