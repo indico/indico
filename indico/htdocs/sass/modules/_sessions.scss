@@ -26,3 +26,25 @@
         cursor: pointer;
     }
 }
+
+#persons-list {
+    & #send-mails-btn {
+        margin-top: 5px;
+    }
+}
+
+.event-persons-dialog {
+    max-width: 900px;
+
+    table {
+        table-layout: fixed;
+
+        tr {
+            td {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 150px;
+            }
+        }
+    }
+}

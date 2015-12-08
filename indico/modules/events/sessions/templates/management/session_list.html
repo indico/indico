@@ -47,7 +47,16 @@
                 </a>
             </div>
             <div class="group left">
-                <a class="i-button arrow button js-requires-selected-row disabled js-dropdown"
+                <a class="i-button icon-users js-requires-selected-row disabled"
+                   data-title="{% trans %}Author list{% endtrans %}"
+                   data-href="{{ url_for('.person_list', event) }}"
+                   data-params-selector="#sessions input[name=session_id]:checkbox:checked"
+                   data-method="POST"
+                   data-dialog-classes="event-persons-dialog"
+                   data-ajax-dialog>
+                    {%- trans %}Author list{% endtrans -%}
+                </a>
+                <a class="i-button arrow js-requires-selected-row disabled js-dropdown"
                    data-toggle="dropdown">
                     {%- trans %}Export{% endtrans -%}
                 </a>

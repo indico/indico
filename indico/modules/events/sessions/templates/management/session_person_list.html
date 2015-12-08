@@ -1,0 +1,61 @@
+{% from 'forms/_form.html' import simple_form %}
+
+{% block content -%}
+    <div id="persons-list" class="i-box titled">
+        <div class"i-box-title">
+            <div class="toolbar">
+                <div class="group i-selection left">
+                    <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+                    <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+                    <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+                    <input type="checkbox" name="authors" id="filter-primary" data-filter="primary" checked>
+                    <label for="filter-primary" class="i-button">{% trans %}Primary authors{% endtrans %}</label>
+                    <input type="checkbox" name="authors" id="filter-secondary" data-filter="secondary" checked>
+                    <label for="filter-secondary" class="i-button">{% trans %}Co-authors{% endtrans %}</label>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table class="i-table-widget">
+                <thead>
+                    <tr>
+                        <th class="checkbox-column"></th>
+                        <th>{% trans -%}Name{%- endtrans %}</th>
+                        <th>{% trans -%}Email{%- endtrans %}</th>
+                        <th>{% trans -%}Affiliation{%- endtrans %}</th>
+                        <th>{% trans -%}Speaker{%- endtrans %}</th>
+                        <th>{% trans -%}Author type{% endtrans %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session_person in session_persons -%}
+                        {% set event_person = session_person.person %}
+                        {% set is_primary_author = session_person.author_type == 1 %}
+                        {% set is_speaker = session_person.is_speaker %}
+                        <tr data-person-data="{{ 'speaker,' if is_speaker }}{{ 'primary' if is_primary_author else 'secondary' }}">
+                            <td><input type="checkbox" id="{{ event_person.id }}" class="select-row"></td>
+                            <td>{{- event_person.full_name -}}</td>
+                            <td>{{- event_person.email -}}</td>
+                            <td>{{- event_person.affiliation -}}</td>
+                            <td>{{- _('Yes') if is_speaker else _('No') -}}</td>
+                            <td>{{- _('Primary') if is_primary_author else _('Secondary') -}}</td>
+                        </tr>
+                    {%- else -%}
+                        <tr>
+                            <td colspan="6">{% trans %}No persons in the session yet{% endtrans %}</td>
+                        </tr>
+                    {%- endfor %}
+                </tbody>
+            </table>
+            <a id="send-mails-btn" href="#" class="i-button highlight disabled js-requires-selected-row">
+                {%- trans %}Send emails{% endtrans -%}
+            </a>
+        </div>
+    </div>
+{%- endblock %}
+
+{% block javascript %}
+    <script>
+        setupPersonsList();
+    </script>
+{% endblock %}
