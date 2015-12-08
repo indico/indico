@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import flash
+from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole, check_roles
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.util import can_manage_sessions
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -66,4 +67,6 @@ class CoordinatorRole(ManagementRole):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
+    if not can_manage_sessions(session.user, event, 'ANY'):
+        return
     return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
