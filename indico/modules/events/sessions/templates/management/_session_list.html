@@ -19,8 +19,7 @@
                 {% for sess in sessions -%}
                     <tr class="i-table">
                         <td class="i-table">
-                            <input class="select-row" type="checkbox" value="{{ sess.id }}"
-                                   name="session_id">
+                            <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
                         </td>
                         <td class="i-table">#{{ sess.friendly_id }}</td>
                         <td class="i-table"><strong>{{ sess.title }}</strong></td>
@@ -51,16 +50,15 @@
                         </td>
                         <td class="i-table">
                             <div class="group right">
-                                <a class="icon-edit highlight edit-session action-icon"
+                                <a href="#" class="icon-edit highlight edit-session action-icon"
                                    title="{% trans %}Edit this session{% endtrans %}"
                                    data-title="{% trans title=sess.title %}Edit session {{ title }}{% endtrans %}"
                                    data-href="{{ url_for('.modify_session', sess) }}"
                                    data-update="#sessions-wrapper"
                                    data-ajax-dialog></a>
                                 <a href="#" class="icon-time highlight action-icon"
-                                   title="{% trans %}Go to this session timetable{% endtrans %}"
-                                   data-method="POST"></a>
-                                <a class="icon-remove highlight action-icon"
+                                   title="{% trans %}Go to this session timetable{% endtrans %}"></a>
+                                <a href="#" class="icon-remove highlight action-icon"
                                    title="{% trans %}Remove this session{% endtrans %}"
                                    data-method="DELETE"
                                    data-href="{{ url_for('.session_rest', sess)}}"
@@ -75,8 +73,8 @@
                             <td class="i-table" colspan="8">
                                 <table class="i-table no-margin">
                                     <colgroup>
-                                        <col span="2"></col>
-                                        <col span="6"></col>
+                                        <col span="2">
+                                        <col span="6">
                                     </colgroup>
                                     <tr class="i-table content">
                                         <td class="i-table caption">
