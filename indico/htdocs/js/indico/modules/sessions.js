@@ -42,20 +42,10 @@
             evt.stopPropagation();
         });
 
-        function updateSessionsListOnSuccess(data) {
-            if (data) {
-                $('#sessions-wrapper').html(data.html);
-                setupTableSorter();
-                setupPalettePickers();
-            }
-        }
-
         $('#sessions').on('indico:htmlUpdated', function() {
             setupTableSorter();
             setupPalettePickers();
-        });
-
-        $('#sessions').on('click', '.show-session-blocks', function() {
+        }).on('click', '.show-session-blocks', function() {
             $(this).closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
     };
