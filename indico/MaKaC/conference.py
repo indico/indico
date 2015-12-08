@@ -3347,7 +3347,7 @@ class Conference(CommonObjectBase, Locatable):
 
     def canKeyModify(self):
         modifKey = self.getModifKey()
-        if not modifKey:
+        if not modifKey or not session.user:
             return False
         return session.get('modifKeys', {}).get(self.id) == modifKey
 
