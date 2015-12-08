@@ -33,18 +33,21 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
 
 
+def _get_session_list_args(event):
+    return {'sessions': get_active_sessions(event), 'default_colors': get_colors()}
+
+
 def _render_session_list(event):
     tpl = get_template_module('events/sessions/management/_session_list.html')
-    return tpl.render_session_list(event, get_active_sessions(event), get_colors())
+    return tpl.render_session_list(event, **_get_session_list_args(event))
 
 
 class RHSessionsList(RHManageSessionsBase):
     """Display list of all sessions within the event"""
 
     def _process(self):
-        return WPManageSessions.render_template('management/session_list.html', self.event_new.as_legacy,
-                                                event=self.event_new, sessions=get_active_sessions(self.event_new),
-                                                default_colors=get_colors())
+        return WPManageSessions.render_template('management/session_list.html', self._conf,
+                                                event=self.event_new, **_get_session_list_args(self.event_new))
 
 
 class RHCreateSession(RHManageSessionsBase):
