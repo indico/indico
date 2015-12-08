@@ -70,3 +70,9 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not can_manage_sessions(session.user, event, 'ANY'):
         return
     return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
+
+
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if can_manage_sessions(session.user, event.as_event, 'ANY'):
+        return url_for('sessions.session_list', event)
