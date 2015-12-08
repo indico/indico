@@ -31,51 +31,49 @@
             var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
-            for (var i = 0; i < availableColors.length; ++i) {
+            $.each(availableColors, function(index, color) {
                 var td = $('<td>', {
-                    'css': {'background': '#' + availableColors[i].background},
-                    'class': 'palette-color'
-                });
-
-                td.on('click', function(evt) {
-                    evt.preventDefault();
-
-                    var $this = $(this),
-                        backgroundColor = $this.find('.background-box').data('value'),
-                        textColor = $this.find('.text-box').data('value');
-
-                    element.css({'background': backgroundColor, 'color': textColor + ' !important'});
-
-                    if (self.options.onSelect) {
-                        self.options.onSelect.call(element, backgroundColor, textColor);
-                    }
-
-                    element.qtip('hide');
+                    'css': {'background': '#' + color.background},
+                    'class': 'palette-color',
+                    'data': {color: color}
                 });
 
                 var colorBox = $('<div>', {
-                    'data-value': '#' + availableColors[i].background,
                     'class': 'background-box'
                 });
 
                 colorBox.append($('<div>', {
-                    'css': {'background': '#' + availableColors[i].text},
+                    'css': {'background': '#' + color.text},
                     'class': 'text-box',
-                    'data-value': '#' + availableColors[i].text
                 }));
 
                 td.append(colorBox);
                 tr.append(td);
 
-                if ((i + 1) % this.options.numColumns == 0) {
+                if ((index + 1) % self.options.numColumns == 0) {
                     paletteTable.append(tr);
-                    tr = this._createTableRow();
+                    tr = self._createTableRow();
                 }
-            }
+            });
 
             if (tr.children().length) {
                 paletteTable.append(tr);
             }
+
+            paletteTable.on('click', '.palette-color', function(evt) {
+                var $this = $(this),
+                    color = $this.data('color'),
+                    backgroundColor = '#' + color.background,
+                    textColor = '#' + color.text;
+
+                element.css({'background': backgroundColor, 'color': textColor + ' !important'});
+
+                if (self.options.onSelect) {
+                    self.options.onSelect.call(element, backgroundColor, textColor);
+                }
+
+                element.qtip('hide');
+            });
 
             element.qtip({
                 prerender: false,
@@ -93,7 +91,7 @@
                     }
                 },
                 content: {
-                    text: $(paletteTable)
+                    text: paletteTable
                 },
                 show: {
                     event: 'click',
