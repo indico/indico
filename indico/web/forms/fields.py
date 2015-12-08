@@ -76,6 +76,10 @@ class IndicoRadioField(RadioField):
 
 
 class JSONField(HiddenField):
+
+    #: Whether an object may be populated with the data from this field
+    CAN_POPULATE = False
+
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = json.loads(valuelist[0])
@@ -84,8 +88,8 @@ class JSONField(HiddenField):
         return json.dumps(self.data)
 
     def populate_obj(self, obj, name):
-        # We don't want to populate an object with this
-        pass
+        if self.CAN_POPULATE:
+            super(JSONField, self).populate_obj(obj, name)
 
 
 class TextListField(TextAreaField):
@@ -547,6 +551,7 @@ class IndicoPalettePickerField(JSONField):
     """Field allowing user to pick a color from a set of predefined values"""
 
     widget = JinjaWidget('forms/palette_picker_widget.html')
+    CAN_POPULATE = True
 
     def __init__(self, *args, **kwargs):
         self.color_list = kwargs.pop('color_list')
@@ -559,9 +564,6 @@ class IndicoPalettePickerField(JSONField):
     def process_formdata(self, valuelist):
         super(IndicoPalettePickerField, self).process_formdata(valuelist)
         self.data = ColorTuple(self.data['text'], self.data['background'])
-
-    def populate_obj(self, obj, name):
-        setattr(obj, name, self.data)
 
     def _value(self):
         return self.data._asdict()
