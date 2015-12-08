@@ -28,7 +28,7 @@ from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 
 
 class RHManageSurveys(RHManageSurveysBase):
@@ -115,8 +115,7 @@ class RHScheduleSurvey(RHManageSurveyBase):
             logger.info('Survey %s scheduled by %s', self.survey, session.user)
             return jsonify_data(flash=False)
         disabled_fields = ('start_dt',) if not allow_reschedule_start else ()
-        return jsonify_template('events/surveys/management/schedule_survey.html',
-                                form=form, disabled_fields=disabled_fields)
+        return jsonify_form(form, submit=_('Schedule'), disabled_fields=disabled_fields)
 
 
 class RHCloseSurvey(RHManageSurveyBase):
