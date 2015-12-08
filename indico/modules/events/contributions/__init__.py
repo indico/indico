@@ -57,7 +57,7 @@ def _convert_email_principals(user, **kwargs):
 
 
 @signals.app_created.connect
-def _check_roles(app, **kawrgs):
+def _check_roles(app, **kwargs):
     check_roles(Contribution)
 
 

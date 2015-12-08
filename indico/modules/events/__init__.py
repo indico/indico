@@ -187,7 +187,7 @@ def _handle_legacy_ids(app, **kwargs):
 
 
 @signals.app_created.connect
-def _check_roles(app, **kawrgs):
+def _check_roles(app, **kwargs):
     check_roles(Event)
 
 
