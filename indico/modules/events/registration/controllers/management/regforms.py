@@ -33,7 +33,7 @@ from indico.modules.events.registration.util import get_event_section_data, crea
 from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
                                                       WPManageParticipants)
 from indico.modules.events.payment import settings as payment_global_settings
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
@@ -175,7 +175,7 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
             flash(_("Registrations for {} have been scheduled").format(self.regform.title), 'success')
             logger.info("Registrations for %s scheduled by %s", self.regform, session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/registration/management/regform_schedule.html', form=form)
+        return jsonify_form(form, submit=_('Schedule'))
 
 
 class RHRegistrationFormModify(RHManageRegFormBase):
