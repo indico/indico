@@ -81,7 +81,7 @@ class RHDeleteSessions(RHManageSessionsBase):
     """Remove multiple sessions"""
 
     def _process(self):
-        session_ids = map(int, request.form.getlist('session_ids'))
+        session_ids = map(int, request.form.getlist('session_id'))
         sessions = self.event_new.sessions.filter(Session.id.in_(session_ids), ~Session.is_deleted)
         for sess in sessions:
             delete_session(sess)
