@@ -24,7 +24,7 @@ from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 from indico.util.i18n import _, ngettext
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -85,7 +85,7 @@ class RHCreateContribution(RHManageContributionsBase):
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             return jsonify_data(html=_render_contribution_list(self.event_new))
-        return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
+        return jsonify_form(form)
 
 
 class RHEditContribution(RHManageContributionBase):
@@ -95,7 +95,7 @@ class RHEditContribution(RHManageContributionBase):
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib), 'success')
             return jsonify_data(html=_render_contribution_list(self.event_new))
-        return jsonify_template('events/contributions/management/contrib_dialog.html', form=form)
+        return jsonify_form(form)
 
 
 class RHDeleteContribution(RHManageContributionBase):

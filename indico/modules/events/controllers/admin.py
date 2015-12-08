@@ -24,7 +24,7 @@ from indico.modules.events.operations import create_reference_type, update_refer
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
@@ -62,7 +62,7 @@ class RHCreateReferenceType(RHAdminBase):
             reference_type = create_reference_type(form.data)
             flash(_("External ID type '{}' created successfully").format(reference_type.name), 'success')
             return jsonify_data(html=_render_reference_type_list())
-        return jsonify_template('events/references/create_reference_type.html', form=form)
+        return jsonify_form(form)
 
 
 class RHEditReferenceType(RHManageReferenceTypeBase):
@@ -74,7 +74,7 @@ class RHEditReferenceType(RHManageReferenceTypeBase):
             update_reference_type(self.reference_type, form.data)
             flash(_("External ID type '{}' successfully updated").format(self.reference_type.name), 'success')
             return jsonify_data(html=_render_reference_type_list())
-        return jsonify_template('events/references/create_reference_type.html', form=form)
+        return jsonify_form(form)
 
 
 class RHDeleteReferenceType(RHManageReferenceTypeBase):
