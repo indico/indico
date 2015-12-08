@@ -77,7 +77,7 @@
 {% macro form_rows(form, fields=none, skip=(), orientation='', skip_labels=false, widget_attrs={}, disable=(), placeholder=false) %}
     {% for field in _iter_form_fields(form, fields=fields, skip=skip) %}
         {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation, skip_label=skip_labels,
-                    disabled=field.name in disable, placeholder=placeholder) }}
+                    disabled=field.short_name in disable, placeholder=placeholder) }}
     {% endfor %}
 {% endmacro %}
 
