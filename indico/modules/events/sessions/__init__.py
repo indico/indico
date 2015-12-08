@@ -49,6 +49,19 @@ def _convert_email_principals(user, **kwargs):
               'info')
 
 
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu(sender, event, **kwargs):
+    if not can_manage_sessions(session.user, event, 'ANY'):
+        return
+    return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
+
+
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if can_manage_sessions(session.user, event.as_event, 'ANY'):
+        return url_for('sessions.session_list', event)
+
+
 @signals.app_created.connect
 def _check_roles(app, **kawrgs):
     check_roles(Session)
@@ -63,16 +76,3 @@ class CoordinatorRole(ManagementRole):
     name = 'coordinate'
     friendly_name = _('Coordination')
     description = _('Grants coordination access to the session.')
-
-
-@signals.menu.items.connect_via('event-management-sidemenu')
-def _extend_event_management_menu(sender, event, **kwargs):
-    if not can_manage_sessions(session.user, event, 'ANY'):
-        return
-    return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
-
-
-@signals.event_management.management_url.connect
-def _get_event_management_url(event, **kwargs):
-    if can_manage_sessions(session.user, event.as_event, 'ANY'):
-        return url_for('sessions.session_list', event)
