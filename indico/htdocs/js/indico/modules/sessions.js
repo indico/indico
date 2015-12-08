@@ -2,7 +2,7 @@
     'use strict';
 
     function setupTableSorter() {
-        $('.sessions .tablesorter').tablesorter({
+        $('#sessions .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
             cssInfoBlock: 'avoid-sort',
@@ -33,33 +33,33 @@
     }
 
     global.setupSessionsList = function setupSessionsList() {
-        enableIfChecked('.sessions-wrapper', '.select-row', '.js-requires-selected-row');
+        enableIfChecked('#sessions-wrapper', '.select-row', '.js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
 
-        $('.sessions .toolbar').on('click', '.disabled', function(evt) {
+        $('#sessions .toolbar').on('click', '.disabled', function(evt) {
             evt.preventDefault();
             evt.stopPropagation();
         });
 
         function updateSessionsListOnSuccess(data) {
             if (data) {
-                $('.sessions-wrapper').html(data.html);
+                $('#sessions-wrapper').html(data.html);
                 setupTableSorter();
                 setupPalettePickers();
             }
         }
 
-        $('.sessions').on('indico:htmlUpdated', function() {
+        $('#sessions').on('indico:htmlUpdated', function() {
             setupTableSorter();
             setupPalettePickers();
         });
 
-        $('.sessions').on('click', '.show-session-blocks', function() {
+        $('#sessions').on('click', '.show-session-blocks', function() {
             $(this).closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
 
-        $('.sessions').on('indico:confirmed', '#remove-selected-sessions', function(evt) {
+        $('#sessions').on('indico:confirmed', '#remove-selected-sessions', function(evt) {
             evt.preventDefault();
             var $this = $(this);
             var sessionIds = $('.sessions input:checkbox:checked').map(function() {

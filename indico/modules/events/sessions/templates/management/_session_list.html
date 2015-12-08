@@ -54,7 +54,7 @@
                                    title="{% trans %}Edit this session{% endtrans %}"
                                    data-title="{% trans title=sess.title %}Edit session {{ title }}{% endtrans %}"
                                    data-href="{{ url_for('.modify_session', sess) }}"
-                                   data-update=".sessions-wrapper"
+                                   data-update="#sessions-wrapper"
                                    data-ajax-dialog></a>
                                 <a href="#" class="icon-time highlight action-icon"
                                    title="{% trans %}Go to this session timetable{% endtrans %}"
@@ -64,7 +64,7 @@
                                    data-method="DELETE"
                                    data-href="{{ url_for('.session_rest', sess)}}"
                                    data-params="{{ dict(sessions_ids=sess.id) | tojson | forceescape }}"
-                                   data-update=".sessions-wrapper"
+                                   data-update="#sessions-wrapper"
                                    data-confirm="{% trans title=sess.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
                             </div>
                         </td>
