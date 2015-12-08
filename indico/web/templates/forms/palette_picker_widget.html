@@ -7,7 +7,7 @@
            class="i-button icon-expand palette-picker-trigger"
            style="background: #{{ colors.background }};
                   color: #{{ colors.text }} !important">
-            {%- trans %}Choose a color{% endtrans -%}
+            {%- trans %}Choose{% endtrans -%}
         </a>
         <input id="{{ field.id }}" type="hidden" name="{{ field.name }}"
                value="{{ colors | tojson | forceescape }}">
