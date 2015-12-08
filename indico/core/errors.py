@@ -87,58 +87,6 @@ class IndicoError(Exception):
         }
 
 
-class AccessControlError(IndicoError):
-    def __init__(self, **kw):
-        self._object_type = kw.pop('object_type', 'object')
-        super(AccessControlError, self).__init__(**kw)
-
-    @ensure_str
-    def __str__(self):
-        return _('you are not authorised to access this {0}').format(self._object_type)
-
-
-class ConferenceClosedError(IndicoError):
-    def __init__(self, conf, **kw):
-        self._conf = kw.pop('conf', None)
-        super(ConferenceClosedError, self).__init__(**kw)
-
-    @ensure_str
-    def __str__(self):
-        return _('the event has been closed')
-
-
-class AccessError(AccessControlError):
-    pass
-
-
-class KeyAccessError(AccessControlError):
-    pass
-
-
-class ModificationError(AccessControlError):
-    @ensure_str
-    def __str__(self):
-        return _('you are not authorised to modify this {0}').format(self._object_type)
-
-
-class TimingError(IndicoError):
-    """
-    Timetable problems
-    """
-
-
-class ParentTimingError(TimingError):
-    pass
-
-
-class EntryTimingError(TimingError):
-    pass
-
-
-class NotLoggedError(IndicoError):
-    pass
-
-
 class FormValuesError(IndicoError):
     pass
 
@@ -148,8 +96,4 @@ class NoReportError(IndicoError):
 
 
 class NotFoundError(IndicoError):
-    pass
-
-
-class BadRefererError(IndicoError):
     pass
