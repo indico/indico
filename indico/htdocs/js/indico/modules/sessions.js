@@ -74,21 +74,6 @@
                 success: updateSessionsListOnSuccess
             });
         });
-
-        $('.sessions').on('click', '.js-export-sessions', function(evt) {
-            evt.preventDefault();
-            var $this = $(this);
-            var checkedItems = $.map($('.sessions input:checkbox:checked'), function() {
-                return $(this).val();
-            });
-
-            $.ajax({
-                url: $this.data('href'),
-                method: 'POST',
-                error: handleAjaxError,
-                data: {session_ids: checkedItems}
-            });
-        });
     };
 
 })(window);

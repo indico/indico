@@ -52,12 +52,14 @@
                 <ul class="dropdown">
                     <li>
                         <a data-href="{{ url_for('.export_pdf', event) }}"
+                           data-method="POSt"
                            class="icon-file-pdf js-requires-selected-row js-export-sessions disabled">
                             {%- trans %}PDF{% endtrans -%}
                         </a>
                     </li>
                     <li>
                         <a data-href="{{ url_for('.export_csv', event) }}"
+                           data-method="POST"
                            class="icon-file-excel js-requires-selected-row js-export-sessions disabled">CSV</a>
                     </li>
                 </ul>
