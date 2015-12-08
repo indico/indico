@@ -63,7 +63,7 @@ def _get_event_management_url(event, **kwargs):
 
 
 @signals.app_created.connect
-def _check_roles(app, **kawrgs):
+def _check_roles(app, **kwargs):
     check_roles(Session)
 
 
