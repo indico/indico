@@ -7,19 +7,19 @@
 {% endblock %}
 
 {% block content %}
-    <div class="sessions">
+    <div id="sessions">
         <div class="toolbar">
             <div class="group left">
                 <a class="icon-checkbox-checked i-button arrow js-dropdown"
                    href="#" title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     <li>
-                        <a href="#" data-select-all=".sessions-wrapper input.select-row">
+                        <a href="#" data-select-all="#sessions-wrapper input.select-row">
                             {% trans %}All{% endtrans %}
                         </a>
                     </li>
                     <li>
-                        <a href="#" data-select-none=".sessions-wrapper input.select-row">
+                        <a href="#" data-select-none="#sessions-wrapper input.select-row">
                             {% trans %}None{% endtrans %}
                         </a>
                     </li>
@@ -29,7 +29,7 @@
                 <a id="add-new-session" class="i-button highlight icon-plus"
                    data-href="{{ url_for('.create_session', event) }}"
                    data-title="{% trans %}Add new session{% endtrans %}"
-                   data-update=".sessions-wrapper"
+                   data-update="#sessions-wrapper"
                    data-ajax-dialog>
                     {% trans %}Add new session{% endtrans %}
                 </a>
@@ -65,7 +65,7 @@
                 </ul>
             </div>
         </div>
-        <div class="sessions-wrapper">
+        <div id="sessions-wrapper">
             {{- render_session_list(event, sessions, default_colors) -}}
         </div>
     </div>
