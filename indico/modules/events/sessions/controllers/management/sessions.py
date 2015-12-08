@@ -24,6 +24,10 @@ from werkzeug.exceptions import BadRequest
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
 from indico.modules.events.sessions.util import (get_colors, get_active_sessions, generate_csv_from_sessions,
@@ -32,7 +36,7 @@ from indico.modules.events.sessions.views import WPManageSessions
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 def _get_session_list_args(event):
@@ -123,3 +127,22 @@ class RHSessionREST(RHManageSessionBase):
             updates['colors'] = colors
         update_session(self.session, updates)
         return jsonify()
+
+
+class RHSessionPersonList(RHManageSessionsBase):
+    """List of persons in the session"""
+
+    def _process(self):
+        session_ids = map(int, request.form.getlist('session_id'))
+        session_persons = (ContributionPersonLink
+                           .find(ContributionPersonLink.person_id == EventPerson.id,
+                                 Contribution.session_id.in_(session_ids))
+                           .join(ContributionPersonLink.contribution).all())
+        session_persons.extend(SubContributionPersonLink
+                               .find(SubContributionPersonLink.person_id == EventPerson.id,
+                                     Contribution.session_id.in_(session_ids))
+                               .join(SubContributionPersonLink.subcontribution)
+                               .join(SubContribution.contribution))
+
+        return jsonify_template('events/sessions/management/session_person_list.html',
+                                session_persons=session_persons)
