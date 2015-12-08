@@ -30,11 +30,6 @@ from flask_babelex import Babel, get_domain, Domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 
-from indico.core.config import Config
-from indico.core.db import DBMgr
-
-from MaKaC.common.info import HelperMaKaCInfo
-
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
 RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
@@ -179,11 +174,13 @@ class IndicoTranslations(Translations):
             raise RuntimeError(msg)
 
     def ugettext(self, message):
+        from indico.core.config import Config
         if Config.getInstance().getDebug():
             self._check_stack()
         return gettext(message)
 
     def ungettext(self, msgid1, msgid2, n):
+        from indico.core.config import Config
         if Config.getInstance().getDebug():
             self._check_stack()
         return ngettext(msgid1, msgid2, n)
@@ -200,6 +197,8 @@ def set_best_lang():
     language, we will try to guess it from the browser settings and only
     after that fall back to the server's default.
     """
+    from indico.core.db import DBMgr
+    from MaKaC.common.info import HelperMaKaCInfo
 
     if not has_request_context():
         return 'en_GB' if current_app.config['TESTING'] else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
