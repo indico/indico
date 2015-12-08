@@ -22,9 +22,9 @@ from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
-from indico.modules.events.sessions.controllers.management import RHManageSessionsBase, RHManageSessionBase
+from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
+                                                                   RHManageSessionsActionsBase)
 from indico.modules.events.sessions.forms import SessionForm
-from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
 from indico.modules.events.sessions.util import get_colors, get_active_sessions
 from indico.modules.events.sessions.views import WPManageSessions
@@ -77,13 +77,11 @@ class RHModifySession(RHManageSessionBase):
         return jsonify_form(form)
 
 
-class RHDeleteSessions(RHManageSessionsBase):
+class RHDeleteSessions(RHManageSessionsActionsBase):
     """Remove multiple sessions"""
 
     def _process(self):
-        session_ids = map(int, request.form.getlist('session_id'))
-        sessions = self.event_new.sessions.filter(Session.id.in_(session_ids), ~Session.is_deleted)
-        for sess in sessions:
+        for sess in self.sessions:
             delete_session(sess)
         return jsonify_data(html=_render_session_list(self.event_new))
 
