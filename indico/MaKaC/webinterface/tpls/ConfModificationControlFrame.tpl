@@ -27,7 +27,7 @@
             <div id="modif-key-warning" class="warning-message-box" style="margin-top: 1em; margin-bottom: 0; max-width: 600px; ${'display: none;' if not modifKey else ''}">
                 <div class="message-text">
                     ${_("This event has a modification key set. Please note that modification keys are deprecated and will be removed in an upcoming version.")}
-                    ${_("It is more secure to use the manager list instead. Also note that using a modification key while not being logged in to Indico is unsupported and may not work.")}
+                    ${_("It is more secure to use the manager list instead. Also note that only users who are logged in to an Indico account may use a modification key.")}
                 </div>
             </div>
             <script type="text/javascript">
