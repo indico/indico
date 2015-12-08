@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request
 
+from indico.modules.events.sessions.models.sessions import Session
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.base import RH
 
@@ -45,3 +46,12 @@ class RHManageSessionBase(RHManageSessionsBase):
         self.session = (self.event_new.sessions
                         .filter_by(id=request.view_args['session_id'], is_deleted=False)
                         .first_or_404())
+
+
+class RHManageSessionsActionsBase(RHManageSessionsBase):
+    """Base class for classes performing actions on sessions"""
+
+    def _checkParams(self, params):
+        RHManageSessionsBase._checkParams(self, params)
+        session_ids = set(map(int, request.form.getlist('session_id')))
+        self.sessions = self.event_new.sessions.filter(Session.id.in_(session_ids), ~Session.is_deleted).all()
