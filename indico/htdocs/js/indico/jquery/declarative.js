@@ -93,7 +93,10 @@
                     ajaxDialog({
                         trigger: $this,
                         url: url,
+                        method: method,
+                        data: params,
                         title: $this.data('title'),
+                        dialogClasses: $this.data('dialog-classes'),
                         onClose: function(data) {
                             if (data) {
                                 handleFlashes(data, true, $this);
