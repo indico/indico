@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.orm import joinedload
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.sessions.models.sessions import Session
@@ -51,3 +53,9 @@ def get_active_sessions(event):
             .filter_by(is_deleted=False)
             .order_by(db.func.lower(Session.title))
             .all())
+
+
+def can_manage_sessions(user, event, role=None):
+    """Check whether a user can manage any sessions in an event"""
+    return event.can_manage(user) or any(s.can_manage(user, role)
+                                         for s in event.sessions.options(joinedload('acl_entries')))
