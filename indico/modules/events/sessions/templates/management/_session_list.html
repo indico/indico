@@ -16,16 +16,16 @@
                 </tr>
             </thead>
             <tbody>
-                {% for session in sessions -%}
+                {% for sess in sessions -%}
                     <tr class="i-table">
                         <td class="i-table">
-                            <input class="select-row" type="checkbox" value="{{ session.id }}">
+                            <input class="select-row" type="checkbox" value="{{ sess.id }}">
                         </td>
-                        <td class="i-table">#{{ session.friendly_id }}</td>
-                        <td class="i-table"><strong>{{ session.title }}</strong></td>
-                        <td class="i-table">{{ session.code }}</td>
+                        <td class="i-table">#{{ sess.friendly_id }}</td>
+                        <td class="i-table"><strong>{{ sess.title }}</strong></td>
+                        <td class="i-table">{{ sess.code }}</td>
                         <td class="i-table">
-                            {%- if session.is_poster %}
+                            {%- if sess.is_poster %}
                                 {%- trans %}Poster{% endtrans -%}
                             {% else %}
                                 {%- trans %}Standard{% endtrans -%}
@@ -34,9 +34,10 @@
                         <td class="i-table">
                             <div class="group">
                                 <a class="i-button icon-palette palette-picker-trigger"
-                                   style="background: #{{ session.background_color }};
-                                          color: #{{ session.text_color }} !important;"
-                                   data-method="PATCH" data-href="{{ url_for('.session_rest', session) }}"
+                                   style="background: #{{ sess.background_color }};
+                                          color: #{{ sess.text_color }} !important;"
+                                   data-method="PATCH"
+                                   data-href="{{ url_for('.session_rest', sess) }}"
                                    data-colors="{{ default_colors | tojson | forceescape }}">
                                 </a>
                             </div>
@@ -44,15 +45,15 @@
                         <td class="i-table">
                             <span class="i-label show-session-blocks">
                                 {%- trans %}Session blocks {% endtrans -%}
-                                <span class="badge">{{ session.blocks | length }}</span>
+                                <span class="badge">{{ sess.blocks | length }}</span>
                             </span>
                         </td>
                         <td class="i-table">
                             <div class="group right">
                                 <a class="icon-edit highlight edit-session action-icon"
                                    title="{% trans %}Edit this session{% endtrans %}"
-                                   data-title="{% trans title=session.title %}Edit session {{ title }}{% endtrans %}"
-                                   data-href="{{ url_for('.modify_session', session) }}"
+                                   data-title="{% trans title=sess.title %}Edit session {{ title }}{% endtrans %}"
+                                   data-href="{{ url_for('.modify_session', sess) }}"
                                    data-update=".sessions-wrapper"
                                    data-ajax-dialog></a>
                                 <a href="#" class="icon-time highlight action-icon"
@@ -61,14 +62,14 @@
                                 <a class="icon-remove highlight action-icon"
                                    title="{% trans %}Remove this session{% endtrans %}"
                                    data-method="DELETE"
-                                   data-href="{{ url_for('.session_rest', session)}}"
-                                   data-params="{{ dict(sessions_ids=session.id) | tojson | forceescape }}"
+                                   data-href="{{ url_for('.session_rest', sess)}}"
+                                   data-params="{{ dict(sessions_ids=sess.id) | tojson | forceescape }}"
                                    data-update=".sessions-wrapper"
-                                   data-confirm="{% trans title=session.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
+                                   data-confirm="{% trans title=sess.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
                             </div>
                         </td>
                     </tr>
-                    {% for block in session.blocks -%}
+                    {% for block in sess.blocks -%}
                         <tr class="i-table session-blocks-row" style="display: none;">
                             <td class="i-table" colspan="8">
                                 <table class="i-table no-margin">
