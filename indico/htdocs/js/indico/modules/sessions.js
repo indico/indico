@@ -59,4 +59,29 @@
         });
     };
 
+    global.setupPersonsList = function setupPersonsList() {
+        $('#persons-list [data-filter]').on('click', function() {
+            var filters = $('#persons-list [data-filter]:checked').map(function() {
+                return $(this).data('filter');
+            }).get();
+            var personRows = $('#persons-list tr[data-person-data]');
+
+            var visibleEntries = personRows.filter(function() {
+                var $this = $(this);
+
+                return _.any(filters, function(filterName) {
+                    return $this.data('person-data').indexOf(filterName) !== -1;
+                });
+            });
+
+            personRows.hide();
+            visibleEntries.show();
+        });
+
+        $('#persons-list').on('click', '#send-mails-btn.disabled', function(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+        });
+    };
+
 })(window);
