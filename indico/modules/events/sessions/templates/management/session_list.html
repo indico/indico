@@ -39,6 +39,8 @@
                    class="i-button icon-remove js-requires-selected-row disabled"
                    data-title="{% trans %}Remove selected sessions{% endtrans %}"
                    data-method="POST"
+                   data-params-selector="#sessions input[name=session_ids]:checkbox:checked"
+                   data-update="#sessions-wrapper"
                    data-href="{{ url_for('.delete_sessions', event) }}"
                    data-confirm="{% trans %}Do you really want to delete the selected sessions?{% endtrans %}">
                     {%- trans %}Remove{% endtrans -%}

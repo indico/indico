@@ -58,22 +58,6 @@
         $('#sessions').on('click', '.show-session-blocks', function() {
             $(this).closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
-
-        $('#sessions').on('indico:confirmed', '#remove-selected-sessions', function(evt) {
-            evt.preventDefault();
-            var $this = $(this);
-            var sessionIds = $('.sessions input:checkbox:checked').map(function() {
-                return $(this).val();
-            }).get();
-
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                error: handleAjaxError,
-                data: {session_ids: sessionIds},
-                success: updateSessionsListOnSuccess
-            });
-        });
     };
 
 })(window);
