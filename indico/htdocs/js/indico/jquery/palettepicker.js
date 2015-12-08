@@ -44,7 +44,7 @@
 
                 colorBox.append($('<div>', {
                     'css': {'background': '#' + color.text},
-                    'class': 'text-box',
+                    'class': 'text-box'
                 }));
 
                 td.append(colorBox);
@@ -60,13 +60,15 @@
                 paletteTable.append(tr);
             }
 
-            paletteTable.on('click', '.palette-color', function(evt) {
+            paletteTable.on('click', '.palette-color', function() {
                 var $this = $(this),
                     color = $this.data('color'),
                     backgroundColor = '#' + color.background,
-                    textColor = '#' + color.text;
+                    textColor = '#' + color.text,
+                    styleObject = element[0].style;
 
-                element.css({'background': backgroundColor, 'color': textColor + ' !important'});
+                styleObject.setProperty('color', textColor, 'important');
+                styleObject.setProperty('background', backgroundColor, 'important');
 
                 if (self.options.onSelect) {
                     self.options.onSelect.call(element, backgroundColor, textColor);

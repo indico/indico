@@ -32,5 +32,4 @@ _bp.add_url_rule('/manage/sessions/delete', 'delete_sessions', RHDeleteSessions,
 _bp.add_url_rule('/manage/sessions/sessions.csv', 'export_csv', RHExportSessionsCSV, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/sessions.pdf', 'export_pdf', RHExportSessionsPDF, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/<int:session_id>', 'session_rest', RHSessionREST, methods=('PATCH', 'DELETE'))
-_bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', RHModifySession,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', RHModifySession, methods=('GET', 'POST'))
