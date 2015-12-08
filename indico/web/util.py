@@ -19,6 +19,9 @@ from __future__ import absolute_import, unicode_literals
 from flask import g, render_template, jsonify, request, session, has_request_context
 from markupsafe import Markup
 
+from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
+
 
 def inject_js(js):
     """Injects JavaScript into the current page.
@@ -30,14 +33,50 @@ def inject_js(js):
     g.injected_js.append(Markup(js))
 
 
-def jsonify_template(template, _render_func=render_template, **context):
-    """Returns a json response containing a rendered template"""
-    html = _render_func(template, **context)
+def _pop_injected_js():
     js = None
     if 'injected_js' in g:
         js = g.injected_js
         del g.injected_js
-    return jsonify(html=html, js=js)
+    return js
+
+
+def jsonify_form(form, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
+                 disabled_fields=(), form_header_kwargs=None):
+    """Returns a json response containing a rendered WTForm.
+
+    This ia shortcut to the ``simple_form`` jinja macro to avoid
+    adding new templates that do nothing besides importing and
+    calling this macro.
+
+    :param form: A WTForms `Form` instance
+    :param submit: The title of the submit button
+    :param back: The title of the back button
+    :param back_url: The URL the back button redirects to
+    :param back_button: Whether to show a back button
+    :param disabled_until_change: Whether to disable form submission
+                                  until a field is changed
+    :param disabled_fields: List of field names to disable
+    :param form_header_kwargs: Keyword arguments passed to the
+                               ``form_header`` macro
+    """
+    if submit is None:
+        submit = _('Save')
+    if back is None:
+        back = _('Cancel')
+    if form_header_kwargs is None:
+        form_header_kwargs = {}
+    tpl = get_template_module('forms/_form.html')
+    html = tpl.simple_form(form, submit=submit, back=back, back_url=back_url, back_button=back_button,
+                           disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
+                           form_header_kwargs=form_header_kwargs)
+    return jsonify(html=html, js=_pop_injected_js())
+
+
+def jsonify_template(template, _render_func=render_template, **context):
+    """Returns a json response containing a rendered template"""
+    html = _render_func(template, **context)
+    return jsonify(html=html, js=_pop_injected_js())
 
 
 def jsonify_data(flash=True, **json_data):
