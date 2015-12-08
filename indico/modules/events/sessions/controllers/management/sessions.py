@@ -30,7 +30,7 @@ from indico.modules.events.sessions.util import get_colors, get_active_sessions
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 
 
 def _get_session_list_args(event):
@@ -63,7 +63,7 @@ class RHCreateSession(RHManageSessionsBase):
         if form.validate_on_submit():
             create_session(self.event_new, form.data)
             return jsonify_data(html=_render_session_list(self.event_new))
-        return jsonify_template('events/sessions/management/add_session.html', form=form)
+        return jsonify_form(form)
 
 
 class RHModifySession(RHManageSessionBase):
@@ -74,7 +74,7 @@ class RHModifySession(RHManageSessionBase):
         if form.validate_on_submit():
             update_session(self.session, form.data)
             return jsonify_data(html=_render_session_list(self.event_new))
-        return jsonify_template('events/sessions/management/add_session.html', form=form)
+        return jsonify_form(form)
 
 
 class RHDeleteSessions(RHManageSessionsBase):
