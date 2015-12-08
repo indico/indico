@@ -7,11 +7,7 @@
     <tr>
         <td align="center">
         <form action=${url} method="POST">
-        %if not _session.user:
-            <a class="loginHighlighted" style="padding:4px 17px" href="${ url_for_login(_request.relative_url) }"><strong style="color: white;">Login</strong></a>&nbsp;${ _("or enter the modification key here:")}
-        %else:
-            ${ _("Please enter it here:")}
-        % endif
+        ${ _("Please enter it here:")}
         <input type="hidden" name="redirectURL" value=${redirectURL}>
         <input name="modifKey" type="password">
         <input type="submit" class="btn" value="${ _("go")}">
