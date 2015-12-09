@@ -1,82 +1,75 @@
-{% from 'forms/_form.html' import simple_form %}
-
-{% block content -%}
-    <div id="persons-list" class="i-box titled">
-        <div class"i-box-title">
-            <div class="toolbar">
-                <div class="group left">
-                    <a class="icon-checkbox-checked i-button arrow js-dropdown"
-                       href="#" title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#" data-select-all="#persons-list input.select-row:visible">
-                                {% trans %}All{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-select-none="#persons-list input.select-row:visible">
-                                {% trans %}None{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="group i-selection">
-                    <span class="i-button label">{% trans %}Show{% endtrans %}</span>
-                    <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
-                    <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
-                    <input type="checkbox" name="authors" id="filter-primary" data-filter="primary" checked>
-                    <label for="filter-primary" class="i-button">{% trans %}Primary authors{% endtrans %}</label>
-                    <input type="checkbox" name="authors" id="filter-secondary" data-filter="secondary" checked>
-                    <label for="filter-secondary" class="i-button">{% trans %}Co-authors{% endtrans %}</label>
-                </div>
+<div id="persons-list" class="i-box titled">
+    <div class"i-box-title">
+        <div class="toolbar">
+            <div class="group left">
+                <a class="icon-checkbox-checked i-button arrow js-dropdown"
+                   href="#" title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" data-select-all="#persons-list input.select-row:visible">
+                            {% trans %}All{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none="#persons-list input.select-row:visible">
+                            {% trans %}None{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="group i-selection">
+                <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+                <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+                <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+                <input type="checkbox" name="authors" id="filter-primary" data-filter="primary" checked>
+                <label for="filter-primary" class="i-button">{% trans %}Primary authors{% endtrans %}</label>
+                <input type="checkbox" name="authors" id="filter-secondary" data-filter="secondary" checked>
+                <label for="filter-secondary" class="i-button">{% trans %}Co-authors{% endtrans %}</label>
             </div>
         </div>
-        <div>
-            <table class="i-table-widget">
-                <thead>
-                    <tr>
-                        <th class="checkbox-column"></th>
-                        <th>{% trans -%}Name{%- endtrans %}</th>
-                        <th>{% trans -%}Email{%- endtrans %}</th>
-                        <th>{% trans -%}Affiliation{%- endtrans %}</th>
-                        <th>{% trans -%}Speaker{%- endtrans %}</th>
-                        <th>{% trans -%}Author type{% endtrans %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for session_person in session_persons -%}
-                        {% set event_person = session_person.person %}
-                        {% set is_primary_author = session_person.author_type == 1 %}
-                        {% set is_speaker = session_person.is_speaker %}
-                        <tr data-person-data="{{ 'speaker,' if is_speaker }}{{ 'primary' if is_primary_author else 'secondary' }}">
-                            <td><input type="checkbox" value="{{ event_person.id }}" class="select-row"
-                                       name="person_id"></td>
-                            <td>{{- event_person.full_name -}}</td>
-                            <td>{{- event_person.email -}}</td>
-                            <td>{{- event_person.affiliation -}}</td>
-                            <td>{{- _('Yes') if is_speaker else _('No') -}}</td>
-                            <td>{{- _('Primary') if is_primary_author else _('Secondary') -}}</td>
-                        </tr>
-                    {%- else -%}
-                        <tr>
-                            <td colspan="6">{% trans %}No persons in the session yet{% endtrans %}</td>
-                        </tr>
-                    {%- endfor %}
-                </tbody>
-            </table>
-            <a id="send-mails-btn" href="#" class="i-button highlight disabled js-requires-selected-row"
-               data-href="{{ url_for('.email_session_persons', event) }}"
-               data-title="{% trans %}Send email{% endtrans %}"
-               data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
-               data-ajax-dialog>
-                {%- trans %}Send emails{% endtrans -%}
-            </a>
-        </div>
     </div>
-{%- endblock %}
-
-{% block javascript %}
-    <script>
-        setupPersonsList();
-    </script>
-{% endblock %}
+    <div>
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th class="checkbox-column"></th>
+                    <th>{% trans -%}Name{%- endtrans %}</th>
+                    <th>{% trans -%}Email{%- endtrans %}</th>
+                    <th>{% trans -%}Affiliation{%- endtrans %}</th>
+                    <th>{% trans -%}Speaker{%- endtrans %}</th>
+                    <th>{% trans -%}Author type{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session_person in session_persons -%}
+                    {% set event_person = session_person.person %}
+                    {% set is_primary_author = session_person.author_type.name == 'primary' %}
+                    {% set is_speaker = session_person.is_speaker %}
+                    <tr data-person-data="{{ 'speaker,' if is_speaker }}{{ 'primary' if is_primary_author else 'secondary' }}">
+                        <td><input type="checkbox" value="{{ event_person.id }}" class="select-row"
+                                   name="person_id"></td>
+                        <td>{{- event_person.full_name -}}</td>
+                        <td>{{- event_person.email -}}</td>
+                        <td>{{- event_person.affiliation -}}</td>
+                        <td>{{- _('Yes') if is_speaker else _('No') -}}</td>
+                        <td>{{- _('Primary') if is_primary_author else _('Secondary') -}}</td>
+                    </tr>
+                {%- else -%}
+                    <tr>
+                        <td colspan="6">{% trans %}No persons in the session yet{% endtrans %}</td>
+                    </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+        <a id="send-mails-btn" href="#" class="i-button highlight disabled js-requires-selected-row"
+           data-href="{{ url_for('.email_session_persons', event) }}"
+           data-title="{% trans %}Send email{% endtrans %}"
+           data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
+           data-ajax-dialog>
+            {%- trans %}Send emails{% endtrans -%}
+        </a>
+    </div>
+</div>
+<script>
+    setupPersonsList();
+</script>
