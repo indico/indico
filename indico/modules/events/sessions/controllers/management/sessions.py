@@ -132,21 +132,18 @@ class RHSessionREST(RHManageSessionBase):
         return jsonify()
 
 
-class RHSessionPersonList(RHManageSessionsBase):
+class RHSessionPersonList(RHManageSessionsActionsBase):
     """List of persons in the session"""
 
     def _process(self):
-        session_ids = map(int, request.form.getlist('session_id'))
+        session_ids = {s.id for s in self.sessions}
         session_persons = (ContributionPersonLink
-                           .find(ContributionPersonLink.person_id == EventPerson.id,
-                                 Contribution.session_id.in_(session_ids))
-                           .join(ContributionPersonLink.contribution).all())
+                           .find(ContributionPersonLink.contribution.has(Contribution.session_id.in_(session_ids)))
+                           .all())
         session_persons.extend(SubContributionPersonLink
-                               .find(SubContributionPersonLink.person_id == EventPerson.id,
-                                     Contribution.session_id.in_(session_ids))
-                               .join(SubContributionPersonLink.subcontribution)
-                               .join(SubContribution.contribution))
-
+                               .find(SubContributionPersonLink.subcontribution
+                                     .has(SubContribution.contribution.has(Contribution.session_id.in_(session_ids))))
+                               .all())
         return jsonify_template('events/sessions/management/session_person_list.html',
                                 session_persons=session_persons, event=self.event_new)
 
