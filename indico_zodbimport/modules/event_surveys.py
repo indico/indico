@@ -23,7 +23,7 @@ from operator import attrgetter
 from uuid import uuid4
 
 from indico.core.db import db
-from indico.modules.events import EventSetting
+from indico.modules.events.models.settings import EventSetting
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.items import SurveyQuestion, SurveySection
 from indico.modules.events.surveys.models.submissions import SurveySubmission, SurveyAnswer
