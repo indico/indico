@@ -16,6 +16,10 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+from itertools import chain
+
+from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 
@@ -23,7 +27,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.decorators import strict_classproperty
 from indico.util.struct.enum import IndicoEnum
-from indico.util.string import to_unicode
 
 
 class LinkType(int, IndicoEnum):
@@ -34,22 +37,25 @@ class LinkType(int, IndicoEnum):
     session = 5
 
 
-_all_columns = {'category_id', 'event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
+_all_columns = {'category_id', 'linked_event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
 _columns_for_types = {
     LinkType.category: {'category_id'},
-    LinkType.event: {'event_id'},
-    LinkType.contribution: {'event_id', 'contribution_id'},
-    LinkType.subcontribution: {'event_id', 'contribution_id', 'subcontribution_id'},
-    LinkType.session: {'event_id', 'session_id'},
+    LinkType.event: {'linked_event_id'},
+    LinkType.contribution: {'contribution_id'},
+    LinkType.subcontribution: {'subcontribution_id'},
+    LinkType.session: {'session_id'},
 }
 
 
 def _make_checks(allowed_link_types):
+    available_columns = set(chain.from_iterable(cols for type_, cols in _columns_for_types.iteritems()
+                                                if type_ in allowed_link_types))
+    yield db.CheckConstraint('(event_id IS NULL) = (link_type = {})'.format(LinkType.category), 'valid_event_id')
     for link_type in allowed_link_types:
-        required_cols = _all_columns & _columns_for_types[link_type]
-        forbidden_cols = _all_columns - required_cols
-        criteria = ['{} IS NULL'.format(col) for col in forbidden_cols]
-        criteria += ['{} IS NOT NULL'.format(col) for col in required_cols]
+        required_cols = available_columns & _columns_for_types[link_type]
+        forbidden_cols = available_columns - required_cols
+        criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
+        criteria += ['{} IS NOT NULL'.format(col) for col in sorted(required_cols)]
         condition = 'link_type != {} OR ({})'.format(link_type, ' AND '.join(criteria))
         yield db.CheckConstraint(condition, 'valid_{}_link'.format(link_type.name))
 
@@ -72,8 +78,11 @@ class LinkMixin(object):
     #: be a string containing an SQL string to specify the criterion
     #: for the unique index to be applied, e.g. ``'is_foo = true'``.
     unique_links = False
-    #: The name of the backref that's added to the Event model
+    #: The name of the backref that's added to the Event model to
+    #: access *all* linked objects
     events_backref_name = None
+    #: The name of the backref that's added to the linked objects
+    link_backref_name = None
 
     @strict_classproperty
     @classmethod
@@ -84,17 +93,58 @@ class LinkMixin(object):
             args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
+    @classmethod
+    def register_link_events(cls):
+        """Registers sqlalchemy events needed by this mixin.
+
+        Call this method after the definition of a model which uses
+        this mixin class.
+        """
+        event_mapping = {cls.session: lambda x: x.event_new,
+                         cls.contribution: lambda x: x.event_new,
+                         cls.subcontribution: lambda x: x.contribution.event_new,
+                         cls.linked_event: lambda x: x}
+
+        type_mapping = {cls.category_id: LinkType.category,
+                        cls.linked_event: LinkType.event,
+                        cls.session: LinkType.session,
+                        cls.contribution: LinkType.contribution,
+                        cls.subcontribution: LinkType.subcontribution}
+
+        def _set_link_type(link_type, target, value, *unused):
+            if value is not None:
+                target.link_type = link_type
+
+        def _set_event_obj(fn, target, value, *unused):
+            if value is not None:
+                event = fn(value)
+                assert event is not None
+                target.event_new = event
+
+        for rel, fn in event_mapping.iteritems():
+            if rel is not None:
+                listen(rel, 'set', partial(_set_event_obj, fn))
+
+        for rel, link_type in type_mapping.iteritems():
+            if rel is not None:
+                listen(rel, 'set', partial(_set_link_type, link_type))
+
     @declared_attr
     def link_type(cls):
         return db.Column(
             PyIntEnum(LinkType, exclude_values=set(LinkType) - cls.allowed_link_types),
             nullable=False
         )
-    category_id = db.Column(
-        db.Integer,
-        nullable=True,
-        index=True
-    )
+
+    @declared_attr
+    def category_id(cls):
+        if LinkType.category in cls.allowed_link_types:
+            return db.Column(
+                db.Integer,
+                nullable=True,
+                index=True
+            )
+
     @declared_attr
     def event_id(cls):
         return db.Column(
@@ -103,23 +153,52 @@ class LinkMixin(object):
             nullable=True,
             index=True
         )
-    session_id = db.Column(
-        db.String,
-        nullable=True
-    )
-    contribution_id = db.Column(
-        db.String,
-        nullable=True
-    )
-    subcontribution_id = db.Column(
-        db.String,
-        nullable=True
-    )
+
+    @declared_attr
+    def linked_event_id(cls):
+        if LinkType.event in cls.allowed_link_types:
+            return db.Column(
+                db.Integer,
+                db.ForeignKey('events.events.id'),
+                nullable=True,
+                index=True
+            )
+
+    @declared_attr
+    def session_id(cls):
+        if LinkType.session in cls.allowed_link_types:
+            return db.Column(
+                db.Integer,
+                db.ForeignKey('events.sessions.id'),
+                nullable=True,
+                index=True
+            )
+
+    @declared_attr
+    def contribution_id(cls):
+        if LinkType.contribution in cls.allowed_link_types:
+            return db.Column(
+                db.Integer,
+                db.ForeignKey('events.contributions.id'),
+                nullable=True,
+                index=True
+            )
+
+    @declared_attr
+    def subcontribution_id(cls):
+        if LinkType.subcontribution in cls.allowed_link_types:
+            return db.Column(
+                db.Integer,
+                db.ForeignKey('events.subcontributions.id'),
+                nullable=True,
+                index=True
+            )
 
     @declared_attr
     def event_new(cls):
         return db.relationship(
             'Event',
+            foreign_keys=cls.event_id,
             lazy=True,
             backref=db.backref(
                 cls.events_backref_name,
@@ -127,55 +206,96 @@ class LinkMixin(object):
             )
         )
 
+    @declared_attr
+    def linked_event(cls):
+        if LinkType.event in cls.allowed_link_types:
+            return db.relationship(
+                'Event',
+                foreign_keys=cls.linked_event_id,
+                lazy=True,
+                backref=db.backref(
+                    cls.link_backref_name,
+                    cascade='all, delete-orphan',
+                    uselist=not cls.unique_links,
+                    lazy=True
+                )
+            )
+
+    @declared_attr
+    def session(cls):
+        if LinkType.session in cls.allowed_link_types:
+            return db.relationship(
+                'Session',
+                lazy=True,
+                backref=db.backref(
+                    cls.link_backref_name,
+                    cascade='all, delete-orphan',
+                    uselist=not cls.unique_links,
+                    lazy=True
+                )
+            )
+
+    @declared_attr
+    def contribution(cls):
+        if LinkType.contribution in cls.allowed_link_types:
+            return db.relationship(
+                'Contribution',
+                lazy=True,
+                backref=db.backref(
+                    cls.link_backref_name,
+                    cascade='all, delete-orphan',
+                    uselist=not cls.unique_links,
+                    lazy=True
+                )
+            )
+
+    @declared_attr
+    def subcontribution(cls):
+        if LinkType.subcontribution in cls.allowed_link_types:
+            return db.relationship(
+                'SubContribution',
+                lazy=True,
+                backref=db.backref(
+                    cls.link_backref_name,
+                    cascade='all, delete-orphan',
+                    uselist=not cls.unique_links,
+                    lazy=True
+                )
+            )
+
     @hybrid_property
-    def linked_object(self):
-        """Returns the linked object."""
-        from MaKaC.conference import CategoryManager, ConferenceHolder
+    def object(self):
+        from MaKaC.conference import CategoryManager
         if self.link_type == LinkType.category:
             return CategoryManager().getById(self.category_id, True)
-        event = ConferenceHolder().getById(self.event_id, True)
-        if event is None:
-            return None
-        if self.link_type == LinkType.event:
-            return event
+        elif self.link_type == LinkType.event:
+            return self.event_new
         elif self.link_type == LinkType.session:
-            return event.getSessionById(self.session_id)
+            return self.session
         elif self.link_type == LinkType.contribution:
-            return event.getContributionById(self.contribution_id)
+            return self.contribution
         elif self.link_type == LinkType.subcontribution:
-            contribution = event.getContributionById(self.contribution_id)
-            if contribution is None:
-                return None
-            return contribution.getSubContributionById(self.subcontribution_id)
+            return self.subcontribution
 
-    @linked_object.setter
-    def linked_object(self, obj):
-        from MaKaC.conference import Category, Conference, Contribution, SubContribution, Session
-        self.category_id = self.event_id = self.session_id = self.contribution_id = self.subcontribution_id = None
+    @object.setter
+    def object(self, obj):
+        from MaKaC.conference import Category
+        self.category = self.event_new = self.session = self.contribution = self.subcontribution = None
         if isinstance(obj, Category):
-            self.link_type = LinkType.category
             self.category_id = int(obj.id)
-        elif isinstance(obj, Conference):
-            self.link_type = LinkType.event
-            self.event_id = int(obj.id)
-        elif isinstance(obj, Session):
-            self.link_type = LinkType.session
-            self.event_id = int(obj.getConference().id)
-            self.session_id = obj.id
-        elif isinstance(obj, Contribution):
-            self.link_type = LinkType.contribution
-            self.event_id = int(obj.getConference().id)
-            self.contribution_id = obj.id
-        elif isinstance(obj, SubContribution):
-            self.link_type = LinkType.subcontribution
-            self.event_id = int(obj.getConference().id)
-            self.contribution_id = obj.getContribution().id
-            self.subcontribution_id = obj.id
+        elif isinstance(obj, db.m.Event):
+            self.linked_event = obj
+        elif isinstance(obj, db.m.Session):
+            self.session = obj
+        elif isinstance(obj, db.m.Contribution):
+            self.contribution = obj
+        elif isinstance(obj, db.m.SubContribution):
+            self.subcontribution = obj
         else:
-            raise ValueError('Unexpected object type {}: {}'.format(type(obj), obj))
+            raise TypeError('Unexpected object: {}'.format(obj))
 
-    @linked_object.comparator
-    def linked_object(cls):
+    @object.comparator
+    def object(cls):
         return LinkedObjectComparator(cls)
 
     @property
@@ -196,13 +316,12 @@ class LinkMixin(object):
         """
         data = {}
         if self.link_type == LinkType.session:
-            data['Session'] = to_unicode(self.linked_object.getTitle())
+            data['Session'] = self.session.title
         elif self.link_type == LinkType.contribution:
-            data['Contribution'] = to_unicode(self.linked_object.getTitle())
+            data['Contribution'] = self.contribution.title
         elif self.link_type == LinkType.subcontribution:
-            obj = self.linked_object
-            data['Contribution'] = to_unicode(obj.getContribution().getTitle())
-            data['Subcontribution'] = to_unicode(obj.getTitle())
+            data['Contribution'] = self.subcontribution.contribution.title
+            data['Subcontribution'] = self.subcontribution.title
         return data
 
 
@@ -215,25 +334,21 @@ class LinkedObjectComparator(Comparator):
         raise NotImplementedError
 
     def __eq__(self, other):
-        from MaKaC.conference import Category, Conference, Contribution, SubContribution, Session
+        from MaKaC.conference import Category
         if isinstance(other, Category):
             return db.and_(self.cls.link_type == LinkType.category,
                            self.cls.category_id == int(other.id))
-        elif isinstance(other, Conference):
+        elif isinstance(other, db.m.Event):
             return db.and_(self.cls.link_type == LinkType.event,
-                           self.cls.event_id == int(other.id))
-        elif isinstance(other, Session):
+                           self.cls.linked_event_id == other.id)
+        elif isinstance(other, db.m.Session):
             return db.and_(self.cls.link_type == LinkType.session,
-                           self.cls.event_id == int(other.getConference().id),
                            self.cls.session_id == other.id)
-        elif isinstance(other, Contribution):
+        elif isinstance(other, db.m.Contribution):
             return db.and_(self.cls.link_type == LinkType.contribution,
-                           self.cls.event_id == int(other.getConference().id),
                            self.cls.contribution_id == other.id)
-        elif isinstance(other, SubContribution):
+        elif isinstance(other, db.m.SubContribution):
             return db.and_(self.cls.link_type == LinkType.subcontribution,
-                           self.cls.event_id == int(other.getConference().id),
-                           self.cls.contribution_id == other.getContribution().id,
                            self.cls.subcontribution_id == other.id)
         else:
             raise ValueError('Unexpected object type {}: {}'.format(type(other), other))

@@ -33,25 +33,31 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('Event', 'event_management_object_url_prefixes', 'event_object_url_prefixes', 'logger')
-
+__all__ = ('Event', 'logger', 'legacy_event_management_object_url_prefixes', 'legacy_event_object_url_prefixes',
+           'event_object_url_prefixes')
 logger = Logger.get('events')
 
 #: URL prefixes for the various event objects (public area)
 #: All prefixes are expected to be used inside the '/event/<confId>'
 #: url space.
-event_object_url_prefixes = {
+legacy_event_object_url_prefixes = {
     'event': [''],
     'session': ['/session/<sessionId>'],
     'contribution': ['/session/<sessionId>/contribution/<contribId>', '/contribution/<contribId>'],
     'subcontribution': ['/session/<sessionId>/contribution/<contribId>/<subContId>',
                         '/contribution/<contribId>/<subContId>']
 }
+event_object_url_prefixes = {
+    'event': [''],
+    'session': ['/session/<session_id>'],
+    'contribution': ['/contribution/<contrib_id>'],
+    'subcontribution': ['/contribution/<contrib_id>/<subcontrib_id>']
+}
 
 #: URL prefixes for the various event objects (management area)
 #: All prefixes are expected to be used inside the '/event/<confId>'
 #: url space.
-event_management_object_url_prefixes = {
+legacy_event_management_object_url_prefixes = {
     'event': ['/manage'],
     'session': ['/manage/session/<sessionId>'],
     'contribution': ['/manage/session/<sessionId>/contribution/<contribId>', '/manage/contribution/<contribId>'],

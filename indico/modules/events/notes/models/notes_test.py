@@ -17,8 +17,6 @@
 from __future__ import unicode_literals
 
 import pytest
-from mock import PropertyMock
-
 from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError
 
@@ -26,8 +24,10 @@ from indico.modules.events.notes.models.notes import EventNote, RenderMode, Even
 
 
 @pytest.fixture
-def note(dummy_event):
-    return EventNote(linked_object=dummy_event)
+def note(db, dummy_event_new):
+    note = EventNote(object=dummy_event_new)
+    db.session.expunge(note)  # keep it out of the SA session (linking it to the event adds it)
+    return note
 
 
 @pytest.mark.parametrize('deleted', (True, False))
@@ -129,42 +129,42 @@ def test_render_markdown(note, dummy_user):
 
 def test_get_for_linked_object(note, dummy_user, create_event):
     note.create_revision(RenderMode.html, 'test', dummy_user)
-    assert EventNote.get_for_linked_object(note.linked_object) == note
-    assert EventNote.get_for_linked_object(create_event('123', legacy=True)) is None
+    assert EventNote.get_for_linked_object(note.object) == note
+    assert EventNote.get_for_linked_object(create_event('123')) is None
 
 
 @pytest.mark.parametrize('preload', (True, False))
-def test_get_for_linked_object_preload(note, dummy_user, mocker, preload):
+def test_get_for_linked_object_preload(note, dummy_user, count_queries, preload):
     note.create_revision(RenderMode.html, 'test', dummy_user)
-    assert EventNote.get_for_linked_object(note.linked_object, preload_event=preload)
-    query = mocker.patch.object(EventNote, 'query', new=PropertyMock())
-    EventNote.get_for_linked_object(note.linked_object)
-    assert query.called == (not preload)
+    assert EventNote.get_for_linked_object(note.object, preload_event=preload)
+    with count_queries() as cnt:
+        EventNote.get_for_linked_object(note.object)
+    assert (cnt() == 0) == preload
 
 
 def test_get_for_linked_object_deleted(note, dummy_user):
     note.create_revision(RenderMode.html, 'test', dummy_user)
     note.is_deleted = True
-    assert EventNote.get_for_linked_object(note.linked_object) is None
+    assert EventNote.get_for_linked_object(note.object) is None
 
 
-def test_get_or_create(db, dummy_user, dummy_event, create_event):
-    note = EventNote.get_or_create(dummy_event)
+def test_get_or_create(db, dummy_user, dummy_event_new, create_event):
+    note = EventNote.get_or_create(dummy_event_new)
     assert note is not None
     assert not inspect(note).persistent  # new object
     note.create_revision(RenderMode.html, 'test', dummy_user)
     note.is_deleted = True
     db.session.flush()
     # get deleted one
-    assert EventNote.get_or_create(dummy_event) == note
+    assert EventNote.get_or_create(dummy_event_new) == note
     assert inspect(note).persistent
     note.is_deleted = False
     db.session.flush()
     # same if it's not deleted
-    assert EventNote.get_or_create(dummy_event) == note
+    assert EventNote.get_or_create(dummy_event_new) == note
     assert inspect(note).persistent
     # other event should create a new one
-    other = EventNote.get_or_create(create_event(123, legacy=True))
+    other = EventNote.get_or_create(create_event(123))
     other.create_revision(RenderMode.html, 'test', dummy_user)
     assert other != note
     assert not inspect(other).persistent

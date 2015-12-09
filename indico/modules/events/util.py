@@ -29,8 +29,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
 
-def get_object_from_args(args=None):
-    """Retrieves an event object from request arguments.
+def get_legacy_object_from_args(args=None):
+    """Retrieves a legacy event object from request arguments.
 
     This utility is meant to be used in cases where the same controller
     can deal with objects attached to various parts of an event which
@@ -62,6 +62,46 @@ def get_object_from_args(args=None):
         contrib = event.getContributionById(args['contribId'])
         if contrib is not None:
             obj = contrib.getSubContributionById(args['subContId'])
+    else:
+        raise ValueError('Unexpected object type: {}'.format(object_type))
+    if obj is not None:
+        return object_type, event, obj
+    else:
+        return object_type, None, None
+
+
+def get_object_from_args(args=None):
+    """Retrieves an event object from request arguments.
+
+    This utility is meant to be used in cases where the same controller
+    can deal with objects attached to various parts of an event which
+    use different URLs to indicate which object to use.
+
+    :param args: The request arguments. If unspecified,
+                 ``request.view_args`` is used.
+    :return: An ``(object_type, event, object)`` tuple.  The event is
+             always the :class:`Event` associated with the object.
+             The object may be an `Event`, `Session`, `Contribution`
+             or `SubContribution`.  If the object does not exist,
+             ``(object_type, None, None)`` is returned.
+    """
+    if args is None:
+        args = request.view_args
+    object_type = args['object_type']
+    event = Event.find_first(id=args['confId'], is_deleted=False)
+    obj = None
+    if event is None:
+        obj = None
+    elif object_type == 'event':
+        obj = event
+    elif object_type == 'session':
+        obj = event.sessions.filter_by(id=args['sessionId']).first()
+    elif object_type == 'contribution':
+        obj = event.contributions.filter_by(id=args['contribId']).first()
+    elif object_type == 'subcontribution':
+        contrib = event.contributions.filter_by(id=args['contribId']).first()
+        if contrib is not None:
+            obj = contrib.subcontributions.filter_by(id=args['subContId']).first()
     else:
         raise ValueError('Unexpected object type: {}'.format(object_type))
     if obj is not None:

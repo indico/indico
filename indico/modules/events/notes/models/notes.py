@@ -27,6 +27,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii, render_markdown, text_to_repr
 from indico.util.struct.enum import TitledIntEnum
 
@@ -41,7 +42,8 @@ class EventNote(LinkMixin, db.Model):
     __tablename__ = 'notes'
     allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
     unique_links = True
-    events_backref_name = 'notes'
+    events_backref_name = 'all_notes'
+    link_backref_name = 'note'
 
     @declared_attr
     def __table_args__(cls):
@@ -92,9 +94,9 @@ class EventNote(LinkMixin, db.Model):
         post_update=True
     )
 
-    @property
+    @locator_property
     def locator(self):
-        return self.linked_object.getLocator()
+        return self.object.locator
 
     @classmethod
     def get_for_linked_object(cls, linked_object, preload_event=True):
@@ -108,16 +110,15 @@ class EventNote(LinkMixin, db.Model):
                               be pre-loaded and cached in the app
                               context.
         """
-        event = linked_object.getConference()
+        event = linked_object.event_new
         try:
             return g.event_notes[event].get(linked_object)
         except (AttributeError, KeyError):
             if not preload_event:
-                return cls.find_first(linked_object=linked_object, is_deleted=False)
+                return linked_object.note if linked_object.note and not linked_object.note.is_deleted else None
             if 'event_notes' not in g:
                 g.event_notes = {}
-            g.event_notes[event] = {n.linked_object: n
-                                    for n in EventNote.find(event_id=int(event.id), is_deleted=False)}
+            g.event_notes[event] = {n.object: n for n in event.all_notes.filter_by(is_deleted=False)}
             return g.event_notes[event].get(linked_object)
 
     @classmethod
@@ -127,9 +128,9 @@ class EventNote(LinkMixin, db.Model):
         If there is an existing note for the object, it will be returned
         even.  Otherwise a new note is created.
         """
-        note = cls.find_first(linked_object=linked_object)
+        note = cls.find_first(object=linked_object)
         if note is None:
-            note = cls(linked_object=linked_object)
+            note = cls(object=linked_object)
         return note
 
     def delete(self, user):
@@ -259,3 +260,6 @@ listen(EventNoteRevision.source, 'set', partial(_render_revision, 'source'))
 def _update_note_html(target, value, *unused):
     if target.note_id is not None and target == target.note.current_revision:
         target.note.html = value
+
+
+EventNote.register_link_events()
