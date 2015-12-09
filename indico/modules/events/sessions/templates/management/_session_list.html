@@ -2,107 +2,110 @@
 
 {% macro render_session_list(event, sessions, default_colors) -%}
     {% if sessions -%}
-        <table class="i-table tablesorter">
-            <thead>
-                <tr class="i-table">
-                    <th class="i-table checkbox-column" data-sorter="false"></th>
-                    <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
-                    <th class="i-table">{% trans %}Title{% endtrans %}</th>
-                    <th class="i-table">{% trans %}Code{% endtrans %}</th>
-                    <th class="i-table">{%- trans %}Type{% endtrans -%}</th>
-                    <th class="i-table" data-sorter="false">{% trans %}Colour{% endtrans %}</th>
-                    <th class="i-table" data-sorter="false">{% trans %}Blocks{% endtrans %}</th>
-                    <th data-sorter="false"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sess in sessions -%}
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            <table class="i-table tablesorter">
+                <thead>
                     <tr class="i-table">
-                        <td class="i-table">
-                            <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
-                        </td>
-                        <td class="i-table">#{{ sess.friendly_id }}</td>
-                        <td class="i-table"><strong>{{ sess.title }}</strong></td>
-                        <td class="i-table">{{ sess.code }}</td>
-                        <td class="i-table">
-                            {%- if sess.is_poster %}
-                                {%- trans %}Poster{% endtrans -%}
-                            {% else %}
-                                {%- trans %}Standard{% endtrans -%}
-                            {% endif -%}
-                        </td>
-                        <td class="i-table">
-                            <div class="group">
-                                <a class="i-button icon-palette palette-picker-trigger"
-                                   style="background: #{{ sess.background_color }};
-                                          color: #{{ sess.text_color }} !important;"
-                                   data-method="PATCH"
-                                   data-href="{{ url_for('.session_rest', sess) }}"
-                                   data-colors="{{ default_colors | tojson | forceescape }}">
-                                </a>
-                            </div>
-                        </td>
-                        <td class="i-table">
-                            <span class="i-label show-session-blocks">
-                                {%- trans %}Session blocks {% endtrans -%}
-                                <span class="badge">{{ sess.blocks | length }}</span>
-                            </span>
-                        </td>
-                        <td class="i-table">
-                            <div class="group right">
-                                <a href="#" class="icon-edit highlight edit-session action-icon"
-                                   title="{% trans %}Edit this session{% endtrans %}"
-                                   data-title="{% trans title=sess.title %}Edit session {{ title }}{% endtrans %}"
-                                   data-href="{{ url_for('.modify_session', sess) }}"
-                                   data-update="#sessions-wrapper"
-                                   data-ajax-dialog></a>
-                                <a href="#" class="icon-time highlight action-icon"
-                                   title="{% trans %}Go to this session timetable{% endtrans %}"></a>
-                                <a href="#" class="icon-remove highlight action-icon"
-                                   title="{% trans %}Remove this session{% endtrans %}"
-                                   data-method="DELETE"
-                                   data-href="{{ url_for('.session_rest', sess)}}"
-                                   data-params="{{ dict(sessions_ids=sess.id) | tojson | forceescape }}"
-                                   data-update="#sessions-wrapper"
-                                   data-confirm="{% trans title=sess.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
-                            </div>
-                        </td>
+                        <th class="i-table checkbox-column" data-sorter="false"></th>
+                        <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
+                        <th class="i-table">{% trans %}Title{% endtrans %}</th>
+                        <th class="i-table">{% trans %}Code{% endtrans %}</th>
+                        <th class="i-table">{%- trans %}Type{% endtrans -%}</th>
+                        <th class="i-table" data-sorter="false">{% trans %}Colour{% endtrans %}</th>
+                        <th class="i-table" data-sorter="false">{% trans %}Blocks{% endtrans %}</th>
+                        <th data-sorter="false"></th>
                     </tr>
-                    {% for block in sess.blocks -%}
-                        <tr class="i-table session-blocks-row" style="display: none;">
-                            <td class="i-table" colspan="8">
-                                <table class="i-table no-margin">
-                                    <colgroup>
-                                        <col span="2">
-                                        <col span="6">
-                                    </colgroup>
-                                    <tr class="i-table content">
-                                        <td class="i-table caption">
-                                            {% trans %}Title{% endtrans %}
-                                        </td>
-                                        <td class="i-table value">{{ block.title }}</td>
-                                    </tr>
-                                    <tr class="i-table content">
-                                        <td class="i-table caption">
-                                            {% trans %}Duration{% endtrans %}
-                                        </td>
-                                        <td class="i-table value">{{ block.duration }}</td>
-                                    </tr>
-                                    <tr class="i-table content">
-                                        <td class="i-table caption">
-                                            {% trans %}Number of contributions{% endtrans %}
-                                        </td>
-                                        <td class="i-table value">
-                                            {{ block.contributions | length }}
-                                        </td>
-                                    </tr>
-                                </table>
+                </thead>
+                <tbody>
+                    {% for sess in sessions -%}
+                        <tr class="i-table">
+                            <td class="i-table">
+                                <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
+                            </td>
+                            <td class="i-table">#{{ sess.friendly_id }}</td>
+                            <td class="i-table"><strong>{{ sess.title }}</strong></td>
+                            <td class="i-table">{{ sess.code }}</td>
+                            <td class="i-table">
+                                {%- if sess.is_poster %}
+                                    {%- trans %}Poster{% endtrans -%}
+                                {% else %}
+                                    {%- trans %}Standard{% endtrans -%}
+                                {% endif -%}
+                            </td>
+                            <td class="i-table">
+                                <div class="group">
+                                    <a class="i-button icon-palette palette-picker-trigger"
+                                       style="background: #{{ sess.background_color }};
+                                              color: #{{ sess.text_color }} !important;"
+                                       data-method="PATCH"
+                                       data-href="{{ url_for('.session_rest', sess) }}"
+                                       data-colors="{{ default_colors | tojson | forceescape }}">
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="i-table">
+                                <span class="i-label show-session-blocks">
+                                    {%- trans %}Session blocks {% endtrans -%}
+                                    <span class="badge">{{ sess.blocks | length }}</span>
+                                </span>
+                            </td>
+                            <td class="i-table">
+                                <div class="group right">
+                                    <a href="#" class="icon-edit highlight edit-session action-icon"
+                                       title="{% trans %}Edit this session{% endtrans %}"
+                                       data-title="{% trans title=sess.title %}Edit session {{ title }}{% endtrans %}"
+                                       data-href="{{ url_for('.modify_session', sess) }}"
+                                       data-update="#sessions-wrapper"
+                                       data-ajax-dialog></a>
+                                    <a href="#" class="icon-time highlight action-icon"
+                                       title="{% trans %}Go to this session timetable{% endtrans %}"></a>
+                                    <a href="#" class="icon-remove highlight action-icon"
+                                       title="{% trans %}Remove this session{% endtrans %}"
+                                       data-method="DELETE"
+                                       data-href="{{ url_for('.session_rest', sess)}}"
+                                       data-params="{{ dict(sessions_ids=sess.id) | tojson | forceescape }}"
+                                       data-update="#sessions-wrapper"
+                                       data-confirm="{% trans title=sess.title %}Do you really want to delete the session '{{ title }}'?{% endtrans %}"></a>
+                                </div>
                             </td>
                         </tr>
+                        {% for block in sess.blocks -%}
+                            <tr class="i-table session-blocks-row" style="display: none;">
+                                <td class="i-table" colspan="8">
+                                    <table class="i-table no-margin">
+                                        <colgroup>
+                                            <col span="2">
+                                            <col span="6">
+                                        </colgroup>
+                                        <tr class="i-table content">
+                                            <td class="i-table caption">
+                                                {% trans %}Title{% endtrans %}
+                                            </td>
+                                            <td class="i-table value">{{ block.title }}</td>
+                                        </tr>
+                                        <tr class="i-table content">
+                                            <td class="i-table caption">
+                                                {% trans %}Duration{% endtrans %}
+                                            </td>
+                                            <td class="i-table value">{{ block.duration }}</td>
+                                        </tr>
+                                        <tr class="i-table content">
+                                            <td class="i-table caption">
+                                                {% trans %}Number of contributions{% endtrans %}
+                                            </td>
+                                            <td class="i-table value">
+                                                {{ block.contributions | length }}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        {%- endfor %}
                     {%- endfor %}
-                {%- endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </form>
     {%- else %}
         {%- call message_box('info') -%}
             {% trans %}There are no sessions yet.{% endtrans %}
