@@ -353,7 +353,7 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
             'data': session.get(session_key)
         }
         url = url_for('.manage_reglist', self.regform, _external=True)
-        if configuration:
+        if configuration['data']:
             uuid = unicode(uuid4())
             url = url_for('.manage_reglist', self.regform, config=uuid, _external=True)
             cache.set(uuid, configuration)
