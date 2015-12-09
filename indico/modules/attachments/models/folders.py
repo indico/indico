@@ -25,7 +25,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.links import LinkMixin
+from indico.core.db.sqlalchemy.legacy_links import LegacyLinkMixin
 from indico.core.db.sqlalchemy.protection import ProtectionMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.attachments.models.attachments import Attachment
@@ -36,7 +36,7 @@ from indico.util.string import return_ascii
 from MaKaC.accessControl import AccessWrapper
 
 
-class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
+class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
     __tablename__ = 'folders'
     unique_links = 'is_default'
     events_backref_name = 'attachment_folders'

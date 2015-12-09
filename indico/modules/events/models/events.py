@@ -172,6 +172,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
 
     # relationship backrefs:
     # - agreements (Agreement.event_new)
+    # - all_notes (EventNote.event_new)
     # - attachment_folders (AttachmentFolder.event_new)
     # - contribution_fields (ContributionField.event_new)
     # - contribution_types (ContributionType.event_new)
@@ -186,7 +187,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     # - legacy_subcontribution_mappings (LegacySubContributionMapping.event_new)
     # - log_entries (EventLogEntry.event_new)
     # - menu_entries (MenuEntry.event_new)
-    # - notes (EventNote.event_new)
+    # - note (EventNote.linked_event)
     # - persons (EventPerson.event_new)
     # - registration_forms (RegistrationForm.event_new)
     # - registrations (Registration.event_new)
