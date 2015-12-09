@@ -11,6 +11,9 @@
         {% if form.csrf_enabled -%}
             {{ form.csrf_token() }}
         {% endif %}
+        {% for field in _iter_form_fields(form, hidden_fields=true, skip=('csrf_token',)) %}
+            {{ field() }}
+        {% endfor %}
 {%- endmacro %}
 
 {% macro form_row_static(label='', content=none, single_row=true, skip_label=false) -%}
