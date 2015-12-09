@@ -1,5 +1,5 @@
 {% macro render_note(note, last) %}
-    <h1>● {{ note.linked_object.getTitle() }}</h1>
+    <h1>● {{ note.object.title }}</h1>
     {{ note.html|safe }}
     {% if not last %}
         <hr>

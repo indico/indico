@@ -34,7 +34,7 @@ def _merge_users(target, source, **kwargs):
 
 class NoteCloner(EventCloner):
     def find_notes(self):
-        return self.event.as_event.notes.filter_by(is_deleted=False)
+        return self.event.as_event.all_notes.filter_by(is_deleted=False)
 
     def get_options(self):
         enabled = bool(self.find_notes().count())
