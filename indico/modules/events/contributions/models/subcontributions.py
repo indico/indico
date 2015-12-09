@@ -104,6 +104,7 @@ class SubContribution(db.Model):
 
     # relationship backrefs:
     # - contribution (Contribution.subcontributions)
+    # - legacy_mapping (LegacySubContributionMapping.subcontribution)
 
     @return_ascii
     def __repr__(self):
