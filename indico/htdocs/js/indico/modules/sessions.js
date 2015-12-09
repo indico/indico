@@ -60,6 +60,9 @@
     };
 
     global.setupPersonsList = function setupPersonsList() {
+        enableIfChecked('#persons-list', '.select-row', '.js-requires-selected-row');
+        $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
+
         $('#persons-list [data-filter]').on('click', function() {
             var filters = $('#persons-list [data-filter]:checked').map(function() {
                 return $(this).data('filter');
