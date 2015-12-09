@@ -25,7 +25,7 @@ from wtforms.validators import DataRequired
 from indico.modules.events.sessions.util import get_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoPalettePickerField, TimeDeltaField
+from indico.web.forms.fields import IndicoPalettePickerField, TimeDeltaField, JSONField
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
 
@@ -47,6 +47,7 @@ class EmailSessionPersonsForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()], choices=[(1, 1)])
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    event_persons = JSONField(_('Event Persons'), default=[])
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

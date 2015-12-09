@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import random
 
-from flask import request, jsonify, session
+from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -155,23 +155,17 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
         self._doNotSanitizeFields.append('from_address')
         RHManageSessionsBase._checkParams(self, params)
 
-    def _create_form(self):
-        return EmailSessionPersonsForm(event=self.event_new)
-
-    def _process_GET(self):
-        form = self._create_form()
-        session['event_person_ids'] = set(map(int, request.args.getlist('person_id')))
+    def _process(self):
+        form = EmailSessionPersonsForm(event=self.event_new, event_persons=request.args.getlist('person_id'))
+        if form.validate_on_submit():
+            event_person_ids = form.event_persons.data
+            event_persons = (self.event_new.persons.filter(EventPerson.id.in_(event_person_ids), ~User.is_deleted)
+                                                   .join(EventPerson.user).all())
+            for event_person in event_persons:
+                if not event_person.email:
+                    continue
+                email = make_email(to_list=event_person.email, from_address=form.from_address.data, body=form.body.data,
+                                   html=True)
+                send_email(email, self.event_new, 'Sessions')
+            return jsonify_data()
         return jsonify_form(form, submit=_('Send'))
-
-    def _process_POST(self):
-        form = self._create_form()
-        event_person_ids = session.pop('event_person_ids', [])
-        event_persons = (self.event_new.persons.filter(EventPerson.id.in_(event_person_ids), ~User.is_deleted)
-                                               .join(EventPerson.user).all())
-        for event_person in event_persons:
-            if not event_person.email:
-                continue
-            email = make_email(to_list=event_person.email, from_address=form.from_address.data, body=form.body.data,
-                               html=True)
-            send_email(email, self.event_new, 'Sessions')
-        return jsonify_data()
