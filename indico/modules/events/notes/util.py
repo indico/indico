@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-import itertools
+from sqlalchemy.orm import joinedload, defaultload
 
+from indico.core.db import db
+from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.web.flask.util import url_for
-from MaKaC.conference import Conference, Contribution, SessionSlot
-from MaKaC.schedule import BreakTimeSchEntry
 
 
 def build_note_api_data(note):
@@ -50,39 +50,44 @@ def build_note_legacy_api_data(note):
             'title': 'Minutes'}
 
 
-def get_nested_notes(obj):
-    """Gets all notes linked to the object and its nested objects.
-
-    In case of :class:`Conference`, nested objects have to be scheduled.
-
-    :param obj: A :class:`Conference`, :class:`SessionSlot`,
-                :class:`Contribution` or :class:`SubContribution` object.
-    """
-    notes = [obj.note] if obj.note else []
-    nested_objects = []
-    if isinstance(obj, Conference):
-        nested_objects = [e.getOwner() for e in obj.getSchedule().getEntries() if not isinstance(e, BreakTimeSchEntry)]
-    if isinstance(obj, SessionSlot):
-        nested_objects = obj.getContributionList()
-    elif isinstance(obj, Contribution):
-        nested_objects = obj.getSubContributionList()
-    return itertools.chain(notes, *map(get_nested_notes, nested_objects))
+def get_scheduled_notes(event):
+    """Gets all notes of scheduled items inside an event"""
+    tt_entries = (event.timetable_entries
+                  .filter(TimetableEntry.parent_id.is_(None),
+                          TimetableEntry.type != TimetableEntryType.BREAK)
+                  .options(joinedload('children'))
+                  .options(defaultload('contribution').joinedload('subcontributions'))
+                  .all())
+    # build a list of all the objects we need notes for. that way we can query
+    # all notes in a single go afterwards instead of making the already-huge
+    # timetable query even bigger.
+    objects = []
+    for entry in tt_entries:
+        objects.append(entry.object)
+        if entry.type == TimetableEntryType.CONTRIBUTION:
+            objects.extend(sc for sc in entry.object.subcontributions if not sc.is_deleted)
+        elif entry.type == TimetableEntryType.SESSION_BLOCK:
+            for contrib in entry.object.contributions:
+                objects.append(contrib)
+                objects.extend(sc for sc in contrib.subcontributions if not sc.is_deleted)
+    used = set(objects)
+    notes = [x for x in event.all_notes.filter_by(is_deleted=False) if x.object in used]
+    positions = {obj: i for i, obj in enumerate(objects)}
+    return sorted(notes, key=lambda x: positions[x.object])
 
 
 def can_edit_note(obj, user):
     """Checks if a user can edit the object's note"""
-    from MaKaC.conference import Contribution, Session, SubContribution
     if not user:
         return False
-    if isinstance(obj, Conference) and obj.as_event.can_manage(user, 'submit'):
+    if obj.can_manage(user):
         return True
-    if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
+    if isinstance(obj, db.m.Event) and obj.can_manage(user, 'submit'):
         return True
-    if isinstance(obj, Contribution):
-        if obj.canUserSubmit(user.as_avatar):
-            return True
-        if obj.getSession() and obj.getSession().canCoordinate(user.as_avatar, 'modifContribs'):
-            return True
-    if isinstance(obj, SubContribution):
-        return can_edit_note(obj.getContribution(), user)
-    return obj.canModify(user.as_avatar)
+    if isinstance(obj, db.m.Session) and obj.can_manage(user, 'coordinate'):
+        return True
+    if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit'):
+        return True
+    if isinstance(obj, db.m.SubContribution):
+        return can_edit_note(obj.contribution, user)
+    return False

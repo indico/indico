@@ -1806,13 +1806,14 @@ class Conference(CommonObjectBase, Locatable):
     @memoize_request
     def note(self):
         from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_for_linked_object(self)
+        return EventNote.get_for_linked_object(self.as_event)
 
     @property
     @memoize_request
     def scheduled_notes(self):
-        from indico.modules.events.notes.util import get_nested_notes
-        return set(get_nested_notes(self)) - {self.note}
+        # XXX: remove this when rewriting ManageButton.tpl
+        from indico.modules.events.notes.util import get_scheduled_notes
+        return get_scheduled_notes(self.as_event)
 
     @property
     def tz(self):
@@ -4121,8 +4122,7 @@ class Session(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_for_linked_object(self)
+        warnings.warn('note of legacy objects is not available anymore; returning None', DeprecationWarning, 2)
 
     def getVerboseType(self):
         return 'Session'
@@ -5348,8 +5348,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     @property
     @memoize_request
     def note(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_for_linked_object(self.session)
+        warnings.warn('note of legacy objects is not available anymore; returning None', DeprecationWarning, 2)
 
     def getTimezone( self ):
         return self.getConference().getTimezone()
@@ -6448,8 +6447,7 @@ class Contribution(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_for_linked_object(self)
+        warnings.warn('note of legacy objects is not available anymore; returning None', DeprecationWarning, 2)
 
     def getVerboseType(self):
         return 'Contribution'
@@ -8547,8 +8545,7 @@ class SubContribution(CommonObjectBase, Locatable):
     @property
     @memoize_request
     def note(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_for_linked_object(self)
+        warnings.warn('note of legacy objects is not available anymore; returning None', DeprecationWarning, 2)
 
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getOwner().updateNonInheritingChildren(elem, delete)

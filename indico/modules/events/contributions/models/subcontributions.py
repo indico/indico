@@ -106,6 +106,7 @@ class SubContribution(db.Model):
     # relationship backrefs:
     # - contribution (Contribution.subcontributions)
     # - legacy_mapping (LegacySubContributionMapping.subcontribution)
+    # - note (EventNote.subcontribution)
 
     @property
     def event_new(self):

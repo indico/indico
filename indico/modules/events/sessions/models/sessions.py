@@ -125,6 +125,7 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     # relationship backrefs:
     # - contributions (Contribution.session)
     # - legacy_mapping (LegacySessionMapping.session)
+    # - note (EventNote.session)
 
     @property
     def location_parent(self):

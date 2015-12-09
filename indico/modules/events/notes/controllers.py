@@ -22,14 +22,12 @@ from werkzeug.exceptions import NotFound, Forbidden
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
-from indico.core.errors import NoReportError
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
-from indico.modules.events.notes.util import can_edit_note
+from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import get_object_from_args
-from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
@@ -41,7 +39,7 @@ class RHNoteBase(RHProtected):
     """Base handler for notes attached to an object inside an event"""
 
     def _checkParams(self):
-        self.object_type, self.event, self.object = get_object_from_args()
+        self.object_type, self.event_new, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound
 
@@ -88,13 +86,13 @@ class RHEditNote(RHManageNoteBase):
             if is_new:
                 signals.event.notes.note_added.send(note)
                 logger.info('Note %s created by %s', note, session.user)
-                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
-                               session.user, data=note.link_event_log_data)
+                self.event_new.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
+                                   session.user, data=note.link_event_log_data)
             elif is_changed:
                 signals.event.notes.note_modified.send(note)
                 logger.info('Note %s modified by %s', note, session.user)
-                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
-                               session.user, data=note.link_event_log_data)
+                self.event_new.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
+                                   session.user, data=note.link_event_log_data)
             saved = is_new or is_changed
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
                                 object=self.object, saved=saved, **kwargs)
@@ -108,7 +106,7 @@ class RHCompileNotes(RHEditNote):
     """Handle note edits a note attached to an object inside an event"""
 
     def _process(self):
-        source = render_template('events/notes/compiled_notes.html', notes=self.event.scheduled_notes)
+        source = render_template('events/notes/compiled_notes.html', notes=get_scheduled_notes(self.event_new))
         form = self._make_form(source=source)
         return self._process_form(form, is_compilation=True)
 
@@ -122,9 +120,9 @@ class RHDeleteNote(RHManageNoteBase):
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
             logger.info('Note %s deleted by %s', note, session.user)
-            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
-                           session.user, data=note.link_event_log_data)
-        return redirect(url_for('event.conferenceDisplay', self.event))
+            self.event_new.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
+                               session.user, data=note.link_event_log_data)
+        return redirect(url_for('event.conferenceDisplay', self.event_new))
 
 
 class RHViewNote(RHNoteBase):
@@ -132,7 +130,7 @@ class RHViewNote(RHNoteBase):
 
     def _checkProtection(self):
         RHNoteBase._checkProtection(self)
-        if not self.object.canAccess(AccessWrapper(session.avatar)):
+        if not self.object.can_access(session.user):
             raise Forbidden
 
     def _process(self):

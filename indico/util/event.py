@@ -20,29 +20,36 @@ Event-related utils
 
 from functools import wraps
 
+from indico.core.db import db
 from indico.util.decorators import smart_decorator
 
 
 def uniqueId(obj):
-    from indico.modules.events.notes.models.notes import EventNote
     from MaKaC import conference
 
-    ret = obj.getId() if hasattr(obj, 'getId') else obj.id
-
+    # legacy objects
     if isinstance(obj, conference.Contribution):
-        ret = "%s.%s" % (obj.getConference().getId(), ret)
+        return '{}.{}'.format(obj.getConference().getId(), obj.getId())
     elif isinstance(obj, conference.SubContribution):
-        ret = "%s.%s.%s" % (obj.getConference().getId(),
-                          obj.getContribution().getId(), ret)
+        return '{}.{}.{}'.format(obj.getConference().getId(), obj.getContribution().getId(), obj.getId())
     elif isinstance(obj, conference.Session):
-        ret = "%s.s%s" % (obj.getConference().getId(), ret)
+        return '{}.s{}'.format(obj.getConference().getId(), obj.getId())
     elif isinstance(obj, conference.SessionSlot):
-        ret = "%s.s%s.%s" % (obj.getConference().getId(),
-                             obj.getSession().getId(), ret)
-    elif isinstance(obj, EventNote):
-        ret = '{}.n{}'.format(uniqueId(obj.linked_object), ret)
-
-    return ret
+        return '{}.s{}.{}'.format(obj.getConference().getId(), obj.getSession().getId(), obj.getId())
+    # new objects
+    elif isinstance(obj, db.m.Contribution):
+        return '{}.{}'.format(obj.event_id, obj.id)
+    elif isinstance(obj, db.m.SubContribution):
+        return '{}.{}.{}'.format(obj.event_new.id, obj.getContribution().getId(), obj.id)
+    elif isinstance(obj, db.m.Session):
+        return '{}.s{}'.format(obj.event_id, obj.id)
+    elif isinstance(obj, db.m.SessionBlock):
+        return '{}.s{}.{}'.format(obj.getConference().getId(), obj.getSession().getId(), obj.id)
+    elif isinstance(obj, db.m.EventNote):
+        return '{}.n{}'.format(uniqueId(obj.object), obj.id)
+    else:
+        # XXX: anything besides Conference/Event?! probably not..
+        return obj.getId() if hasattr(obj, 'getId') else obj.id
 
 
 def truncate_path(full_path, chars=30, skip_first=True):

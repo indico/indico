@@ -27,7 +27,7 @@ from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.views import (WPContributionAttachments, WPEventAttachments, WPSessionAttachments,
                                               WPSubContributionAttachments, WPPackageEventAttachmentsManagement)
-from indico.modules.events.util import get_object_from_args
+from indico.modules.events.util import get_legacy_object_from_args
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -44,7 +44,7 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
 
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
-        self.object_type, self.base_object, self.object = get_object_from_args()
+        self.object_type, self.base_object, self.object = get_legacy_object_from_args()
         if self.object is None:
             raise NotFound
 

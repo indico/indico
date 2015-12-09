@@ -19,12 +19,12 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
+from indico.core.db.sqlalchemy.legacy_links import LegacyLinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import return_ascii
 
 
-class LegacyAttachmentFolderMapping(LinkMixin, db.Model):
+class LegacyAttachmentFolderMapping(LegacyLinkMixin, db.Model):
     """Legacy attachmentfolder id mapping
 
     Legacy folders ("materials") had ids unique only within their
@@ -33,7 +33,7 @@ class LegacyAttachmentFolderMapping(LinkMixin, db.Model):
     """
 
     __tablename__ = 'legacy_folder_id_map'
-    allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
+    allowed_link_types = LegacyLinkMixin.allowed_link_types - {LinkType.category}
     events_backref_name = 'legacy_attachment_folder_mappings'
 
     @declared_attr
@@ -63,7 +63,7 @@ class LegacyAttachmentFolderMapping(LinkMixin, db.Model):
         )
 
 
-class LegacyAttachmentMapping(LinkMixin, db.Model):
+class LegacyAttachmentMapping(LegacyLinkMixin, db.Model):
     """Legacy attachment id mapping
 
     Legacy attachments ("resources") had ids unique only within their
@@ -72,7 +72,7 @@ class LegacyAttachmentMapping(LinkMixin, db.Model):
     """
 
     __tablename__ = 'legacy_attachment_id_map'
-    allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
+    allowed_link_types = LegacyLinkMixin.allowed_link_types - {LinkType.category}
     events_backref_name = 'legacy_attachment_mappings'
 
     @declared_attr
