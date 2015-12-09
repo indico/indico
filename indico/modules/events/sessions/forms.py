@@ -18,14 +18,15 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from wtforms.fields import StringField, BooleanField
+from flask import session
+from wtforms.fields import StringField, BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.modules.events.sessions.util import get_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoPalettePickerField, TimeDeltaField
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
 
 class SessionForm(IndicoForm):
@@ -40,3 +41,16 @@ class SessionForm(IndicoForm):
                                       description=_('Specify text and background colours for the session.'))
     is_poster = BooleanField(_('Poster session'), widget=SwitchWidget(),
                              description=_('Whether the session is a poster session.'))
+
+
+class EmailSessionPersonsForm(IndicoForm):
+    from_address = SelectField(_('From'), [DataRequired()], choices=[(1, 1)])
+    subject = StringField(_('Subject'), [DataRequired()])
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(EmailSessionPersonsForm, self).__init__(*args, **kwargs)
+        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
+                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
+        self.from_address.choices = zip(from_addresses, from_addresses)
