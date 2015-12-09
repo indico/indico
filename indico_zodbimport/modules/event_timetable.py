@@ -31,7 +31,8 @@ from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
-from indico.modules.events.contributions.models.legacy_mapping import LegacyContributionMapping
+from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
+                                                                       LegacySubContributionMapping)
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
@@ -396,7 +397,7 @@ class TimetableMigration(object):
         contrib.references = list(self._process_references(ContributionReference, old_contrib))
         # contribution/abstract fields
         contrib.field_values = list(self._migrate_contribution_field_values(old_contrib))
-        contrib.subcontributions = [self._migrate_subcontribution(old_subcontrib, pos)
+        contrib.subcontributions = [self._migrate_subcontribution(old_contrib, old_subcontrib, pos)
                                     for pos, old_subcontrib in enumerate(old_contrib._subConts, 1)]
         contrib._last_friendly_subcontribution_id = len(contrib.subcontributions)
         return contrib
@@ -436,12 +437,15 @@ class TimetableMigration(object):
         else:
             raise ValueError('Unexpected field type: {}'.format(new_field.field_type))
 
-    def _migrate_subcontribution(self, old_subcontrib, position):
+    def _migrate_subcontribution(self, old_contrib, old_subcontrib, position):
         subcontrib = SubContribution(position=position, friendly_id=position, duration=old_subcontrib.duration,
                                      title=convert_to_unicode(old_subcontrib.title),
                                      description=convert_to_unicode(old_subcontrib.description))
         if not self.importer.quiet:
             self.importer.print_info(cformat('  %{cyan!}SubContribution%{reset} {}').format(subcontrib.title))
+        subcontrib.legacy_mapping = LegacySubContributionMapping(event_new=self.event,
+                                                                 legacy_contribution_id=old_contrib.id,
+                                                                 legacy_subcontribution_id=old_subcontrib.id)
         subcontrib.references = list(self._process_references(SubContributionReference, old_subcontrib))
         subcontrib.person_links = list(self._migrate_subcontribution_persons(old_subcontrib))
         return subcontrib

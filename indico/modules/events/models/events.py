@@ -183,6 +183,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     # - legacy_contribution_mappings (LegacyContributionMapping.event_new)
     # - legacy_mapping (LegacyEventMapping.event_new)
     # - legacy_session_mappings (LegacySessionMapping.event_new)
+    # - legacy_subcontribution_mappings (LegacySubContributionMapping.event_new)
     # - log_entries (EventLogEntry.event_new)
     # - menu_entries (MenuEntry.event_new)
     # - notes (EventNote.event_new)
