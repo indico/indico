@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+import csv
+from io import BytesIO
+
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
@@ -59,3 +62,20 @@ def can_manage_sessions(user, event, role=None):
     """Check whether a user can manage any sessions in an event"""
     return event.can_manage(user) or any(s.can_manage(user, role)
                                          for s in event.sessions.options(joinedload('acl_entries')))
+
+
+def generate_csv_from_sessions(sessions):
+    """Generate a CSV file from a given session list.
+
+    :param sessions: The list of sessions to include in the file
+    """
+    column_names = ['ID', 'Title', 'Description', 'Code']
+    buf = BytesIO()
+    writer = csv.DictWriter(buf, fieldnames=column_names)
+    writer.writeheader()
+    for sess in sessions:
+        row = {'ID': sess.friendly_id, 'Title': sess.title.encode('utf-8'),
+               'Description': sess.description.encode('utf-8'), 'Code': sess.code.encode('utf-8')}
+        writer.writerow(row)
+    buf.seek(0)
+    return buf
