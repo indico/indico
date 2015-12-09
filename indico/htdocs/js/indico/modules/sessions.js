@@ -48,6 +48,15 @@
         }).on('click', '.show-session-blocks', function() {
             $(this).closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
         });
+
+        $('.js-submit-session-form').on('click', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+
+            if (!$this.hasClass('disabled')) {
+                $('#sessions-wrapper form').attr('action', $this.data('href')).submit();
+            }
+        });
     };
 
 })(window);
