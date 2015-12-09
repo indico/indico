@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.events.sessions.controllers.management.sessions import (RHSessionsList, RHCreateSession,
                                                                             RHModifySession, RHDeleteSessions,
                                                                             RHExportSessionsCSV, RHExportSessionsPDF,
-                                                                            RHSessionREST, RHSessionPersonList)
+                                                                            RHSessionREST, RHSessionPersonList,
+                                                                            RHSessionsEmailPersons)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -34,3 +35,4 @@ _bp.add_url_rule('/manage/sessions/sessions.pdf', 'export_pdf', RHExportSessions
 _bp.add_url_rule('/manage/sessions/<int:session_id>', 'session_rest', RHSessionREST, methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', RHModifySession, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/sessions/person-list', 'person_list', RHSessionPersonList, methods=('POST',))
+_bp.add_url_rule('/manage/sessions/email', 'email_session_persons', RHSessionsEmailPersons, methods=('GET', 'POST'))

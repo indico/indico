@@ -18,21 +18,24 @@ from __future__ import unicode_literals
 
 import random
 
-from flask import request, jsonify
+from flask import request, jsonify, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
-from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
-                                                                   RHManageSessionsActionsBase)
+from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.sessions.forms import SessionForm
+from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
+                                                                   RHManageSessionsActionsBase)
+from indico.modules.events.sessions.forms import SessionForm, EmailSessionPersonsForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
 from indico.modules.events.sessions.util import (get_colors, get_active_sessions, generate_csv_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
+from indico.modules.users.models.users import User
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -145,4 +148,33 @@ class RHSessionPersonList(RHManageSessionsBase):
                                .join(SubContribution.contribution))
 
         return jsonify_template('events/sessions/management/session_person_list.html',
-                                session_persons=session_persons)
+                                session_persons=session_persons, event=self.event_new)
+
+
+class RHSessionsEmailPersons(RHManageSessionsBase):
+    """Send emails to selected EventPersons"""
+
+    def _checkParams(self, params):
+        self._doNotSanitizeFields.append('from_address')
+        RHManageSessionsBase._checkParams(self, params)
+
+    def _create_form(self):
+        return EmailSessionPersonsForm(event=self.event_new)
+
+    def _process_GET(self):
+        form = self._create_form()
+        session['event_person_ids'] = set(map(int, request.args.getlist('person_id')))
+        return jsonify_form(form, submit=_('Send'))
+
+    def _process_POST(self):
+        form = self._create_form()
+        event_person_ids = session.pop('event_person_ids', [])
+        event_persons = (self.event_new.persons.filter(EventPerson.id.in_(event_person_ids), ~User.is_deleted)
+                                               .join(EventPerson.user).all())
+        for event_person in event_persons:
+            if not event_person.email:
+                continue
+            email = make_email(to_list=event_person.email, from_address=form.from_address.data, body=form.body.data,
+                               html=True)
+            send_email(email, self.event_new, 'Sessions')
+        return jsonify_data()
