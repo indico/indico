@@ -210,6 +210,7 @@ class EventPersonLink(PersonLinkBase):
     )
 
     # relationship backrefs:
+    # - event (Event.person_links)
 
     @return_ascii
     def __repr__(self):
