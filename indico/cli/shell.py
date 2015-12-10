@@ -23,6 +23,7 @@ from functools import partial
 from operator import itemgetter, attrgetter
 
 import transaction
+import sqlalchemy.orm
 from flask import current_app
 from flask_script import Shell, Option
 from werkzeug.local import LocalProxy
@@ -36,6 +37,7 @@ from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import strip_ansi, cformat
+from indico.util.date_time import now_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
 from MaKaC.common import HelperMaKaCInfo
@@ -95,6 +97,7 @@ class IndicoShell(Shell):
             return self.run(*args, **kwargs)
 
     def run(self, no_ipython, use_bpython, quiet):
+        current_app.config['REPL'] = True  # disables e.g. memoize_request
         context = self.get_context()
         if not quiet:
             self.banner = '\n'.join(self._info + ['', self.banner])
@@ -126,7 +129,10 @@ class IndicoShell(Shell):
             add_to_context_smart = partial(_add_to_context_smart, context, self._info)
             # Common stdlib modules
             self._info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
-            add_to_context_multi([getattr(datetime, attr) for attr in ('date', 'time', 'datetime', 'timedelta')] +
+            DATETIME_ATTRS = ('date', 'time', 'datetime', 'timedelta')
+            ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload', 'subqueryload')
+            add_to_context_multi([getattr(datetime, attr) for attr in DATETIME_ATTRS] +
+                                 [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
                                  [itertools, re, sys, os],
                                  color='yellow')
             # Legacy Indico
@@ -153,6 +159,7 @@ class IndicoShell(Shell):
             add_to_context(DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
             add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
             add_to_context(transaction, doc='transaction module', color='cyan!')
+            add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
             add_to_context(current_app, 'app', doc='flask app')
             add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id (Conference)')

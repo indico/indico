@@ -278,13 +278,17 @@ def url_for(endpoint, *targets, **values):
 def url_rule_to_js(endpoint):
     """Converts the rule(s) of an endpoint to a JavaScript object.
 
-    Use this if you need to build an URL in JavaScript.
-    JS Usage:
+    Use this if you need to build an URL in JavaScript, but only if
+    you really have to do that instead of e.g. building the URL on
+    the server and storing it in a data attribute.
 
-    var url_template = ${ url_rule_to_js('blueprint.endpoint') | j,n };
-    var url = build_url(url_template[, params[, fragment]]);
+    JS usage::
 
-    `params` is is an object containing the arguments and `fragment` a string containing the #anchor
+        var urlTemplate = {{ url_rule_to_js('blueprint.endpoint') | tojson }};
+        var url = build_url(urlTemplate[, params[, fragment]]);
+
+    ``params`` is is an object containing the arguments and ``fragment``
+    a string containing the ``#anchor`` if needed.
     """
 
     if hasattr(endpoint, '_endpoint'):

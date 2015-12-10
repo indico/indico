@@ -118,7 +118,7 @@ class OAuthApplication(db.Model):
 
     def reset_client_secret(self):
         self.client_secret = unicode(uuid4())
-        logger.info("Client secret for {} has been reset.".format(self))
+        logger.info("Client secret for %s has been reset.", self)
 
     def validate_redirect_uri(self, redirect_uri):
         """Called by flask-oauthlib to validate the redirect_uri.

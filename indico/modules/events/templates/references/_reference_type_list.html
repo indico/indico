@@ -1,0 +1,40 @@
+{% macro render_reference_type_list(reference_types) %}
+    {% if reference_types %}
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}URL{% endtrans %}</th>
+                    <th>{% trans %}Scheme{% endtrans %}</th>
+                    <th class="action-column">{% trans %}Actions{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reference_type in reference_types %}
+                    <tr>
+                        <td>{{ reference_type.name }}</td>
+                        <td>{{ reference_type.url_template }}</td>
+                        <td>{{ reference_type.scheme }}</td>
+                        <td>
+                            <a href="#" class="icon-edit action-icon" title="{% trans %}Edit{% endtrans %}"
+                               data-href="{{ url_for('.update_reference_type', reference_type) }}"
+                               data-title="{% trans name=reference_type.name %}Edit {{ name }} external ID type{% endtrans %}"
+                               data-update="#external-id-types"
+                               data-ajax-dialog>
+                            </a>
+                            <a href="#" class="icon-remove action-icon" title="{% trans %}Delete{% endtrans %}"
+                               data-href="{{ url_for('.delete_reference_type', reference_type) }}"
+                               data-title="{% trans name=reference_type.name %}Delete external ID type {{ name }}?{% endtrans %}"
+                               data-confirm="{% trans name=reference_type.name %}Are you sure you want to permanently delete the external ID type '{{ name }}'? This action will remove it from all events that use it.{% endtrans %}"
+                               data-update="#external-id-types"
+                               data-method="DELETE">
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <span class="empty">{% trans %}There are no external ID types yet.{% endtrans %}</span>
+    {% endif %}
+{% endmacro %}

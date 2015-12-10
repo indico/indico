@@ -197,6 +197,10 @@
         > .empty {
             @extend %i-box-empty;
         }
+
+        > table.i-table-widget {
+            border: 0;
+        }
     }
 }
 

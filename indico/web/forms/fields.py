@@ -28,6 +28,7 @@ from wtforms.widgets.core import CheckboxInput, Select
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
+from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.users import User
@@ -75,6 +76,10 @@ class IndicoRadioField(RadioField):
 
 
 class JSONField(HiddenField):
+
+    #: Whether an object may be populated with the data from this field
+    CAN_POPULATE = False
+
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = json.loads(valuelist[0])
@@ -83,8 +88,8 @@ class JSONField(HiddenField):
         return json.dumps(self.data)
 
     def populate_obj(self, obj, name):
-        # We don't want to populate an object with this
-        pass
+        if self.CAN_POPULATE:
+            super(JSONField, self).populate_obj(obj, name)
 
 
 class TextListField(TextAreaField):
@@ -540,3 +545,25 @@ class IndicoStaticTextField(Field):
 
     def _value(self):
         return self.text_value
+
+
+class IndicoPalettePickerField(JSONField):
+    """Field allowing user to pick a color from a set of predefined values"""
+
+    widget = JinjaWidget('forms/palette_picker_widget.html')
+    CAN_POPULATE = True
+
+    def __init__(self, *args, **kwargs):
+        self.color_list = kwargs.pop('color_list')
+        super(IndicoPalettePickerField, self).__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        if self.data not in self.color_list:
+            raise ValueError(_('Invalid colors selected'))
+
+    def process_formdata(self, valuelist):
+        super(IndicoPalettePickerField, self).process_formdata(valuelist)
+        self.data = ColorTuple(self.data['text'], self.data['background'])
+
+    def _value(self):
+        return self.data._asdict()

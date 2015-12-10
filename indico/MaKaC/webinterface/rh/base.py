@@ -482,6 +482,9 @@ class RH(RequestHandlerBase):
         self._tohttps = True
         if self._checkHttpsRedirect():
             return
+        if not session.user:
+            return redirect_to_login(reason=_("Please log in to access this page. If you have a modification key, you "
+                                              "may enter it afterwards."))
         return errors.WPModificationError(self).display()
 
     @jsonify_error(status=400)

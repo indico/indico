@@ -1,0 +1,76 @@
+{% extends 'layout/full_content_base.html' %}
+
+{% from 'events/sessions/management/_session_list.html' import render_session_list %}
+
+{% block title %}
+    {%- trans %}Sessions{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <div id="sessions">
+        <div class="toolbar">
+            <div class="group left">
+                <a class="icon-checkbox-checked i-button arrow js-dropdown"
+                   href="#" title="{% trans %}Select{% endtrans %}" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" data-select-all="#sessions-wrapper input.select-row">
+                            {% trans %}All{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none="#sessions-wrapper input.select-row">
+                            {% trans %}None{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="group left">
+                <a id="add-new-session" class="i-button highlight icon-plus"
+                   data-href="{{ url_for('.create_session', event) }}"
+                   data-title="{% trans %}Add new session{% endtrans %}"
+                   data-update="#sessions-wrapper"
+                   data-ajax-dialog>
+                    {% trans %}Add new session{% endtrans %}
+                </a>
+            </div>
+            <div class="group left">
+                <a id="remove-selected-sessions"
+                   class="i-button icon-remove js-requires-selected-row disabled"
+                   data-title="{% trans %}Remove selected sessions{% endtrans %}"
+                   data-method="POST"
+                   data-params-selector="#sessions input[name=session_id]:checkbox:checked"
+                   data-update="#sessions-wrapper"
+                   data-href="{{ url_for('.delete_sessions', event) }}"
+                   data-confirm="{% trans %}Do you really want to delete the selected sessions?{% endtrans %}">
+                    {%- trans %}Remove{% endtrans -%}
+                </a>
+            </div>
+            <div class="group left">
+                <a class="i-button arrow button js-requires-selected-row disabled js-dropdown"
+                   data-toggle="dropdown">
+                    {%- trans %}Export{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a data-href="{{ url_for('.export_pdf', event) }}"
+                           class="icon-file-pdf js-requires-selected-row js-submit-session-form disabled">
+                            {%- trans %}PDF{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a data-href="{{ url_for('.export_csv', event) }}"
+                           class="icon-file-excel js-requires-selected-row js-submit-session-form disabled">CSV</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="sessions-wrapper">
+            {{- render_session_list(event, sessions, default_colors) -}}
+        </div>
+    </div>
+
+    <script>
+        setupSessionsList();
+    </script>
+{% endblock %}

@@ -23,9 +23,9 @@ event.add_url_rule('/program', 'conferenceProgram', conferenceDisplay.RHConferen
 event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
 
 # Timetable
-event.add_url_rule('/timetable/', 'conferenceTimeTable', conferenceDisplay.RHConferenceTimeTable)
-event.add_url_rule('/timetable/pdf', 'conferenceTimeTable-customizePdf', conferenceDisplay.RHTimeTableCustomizePDF)
-event.add_url_rule('/timetable/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF,
+event.add_url_rule('/timetable-old/', 'conferenceTimeTable', conferenceDisplay.RHConferenceTimeTable)
+event.add_url_rule('/timetable-old/pdf', 'conferenceTimeTable-customizePdf', conferenceDisplay.RHTimeTableCustomizePDF)
+event.add_url_rule('/timetable-old/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF,
                    methods=('GET', 'POST'))
 
 # Sessions

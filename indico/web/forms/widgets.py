@@ -84,10 +84,8 @@ class JinjaWidget(object):
 class PasswordWidget(JinjaWidget):
     """Renders a password input"""
 
-    single_line = True
-
     def __init__(self):
-        super(PasswordWidget, self).__init__('forms/password_widget.html')
+        super(PasswordWidget, self).__init__('forms/password_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
         return super(PasswordWidget, self).__call__(field, input_args=kwargs)
@@ -195,10 +193,8 @@ class TypeaheadWidget(JinjaWidget):
 class ColorPickerWidget(JinjaWidget):
     """Renders a colorpicker input field"""
 
-    single_line = True
-
     def __init__(self):
-        super(ColorPickerWidget, self).__init__('forms/colorpicker_widget.html')
+        super(ColorPickerWidget, self).__init__('forms/colorpicker_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
         return super(ColorPickerWidget, self).__call__(field, input_args=kwargs)

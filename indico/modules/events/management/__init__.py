@@ -65,7 +65,7 @@ def _sidemenu_items(sender, event, **kwargs):
                            90,
                            icon='settings')
         if not is_lecture:
-            yield SideMenuItem('timetable', _('Timetable'),
+            yield SideMenuItem('timetable_old', _('Timetable (Old)'),
                                url_for('event_mgmt.confModifSchedule', event),
                                80,
                                icon='calendar')
@@ -84,7 +84,7 @@ def _sidemenu_items(sender, event, **kwargs):
                                url_for('event_mgmt.confModifCFA', event),
                                section='organization')
         if can_modify or is_review_manager:
-            yield SideMenuItem('contributions', _('Contributions'),
+            yield SideMenuItem('contributions_old', _('Contributions (Old)'),
                                url_for('event_mgmt.confModifContribList', event),
                                section='organization')
         if can_modify or is_review_staff:

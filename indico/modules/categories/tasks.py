@@ -50,7 +50,7 @@ def category_suggestions():
             for category, score in get_category_scores(user).iteritems():
                 if score < SUGGESTION_MIN_SCORE:
                     continue
-                logger.debug('Suggesting {} with score {:.03} for {}'.format(category, score, user))
+                logger.debug('Suggesting %s with score %.03f for %s', category, score, user)
                 suggest(user, 'category', category.getId(), score)
         unschedule_check(user_id)
 
@@ -65,7 +65,7 @@ def category_cleanup():
         try:
             category = CategoryManager().getById(categ_id)
         except KeyError:
-            logger.warning("Category {} does not exist!".format(categ_id))
+            logger.warning("Category %s does not exist!", categ_id)
             continue
 
         now = now_utc()
@@ -73,11 +73,10 @@ def category_cleanup():
         if not to_delete:
             continue
 
-        logger.info("Category {}: {} events were created more than {} days ago and will be deleted".format(
-            categ_id, len(to_delete), days
-        ))
+        logger.info("Category %s: %s events were created more than %s days ago and will be deleted", categ_id,
+                    len(to_delete), days)
         for i, event in enumerate(to_delete, 1):
-            logger.info("Deleting {}".format(event))
+            logger.info("Deleting %s", event)
             event.delete(user=janitor_user)
             if i % 100 == 0:
                 db.session.commit()

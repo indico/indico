@@ -117,7 +117,6 @@ indico_management = rjs_bundle(
                'Timetable.js',
                'AbstractReviewing.js',
                'NotificationTPL.js',
-               'Registration.js',
                'Contributions.js',
                'Sessions.js',
                'CFA.js',
@@ -180,6 +179,7 @@ indico_jquery = rjs_bundle(
     *namespace('js/indico/jquery',
                'defaults.js',
                'global.js',
+               'declarative.js',
                'errors.js',
                'ajaxcheckbox.js',
                'ajaxdialog.js',
@@ -193,7 +193,8 @@ indico_jquery = rjs_bundle(
                'timerange.js',
                'tooltips.js',
                'nullableselector.js',
-               'colorpicker.js'))
+               'colorpicker.js',
+               'palettepicker.js'))
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
@@ -397,7 +398,13 @@ module_js = {
                                'js/indico/modules/registration/invitations.js',
                                'js/indico/modules/registration/reglists.js',
                                *namespace('js/indico/modules/registration/form', 'form.js', 'section.js', 'field.js',
-                                          'sectiontoolbar.js', 'table.js'))
+                                          'sectiontoolbar.js', 'table.js')),
+    'contributions': rjs_bundle('modules_contributions',
+                                *namespace('js/indico/modules/contributions', 'common.js', 'userlists.js')),
+    'timetable': rjs_bundle('modules_timetable',
+                            *namespace('js/indico/modules/timetable/timetable', 'Base.js', 'DragAndDrop.js', 'Draw.js',
+                                       'Filter.js', 'Layout.js', 'Management.js', 'Undo.js')),
+    'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js')
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",
@@ -432,6 +439,8 @@ news_sass = sass_module_bundle('news')
 users_sass = sass_module_bundle('users')
 auth_sass = sass_module_bundle('auth')
 surveys_sass = sass_module_bundle('surveys')
+timetable_sass = sass_module_bundle('timetable')
+sessions_sass = sass_module_bundle('sessions')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -519,6 +528,8 @@ def register_all_css(env, main_css_file):
     env.register('fonts_sass', fonts_sass)
     env.register('payment_sass', payment_sass)
     env.register('surveys_sass', surveys_sass)
+    env.register('timetable_sass', timetable_sass)
+    env.register('sessions_sass', sessions_sass)
 
 
 core_env = IndicoEnvironment()

@@ -73,7 +73,7 @@ class RHDeleteReminder(RHSpecificReminderBase):
             flash(_('Sent reminders cannot be deleted.'), 'error')
         else:
             db.session.delete(self.reminder)
-            logger.info('Reminder deleted by {}: {}'.format(session.user, self.reminder))
+            logger.info('Reminder deleted by %s: %s', session.user, self.reminder)
             flash(_("The reminder at {} has been deleted.").format(format_datetime(self.reminder.scheduled_dt)),
                   'success')
         return redirect(url_for('.list', self.event))
@@ -82,7 +82,7 @@ class RHDeleteReminder(RHSpecificReminderBase):
 def _send_reminder(reminder):
     """Send reminder immediately"""
     reminder.send()
-    logger.info('Reminder sent by {}: {}'.format(session.user, reminder))
+    logger.info('Reminder sent by %s: %s', session.user, reminder)
     flash(_('The reminder has been sent.'), 'success')
 
 
@@ -114,7 +114,7 @@ class RHEditReminder(RHSpecificReminderBase):
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
-                logger.info('Reminder modified by {}: {}'.format(session.user, reminder))
+                logger.info('Reminder modified by %s: %s', session.user, reminder)
                 flash(_("The reminder at {} has been modified.").format(format_datetime(reminder.scheduled_dt)),
                       'success')
             return redirect(url_for('.list', self.event))
@@ -136,7 +136,7 @@ class RHAddReminder(RHRemindersBase):
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
-                logger.info('Reminder created by {}: {}'.format(session.user, reminder))
+                logger.info('Reminder created by %s: %s', session.user, reminder)
                 flash(_("A reminder at {} has been created.").format(format_datetime(reminder.scheduled_dt)), 'success')
             return redirect(url_for('.list', self.event))
 

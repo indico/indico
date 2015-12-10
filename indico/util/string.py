@@ -391,6 +391,9 @@ def format_repr(obj, *args, **kwargs):
                   for objects which have one longer title or text
                   that doesn't look well in the unquoted
                   comma-separated argument list.
+    :param _repr: Similar as `_text`, but uses the `repr()` of the
+                  passed object instead of quoting it.  Cannot be
+                  used together with `_text`.
     """
     def _format_value(value):
         if isinstance(value, Enum):
@@ -399,16 +402,19 @@ def format_repr(obj, *args, **kwargs):
             return value
 
     text_arg = kwargs.pop('_text', None)
+    repr_arg = kwargs.pop('_repr', None)
     obj_name = type(obj).__name__
     formatted_args = [unicode(_format_value(getattr(obj, arg))) for arg in args]
     for name, default_value in sorted(kwargs.items()):
         value = getattr(obj, name)
         if value != default_value:
             formatted_args.append(u'{}={}'.format(name, _format_value(value)))
-    if text_arg is None:
-        return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
-    else:
+    if text_arg is not None:
         return u'<{}({}): "{}">'.format(obj_name, u', '.join(formatted_args), text_arg)
+    elif repr_arg is not None:
+        return u'<{}({}): {!r}>'.format(obj_name, u', '.join(formatted_args), repr_arg)
+    else:
+        return u'<{}({})>'.format(obj_name, u', '.join(formatted_args))
 
 
 def snakify(name):
@@ -472,7 +478,7 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     Note: Do not use positional arguments (except for the names/title)
     when calling this method.  Always use keyword arguments!
 
-    :param first_name: The first name
+    :param first_name: The first name (may be empty)
     :param last_name: The last name
     :param title: The title (may be empty/None)
     :param last_name_first: if "lastname, firstname" instead of
@@ -484,8 +490,12 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     """
     if last_name_upper:
         last_name = last_name.upper()
-    first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
-    full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name, last_name)
+    if not first_name:
+        full_name = last_name
+    else:
+        first_name = u'{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
+        full_name = u'{}, {}'.format(last_name, first_name) if last_name_first else u'{} {}'.format(first_name,
+                                                                                                    last_name)
     return full_name if not show_title or not title else u'{} {}'.format(title, full_name)
 
 

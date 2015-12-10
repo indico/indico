@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.core.logger import Logger
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, EventPage
 from indico.modules.events.layout.util import get_images_for_event
@@ -26,9 +25,6 @@ from indico.modules.events.features.util import is_feature_enabled
 from indico.util.i18n import _
 
 from MaKaC.conference import EventCloner
-
-
-logger = Logger.get('events.images')
 
 
 class ImageCloner(EventCloner):
@@ -55,7 +51,6 @@ class ImageCloner(EventCloner):
                 new_image.save(fd)
             db.session.add(new_image)
             db.session.flush()
-            logger.info('Added image during event cloning: {}'.format(new_image))
 
 
 class LayoutCloner(EventCloner):

@@ -56,7 +56,6 @@ class NoteCloner(EventCloner):
                                      user=revision.user)
             db.session.add(new_note)
             db.session.flush()
-            logger.info('Added note during event cloning: {}'.format(new_note))
 
 
 @signals.event_management.clone.connect

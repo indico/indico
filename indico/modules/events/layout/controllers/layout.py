@@ -119,7 +119,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
             'content_type': 'image/png'
         }
         flash(_('New logo saved'), 'success')
-        logger.info("New logo '{}' uploaded by {} ({})".format(f.filename, session.user, self.event))
+        logger.info("New logo '%s' uploaded by %s (%s)", f.filename, session.user, self.event)
         return jsonify_data(content=_logo_data(self.event))
 
 
@@ -128,7 +128,7 @@ class RHLayoutLogoDelete(RHLayoutBase):
         self.event.logo = None
         self.event.logo_metadata = None
         flash(_('Logo deleted'), 'success')
-        logger.info("Logo of {} deleted by {}".format(self.event, session.user))
+        logger.info("Logo of %s deleted by %s", self.event, session.user)
         return jsonify_data(content=None)
 
 
@@ -144,7 +144,7 @@ class RHLayoutCSSUpload(RHLayoutBase):
         db.session.flush()
         flash(_('New CSS file saved. Do not forget to enable it ("Use custom CSS") after verifying that it is correct '
                 'using the preview.'), 'success')
-        logger.info('CSS file for {} uploaded by {}'.format(self.event, session.user))
+        logger.info('CSS file for %s uploaded by %s', self.event, session.user)
         return jsonify_data(content=_css_file_data(self.event))
 
 
@@ -155,7 +155,7 @@ class RHLayoutCSSDelete(RHLayoutBase):
         self.event.stylesheet_metadata = None
         layout_settings.set(self.event, 'use_custom_css', False)
         flash(_('CSS file deleted'), 'success')
-        logger.info("CSS file for {} deleted by {}".format(self.event, session.user))
+        logger.info("CSS file for %s deleted by %s", self.event, session.user)
         return jsonify_data(content=None)
 
 

@@ -161,7 +161,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
         deleted = set()
         for task_name, entry in Config.getInstance().getScheduledTaskOverride().iteritems():
             if task_name not in self.app.conf['CELERYBEAT_SCHEDULE']:
-                self.logger.error('Invalid entry in ScheduledTaskOverride: ' + task_name)
+                self.logger.error('Invalid entry in ScheduledTaskOverride: %s', task_name)
                 continue
             if not entry:
                 deleted.add(task_name)

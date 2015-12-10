@@ -31,6 +31,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
@@ -252,13 +253,16 @@ class User(db.Model):
     # - created_events (Event.creator)
     # - event_log_entries (EventLogEntry.user)
     # - event_notes_revisions (EventNoteRevision.user)
+    # - event_persons (EventPerson.user)
     # - event_reminders (EventReminder.creator)
     # - favorite_of (User.favorite_users)
     # - in_attachment_acls (AttachmentPrincipal.user)
     # - in_attachment_folder_acls (AttachmentFolderPrincipal.user)
     # - in_blocking_acls (BlockingPrincipal.user)
+    # - in_contribution_acls (ContributionPrincipal.user)
     # - in_event_acls (EventPrincipal.user)
     # - in_event_settings_acls (EventSettingPrincipal.user)
+    # - in_session_acls (SessionPrincipal.user)
     # - in_settings_acls (SettingPrincipal.user)
     # - local_groups (LocalGroup.members)
     # - merged_from_users (User.merged_into_user)
@@ -318,6 +322,8 @@ class User(db.Model):
     @hybrid_property
     def title(self):
         """the title of the user"""
+        if self._title is None:
+            return get_default_values(type(self))['_title'].title
         return self._title.title
 
     @title.expression

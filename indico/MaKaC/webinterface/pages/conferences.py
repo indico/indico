@@ -1420,7 +1420,7 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
 class WPConfModifScheduleGraphic( WPConferenceModifBase ):
 
-    sidemenu_option = 'timetable'
+    sidemenu_option = 'timetable_old'
     _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def __init__(self, rh, conf):
@@ -2934,7 +2934,7 @@ class WFilterCriterionOptionsContribs(wcomponents.WTemplated):
 
 class WPModifContribList( WPConferenceModifBase ):
 
-    sidemenu_option = 'contributions'
+    sidemenu_option = 'contributions_old'
     _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def __init__(self, rh, conference, filterUsed=False):

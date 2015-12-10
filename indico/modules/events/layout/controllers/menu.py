@@ -31,7 +31,7 @@ from indico.modules.events.layout.views import WPMenuEdit, WPPage
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -78,8 +78,8 @@ class RHMenuToggleCustom(RHMenuBase):
                 db.session.delete(entry)
             flash(_('Menu customization has been disabled.'), 'success')
         layout_settings.set(self._conf, 'use_custom_menu', enabled)
-        logger.info('Menu customization for {} {} by {}'.format(self._conf, 'enabled' if enabled else 'disabled',
-                                                                session.user))
+        logger.info('Menu customization for %s %s by %s', self._conf, 'enabled' if enabled else 'disabled',
+                    session.user)
         return jsonify(enabled=enabled)
 
 
@@ -118,7 +118,7 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             if self.entry.is_page:
                 self.entry.page.html = form.html.data
             return jsonify_data(entry=_render_menu_entry(self.entry))
-        return jsonify_template('events/layout/menu_entry_form.html', form=form)
+        return jsonify_form(form)
 
 
 class RHMenuEntryPosition(RHMenuEntryEditBase):
@@ -215,7 +215,7 @@ class RHMenuAddEntry(RHMenuBase):
             db.session.add(entry)
             db.session.flush()
             return jsonify_data(entry=_render_menu_entry(entry))
-        return jsonify_template('events/layout/menu_entry_form.html', form=form)
+        return jsonify_form(form)
 
 
 class RHMenuDeleteEntry(RHMenuEntryEditBase):

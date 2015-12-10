@@ -1,0 +1,27 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    {% set colors = field._value() %}
+    <div class="group">
+        <a id="{{ field.id }}-palette-picker"
+           class="i-button icon-expand palette-picker-trigger"
+           style="background: #{{ colors.background }};
+                  color: #{{ colors.text }} !important">
+            {%- trans %}Choose{% endtrans -%}
+        </a>
+        <input id="{{ field.id }}" type="hidden" name="{{ field.name }}"
+               value="{{ colors | tojson | forceescape }}">
+    </div>
+{% endblock %}
+
+{% block javascript -%}
+    <script>
+        $('#{{ field.id }}-palette-picker').palettepicker({
+            availableColors: {{ field.color_list | tojson }},
+            onSelect: function(background, text) {
+                var colorsValue = JSON.stringify({background: background, text: text});
+                $('#{{ field.id }}').val(colorsValue).trigger('change');
+            }
+        });
+    </script>
+{%- endblock %}
