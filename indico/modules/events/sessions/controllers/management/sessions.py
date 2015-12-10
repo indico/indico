@@ -26,7 +26,8 @@ from indico.modules.events.sessions.controllers.management import (RHManageSessi
                                                                    RHManageSessionsActionsBase)
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
-from indico.modules.events.sessions.util import get_colors, get_active_sessions, generate_csv_from_sessions
+from indico.modules.events.sessions.util import (get_colors, get_active_sessions, generate_csv_from_sessions,
+                                                 generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -95,11 +96,12 @@ class RHExportSessionsCSV(RHManageSessionsActionsBase):
         return send_file('sessions.csv', csv_file, 'text/csv')
 
 
-class RHExportSessionsPDF(RHManageSessionsBase):
+class RHExportSessionsPDF(RHManageSessionsActionsBase):
     """Export list of sessions to a PDF"""
 
     def _process(self):
-        pass
+        pdf_file = generate_pdf_from_sessions(self.event_new, self.sessions)
+        return send_file('sessions.pdf', pdf_file, 'application/pdf')
 
 
 class RHSessionREST(RHManageSessionBase):
