@@ -19,11 +19,18 @@ from __future__ import unicode_literals
 import csv
 from io import BytesIO
 
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.platypus import Table, TableStyle
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.sessions.models.sessions import Session
+from indico.util.i18n import _
+from MaKaC.PDFinterface.base import PDFBase, Paragraph
 
 
 def get_colors():
@@ -79,3 +86,53 @@ def generate_csv_from_sessions(sessions):
         writer.writerow(row)
     buf.seek(0)
     return buf
+
+
+class SessionListToPDF(PDFBase):
+    def __init__(self, conf, sessions):
+        PDFBase.__init__(self, story=[])
+        self.conf = conf
+        self.sessions = sessions
+        self.PAGE_WIDTH, self.PAGE_HEIGHT = landscape(A4)
+
+    def getBody(self, story=None):
+        story = story or self._story
+        header_style = ParagraphStyle(name='header_style', fontSize=12, alignment=TA_CENTER)
+        story.append(Paragraph('<b>{}</b>'.format(_('List of sessions')), header_style))
+
+        text_style = ParagraphStyle(name='text_style', fontSize=8, alignment=TA_LEFT, leading=10, leftIndent=10)
+        text_style.fontName = 'Times-Roman'
+        text_style.spaceBefore = 0
+        text_style.spaceAfter = 0
+        text_style.firstLineIndent = 0
+
+        rows = []
+        row_values = []
+        for col in [_('ID'), _('Type'), _('Title'), _('Code'), _('Description')]:
+            row_values.append(Paragraph('<b>{}</b>'.format(col), text_style))
+        rows.append(row_values)
+
+        for sess in self.sessions:
+            rows.append([
+                Paragraph(sess.friendly_id, text_style),
+                Paragraph(_('Poster') if sess.is_poster else _('Standard'), text_style),
+                Paragraph(sess.title.encode('utf-8'), text_style),
+                Paragraph(sess.code.encode('utf-8'), text_style),
+                Paragraph(sess.description.encode('utf-8'), text_style)
+            ])
+
+        col_widths = (None,) * 5
+        table_style = TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('ALIGN', (0, 1), (-1, -1), 'LEFT')
+        ])
+        story.append(Table(rows, colWidths=col_widths, style=table_style))
+        return story
+
+
+def generate_pdf_from_sessions(event, sessions):
+    """Generate a PDF file from a given session list"""
+    pdf = SessionListToPDF(event.as_legacy, sessions)
+    return BytesIO(pdf.getPDFBin())
