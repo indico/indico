@@ -67,13 +67,13 @@
             var filters = $('#persons-list [data-filter]:checked').map(function() {
                 return $(this).data('filter');
             }).get();
-            var personRows = $('#persons-list tr[data-person-data]');
+            var personRows = $('#persons-list tr[data-person-roles]');
 
             var visibleEntries = personRows.filter(function() {
                 var $this = $(this);
 
                 return _.any(filters, function(filterName) {
-                    return $this.data('person-data').indexOf(filterName) !== -1;
+                    return $this.data('person-roles')[filterName];
                 });
             });
 
