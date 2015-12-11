@@ -58,6 +58,9 @@
         $('body').on('click', selectors.join(', '), function(e) {
             e.preventDefault();
             var $this = $(this);
+            if ($this.hasClass('disabled')) {
+                return;
+            }
             var url = $this.data('href');
             var method = ($this.data('method') || 'GET').toUpperCase();
             var params = $this.data('params') || {};
