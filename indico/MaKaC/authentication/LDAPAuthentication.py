@@ -725,9 +725,9 @@ def get_login_attribute():
 
 def get_existing_user(login, emails):
     from MaKaC.user import AvatarHolder
-    avatars = {avatar
-               for email in emails
-               for avatar in AvatarHolder().match({'email': email}, searchInAuthenticators=False)}
+    avatars = set([avatar
+                   for email in emails
+                   for avatar in AvatarHolder().match({'email': email}, searchInAuthenticators=False)])
     matching = (avatar
                 for avatar in avatars
                 for identity in avatar.identities

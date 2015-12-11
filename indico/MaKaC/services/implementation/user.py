@@ -380,7 +380,7 @@ class UserSetPersonalData(UserPersonalDataBase):
 
     def _checkParams(self):
         UserPersonalDataBase._checkParams(self)
-        if self._dataType in {"surName", "name", "organisation", "email", "secondaryEmails"}:
+        if self._dataType in set(["surName", "name", "organisation", "email", "secondaryEmails"]):
             # empty only for secondary emails
             self._value = self._pm.extract("value", pType=str, allowEmpty=self._dataType == "secondaryEmails")
 
