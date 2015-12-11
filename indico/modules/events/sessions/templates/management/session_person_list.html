@@ -33,26 +33,36 @@
             <thead>
                 <tr>
                     <th class="checkbox-column"></th>
-                    <th>{% trans -%}Name{%- endtrans %}</th>
-                    <th>{% trans -%}Email{%- endtrans %}</th>
-                    <th>{% trans -%}Affiliation{%- endtrans %}</th>
-                    <th>{% trans -%}Speaker{%- endtrans %}</th>
-                    <th>{% trans -%}Author type{% endtrans %}</th>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}Email{% endtrans %}</th>
+                    <th>{% trans %}Affiliation{% endtrans %}</th>
+                    <th>{% trans %}Speaker{% endtrans %}</th>
+                    <th>{% trans %}Author type{% endtrans %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for session_person in session_persons -%}
                     {% set event_person = session_person.person %}
-                    {% set is_primary_author = session_person.author_type.name == 'primary' %}
                     {% set is_speaker = session_person.is_speaker %}
-                    <tr data-person-data="{{ 'speaker,' if is_speaker }}{{ 'primary' if is_primary_author else 'secondary' }}">
+                    {% set is_primary_author = session_person.author_type.name == 'primary' %}
+                    {% set is_secondary_author = session_person.author_type.name == 'secondary' %}
+                    {% set person_data = dict(speaker=is_speaker,
+                                              primary=is_primary_author,
+                                              secondary=is_secondary_author) %}
+                    <tr data-person-roles="{{ person_data | tojson | forceescape }}">
                         <td><input type="checkbox" value="{{ event_person.id }}" class="select-row"
                                    name="person_id"></td>
-                        <td>{{- event_person.full_name -}}</td>
-                        <td>{{- event_person.email -}}</td>
-                        <td>{{- event_person.affiliation -}}</td>
-                        <td>{{- _('Yes') if is_speaker else _('No') -}}</td>
-                        <td>{{- _('Primary') if is_primary_author else _('Secondary') -}}</td>
+                        <td>{{ event_person.full_name }}</td>
+                        <td>{{ event_person.email }}</td>
+                        <td>{{ event_person.affiliation }}</td>
+                        <td>{{ _('Yes') if is_speaker else _('No') }}</td>
+                        <td>
+                            {%- if is_primary_author %}
+                                {%- trans %}Primary{% endtrans -%}
+                            {% elif is_secondary_author %}
+                                {%- trans %}Secondary{% endtrans -%}
+                            {% endif -%}
+                        </td>
                     </tr>
                 {%- else -%}
                     <tr>
