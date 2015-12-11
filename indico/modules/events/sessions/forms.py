@@ -50,7 +50,6 @@ class EmailSessionPersonsForm(IndicoForm):
     event_persons = JSONField(_('Event Persons'), default=[])
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
         super(EmailSessionPersonsForm, self).__init__(*args, **kwargs)
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
