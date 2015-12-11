@@ -34,7 +34,6 @@ from indico.modules.events.sessions.operations import create_session, update_ses
 from indico.modules.events.sessions.util import (get_colors, get_active_sessions, generate_csv_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -156,16 +155,17 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
         RHManageSessionsBase._checkParams(self, params)
 
     def _process(self):
-        form = EmailSessionPersonsForm(event=self.event_new, event_persons=request.args.getlist('person_id'))
+        form = EmailSessionPersonsForm(event_persons=request.args.getlist('person_id'))
         if form.validate_on_submit():
-            event_person_ids = form.event_persons.data
-            event_persons = (self.event_new.persons.filter(EventPerson.id.in_(event_person_ids), ~User.is_deleted)
-                                                   .join(EventPerson.user).all())
+            person_ids = form.event_persons.data
+            event_persons = (self.event_new.persons
+                             .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
+                             .all())
             for event_person in event_persons:
                 if not event_person.email:
                     continue
-                email = make_email(to_list=event_person.email, from_address=form.from_address.data, body=form.body.data,
-                                   html=True)
+                email = make_email(to_list=event_person.email, from_address=form.from_address.data,
+                                   subject=form.subject.data, body=form.body.data, html=True)
                 send_email(email, self.event_new, 'Sessions')
             return jsonify_data()
         return jsonify_form(form, submit=_('Send'))
