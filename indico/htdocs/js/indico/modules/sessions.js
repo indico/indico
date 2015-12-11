@@ -80,11 +80,6 @@
             personRows.hide();
             visibleEntries.show();
         });
-
-        $('#persons-list').on('click', '#send-mails-btn.disabled', function(evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
-        });
     };
 
 })(window);

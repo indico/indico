@@ -71,7 +71,7 @@
                 {%- endfor %}
             </tbody>
         </table>
-        <a id="send-mails-btn" href="#" class="i-button highlight disabled js-requires-selected-row"
+        <a href="#" class="i-button highlight disabled js-requires-selected-row send-mails-btn"
            data-href="{{ url_for('.email_session_persons', event) }}"
            data-title="{% trans %}Send email{% endtrans %}"
            data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
