@@ -17,4 +17,4 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-__version__ = "1.2.1rc2"
+__version__ = "1.2.1rc3"
