@@ -112,13 +112,16 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                        _join=Registration.registration_form)
                  .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
         registrations = [(reg.get_full_name(), reg.get_personal_data()) for reg in query]
+        enabled_pd_fields = {field.personal_data_type for reg in regforms for field in reg.active_fields}
+        affiliation_enabled = PersonalDataType.affiliation in enabled_pd_fields
+        position_enabled = PersonalDataType.position in enabled_pd_fields
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
             event=self.event,
             regforms=regforms,
-            show_affiliation=any(pd.get('affiliation') for reg, pd in registrations),
-            show_position=any(pd.get('position') for reg, pd in registrations),
+            show_affiliation=affiliation_enabled and any(pd.get('affiliation') for reg, pd in registrations),
+            show_position=position_enabled and any(pd.get('position') for reg, pd in registrations),
             registrations=registrations
         )
 
