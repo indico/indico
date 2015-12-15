@@ -1,4 +1,5 @@
 {% extends 'events/registration/display/_event_registration_base.html' %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}
     {% trans %}Participant List{% endtrans %}
@@ -12,6 +13,11 @@
 {% endblock %}
 
 {% block content %}
+    {% if not published %}
+        {% call message_box('warning', fixed_width=True) %}
+            {% trans %}There are no published registrations.{% endtrans %}
+        {% endcall %}
+    {% endif %}
     <div class="registrations">
         <table class="i-table tablesorter">
             <thead>

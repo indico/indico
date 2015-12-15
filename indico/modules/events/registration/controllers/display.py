@@ -115,6 +115,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         enabled_pd_fields = {field.personal_data_type for reg in regforms for field in reg.active_fields}
         affiliation_enabled = PersonalDataType.affiliation in enabled_pd_fields
         position_enabled = PersonalDataType.position in enabled_pd_fields
+        published = bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
+                         RegistrationForm.event_id == int(self.event.id)).count())
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
@@ -122,7 +124,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             regforms=regforms,
             show_affiliation=affiliation_enabled and any(pd.get('affiliation') for reg, pd in registrations),
             show_position=position_enabled and any(pd.get('position') for reg, pd in registrations),
-            registrations=registrations
+            registrations=registrations,
+            published=published
         )
 
 
