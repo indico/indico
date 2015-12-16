@@ -7,24 +7,6 @@
     <div class="flashed-messages"></div>
 
     <div class="attachment-editor">
-        {% if linked_object_type != 'category' and (linked_object_type != 'event' or linked_object.as_event.can_manage(session.user)) %}
-            <div class="action-box fixed-width">
-                <div class="section">
-                    <span class="icon icon-package-download"></span>
-                    <div class="text">
-                        <div class="label">
-                            {% trans %}Generate a material package.{% endtrans %}
-                        </div>
-                        <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
-                    </div>
-                    <div class="toolbar right">
-                        <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
-                            {%- trans %}Material Package{% endtrans -%}
-                        </a>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
         <div class="action-box fixed-width">
             <div class="section">
                 <span class="icon icon-upload"></span>
@@ -60,6 +42,26 @@
                 </div>
             </div>
         </div>
+
+        {% if linked_object_type != 'category' and (linked_object_type != 'event' or linked_object.as_event.can_manage(session.user)) %}
+            <div class="action-box fixed-width">
+                <div class="section">
+                    <span class="icon icon-package-download"></span>
+                    <div class="text">
+                        <div class="label">
+                            {% trans %}Generate a material package.{% endtrans %}
+                        </div>
+                        <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
+                    </div>
+                    <div class="toolbar right">
+                        <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
+                            {%- trans %}Material Package{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="i-box fixed-width attachments-container" id="attachments-container">
             {{ render_attachments(attachments, linked_object) }}
         </div>
