@@ -209,6 +209,11 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         return ConferenceHolder().getById(self.id, True)
 
     @property
+    def event_new(self):
+        """Convenience property so all event entities have it"""
+        return self
+
+    @property
     def protection_parent(self):
         return self.as_legacy.getOwner()
 

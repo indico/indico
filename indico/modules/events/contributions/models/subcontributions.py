@@ -106,6 +106,10 @@ class SubContribution(db.Model):
     # - contribution (Contribution.subcontributions)
     # - legacy_mapping (LegacySubContributionMapping.subcontribution)
 
+    @property
+    def event_new(self):
+        return self.contribution.event_new
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
