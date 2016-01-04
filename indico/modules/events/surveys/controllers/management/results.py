@@ -72,9 +72,10 @@ class RHSurveySubmissionBase(RHManageSurveysBase):
         RHManageSurveysBase._checkParams(self, params)
         survey_strategy = joinedload('survey')
         answers_strategy = defaultload('answers').joinedload('question')
+        sections_strategy = joinedload('survey').defaultload('sections').joinedload('children')
         self.submission = (SurveySubmission
                            .find(id=request.view_args['submission_id'])
-                           .options(answers_strategy, survey_strategy)
+                           .options(answers_strategy, survey_strategy, sections_strategy)
                            .one())
 
 
@@ -97,5 +98,7 @@ class RHDisplaySubmission(RHSurveySubmissionBase):
     """Display a single submission-page"""
 
     def _process(self):
+        answers = {answer.question_id: answer for answer in self.submission.answers}
         return WPManageSurvey.render_template('management/survey_submission.html',
-                                              self.event, submission=self.submission)
+                                              self.event, survey=self.submission.survey, submission=self.submission,
+                                              answers=answers)

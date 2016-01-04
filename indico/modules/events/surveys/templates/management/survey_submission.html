@@ -21,13 +21,26 @@
 {% endblock %}
 
 {% block content %}
-    <div class="i-box-content">
-        <dl class="i-data-list">
-            {% for answer in submission.answers -%}
-                <dt><strong>{{ answer.question.title }}</strong></dt>
-                <dd>{{ _render_answer(answer) }}</dd>
-            {%- endfor %}
-        </dl>
+    <div id="survey-submission" class="i-box-content">
+        {% for section in survey.sections if section.children -%}
+            <div class="i-box titled">
+                {%- if section.display_as_section %}
+                    <div class="i-box-header">
+                        <div class="i-box-title">{{ section.title }}</div>
+                    </div>
+                {% endif -%}
+                <div class="i-box-content">
+                    <dl class="i-data-list">
+                        {%- for question in section.children -%}
+                            {%- if question.id in answers %}
+                                <dt><strong>{{ question.title }}</strong></dt>
+                                <dd>{{ _render_answer(answers[question.id]) }}</dd>
+                            {% endif -%}
+                        {%- endfor -%}
+                    </dl>
+                </div>
+            </div>
+        {%- endfor %}
         <div style="margin-top: 10px;">
             <a href="{{ url_for('.manage_survey', submission.survey) }}" class="i-button big" data-button-back>
                 {%- trans %}Back{% endtrans -%}

@@ -101,10 +101,7 @@ def _extend_event_menu(sender, **kwargs):
                                       _join=Registration.registration_form).count())
 
     def _visible_participant_list(event):
-        if not event.has_feature('registration'):
-            return False
-        return bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
-                                          RegistrationForm.event_id == int(event.id)).count())
+        return event.has_feature('registration')
 
     yield MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
                         visible=_visible_registration)
