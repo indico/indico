@@ -63,12 +63,28 @@ class IndicoModel(Model):
         return cls.find(*args, **kwargs).one()
 
     @classmethod
-    def get(cls, oid):
-        return cls.query.get(oid)
+    def get(cls, oid, is_deleted=None):
+        """Get an object based on its primary key.
+
+        :param oid: The primary key of the object
+        :param is_deleted: If specified, ``None`` will be returned if
+                           the ``is_deleted`` attribute of the object
+                           does not match the specified value.  This
+                           is useful when you want to keep the
+                           simplicity of ``get()`` without having to
+                           write extra code to filter out deleted
+                           objects.
+        """
+        obj = cls.query.get(oid)
+        if obj is None:
+            return None
+        if is_deleted is not None and obj.is_deleted != is_deleted:
+            return None
+        return obj
 
     @classmethod
-    def get_one(cls, oid):
-        obj = cls.query.get(oid)
+    def get_one(cls, oid, is_deleted=None):
+        obj = cls.get(oid, is_deleted=is_deleted)
         if obj is None:
             raise NoResultFound()
         return obj
