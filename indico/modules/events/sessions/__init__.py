@@ -23,12 +23,17 @@ from indico.core.logger import Logger
 from indico.core.roles import ManagementRole, check_roles
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import can_manage_sessions
+from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.sessions')
+session_settings = EventSettingsProxy('sessions', {
+    # Whether session coordinators can manage contributions inside their sessions
+    'coordinators_manage_contributions': False
+})
 
 
 @signals.users.merged.connect
