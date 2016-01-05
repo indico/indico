@@ -58,8 +58,9 @@
                 method: $this.data('method'),
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
-                success: function() {
+                success: function(data) {
                     $('#payment-disabled-notice').remove();
+                    $('#event-sidemenu').html(data.event_menu);
                 }
             });
         });
