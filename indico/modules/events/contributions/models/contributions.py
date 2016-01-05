@@ -24,6 +24,7 @@ from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.modules.events.sessions import session_settings
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -237,3 +238,13 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
+
+    def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
+        if super(Contribution, self).can_manage(user, role, allow_admin=allow_admin, check_parent=check_parent,
+                                                explicit_role=explicit_role):
+            return True
+        if (check_parent and self.session_id is not None and
+                self.session.can_manage(user, 'coordinate', allow_admin=allow_admin, explicit_role=explicit_role) and
+                session_settings.get(self.event_new, 'coordinators_manage_contributions')):
+            return True
+        return False
