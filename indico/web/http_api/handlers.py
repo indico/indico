@@ -245,7 +245,8 @@ def handler(prefix, path):
                 result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
             ttl = api_settings.get('cache_ttl')
-            cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
+            if ttl > 0:
+                cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError, e:
         error = e
         if e.getCode():
