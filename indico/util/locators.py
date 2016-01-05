@@ -100,7 +100,14 @@ class _LocatorDict(IterableUserDict, object):
 
     @cached_property
     def data(self):
-        return self._locator.fn(self._obj)
+        try:
+            return self._locator.fn(self._obj)
+        except AttributeError as e:
+            # an AttributeError leaving this function would result in
+            # `__getattr__ ` being called which is clearly not what we
+            # want here as there cannot be a 'data' locator and the
+            # error raised in `__getattr__` would be very misleading
+            raise Exception(e)
 
     def __getattr__(self, name):
         try:
