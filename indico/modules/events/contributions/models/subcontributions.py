@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
@@ -110,6 +111,16 @@ class SubContribution(db.Model):
     def event_new(self):
         return self.contribution.event_new
 
+    @locator_property
+    def locator(self):
+        return dict(self.contribution.locator, subcontrib_id=self.id)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
+
+    def can_access(self, user, **kwargs):
+        return self.contribution.can_access(user, **kwargs)
+
+    def can_manage(self, user, role=None, **kwargs):
+        return self.contribution.can_manage(user, role, **kwargs)
