@@ -47,15 +47,15 @@ def _render_protection_message(linked_object):
 
 
 def _get_parent_info(parent):
-    from MaKaC.conference import Conference, Session, Contribution, SubContribution, Category
-    parent_data = {'is_protected': parent.isProtected()}
-    if isinstance(parent, Conference):
+    from MaKaC.conference import Category
+    parent_data = {'is_protected': parent.is_protected_recursive}
+    if isinstance(parent, db.m.Event):
         parent_data['type'] = _('Event')
-    elif isinstance(parent, Session):
+    elif isinstance(parent, db.m.Session):
         parent_data['type'] = _('Session')
-    elif isinstance(parent, Contribution):
+    elif isinstance(parent, db.m.Contribution):
         parent_data['type'] = _('Contribution')
-    elif isinstance(parent, SubContribution):
+    elif isinstance(parent, db.m.SubContribution):
         parent_data['type'] = _('Sub contribution')
     elif isinstance(parent, Category):
         parent_data['type'] = _('Category')
@@ -64,7 +64,7 @@ def _get_parent_info(parent):
 
 
 def _get_folders_protection_info(linked_object):
-    folders = AttachmentFolder.find(linked_object=linked_object, is_deleted=False)
+    folders = AttachmentFolder.find(object=linked_object, is_deleted=False)
     return {folder.id: folder.is_protected for folder in folders}
 
 
@@ -73,8 +73,12 @@ class ManageAttachmentsMixin:
     wp = None
 
     def _process(self):
-        return self.wp.render_template('attachments.html', self.object, linked_object=self.object,
-                                       linked_object_type=self.object_type, attachments=get_attached_items(self.object))
+        tpl_args = {'linked_object': self.object, 'linked_object_type': self.object_type,
+                    'attachments': get_attached_items(self.object)}
+        if self.object_type == 'event':
+            return self.wp.render_template('attachments.html', self._conf, **tpl_args)
+        else:
+            return jsonify_template('attachments/attachments.html', **tpl_args)
 
 
 class AddAttachmentFilesMixin:
@@ -183,7 +187,7 @@ class CreateFolderMixin:
     def _process(self):
         form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True), linked_object=self.object)
         if form.validate_on_submit():
-            folder = AttachmentFolder(linked_object=self.object)
+            folder = AttachmentFolder(object=self.object)
             form.populate_obj(folder, skip={'acl'})
             if folder.is_protected:
                 folder.acl = form.acl.data

@@ -83,6 +83,8 @@ class LinkMixin(object):
     events_backref_name = None
     #: The name of the backref that's added to the linked objects
     link_backref_name = None
+    #: The laziness of the backref that's added to the linked objects
+    link_backref_lazy = True
 
     @strict_classproperty
     @classmethod
@@ -216,8 +218,8 @@ class LinkMixin(object):
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=not cls.unique_links,
-                    lazy=True
+                    uselist=(cls.unique_links != True),  # noqa
+                    lazy=cls.link_backref_lazy
                 )
             )
 
@@ -230,8 +232,8 @@ class LinkMixin(object):
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=not cls.unique_links,
-                    lazy=True
+                    uselist=(cls.unique_links != True),  # noqa
+                    lazy=cls.link_backref_lazy
                 )
             )
 
@@ -244,8 +246,8 @@ class LinkMixin(object):
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=not cls.unique_links,
-                    lazy=True
+                    uselist=(cls.unique_links != True),  # noqa
+                    lazy=cls.link_backref_lazy
                 )
             )
 
@@ -258,8 +260,8 @@ class LinkMixin(object):
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=not cls.unique_links,
-                    lazy=True
+                    uselist=(cls.unique_links != True),  # noqa
+                    lazy=cls.link_backref_lazy
                 )
             )
 

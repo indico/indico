@@ -48,7 +48,7 @@ class AttachmentFormBase(IndicoForm):
         linked_object = kwargs.pop('linked_object')
         super(AttachmentFormBase, self).__init__(*args, **kwargs)
         self.folder.query = (AttachmentFolder
-                             .find(linked_object=linked_object, is_default=False, is_deleted=False)
+                             .find(object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
 
     @generated_data
@@ -103,7 +103,7 @@ class AttachmentFolderForm(IndicoForm):
 
     def _get_title_suggestions(self):
         query = db.session.query(AttachmentFolder.title).filter_by(is_deleted=False, is_default=False,
-                                                                   linked_object=self.linked_object)
+                                                                   object=self.linked_object)
         existing = set(x[0] for x in query)
         suggestions = set(get_default_folder_names()) - existing
         if self.title.data:

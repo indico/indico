@@ -19,12 +19,62 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.legacy_links import LegacyLinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import return_ascii
 
 
-class LegacyAttachmentFolderMapping(LegacyLinkMixin, db.Model):
+class _LegacyLinkMixin(object):
+    events_backref_name = None
+
+    @declared_attr
+    def event_id(cls):
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('events.events.id'),
+            nullable=False,
+            index=True
+        )
+
+    @declared_attr
+    def session_id(cls):
+        return db.Column(
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def contribution_id(cls):
+        return db.Column(
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def subcontribution_id(cls):
+        return db.Column(
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def event_new(cls):
+        return db.relationship(
+            'Event',
+            lazy=True,
+            backref=db.backref(
+                cls.events_backref_name,
+                lazy='dynamic'
+            )
+        )
+
+    def link_repr(self):
+        """A kwargs-style string suitable for the object's repr"""
+        _all_columns = {'event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
+        info = [((key, getattr(self, key)) for key in _all_columns if getattr(self, key) is not None)]
+        return ', '.join('{}={}'.format(key, value) for key, value in info)
+
+
+class LegacyAttachmentFolderMapping(_LegacyLinkMixin, db.Model):
     """Legacy attachmentfolder id mapping
 
     Legacy folders ("materials") had ids unique only within their
@@ -33,8 +83,7 @@ class LegacyAttachmentFolderMapping(LegacyLinkMixin, db.Model):
     """
 
     __tablename__ = 'legacy_folder_id_map'
-    allowed_link_types = LegacyLinkMixin.allowed_link_types - {LinkType.category}
-    events_backref_name = 'legacy_attachment_folder_mappings'
+    events_backref_name = 'all_legacy_attachment_folder_mappings'
 
     @declared_attr
     def __table_args__(cls):
@@ -63,7 +112,7 @@ class LegacyAttachmentFolderMapping(LegacyLinkMixin, db.Model):
         )
 
 
-class LegacyAttachmentMapping(LegacyLinkMixin, db.Model):
+class LegacyAttachmentMapping(_LegacyLinkMixin, db.Model):
     """Legacy attachment id mapping
 
     Legacy attachments ("resources") had ids unique only within their
@@ -72,8 +121,7 @@ class LegacyAttachmentMapping(LegacyLinkMixin, db.Model):
     """
 
     __tablename__ = 'legacy_attachment_id_map'
-    allowed_link_types = LegacyLinkMixin.allowed_link_types - {LinkType.category}
-    events_backref_name = 'legacy_attachment_mappings'
+    events_backref_name = 'all_legacy_attachment_mappings'
 
     @declared_attr
     def __table_args__(cls):

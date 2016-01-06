@@ -117,6 +117,10 @@ class SubContribution(db.Model):
         return dict(self.contribution.locator, subcontrib_id=self.id)
 
     @property
+    def is_protected_recursive(self):
+        return self.contribution.is_protected_recursive
+
+    @property
     def session(self):
         """Convenience property so all event entities have it"""
         return self.contribution.session if self.contribution.session_id is not None else None

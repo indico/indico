@@ -40,7 +40,7 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment,
                                                                      RHPackageEventAttachmentsManagement)
-from indico.modules.events import legacy_event_management_object_url_prefixes, legacy_event_object_url_prefixes
+from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func, make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -60,7 +60,7 @@ def _dispatch(event_rh, category_rh):
 
 
 # Management
-items = itertools.chain(legacy_event_management_object_url_prefixes.iteritems(), [('category', ['/manage'])])
+items = itertools.chain(event_management_object_url_prefixes.iteritems(), [('category', ['/manage'])])
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':
@@ -93,7 +93,7 @@ for object_type, prefixes in items:
                          methods=('DELETE',), defaults={'object_type': object_type})
 
 # Display/download
-items = itertools.chain(legacy_event_object_url_prefixes.iteritems(), [('category', [''])])
+items = itertools.chain(event_object_url_prefixes.iteritems(), [('category', [''])])
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':

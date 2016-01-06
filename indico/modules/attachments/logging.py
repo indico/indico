@@ -75,38 +75,38 @@ def _log(event, kind, msg, user, data):
 
 @_ignore_non_loggable
 def _log_folder_created(folder, user, **kwargs):
-    event = folder.linked_object.getConference()
+    event = folder.object.event_new
     _log(event, EventLogKind.positive, 'Created folder "{}"'.format(folder.title), user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_deleted(folder, user, **kwargs):
-    event = folder.linked_object.getConference()
+    event = folder.object.event_new
     _log(event, EventLogKind.negative, 'Deleted folder "{}"'.format(folder.title), user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_updated(folder, user, **kwargs):
-    event = folder.linked_object.getConference()
+    event = folder.object.event_new
     _log(event, EventLogKind.change, 'Updated folder "{}"'.format(folder.title), user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_attachment_created(attachment, user, **kwargs):
-    event = attachment.folder.linked_object.getConference()
+    event = attachment.folder.object.event_new
     _log(event, EventLogKind.positive, 'Added material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_deleted(attachment, user, **kwargs):
-    event = attachment.folder.linked_object.getConference()
+    event = attachment.folder.object.event_new
     _log(event, EventLogKind.negative, 'Deleted material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_updated(attachment, user, **kwargs):
-    event = attachment.folder.linked_object.getConference()
+    event = attachment.folder.object.event_new
     _log(event, EventLogKind.change, 'Updated material "{}"'.format(attachment.title), user,
          _get_attachment_data(attachment))

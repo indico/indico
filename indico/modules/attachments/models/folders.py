@@ -25,21 +25,23 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.legacy_links import LegacyLinkMixin
+from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal
 from indico.modules.attachments.util import can_manage_attachments
 from indico.util.decorators import strict_classproperty
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii
-from MaKaC.accessControl import AccessWrapper
 
 
-class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
+class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     __tablename__ = 'folders'
     unique_links = 'is_default'
-    events_backref_name = 'attachment_folders'
+    events_backref_name = 'all_attachment_folders'
+    link_backref_name = 'attachment_folders'
+    link_backref_lazy = 'dynamic'
 
     @strict_classproperty
     @staticmethod
@@ -113,14 +115,14 @@ class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
 
     @property
     def protection_parent(self):
-        return self.linked_object
+        return self.object
 
     @classmethod
     def get_or_create_default(cls, linked_object):
         """Gets the default folder for the given object or creates it."""
-        folder = cls.find_first(is_default=True, linked_object=linked_object)
+        folder = cls.find_first(is_default=True, object=linked_object)
         if folder is None:
-            folder = cls(is_default=True, linked_object=linked_object)
+            folder = cls(is_default=True, object=linked_object)
         return folder
 
     @classmethod
@@ -129,19 +131,19 @@ class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
 
         If no folder title is specified, the default folder will be
         used.  It is the caller's responsibility to add the folder
-        or an object (such as an attachment) associated wit with
+        or an object (such as an attachment) associated with it
         to the SQLAlchemy session using ``db.session.add(...)``.
         """
         if title is None:
             return AttachmentFolder.get_or_create_default(linked_object)
         else:
-            folder = AttachmentFolder.find_first(linked_object=linked_object, is_default=False, is_deleted=False,
-                                                 title=title)
-            return folder or AttachmentFolder(linked_object=linked_object, title=title)
+            folder = AttachmentFolder.find_first(object=linked_object, is_default=False, is_deleted=False, title=title)
+            return folder or AttachmentFolder(object=linked_object, title=title)
 
-    @property
+    @locator_property
     def locator(self):
-        return dict(self.linked_object.getLocator(), folder_id=self.id)
+        locator = self.object.locator if self.link_type != LinkType.category else self.object.getLocator()
+        return dict(locator, folder_id=self.id)
 
     def can_access(self, user, *args, **kwargs):
         """Checks if the user is allowed to access the folder.
@@ -150,7 +152,7 @@ class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
         user can manage attachments for the linked object.
         """
         return (super(AttachmentFolder, self).can_access(user, *args, **kwargs) or
-                can_manage_attachments(self.linked_object, user))
+                can_manage_attachments(self.object, user))
 
     def can_view(self, user):
         """Checks if the user can see the folder.
@@ -158,7 +160,7 @@ class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
         """
-        if not self.linked_object.canView(AccessWrapper(user.as_avatar if user else None)):
+        if not self.object.can_access(user):
             return False
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
 
@@ -177,26 +179,27 @@ class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
         """
         from MaKaC.conference import Category
 
-        event = linked_object.getConference() if not isinstance(linked_object, Category) else None
+        event = linked_object.event_new if not isinstance(linked_object, Category) else None
 
         if event and event in g.get('event_attachments', {}):
             return g.event_attachments[event].get(linked_object, [])
         elif not preload_event or not event:
-            return (cls.find(linked_object=linked_object, is_deleted=False)
-                       .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
-                       .options(joinedload(AttachmentFolder.attachments))
-                       .all())
+            return (linked_object.attachment_folders.filter_by(is_deleted=False)
+                    .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
+                    .options(joinedload(AttachmentFolder.attachments))
+                    .all())
         else:
             if 'event_attachments' not in g:
                 g.event_attachments = {}
             g.event_attachments[event] = defaultdict(list)
-            query = (cls.find(event_id=int(linked_object.getConference().id), is_deleted=False)
-                        .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
-                        .options(joinedload(AttachmentFolder.attachments)))
+            query = (linked_object.event_new.all_attachment_folders
+                     .filter_by(is_deleted=False)
+                     .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
+                     .options(joinedload(AttachmentFolder.attachments)))
 
             # populate cache
             for obj in query:
-                g.event_attachments[event][obj.linked_object].append(obj)
+                g.event_attachments[event][obj.object].append(obj)
 
             return g.event_attachments[event].get(linked_object, [])
 
@@ -217,3 +220,6 @@ class AttachmentFolder(LegacyLinkMixin, ProtectionMixin, db.Model):
 @listens_for(AttachmentFolder.attachments, 'remove')
 def _wrong_attachments_modified(target, value, *unused):
     raise Exception('AttachmentFolder.attachments is view-only. Use all_attachments for write operations!')
+
+
+AttachmentFolder.register_link_events()
