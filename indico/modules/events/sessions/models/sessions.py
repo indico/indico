@@ -134,6 +134,11 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     def protection_parent(self):
         return self.event_new
 
+    @property
+    def session(self):
+        """Convenience property so all event entities have it"""
+        return self
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, session_id=self.id)
