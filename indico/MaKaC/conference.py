@@ -56,6 +56,7 @@ import re
 import os
 import copy
 import stat
+import warnings
 from datetime import datetime, timedelta
 from flask import session, request, has_request_context
 
@@ -80,7 +81,7 @@ from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
-from MaKaC.accessControl import AccessController
+from MaKaC.accessControl import AccessController, AccessWrapper
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
@@ -320,8 +321,14 @@ class CommonObjectBase(CoreObject, Fossilizable):
         CAUTION: this won't return empty directories (used by interface), nor things the
         current user can't see
         """
-        if isinstance(self, (Contribution, Session, SubContribution, Conference, Category)):
-            return get_attached_items(self, include_empty=False, include_hidden=False, preload_event=True)
+        if isinstance(self, Category):
+            return get_attached_items(self, include_empty=False, include_hidden=False)
+        elif isinstance(self, Conference):
+            return get_attached_items(self.as_event, include_empty=False, include_hidden=False, preload_event=True)
+        elif isinstance(self, (Contribution, Session, SubContribution)):
+            warnings.warn('attached_items of legacy objects is not available anymore; returning empty list',
+                          DeprecationWarning, 2)
+            return {}
         else:
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 
@@ -467,6 +474,28 @@ class Category(CommonObjectBase):
             return url_for('misc.index')
         else:
             return url_for('category.categoryDisplay', self)
+
+    @property
+    def attachment_folders(self):
+        return AttachmentFolder.find(object=self)
+
+    @property
+    def is_protected_recursive(self):
+        return self.isProtected()
+
+    def can_access(self, user, allow_admin=True):
+        # used in attachments module
+        if not allow_admin:
+            raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
+        return self.canView(AccessWrapper(user.as_avatar if user else None))
+
+    def can_manage(self, user, role=None, allow_admin=True):
+        # used in attachments module
+        if role is not None:
+            raise NotImplementedError('can_access(..., role=...) is unsupported until ACLs are migrated')
+        if not allow_admin:
+            raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
+        return self.canUserModify(user.as_avatar if user else None)
 
     def getAccessController(self):
         return self.__ac

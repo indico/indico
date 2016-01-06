@@ -65,6 +65,7 @@ def adjust_path_length(segments):
 
 
 def _get_start_dt(obj):
+    # TODO: adapt to new models (needs extra properties to use event TZ)
     if isinstance(obj, SubContribution):
         return obj.getContribution().getAdjustedStartDate()
     else:
@@ -94,12 +95,7 @@ class AttachmentPackageGeneratorMixin:
 
     def _get_all_attachments(self, added_since):
         query = self._build_base_query(added_since)
-
-        def _check_scheduled(attachment):
-            obj = attachment.folder.linked_object
-            return obj is not None and _get_start_dt(obj) is not None
-
-        return filter(_check_scheduled, query)
+        return [attachment for attachment in query if _get_start_dt(attachment.folder.object) is not None]
 
     def _build_base_query(self, added_since=None):
         query = Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
@@ -114,32 +110,19 @@ class AttachmentPackageGeneratorMixin:
         query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.session,
                                                                                            LinkType.contribution,
                                                                                            LinkType.subcontribution]))
-
-        def _check_session(attachment):
-            obj = attachment.folder.linked_object
-            return obj is not None and obj.getSession() and obj.getSession().getId() in session_ids
-
-        return filter(_check_session, query)
+        return [attachment for attachment in query if attachment.folder.object.session.id in session_ids]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
         query = self._build_base_query(added_since).filter(AttachmentFolder.contribution_id.in_(contribution_ids),
                                                            AttachmentFolder.link_type.in_([LinkType.contribution,
                                                                                            LinkType.subcontribution]))
-
-        def _check_scheduled(attachment):
-            obj = attachment.folder.linked_object
-            return obj is not None and _get_start_dt(obj) is not None
-
-        return filter(_check_scheduled, query)
+        return [attachment for attachment in query if _get_start_dt(attachment.folder.object) is not None]
 
     def _filter_by_dates(self, dates):
         dates = set(dates)
 
         def _check_date(attachment):
-            obj = attachment.folder.linked_object
-            if obj is None:
-                return False
-            start_dt = _get_start_dt(obj)
+            start_dt = _get_start_dt(attachment.folder.object)
             if start_dt is None:
                 return None
             return unicode(start_dt.date()) in dates
@@ -178,7 +161,8 @@ class AttachmentPackageGeneratorMixin:
         return path
 
     def _get_base_path(self, attachment):
-        obj = linked_object = attachment.folder.linked_object
+        # TODO: adapt to new models (needs extra properties to use event TZ)
+        obj = linked_object = attachment.folder.object
         paths = []
         while obj != self._conf:
             owner = obj.getOwner()
@@ -198,7 +182,7 @@ class AttachmentPackageGeneratorMixin:
         else:
             linked_obj_start_date = linked_object.getAdjustedStartDate()
 
-        if attachment.folder.linked_object != self._conf and linked_obj_start_date is not None:
+        if attachment.folder.object != self._conf and linked_obj_start_date is not None:
             paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
 
         return reversed(paths)

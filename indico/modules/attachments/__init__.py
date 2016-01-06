@@ -22,7 +22,6 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.modules.attachments.legacy import connect_legacy_signals
 from indico.modules.attachments.logging import connect_log_signals
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -31,8 +30,6 @@ from indico.web.menu import SideMenuItem
 
 logger = Logger.get('attachments')
 connect_log_signals()
-
-connect_legacy_signals()
 
 
 @signals.users.merged.connect
@@ -47,7 +44,7 @@ def _merge_users(target, source, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not can_manage_attachments(event.as_legacy, session.user):
+    if not can_manage_attachments(event, session.user):
         return
     return SideMenuItem('attachments', _('Materials'), url_for('attachments.management', event), 80,
                         section='organization')
@@ -55,7 +52,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if can_manage_attachments(event, session.user):
+    if can_manage_attachments(event.as_event, session.user):
         return url_for('attachments.management', event)
 
 

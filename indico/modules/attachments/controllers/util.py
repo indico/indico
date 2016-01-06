@@ -33,7 +33,7 @@ class SpecificAttachmentMixin:
                                       else 'go')
         },
         'locators': {
-            lambda self: self.attachment.folder.linked_object
+            lambda self: self.attachment.folder.object
         },
         'preserved_args': {'attachment_id'}
     }
@@ -49,7 +49,7 @@ class SpecificFolderMixin:
 
     normalize_url_spec = {
         'locators': {
-            lambda self: self.folder.linked_object
+            lambda self: self.folder.object
         },
         'preserved_args': {'folder_id'}
     }
