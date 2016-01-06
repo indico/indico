@@ -115,6 +115,16 @@ class SubContribution(db.Model):
     def locator(self):
         return dict(self.contribution.locator, subcontrib_id=self.id)
 
+    @property
+    def session(self):
+        """Convenience property so all event entities have it"""
+        return self.contribution.session if self.contribution.session_id is not None else None
+
+    @property
+    def timetable_entry(self):
+        """Convenience property so all event entities have it"""
+        return self.contribution.timetable_entry
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
