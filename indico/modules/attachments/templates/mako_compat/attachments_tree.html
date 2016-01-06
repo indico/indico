@@ -10,7 +10,8 @@
     {{ render_attachments(linked_object.attached_items, management=false) }}
 </div>
 <script>
-    $('#manageAttachments-{{ linked_object.id }}').on('click', function openAtttachmentsPopup() {
+    $('#manageAttachments-{{ linked_object.id }}').on('click', function(evt) {
+        evt.preventDefault();
         openAttachmentManager({{ linked_object.getLocator()|tojson }});
     });
 </script>

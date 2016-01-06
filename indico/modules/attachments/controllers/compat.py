@@ -47,7 +47,7 @@ def _clean_args(kwargs):
 def compat_folder(**kwargs):
     _clean_args(kwargs)
     folder = LegacyAttachmentFolderMapping.find(**kwargs).first_or_404().folder
-    if folder.is_deleted or folder.linked_object is None:
+    if folder.is_deleted:
         raise NotFound
     return redirect(url_for('attachments.list_folder', folder), 302 if current_app.debug else 301)
 
@@ -78,6 +78,6 @@ def compat_attachment(**kwargs):
             return _redirect_to_note(**kwargs)
         raise NotFound
     attachment = mapping.attachment
-    if attachment.is_deleted or attachment.folder.is_deleted or attachment.folder.linked_object is None:
+    if attachment.is_deleted or attachment.folder.is_deleted:
         raise NotFound
     return redirect(attachment.download_url, 302 if current_app.debug else 301)

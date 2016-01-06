@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        {% if linked_object_type != 'category' and (linked_object_type != 'event' or linked_object.as_event.can_manage(session.user)) %}
+        {% if linked_object_type != 'category' and (linked_object_type != 'event' or linked_object.can_manage(session.user)) %}
             <div class="action-box fixed-width">
                 <div class="section">
                     <span class="icon icon-package-download"></span>

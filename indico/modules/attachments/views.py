@@ -19,11 +19,7 @@ from __future__ import unicode_literals
 from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.category import WPCategoryModifBase
-from MaKaC.webinterface.pages.conferences import (WPConferenceModifBase, WPConfModifToolsBase,
-                                                  WPConferenceDefaultDisplayBase)
-from MaKaC.webinterface.pages.sessions import WPSessionModifBase
-from MaKaC.webinterface.pages.contributions import WPContributionModifBase
-from MaKaC.webinterface.pages.subContributions import WPSubContributionModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class AttachmentsMixin(WPJinjaMixin):
@@ -34,17 +30,6 @@ class AttachmentsMixin(WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class EventObjectAttachmentsMixin(AttachmentsMixin):
-    def _getPageContent(self, params):
-        return self.base_wp._getPageContent(self, params)
-
-    def _getTabContent(self, params):
-        return AttachmentsMixin._getPageContent(self, params)
-
-    def _setActiveTab(self):
-        self._tab_attachments.setActive()
-
-
 class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
     base_wp = WPCategoryModifBase
     sidemenu_option = 'attachments'
@@ -53,18 +38,6 @@ class WPCategoryAttachments(AttachmentsMixin, WPCategoryModifBase):
 class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
     base_wp = WPConferenceModifBase
     sidemenu_option = 'attachments'
-
-
-class WPSessionAttachments(EventObjectAttachmentsMixin, WPSessionModifBase):
-    base_wp = WPSessionModifBase
-
-
-class WPContributionAttachments(EventObjectAttachmentsMixin, WPContributionModifBase):
-    base_wp = WPContributionModifBase
-
-
-class WPSubContributionAttachments(EventObjectAttachmentsMixin, WPSubContributionModifBase):
-    base_wp = WPSubContributionModifBase
 
 
 class WPEventFolderDisplay(WPMeetingDisplay, WPJinjaMixin):

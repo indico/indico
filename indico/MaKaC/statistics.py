@@ -54,7 +54,7 @@ class CategoryStatistics(Statistics):
 
     @classmethod
     def _count_attachments(cls, obj):
-        return Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.linked_object == obj,
+        return Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.object == obj,
                                is_deleted=False, _join=AttachmentFolder).count()
 
     @classmethod

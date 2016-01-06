@@ -204,7 +204,7 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
 
                     for j, target in enumerate(lectures, 1):
                         if j != i:
-                            folder = AttachmentFolder(linked_object=source, title="part{}".format(j))
+                            folder = AttachmentFolder(object=source.as_event, title="part{}".format(j))
                             link = Attachment(user=session.user, type=AttachmentType.link,
                                               folder=folder, title="Part {}".format(j),
                                               link_url=target.getURL())

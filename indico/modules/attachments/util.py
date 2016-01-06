@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.core.db import db
+
 
 def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
     """
@@ -74,18 +76,17 @@ def get_nested_attached_items(obj):
     Returns a structured representation of all attachments linked to an object
     and all its nested objects.
 
-    :param obj: A :class:`Conference`, :class:`Session`, :class:`Contribution`
-                or :class:`Subcontribution` object.
+    :param obj: A :class:`Event`, :class:`Session`, :class:`Contribution`
+                or :class:`SubContribution` object.
     """
-    from MaKaC.conference import Conference, Session, Contribution
     attachments = get_attached_items(obj, include_empty=False, include_hidden=False)
     nested_objects = []
-    if isinstance(obj, Conference):
-        nested_objects = obj.getSessionList() + obj.getContributionList()
-    elif isinstance(obj, Session):
-        nested_objects = obj.getContributionList()
-    elif isinstance(obj, Contribution):
-        nested_objects = obj.getSubContributionList()
+    if isinstance(obj, db.m.Event):
+        nested_objects = obj.sessions.all() + obj.contributions.all()
+    elif isinstance(obj, db.m.Session):
+        nested_objects = obj.contributions
+    elif isinstance(obj, db.m.Contribution):
+        nested_objects = obj.subcontributions
     if nested_objects:
         children = filter(None, map(get_nested_attached_items, nested_objects))
         if children:
@@ -97,21 +98,19 @@ def get_nested_attached_items(obj):
 
 def can_manage_attachments(obj, user):
     """Checks if a user can manage attachments for the object"""
-    from MaKaC.conference import Contribution, Session, SubContribution, Conference
     if not user:
         return False
-    if isinstance(obj, Conference) and obj.as_event.can_manage(user, 'submit'):
+    if obj.can_manage(user):
         return True
-    if isinstance(obj, Session) and obj.canCoordinate(user.as_avatar):
+    if isinstance(obj, db.m.Event) and obj.can_manage(user, 'submit'):
         return True
-    if isinstance(obj, Contribution):
-        if obj.canUserSubmit(user.as_avatar):
-            return True
-        if obj.getSession() and obj.getSession().canCoordinate(user.as_avatar, 'modifContribs'):
-            return True
-    if isinstance(obj, SubContribution):
-        return can_manage_attachments(obj.getContribution(), user)
-    return obj.canModify(user.as_avatar)
+    if isinstance(obj, db.m.Session) and obj.can_manage(user, 'coordinate'):
+        return True
+    if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit'):
+        return True
+    if isinstance(obj, db.m.SubContribution):
+        return can_manage_attachments(obj.contribution, user)
+    return False
 
 
 def get_default_folder_names():
