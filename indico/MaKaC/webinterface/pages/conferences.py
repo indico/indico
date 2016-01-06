@@ -969,6 +969,7 @@ class WPConferenceModifBase(main.WPMainBase):
     _userData = ['favorite-user-ids']
 
     def __init__(self, rh, conference, **kwargs):
+        conference = getattr(conference, 'as_legacy', conference)
         main.WPMainBase.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = conference
 

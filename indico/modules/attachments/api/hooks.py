@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events import Event
 from indico.modules.attachments.api.util import build_folders_api_data
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-from MaKaC.conference import ConferenceHolder
 
 
 @HTTPAPIHook.register
@@ -33,27 +34,29 @@ class AttachmentsExportHook(HTTPAPIHook):
 
     def _getParams(self):
         super(AttachmentsExportHook, self)._getParams()
-        event = self._obj = ConferenceHolder().getById(self._pathParams['event_id'], True)
+        event = self._obj = Event.get(self._pathParams['event_id'], is_deleted=False)
         if event is None:
             raise HTTPAPIError('No such event', 404)
         session_id = self._pathParams.get('session_id')
         if session_id:
-            session = self._obj = event.getSessionById(session_id)
-            if session is None:
+            self._obj = event.sessions.filter_by(id=session_id, is_deleted=False).first()
+            if self._obj is None:
                 raise HTTPAPIError("No such session", 404)
         contribution_id = self._pathParams.get('contribution_id')
         if contribution_id:
-            contribution = self._obj = event.getContributionById(contribution_id)
+            contribution = self._obj = event.contributions.filter_by(id=contribution_id, is_deleted=False).first()
             if contribution is None:
                 raise HTTPAPIError("No such contribution", 404)
-        subcontribution_id = self._pathParams.get('subcontribution_id')
-        if subcontribution_id:
-            subcontribution = self._obj = contribution.getSubContributionById(subcontribution_id)
-            if subcontribution is None:
-                raise HTTPAPIError("No such subcontribution", 404)
+            subcontribution_id = self._pathParams.get('subcontribution_id')
+            if subcontribution_id:
+                self._obj = SubContribution.query.with_parent(contribution).filter_by(id=subcontribution_id,
+                                                                                      is_deleted=False).first()
+                if self._obj is None:
+                    raise HTTPAPIError("No such subcontribution", 404)
 
     def _hasAccess(self, aw):
-        return self._obj.canView(aw)
+        user = aw.getUser().user if aw.getUser() else None
+        return self._obj.can_access(user)
 
     def export_attachments(self, aw):
         return {'folders': build_folders_api_data(self._obj)}

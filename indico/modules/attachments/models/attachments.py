@@ -88,7 +88,7 @@ class AttachmentFile(StoredFileMixin, db.Model):
 
     def _build_storage_path(self):
         folder = self.attachment.folder
-        assert folder.linked_object is not None
+        assert folder.object is not None
         if folder.link_type == LinkType.category:
             # category/<id>/...
             path_segments = ['category', unicode(folder.category_id)]
@@ -260,7 +260,7 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
         or if the user can manage attachments for the linked object.
         """
         return (super(Attachment, self).can_access(user, *args, **kwargs) or
-                can_manage_attachments(self.folder.linked_object, user))
+                can_manage_attachments(self.folder.object, user))
 
     @return_ascii
     def __repr__(self):
@@ -280,17 +280,15 @@ Attachment.register_events()
 
 def _offline_download_url(attachment):
     # Legacy offline download link generation
-    from MaKaC import conference
-
     if attachment.type == AttachmentType.file:
-        if isinstance(attachment.folder.linked_object, conference.Conference):
+        if isinstance(attachment.folder.object, db.m.Event):
             path = "events/conference"
-        elif isinstance(attachment.folder.linked_object, conference.Session):
-            path = "agenda/%s-session" % attachment.folder.linked_object.getId()
-        elif isinstance(attachment.folder.linked_object, conference.Contribution):
-            path = "agenda/%s-contribution" % attachment.folder.linked_object.getId()
-        elif isinstance(attachment.folder.linked_object, conference.SubContribution):
-            path = "agenda/%s-subcontribution" % attachment.folder.linked_object.getId()
+        elif isinstance(attachment.folder.object, db.m.Session):
+            path = "agenda/%s-session".format(attachment.folder.session_id)
+        elif isinstance(attachment.folder.object, db.m.Contribution):
+            path = "agenda/%s-contribution".format(attachment.folder.contribution_id)
+        elif isinstance(attachment.folder.object, db.m.SubContribution):
+            path = "agenda/%s-subcontribution".format(attachment.folder.subcontribution_id)
         else:
             return ''
         return posixpath.join("files", path, str(attachment.id) + "-" + attachment.file.filename)
