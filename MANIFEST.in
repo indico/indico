@@ -4,9 +4,8 @@ include COPYING
 include INSTALL
 include NEWS
 include README
-include THANKS
-
-include doc/*.pdf
+include THANKS.md
+include requirements.txt
 include ez_setup.py
 
 recursive-include bin *
