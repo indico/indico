@@ -143,10 +143,16 @@
     };
 
     global.enableIfChecked = function enableIfChecked(checkboxContainer, checkboxSelector, buttonSelector) {
-        $(checkboxContainer).on('change', checkboxSelector, function() {
-            var checked = this.checked || !!$(checkboxContainer).find(checkboxSelector).filter(':checked').length;
+        function _update(force) {
+            var checked = force || !!$(checkboxContainer).find(checkboxSelector).filter(':checked').length;
             $(buttonSelector).prop('disabled', !checked).toggleClass('disabled', !checked);
+        }
+
+        $(checkboxContainer).on('change', checkboxSelector, function() {
+            _update(this.checked);
         });
+
+        _update();
     };
 
     $(document).ready(function() {
