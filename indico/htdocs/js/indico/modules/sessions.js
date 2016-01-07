@@ -59,7 +59,7 @@
         });
     };
 
-    global.setupPersonsList = function setupPersonsList() {
+    global.setupSessionPersonsList = function setupSessionPersonsList() {
         enableIfChecked('#persons-list', '.select-row', '.js-requires-selected-row');
         $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
 
