@@ -155,7 +155,7 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
         RHManageSessionsBase._checkParams(self, params)
 
     def _process(self):
-        form = EmailSessionPersonsForm(event_persons=request.args.getlist('person_id'))
+        form = EmailSessionPersonsForm(event_persons=request.form.getlist('person_id'))
         if form.validate_on_submit():
             person_ids = form.event_persons.data
             event_persons = (self.event_new.persons

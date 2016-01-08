@@ -73,6 +73,7 @@
         <a href="#" class="i-button highlight disabled js-requires-selected-row send-mails-btn"
            data-href="{{ url_for('.email_session_persons', event) }}"
            data-title="{% trans %}Send email{% endtrans %}"
+           data-method="POST"
            data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
            data-ajax-dialog>
             {%- trans %}Send emails{% endtrans -%}

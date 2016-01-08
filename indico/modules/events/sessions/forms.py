@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from flask import session
-from wtforms.fields import StringField, BooleanField, SelectField, TextAreaField
+from flask import session, request
+from wtforms.fields import StringField, BooleanField, SelectField, TextAreaField, HiddenField
 from wtforms.validators import DataRequired
 
 from indico.modules.events.sessions.util import get_colors
@@ -48,9 +48,13 @@ class EmailSessionPersonsForm(IndicoForm):
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
     event_persons = JSONField(_('Event Persons'), default=[])
+    submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         super(EmailSessionPersonsForm, self).__init__(*args, **kwargs)
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
         self.from_address.choices = zip(from_addresses, from_addresses)
+
+    def is_submitted(self):
+        return super(EmailSessionPersonsForm, self).is_submitted() and 'submitted' in request.form
