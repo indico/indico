@@ -155,18 +155,21 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
         RHManageSessionsBase._checkParams(self, params)
 
     def _process(self):
-        form = EmailSessionPersonsForm(event_persons=request.form.getlist('person_id'))
+        person_ids = request.form.getlist('person_id')
+        recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
+        form = EmailSessionPersonsForm(event_persons=person_ids, recipients=', '.join(recipients))
         if form.validate_on_submit():
             person_ids = form.event_persons.data
-            event_persons = (self.event_new.persons
-                             .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
-                             .all())
-            event_person_emails = {p.email for p in event_persons if p.email}
-            for event_person_email in event_person_emails:
-                email = make_email(to_list=event_person_email.email, from_address=form.from_address.data,
+            for recipient in recipients:
+                email = make_email(to_list=recipient, from_address=form.from_address.data,
                                    subject=form.subject.data, body=form.body.data, html=True)
                 send_email(email, self.event_new, 'Sessions')
-            num = len(event_person_emails)
+            num = len(recipients)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data()
         return jsonify_form(form, submit=_('Send'))
+
+    def _find_event_persons(self, person_ids):
+        return (self.event_new.persons
+                .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
+                .all())
