@@ -161,13 +161,12 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
             event_persons = (self.event_new.persons
                              .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
                              .all())
-            for event_person in event_persons:
-                if not event_person.email:
-                    continue
-                email = make_email(to_list=event_person.email, from_address=form.from_address.data,
+            event_person_emails = {p.email for p in event_persons if p.email}
+            for event_person_email in event_person_emails:
+                email = make_email(to_list=event_person_email.email, from_address=form.from_address.data,
                                    subject=form.subject.data, body=form.body.data, html=True)
                 send_email(email, self.event_new, 'Sessions')
-            num = len(event_persons)
+            num = len(event_person_emails)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data()
         return jsonify_form(form, submit=_('Send'))
