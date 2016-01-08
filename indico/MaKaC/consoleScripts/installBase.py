@@ -166,8 +166,12 @@ def _updateMaKaCEggCache(file, path):
     open(file, 'w').write(fdata)
 
 
-def compileAllLanguages(cmd):
+def compileAllLanguages(cmd, pkg_path):
     '''Generates .mo files from .po files'''
+
+    if os.path.exists(os.path.join(pkg_path, 'locale', 'en_GB', 'LC_MESSAGES', 'messages.mo')):
+        print "No need to generate i18n data..."
+        return
 
     try:
         pkg_resources.require('babel')

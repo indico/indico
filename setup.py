@@ -48,7 +48,7 @@ try:
 except ImportError:
     BABEL_PRESENT = False
 
-
+INDICO_PKG_DIR = os.path.join(os.path.dirname(__file__), 'indico')
 DEPENDENCY_URLS = ["https://github.com/indico/indico-fonts/releases/"]
 
 if sys.platform == 'linux2':
@@ -159,7 +159,7 @@ class sdist_indico(sdist.sdist):
 def _bdist_indico(dataFiles):
     class bdist_indico(bdist.bdist):
         def run(self):
-            compileAllLanguages(self)
+            compileAllLanguages(self, INDICO_PKG_DIR)
             bdist.bdist.run(self)
 
     bdist_indico.dataFiles = dataFiles
@@ -169,7 +169,7 @@ def _bdist_indico(dataFiles):
 def _bdist_egg_indico(dataFiles):
     class bdist_egg_indico(bdist_egg.bdist_egg):
         def run(self):
-            compileAllLanguages(self)
+            compileAllLanguages(self, INDICO_PKG_DIR)
             bdist_egg.bdist_egg.run(self)
 
     bdist_egg_indico.dataFiles = dataFiles
@@ -278,7 +278,7 @@ Please specify the directory where you'd like it to be placed.
         _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'),
                              directories['tmp'])
 
-        compileAllLanguages(self)
+        compileAllLanguages(self, INDICO_PKG_DIR)
         print '''
 %s
         ''' % _databaseText('etc')
