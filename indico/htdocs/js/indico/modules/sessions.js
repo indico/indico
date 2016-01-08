@@ -33,7 +33,7 @@
     }
 
     global.setupSessionsList = function setupSessionsList() {
-        enableIfChecked('#sessions-wrapper', '.select-row', '.js-requires-selected-row');
+        enableIfChecked('#sessions-wrapper', '.select-row', '#sessions .js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
 
@@ -60,7 +60,7 @@
     };
 
     global.setupSessionPersonsList = function setupSessionPersonsList() {
-        enableIfChecked('#persons-list', '.select-row', '.js-requires-selected-row');
+        enableIfChecked('#persons-list', '.select-row', '#persons-list .js-requires-selected-row');
         $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
 
         $('#persons-list [data-filter]').on('click', function() {
@@ -86,6 +86,13 @@
             if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
                 $this.attr('title', $this.text());
             }
+        });
+
+        $('#persons-list .tablesorter').tablesorter({
+            cssAsc: 'header-sort-asc',
+            cssDesc: 'header-sort-desc',
+            headerTemplate: '',
+            sortList: [[1, 0]]
         });
     };
 
