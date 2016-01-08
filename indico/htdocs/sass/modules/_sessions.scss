@@ -41,9 +41,15 @@
 
         tr {
             td {
-                text-overflow: ellipsis;
-                overflow: hidden;
-                max-width: 150px;
+                &.email-column {
+                    white-space: normal;
+                    word-break: break-all;
+                }
+
+                .speaker-icon {
+                    font-size: 1.5em;
+                    float: right;
+                }
             }
         }
     }
