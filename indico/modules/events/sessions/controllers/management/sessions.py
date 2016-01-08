@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import random
 
-from flask import request, jsonify
+from flask import request, jsonify, flash
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -34,7 +34,7 @@ from indico.modules.events.sessions.operations import create_session, update_ses
 from indico.modules.events.sessions.util import (get_colors, get_active_sessions, generate_csv_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -167,5 +167,7 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
                 email = make_email(to_list=event_person.email, from_address=form.from_address.data,
                                    subject=form.subject.data, body=form.body.data, html=True)
                 send_email(email, self.event_new, 'Sessions')
+            num = len(event_persons)
+            flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data()
         return jsonify_form(form, submit=_('Send'))
