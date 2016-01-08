@@ -39,6 +39,10 @@ flask_sqlalchemy.Model = IndicoModel
 
 
 class IndicoSQLAlchemy(SQLAlchemy):
+    def __init__(self, *args, **kwargs):
+        super(IndicoSQLAlchemy, self).__init__(*args, **kwargs)
+        self.m = type(b'_Models', (object,), {})
+
     @cached_property
     def logger(self):
         from indico.core.logger import Logger
@@ -86,6 +90,9 @@ def _before_create(target, connection, **kw):
 
 
 def _mapper_configured(mapper, class_):
+    # Make model available via db.m.*
+    setattr(db.m, class_.__name__, class_)
+
     # Create a setter listener to coerce attribute values for custom types supporting it
     def _coerce_custom(target, value, oldvalue, initiator, fn):
         return fn(value)
