@@ -42,6 +42,7 @@ class TextField(RegistrationFormFieldBase):
 class NumberField(RegistrationFormBillableField):
     name = 'number'
     wtf_field_class = wtforms.IntegerField
+    required_validator = InputRequired
 
     @property
     def validators(self):
