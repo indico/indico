@@ -543,6 +543,9 @@ class IndicoStaticTextField(Field):
         self.text_value = kwargs.pop('text', '')
         super(IndicoStaticTextField, self).__init__(*args, **kwargs)
 
+    def process_data(self, data):
+        self.text_value = self.data = unicode(data)
+
     def _value(self):
         return self.text_value
 
