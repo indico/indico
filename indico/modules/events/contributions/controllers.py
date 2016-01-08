@@ -101,7 +101,8 @@ class RHContributions(RHManageContributionsBase):
 
 class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
-        form = ContributionForm(event=self.event_new)
+        form = ContributionForm(event=self.event_new,
+                                obj=FormDefaults(location_data=Contribution.get_location_for_parent(self.event_new)))
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
