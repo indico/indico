@@ -80,6 +80,13 @@
             personRows.hide();
             visibleEntries.show();
         });
+
+        $('#persons-list td').on('mouseenter', function() {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.attr('title', $this.text());
+            }
+        });
     };
 
 })(window);
