@@ -266,3 +266,12 @@ class LocationMixin(object):
             else:
                 self.venue_name = data['venue_name']
                 self.room_name = data['room_name']
+
+    @classmethod
+    def get_location_for_parent(cls, parent):
+        return {'source': parent,
+                'address': '',
+                'venue_name': '',
+                'inheriting': True,
+                'room_name': ''}
+

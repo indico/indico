@@ -21,11 +21,11 @@ from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
 from indico.core.config import Config
+from indico.core.db import db
 from indico.web.util import inject_js
 from indico.web.flask.templating import get_template_module
 
 html_commment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
-
 
 class ConcatWidget(object):
     """Renders a list of fields as a simple string joined by an optional separator."""
@@ -209,7 +209,23 @@ class LocationWidget(JinjaWidget):
                  for r in loc.rooms]} for loc in field.locations}
         venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
         venue_names = [v['name'] for v in venues['data']]
-        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, venue_names=venue_names)
+        parent = self._get_parent_info(field.data['source']) if field.data and field.data.get('source', None) else None
+        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, venue_names=venue_names,
+                                                    parent=parent)
+
+    def _get_parent_info(self, parent):
+        if isinstance(parent, db.m.Contribution):
+            return 'Contribution', parent.title
+        elif isinstance(parent, db.m.Break):
+            return 'Break', parent.title
+        elif isinstance(parent, db.m.SessionBlock):
+            return 'Block', parent.title
+        elif isinstance(parent, db.m.Session):
+            return 'Session', parent.title
+        elif isinstance(parent, db.m.Event):
+            return 'Event', parent.title
+        else:
+            raise TypeError('Unexpected parent type {}'.format(type(parent)))
 
 
 class ColorPickerWidget(JinjaWidget):
