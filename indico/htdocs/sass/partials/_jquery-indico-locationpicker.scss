@@ -99,7 +99,7 @@
 
         .toggle-results-list {
             position: absolute;
-            padding: 0.5em 1em;
+            padding: 0.5em 0.6em;
             top: 0;
             right: 0;
             line-height: 1.5;
@@ -134,4 +134,22 @@
     left: 0;
     z-index: 1060;
     display: none;
+}
+
+.highlighter {
+    @include border-radius();
+    display: none !important;
+    background-color: $pastel-blue;
+    padding: 2px;
+    position: absolute;
+    top: 0.5em;
+    left: 1em;
+    max-width: 8.5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.visible {
+        display: block !important;
+    }
 }
