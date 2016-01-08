@@ -70,9 +70,7 @@
             var latestUsedField = '';
             var latestSelectedOption = {field: '', value: ''};
 
-            if (hiddenData.inheriting) {
-                usingDefault.prop('checked', hiddenData.inheriting);
-            }
+            usingDefault.prop('checked', hiddenData.inheriting);
             if (hiddenData.address) {
                 address.val(hiddenData.address);
             }
@@ -83,9 +81,10 @@
                 venueInput.val(hiddenData.venue_name);
             }
 
-            function toggleDefaultLocation(isChecked) {
-                // TODO: complete description message
-                var text = isChecked ? 'Using default location from: TODO' : 'Using custom location';
+            function toggleDefaultLocation(isChecked, isInitStep) {
+                var message = ($T.gettext('Using default location from: {0} ({1})').format({{ parent[1] | tojson }},
+                                                                                           {{ parent[0] | tojson }}));
+                var text = isChecked ? message : $T.gettext('Using custom location');
                 description.html(text);
                 venueInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
                 roomInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
@@ -119,11 +118,11 @@
                 if (node.val().length > 0) {
                     if (justUse.length === 0) {
                         justUse = $('<div>').attr({
-                                'class': 'just-use-option'
-                            })
-                            .on('click', function() {
-                                node.trigger('indico:click-on-custom-option', {item_name: node.val()});
-                            });
+                            'class': 'just-use-option'
+                        })
+                        .on('click', function() {
+                            node.trigger('typeahead:click-on-custom-option', {item_name: node.val()});
+                        });
                         resultsWrapper.append(justUse);
                     }
                     justUse.text('Just use "' + node.val() + '"');

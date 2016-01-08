@@ -140,7 +140,7 @@ class IndicoLocationField(JSONField):
             'venue_name': self.data['venue_name'],
             'inheriting': self.data['inheriting'],
         }
-        if self.data['room']:
+        if self.data.get('room'):
             result['room_id'] = self.data['room'].id
             result['venue_id'] = self.data['room'].location.id
             result['room_name'] = self.data['room'].name
