@@ -125,12 +125,11 @@ def validIP(ip):
 
 
 def isStringHTML(s):
-    if type(s) == str:
-        tags = [ "<p>", "<p ", "<br", "<li>" ]
-        for tag in tags:
-            if s.lower().find(tag) != -1:
-                return True
-    return False
+    if not isinstance(s, basestring):
+        return False
+    s = s.lower()
+    return any(tag in s for tag in ('<p>', '<p ', '<br', '<li>'))
+
 
 def getEmailList(stri):
     emailList = []
