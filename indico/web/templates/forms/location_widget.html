@@ -17,6 +17,7 @@
                            placeholder="{% trans %}Venue{% endtrans %}"
                            autocomplete="off"
                            tabindex="-1">
+                    <span class="highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
                     <div class="typeahead-results">
                         <div class="results-list-container" id="location-venue-{{ field.id }}-results"></div>
@@ -35,6 +36,7 @@
                            placeholder="{% trans %}Room{% endtrans %}"
                            autocomplete="off"
                            tabindex="-1">
+                    <span class="highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
                     <div class="typeahead-results">
                         <div class="results-list-container" id="location-room-{{ field.id }}-results"></div>
@@ -166,6 +168,11 @@
                 inputField.trigger('typeahead:close-results-list');
             }
 
+            function highlightOption(inputField, value) {
+                var highlighter = inputField.parent().find('.highlighter');
+                highlighter.html(value).addClass('visible');
+            }
+
             function cleanQuery(query) {
                 return query ? query.trim() : '';
             }
@@ -199,6 +206,9 @@
                     },
                     onSearch: function(node, query) {
                         this.query = cleanQuery(query);
+                    },
+                    onShowLayout: function(node, query) {
+                        venueInput.parent().find('.highlighter').removeClass('visible');
                     }
                 }
             });
@@ -226,12 +236,16 @@
                         postSelectionActions(roomInput, item.name);
                         roomInput.trigger('blur');
                         latestSelectedOption = {field: node.attr('id'), value: item.name}
+                        highlightOption(roomInput, item.name);
                     },
                     onLayoutBuiltBefore: function(node, query, result, resultHtmlList) {
                         return updateResultsList(node, resultHtmlList);
                     },
                     onSearch: function(node, query) {
                         this.query = cleanQuery(query);
+                    },
+                    onShowLayout: function(node, query) {
+                        roomInput.parent().find('.highlighter').removeClass('visible');
                     }
                 }
             });
@@ -240,10 +254,12 @@
                 if (hiddenData.venue_id && data.venue_id != hiddenData.venue_id) {
                     delete hiddenData.room_id;
                     roomInput.val('');
+                    roomInput.parent().find('.highlighter').removeClass('visible');
                 }
                 hiddenData.venue_name = data.item_name;
                 hiddenData.venue_id = data.venue_id;
                 postSelectionActions(venueInput, data.item_name);
+                highlightOption(venueInput, data.item_name);
             })
             .on('typeahead:click-on-custom-option', function(e, data) {
                 if (hiddenData.room_id) {
@@ -324,6 +340,10 @@
             address.on('keyup', function() {
                 hiddenData.address = address.val();
                 field.val(JSON.stringify(hiddenData)).trigger('change');
+            });
+
+            $('.typeahead-field .highlighter').on('click', function() {
+                $(this).parent().find('.i-location-input-field').trigger('focus.typeahead');
             });
         })();
     </script>
