@@ -40,6 +40,12 @@
         table-layout: fixed;
 
         tr {
+            th {
+                &.speaker-column {
+                    width: 5%;
+                }
+            }
+
             td {
                 &.email-column {
                     white-space: normal;

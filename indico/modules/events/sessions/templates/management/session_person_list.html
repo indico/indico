@@ -37,38 +37,42 @@
                     <th class="i-table">{% trans %}Email{% endtrans %}</th>
                     <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
                     <th class="i-table">{% trans %}Author type{% endtrans %}</th>
-                    <th class="i-table" data-sorter="false"></th>
+                    <th class="i-table speaker-column" data-sorter="false"></th>
                 </tr>
             </thead>
             <tbody>
-                {% for session_person in session_persons -%}
-                    {% set event_person = session_person.person %}
-                    {% set is_speaker = session_person.is_speaker %}
-                    {% set is_primary_author = session_person.author_type.name == 'primary' %}
-                    {% set is_secondary_author = session_person.author_type.name == 'secondary' %}
+                {% for event_person, person_roles in session_persons.iteritems() -%}
+                    {% set is_speaker = person_roles.speaker %}
                     {% set person_data = dict(speaker=is_speaker,
-                                              primary=is_primary_author,
-                                              secondary=is_secondary_author) %}
+                                              primary=person_roles.primary_author,
+                                              secondary=person_roles.secondary_author) %}
                     <tr class="i-table" data-person-roles="{{ person_data | tojson | forceescape }}">
                         <td class="i-table">
-                            <input type="checkbox" value="{{ event_person.id }}" class="select-row"
-                                   name="person_id">
+                            <input type="checkbox" value="{{ event_person.id }}" class="select-row" name="person_id"
+                                   {{ 'disabled' if not event_person.email }}>
                         </td>
                         <td class="i-table">{{ event_person.full_name }}</td>
                         <td class="i-table email-column">{{ event_person.email }}</td>
                         <td class="i-table">{{ event_person.affiliation }}</td>
                         <td class="i-table">
-                            {%- if is_primary_author %}
-                                {%- trans %}Primary{% endtrans -%}
-                            {% elif is_secondary_author %}
-                                {%- trans %}Secondary{% endtrans -%}
+                            {% if person_roles.primary_author or person_roles.secondary_author %}
+                                {% if person_roles.primary_author %}
+                                    {% trans %}Primary{% endtrans %}
+                                {% elif person_roles.secondary_author %}
+                                    {% trans %}, secondary{% endtrans %}
+                                {% endif %}
                             {% else %}
-                                {%- trans %}None{% endtrans -%}
-                            {% endif -%}
+                                -
+                            {% endif %}
                         </td>
                         <td class="i-table">
-                            <i class="icon-mic speaker-icon {{- ' inactive' if not is_speaker else '' -}}"
-                               title="{{- _('This person is{} a speaker').format((' not' if not is_primary_author else '')) -}}"></i>
+                            {%- if is_speaker %}
+                                {% set speaker_title = _('This person is a speaker') %}
+                            {%- else -%}
+                                {% set speaker_title = _('This person is not a speaker') %}
+                            {% endif -%}
+                            <i class="icon-mic speaker-icon {{ 'inactive' if not is_speaker }}"
+                               title="{{ speaker_title }}"></i>
                         </td>
                     </tr>
                 {%- else -%}
