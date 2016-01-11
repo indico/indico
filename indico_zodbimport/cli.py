@@ -39,6 +39,8 @@ from indico.util.decorators import classproperty
 from indico.web.flask.wrappers import IndicoFlask
 from indico_zodbimport.util import UnbreakingDB, get_storage
 
+click.disable_unicode_literals_warning = True
+
 
 @click.group()
 @click.argument('sqlalchemy-uri')
