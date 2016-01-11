@@ -56,11 +56,9 @@
                         <td class="i-table">{{ event_person.affiliation }}</td>
                         <td class="i-table">
                             {% if person_roles.primary_author or person_roles.secondary_author %}
-                                {% if person_roles.primary_author %}
-                                    {% trans %}Primary{% endtrans %}
-                                {% elif person_roles.secondary_author %}
-                                    {% trans %}, secondary{% endtrans %}
-                                {% endif %}
+                                {% set author_types = [_('Primary') if person_roles.primary_author,
+                                                       _('Secondary') if person_roles.secondary_author] %}
+                                {{ author_types | reject('undefined') | join(', ') }}
                             {% else %}
                                 -
                             {% endif %}
