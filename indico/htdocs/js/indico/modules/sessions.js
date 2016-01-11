@@ -60,7 +60,7 @@
     };
 
     global.setupSessionPersonsList = function setupSessionPersonsList() {
-        enableIfChecked('#persons-list', '.select-row', '#persons-list .js-requires-selected-row');
+        enableIfChecked('#persons-list', '.select-row:visible', '#persons-list .js-requires-selected-row');
         $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
 
         $('#persons-list [data-filter]').on('click', function() {
@@ -79,6 +79,7 @@
 
             personRows.hide();
             visibleEntries.show();
+            $('#persons-list').trigger('indico:syncEnableIfChecked');
         });
 
         $('#persons-list td').on('mouseenter', function() {
