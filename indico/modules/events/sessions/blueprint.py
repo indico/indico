@@ -36,4 +36,4 @@ _bp.add_url_rule('/manage/sessions/<int:session_id>', 'session_rest', RHSessionR
 _bp.add_url_rule('/manage/sessions/<int:session_id>/modify', 'modify_session', RHModifySession, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/sessions/person-list/', 'person_list', RHSessionPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/sessions/person-list/email', 'email_session_persons', RHSessionsEmailPersons,
-                 methods=('GET', 'POST'))
+                 methods=('POST',))
