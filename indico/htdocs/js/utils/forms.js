@@ -150,6 +150,8 @@
 
         $(checkboxContainer).on('change', checkboxSelector, function() {
             _update(this.checked);
+        }).on('indico:syncEnableIfChecked', function() {
+            _update();
         });
 
         _update();
