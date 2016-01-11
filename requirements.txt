@@ -67,7 +67,7 @@ Flask-Migrate==1.2.0
 Flask-Script==2.0.5
 git+https://github.com/indico/flask-pluginengine.git
 git+https://github.com/indico/flask-multipass.git
-click==3.3
+click==6.2
 colorclass==1.0.2
 itsdangerous==0.24
 celery==3.1.19
