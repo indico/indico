@@ -540,7 +540,7 @@ class IndicoStaticTextField(Field):
     widget = JinjaWidget('forms/static_text_widget.html')
 
     def __init__(self, *args, **kwargs):
-        self.text_value = kwargs.pop('text')
+        self.text_value = kwargs.pop('text', '')
         super(IndicoStaticTextField, self).__init__(*args, **kwargs)
 
     def _value(self):
