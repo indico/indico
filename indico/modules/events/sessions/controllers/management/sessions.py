@@ -20,6 +20,7 @@ import random
 from collections import defaultdict
 
 from flask import request, jsonify, flash
+from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -33,7 +34,7 @@ from indico.modules.events.sessions.controllers.management import (RHManageSessi
                                                                    RHManageSessionsActionsBase)
 from indico.modules.events.sessions.forms import SessionForm, EmailSessionPersonsForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
-from indico.modules.events.sessions.util import (get_colors, get_active_sessions, generate_csv_from_sessions,
+from indico.modules.events.sessions.util import (get_colors, query_active_sessions, generate_csv_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.util.i18n import _, ngettext
@@ -44,7 +45,11 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 def _get_session_list_args(event):
-    return {'sessions': get_active_sessions(event), 'default_colors': get_colors()}
+    sessions = (query_active_sessions(event)
+                .options(subqueryload('contributions'),
+                         subqueryload('blocks').joinedload('contributions'))
+                .all())
+    return {'sessions': sessions, 'default_colors': get_colors()}
 
 
 def _render_session_list(event):

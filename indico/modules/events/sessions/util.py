@@ -58,11 +58,10 @@ def get_colors():
     ]
 
 
-def get_active_sessions(event):
+def query_active_sessions(event):
     return (event.sessions
             .filter_by(is_deleted=False)
-            .order_by(db.func.lower(Session.title))
-            .all())
+            .order_by(db.func.lower(Session.title)))
 
 
 def can_manage_sessions(user, event, role=None):
