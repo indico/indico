@@ -25,11 +25,10 @@
 {% endblock %}
 
 
-{% macro render_registration_info() %}
-    <strong>{{ registration.registration_form.title }}</strong>
+{% macro render_registration_info() -%}
     for the event <strong>{{ event.title }}</strong>
     under <strong>{{ registration.full_name }}</strong>
-{% endmacro %}
+{%- endmacro %}
 
 
 {% macro render_text_pending() %}

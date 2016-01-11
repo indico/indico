@@ -46,7 +46,7 @@ class RegistrationEditMixin:
 
         if form.validate_on_submit():
             data = form.data
-            notify_user = data.pop('notify_user', False)
+            notify_user = not self.management or data.pop('notify_user', False)
             modify_registration(self.registration, data, management=self.management, notify_user=notify_user)
             return redirect(self.success_url)
         elif form.is_submitted():

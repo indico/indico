@@ -1,5 +1,5 @@
 <%def name="renderDescription(text)">
-    <span itemprop="description">${text}</span>
+    <span itemprop="description" class="contrib-description ${'html' if isStringHTML(text) else 'plain'}">${text}</span>
 </%def>
 
 <%def name="renderLocation(item, parent=None, span='')">

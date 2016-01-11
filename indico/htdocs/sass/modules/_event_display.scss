@@ -178,3 +178,9 @@ li > table + .note-area-wrapper {
         }
     }
 }
+
+.contrib-description {
+    &.plain {
+        white-space: pre-line;
+    }
+}
