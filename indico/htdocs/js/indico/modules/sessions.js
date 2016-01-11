@@ -64,10 +64,10 @@
         $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
 
         $('#persons-list [data-filter]').on('click', function() {
+            var personRows = $('#persons-list tr[data-person-roles]');
             var filters = $('#persons-list [data-filter]:checked').map(function() {
                 return $(this).data('filter');
             }).get();
-            var personRows = $('#persons-list tr[data-person-roles]');
 
             var visibleEntries = personRows.filter(function() {
                 var $this = $(this);

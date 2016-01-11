@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import random
+from collections import defaultdict
 
 from flask import request, jsonify, flash
 from werkzeug.exceptions import BadRequest
@@ -24,7 +25,8 @@ from werkzeug.exceptions import BadRequest
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
+from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
+                                                                AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
@@ -143,8 +145,16 @@ class RHSessionPersonList(RHManageSessionsActionsBase):
                                .find(SubContributionPersonLink.subcontribution
                                      .has(SubContribution.contribution.has(Contribution.session_id.in_(session_ids))))
                                .all())
+
+        session_persons_dict = defaultdict(lambda: {'speaker': False, 'primary_author': False,
+                                                    'secondary_author': False})
+        for session_person in session_persons:
+            person_roles = session_persons_dict[session_person.person]
+            person_roles['speaker'] |= session_person.is_speaker
+            person_roles['primary_author'] |= session_person.author_type == AuthorType.primary
+            person_roles['secondary_author'] |= session_person.author_type == AuthorType.secondary
         return jsonify_template('events/sessions/management/session_person_list.html',
-                                session_persons=session_persons, event=self.event_new)
+                                session_persons=session_persons_dict, event=self.event_new)
 
 
 class RHSessionsEmailPersons(RHManageSessionsBase):
