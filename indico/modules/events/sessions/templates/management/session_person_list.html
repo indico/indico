@@ -21,9 +21,9 @@
                 <span class="i-button label">{% trans %}Show{% endtrans %}</span>
                 <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
                 <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
-                <input type="checkbox" name="authors" id="filter-primary" data-filter="primary" checked>
+                <input type="checkbox" name="authors" id="filter-primary" data-filter="primary_author" checked>
                 <label for="filter-primary" class="i-button">{% trans %}Primary authors{% endtrans %}</label>
-                <input type="checkbox" name="authors" id="filter-secondary" data-filter="secondary" checked>
+                <input type="checkbox" name="authors" id="filter-secondary" data-filter="secondary_author" checked>
                 <label for="filter-secondary" class="i-button">{% trans %}Co-authors{% endtrans %}</label>
             </div>
         </div>
@@ -43,10 +43,7 @@
             <tbody>
                 {% for event_person, person_roles in session_persons.iteritems() -%}
                     {% set is_speaker = person_roles.speaker %}
-                    {% set person_data = dict(speaker=is_speaker,
-                                              primary=person_roles.primary_author,
-                                              secondary=person_roles.secondary_author) %}
-                    <tr class="i-table" data-person-roles="{{ person_data | tojson | forceescape }}">
+                    <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
                         <td class="i-table">
                             <input type="checkbox" value="{{ event_person.id }}" class="select-row" name="person_id"
                                    {{ 'disabled' if not event_person.email }}>
