@@ -75,15 +75,15 @@ def upgrade():
                                'link_type != 4 OR (category_id IS NULL AND contribution_id IS NULL AND '
                                'linked_event_id IS NULL AND session_id IS NULL AND subcontribution_id IS NOT NULL)',
                                schema='attachments')
-    op.drop_column('folders', 'legacy_session_id', schema='attachments')
-    op.drop_column('folders', 'legacy_contribution_id', schema='attachments')
-    op.drop_column('folders', 'legacy_subcontribution_id', schema='attachments')
+    # op.drop_column('folders', 'legacy_session_id', schema='attachments')
+    # op.drop_column('folders', 'legacy_contribution_id', schema='attachments')
+    # op.drop_column('folders', 'legacy_subcontribution_id', schema='attachments')
 
 
 def downgrade():
-    op.add_column('folders', sa.Column('legacy_session_id', sa.String(), nullable=True), schema='attachments')
-    op.add_column('folders', sa.Column('legacy_contribution_id', sa.String(), nullable=True), schema='attachments')
-    op.add_column('folders', sa.Column('legacy_subcontribution_id', sa.String(), nullable=True), schema='attachments')
+    # op.add_column('folders', sa.Column('legacy_session_id', sa.String(), nullable=True), schema='attachments')
+    # op.add_column('folders', sa.Column('legacy_contribution_id', sa.String(), nullable=True), schema='attachments')
+    # op.add_column('folders', sa.Column('legacy_subcontribution_id', sa.String(), nullable=True), schema='attachments')
     op.drop_constraint('ck_folders_valid_session_link', 'folders', schema='attachments')
     op.drop_constraint('ck_folders_valid_contribution_link', 'folders', schema='attachments')
     op.drop_constraint('ck_folders_valid_subcontribution_link', 'folders', schema='attachments')
