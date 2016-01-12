@@ -29,7 +29,8 @@ from indico.web.menu import SideMenuItem, SideMenuSection
 
 @template_hook('event-manage-header')
 def _add_action_menu(event, **kwargs):
-    return render_template('events/management/action_menu.html', event=event, can_lock=can_lock(event, session.user))
+    return render_template('events/management/action_menu.html', event=event, can_lock=can_lock(event, session.user),
+                           can_manage=event.as_event.can_manage(session.user))
 
 
 @signals.menu.sections.connect_via('event-management-sidemenu')
