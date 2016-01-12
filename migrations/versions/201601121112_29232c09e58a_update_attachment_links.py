@@ -1,7 +1,7 @@
 """Update attachment links
 
 Revision ID: 29232c09e58a
-Revises: 421ef2bc48ae
+Revises: 30421387bea5
 Create Date: 2016-01-06 11:18:01.623744
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '29232c09e58a'
-down_revision = '421ef2bc48ae'
+down_revision = '30421387bea5'
 
 
 def upgrade():

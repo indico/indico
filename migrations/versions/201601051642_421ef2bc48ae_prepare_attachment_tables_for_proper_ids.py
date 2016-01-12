@@ -1,7 +1,7 @@
 """Prepare attachment tables for proper IDs
 
 Revision ID: 421ef2bc48ae
-Revises: 30421387bea5
+Revises: 3977853711e4
 Create Date: 2016-01-05 16:42:27.139437
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '421ef2bc48ae'
-down_revision = '30421387bea5'
+down_revision = '3977853711e4'
 
 
 LEGACY_TABLES = ('legacy_folder_id_map', 'legacy_attachment_id_map')
