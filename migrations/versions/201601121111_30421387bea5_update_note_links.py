@@ -1,7 +1,7 @@
 """Update note links
 
 Revision ID: 30421387bea5
-Revises: 3977853711e4
+Revises: 421ef2bc48ae
 Create Date: 2016-01-04 10:00:35.572008
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '30421387bea5'
-down_revision = '3977853711e4'
+down_revision = '421ef2bc48ae'
 
 
 def upgrade():
