@@ -20,6 +20,7 @@ from sqlalchemy.event import listens_for
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
@@ -203,3 +204,6 @@ def _set_contribution(target, value, *unused):
 @listens_for(TimetableEntry.break_, 'set')
 def _set_break(target, value, *unused):
     target.type = TimetableEntryType.BREAK
+
+
+populate_one_to_one_backrefs(TimetableEntry, 'session_block', 'contribution', 'break_')

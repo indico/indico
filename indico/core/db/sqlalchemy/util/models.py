@@ -20,9 +20,10 @@ from importlib import import_module
 
 from flask import g
 from flask_sqlalchemy import Model
-from sqlalchemy import inspect
+from sqlalchemy import inspect, orm
+from sqlalchemy.event import listens_for
 from sqlalchemy.orm import joinedload, contains_eager
-from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core import signals
@@ -263,3 +264,30 @@ def auto_table_args(cls, **extra_kwargs):
         return kwargs
     else:
         return tuple(posargs)
+
+
+def _get_backref_name(relationship):
+    return relationship.backref if isinstance(relationship.backref, basestring) else relationship.backref[0]
+
+
+def populate_one_to_one_backrefs(model, *relationships):
+    """Populates the backref of a one-to-one relationship on load
+
+    See this post in the SQLAlchemy docs on why it's useful/necessary:
+    http://docs.sqlalchemy.org/en/latest/orm/loading_relationships.html#creating-custom-load-rules
+
+    :param model: The model class.
+    :param relationships: The names of the relationships.
+    """
+    assert relationships
+
+    @listens_for(orm.mapper, 'after_configured', once=True)
+    def _mappers_configured():
+        mappings = {rel.key: _get_backref_name(rel) for rel in inspect(model).relationships if rel.key in relationships}
+
+        @listens_for(model, 'load')
+        def _populate_backrefs(target, context):
+            for name, backref in mappings.iteritems():
+                # __dict__ to avoid triggering lazy-loaded relationships
+                if target.__dict__.get(name) is not None:
+                    set_committed_value(getattr(target, name), backref, target)
