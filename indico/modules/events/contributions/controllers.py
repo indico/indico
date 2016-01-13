@@ -27,6 +27,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 from indico.util.i18n import _, ngettext
+from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -52,6 +53,9 @@ class RHManageContributionsBase(RHConferenceModifBase):
     """Base class for all contributions management RHs"""
 
     CSRF_ENABLED = True
+
+    def _process(self):
+        return RH._process(self)
 
 
 class RHManageContributionBase(RHManageContributionsBase):
@@ -105,13 +109,6 @@ class RHEditContribution(RHManageContributionBase):
         return jsonify_form(form)
 
 
-class RHDeleteContribution(RHManageContributionBase):
-    def _process(self):
-        delete_contribution(self.contrib)
-        flash(_("Contribution '{}' successfully deleted").format(self.contrib), 'success')
-        return jsonify_data(html=_render_contribution_list(self.event_new))
-
-
 class RHDeleteContributions(RHManageContributionsActionsBase):
     def _process(self):
         for contrib in self.contribs:
@@ -120,4 +117,11 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         flash(ngettext("The contribution has been deleted.",
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
+        return jsonify_data(html=_render_contribution_list(self.event_new))
+
+
+class RHContributionREST(RHManageContributionBase):
+    def _process_DELETE(self):
+        delete_contribution(self.contrib)
+        flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(html=_render_contribution_list(self.event_new))
