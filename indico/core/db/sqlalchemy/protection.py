@@ -73,6 +73,17 @@ class ProtectionMixin(object):
         return self.protection_mode == ProtectionMode.protected
 
     @property
+    def is_protected_recursive(self):
+        """
+        Checks whether ths object is protected, either itself or by
+        inheriting from a protected object.
+        """
+        if self.is_inheriting:
+            return self.protection_parent.is_protected_recursive
+        else:
+            return self.is_protected
+
+    @property
     def protection_repr(self):
         protection_mode = self.protection_mode.name if self.protection_mode is not None else None
         return 'protection_mode={}'.format(protection_mode)
