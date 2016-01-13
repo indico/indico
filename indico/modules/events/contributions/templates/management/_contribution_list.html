@@ -108,7 +108,7 @@
                                    data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
                                    data-update="#contribution-list"
                                    data-method="DELETE"
-                                   data-href="{{ url_for('.manage_delete_contrib', contrib) }}"></a>
+                                   data-href="{{ url_for('.manage_contrib_rest', contrib) }}"></a>
                             </td>
                         </tr>
                     {% endfor %}
