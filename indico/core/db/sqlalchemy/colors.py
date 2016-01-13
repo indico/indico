@@ -56,6 +56,10 @@ class ColorTuple(namedtuple('ColorTuple', ('text', 'background'))):
     def __nonzero__(self):
         return all(self)
 
+    @property
+    def css(self):
+        return 'color: #{} !important; background: #{} !important'.format(self.text, self.background)
+
 
 class ColorMixin(object):
     """Mixin to store text+background colors in a model.
