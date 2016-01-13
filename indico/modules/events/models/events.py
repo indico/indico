@@ -274,6 +274,10 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         return (super(Event, self).can_manage(user, role, *args, **kwargs) or
                 bool(allow_key and user and self.as_legacy.canKeyModify()))
 
+    @property
+    def is_protected_recursive(self):
+        return self.as_legacy.isProtected()
+
     @memoize_request
     def has_feature(self, feature):
         """Checks if a feature is enabled for the event"""
