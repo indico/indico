@@ -60,30 +60,15 @@
 
             ul.dropdown {
                 position: absolute;
-            }
-
-            ul.dropdown li {
                 font-size: 13px;
-            }
 
-            a:link, .fakeLink {
-                color: #0b63a5;
-            }
+                li a {
+                    color: $dark-blue;
+                }
 
-            a:visited {
-               color: #0b63a5;
-               text-decoration: none;
-            }
-            a:active {
-               color: #E25300;
-            }
-            a:hover, .fakeLink:hover {
-               color: #E25300;
-               cursor: pointer;
-            }
-
-            ul.dropdown li:hover a {
-                color: #888;
+                li:hover a {
+                    color: $dark-gray;
+                }
             }
         }
 
