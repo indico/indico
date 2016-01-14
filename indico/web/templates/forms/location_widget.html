@@ -311,7 +311,11 @@
                 var $this = $(this);
                 if (e.keyCode == 9) { // on tab
                     e.preventDefault();
-                    $this.trigger('typeahead:close-results-list')
+                    // trigger the return key
+                    var returnKey = jQuery.Event("keydown");
+                    returnKey.which = 13;
+                    returnKey.keyCode = 13;
+                    $this.trigger(returnKey);
                 } else if (e.keyCode == 27) { // on esc
                     e.preventDefault();
                     latestUsedField.trigger('typeahead:click-on-clear-button');
