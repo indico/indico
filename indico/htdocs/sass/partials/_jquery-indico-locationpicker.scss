@@ -70,8 +70,12 @@
 
             &.backdrop {
                 .i-location-input-field {
-                    background-color: white;
                     z-index: 1050 !important;
+
+                    &.typeahead-hint {
+                        z-index: -1 !important;
+                        background-color: white !important;
+                    }
                 }
 
                 .just-use-option {

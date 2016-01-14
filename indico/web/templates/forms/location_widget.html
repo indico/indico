@@ -195,6 +195,7 @@
                 },
                 display: 'name',
                 backdrop: true,
+                hint: true,
                 callback: {
                     onClickAfter: function(node, a, item, event) {
                         reorderCategories(item);
@@ -219,6 +220,7 @@
                 minLength: 0,
                 searchOnFocus: true,
                 group: true,
+                hint: true,
                 maxItem: 0,
                 resultContainer: '#' + roomInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
                 template: {% raw %}'<span>{{name}}</span>'{% endraw %},
