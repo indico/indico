@@ -150,6 +150,11 @@ class EventPerson(db.Model):
     def __repr__(self):
         return format_repr(self, 'id', _text=self.full_name)
 
+    @classmethod
+    def create_from_user(self, user):
+        return EventPerson(user=user, first_name=user.first_name, last_name=user.last_name, email=user.email,
+                           affiliation=user.affiliation, address=user.address, phone=user.phone)
+
 
 class PersonLinkBase(db.Model):
     """Base class for EventPerson associations."""
