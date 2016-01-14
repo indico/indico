@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {% assets 'auth_sass' -%}
+        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+{% endblock %}
+
+{% block body %}
+    <div class="wrapper">
+        <div class="main">
+            <div class="layout-wrapper login-page">
+                <div class="middle">
+                    <div class="centered-column-wrapper">
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,64 +1,48 @@
-{% extends 'base.html' %}
+{% extends 'layout/auth_base.html' %}
 
-{% block head %}
-    {% assets 'auth_sass' -%}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
-{% endblock %}
-
-{% block body %}
-    <div class="wrapper">
-        <div class="main">
-            <div class="fixed-width-page layout-wrapper login-page">
-                <div class="middle">
-                    <div class="centered-column-wrapper">
-                        <div class="centered-column wide">
-                            <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
-                            {% block auth_content %}
-                                <div class="i-box app-auth-box">
-                                    <div class="app-auth-box-content">
-                                        <div class="row">
-                                            {# TODO: replace icons with user profile image and app logo #}
-                                            <div class="column col-50">
-                                                <div class="auth-stakeholder-info right">
-                                                    <i class="icon-user"></i>
-                                                    <div>{{ session.user.full_name }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="column col-50">
-                                                <div class="auth-stakeholder-info left">
-                                                    <i class="icon-settings"></i>
-                                                    <div>{{ application.name }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr class="inline">
-                                        <div class="row">
-                                            <div class="auth-scopes">
-                                                <span class="bold">{{ application.name }}</span> {% trans %}is requesting the following permissions:{% endtrans %}
-                                                <ul>
-                                                    {% for scope in authorized_scopes|sort %}
-                                                        <li class="authorized" title="{% trans %}Permission already authorized{% endtrans %}">{{ scope }}</li>
-                                                    {% endfor %}
-                                                    {% for scope in new_scopes|sort %}
-                                                        <li>{{ scope }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="button-wrapper">
-                                    <form method="POST">
-                                        <input type="submit" name="confirm" class="i-button big highlight right" value="{% trans %}Authorize{% endtrans %}">
-                                        <button class="i-button big right">{% trans %}Cancel{% endtrans %}</button>
-                                    </form>
-                                </div>
-                            {% endblock %}
+{% block content %}
+    <div class="centered-column wide">
+        <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+        {% block auth_content %}
+            <div class="i-box app-auth-box">
+                <div class="app-auth-box-content">
+                    <div class="row">
+                        {# TODO: replace icons with user profile image and app logo #}
+                        <div class="column col-50">
+                            <div class="auth-stakeholder-info right">
+                                <i class="icon-user"></i>
+                                <div>{{ session.user.full_name }}</div>
+                            </div>
+                        </div>
+                        <div class="column col-50">
+                            <div class="auth-stakeholder-info left">
+                                <i class="icon-settings"></i>
+                                <div>{{ application.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="inline">
+                    <div class="row">
+                        <div class="auth-scopes">
+                            <span class="bold">{{ application.name }}</span> {% trans %}is requesting the following permissions:{% endtrans %}
+                            <ul>
+                                {% for scope in authorized_scopes|sort %}
+                                    <li class="authorized" title="{% trans %}Permission already authorized{% endtrans %}">{{ scope }}</li>
+                                {% endfor %}
+                                {% for scope in new_scopes|sort %}
+                                    <li>{{ scope }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="button-wrapper">
+                <form method="POST">
+                    <input type="submit" name="confirm" class="i-button big highlight right" value="{% trans %}Authorize{% endtrans %}">
+                    <button class="i-button big right">{% trans %}Cancel{% endtrans %}</button>
+                </form>
+            </div>
+        {% endblock %}
     </div>
 {% endblock %}
