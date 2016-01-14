@@ -1,97 +1,81 @@
-{% extends 'base.html' %}
+{% extends 'layout/auth_base.html' %}
 {% from 'auth/_login_form.html' import login_form %}
 
-{% block head %}
-    {% assets 'auth_sass' -%}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
-{% endblock %}
-
-{% block body %}
-    <div class="wrapper">
-        <div class="main">
-            <div class="fixed-width-page layout-wrapper login-page">
-                <div class="middle">
-                    <div class="centered-column-wrapper">
-                        <div class="centered-column">
-                            {% if active_provider %}
-                                <div class="login-container clearfix">
-                                    <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
-                                    {% if login_reason %}
-                                        <div class="login-reason-box">
-                                            {{ login_reason }}
-                                        </div>
-                                    {% endif %}
-                                    {% include 'flashed_messages.html' %}
-                                    <div id="form-wrapper">
-                                        {{ login_form(active_provider, form) }}
-                                    </div>
-                                    <button class="i-button login-form-button" data-provider="{{ active_provider.title }}"
-                                            data-href="{{ url_for('auth.login_form', provider=active_provider.name) }}">
-                                        {%- trans name=active_provider.title %}Login with {{ name }}{% endtrans -%}
-                                    </button>
-                                </div>
-                                {% set other_local_providers = providers|rejectattr('is_external')|reject('equalto', active_provider)|list %}
-                                {% if other_local_providers %}
-                                    <div class="seperator-line-center">
-                                        <span class="seperator-text">{% trans %}or change authentication provider{% endtrans %}</span>
-                                    </div>
-                                    <div class="login-providers providers-with-form">
-                                        {% for provider in other_local_providers %}
-                                            <button class="i-button provider-with-form" data-provider="{{ provider.title }}"
-                                                    data-href="{{ url_for('auth.login_form', provider=provider.name) }}">
-                                                {{- provider.title -}}
-                                            </button>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            {% else %}
-                                <div class="login-container clearfix">
-                                    <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
-                                    {% include 'flashed_messages.html' %}
-                                </div>
-                            {% endif %}
-                            {% set external_providers = providers|selectattr('is_external')|sort(attribute='title') %}
-                            {% if external_providers %}
-                                <div class="seperator-line-center">
-                                    <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
-                                </div>
-                                <div class="login-providers external">
-                                    {% for provider in external_providers %}
-                                        <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
-                                           class="i-button external-provider-{{ provider.name }}">
-                                           {{- provider.title -}}
-                                        </a>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            {% if indico_config.LocalIdentities %}
-                                <p class="register">
-                                    {% trans url=url_for('.register', next=request.args.get('next')) -%}
-                                        If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
-                                    {%- endtrans %}
-                                </p>
-                            {% elif indico_config.ExternalRegistrationURL %}
-                                <p class="register">
-                                    {% trans url=indico_config.ExternalRegistrationURL -%}
-                                        If you do not have an account yet, you can <a href="{{ url }}" target="_blank">create one here</a>.
-                                    {%- endtrans %}
-                                </p>
-                            {% endif %}
-                            <div class="link">
-                                <a class="icon-prev" href="/">{% trans %}Back{% endtrans %}</a>
-                            </div>
-                        </div>
-                        <div id="footer" class="footer footerCERN">
-                            <a id="cern_link" href="http://cern.ch">
-                                <img src="{{ indico_config.config.getSystemIconURL('cern_small') }}" alt="CERN" class="cern_logo" style="vertical-align: middle; margin: 15px;">
-                            </a>
-                            <div class="text">{% trans %}Powered by{% endtrans %} <a href="http://indico-software.org">Indico</a></div>
-                        </div>
+{% block content %}
+    <div class="centered-column">
+        {% if active_provider %}
+            <div class="login-container clearfix">
+                <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                {% if login_reason %}
+                    <div class="login-reason-box">
+                        {{ login_reason }}
                     </div>
+                {% endif %}
+                {% include 'flashed_messages.html' %}
+                <div id="form-wrapper">
+                    {{ login_form(active_provider, form) }}
                 </div>
+                <button class="i-button login-form-button" data-provider="{{ active_provider.title }}"
+                        data-href="{{ url_for('auth.login_form', provider=active_provider.name) }}">
+                    {%- trans name=active_provider.title %}Login with {{ name }}{% endtrans -%}
+                </button>
             </div>
+            {% set other_local_providers = providers|rejectattr('is_external')|reject('equalto', active_provider)|list %}
+            {% if other_local_providers %}
+                <div class="seperator-line-center">
+                    <span class="seperator-text">{% trans %}or change authentication provider{% endtrans %}</span>
+                </div>
+                <div class="login-providers providers-with-form">
+                    {% for provider in other_local_providers %}
+                        <button class="i-button provider-with-form" data-provider="{{ provider.title }}"
+                                data-href="{{ url_for('auth.login_form', provider=provider.name) }}">
+                            {{- provider.title -}}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="login-container clearfix">
+                <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                {% include 'flashed_messages.html' %}
+            </div>
+        {% endif %}
+        {% set external_providers = providers|selectattr('is_external')|sort(attribute='title') %}
+        {% if external_providers %}
+            <div class="seperator-line-center">
+                <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
+            </div>
+            <div class="login-providers external">
+                {% for provider in external_providers %}
+                    <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
+                       class="i-button external-provider-{{ provider.name }}">
+                       {{- provider.title -}}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if indico_config.LocalIdentities %}
+            <p class="register">
+                {% trans url=url_for('.register', next=request.args.get('next')) -%}
+                    If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
+                {%- endtrans %}
+            </p>
+        {% elif indico_config.ExternalRegistrationURL %}
+            <p class="register">
+                {% trans url=indico_config.ExternalRegistrationURL -%}
+                    If you do not have an account yet, you can <a href="{{ url }}" target="_blank">create one here</a>.
+                {%- endtrans %}
+            </p>
+        {% endif %}
+        <div class="link">
+            <a class="icon-prev" href="/">{% trans %}Back{% endtrans %}</a>
         </div>
+    </div>
+    <div id="footer" class="footer footerCERN">
+        <a id="cern_link" href="http://cern.ch">
+            <img src="{{ indico_config.config.getSystemIconURL('cern_small') }}" alt="CERN" class="cern_logo" style="vertical-align: middle; margin: 15px;">
+        </a>
+        <div class="text">{% trans %}Powered by{% endtrans %} <a href="http://indico-software.org">Indico</a></div>
     </div>
 
     <script>
