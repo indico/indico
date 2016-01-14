@@ -104,6 +104,7 @@
             > select,
             > input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
             input.clearabletext,
+            .clearableinput,
             .i-form-field-width {
                 width: 400px;
             }

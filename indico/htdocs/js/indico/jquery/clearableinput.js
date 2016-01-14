@@ -39,7 +39,7 @@
                 });
 
             self.element.addClass('clearabletext');
-            self.element.wrap($('<div>', {'class': self.options.clearClass}))
+            self.element.wrap($('<span>', {'class': self.options.clearClass}))
                 .on('input', function() {
                     self._handleInput();
                 })

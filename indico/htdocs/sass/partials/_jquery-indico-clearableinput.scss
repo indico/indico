@@ -1,8 +1,8 @@
 .clearableinput {
+    display: inline-block;
     position: relative;
 
     .clearabletext {
-        display: block !important;
         padding-right: 1.7em !important;
 
         &.actionabletext {
