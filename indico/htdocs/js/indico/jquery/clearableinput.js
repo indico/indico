@@ -50,10 +50,6 @@
                             self._clear();
                         }
                     }
-                    // TODO remove when support for IE9 is dropped
-                    if (e.which == K.BACKSPACE || e.which == K.DELETE) {
-                        self._handleInput();
-                    }
                 });
 
             self.buttonBox.append(self.clearIcon);
