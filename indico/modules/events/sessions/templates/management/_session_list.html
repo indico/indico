@@ -54,7 +54,7 @@
                                 <div class="group right">
                                     <a href="#" class="icon-edit highlight edit-session action-icon"
                                        title="{% trans %}Edit this session{% endtrans %}"
-                                       data-title="{% trans title=sess.title %}Edit session {{ title }}{% endtrans %}"
+                                       data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
                                        data-href="{{ url_for('.modify_session', sess) }}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
