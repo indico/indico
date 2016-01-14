@@ -18,11 +18,21 @@
 (function(global) {
     'use strict';
 
-    $(document).ready(function() {
-        setupContributionList();
-    });
-
-    function setupContributionList() {
-        enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+    function setupTableSorter() {
+        $('#contribution-list .tablesorter').tablesorter({
+            cssAsc: 'header-sort-asc',
+            cssDesc: 'header-sort-desc',
+            cssInfoBlock: 'avoid-sort',
+            headerTemplate: '',
+            sortList: [[1, 0]]
+        });
     }
+
+    global.setupContributionList = function setupContributionList() {
+        setupTableSorter();
+        enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+        $('#contribution-list').on('indico:htmlUpdated', function() {
+            setupTableSorter();
+        });
+    };
 })(window);
