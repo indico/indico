@@ -60,6 +60,12 @@
                                        data-ajax-dialog></a>
                                     <a href="#" class="icon-time highlight action-icon"
                                        title="{% trans %}Go to this session timetable{% endtrans %}"></a>
+                                    <a href="#" class="icon-attachment highlight action-icon"
+                                       title="{% trans %}Manage materials{% endtrans %}"
+                                       data-attachment-editor
+                                       data-title="{% trans title=sess.title %}Manage materials for '{{ title }}'{% endtrans %}"
+                                       data-locator="{{ sess.locator|tojson|forceescape }}">
+                                    </a>
                                     <a href="#" class="icon-remove highlight action-icon"
                                        title="{% trans %}Remove this session{% endtrans %}"
                                        data-method="DELETE"
