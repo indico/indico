@@ -136,9 +136,10 @@ class IndicoModel(Model):
 
         :param data: a dict containing values to populate the object.
         """
+        cls = type(self)
         for key, value in data.iteritems():
-            if not hasattr(self, key):
-                raise ValueError("{} has no attribute '{}'".format(type(self).__name__, key))
+            if not hasattr(cls, key):
+                raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
             setattr(self, key, value)
 
     def __committed__(self, change):
