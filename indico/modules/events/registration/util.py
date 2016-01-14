@@ -23,8 +23,10 @@ from io import BytesIO
 
 from flask import current_app, session
 from sqlalchemy.orm import load_only, joinedload
+from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
+from indico.core.config import Config
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.fields.choices import (ChoiceBaseField, AccommodationField,
@@ -187,7 +189,8 @@ def url_rule_to_angular(endpoint):
     assert not rule.defaults
     segments = [':' + mapping.get(data, data) if is_dynamic else data
                 for is_dynamic, data in rule._trace]
-    return ''.join(segments).split('|', 1)[-1]
+    prefix = url_parse(Config.getInstance().getBaseURL()).path.rstrip('/')
+    return prefix + ''.join(segments).split('|', 1)[-1]
 
 
 def create_registration(regform, data, invitation=None, management=False, notify_user=True):
