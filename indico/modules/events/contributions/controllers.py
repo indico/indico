@@ -35,7 +35,7 @@ def _get_contribution_list_args(event):
     timetable_entry_strategy.lazyload('*')
     contribs = (event.contributions
                 .filter_by(is_deleted=False)
-                .order_by(Contribution.id)
+                .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy)
                 .all())
     sessions = event.sessions.filter_by(is_deleted=False).all()
