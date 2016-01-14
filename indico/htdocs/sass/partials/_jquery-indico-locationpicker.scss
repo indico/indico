@@ -58,11 +58,11 @@
                 .just-use-option {
                     display: none;
                     cursor: pointer;
-                    background-color: $light-gray;
+                    background-color: white;
                     text-align: center;
                     padding: 6px 20px;
 
-                    &:hover {
+                    &:hover, &.active {
                         background-color: #ebebeb;  // same as in typeahead
                     }
                 }
@@ -77,6 +77,7 @@
                 .just-use-option {
                     display: block;
                     border-top: 1px solid rgba(0, 0, 0, 0.15);  // same as in typeahead
+                    font-style: italic;
                 }
 
                 z-index: 1060 !important;
