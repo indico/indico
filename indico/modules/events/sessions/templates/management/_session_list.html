@@ -36,8 +36,7 @@
                             <td class="i-table">
                                 <div class="group">
                                     <a class="i-button icon-palette palette-picker-trigger"
-                                       style="background: #{{ sess.background_color }};
-                                              color: #{{ sess.text_color }} !important;"
+                                       style="{{ sess.colors.css }}"
                                        data-method="PATCH"
                                        data-href="{{ url_for('.session_rest', sess) }}"
                                        data-colors="{{ default_colors | tojson | forceescape }}">
