@@ -1224,7 +1224,8 @@ class WCategModifMain(wcomponents.WTemplated):
         if not self._categ.getSubCategoryList():
             vars['containsEvents'] = True
             vars["removeItemsURL"] = vars["actionConferencesURL"]
-            vars["items"] = self.__getConferenceItems(index.itervalues(), vars["confModifyURLGen"])
+            events = [e for e in index.itervalues() if conference.ConferenceHolder().hasKey(e.getId())]
+            vars["items"] = self.__getConferenceItems(events, vars["confModifyURLGen"])
         else:
             vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )

@@ -159,7 +159,8 @@ class GetPastEventsList(CategoryDisplayBase):
         skip = max(0, self._lastIdx - 100)
         pastEvents = {}
         num = 0
-        for event in islice(index.itervalues(), skip, self._lastIdx):
+        events = [e for e in index.itervalues() if conference.ConferenceHolder().hasKey(e.getId())]
+        for event in islice(events, skip, self._lastIdx):
             sd = event.getStartDate()
             key = (sd.year, sd.month)
             if key not in pastEvents:
