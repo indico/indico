@@ -37,7 +37,7 @@ from indico.util.date_time import localize_as_utc
 from indico.util.i18n import _
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail, sanitize_email
-from indico.web.forms.widgets import JinjaWidget, PasswordWidget
+from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from MaKaC.common.timezoneUtils import DisplayTZ
 
@@ -90,6 +90,27 @@ class JSONField(HiddenField):
     def populate_obj(self, obj, name):
         if self.CAN_POPULATE:
             super(JSONField, self).populate_obj(obj, name)
+
+
+class HiddenFieldList(HiddenField):
+    """A hidden field that handles lists of strings.
+
+    This is done `getlist`-style, i.e. by repeating the input element
+    with the same name for each list item.
+
+    The only case where this field is useful is when you display a
+    form via POST and provide a list of items (e.g. ids) related
+    to the form which needs to be kept when the form is submitted and
+    also need to access it via ``request.form.getlist(...)`` before
+    submitting the form.
+    """
+    widget = HiddenInputs()
+
+    def process_formdata(self, valuelist):
+        self.data = valuelist
+
+    def _value(self):
+        return self.data
 
 
 class TextListField(TextAreaField):
