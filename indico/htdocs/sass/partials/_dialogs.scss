@@ -117,7 +117,7 @@
 
 .dialog-window {
     &.no-page-header {
-        .page-content-header, .page-content-description {
+        header {
             display: none;
         }
     }
