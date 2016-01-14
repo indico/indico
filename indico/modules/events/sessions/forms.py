@@ -32,7 +32,7 @@ from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 class SessionForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()], description=_('Title of the session'))
     code = StringField(_('Session code'), description=_('Code of the session'))
-    description = StringField(_('Description'), description=_('Text describing the session'))
+    description = TextAreaField(_('Description'), description=_('Text describing the session'))
     default_contribution_duration = TimeDeltaField(_('Default contribution duration'), units=('minutes', 'hours'),
                                                    description=_('Specify the default duration of contributions '
                                                                  'within the session'),
