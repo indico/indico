@@ -95,7 +95,7 @@
                                 <a href="#" class="icon-edit"
                                    data-ajax-dialog
                                    data-href="{{ url_for('.manage_update_contrib', contrib) }}"
-                                   data-title="{% trans title=contrib.title %}Edit contribution {{ title }}{% endtrans %}"
+                                   data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
                                    data-update="#contribution-list">
                                 </a>
                                 <a href="#" class="icon-attachment"
@@ -104,7 +104,7 @@
                                     data-locator="{{ contrib.locator|tojson|forceescape }}">
                                 </a>
                                 <a href="#" class="icon-remove"
-                                   data-title="{% trans title=contrib.title %}Delete contribution {{ title }}?{% endtrans %}"
+                                   data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
                                    data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
                                    data-update="#contribution-list"
                                    data-method="DELETE"
