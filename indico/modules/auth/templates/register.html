@@ -1,7 +1,8 @@
-{% extends 'layout/full_page_base.html' %}
+{% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
 {% set show_extra_form = local and not must_verify_email %}
 
+{% block page_class %}fixed-width-standalone-page{% endblock %}
 {% block title %}
     {% trans %}Create a new Indico profile{% endtrans %}
 {% endblock %}

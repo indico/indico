@@ -21,27 +21,7 @@
     max-width: 800px !important;
 }
 
-.fixed-width-page {
-    margin-left: auto;
-    margin-right: auto;
-    width: 1000px;
-
-    .page-content {
-        max-width: 1000px;
-    }
-}
-
-.fixed-width-event-page {
-    margin-left: auto;
-    margin-right: auto;
-    width: 800px;
-
-    .page-content {
-        max-width: 800px;
-    }
-}
-
-.full-width-content-page {
+.full-width-content-wrapper {
     .management-page > .page-content {
         max-width: 100% !important;
     }

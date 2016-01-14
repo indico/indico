@@ -1,7 +1,8 @@
-{% extends 'layout/full_page_base.html' %}
+{% extends 'layout/base.html' %}
 
 {% set show_nav = request.endpoint != 'users.user_dashboard' %}
 
+{% block page_class %}fixed-width-standalone-page{% endblock %}
 {% block title -%}
     {% if user == session.user %}
         {% trans %}My Profile{% endtrans %}
@@ -11,21 +12,25 @@
 {%- endblock %}
 
 {% block content %}
-    <div class="row">
-        {% include 'flashed_messages.html' %}
-    </div>
-    <div class="row">
-        {% if show_nav %}
-            <div class="column col-20">
-                <nav class="menu vertical i-box">
-                    {% for item in user_menu_items %}
-                        <a class="item{% if item.active %} active{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
-                    {% endfor %}
-                </nav>
+    <div class="layout-wrapper">
+        <div class="row">
+            {% include 'flashed_messages.html' %}
+        </div>
+        <div class="row">
+            {% if show_nav %}
+                <div class="column col-20">
+                    <nav class="menu vertical i-box">
+                        {% for item in user_menu_items %}
+                            <a class="item{% if item.active %} active{% endif %}" href="{{ item.url }}">
+                                {{- item.title -}}
+                            </a>
+                        {% endfor %}
+                    </nav>
+                </div>
+            {% endif %}
+            <div class="column {% if show_nav %}col-80{% else %}col-full{% endif %}">
+                {% block user_content %}{% endblock %}
             </div>
-        {% endif %}
-        <div class="column {% if show_nav %}col-80{% else %}col-full{% endif %}">
-            {% block user_content %}{% endblock %}
         </div>
     </div>
 {% endblock %}

@@ -44,11 +44,36 @@
     }
 }
 
+%indico-page-standalone {
+    @extend %indico-page;
+    header {
+        margin-top: 1em;
+    }
+}
+
 .management-page {
     @extend %indico-page;
 
     div.page-content {
         @extend .fixed-width;
+    }
+
+    &.wide {
+        .page-content {
+            max-width: 1000px !important;
+        }
+    }
+}
+
+.fixed-width-standalone-page {
+    @extend %indico-page-standalone;
+
+    margin-left: auto;
+    margin-right: auto;
+    width: 1000px;
+
+    .page-content {
+        max-width: 1000px;
     }
 }
 
