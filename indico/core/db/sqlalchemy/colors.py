@@ -108,4 +108,4 @@ class ColorMixin(object):
     def colors(self, value):
         if value is None:
             value = '', ''
-        self.text_color, self.background_color = value
+        self.text_color, self.background_color = ColorTuple(*value)
