@@ -21,11 +21,16 @@
             setupAttachmentPreview();
         }
 
-        $('[data-attachment-editor]').on('click', function(e) {
-            e.preventDefault();
+        $(document).on('click', '[data-attachment-editor]', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            if (this.disabled || $this.hasClass('disabled')) {
+                return;
+            }
             var locator = $(this).data('locator');
             var title = $(this).data('title');
-            openAttachmentManager(locator, title);
+            var reloadOnChange = $this.data('reload-on-change') !== undefined;
+            openAttachmentManager(locator, title, reloadOnChange);
         });
     });
 
@@ -190,14 +195,15 @@
             });
     };
 
-    global.openAttachmentManager = function openAttachmentManager(itemLocator, title) {
+    global.openAttachmentManager = function openAttachmentManager(itemLocator, title, reloadOnChange) {
+        reloadOnChange = reloadOnChange === undefined ? true : reloadOnChange;
         ajaxDialog({
             url: build_url(Indico.Urls.AttachmentManager, itemLocator),
             title: title || $T.gettext("Manage material"),
             confirmCloseUnsaved: false,
             hidePageHeader: true,
             onClose: function(callbackData, customData) {
-                if (customData) {
+                if (customData && reloadOnChange) {
                     location.reload();
                 }
             }
