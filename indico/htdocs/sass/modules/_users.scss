@@ -16,11 +16,22 @@
  */
 
 @import "compass/css3/transition";
-
 @import "base/palette";
+@import "base/utilities";
 
 
 @mixin user-action($color, $final-color:$color) {
+    @extend %user-action-button;
+    color: $color;
+    opacity: 0.7;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+%user-action-button {
+    @include transition(color .25s, opacity, .25s);
     display: inline;
     height: 1.3em;
     font-size: 1.3em;
@@ -28,15 +39,6 @@
     margin-left: 0.3em;
     cursor: pointer;
     vertical-align: baseline;
-    color: $color;
-    opacity: 0.7;
-
-    @include transition(color .25s, opacity, .25s);
-
-    &:hover {
-        opacity: 1;
-        color: $final-color;
-    }
 }
 
 .suggested-users {
@@ -205,6 +207,11 @@
                 }
             }
 
+            .event-person {
+                @extend %user-action-button;
+                @include icon-before('icon-ticket');
+                color: $gray;
+            }
         }
     }
 }

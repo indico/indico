@@ -115,12 +115,17 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
             var userName = Html.span("name", peopleData.get("firstName"), ' ', peopleData.get("familyName"));
             var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "email"}, Util.truncate(peopleData.get("email"), 40));
             var affiliation = Html.$($('<span class="affiliation">').text(peopleData.get('affiliation')));
+            var html = Html.div("info", userName, userEmail, affiliation);
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
                 var favouritizeButtonDiv = Html.div("actions", new Html(create_favorite_button(peopleData.get('id')).get(0)));
-                return [Html.div("info", userName, userEmail, affiliation), favouritizeButtonDiv];
+                return [html, favouritizeButtonDiv];
+            } else if (peopleData.get('_type') == 'EventPerson') {
+                var eventPersonIcon = $('<span>', {'class': 'event-person', 'title': $T("This person exists in the event")});
+                var wrapper = $('<div>', {'class': 'actions', 'html': eventPersonIcon});
+                return [html, Html.$(wrapper)];
             } else {
-                return Html.div("info", userName, userEmail, affiliation);
+                return html;
             }
         }
     }
