@@ -172,9 +172,8 @@ class RHSessionsEmailPersons(RHManageSessionsBase):
     def _process(self):
         person_ids = request.form.getlist('person_id')
         recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
-        form = EmailSessionPersonsForm(event_persons=person_ids, recipients=', '.join(recipients))
+        form = EmailSessionPersonsForm(person_id=person_ids, recipients=', '.join(recipients))
         if form.validate_on_submit():
-            person_ids = form.event_persons.data
             for recipient in recipients:
                 email = make_email(to_list=recipient, from_address=form.from_address.data,
                                    subject=form.subject.data, body=form.body.data, html=True)
