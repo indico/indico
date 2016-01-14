@@ -1,3 +1,4 @@
+{% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
 
 {# Implement this macro in child templates
@@ -10,11 +11,8 @@
     {% endmacro %}
 #}
 
-<div class="fixed-width-page">
-    <div class="page-content-header">
-        <h1>{% block title %}{% endblock %}</h1>
-    </div>
-
+{% block page_class %}fixed-width-page{% endblock %}
+{% block content %}
     <div class="i-box-group vert">
         <div class="i-box">
             {{ form_header(form, method='get', action=action) }}
@@ -51,25 +49,25 @@
             </div>
         {% endif %}
     </div>
-</div>
 
-<script>
-    (function() {
-        'use strict';
+    <script>
+        (function() {
+            'use strict';
 
-        var mapping = {
-            '#abs_start_date': '#rel_start_date',
-            '#rel_start_date': '#abs_start_date',
-            '#abs_end_date': '#rel_end_date',
-            '#rel_end_date': '#abs_end_date'
-        };
+            var mapping = {
+                '#abs_start_date': '#rel_start_date',
+                '#rel_start_date': '#abs_start_date',
+                '#abs_end_date': '#rel_end_date',
+                '#rel_end_date': '#abs_end_date'
+            };
 
-        $(Object.keys(mapping).join(', ')).on('input change', function() {
-            if ($(this).val()) {
-                $(mapping['#' + this.id]).val('');
-            }
-        });
+            $(Object.keys(mapping).join(', ')).on('input change', function() {
+                if ($(this).val()) {
+                    $(mapping['#' + this.id]).val('');
+                }
+            });
 
-        $('#abs_start_date, #abs_end_date').datepicker();
-    })();
-</script>
+            $('#abs_start_date, #abs_end_date').datepicker();
+        })();
+    </script>
+{% endblock %}
