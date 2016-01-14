@@ -589,5 +589,10 @@ class IndicoPalettePickerField(JSONField):
         super(IndicoPalettePickerField, self).process_formdata(valuelist)
         self.data = ColorTuple(self.data['text'], self.data['background'])
 
+    def process_data(self, value):
+        super(IndicoPalettePickerField, self).process_data(value)
+        if self.object_data and self.object_data not in self.color_list:
+            self.color_list = self.color_list + [self.object_data]
+
     def _value(self):
         return self.data._asdict()
