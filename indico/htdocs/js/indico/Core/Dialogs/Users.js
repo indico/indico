@@ -321,11 +321,11 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
                     if (result.length === 0) {
                         self.foundPeopleList.setMessage($T("No results for this search..."));
                     } else {
-                        each(result, function(user){
-                            if (user._type === "Avatar") {
-                                self.foundPeopleList.set('existingAv' + user.id, $O(user));
-                            } else if (user._type === "ContributionParticipation") {
-                                self.foundPeopleList.set('existingAuthor' + user.id, $O(user));
+                        each(result, function(entry) {
+                            if (entry._type === "Avatar") {
+                                self.foundPeopleList.set('existingAv' + entry.id, $O(entry));
+                            } else if (entry._type === "EventPerson") {
+                                self.foundPeopleList.set('existingEventPerson' + entry.id, $O(entry));
                             }
                         });
                     }
