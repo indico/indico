@@ -23,8 +23,7 @@ from MaKaC.conference import ContributionParticipation
 from indico.modules.users.util import get_user_by_email
 
 
-def searchUsers(surName="", name="", organisation="", email="", conferenceId=None, exactMatch=True, searchExt=False):
-
+def searchUsers(surName="", name="", organisation="", email="", exactMatch=True, searchExt=False):
     if surName != "" or name != "" or organisation != "" or email != "":
         # build criteria
         criteria = {
