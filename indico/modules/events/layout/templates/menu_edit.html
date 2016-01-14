@@ -3,12 +3,13 @@
 {% from 'message_box.html' import message_box %}
 {% from 'events/layout/_menu.html' import menu_entries %}
 
+{% block page_class %}{{ super() }} wide{% endblock %}
 {% block title %}
     {%- trans %}Menu{% endtrans -%}
 {% endblock %}
 
 {%- block content %}
-    <div class="fixed-width-page layout-wrapper" id="menu-customization">
+    <div class="layout-wrapper" id="menu-customization">
         <div class="row">
             <div class="col-100">
                 <div class="action-box">
