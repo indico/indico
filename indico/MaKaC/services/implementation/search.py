@@ -21,11 +21,11 @@ from MaKaC.common import search
 from MaKaC.fossils.user import IGroupFossil
 from MaKaC.common.fossilize import fossilize
 
+from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.modules.groups import GroupProxy
-
-#################################
-# User and group search
-#################################
+from indico.modules.events.models.events import Event
+from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.util import serialize_event_person
 
 
 class SearchBase(ServiceBase):
@@ -42,18 +42,24 @@ class SearchUsers(SearchBase):
         self._name = self._params.get("name", "")
         self._organisation = self._params.get("organisation", "")
         self._email = self._params.get("email", "")
-        self._confId = self._params.get("conferenceId", None)
         self._exactMatch = self._params.get("exactMatch", False)
+        self._confId = self._params.get("conferenceId", None)
+        self._event = Event.get(self._confId) if self._confId else None
 
     def _getAnswer(self):
-
-        results = search.searchUsers(self._surName, self._name, self._organisation, self._email,
-                                     self._confId, self._exactMatch, self._searchExt)
-
-        # will use either IAvatarFossil or IContributionParticipationFossil
-        fossilizedResults = fossilize(sorted(results, key=lambda av: (av.getStraightFullName(), av.getEmail())))
-
-        return fossilizedResults
+        event_persons = []
+        users = search.searchUsers(self._surName, self._name, self._organisation, self._email,
+                                   self._exactMatch, self._searchExt)
+        if self._event:
+            fields = {EventPerson.first_name: self._name,
+                      EventPerson.last_name: self._surName,
+                      EventPerson.email: self._email,
+                      EventPerson.affiliation: self._organisation}
+            criteria = [unaccent_match(col, val, exact=self._exactMatch) for col, val in fields.iteritems()]
+            event_persons = self._event.persons.filter(*criteria).all()
+        fossilized_users = fossilize(sorted(users, key=lambda av: (av.getStraightFullName(), av.getEmail())))
+        fossilized_event_persons = map(serialize_event_person, event_persons)
+        return fossilized_users + fossilized_event_persons
 
 
 class SearchGroups(SearchBase):
