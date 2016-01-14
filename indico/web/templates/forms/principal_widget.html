@@ -28,8 +28,11 @@
             {% endif %}
 
             field.principalfield({
-                allowExternalUsers: {{ field.allow_external | tojson }},
-                enableGroupsTab: {{ field.groups | tojson }},
+                {% if field.event %}
+                    eventId: {{ field.event.id|tojson }},
+                {% endif %}
+                allowExternalUsers: {{ field.allow_external|tojson }},
+                enableGroupsTab: {{ field.groups|tojson }},
                 onUpdate: function(users) {
                     var name = users[0] ? users[0].name : '';
                     {% if not field.flags.required %}

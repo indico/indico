@@ -30,6 +30,7 @@ from wtforms.validators import StopValidation
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.users.util import serialize_user
@@ -207,7 +208,7 @@ class PrincipalListField(HiddenField):
         self.groups = kwargs.pop('groups', False)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
-        # if we want serializable objects (usually for json) or the real thing (User/GroupProxy)
+        # Whether we want serializable objects (usually for json) or the real thing (User/GroupProxy)
         self.serializable = kwargs.pop('serializable', True)
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
@@ -260,6 +261,27 @@ class PrincipalField(PrincipalListField):
         if valuelist:
             data = map(self._convert_principal, json.loads(valuelist[0]))
             self.data = None if not data else data[0]
+
+
+class EventPersonField(PrincipalField):
+    """A field to select an EventPerson or create one from an Indico user"""
+
+    def __init__(self, *args, **kwargs):
+        self.event = None
+        super(EventPersonField, self).__init__(*args, groups=False, allow_external=True, serializable=False, **kwargs)
+
+    def _convert_event_person(self, data):
+        if data['_type'] == 'Avatar':
+            user = self._convert_principal(data)
+            return EventPerson.create_from_user(user)
+        return self.event.persons.filter_by(id=data['id']).one()
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
+
+    def pre_validate(self, form):
+        self.data = map(self._convert_event_person, self.data)
 
 
 class MultiStringField(HiddenField):
