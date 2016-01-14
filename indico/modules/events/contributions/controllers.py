@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, request
+from sqlalchemy.orm import joinedload
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
@@ -30,7 +31,13 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _get_contribution_list_args(event):
-    contribs = event.contributions.filter_by(is_deleted=False).order_by(Contribution.id).all()
+    timetable_entry_strategy = joinedload('timetable_entry')
+    timetable_entry_strategy.lazyload('*')
+    contribs = (event.contributions
+                .filter_by(is_deleted=False)
+                .order_by(Contribution.id)
+                .options(timetable_entry_strategy)
+                .all())
     sessions = event.sessions.filter_by(is_deleted=False).all()
     tracks = event.as_legacy.getTrackList()
     return {'contribs': contribs, 'sessions': sessions, 'tracks': tracks}
