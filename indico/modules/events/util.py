@@ -166,6 +166,20 @@ def notify_pending(acl_entry):
     send_email(make_email(to_list={email}, template=template), event.as_legacy, module='Protection')
 
 
+def serialize_event_person(person):
+    """Serialize EventPerson to JSON-like object"""
+    return {'_type': 'EventPerson',
+            'id': person.id,
+            'email': person.email,
+            'name': person.full_name,
+            'firstName': person.first_name,
+            'familyName': person.last_name,
+            'title': person.title,
+            'affiliation': person.affiliation,
+            'phone': person.phone,
+            'address': person.address}
+
+
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, role=None):
     """Updates an object's ACL with a new list of principals
 
