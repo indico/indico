@@ -131,6 +131,7 @@
                 } else if (justUse.length != 0) {
                     justUse.remove();
                 }
+                resultHtmlList.find('li').first().addClass('active');
                 return resultHtmlList;
             }
 
@@ -316,6 +317,9 @@
                     if (latestSelectedOption != '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
                         $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
                     }
+                } else if (~[38,40].indexOf(e.keyCode)) {
+                    var activeOption = $this.parent().find('.typeahead-results').find('.typeahead-item.active');
+                    $this.parent().find('.just-use-option').toggleClass('active', activeOption.length === 0);
                 }
             });
 
