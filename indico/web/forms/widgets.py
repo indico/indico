@@ -16,7 +16,7 @@
 
 import re
 
-from wtforms.widgets import TextInput, TextArea
+from wtforms.widgets import TextInput, TextArea, HiddenInput
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
@@ -41,6 +41,14 @@ class ConcatWidget(object):
             fmt = u'{0} {1}' if self.prefix_label else u'{1} {0}'
             html.append(fmt.format(subfield.label(**label_args), subfield(**field_args)))
         return HTMLString(self.separator.join(html))
+
+
+class HiddenInputs(HiddenInput):
+    """Renders hidden inputs for list elements"""
+    item_widget = HiddenInput()
+
+    def __call__(self, field, **kwargs):
+        return HTMLString('\n'.join(self.item_widget(field, value=item) for item in field._value()))
 
 
 class JinjaWidget(object):
