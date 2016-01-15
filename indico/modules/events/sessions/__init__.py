@@ -16,7 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session
+from operator import itemgetter
+
+from flask import flash, session, render_template
+from wtforms import BooleanField
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -25,15 +28,29 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import can_manage_sessions
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
+from indico.web.forms.base import IndicoForm, FormDefaults
+from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.sessions')
 session_settings = EventSettingsProxy('sessions', {
     # Whether session coordinators can manage contributions inside their sessions
-    'coordinators_manage_contributions': False
+    'coordinators_manage_contributions': False,
+    # Whether session coordinators can manage their session blocks
+    'coordinators_manage_blocks': False
 })
+
+
+COORDINATOR_PRIV_SETTINGS = {'manage-contributions': 'coordinators_manage_contributions',
+                             'manage-blocks': 'coordinators_manage_blocks'}
+COORDINATOR_PRIV_TITLES = {'manage-contributions': _('Contributions'),
+                           'manage-blocks': _('Session blocks')}
+COORDINATOR_PRIV_DESCS = {'manage-contributions': _('Allows coordinators to modify contributions in their sessions.'),
+                          'manage-blocks': _('Allows coordinators to manage/reschedule session blocks of their '
+                                             'sessions.  This includes creating new session blocks..')}
 
 
 @signals.users.merged.connect
@@ -65,6 +82,19 @@ def _extend_event_management_menu(sender, event, **kwargs):
 def _get_event_management_url(event, **kwargs):
     if can_manage_sessions(session.user, event.as_event, 'ANY'):
         return url_for('sessions.session_list', event)
+
+
+@template_hook('conference-protection')
+def _inject_conference_protection_coordinator_privs(event, **kwargs):
+    settings = session_settings.get_all(event)
+    form_class = type(b'PrivsForm', (IndicoForm,), {})
+    defaults = {}
+    for name, title in sorted(COORDINATOR_PRIV_TITLES.iteritems(), key=itemgetter(1)):
+        field = BooleanField(title, widget=SwitchWidget(), description=COORDINATOR_PRIV_DESCS[name])
+        setattr(form_class, name, field)
+        defaults[name] = settings[COORDINATOR_PRIV_SETTINGS[name]]
+    form = form_class(csrf_enabled=False, obj=FormDefaults(defaults))
+    return render_template('events/sessions/management/coordinator_privs.html', event=event, form=form)
 
 
 @signals.app_created.connect
