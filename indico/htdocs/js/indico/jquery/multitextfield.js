@@ -258,10 +258,9 @@
                 data: {
                     id: id
                 },
-                value: value
-            })
-            .attr('placeholder', placeholder)
-            .placeholder();
+                value: value,
+                placeholder: placeholder
+            });
 
             this._validateValue(newInput);
             item.append(newInput);
