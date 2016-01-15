@@ -27,7 +27,20 @@
             width: inherit;
             display: inline-block;
             position: relative;
-            z-index: 1030 !important;
+            float: left;
+
+            &.venue-container {
+                width: 40%;
+                padding-right: 10px;
+            }
+
+            &.room-container {
+                width: 60%;
+
+                input[type='text'] {
+                    width: 100%;
+                }
+            }
 
             .typeahead-results {
                 position: absolute;
@@ -41,14 +54,19 @@
                     max-height: 30em;
                     width: 20em;
                     position: relative;
-                    border: none;
                     border-radius: 0;
+                    border-color: $gray;
 
                     > li {
                         background: white;
+                        // border-bottom: 1px solid $gray;
                     }
 
                     &.empty {
+                        border-width: 0px 0px 1px 0px;
+                        border-style: solid;
+                        border-color: $gray;
+
                         li:first-child {
                             display: none;
                         }
@@ -61,6 +79,10 @@
                     background-color: white;
                     text-align: center;
                     padding: 6px 20px;
+                    border-width: 0px 1px 1px 1px;
+                    border-style: solid;
+                    border-color: $gray;
+                    font-style: italic;
 
                     &:hover, &.active {
                         background-color: #ebebeb;  // same as in typeahead
@@ -68,9 +90,8 @@
                 }
             }
 
-            &.backdrop {
+            &.result {
                 .i-location-input-field {
-                    z-index: 1050 !important;
 
                     &.typeahead-hint {
                         z-index: -1 !important;
@@ -80,11 +101,7 @@
 
                 .just-use-option {
                     display: block;
-                    border-top: 1px solid rgba(0, 0, 0, 0.15);  // same as in typeahead
-                    font-style: italic;
                 }
-
-                z-index: 1060 !important;
             }
         }
 
@@ -121,24 +138,6 @@
             }
         }
     }
-}
-
-.backdrop-wrapper {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1050;
-    opacity: 0;
-}
-
-.close-backdrop-button {
-    position: absolute;
-    top: -30px;
-    left: 0;
-    z-index: 1060;
-    display: none;
 }
 
 .highlighter {
