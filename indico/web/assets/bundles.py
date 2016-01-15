@@ -275,8 +275,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'jquery.colorpicker.js',
               'jquery-extra-selectors.js',
               'jquery.typewatch.js',
-              'jstorage.js',
-              'jquery.placeholder.js')))
+              'jstorage.js')))
 
 utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js', 'forms.js'))
 calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
