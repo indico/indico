@@ -175,7 +175,7 @@
         });
 
         var principal = $('#indico-user-to-add').principalfield({
-            onUpdate: function(users) {
+            onSelect: function(users) {
                 if (users.length) {
                     var url = $('.js-add-user').data('href');
                     location.href = build_url(url, {user: users[0].id});

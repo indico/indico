@@ -25,13 +25,15 @@
             allowExternalUsers: true,
             enableGroupsTab: false,
             showFavoriteUsers: true,
-            onUpdate: function(users) {}
+            render: function(users) {},
+            onRemove: function() {},
+            onSelect: function(users) {},
         },
 
         _create: function _create() {
             var self = this;
             self.users = JSON.parse(self.element.val() || '[]');
-            self._update();
+            self.options.render(self.users);
         },
 
         _update: function _update() {
@@ -39,13 +41,14 @@
             var users = self.users ? JSON.stringify(self.users) : '[]';
             self.element.val(users);
             self.element.trigger('change');
-            self.options.onUpdate(self.users);
+            self.options.render(self.users);
         },
 
         choose: function choose() {
             var self = this;
             function handleUsersChosen(users) {
                 self.users = users;
+                self.options.onSelect(self.users);
                 self._update();
             }
             var userChoosePopup = new ChooseUsersPopup($T("Choose user"), true, self.options.eventId,
@@ -59,6 +62,7 @@
         remove: function remove() {
             var self = this;
             self.users = [];
+            self.options.onRemove();
             self._update();
         }
     });
