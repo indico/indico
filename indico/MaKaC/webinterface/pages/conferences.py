@@ -59,7 +59,7 @@ from indico.modules.auth.util import url_for_logout
 from MaKaC.conference import Session, Contribution
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
-from MaKaC.common.TemplateExec import render
+from MaKaC.common.TemplateExec import render, mako_call_template_hook
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -1528,7 +1528,7 @@ class WConfModifAC:
             tf = "<br>%s" % wcomponents.WConfProtectionToolsFrame(self.__conf).getHTML()
         cr = ""
         if self._eventType == "conference":
-            cr = "<br>%s" % WConfModifACSessionCoordinatorRights(self.__conf).getHTML()
+            cr = "<br>" + mako_call_template_hook('conference-protection', event=self.__conf.as_event)
 
         return """<br><table width="100%%" class="ACtab"><tr><td>%s%s%s%s%s%s<br></td></tr></table>""" % (mc, rc, ac, dc, tf, cr)
 
