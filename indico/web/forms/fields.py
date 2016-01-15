@@ -270,10 +270,10 @@ class EventPersonField(PrincipalField):
         self.event = None
         super(EventPersonField, self).__init__(*args, groups=False, allow_external=True, serializable=False, **kwargs)
 
-    def _convert_event_person(self, data):
+    def _get_event_person(self, data):
         if data['_type'] == 'Avatar':
             user = self._convert_principal(data)
-            return EventPerson.create_from_user(user)
+            return EventPerson.for_user(user, self.event)
         return self.event.persons.filter_by(id=data['id']).one()
 
     def process_formdata(self, valuelist):
@@ -281,7 +281,7 @@ class EventPersonField(PrincipalField):
             self.data = json.loads(valuelist[0])
 
     def pre_validate(self, form):
-        self.data = map(self._convert_event_person, self.data)
+        self.data = map(self._get_event_person, self.data)
 
 
 class MultiStringField(HiddenField):
