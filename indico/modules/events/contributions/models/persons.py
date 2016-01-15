@@ -59,7 +59,7 @@ class ContributionPersonLink(PersonLinkBase):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'contribution_id', 'person_id', is_speaker=False, author_type=AuthorType.none,
-                           _text=self.person.full_name)
+                           _text=self.person.full_name if self.person else None)
 
 
 class SubContributionPersonLink(PersonLinkBase):
@@ -87,4 +87,5 @@ class SubContributionPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'subcontribution_id', 'person_id', _text=self.person.full_name)
+        return format_repr(self, 'subcontribution_id', 'person_id',
+                           _text=self.person.full_name if self.person else None)
