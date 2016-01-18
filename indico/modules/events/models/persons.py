@@ -91,6 +91,7 @@ class EventPerson(db.Model):
         backref=db.backref(
             'persons',
             cascade='all, delete-orphan',
+            cascade_backrefs=False,
             lazy='dynamic'
         )
     )
@@ -99,6 +100,7 @@ class EventPerson(db.Model):
         lazy=True,
         backref=db.backref(
             'event_persons',
+            cascade_backrefs=False,
             lazy='dynamic'
         )
     )
