@@ -1500,8 +1500,12 @@ type("UserListField", ["IWidget"], {
                             var key;
                             if (person.isGroup || person._fossil === 'group') {
                                 key = person.identifier;
+                            } else if (person._type === "Avatar") {
+                                key = "existingAv" + person.id;
+                            } else if (person._type === "EventPerson") {
+                                key = "existingEventPerson" + person.id;
                             } else {
-                                key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
+                                key = person.id;
                             }
                             if (person._type === "Avatar" && self.userList.get(key)) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
@@ -1627,6 +1631,8 @@ type("UserListField", ["IWidget"], {
             each(initialUsers, function(user){
                 if (any(user._type, null) === 'Avatar') {
                     self.userList.set('existingAv' + user.id, $O(user));
+                } else if (user._type === 'EventPerson') {
+                    self.userList.set('existingEventPerson' + user.id, $O(user));
                 } else if (~['LDAPGroupWrapper', 'LocalGroupWrapper', 'MultipassGroup', 'LocalGroup'].indexOf(user._type)) {
                     self.userList.set(user.identifier, $O(user));
                 } else {

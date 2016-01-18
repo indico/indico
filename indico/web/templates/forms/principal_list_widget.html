@@ -44,7 +44,10 @@
                 'PluginOptionPeopleListDiv', 'user-list', principals,
                 true, null, true,
                 {{ field.groups | tojson }},
-                null, null, false, false, false, true,
+                {{ field.event.id if field.event else none|tojson }},
+                null, false, false, false,
+                // Disable favorite button for EventPerson mode
+                {{ (field.event is none)|tojson }},
                 addPrincipal, userListNothing, removePrincipal, {{ field.allow_external|tojson }}
             );
 
