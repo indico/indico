@@ -95,12 +95,22 @@
                                 </a>
                             </td>
                             <td class="i-table">
-                                <select>
-                                    <option>--No track--</option>
-                                    {% for track in tracks %}
-                                        <option>{{ track.getTitle() }}</option>
-                                    {% endfor %}
-                                </select>
+                                <a class="i-button track-item-picker"
+                                   data-items="{{ tracks | tojson | forceescape }}"
+                                   data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                   data-method="PATCH"
+                                   data-selected-item-id="{{ contrib.track_id or None | tojson }}">
+                                    <span class="label">
+                                        {% if contrib.track %}
+                                            {%- trans title=contrib.track.getTitle() %}
+                                                {{ title }}
+                                            {% endtrans -%}
+                                        {% else %}
+                                            {% trans %}No track{% endtrans %}
+                                        {% endif %}
+                                    </span>
+                                    <i class="icon-arrow-down"></i>
+                                </a>
                             </td>
                             <td class="i-table" style="text-align: right;">
                                 <a href="#" class="icon-edit"
@@ -179,6 +189,36 @@
                         return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
                             $this.find('.label').text($T.gettext('No session'));
                             $this.removeAttr('style');
+                        });
+                    }
+                });
+
+                $('.track-item-picker').itempicker({
+                    filterPlaceholder: $T.gettext('Filter tracks'),
+                    containerClasses: 'track-item-container',
+                    uncheckedItemIcon: '',
+                    footerElements: [
+                        {
+                            title: $T.gettext('Add new track'),
+                            onClick: function() {
+                                window.location = {{ url_for('event_mgmt.confModifProgram-addTrack', event) | tojson }}
+                            }
+                        }
+                    ],
+                    onSelect: function(track) {
+                        var $this = $(this);
+                        var postData = {track_id: track.id};
+
+                        return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                            $this.find('.label').text(track.title);
+                        });
+                    },
+                    onClear: function(track) {
+                        var $this = $(this);
+                        var postData = {track_id: null};
+
+                        return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                            $this.find('.label').text($T.gettext('No track'));
                         });
                     }
                 });

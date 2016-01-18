@@ -232,6 +232,10 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     def protection_parent(self):
         return self.session if self.session_id is not None else self.event_new
 
+    @property
+    def track(self):
+        return self.event_new.as_legacy.getTrackById(str(self.track_id))
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, contrib_id=self.id)
