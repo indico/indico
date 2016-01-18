@@ -65,3 +65,9 @@
 
     width: 100%;
 }
+
+.track-item-picker {
+    @include picker-root-element-label();
+
+    width: 100%;
+}

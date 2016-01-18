@@ -27,6 +27,7 @@ from indico.modules.events.contributions.views import WPManageContributions
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
+from indico.util.string import to_unicode
 from indico.util.i18n import _, ngettext
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -41,7 +42,7 @@ def _get_contribution_list_args(event):
                 .options(timetable_entry_strategy)
                 .all())
     sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in event.sessions.filter_by(is_deleted=False)]
-    tracks = event.as_legacy.getTrackList()
+    tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())} for t in event.as_legacy.getTrackList()]
     return {'contribs': contribs, 'sessions': sessions, 'tracks': tracks}
 
 
@@ -130,10 +131,12 @@ class RHContributionREST(RHManageContributionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if data.viewkeys() > 'session_id':
+        if data.viewkeys() > {'session_id', 'track_id'}:
             raise BadRequest
         if 'session_id' in data:
             updates.update(self._get_contribution_session_updates(data['session_id']))
+        if 'track_id' in data:
+            updates.update(self._get_contribution_track_updates(data['track_id']))
         if updates:
             update_contribution(self.contrib, updates)
         return jsonify_data(flash=False)
@@ -150,4 +153,16 @@ class RHContributionREST(RHManageContributionBase):
             if session != self.contrib.session:
                 updates['session'] = session
                 updates['session_block'] = None
+        return updates
+
+    def _get_contribution_track_updates(self, track_id):
+        updates = {}
+        if track_id is None:
+            updates['track_id'] = None
+        else:
+            track = self._conf.getTrackById(str(track_id))
+            if not track:
+                raise BadRequest('Invalid track id')
+            if track_id != self.contrib.track_id:
+                updates['track_id'] = track_id
         return updates
