@@ -28,11 +28,78 @@
         });
     }
 
+    function formatState(visible, total) {
+        return $T.gettext('{0} / {1}').format('<strong>{0}</strong>'.format(visible.length),
+                                              total.length);
+    }
+
+    function setState(visible, total) {
+        var $state = $('#filtering-state'),
+            title = '{0} out of {1} contributions displayed'.format(visible.length, total.length);
+        $state.html(formatState(visible, total));
+
+        // oldtitle needs to be updated too, because of qTip
+        $state.attr({
+            oldtitle: title,
+            title: title
+        });
+    }
+
+    function applyFilters() {
+        var contributions = $('#contribution-list tbody tr'),
+            term = $('#search-input').val().trim(),
+            visibleEntries, m,
+            $state = $('#filtering-state'),
+            $filterPlaceholder = $('#filter-placeholder');
+
+        $filterPlaceholder.hide();
+        $state.removeClass('active');
+
+        if (!term) {
+            contributions.show();
+            setState(contributions, contributions);
+            return;
+        }
+
+        // quick search of contribution by ID
+        if (m = term.match(/^#(\d+)$/)) {
+            visibleEntries = $('#contrib-' + m[1]);
+        } else {
+            visibleEntries = contributions.find('td[data-searchable*="' + term + '"]').closest('tr');
+        }
+
+        if (visibleEntries.length === 0) {
+            $filterPlaceholder.text($T.gettext('There are no contributions that match your search criteria.')).show();
+            $state.addClass('active');
+        } else if (visibleEntries.length !== contributions.length) {
+            $state.addClass('active');
+        }
+
+        setState(visibleEntries, contributions);
+
+        contributions.hide();
+        visibleEntries.show();
+
+        // Needed because $(window).scroll() is not called when hiding elements
+        // causing scrolling elements to be out of place.
+        $(window).trigger('scroll');
+    }
+
+    function setupSearchBox() {
+        $('#search-input').realtimefilter({
+            callback: function() {
+                applyFilters();
+            }
+        });
+    }
+
     global.setupContributionList = function setupContributionList() {
         setupTableSorter();
+        setupSearchBox();
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter();
+            applyFilters();
         });
     };
 })(window);

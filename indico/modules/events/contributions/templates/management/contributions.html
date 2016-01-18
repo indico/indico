@@ -43,18 +43,27 @@
         </div>
         <div class="group right">
             <span class="i-button label icon-search"></span>
-            <input type="text" id="search-input">
+            <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
         </div>
-        <div class="group right">
-            <button class="i-button icon-filter"
-                    data-title="{% trans %}Registration list configuration{% endtrans %}">
-                {% trans %}Filters{% endtrans %}
-            </button>
+        <div class="right">
+            <div class="group">
+                <span id="filtering-state" class="i-button label icon-list">
+                    <strong>{{ contribs|length }}</strong> / {{ contribs|length }}
+                </span>
+            </div>
+            <div class="group">
+                <button id="filter-button"
+                        class="i-button icon-filter"
+                        data-title="{% trans %}Registration list configuration{% endtrans %}">
+                    {% trans %}Filters{% endtrans %}
+                </button>
+            </div>
         </div>
     </div>
     <div id="contribution-list">
         {{ render_contribution_list(contribs, sessions, tracks) }}
     </div>
+    <div id="filter-placeholder"></div>
     <script>
         setupContributionList();
     </script>
