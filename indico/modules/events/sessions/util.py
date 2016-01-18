@@ -135,3 +135,18 @@ def generate_pdf_from_sessions(event, sessions):
     """Generate a PDF file from a given session list"""
     pdf = SessionListToPDF(event.as_legacy, sessions)
     return BytesIO(pdf.getPDFBin())
+
+
+def session_coordinator_priv_enabled(event, priv):
+    """Check whether a coordinator privilege is enabled.
+
+    Currently the following privileges are available:
+
+    - manage-contributions
+    - manage-blocks
+
+    :param event: The `Event` to check for
+    :param priv: The name of the privilege
+    """
+    from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
+    return session_settings.get(event, COORDINATOR_PRIV_SETTINGS[priv])
