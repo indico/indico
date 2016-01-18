@@ -31,6 +31,7 @@ from wtforms.validators import StopValidation
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.users.util import serialize_user
@@ -239,14 +240,41 @@ class PrincipalListField(HiddenField):
 
     def _value(self):
         if self.serializable:
-            data = retrieve_principals(self._get_data(), legacy=False)
+            principals = retrieve_principals(self._get_data(), legacy=False)
         else:
-            data = self._get_data()
-        data.sort(key=lambda x: x.name.lower())
-        return map(self._serialize_principal, data)
+            principals = self._get_data()
+        principals.sort(key=lambda x: x.full_name.lower())
+        return [self._serialize_principal(x) for x in principals]
 
     def _get_data(self):
         return sorted(self.data) if self.data else []
+
+
+class EventPersonListField(PrincipalListField):
+    """"A field that lets you select a list Indico user and EventPersons"""
+
+    def __init__(self, *args, **kwargs):
+        self.event = None
+        super(EventPersonListField, self).__init__(*args,
+                                                   groups=False, allow_external=True, serializable=False, **kwargs)
+
+    def _get_event_person(self, data):
+        if data['_type'] == 'Avatar':
+            user = self._convert_principal(data)
+            return EventPerson.for_user(user, self.event)
+        return self.event.persons.filter_by(id=data['id']).one()
+
+    def _serialize_principal(self, principal):
+        if not isinstance(principal, EventPerson):
+            return super(EventPersonField, self)._serialize_principal(principal)
+        return serialize_event_person(principal)
+
+    def pre_validate(self, form):
+        self.data = map(self._get_event_person, self.data)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
 
 
 class PrincipalField(PrincipalListField):
@@ -263,25 +291,13 @@ class PrincipalField(PrincipalListField):
             self.data = None if not data else data[0]
 
 
-class EventPersonField(PrincipalField):
+class EventPersonField(EventPersonListField):
     """A field to select an EventPerson or create one from an Indico user"""
 
-    def __init__(self, *args, **kwargs):
-        self.event = None
-        super(EventPersonField, self).__init__(*args, groups=False, allow_external=True, serializable=False, **kwargs)
+    widget = JinjaWidget('forms/principal_widget.html', single_line=True)
 
-    def _get_event_person(self, data):
-        if data['_type'] == 'Avatar':
-            user = self._convert_principal(data)
-            return EventPerson.for_user(user, self.event)
-        return self.event.persons.filter_by(id=data['id']).one()
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = json.loads(valuelist[0])
-
-    def pre_validate(self, form):
-        self.data = map(self._get_event_person, self.data)
+    def _get_data(self):
+        return [] if self.data is None else [self.data]
 
 
 class MultiStringField(HiddenField):
