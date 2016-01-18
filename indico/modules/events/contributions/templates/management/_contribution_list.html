@@ -48,7 +48,7 @@
                                 <input type="checkbox" class="select-row" name="contribution_id" value="{{ contrib.id }}">
                             </td>
                             <td class="i-table id-column">#{{ contrib.friendly_id }}</td>
-                            <td class="i-table">
+                            <td class="i-table" data-searchable="{{ contrib.title }}">
                                 <strong>
                                     {{ contrib.title }}
                                 </strong>
@@ -65,8 +65,8 @@
                             <td class="i-table">
                                 {{ contrib.duration|format_timedelta(format='medium') }}
                             </td>
-                            <td class="i-table">
-                                {# people #}
+                            <td class="i-table" data-searchable="TODO">
+                                {# people (don't forget data-searchable above) #}
                                 TODO
                             </td>
                             <td class="i-table">
