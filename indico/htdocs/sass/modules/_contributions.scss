@@ -36,3 +36,32 @@
     color: $dark-yellow !important;
     border-color: $dark-yellow !important;
 }
+
+@mixin picker-root-element-label() {
+    .label {
+        float: left;
+        max-width: 80%;
+        overflow: hidden !important;
+        text-overflow: ellipsis;
+        display: inline-block;
+        line-height: 1.2em;
+    }
+
+    .icon-arrow-down {
+        float: right;
+    }
+}
+
+.session-item-picker {
+    @include picker-root-element-label();
+
+    width: 100%;
+    line-height: 0.9em;
+    white-space: nowrap;
+}
+
+.track-item-picker {
+    @include picker-root-element-label();
+
+    width: 100%;
+}

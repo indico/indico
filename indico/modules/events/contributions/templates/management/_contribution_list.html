@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_contribution_list(contribs, sessions, tracks) %}
+{% macro render_contribution_list(event, contribs, sessions, tracks) %}
     {% if not contribs %}
         {%- call message_box('info') -%}
             {% trans %}There are no contributions yet.{% endtrans %}
@@ -75,13 +75,24 @@
                                 {% endif %}
                             </td>
                             <td class="i-table">
-                                <select>
-                                    <option>--No session--</option>
-                                    {% for section in sections %}
-                                        <option>{{ section.name }}</option>
-                                    {% endfor %}
-                                    <option>Add to new session...</option>
-                                </select>
+                                <a class="i-button session-item-picker"
+                                   style="{{ contrib.session.colors.css if contrib.session }}"
+                                   data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                   data-method="PATCH"
+                                   data-items="{{ sessions | tojson | forceescape }}"
+                                   data-contrib-id="{{ contrib.id }}"
+                                   data-selected-item-id="{{ contrib.session.id or None | tojson }}">
+                                    <span class="label">
+                                        {% if contrib.session %}
+                                            {% trans title=contrib.session.title -%}
+                                                {{ title }}
+                                            {%- endtrans %}
+                                        {% else %}
+                                            {%- trans %}No session{% endtrans -%}
+                                        {% endif %}
+                                    </span>
+                                    <i class="icon-arrow-down"></i>
+                                </a>
                             </td>
                             <td class="i-table">
                                 <select>
@@ -115,5 +126,63 @@
                 </tbody>
             </table>
         </form>
+        <script>
+            (function() {
+                'use strict';
+
+                function patchObject(url, method, data) {
+                    return $.ajax({
+                        url: url,
+                        method: method,
+                        data: JSON.stringify(data),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        error: handleAjaxError,
+                        complete: IndicoUI.Dialogs.Util.progress(),
+                    });
+                }
+
+                $('.session-item-picker').itempicker({
+                    containerClasses: 'session-item-container',
+                    filterPlaceholder: $T.gettext('Filter sessions'),
+                    footerElements: [
+                        {
+                            title: $T.gettext('Add new session'),
+                            onClick: function() {
+                                ajaxDialog({
+                                    title: $T.gettext('Add new session'),
+                                    url: {{ url_for('sessions.create_session', event) | tojson }},
+                                    onClose: function(data) {
+                                        if (data) {
+                                            $('.session-item-picker').itempicker('refreshItemList', data.sessions);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    ],
+                    onSelect: function(session) {
+                        var $this = $(this);
+                        var styleObject = $this[0].style;
+                        var postData =  {session_id: session.id};
+
+                        return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                            $this.find('.label').text(session.title);
+                            styleObject.setProperty('color', '#' + session.colors.text, 'important');
+                            styleObject.setProperty('background', '#' + session.colors.background, 'important');
+                        });
+                    },
+                    onClear: function(session) {
+                        var $this = $(this);
+                        var postData = {session_id: null};
+
+                        return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                            $this.find('.label').text($T.gettext('No session'));
+                            $this.removeAttr('style');
+                        });
+                    }
+                });
+            })();
+        </script>
     {% endif %}
 {% endmacro %}

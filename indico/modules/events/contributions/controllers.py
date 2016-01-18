@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import flash, request
 from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
@@ -39,14 +40,14 @@ def _get_contribution_list_args(event):
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy)
                 .all())
-    sessions = event.sessions.filter_by(is_deleted=False).all()
+    sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in event.sessions.filter_by(is_deleted=False)]
     tracks = event.as_legacy.getTrackList()
     return {'contribs': contribs, 'sessions': sessions, 'tracks': tracks}
 
 
 def _render_contribution_list(event):
     tpl = get_template_module('events/contributions/management/_contribution_list.html')
-    return tpl.render_contribution_list(**_get_contribution_list_args(event))
+    return tpl.render_contribution_list(event=event, **_get_contribution_list_args(event))
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -125,3 +126,28 @@ class RHContributionREST(RHManageContributionBase):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(html=_render_contribution_list(self.event_new))
+
+    def _process_PATCH(self):
+        data = request.json
+        updates = {}
+        if data.viewkeys() > 'session_id':
+            raise BadRequest
+        if 'session_id' in data:
+            updates.update(self._get_contribution_session_updates(data['session_id']))
+        if updates:
+            update_contribution(self.contrib, updates)
+        return jsonify_data(flash=False)
+
+    def _get_contribution_session_updates(self, session_id):
+        updates = {}
+        if session_id is None:
+            updates['session'] = None
+            updates['session_block'] = None
+        else:
+            session = self.event_new.sessions.filter_by(id=session_id, is_deleted=False).one()
+            if not session:
+                raise BadRequest('Invalid session id')
+            if session != self.contrib.session:
+                updates['session'] = session
+                updates['session_block'] = None
+        return updates
