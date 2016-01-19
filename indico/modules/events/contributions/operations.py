@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.timetable.util import ensure_timetable_consistency
 
 
 def create_contribution(event, data):
@@ -36,6 +37,7 @@ def create_contribution(event, data):
 
 def update_contribution(contrib, data):
     contrib.populate_from_dict(data)
+    ensure_timetable_consistency(contrib.event_new, delete=True)
     db.session.flush()
     logger.info('Contribution %s updated by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
