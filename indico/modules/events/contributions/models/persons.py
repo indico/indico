@@ -56,10 +56,14 @@ class ContributionPersonLink(PersonLinkBase):
     # relationship backrefs:
     # - contribution (Contribution.person_links)
 
+    @property
+    def full_name(self):
+        return self.person.full_name if self.person else None
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'contribution_id', 'person_id', is_speaker=False, author_type=AuthorType.none,
-                           _text=self.person.full_name if self.person else None)
+                           _text=self.full_name)
 
 
 class SubContributionPersonLink(PersonLinkBase):
