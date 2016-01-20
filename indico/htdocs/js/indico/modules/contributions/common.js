@@ -146,7 +146,7 @@
                         styleObject.setProperty('background', '#' + newSession.colors.background, 'important');
                     }
 
-                    if (!data.scheduled) {
+                    if (data.unscheduled) {
                         changeContribDisplayedStartDate($this);
                     }
                 });
