@@ -24,6 +24,8 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.contributions.views import WPManageContributions
+from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
@@ -166,3 +168,11 @@ class RHContributionREST(RHManageContributionBase):
             if track_id != self.contrib.track_id:
                 updates['track_id'] = track_id
         return updates
+
+
+class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
+    """List of persons in the contribution"""
+
+    @property
+    def _membership_filter(self):
+        return Contribution.id.in_(contrib.id for contrib in self.contribs)

@@ -974,9 +974,10 @@ class WPConferenceModifBase(main.WPMainBase):
         self._navigationTarget = self._conf = conference
 
     def getJSFiles(self):
-        return main.WPMainBase.getJSFiles(self) + \
-               self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
+        return (main.WPMainBase.getJSFiles(self) +
+                self._includeJSPackage('Management') +
+                self._includeJSPackage('MaterialEditor') +
+                self._asset_env['modules_event_management_js'].urls())
 
     def getCSSFiles(self):
         return main.WPMainBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
