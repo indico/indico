@@ -69,7 +69,7 @@
             var self = this;
             self.element.val(self.options.emptyvalue).trigger('propertychange').trigger('change');
             self._refreshClearIcon();
-            self.options.onClear();
+            self.options.onClear.call(self.element);
             if (self.options.focusOnClear) {
                 self.element.focus();
             } else {
@@ -79,7 +79,7 @@
 
         _handleInput: function() {
             var self = this;
-            self.options.onInput();
+            self.options.onInput.call(self.element);
             self._refreshClearIcon();
         },
 
