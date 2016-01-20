@@ -23,6 +23,7 @@ from sqlalchemy.orm import load_only, contains_eager, noload
 from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.util import serialize_event_person
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 
 
@@ -61,4 +62,11 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
             roles.add('contribution_manager')
         if principal.read_access:
             roles.add('contribution_access')
+
+
+def serialize_contribution_person_link(person_link):
+    """Serialize ContributionPersonLink to JSON-like object"""
+    data = serialize_event_person(person_link.person)
+    data['isSpeaker'] = person_link.is_speaker
+    data['authorType'] = person_link.author_type.value
     return data
