@@ -94,3 +94,8 @@ The *sender* is a string (or some other object) identifying the
 context.  The additional kwargs passed to this signal depend on
 the context.
 """)
+
+db_schema_created = _signals.signal('db-schema-created', """
+Executed when a new database schema is created.  The *sender* is the
+name of the schema.
+""")
