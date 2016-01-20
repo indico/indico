@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField
+from flask import session, request
+from wtforms.fields import StringField, SelectField, TextAreaField, HiddenField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -24,6 +25,8 @@ from indico.core.db import db
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.modules.events.models.references import ReferenceType
+from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField
+from indico.web.forms.widgets import CKEditorWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -47,3 +50,21 @@ class ReferenceTypeForm(IndicoForm):
     def validate_url_template(self, field):
         if field.data and '{value}' not in field.data:
             raise ValidationError(_("The URL template must contain the placeholder '{value}'."))
+
+
+class EmailEventPersonsForm(IndicoForm):
+    from_address = SelectField(_('From'), [DataRequired()], choices=[(1, 1)])
+    subject = StringField(_('Subject'), [DataRequired()])
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    recipients = IndicoStaticTextField(_('Recipients'))
+    person_id = HiddenFieldList(validators=[DataRequired()])
+    submitted = HiddenField()
+
+    def __init__(self, *args, **kwargs):
+        super(EmailEventPersonsForm, self).__init__(*args, **kwargs)
+        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
+                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
+        self.from_address.choices = zip(from_addresses, from_addresses)
+
+    def is_submitted(self):
+        return super(EmailEventPersonsForm, self).is_submitted() and 'submitted' in request.form
