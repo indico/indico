@@ -145,14 +145,12 @@ class RHContributionREST(RHManageContributionBase):
         updates = {}
         if session_id is None:
             updates['session'] = None
-            updates['session_block'] = None
         else:
             session = self.event_new.sessions.filter_by(id=session_id, is_deleted=False).one()
             if not session:
                 raise BadRequest('Invalid session id')
             if session != self.contrib.session:
                 updates['session'] = session
-                updates['session_block'] = None
         return updates
 
     def _get_contribution_track_updates(self, track_id):
