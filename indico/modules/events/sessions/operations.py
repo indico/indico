@@ -60,7 +60,6 @@ def delete_session(event_session):
     """Delete session from the event"""
     event_session.is_deleted = True
     for contribution in event_session.contributions:
-        contribution.session_block = None
         contribution.session = None
     _delete_session_timetable_entries(event_session)
     logger.info('Session %s deleted by %s', event_session, session.user)

@@ -20,12 +20,14 @@ from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import mapper
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -255,6 +257,23 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
                 session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
             return True
         return False
+
+
+@listens_for(mapper, 'after_configured', once=True)
+def _mapper_configured():
+    @listens_for(Contribution.session, 'set')
+    def _set_session_block(target, value, *unused):
+        if value is None:
+            target.session_block = None
+
+    @listens_for(Contribution.timetable_entry, 'set')
+    @no_autoflush
+    def _set_timetable_entry(target, value, *unused):
+        if value is None:
+            target.session_block = None
+        else:
+            if target.session is not None:
+                target.session_block = value.parent.session_block
 
 
 @listens_for(Contribution.__table__, 'after_create')
