@@ -31,6 +31,7 @@ from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
 
+from indico.core import signals
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
@@ -74,17 +75,19 @@ def on_models_committed(sender, changes):
         obj.__committed__(change)
 
 
-def _should_create_schema(ddl, target, connection, **kw):
+def _schema_exists(connection, name):
     sql = 'SELECT COUNT(*) FROM "information_schema"."schemata" WHERE "schema_name" = :name'
-    count = connection.execute(db.text(sql), name=ddl.element).scalar()
-    return not count
+    count = connection.execute(db.text(sql), name=name).scalar()
+    return bool(count)
 
 
 def _before_create(target, connection, **kw):
     # SQLAlchemy doesn't create schemas so we need to take care of it...
     schemas = {table.schema for table in kw['tables']}
     for schema in schemas:
-        CreateSchema(schema).execute_if(callable_=_should_create_schema).execute(connection)
+        if not _schema_exists(connection, schema):
+            CreateSchema(schema).execute(connection)
+            signals.db_schema_created.send(unicode(schema), connection=connection)
     # Create the indico_unaccent function
     create_unaccent_function(connection)
 
