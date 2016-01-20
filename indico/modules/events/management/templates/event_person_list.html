@@ -41,7 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for event_person, person_roles in session_persons.iteritems() -%}
+                {% for event_person, person_roles in event_persons.iteritems() -%}
                     {% set is_speaker = person_roles.speaker %}
                     <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
                         <td class="i-table">
@@ -78,7 +78,7 @@
             </tbody>
         </table>
         <a href="#" class="i-button highlight disabled js-requires-selected-row send-mails-btn"
-           data-href="{{ url_for('.email_session_persons', event) }}"
+           data-href="{{ url_for('event_management.email_event_persons', event) }}"
            data-title="{% trans %}Send email{% endtrans %}"
            data-method="POST"
            data-params-selector="#persons-list input[name=person_id]:checkbox:checked:visible"
@@ -88,5 +88,5 @@
     </div>
 </div>
 <script>
-    setupSessionPersonsList();
+    setupEventPersonsList();
 </script>
