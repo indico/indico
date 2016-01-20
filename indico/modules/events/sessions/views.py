@@ -25,8 +25,7 @@ class WPManageSessions(WPJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'sessions'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls() +
-                self._asset_env['modules_event_management_js'].urls())
+        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls())
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls()
