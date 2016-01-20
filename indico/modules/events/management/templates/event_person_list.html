@@ -1,7 +1,7 @@
-<div id="persons-list">
+<div id="persons-list" class="i-form">
     <div class="flashed-messages"></div>
     <div>
-        <div class="toolbar">
+        <div class="toolbar form-group">
             <div class="group left">
                 <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
                 <ul class="dropdown">
@@ -28,8 +28,8 @@
             </div>
         </div>
     </div>
-    <div>
-        <table class="i-table-widget tablesorter">
+    <div class="form-group">
+        <table class="i-table-widget tablesorter form-block">
             <thead>
                 <tr class="i-table">
                     <th class="i-table checkbox-column" data-sorter="false"></th>
@@ -54,7 +54,7 @@
                         <td class="i-table">
                             {% if person_roles.primary_author or person_roles.secondary_author %}
                                 {% set author_types = [_('Primary') if person_roles.primary_author,
-                                                       _('Secondary') if person_roles.secondary_author] %}
+                                                       _('Co-author') if person_roles.secondary_author] %}
                                 {{ author_types | reject('undefined') | join(', ') }}
                             {% else %}
                                 -
@@ -77,7 +77,9 @@
                 {%- endfor %}
             </tbody>
         </table>
-        <a href="#" class="i-button highlight disabled js-requires-selected-row send-mails-btn"
+    </div>
+    <div class="form-group form-group">
+        <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row send-mails-btn"
            data-href="{{ url_for('event_management.email_event_persons', event) }}"
            data-title="{% trans %}Send email{% endtrans %}"
            data-method="POST"
