@@ -23,10 +23,12 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.contributions.views import WPManageContributions
+from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from indico.util.i18n import _, ngettext
+
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -121,3 +123,12 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
         return jsonify_data(html=_render_contribution_list(self.event_new))
+
+
+class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
+    """List of persons in the contribution"""
+
+    @property
+    def _membership_filter(self):
+        contribution_ids = {contrib.id for contrib in self.contribs}
+        return Contribution.id.in_(contribution_ids)

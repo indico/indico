@@ -25,7 +25,7 @@ class WPManageContributions(WPJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'contributions'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
+        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls())
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls()
