@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
@@ -35,6 +36,7 @@ def create_contribution(event, data):
     return contrib
 
 
+@no_autoflush
 def update_contribution(contrib, data):
     contrib.populate_from_dict(data)
     ensure_timetable_consistency(contrib.event_new, delete=True)
