@@ -96,17 +96,20 @@ def upgrade():
         sa.Column('session_id', sa.Integer(), nullable=False, index=True),
         sa.Column('local_group_id', sa.Integer(), nullable=True, index=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('type', PyIntEnum(PrincipalType, exclude_values={PrincipalType.email}), nullable=True),
+        sa.Column('type', PyIntEnum(PrincipalType), nullable=True),
+        sa.Column('email', sa.String(), nullable=True, index=True),
+        sa.CheckConstraint('email IS NULL OR email = lower(email)', name='lowercase_email'),
         sa.CheckConstraint('read_access OR full_access OR array_length(roles, 1) IS NOT NULL', name='has_privs'),
-        sa.CheckConstraint('type != 1 OR (local_group_id IS NULL AND mp_group_provider IS NULL AND '
-                           'mp_group_name IS NULL AND user_id IS NOT NULL)',
-                           name='valid_user'),
-        sa.CheckConstraint('type != 2 OR (user_id IS NULL AND mp_group_provider IS NULL AND mp_group_name IS NULL AND '
-                           'local_group_id IS NOT NULL)',
+        sa.CheckConstraint('type != 1 OR (local_group_id IS NULL AND mp_group_provider IS NULL AND email IS NULL AND '
+                           'mp_group_name IS NULL AND user_id IS NOT NULL)', name='valid_user'),
+        sa.CheckConstraint('type != 2 OR (user_id IS NULL AND mp_group_provider IS NULL AND email IS NULL AND '
+                           'mp_group_name IS NULL AND local_group_id IS NOT NULL)',
                            name='valid_local_group'),
-        sa.CheckConstraint('type != 3 OR (local_group_id IS NULL AND user_id IS NULL AND '
+        sa.CheckConstraint('type != 3 OR (local_group_id IS NULL AND user_id IS NULL AND email IS NULL AND '
                            'mp_group_provider IS NOT NULL AND mp_group_name IS NOT NULL)',
                            name='valid_multipass_group'),
+        sa.CheckConstraint('type != 4 OR (local_group_id IS NULL AND mp_group_provider IS NULL AND '
+                           'mp_group_name IS NULL AND user_id IS NULL AND email IS NOT NULL)', name='valid_email'),
         sa.ForeignKeyConstraint(['local_group_id'], ['users.groups.id']),
         sa.ForeignKeyConstraint(['session_id'], ['events.sessions.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
@@ -114,6 +117,8 @@ def upgrade():
         schema='events'
     )
     op.create_index(None, 'session_principals', ['mp_group_provider', 'mp_group_name'], schema='events')
+    op.create_index('ix_uq_session_principals_email', 'session_principals', ['email', 'session_id'],
+                    unique=True, schema='events', postgresql_where=sa.text('type = 4'))
     op.create_index('ix_uq_session_principals_local_group', 'session_principals', ['local_group_id', 'session_id'],
                     unique=True, schema='events', postgresql_where=sa.text('type = 2'))
     op.create_index('ix_uq_session_principals_mp_group', 'session_principals',

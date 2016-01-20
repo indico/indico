@@ -281,12 +281,12 @@ class TimetableMigration(object):
                                         event_id=self.event.id)
         principals = {}
         # managers / read access
-        self._process_ac(SessionPrincipal, principals, ac, allow_emails=False)
+        self._process_ac(SessionPrincipal, principals, ac, allow_emails=True)
         # coordinators
         for submitter in old_session._coordinators.itervalues():
             self._process_principal(SessionPrincipal, principals, submitter, 'Coordinator', roles={'coordinate'})
         self._process_principal_emails(SessionPrincipal, principals, getattr(old_session, '_coordinatorsEmail', []),
-                                       'Coordinator', roles={'coordinate'}, allow_emails=False)
+                                       'Coordinator', roles={'coordinate'}, allow_emails=True)
         session.acl_entries = set(principals.itervalues())
         return session
 
