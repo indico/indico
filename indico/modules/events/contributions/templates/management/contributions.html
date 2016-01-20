@@ -20,6 +20,7 @@
         </div>
         <div class="group">
             <button class="i-button highlight icon-plus"
+                  title="{% trans %}Add new contribution{% endtrans %}"
                   data-title="{% trans %}Add new contribution{% endtrans %}"
                   data-href="{{ url_for('.manage_create_contrib', event) }}"
                   data-ajax-dialog
@@ -28,14 +29,15 @@
             </button>
         </div>
         <div class="group">
-            <button class="i-button js-enable-if-checked" disabled
+            <button class="i-button js-enable-if-checked icon-remove" disabled
+                    title="{% trans %}Remove{% endtrans %}"
                     data-method="POST"
                     data-href="{{ url_for('.manage_delete_contribs', event) }}"
                     data-params-selector="#contribution-list input[name=contribution_id]:checked"
                     data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
                     data-title="{% trans %}Confirm deletion{% endtrans %}"
                     data-update="#contribution-list">
-                {% trans %}Remove{% endtrans %}
+                {%- trans %}Remove{% endtrans -%}
             </button>
             <button class="i-button js-enable-if-checked" disabled>{% trans %}Move{% endtrans %}</button>
             <button class="i-button js-enable-if-checked" disabled>{% trans %}Download{% endtrans %}</button>
