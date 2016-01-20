@@ -38,4 +38,17 @@
             sortList: [[1, 0]]
         });
     };
+
+    global.showUndoWarning = function showUndoWarning(message, feedbackMessage, actionCallback) {
+        cornerMessage({
+            message: message,
+            progressMessage: $T.gettext("Undoing previous operation..."),
+            feedbackMessage: feedbackMessage,
+            actionLabel: $T.gettext('Undo'),
+            actionCallback: actionCallback,
+            duration: 10000,
+            feedbackDuration: 4000,
+            class: 'warning'
+        });
+    };
 })(window);
