@@ -62,8 +62,8 @@
         }
 
         // quick search of contribution by ID
-        if (m = term.match(/^#(\d+)$/)) {
-            visibleEntries = $('#contrib-' + m[1]);
+        if ((m = term.match(/^#(\d+)$/))) {
+            visibleEntries = $('[data-friendly-id="' + m[1] + '"]');
         } else {
             visibleEntries = contributions.find('td[data-searchable*="' + term + '"]').closest('tr');
         }
