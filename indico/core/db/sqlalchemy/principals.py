@@ -160,7 +160,8 @@ class PrincipalMixin(object):
     def type(cls):
         exclude_values = None if cls.allow_emails else {PrincipalType.email}
         return db.Column(
-            PyIntEnum(PrincipalType, exclude_values=exclude_values)
+            PyIntEnum(PrincipalType, exclude_values=exclude_values),
+            nullable=False
         )
 
     @declared_attr
