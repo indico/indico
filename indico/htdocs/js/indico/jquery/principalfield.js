@@ -24,6 +24,8 @@
             suggestedUsers: null,
             allowExternalUsers: true,
             enableGroupsTab: false,
+            multiChoice: false,
+            overwriteChoice: true,
             showFavoriteUsers: true,
             render: function(users) {},
             onRemove: function() {},
@@ -46,15 +48,24 @@
 
         choose: function choose() {
             var self = this;
+            function cleanDuplicates(users) {
+                _.each(self.users, function(user) {
+                    users = _.without(users, _.findWhere(users, {
+                        _type: user._type,
+                        id: user.id
+                    }));
+                });
+                return users;
+            }
             function handleUsersChosen(users) {
-                self.users = users;
+                self.users = self.options.overwriteChoice? users : self.users.concat(cleanDuplicates(users));
                 self.options.onSelect(self.users);
                 self._update();
             }
             var userChoosePopup = new ChooseUsersPopup($T("Choose user"), true, self.options.eventId,
                                                        self.options.enableGroupsTab, self.options.showFavoriteUsers,
-                                                       self.options.suggestedUsers, true, true, false,
-                                                       handleUsersChosen, null,
+                                                       self.options.suggestedUsers, !self.options.multiChoice,
+                                                       true, false, handleUsersChosen, null,
                                                        self.options.allowExternalUsers);
             userChoosePopup.execute();
         },
@@ -63,6 +74,13 @@
             var self = this;
             self.users = [];
             self.options.onRemove();
+            self._update();
+        },
+
+        removeOne: function removeOne(userId) {
+            var self = this;
+            var user = _.findWhere(self.users, {id: userId});
+            self.users = _.without(self.users, user);
             self._update();
         }
     });
