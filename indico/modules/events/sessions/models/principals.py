@@ -30,6 +30,7 @@ class SessionPrincipal(PrincipalRolesMixin, db.Model):
     principal_for = 'Session'
     unique_columns = ('session_id',)
     disallowed_protection_modes = frozenset()
+    allow_emails = True
 
     @declared_attr
     def __table_args__(cls):
