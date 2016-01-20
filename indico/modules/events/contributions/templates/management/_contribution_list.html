@@ -53,7 +53,7 @@
                                     {{ contrib.title }}
                                 </strong>
                             </td>
-                            <td class="i-table">
+                            <td class="i-table start-date">
                                 {% if contrib.timetable_entry %}
                                     {{ contrib.timetable_entry.start_dt|format_datetime('short') }}
                                 {% else %}
@@ -148,7 +148,7 @@
                         dataType: 'json',
                         contentType: 'application/json',
                         error: handleAjaxError,
-                        complete: IndicoUI.Dialogs.Util.progress(),
+                        complete: IndicoUI.Dialogs.Util.progress()
                     });
                 }
 
@@ -176,10 +176,14 @@
                         var styleObject = $this[0].style;
                         var postData =  {session_id: session.id};
 
-                        return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                        return patchObject($this.data('href'), $this.data('method'), postData).then(function(data) {
                             $this.find('.label').text(session.title);
                             styleObject.setProperty('color', '#' + session.colors.text, 'important');
                             styleObject.setProperty('background', '#' + session.colors.background, 'important');
+                            if (!data.scheduled) {
+                                $this.closest('tr').find('td.start-date')
+                                     .html($('<em>', {'text': $T.gettext('Not scheduled')}));
+                            }
                         });
                     },
                     onClear: function(session) {
