@@ -20,11 +20,11 @@
         </div>
         <div class="group">
             <button class="i-button highlight icon-plus"
-                  title="{% trans %}Add new contribution{% endtrans %}"
-                  data-title="{% trans %}Add new contribution{% endtrans %}"
-                  data-href="{{ url_for('.manage_create_contrib', event) }}"
-                  data-ajax-dialog
-                  data-update="#contribution-list">
+                    title="{% trans %}Add new contribution{% endtrans %}"
+                    data-title="{% trans %}Add new contribution{% endtrans %}"
+                    data-href="{{ url_for('.manage_create_contrib', event) }}"
+                    data-ajax-dialog
+                    data-update="#contribution-list">
                 {% trans %}New contribution{% endtrans %}
             </button>
         </div>
@@ -42,12 +42,12 @@
         </div>
         <div class="group">
             <button class="i-button icon-users js-enable-if-checked disabled"
-               data-title="{% trans %}Author list{% endtrans %}"
-               data-href="{{ url_for('contributions.person_list', event) }}"
-               data-params-selector="#contribution-list input[name=contribution_id]:checked"
-               data-method="POST"
-               data-dialog-classes="event-persons-dialog"
-               data-ajax-dialog>
+                    data-title="{% trans %}Author list{% endtrans %}"
+                    data-href="{{ url_for('contributions.person_list', event) }}"
+                    data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                    data-method="POST"
+                    data-dialog-classes="event-persons-dialog"
+                    data-ajax-dialog>
                 {%- trans %}Author list{% endtrans -%}
             </button>
             <button class="i-button js-enable-if-checked arrow" disabled
