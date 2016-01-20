@@ -23,7 +23,32 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.timetable.util import ensure_timetable_consistency
+
+
+def _ensure_consistency(contrib):
+    """Unschedule contribution if not consistent with timetable
+
+    A contribution that has no session assigned, may not be scheduled
+    inside a session.  A contribution that has a session assigned may
+    only be scheduled inside a session block associated with that
+    session, and that session block must match the session block of
+    the contribution.
+
+    :return: A dict containing the data needed to
+    """
+    entry = contrib.timetable_entry
+    if entry is None:
+        return False
+    if entry.parent_id is None and (contrib.session is not None or contrib.session_block is not None):
+        # Top-level entry but we have a session/block set
+        contrib.timetable_entry = None
+        return True
+    elif entry.parent_id is not None:
+        parent = entry.parent
+        # Nested entry but no or a different session/block set
+        if parent.session_block.session != contrib.session or parent.session_block != contrib.session_block:
+            contrib.timetable_entry = None
+            return True
 
 
 def create_contribution(event, data):
@@ -38,12 +63,33 @@ def create_contribution(event, data):
 
 @no_autoflush
 def update_contribution(contrib, data):
+    """Update a contribution
+
+    :param contrib: The `Contribution` to update
+    :param data: A dict containing the data to update
+    :return: A dictionary containing information related to the
+             update.  `unscheduled` will be true if the modification
+             resulted in the contribution being unscheduled.  In this
+             case `undo_unschedule` contains the necessary data to
+             re-schedule it (undoing the session change causing it to
+             be unscheduled)
+    """
+    rv = {'unscheduled': False, 'undo_unschedule': None}
+    current_session_block = contrib.session_block
     contrib.populate_from_dict(data)
-    ensure_timetable_consistency(contrib.event_new, delete=True)
+    if 'session' in data:
+        timetable_entry = contrib.timetable_entry
+        if timetable_entry is not None and _ensure_consistency(contrib):
+            rv['unscheduled'] = True
+            rv['undo_unschedule'] = {'start_dt': timetable_entry.start_dt.isoformat(),
+                                     'contribution_id': contrib.id,
+                                     'session_block_id': current_session_block.id if current_session_block else None,
+                                     'force': True}
     db.session.flush()
     logger.info('Contribution %s updated by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                           'Contribution "{}" has been updated'.format(contrib.title), session.user)
+    return rv
 
 
 def delete_contribution(contrib):

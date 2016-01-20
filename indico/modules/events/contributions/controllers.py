@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request
+from flask import flash, request, jsonify
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest
 
@@ -138,9 +138,10 @@ class RHContributionREST(RHManageContributionBase):
             updates.update(self._get_contribution_session_updates(data['session_id']))
         if 'track_id' in data:
             updates.update(self._get_contribution_track_updates(data['track_id']))
+        rv = {}
         if updates:
-            update_contribution(self.contrib, updates)
-        return jsonify_data(flash=False, scheduled=(self.contrib.timetable_entry is not None))
+            rv = update_contribution(self.contrib, updates)
+        return jsonify(unscheduled=rv.get('unscheduled', False), undo_unschedule=rv.get('undo_unschedule'))
 
     def _get_contribution_session_updates(self, session_id):
         updates = {}
