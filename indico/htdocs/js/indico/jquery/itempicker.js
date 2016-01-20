@@ -60,7 +60,22 @@
                 events: {
                     show: function() {
                         _.defer(function() {
-                            qtipContent.find('.filter-input').focus();
+                            function handleInput() {
+                                var $this = $(this);
+                                var textTyped = $this.val().trim().toLowerCase();
+                                var dropdownContainer = $this.closest('.dropdown-container');
+
+                                dropdownContainer.find('.dropdown-item').each(function() {
+                                    var $item = $(this);
+                                    var found = $item.data('filter').toLowerCase().indexOf(textTyped) !== -1;
+
+                                    $item.toggle(found);
+                                });
+                            }
+
+                            qtipContent.find('.filter-input')
+                                .clearableinput({'onInput': handleInput, 'onClear': handleInput, 'focusOnStart': true})
+                                .focus();
                         });
                     }
                 }
@@ -79,22 +94,7 @@
                                             'attr': {'placeholder': self.options.filterPlaceholder}});
             var itemsContainer = $('<div>', {'class': 'dropdown-items-container'});
 
-            function handleInput() {
-                var textTyped = filterInput.val().trim().toLowerCase();
-
-                dropdownContainer.find('.dropdown-item').each(function() {
-                    var $item = $(this);
-                    var found = $item.data('filter').toLowerCase().indexOf(textTyped) !== -1;
-
-                    $item.toggle(found);
-                });
-            }
-
             filterWrapper.append(filterInput);
-            $(window).load(function() {
-                filterInput.clearableinput({'onInput': handleInput, 'onClear': handleInput, 'focusOnStart': true});
-            });
-
             dropdownContainer.append(filterWrapper);
             $.each(items, function(index, itemData) {
                 var isSelected = (itemData.id === self.element.data('selected-item-id'));
