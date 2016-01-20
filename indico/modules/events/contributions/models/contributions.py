@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -253,3 +255,16 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
                 session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
             return True
         return False
+
+
+@listens_for(Contribution.__table__, 'after_create')
+def _add_timetable_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER INSERT OR UPDATE
+        ON {}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency();
+    """.format(target.fullname)
+    DDL(sql).execute(conn)
