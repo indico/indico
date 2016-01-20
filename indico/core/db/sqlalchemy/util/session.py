@@ -16,7 +16,11 @@
 
 from __future__ import unicode_literals
 
+from functools import wraps
+
 from flask_sqlalchemy import connection_stack
+
+from indico.core.db import db
 
 
 def update_session_options(db, session_options=None):
@@ -30,3 +34,12 @@ def update_session_options(db, session_options=None):
         'scopefunc', connection_stack.__ident_func__
     )
     db.session = db.create_scoped_session(session_options)
+
+
+def no_autoflush(fn):
+    """Wraps the decorated function in a no-autoflush block"""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        with db.session.no_autoflush:
+            return fn(*args, **kwargs)
+    return wrapper
