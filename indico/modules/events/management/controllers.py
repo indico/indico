@@ -16,13 +16,22 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, session
+from collections import defaultdict
+
+from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden
 
+from indico.core.notifications import make_email, send_email
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
+                                                                AuthorType)
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.management.util import can_lock
-from indico.util.i18n import _
+from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.forms import EmailEventPersonsForm
+from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for, jsonify_data
-from indico.web.util import jsonify_template
+from indico.web.util import jsonify_form, jsonify_template
 
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -87,3 +96,53 @@ class RHUnlockEvent(RHConferenceModifBase):
         self._conf.setClosed(False)
         flash(_('The event is now unlocked.'), 'success')
         return redirect(url_for('event_mgmt.conferenceModification', self._conf))
+
+
+class RHContributionPersonListMixin:
+    """List of persons somehow related to contributions (co-authors, speakers...)"""
+
+    def _process(self):
+        contribution_persons = (ContributionPersonLink
+                                .find(ContributionPersonLink.contribution.has(self._membership_filter))
+                                .all())
+        contribution_persons.extend(SubContributionPersonLink
+                                    .find(SubContributionPersonLink.subcontribution
+                                          .has(SubContribution.contribution.has(self._membership_filter)))
+                                    .all())
+
+        contribution_persons_dict = defaultdict(lambda: {'speaker': False, 'primary_author': False,
+                                                         'secondary_author': False})
+        for contrib_person in contribution_persons:
+            person_roles = contribution_persons_dict[contrib_person.person]
+            person_roles['speaker'] |= contrib_person.is_speaker
+            person_roles['primary_author'] |= contrib_person.author_type == AuthorType.primary
+            person_roles['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
+        return jsonify_template('events/management/event_person_list.html',
+                                event_persons=contribution_persons_dict, event=self.event_new)
+
+
+class RHEmailEventPersons(RHConferenceModifBase):
+    """Send emails to selected EventPersons"""
+
+    def _checkParams(self, params):
+        self._doNotSanitizeFields.append('from_address')
+        RHConferenceModifBase._checkParams(self, params)
+
+    def _process(self):
+        person_ids = request.form.getlist('person_id')
+        recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
+        form = EmailEventPersonsForm(person_id=person_ids, recipients=', '.join(recipients))
+        if form.validate_on_submit():
+            for recipient in recipients:
+                email = make_email(to_list=recipient, from_address=form.from_address.data,
+                                   subject=form.subject.data, body=form.body.data, html=True)
+                send_email(email, self.event_new, 'Event Persons')
+            num = len(recipients)
+            flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
+            return jsonify_data()
+        return jsonify_form(form, submit=_('Send'))
+
+    def _find_event_persons(self, person_ids):
+        return (self.event_new.persons
+                .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
+                .all())
