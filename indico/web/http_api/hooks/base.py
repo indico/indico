@@ -36,7 +36,7 @@ from MaKaC.common.mail import GenericMailer
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.db.util import flush_after_commit_queue
-from indico.util.date_time import nowutc
+from indico.util.date_time import now_utc
 from indico.util.fossilize import fossilize
 from indico.web.http_api.metadata import Serializer
 from indico.web.http_api.metadata.html import HTML4Serializer
@@ -257,7 +257,7 @@ class DataFetcher(object):
         """
 
         # if it's a an "alias", return immediately
-        now = nowutc()
+        now = now_utc()
         if dateTime in cls._deltas:
             return ('ctx', now + cls._deltas[dateTime])
         elif dateTime == 'now':
@@ -297,7 +297,7 @@ class DataFetcher(object):
         if rel == 'abs':
             return tz.localize(value) if not value.tzinfo else value
         elif rel == 'ctx' and type(value) == timedelta:
-            value = nowutc() + value
+            value = now_utc() + value
 
         # from here on, 'value' has to be a datetime
         if ctx == 'from':

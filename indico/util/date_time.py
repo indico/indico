@@ -31,12 +31,21 @@ from babel.numbers import format_number as _format_number
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from dateutil.relativedelta import relativedelta
 
-from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from indico.core.config import Config
 from indico.util.i18n import get_current_locale, _, ngettext
+from MaKaC.common.timezoneUtils import DisplayTZ
 
 
-now_utc = nowutc
+def now_utc(exact=True):
+    """Get the current date/time in UTC
+
+    :param exact: Set to ``False`` to set seconds/microseconds to 0.
+    :return: A timezone-aware `datetime` object
+    """
+    now = datetime.utcnow()
+    if not exact:
+        now = now.replace(second=0, microsecond=0)
+    return pytz.utc.localize(now)
 
 
 def utc_timestamp(datetimeVal):
@@ -202,7 +211,7 @@ def format_human_date(dt, format='medium', locale=None):
     Return the date in a human-like format for yesterday, today and tomorrow.
     Format the date otherwise.
     """
-    today = nowutc().date()
+    today = now_utc().date()
     oneday = timedelta(days=1)
 
     if not locale:
