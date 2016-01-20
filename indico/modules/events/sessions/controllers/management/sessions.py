@@ -19,25 +19,23 @@ from __future__ import unicode_literals
 import random
 from collections import defaultdict
 
-from flask import request, jsonify, flash
+from flask import request, jsonify
 from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
-from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
-from indico.modules.events.sessions.forms import SessionForm, EmailSessionPersonsForm
+from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
 from indico.modules.events.sessions.util import (get_colors, query_active_sessions, generate_csv_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -140,52 +138,10 @@ class RHSessionREST(RHManageSessionBase):
         return jsonify()
 
 
-class RHSessionPersonList(RHManageSessionsActionsBase):
-    """List of persons in the session"""
+class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActionsBase):
+    """List of persons in the session's contributions"""
 
-    def _process(self):
+    @property
+    def _membership_filter(self):
         session_ids = {s.id for s in self.sessions}
-        session_persons = (ContributionPersonLink
-                           .find(ContributionPersonLink.contribution.has(Contribution.session_id.in_(session_ids)))
-                           .all())
-        session_persons.extend(SubContributionPersonLink
-                               .find(SubContributionPersonLink.subcontribution
-                                     .has(SubContribution.contribution.has(Contribution.session_id.in_(session_ids))))
-                               .all())
-
-        session_persons_dict = defaultdict(lambda: {'speaker': False, 'primary_author': False,
-                                                    'secondary_author': False})
-        for session_person in session_persons:
-            person_roles = session_persons_dict[session_person.person]
-            person_roles['speaker'] |= session_person.is_speaker
-            person_roles['primary_author'] |= session_person.author_type == AuthorType.primary
-            person_roles['secondary_author'] |= session_person.author_type == AuthorType.secondary
-        return jsonify_template('events/sessions/management/session_person_list.html',
-                                session_persons=session_persons_dict, event=self.event_new)
-
-
-class RHSessionsEmailPersons(RHManageSessionsBase):
-    """Send emails to selected EventPersons"""
-
-    def _checkParams(self, params):
-        self._doNotSanitizeFields.append('from_address')
-        RHManageSessionsBase._checkParams(self, params)
-
-    def _process(self):
-        person_ids = request.form.getlist('person_id')
-        recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
-        form = EmailSessionPersonsForm(person_id=person_ids, recipients=', '.join(recipients))
-        if form.validate_on_submit():
-            for recipient in recipients:
-                email = make_email(to_list=recipient, from_address=form.from_address.data,
-                                   subject=form.subject.data, body=form.body.data, html=True)
-                send_email(email, self.event_new, 'Sessions')
-            num = len(recipients)
-            flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
-            return jsonify_data()
-        return jsonify_form(form, submit=_('Send'))
-
-    def _find_event_persons(self, person_ids):
-        return (self.event_new.persons
-                .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
-                .all())
+        return Contribution.session_id.in_(session_ids)
