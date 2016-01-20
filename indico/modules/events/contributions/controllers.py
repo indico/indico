@@ -139,7 +139,7 @@ class RHContributionREST(RHManageContributionBase):
             updates.update(self._get_contribution_track_updates(data['track_id']))
         if updates:
             update_contribution(self.contrib, updates)
-        return jsonify_data(flash=False)
+        return jsonify_data(flash=False, scheduled=(self.contrib.timetable_entry is not None))
 
     def _get_contribution_session_updates(self, session_id):
         updates = {}
