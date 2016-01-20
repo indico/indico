@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 
 from indico.core.db import db
@@ -189,6 +190,19 @@ class TimetableEntry(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'type', 'start_dt', 'end_dt', _repr=self.object)
+
+
+@listens_for(TimetableEntry.__table__, 'after_create')
+def _add_timetable_consistency_trigger(target, conn, **kw):
+    sql = """
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER INSERT OR UPDATE
+        ON {}
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency();
+    """.format(target.fullname)
+    DDL(sql).execute(conn)
 
 
 @listens_for(TimetableEntry.session_block, 'set')

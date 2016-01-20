@@ -1,31 +1,22 @@
-# This file is part of Indico.
-# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
-#
-# Indico is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3 of the
-# License, or (at your option) any later version.
-#
-# Indico is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+"""Add trigger for consistent timetable
 
-from __future__ import unicode_literals
+Revision ID: 43f6a1414c75
+Revises: 29232c09e58a
+Create Date: 2016-01-19 17:50:14.391523
+"""
 
 import textwrap
 
-from sqlalchemy import DDL
-
-from indico.core import signals
+from alembic import op
 
 
-@signals.db_schema_created.connect_via('events')
-def _events_schema_created(sender, connection, **kwargs):
-    sql = textwrap.dedent("""
+# revision identifiers, used by Alembic.
+revision = '43f6a1414c75'
+down_revision = '29232c09e58a'
+
+
+def upgrade():
+    op.execute(textwrap.dedent("""
         CREATE OR REPLACE FUNCTION events.check_timetable_consistency() RETURNS trigger AS
         $BODY$
         BEGIN
@@ -61,5 +52,26 @@ def _events_schema_created(sender, connection, **kwargs):
         END;
         $BODY$
         LANGUAGE plpgsql;
+    """))
+    op.execute("""
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER INSERT OR UPDATE
+        ON events.contributions
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency();
     """)
-    DDL(sql).execute(connection)
+    op.execute("""
+        CREATE CONSTRAINT TRIGGER consistent_timetable
+        AFTER INSERT OR UPDATE
+        ON events.timetable_entries
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+        EXECUTE PROCEDURE events.check_timetable_consistency();
+    """)
+
+
+def downgrade():
+    op.execute("DROP TRIGGER consistent_timetable ON events.contributions")
+    op.execute("DROP TRIGGER consistent_timetable ON events.timetable_entries")
+    op.execute("DROP FUNCTION events.check_timetable_consistency()")
