@@ -63,6 +63,72 @@
         }
     };
 
+    global.cornerMessage = function cornerWarning(options) {
+        // Create nice message in bottom right corner
+
+        options = $.extend({
+            actionLabel: null, // the text of the action label
+            actionCallback: null, // the callback that will be invoked
+            message: '', // the message that will be displayed
+            progressMessage: $T.gettext('Executing operation...'), // the message that will be displayed while executing
+                                                                   // the action
+            feedbackMessage: $T.gettext('Operation done!'), // the message that will be displayed once the action has
+                                                            // been successfully executed
+            duration: 0, // the lifetime of the message (without being clicked, 0 = forever)
+            feedbackDuration: 4000, // the lifetime of the feedback message (0 = forever)
+            class: '' // a class that will be added to the message box (warning, error, success or highlight)
+        }, options);
+
+        function _disappear(when) {
+            return setTimeout(function() {
+                box.fadeOut(function() {
+                    box.remove();
+                });
+            }, when);
+        }
+
+        var container = $('#corner-message-container'),
+            disappearHandler = options.duration ? _disappear(options.duration) : null;
+
+        if (!container.length) {
+            container = $('<div id="corner-message-container">').appendTo('body');
+        }
+
+        var box = $('<div class="corner-message">').text(options.message).prependTo(container);
+
+        if (options.class) {
+            box.addClass(options.class);
+        }
+
+        if (options.actionLabel) {
+            var text = $('<a class="corner-message-text" href="#">').text(options.actionLabel).appendTo(box);
+
+            text.on('click', function(evt) {
+                evt.preventDefault();
+
+                if (disappearHandler) {
+                    clearTimeout(disappearHandler);
+                }
+                text.remove();
+                if (options.actionCallback) {
+                    var promise = options.actionCallback();
+
+                    box.addClass('progress').text(options.progressMessage);
+
+                    promise.done(function() {
+                        box.text(options.feedbackMessage);
+                        box.removeClass(options.class).addClass('success').removeClass('progress');
+                        if (options.feedbackDuration) {
+                            _disappear(options.feedbackDuration);
+                        }
+                    });
+                } else {
+                    _disappear(0);
+                }
+            });
+        }
+    };
+
     global.uniqueId = function uniqueId() {
         return '' + Math.round(new Date().getTime() + (Math.random() * 100));
     };
