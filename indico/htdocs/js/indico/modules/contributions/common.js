@@ -105,11 +105,7 @@
         });
     }
 
-    function changeContribDisplayedStartDate(itemPicker) {
-        itemPicker.closest('tr').find('td.start-date').html($('<em>', {'text': $T.gettext('Not scheduled')}));
-    }
-
-    function setupSessionPicker(createURL) {
+    function setupSessionPicker(createURL, timetableRESTURL) {
         $('#contribution-list .session-item-picker').itempicker({
             filterPlaceholder: $T.gettext('Filter sessions'),
             containerClasses: 'session-item-container',
@@ -121,7 +117,6 @@
                         url: createURL,
                         onClose: function(data) {
                             if (data) {
-                                var postData = {session_id: data.new_session_id};
                                 $('.session-item-picker').itempicker('updateItemList', data.sessions);
                                 itemPicker.itempicker('selectItem', data.new_session_id);
                             }
@@ -147,7 +142,19 @@
                     }
 
                     if (data.unscheduled) {
-                        changeContribDisplayedStartDate($this);
+                        var row = $this.closest('tr');
+                        var startDateCol = row.find('td.start-date');
+                        startDateCol.html($('<em>', {'text': $T.gettext('Not scheduled')}));
+                        showUndoWarning(
+                            $T.gettext("'{0}' has been unscheduled due to the session change.").format(row.data('title')),
+                            $T.gettext("Undo successful! Timetable entry and session have been restored."),
+                            function() {
+                                return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
+                                    startDateCol.text(moment(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                                    $this.itempicker('selectItem', oldSession.id);
+                                });
+                            }
+                        );
                     }
                 });
             }
@@ -165,7 +172,7 @@
                     location.href = createURL;
                 }
             }],
-            onSelect: function(newTrack, oldTrack) {
+            onSelect: function(newTrack) {
                 var $this = $(this);
                 var postData = {track_id: newTrack ? newTrack.id : null};
 
@@ -180,11 +187,12 @@
     global.setupContributionList = function setupContributionList(options) {
         options = $.extend({
             createSessionURL: null,
-            createTrackURL: null
+            createTrackURL: null,
+            timetableRESTURL: null
         }, options);
         setupTableSorter();
         setupSearchBox();
-        setupSessionPicker(options.createSessionURL);
+        setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
