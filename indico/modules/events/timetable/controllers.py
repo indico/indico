@@ -94,8 +94,8 @@ class RHTimetableREST(RHManageTimetableBase):
         # TODO: breaks & session blocks
         else:
             raise BadRequest('No object specified')
-        create_timetable_entry(self.event_new, updates)
-        return jsonify()
+        entry = create_timetable_entry(self.event_new, updates)
+        return jsonify(start_dt=entry.start_dt.isoformat(), id=entry.id)
 
     def _process_PATCH(self):
         """Update a timetable entry"""
