@@ -60,7 +60,7 @@
             var address = $('#location-address-{{ field.id }}');
             var usingDefault = $('#location-inheritance-{{ field.id }}');
             var venues = {{ venues | tojson }};
-            var venueNames = {{ venue_names | tojson }};
+            var venueNames = $.map(venues.data, function(venue) {return venue.name;});
             var rooms = {{ rooms | tojson }};
             var hiddenData = field.val() ? JSON.parse(field.val()) : {};
             var latestUsedField = '';
@@ -193,6 +193,15 @@
                 return query ? query.trim() : '';
             }
 
+            function findRoomInVenue(query, venue) {
+                if (rooms[venue]) {
+                    return $.grep(rooms[venue].data, function(room) {
+                        return room.name.toUpperCase() == query.toUpperCase();
+                    });
+                }
+                return [];
+            }
+
             initializeInputs();
 
             var latestVenueValue = venueInput.val();
@@ -209,7 +218,7 @@
                 minLength: 0,
                 searchOnFocus: true,
                 resultContainer: '#' + venueInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
-                template: {% raw %}'<span>{{name}}</span>'{% endraw %},
+                template: {% raw %}'<span id="location-venue-{{id}}">{{name}}</span>'{% endraw %},
                 emptyTemplate: function(query) { return ""; },
                 display: 'name',
                 hint: true,
@@ -234,12 +243,13 @@
                     },
                     onHideLayout: function(node, query) {
                         if (!validVenue && node.val() && !preventGuessing) {
-                            // In case of an outside click, guess the selection:
-                            // 1. compare if it matches exactly with an option
-                            if (false) {
-                                // TODO
+                            var result = [];
+                            result = $.grep(venues.data, function(venue) {
+                                return venue.name.toUpperCase() == query.toUpperCase();
+                            });
+                            if (result.length > 0) {
+                                $('#location-venue-' + result[0].id).parent().trigger('click');
                             } else {
-                                // 2. if not, assume it's "Just use"
                                 venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                             }
                             preventGuessing = false
@@ -267,7 +277,7 @@
                 hint: true,
                 maxItem: 0,
                 resultContainer: '#' + roomInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
-                template: {% raw %}'<span>{{name}}</span>'{% endraw %},
+                template: {% raw %}'<span id="location-room-{{id}}">{{name}}</span>'{% endraw %},
                 emptyTemplate: function(query) { return ""; },
                 display: 'name',
                 callback: {
@@ -296,12 +306,20 @@
                     },
                     onHideLayout: function(node, query) {
                         if (!validRoom && node.val() && !preventGuessing) {
-                            // In case of an outside click, guess the selection:
-                            // 1. compare if it matches exactly with an option
-                            if (false) {
-                                // TODO
+                            var result = [];
+                            var venueValue = venueInput.val();
+                            if (venueValue) {
+                                result = findRoomInVenue(query, venueValue);
                             } else {
-                                // 2. if not, assume it's "Just use"
+                                var count = 0;
+                                while (count < venueNames.length && result.length == 0) {
+                                    result = findRoomInVenue(query, venueNames[count]);
+                                    count++;
+                                }
+                            }
+                            if (result.length > 0) {
+                                $('#location-room-' + result[0].id).parent().trigger('click');
+                            } else {
                                 roomInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                             }
                             preventGuessing = false
@@ -322,7 +340,6 @@
 
             venueInput.on('typeahead:click-on-option', function(e, data) {
                 if (hiddenData.venue_id && data.venue_id != hiddenData.venue_id && !data.room_id) {
-                    debugger
                     clearRoomOnVenueChange();
                 }
                 hiddenData.venue_name = data.item_name;
@@ -332,7 +349,6 @@
             })
             .on('typeahead:click-on-custom-option', function(e, data) {
                 if (hiddenData.room_id) {
-                    debugger
                     clearRoomOnVenueChange();
                 }
                 delete hiddenData.venue_id;
@@ -362,7 +378,6 @@
             .on('focus.typeahead', function() {
                 // In case the input is cleared, this ensures that the results list will contain all available options.
                 if (roomWasJustCleared) {
-                    debugger
                     $(this).trigger('input.typeahead');
                     roomWasJustCleared = false;
                 }

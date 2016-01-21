@@ -208,10 +208,8 @@ class LocationWidget(JinjaWidget):
         rooms = {loc.name: {'data': [{'name': r.full_name, 'id': r.id, 'venue_id': r.location_id}
                  for r in loc.rooms]} for loc in field.locations}
         venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
-        venue_names = [v['name'] for v in venues['data']]
         parent = self._get_parent_info(field.data['source']) if field.data and field.data.get('source', None) else None
-        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, venue_names=venue_names,
-                                                    parent=parent)
+        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent)
 
     def _get_parent_info(self, parent):
         if isinstance(parent, db.m.Contribution):
