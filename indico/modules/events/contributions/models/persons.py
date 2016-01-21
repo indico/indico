@@ -69,6 +69,11 @@ class SubContributionPersonLink(PersonLinkBase):
     __auto_table_args = {'schema': 'events'}
     person_link_backref_name = 'subcontribution_links'
     person_link_unique_columns = ('subcontribution_id',)
+    # subcontribution persons are always speakers and never authors
+    # we provide these attributes to make subcontribution links
+    # compatible with contribution links
+    is_speaker = True
+    author_type = AuthorType.none
 
     subcontribution_id = db.Column(
         db.Integer,
