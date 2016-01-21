@@ -65,6 +65,9 @@
     </div>
     <div id="filter-placeholder"></div>
     <script>
-        setupContributionList();
+        setupContributionList({
+            createSessionURL: {{ url_for('sessions.create_session', event) | tojson }},
+            createTrackURL: {{ url_for('event_mgmt.confModifProgram-addTrack', event) | tojson }}
+        });
     </script>
 {% endblock %}
