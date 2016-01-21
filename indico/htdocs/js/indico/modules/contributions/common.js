@@ -140,11 +140,13 @@
             },
             onClear: function(session) {
                 var $this = $(this);
+                var styleObject = $this[0].style;
                 var postData = {session_id: null};
 
                 return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
                     $this.find('.label').text($T.gettext('No session'));
-                    $this.removeAttr('style');
+                    styleObject.removeProperty('color');
+                    styleObject.removeProperty('background');
                 });
             }
         });
