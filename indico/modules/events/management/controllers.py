@@ -101,6 +101,10 @@ class RHUnlockEvent(RHConferenceModifBase):
 class RHContributionPersonListMixin:
     """List of persons somehow related to contributions (co-authors, speakers...)"""
 
+    @property
+    def _membership_filter(self):
+        raise NotImplementedError
+
     def _process(self):
         contribution_persons = (ContributionPersonLink
                                 .find(ContributionPersonLink.contribution.has(self._membership_filter))
