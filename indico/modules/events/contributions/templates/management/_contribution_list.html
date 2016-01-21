@@ -43,7 +43,9 @@
                 </thead>
                 <tbody>
                     {% for contrib in contribs %}
-                        <tr id="contrib-{{ contrib.id }}" class="i-table" data-friendly-id="{{ contrib.friendly_id }}">
+                        <tr id="contrib-{{ contrib.id }}" class="i-table"
+                            data-friendly-id="{{ contrib.friendly_id }}"
+                            data-title="{{ contrib.title }}">
                             <td class="i-table">
                                 <input type="checkbox" class="select-row" name="contribution_id" value="{{ contrib.id }}">
                             </td>
