@@ -82,6 +82,13 @@
             var user = _.findWhere(self.users, {id: userId});
             self.users = _.without(self.users, user);
             self._update();
+        },
+
+        set: function set(userId, data) {
+            var self = this;
+            var user = _.findWhere(self.users, {id: userId});
+            $.extend(user, data);
+            self._update();
         }
     });
 })(jQuery);
