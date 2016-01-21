@@ -93,13 +93,108 @@
         });
     }
 
-    global.setupContributionList = function setupContributionList() {
+    function patchObject(url, method, data) {
+        return $.ajax({
+            url: url,
+            method: method,
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json',
+            error: handleAjaxError,
+            complete: IndicoUI.Dialogs.Util.progress()
+        });
+    }
+
+    function setupSessionPicker(createURL) {
+        $('#contribution-list .session-item-picker').itempicker({
+            filterPlaceholder: $T.gettext('Filter sessions'),
+            containerClasses: 'session-item-container',
+            footerElements: [{
+                title: $T.gettext('Add new session'),
+                onClick: function() {
+                    ajaxDialog({
+                        title: $T.gettext('Add new session'),
+                        url: createURL,
+                        onClose: function(data) {
+                            if (data) {
+                                $('.session-item-picker').itempicker('refreshItemList', data.sessions);
+                            }
+                        }
+                    });
+                }
+            }],
+            onSelect: function(session) {
+                var $this = $(this);
+                var styleObject = $this[0].style;
+                var postData =  {session_id: session.id};
+
+                return patchObject($this.data('href'), $this.data('method'), postData).then(function(data) {
+                    $this.find('.label').text(session.title);
+                    styleObject.setProperty('color', '#' + session.colors.text, 'important');
+                    styleObject.setProperty('background', '#' + session.colors.background, 'important');
+                    if (!data.scheduled) {
+                        $this.closest('tr').find('td.start-date')
+                             .html($('<em>', {'text': $T.gettext('Not scheduled')}));
+                    }
+                });
+            },
+            onClear: function(session) {
+                var $this = $(this);
+                var postData = {session_id: null};
+
+                return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                    $this.find('.label').text($T.gettext('No session'));
+                    $this.removeAttr('style');
+                });
+            }
+        });
+    }
+
+    function setupTrackPicker(createURL) {
+        $('#contribution-list .track-item-picker').itempicker({
+            filterPlaceholder: $T.gettext('Filter tracks'),
+            containerClasses: 'track-item-container',
+            uncheckedItemIcon: '',
+            footerElements: [{
+                title: $T.gettext('Add new track'),
+                onClick: function() {
+                    location.href = createURL;
+                }
+            }],
+            onSelect: function(track) {
+                var $this = $(this);
+                var postData = {track_id: track.id};
+
+                return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                    $this.find('.label').text(track.title);
+                });
+            },
+            onClear: function(track) {
+                var $this = $(this);
+                var postData = {track_id: null};
+
+                return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                    $this.find('.label').text($T.gettext('No track'));
+                });
+            }
+        });
+    }
+
+    global.setupContributionList = function setupContributionList(options) {
+        options = $.extend({
+            createSessionURL: null,
+            createTrackURL: null
+        }, options);
         setupTableSorter();
         setupSearchBox();
+        setupSessionPicker(options.createSessionURL);
+        setupTrackPicker(options.createTrackURL);
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter();
             applyFilters();
+            setupSessionPicker();
+            setupTrackPicker();
         });
     };
 })(window);
