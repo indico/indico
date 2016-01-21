@@ -63,7 +63,7 @@
         }
     };
 
-    global.cornerMessage = function cornerWarning(options) {
+    global.cornerMessage = function cornerMessage(options) {
         // Create nice message in bottom right corner
 
         options = $.extend({
@@ -115,9 +115,13 @@
 
                     box.addClass('progress').text(options.progressMessage);
 
-                    promise.done(function() {
+                    promise.then(function() {
                         box.text(options.feedbackMessage);
                         box.removeClass(options.class).addClass('success').removeClass('progress');
+                    }, function() {
+                        box.text($T.gettext('Operation failed!'));
+                        box.removeClass('progress success warning highlight').addClass('error');
+                    }).always(function() {
                         if (options.feedbackDuration) {
                             _disappear(options.feedbackDuration);
                         }
