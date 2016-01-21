@@ -62,9 +62,11 @@
         }
 
         // quick search of contribution by ID
-        if (m = term.match(/^#(\d+)$/)) {
-            visibleEntries = $('#contrib-' + m[1]);
+        if ((m = term.match(/^#(\d+)$/))) {
+            visibleEntries = contributions.find('[data-friendly-id="' + m[1] + '"]');
         } else {
+            // escape chars that can interfere with selector
+            term = term.replace( /(:|\.|\[|\]|,|'|")/g, "\\$1" );
             visibleEntries = contributions.find('td[data-searchable*="' + term + '"]').closest('tr');
         }
 

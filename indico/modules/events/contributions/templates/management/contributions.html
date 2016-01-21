@@ -20,26 +20,40 @@
         </div>
         <div class="group">
             <button class="i-button highlight icon-plus"
-                  data-title="{% trans %}Add new contribution{% endtrans %}"
-                  data-href="{{ url_for('.manage_create_contrib', event) }}"
-                  data-ajax-dialog
-                  data-update="#contribution-list">
+                    title="{% trans %}Add new contribution{% endtrans %}"
+                    data-title="{% trans %}Add new contribution{% endtrans %}"
+                    data-href="{{ url_for('.manage_create_contrib', event) }}"
+                    data-ajax-dialog
+                    data-update="#contribution-list">
                 {% trans %}New contribution{% endtrans %}
             </button>
         </div>
         <div class="group">
-            <button class="i-button js-enable-if-checked" disabled
+            <button class="i-button js-enable-if-checked icon-remove" disabled
+                    title="{% trans %}Remove{% endtrans %}"
                     data-method="POST"
                     data-href="{{ url_for('.manage_delete_contribs', event) }}"
                     data-params-selector="#contribution-list input[name=contribution_id]:checked"
                     data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
                     data-title="{% trans %}Confirm deletion{% endtrans %}"
                     data-update="#contribution-list">
-                {% trans %}Remove{% endtrans %}
+                {%- trans %}Remove{% endtrans -%}
             </button>
-            <button class="i-button js-enable-if-checked" disabled>{% trans %}Move{% endtrans %}</button>
-            <button class="i-button js-enable-if-checked" disabled>{% trans %}Download{% endtrans %}</button>
-            <button class="i-button js-enable-if-checked" disabled>{% trans %}Export{% endtrans %}</button>
+        </div>
+        <div class="group">
+            <button class="i-button icon-users js-enable-if-checked disabled"
+                    data-title="{% trans %}Author list{% endtrans %}"
+                    data-href="{{ url_for('contributions.person_list', event) }}"
+                    data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                    data-method="POST"
+                    data-dialog-classes="event-persons-dialog"
+                    data-ajax-dialog>
+                {%- trans %}Author list{% endtrans -%}
+            </button>
+            <button class="i-button js-enable-if-checked arrow" disabled
+                    title="{% trans %}Export data{% endtrans %}">
+                    {% trans %}Export{% endtrans %}
+            </button>
         </div>
         <div class="group right">
             <span class="i-button label icon-search"></span>
