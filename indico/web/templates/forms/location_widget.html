@@ -12,8 +12,7 @@
                            name="location-venue-{{ field.name }}"
                            type="text"
                            placeholder="{% trans %}Venue{% endtrans %}"
-                           autocomplete="off"
-                           tabindex="-1">
+                           autocomplete="off">
                     <span class="highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
                     <div class="typeahead-results">
@@ -28,8 +27,7 @@
                            name="location-room-{{ field.name }}"
                            type="text"
                            placeholder="{% trans %}Room{% endtrans %}"
-                           autocomplete="off"
-                           tabindex="-1">
+                           autocomplete="off">
                     <span class="highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
                     <div class="typeahead-results">
@@ -400,7 +398,6 @@
                 var $this = $(this);
                 if (e.keyCode == 9) {  // on tab
                     // treat tab as the return key
-                    e.preventDefault();
                     var returnKey = jQuery.Event("keydown");
                     returnKey.which = 13;
                     returnKey.keyCode = 13;
