@@ -195,8 +195,8 @@
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter();
             applyFilters();
-            setupSessionPicker();
-            setupTrackPicker();
+            setupSessionPicker(options.createSessionURL);
+            setupTrackPicker(options.createTrackURL);
         });
     };
 })(window);
