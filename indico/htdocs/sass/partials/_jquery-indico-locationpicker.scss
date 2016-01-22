@@ -117,6 +117,11 @@
             &.bring-to-front {
                 background: white;
             }
+
+            &:focus {
+              @include box-shadow($blue 0 0 5px);
+              @include border-all($color: $blue !important, $width: 1px);
+            }
         }
 
         .toggle-results-list {
