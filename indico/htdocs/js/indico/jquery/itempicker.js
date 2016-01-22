@@ -158,7 +158,9 @@
         },
 
         selectItem: function(id) {
-            this._handleSelect(this.itemsDict[id].elem, this.itemsDict[id].data, this.selectedItem);
+            var newItem = id !== null ? this.itemsDict[id].data : null;
+            var newElem = this.itemsDict[id !== null ? id : this.selectedItem.id].elem;
+            this._handleSelect(newElem, newItem, this.selectedItem);
         },
 
         hide: function() {
@@ -180,7 +182,7 @@
                 if (newItem) {
                     self._selectItem(newElem, newItem);
                 } else {
-                    self._deselectItem(newElem, oldItem);
+                    self._deselectItem(newElem);
                 }
             });
         },
@@ -200,8 +202,8 @@
             this.selectedItem = itemData;
         },
 
-        _deselectItem: function(item, itemData) {
-            this.selectedItemData = null;
+        _deselectItem: function(item) {
+            this.selectedItem = null;
             item.css('background', '').removeClass('active').find('.item-title').css('color', '');
         },
 
@@ -224,10 +226,10 @@
                    ((0 | (1 << 8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
         },
 
-        _getContrastYIQ: function(hexcolor) {
-            var r = parseInt(hexcolor.substr(0, 2), 16);
-            var g = parseInt(hexcolor.substr(2, 2), 16);
-            var b = parseInt(hexcolor.substr(4, 2), 16);
+        _getContrastYIQ: function(hexColor) {
+            var r = parseInt(hexColor.substr(0, 2), 16);
+            var g = parseInt(hexColor.substr(2, 2), 16);
+            var b = parseInt(hexColor.substr(4, 2), 16);
             var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
             return (yiq >= 128) ? '000' : 'FFF';
         },
