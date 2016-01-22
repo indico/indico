@@ -423,6 +423,11 @@
                     scrollResultsList($this);
                     $this.trigger('focus.typeahead');
                 }
+            })
+            .on('click', function() {
+                // Since focus remains on the field after selection, we need special handling for the click event
+                // in order to reopen the results list
+                Typeahead["#" + $(this).attr('id')].showLayout();
             });
 
             $('.toggle-results-list').on('click', function() {
