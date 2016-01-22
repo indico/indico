@@ -105,48 +105,50 @@
         });
     }
 
+    function changeContribDisplayedStartDate(itemPicker) {
+        itemPicker.closest('tr').find('td.start-date').html($('<em>', {'text': $T.gettext('Not scheduled')}));
+    }
+
     function setupSessionPicker(createURL) {
         $('#contribution-list .session-item-picker').itempicker({
             filterPlaceholder: $T.gettext('Filter sessions'),
             containerClasses: 'session-item-container',
             footerElements: [{
-                title: $T.gettext('Add new session'),
-                onClick: function() {
+                title: $T.gettext('Assign new session'),
+                onClick: function(itemPicker) {
                     ajaxDialog({
                         title: $T.gettext('Add new session'),
                         url: createURL,
                         onClose: function(data) {
                             if (data) {
-                                $('.session-item-picker').itempicker('refreshItemList', data.sessions);
+                                var postData = {session_id: data.new_session_id};
+                                $('.session-item-picker').itempicker('updateItemList', data.sessions);
+                                itemPicker.itempicker('selectItem', data.new_session_id);
                             }
                         }
                     });
                 }
             }],
-            onSelect: function(session) {
+            onSelect: function(newSession, oldSession) {
                 var $this = $(this);
                 var styleObject = $this[0].style;
-                var postData =  {session_id: session.id};
+                var postData =  {session_id: newSession ? newSession.id : null};
 
                 return patchObject($this.data('href'), $this.data('method'), postData).then(function(data) {
-                    $this.find('.label').text(session.title);
-                    styleObject.setProperty('color', '#' + session.colors.text, 'important');
-                    styleObject.setProperty('background', '#' + session.colors.background, 'important');
-                    if (!data.scheduled) {
-                        $this.closest('tr').find('td.start-date')
-                             .html($('<em>', {'text': $T.gettext('Not scheduled')}));
-                    }
-                });
-            },
-            onClear: function(session) {
-                var $this = $(this);
-                var styleObject = $this[0].style;
-                var postData = {session_id: null};
+                    var label = newSession ? newSession.title : $T.gettext('No session');
+                    $this.find('.label').text(label);
 
-                return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-                    $this.find('.label').text($T.gettext('No session'));
-                    styleObject.removeProperty('color');
-                    styleObject.removeProperty('background');
+                    if (!newSession) {
+                        styleObject.removeProperty('color');
+                        styleObject.removeProperty('background');
+                    } else {
+                        styleObject.setProperty('color', '#' + newSession.colors.text, 'important');
+                        styleObject.setProperty('background', '#' + newSession.colors.background, 'important');
+                    }
+
+                    if (!data.scheduled) {
+                        changeContribDisplayedStartDate($this);
+                    }
                 });
             }
         });
@@ -163,20 +165,13 @@
                     location.href = createURL;
                 }
             }],
-            onSelect: function(track) {
+            onSelect: function(newTrack, oldTrack) {
                 var $this = $(this);
-                var postData = {track_id: track.id};
+                var postData = {track_id: newTrack ? newTrack.id : null};
 
                 return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-                    $this.find('.label').text(track.title);
-                });
-            },
-            onClear: function(track) {
-                var $this = $(this);
-                var postData = {track_id: null};
-
-                return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-                    $this.find('.label').text($T.gettext('No track'));
+                    var label = newTrack ? newTrack.title : $T.gettext('No track');
+                    $this.find('.label').text(label);
                 });
             }
         });
