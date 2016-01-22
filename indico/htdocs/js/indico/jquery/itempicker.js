@@ -29,8 +29,10 @@
         },
 
         _create: function() {
-            var items = this.options.items || this.element.data('items') || [];
-            var qtipContent = this._createQtipContent(items);
+            this.selectedItem = null;
+            this._createItemsDict(this.options.items || this.element.data('items') || []);
+
+            var qtipContent = this._createQtipContent(this.itemsDict);
 
             this.element.qtip({
                 prerender: true,
@@ -86,6 +88,15 @@
             self.element.qtip('destroy');
         },
 
+        _createItemsDict: function(items) {
+            var self = this;
+            this.itemsDict = {};
+
+            $.each(items, function(index, data) {
+                self.itemsDict[data.id] = {data: data, elem: null};
+            });
+        },
+
         _createQtipContent: function(items) {
             var self = this;
             var dropdownContainer = $('<div>', {'class': 'dropdown-container'});
@@ -96,19 +107,23 @@
 
             filterWrapper.append(filterInput);
             dropdownContainer.append(filterWrapper);
-            $.each(items, function(index, itemData) {
-                var isSelected = (itemData.id === self.element.data('selected-item-id'));
+
+            $.each(items, function(itemId, itemDict) {
+                var isSelected = (itemId == self.element.data('selected-item-id'));
+                var itemData = itemDict.data;
                 var itemIcon = $('<span>', {'class': 'item-icon ' + self.options.uncheckedItemIcon});
-                var $item = $('<div>', {
+
+                var $item = itemDict.elem = $('<div>', {
                     'class': 'dropdown-item',
-                    'data': {'filter': itemData.title},
+                    'data': {'filter': itemData.title, 'id': itemId},
                     'on': {
                         'click': function() {
                             self.element.qtip('hide');
-                            if (itemData.id === self.element.data('selected-item-id')) {
-                                self._handleClear($item, itemData);
+
+                            if (self.selectedItem && itemId == self.selectedItem.id) {
+                                self._handleSelect($item, null, itemData);
                             } else {
-                                self._handleSelect($item, itemData);
+                                self._handleSelect($item, itemData, self.selectedItem);
                             }
                         }
                     }
@@ -122,7 +137,7 @@
                 $item.append(itemIcon).append($('<span>', {'class': 'item-title', 'text': itemData.title}));
 
                 if (isSelected) {
-                    self._markItemAsSelected($item, itemData);
+                    self._selectItem($item, itemData);
                     itemsContainer.prepend($item);
                 } else {
                     itemsContainer.append($item);
@@ -137,43 +152,56 @@
             return dropdownContainer;
         },
 
-        refreshItemList: function(items) {
-            this.element.qtip('option', 'content.text', this._createQtipContent(items));
+        updateItemList: function(items) {
+            this._createItemsDict(items);
+            this.element.qtip('option', 'content.text', this._createQtipContent(this.itemsDict));
+        },
+
+        selectItem: function(id) {
+            this._handleSelect(this.itemsDict[id].elem, this.itemsDict[id].data, this.selectedItem);
         },
 
         hide: function() {
             this.element.qtip('hide');
         },
 
-        _handleSelect: function(item, itemData) {
+        _handleSelect: function(newElem, newItem, oldItem) {
             var promise;
             var self = this;
 
             if ($.isFunction(self.options.onSelect)) {
-                promise = self.options.onSelect.call(self.element, itemData);
+                promise = self.options.onSelect.call(self.element, newItem, oldItem);
             }
             if (promise === undefined) {
                 promise = $.Deferred().resolve();
             }
 
             return promise.then(function() {
-                self.element.data('selected-item-id', itemData.id);
-                self._markItemAsSelected(item, itemData);
+                if (newItem) {
+                    self._selectItem(newElem, newItem);
+                } else {
+                    self._deselectItem(newElem, oldItem);
+                }
             });
         },
 
-        _markItemAsSelected: function(item, itemData) {
+        _selectItem: function(item, itemData) {
             var itemsContainer = item.closest('.dropdown-items-container');
+
             itemsContainer.find('.dropdown-item').css('background', '').removeClass('active');
             itemsContainer.find('.item-title').css('color', '');
             item.addClass('active');
+
             if (itemData.colors) {
                 item.css('background', '#' + this._increaseBrightness(itemData.colors.background, 50));
                 item.find('.item-title').css('color', '#' + this._getContrastYIQ(itemData.colors.background));
             }
+
+            this.selectedItem = itemData;
         },
 
-        _deselectItem: function(item) {
+        _deselectItem: function(item, itemData) {
+            this.selectedItemData = null;
             item.css('background', '').removeClass('active').find('.item-title').css('color', '');
         },
 
@@ -204,24 +232,6 @@
             return (yiq >= 128) ? '000' : 'FFF';
         },
 
-        _handleClear: function(item, itemData) {
-            var promise;
-            var self = this;
-
-            if ($.isFunction(this.options.onClear)) {
-                promise = this.options.onClear.call(this.element, itemData);
-            }
-
-            if (promise === undefined) {
-                promise = $.Deferred().resolve();
-            }
-
-            return promise.then(function() {
-                self.element.data('selected-item-id', '');
-                self._deselectItem(item);
-            });
-        },
-
         _appendFooterItems: function(container) {
             var self = this;
             var footerElements = self.options.footerElements;
@@ -236,7 +246,7 @@
                         'click': function() {
                             self.element.qtip('hide');
                             if ($.isFunction($this.onClick)) {
-                                $this.onClick.call(actionButton);
+                                $this.onClick.call(actionButton, self.element);
                             }
                         }
                     }
