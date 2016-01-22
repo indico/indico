@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.db import db
+from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.sessions import logger
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 
 
 def create_session(event, data):
