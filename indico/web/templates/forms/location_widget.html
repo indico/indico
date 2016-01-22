@@ -258,7 +258,6 @@
                             preventGuessing = false
                         }
                         validVenue = false;
-                        node.blur();
                     },
                     onNavigateBefore: function(node, query, event) {
                         if (event.keyCode == 9) {
@@ -328,7 +327,6 @@
                             preventGuessing = false
                         }
                         validRoom = false;
-                        node.blur();
                     },
                     onNavigateBefore: function(node, query, event) {
                         if (event.keyCode == 9) {
@@ -362,7 +360,6 @@
                 venueInput.val(data.item_name);
                 validVenue = true;
                 Typeahead["#" + venueInput.attr('id')].hideLayout();
-                venueInput.blur();
             });
 
             roomInput.on('typeahead:click-on-custom-option', function(e, data) {
@@ -372,25 +369,31 @@
                 roomInput.val(data.item_name);
                 validRoom = true;
                 Typeahead["#" + roomInput.attr('id')].hideLayout();
-                roomInput.blur();
             });
 
 
             $('.i-location-input-field').on('typeahead:close-results-list', function() {
                 Typeahead["#" + this.id].hideLayout();
-                $(this).trigger('blur');
             })
             .on('focus.typeahead', function() {
                 // In case the input is cleared, this ensures that the results list will contain all available options.
+                var $this = $(this);
                 if (roomJustCleared) {
-                    $(this).trigger('input.typeahead');
+                    $this.trigger('input.typeahead');
                     roomJustCleared = false;
                 }
                 if (venueJustChanged) {
-                    $(this).trigger('input.typeahead');
+                    $this.trigger('input.typeahead');
                     venueJustChanged = false;
                 }
                 $('.ui-dialog-content').css('overflow', 'inherit');
+
+                if ($this.is(venueInput) && roomInput.closest('.typeahead-container').hasClass('result')) {
+                    roomInput.trigger('typeahead:close-results-list');
+                } else if ($this.is(roomInput) && venueInput.closest('.typeahead-container').hasClass('result')) {
+                    venueInput.trigger('typeahead:close-results-list');
+                }
+
                 latestUsedField = $(this);
             })
             .on('keydown', function(e) {
