@@ -99,7 +99,7 @@
                                    data-items="{{ tracks | tojson | forceescape }}"
                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
                                    data-method="PATCH"
-                                   data-selected-item-id="{{ contrib.track_id or None | tojson }}">
+                                   data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
                                     <span class="label">
                                         {% if contrib.track %}
                                             {%- trans title=contrib.track.getTitle() %}
