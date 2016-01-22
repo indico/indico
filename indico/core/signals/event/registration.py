@@ -30,3 +30,8 @@ kwarg.
 registration_deleted = _signals.signal('registration-deleted', """
 Called when a registration is removed.  The `sender` is the registration.
 """)
+
+registration_form_created = _signals.signal('registration-form-created', """
+Called when a new registration form is created.  The `sender` is the
+`RegistrationForm` object.
+""")

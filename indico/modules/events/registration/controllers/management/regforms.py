@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import redirect, flash, session
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
@@ -68,6 +69,7 @@ class RHManageParticipants(RHManageRegFormsBase):
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()
+            signals.event.registration_form_created.send(regform)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
                            'Registration form "{}" has been created'.format(regform.title), session.user)
         return redirect(url_for('event_registration.manage_regform', regform))
@@ -93,6 +95,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             form.populate_obj(regform)
             db.session.add(regform)
             db.session.flush()
+            signals.event.registration_form_created.send(regform)
             flash(_('Registration form has been successfully created'), 'success')
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
                            'Registration form "{}" has been created'.format(regform.title), session.user)
