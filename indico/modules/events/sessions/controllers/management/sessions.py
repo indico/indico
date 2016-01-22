@@ -74,10 +74,11 @@ class RHCreateSession(RHManageSessionsBase):
     def _process(self):
         form = SessionForm(obj=FormDefaults(colors=self._get_random_color()))
         if form.validate_on_submit():
-            create_session(self.event_new, form.data)
+            new_session = create_session(self.event_new, form.data)
             sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors}
                         for s in self.event_new.sessions.filter_by(is_deleted=False)]
-            return jsonify_data(sessions=sessions, html=_render_session_list(self.event_new))
+            return jsonify_data(sessions=sessions, new_session_id=new_session.id,
+                                html=_render_session_list(self.event_new))
         return jsonify_form(form)
 
 
