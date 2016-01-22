@@ -151,7 +151,7 @@
                             function() {
                                 return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
                                     startDateCol.text(moment(data.start_dt).format('DD/MM/YYYY HH:mm'));
-                                    $this.itempicker('selectItem', oldSession.id);
+                                    $this.itempicker('selectItem', oldSession ? oldSession.id : null);
                                 });
                             }
                         );
