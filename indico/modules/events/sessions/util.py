@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import csv
 from io import BytesIO
 
 from reportlab.lib import colors
@@ -70,21 +69,15 @@ def can_manage_sessions(user, event, role=None):
                                          for s in event.sessions.options(joinedload('acl_entries')))
 
 
-def generate_csv_from_sessions(sessions):
-    """Generate a CSV file from a given session list.
+def generate_spreadsheet_from_sessions(sessions):
+    """Generate spreadsheet data from a given session list.
 
-    :param sessions: The list of sessions to include in the file
+    :param sessions: The sessions to include in the spreadsheet
     """
     column_names = ['ID', 'Title', 'Description', 'Code']
-    buf = BytesIO()
-    writer = csv.DictWriter(buf, fieldnames=column_names)
-    writer.writeheader()
-    for sess in sessions:
-        row = {'ID': sess.friendly_id, 'Title': sess.title.encode('utf-8'),
-               'Description': sess.description.encode('utf-8'), 'Code': sess.code.encode('utf-8')}
-        writer.writerow(row)
-    buf.seek(0)
-    return buf
+    rows = [{'ID': sess.friendly_id, 'Title': sess.title, 'Description': sess.description, 'Code': sess.code}
+            for sess in sessions]
+    return column_names, rows
 
 
 class SessionListToPDF(PDFBase):
