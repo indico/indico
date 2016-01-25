@@ -118,6 +118,7 @@
 
             function clearRoomOnVenueChange() {
                 delete hiddenData.room_id;
+                delete hiddenData.room_name;
                 roomInput.val('');
                 roomInput.parent().find('.highlighter').removeClass('visible');
                 latestRoomValue = '';
@@ -376,11 +377,11 @@
             .on('focus.typeahead', function() {
                 // In case the input is cleared, this ensures that the results list will contain all available options.
                 var $this = $(this);
-                if (roomJustCleared) {
+                if (roomJustCleared && $this.is(roomInput)) {
                     $this.trigger('input.typeahead');
                     roomJustCleared = false;
                 }
-                if (venueJustChanged) {
+                if (venueJustChanged && $this.is(venueInput)) {
                     $this.trigger('input.typeahead');
                     venueJustChanged = false;
                 }
