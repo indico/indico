@@ -27,12 +27,13 @@
 @import "partials/infogrids";
 @import "partials/inputs";
 @import "partials/jquery-indico-clearableinput";
-@import "partials/jquery-indico-nullableselector";
 @import "partials/jquery-indico-colorpicker";
+@import "partials/jquery-indico-nullableselector";
 @import "partials/labels";
 @import "partials/links";
 @import "partials/lists";
 @import "partials/main";
+@import "partials/management_lists";
 @import "partials/messageboxes";
 @import "partials/paddedboxes";
 @import "partials/payment";
@@ -48,4 +49,4 @@
 @import "partials/widgets";
 @import "partials/jquery-indico-palettepicker";
 @import "partials/jquery-indico-itempicker";
-@import "partials/management_lists";
+@import "partials/jquery-indico-qbubble";
