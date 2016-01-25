@@ -136,15 +136,16 @@
                 $item.append($('<span>', {'class': self.options.checkedItemIcon + ' active-item-icon'}));
                 $item.append(itemIcon).append($('<span>', {'class': 'item-title', 'text': itemData.title}));
 
+                itemsContainer.append($item);
+
                 if (isSelected) {
                     self._selectItem($item, itemData);
-                    itemsContainer.prepend($item);
-                } else {
-                    itemsContainer.append($item);
                 }
             });
 
             dropdownContainer.append(itemsContainer);
+            this._sortItems(itemsContainer);
+
             if (self.options.footerElements) {
                 self._appendFooterItems(dropdownContainer);
             }
@@ -160,6 +161,7 @@
         selectItem: function(id) {
             var newItem = id !== null ? this.itemsDict[id].data : null;
             var newElem = this.itemsDict[id !== null ? id : this.selectedItem.id].elem;
+
             this._handleSelect(newElem, newItem, this.selectedItem);
         },
 
@@ -189,8 +191,9 @@
 
         _selectItem: function(item, itemData) {
             var itemsContainer = item.closest('.dropdown-items-container');
+            var dropdownItems = itemsContainer.find('.dropdown-item');
 
-            itemsContainer.find('.dropdown-item').css('background', '').removeClass('active');
+            dropdownItems.css('background', '').removeClass('active');
             itemsContainer.find('.item-title').css('color', '');
             item.addClass('active');
 
@@ -200,11 +203,28 @@
             }
 
             this.selectedItem = itemData;
+            this._sortItems(itemsContainer);
+        },
+
+        _sortItems: function(dropdownContainer) {
+            var self = this;
+            var dropdownItems = dropdownContainer.find('.dropdown-item');
+
+            dropdownItems.detach().sort(function(a, b) {
+                var $a = $(a);
+                var $b = $(b);
+
+                if (self.selectedItem && $a.data('id') == self.selectedItem.id) return -1;
+                if (self.selectedItem && $b.data('id') == self.selectedItem.id) return 1;
+
+                return strnatcmp($a.text().toLowerCase(), $b.text().toLowerCase());
+            }).appendTo(dropdownContainer);
         },
 
         _deselectItem: function(item) {
             this.selectedItem = null;
             item.css('background', '').removeClass('active').find('.item-title').css('color', '');
+            this._sortItems(item.closest('.dropdown-items-container'));
         },
 
         _increaseBrightness: function(hex, percent) {
