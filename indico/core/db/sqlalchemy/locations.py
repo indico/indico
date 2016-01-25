@@ -270,8 +270,8 @@ class LocationMixin(object):
     @classmethod
     def get_location_for_parent(cls, parent):
         return {'source': parent,
-                'address': '',
-                'venue_name': '',
+                'address': parent.location_data.get('address'),
+                'venue_name': parent.location_data.get('venue_name'),
                 'inheriting': True,
-                'room_name': ''}
-
+                'room': parent.location_data.get('room'),
+                'room_name': parent.location_data.get('room_name')}
