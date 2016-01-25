@@ -168,8 +168,17 @@
             uncheckedItemIcon: '',
             footerElements: [{
                 title: $T.gettext('Add new track'),
-                onClick: function() {
-                    location.href = createURL;
+                onClick: function(trackItemPicker) {
+                    ajaxDialog({
+                        title: $T.gettext('Add new track'),
+                        url: createURL,
+                        onClose: function(data) {
+                            if (data) {
+                                $('.track-item-picker').itempicker('updateItemList', data.tracks);
+                                trackItemPicker.itempicker('selectItem', data.new_track_id);
+                            }
+                        }
+                    });
                 }
             }],
             onSelect: function(newTrack) {
