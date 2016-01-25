@@ -85,9 +85,17 @@
                     handleAjaxError(xhr);
                 }
             },
-            success: function(data) {
+            success: function(data, _, xhr) {
                 if (handleAjaxError(data)) {
                     return;
+                }
+                var loadedURL = xhr.getResponseHeader('X-Indico-URL');
+                if (loadedURL) {
+                    // in case of a redirect we need to update the url used to submit the ajaxified
+                    // form. otherwise url normalization might fail during the POST requests.
+                    // we also remove the _=\d+ cache buster since it's only relevant for the GET
+                    // request and added there automatically
+                    options.url = loadedURL.replace(/&_=\d+/, '').replace(/\?_=\d+$/, '').replace(/\?_=\d+&/, '?');
                 }
                 showDialog(data);
             }

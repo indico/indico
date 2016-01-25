@@ -640,11 +640,11 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             info['parentProtection'] = item.getAccessController().isProtected()
             if item.canModify(self._rh._aw):
                 info["modifyLink"] = urlHandlers.UHConferenceModification.getURL(item)
-                info["minutesLink"] = True
+                info["minutesLink"] = self._type != 'simple_event'
                 info["materialLink"] = True
                 info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
             elif item.as_event.can_manage(session.user, 'submit'):
-                info["minutesLink"] = True
+                info["minutesLink"] = self._type != 'simple_event'
                 info["materialLink"] = True
 
         elif itemType == 'Session':

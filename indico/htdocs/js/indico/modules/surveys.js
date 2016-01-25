@@ -101,12 +101,12 @@
             $('#submission-list input:checkbox').prop('checked', false).trigger('change');
         });
 
-        $('#export-submissions').on('click', function(evt) {
+        $('.js-export-submissions').on('click', function() {
             var $this = $(this);
 
             var form = $('<form>', {
                 method: 'POST',
-                action: $this.data('href'),
+                action: $this.data('href')
             });
 
             $('.submission-ids:checked').each(function() {
@@ -118,7 +118,8 @@
         });
 
         function _disableButtons() {
-            $('#export-submissions, #delete-submissions').prop('disabled', !$('li.submission-row').length);
+            $('#delete-submissions').prop('disabled', !$('li.submission-row').length);
+            $('.js-export-submissions').toggleClass('disabled', !$('li.submission-row').length);
             $('#delete-submissions').prop('disabled', !$('.submission-ids:checked').length);
         }
 

@@ -99,7 +99,7 @@
             </div>
 
             <div class="item clearfix">
-                <div class="icons"><a href="ihelp/html/QuickStartGuides/QSGSessionManager/index.html" style="vertical-align: top">
+                <div class="icons"><a href="ihelp/html/QuickStartGuides/QSGSessionCoordinator/index.html" style="vertical-align: top">
                             Web
                     </a> |
                     <a href="ihelp/pdf/IndicoQSGSessionCoordinator.pdf"><img src="${Config.getInstance().getImagesBaseURL()}/pdf_small.png" alt="PDF version"></a></div>

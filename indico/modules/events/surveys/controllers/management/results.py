@@ -25,9 +25,10 @@ from indico.modules.events.surveys.controllers.management import RHManageSurveyB
 from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey
-from indico.modules.events.surveys.util import generate_csv_from_survey
+from indico.modules.events.surveys.util import generate_spreadsheet_from_survey
 from indico.modules.events.surveys.views import WPSurveyResults, WPManageSurvey
 from indico.util.i18n import _
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import url_for, send_file
 
 
@@ -46,10 +47,12 @@ class RHSurveyResults(RHManageSurveyBase):
         return WPSurveyResults.render_template('management/survey_results.html', self.event, survey=self.survey)
 
 
-class RHExportSubmissions(RHManageSurveyBase):
-    """Export submissions from the survey to a CSV file"""
+class RHExportSubmissionsBase(RHManageSurveyBase):
+    """Export submissions from the survey"""
 
     CSRF_ENABLED = False
+    EXT = None
+    FUNC = None
 
     def _process(self):
         if not self.survey.submissions:
@@ -57,8 +60,23 @@ class RHExportSubmissions(RHManageSurveyBase):
             return redirect(url_for('.manage_survey', self.survey))
 
         submission_ids = set(map(int, request.form.getlist('submission_ids')))
-        csv_file = generate_csv_from_survey(self.survey, submission_ids)
-        return send_file('submissions-{}.csv'.format(self.survey.id), csv_file, 'text/csv')
+        headers, rows = generate_spreadsheet_from_survey(self.survey, submission_ids)
+        filename = 'submissions-{}.{}'.format(self.survey.id, self.EXT)
+        return self.FUNC(filename, headers, rows)
+
+
+class RHExportSubmissionsCSV(RHExportSubmissionsBase):
+    """Export submissions as CSV"""
+
+    EXT = 'csv'
+    FUNC = staticmethod(send_csv)
+
+
+class RHExportSubmissionsExcel(RHExportSubmissionsBase):
+    """Export submissions as XLSX"""
+
+    EXT = 'xlsx'
+    FUNC = staticmethod(send_xlsx)
 
 
 class RHSurveySubmissionBase(RHManageSurveysBase):

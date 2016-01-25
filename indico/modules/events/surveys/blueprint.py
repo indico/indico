@@ -25,8 +25,9 @@ from indico.modules.events.surveys.controllers.management.questionnaire import (
                                                                                 RHAddSurveySection, RHEditSurveySection,
                                                                                 RHDeleteSurveySection,
                                                                                 RHSortSurveyItems)
-from indico.modules.events.surveys.controllers.management.results import (RHSurveyResults, RHExportSubmissions,
-                                                                          RHDeleteSubmissions, RHDisplaySubmission)
+from indico.modules.events.surveys.controllers.management.results import (RHSurveyResults, RHExportSubmissionsCSV,
+                                                                          RHExportSubmissionsExcel, RHDeleteSubmissions,
+                                                                          RHDisplaySubmission)
 from indico.modules.events.surveys.controllers.management.survey import (RHManageSurveys, RHManageSurvey, RHEditSurvey,
                                                                          RHDeleteSurvey, RHCreateSurvey,
                                                                          RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey)
@@ -53,8 +54,10 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/schedule', 'schedule_survey', 
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/open', 'open_survey', RHOpenSurvey, methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/close', 'close_survey', RHCloseSurvey, methods=('POST',))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions.csv', 'export_submissions', RHExportSubmissions,
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions.csv', 'export_submissions_csv', RHExportSubmissionsCSV,
                  methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions.xlsx', 'export_submissions_excel',
+                 RHExportSubmissionsExcel, methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions', 'delete_submissions', RHDeleteSubmissions,
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>', 'display_submission',

@@ -752,9 +752,6 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
     Create an Indico release - source and binary distributions
     """
 
-    DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric',
-                        'sphinx', 'repoze.sphinx.autointerface']
-
     py_versions = py_versions.split('/') if py_versions else env.py_versions
     upload_to = upload_to.split('/') if upload_to else []
 
