@@ -225,6 +225,9 @@
                 display: 'name',
                 hint: true,
                 callback: {
+                    onInit: function(node) {
+                        this.query = node.val();
+                    },
                     onClickBefore: function(node, a, item, event) {
                         validVenue = true;
                     },
@@ -283,6 +286,9 @@
                 emptyTemplate: function(query) { return ""; },
                 display: 'name',
                 callback: {
+                    onInit: function(node) {
+                        this.query = node.val();
+                    },
                     onClickBefore: function(node, a, item, event) {
                         validRoom = true;
                     },
