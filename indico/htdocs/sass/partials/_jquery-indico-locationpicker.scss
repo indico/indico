@@ -143,6 +143,12 @@
             }
         }
     }
+
+    &.disabled {
+        .highlighter {
+            display: none !important;
+        }
+    }
 }
 
 .highlighter {

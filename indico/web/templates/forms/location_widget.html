@@ -93,6 +93,7 @@
                 venueInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
                 roomInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
                 address.prop('disabled', isChecked).toggleClass('disabled', isChecked);
+                field.closest('.i-location-field').toggleClass('disabled', isChecked);
 
                 hiddenData.inheriting = isChecked;
                 field.val(JSON.stringify(hiddenData)).trigger('change');
