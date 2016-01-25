@@ -78,3 +78,4 @@ Flask-OAuthlib==0.9.1
 translitcodec
 certifi
 Jinja2==2.8
+xlsxwriter==0.8.4
