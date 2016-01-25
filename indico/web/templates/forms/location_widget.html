@@ -97,6 +97,10 @@
 
                 hiddenData.inheriting = isChecked;
                 field.val(JSON.stringify(hiddenData)).trigger('change');
+
+                if (!isChecked) {
+                    clearVenue();
+                }
             };
 
             function reorderCategories(venueName) {
@@ -117,13 +121,13 @@
                 }
             }
 
-            function clearRoomOnVenueChange() {
+            function clearRoom() {
                 delete hiddenData.room_id;
                 delete hiddenData.room_name;
                 roomInput.val('');
                 roomInput.parent().find('.highlighter').removeClass('visible');
-                latestRoomValue = '';
                 roomJustCleared = true;
+                postSelectionActions(roomInput, '');
             }
 
             function clearVenue() {
@@ -131,9 +135,17 @@
                 delete hiddenData.venue_name;
                 venueInput.val('');
                 venueInput.parent().find('.highlighter').removeClass('visible');
-                latestVenueValue = '';
                 venueJustChanged = true;
-                clearRoomOnVenueChange();
+                postSelectionActions(venueInput, '');
+                clearRoom();
+            }
+
+            function clearField(field) {
+                if (field.is(venueInput)) {
+                    clearVenue();
+                } else if (field.is(roomInput)) {
+                    clearRoom();
+                }
             }
 
             function updateResultsList(node, resultHtmlList) {
@@ -358,7 +370,7 @@
             venueInput.on('typeahead:click-on-option', function(e, data) {
                 reorderCategories(data.item_name);
                 if (hiddenData.venue_id && data.venue_id != hiddenData.venue_id && !data.room_id) {
-                    clearRoomOnVenueChange();
+                    clearRoom();
                 }
                 hiddenData.venue_name = data.item_name;
                 hiddenData.venue_id = data.venue_id;
@@ -368,7 +380,7 @@
             })
             .on('typeahead:click-on-custom-option', function(e, data) {
                 if (hiddenData.room_id) {
-                    clearRoomOnVenueChange();
+                    clearRoom();
                 }
                 delete hiddenData.venue_id;
                 hiddenData.venue_name = data.item_name;
@@ -422,11 +434,15 @@
                         returnKey.keyCode = 13;
                         $this.trigger(returnKey);
                     } else {
-                        clearVenue();
+                        clearField($this);
                     }
                 } else if (e.keyCode == 13) { // on enter
-                    if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
-                        $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
+                    if ($this.val()) {
+                        if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
+                            $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
+                        }
+                    } else {
+                        clearField($this);
                     }
                 } else if (e.keyCode == 27) {  // on esc
                     e.preventDefault();
