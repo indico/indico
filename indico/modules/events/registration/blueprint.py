@@ -66,6 +66,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationsExportPDFTable,
                                                                                 RHRegistrationsExportPDFBook,
                                                                                 RHRegistrationsExportCSV,
+                                                                                RHRegistrationsExportExcel,
                                                                                 RHRegistrationTogglePayment,
                                                                                 RHRegistrationsPrintBadges,
                                                                                 RHRegistrationApprove,
@@ -136,6 +137,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/book.pdf'
                  'registrations_pdf_export_book', RHRegistrationsExportPDFBook, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.csv',
                  'registrations_csv_export', RHRegistrationsExportCSV, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
+                 'registrations_excel_export', RHRegistrationsExportExcel, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/badges',
                  'registrations_print_badges', RHRegistrationsPrintBadges, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status',

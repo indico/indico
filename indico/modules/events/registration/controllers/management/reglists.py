@@ -49,13 +49,14 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     create_registration, generate_csv_from_registrations)
+                                                     create_registration, generate_spreadsheet_from_registrations)
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.tasks import delete_file
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
@@ -555,8 +556,18 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
     """Export registration list to a CSV file"""
 
     def _process(self):
-        csv_file = generate_csv_from_registrations(self.registrations, self.regform_items, self.special_item_ids)
-        return send_file('registrations.csv', csv_file, 'text/csv')
+        headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.regform_items,
+                                                                self.special_item_ids)
+        return send_csv('registrations.csv', headers, rows)
+
+
+class RHRegistrationsExportExcel(RHRegistrationsExportBase):
+    """Export registration list to an XLSX file"""
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.regform_items,
+                                                                self.special_item_ids)
+        return send_xlsx('registrations.xlsx', headers, rows)
 
 
 class RHRegistrationsPrintBadges(RHRegistrationsActionBase):

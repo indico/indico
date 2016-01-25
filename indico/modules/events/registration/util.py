@@ -16,10 +16,8 @@
 
 from __future__ import unicode_literals
 
-import csv
 import re
 from collections import OrderedDict
-from io import BytesIO
 
 from flask import current_app, session
 from sqlalchemy.orm import load_only, joinedload
@@ -47,6 +45,7 @@ from indico.web.forms.widgets import SwitchWidget
 from indico.core.db import db
 from indico.util.date_time import format_datetime, format_date
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 
 
 def user_registered_in_event(user, event):
@@ -274,46 +273,44 @@ def _prepare_data(data):
     return re.sub(r'(\r?\n)+', '    ', unicode(data)).encode('utf-8')
 
 
-def generate_csv_from_registrations(registrations, regform_items, special_items):
-    """Generates a CSV file from a given registration list.
+def generate_spreadsheet_from_registrations(registrations, regform_items, special_items):
+    """Generates a spreadsheet data from a given registration list.
 
     :param registrations: The list of registrations to include in the file
     :param regform_items: The registration form items to be used as columns
     :param special_items: Registration form information as extra columns
     """
-
     field_names = ['ID', 'Name']
     special_item_mapping = OrderedDict([
-        ('reg_date', ('Registration date', lambda x: format_datetime(x.submitted_dt))),
+        ('reg_date', ('Registration date', lambda x: to_unicode(format_datetime(x.submitted_dt)))),
         ('state', ('Registration state', lambda x: x.state.title)),
         ('price', ('Price', lambda x: x.render_price())),
-        ('checked_in', ('Checked in', lambda x: 'Yes' if x.checked_in else 'No')),
-        ('checked_in_date', ('Check-in date', lambda x: format_datetime(x.checked_in_dt) if x.checked_in else ''))
+        ('checked_in', ('Checked in', lambda x: x.checked_in)),
+        ('checked_in_date', ('Check-in date', lambda x: (to_unicode(format_datetime(x.checked_in_dt)) if x.checked_in
+                                                         else '')))
     ])
     for item in regform_items:
-        field_names.append('{}_{}'.format(item.title.encode('utf-8'), item.id))
+        field_names.append('{}_{}'.format(item.title, item.id))
         if item.input_type == 'accommodation':
-            field_names.append('{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id))
-            field_names.append('{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id))
+            field_names.append('{}_{}_{}'.format(item.title, 'Arrival', item.id))
+            field_names.append('{}_{}_{}'.format(item.title, 'Departure', item.id))
     field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in special_items)
-    buf = BytesIO()
-    writer = csv.DictWriter(buf, fieldnames=field_names)
-    writer.writeheader()
+    rows = []
     for registration in registrations:
         data = registration.data_by_field
         registration_dict = {
             'ID': registration.friendly_id,
-            'Name': "{} {}".format(registration.first_name, registration.last_name).encode('utf-8')
+            'Name': "{} {}".format(registration.first_name, registration.last_name)
         }
         for item in regform_items:
-            key = '{}_{}'.format(item.title.encode('utf-8'), item.id)
+            key = '{}_{}'.format(item.title, item.id)
             if item.input_type == 'accommodation':
                 registration_dict[key] = _prepare_data(data[item.id].friendly_data.get('choice')
                                                        if item.id in data else '')
-                key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Arrival', item.id)
+                key = '{}_{}_{}'.format(item.title, 'Arrival', item.id)
                 arrival_date = data[item.id].friendly_data.get('arrival_date') if item.id in data else None
                 registration_dict[key] = _prepare_data(format_date(arrival_date) if arrival_date else '')
-                key = '{}_{}_{}'.format(item.title.encode('utf-8'), 'Departure', item.id)
+                key = '{}_{}_{}'.format(item.title, 'Departure', item.id)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
                 registration_dict[key] = _prepare_data(format_date(departure_date) if departure_date else '')
             else:
@@ -322,12 +319,9 @@ def generate_csv_from_registrations(registrations, regform_items, special_items)
             if name not in special_items:
                 continue
             value = fn(registration)
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
             registration_dict[title] = value
-        writer.writerow(registration_dict)
-    buf.seek(0)
-    return buf
+        rows.append(registration_dict)
+    return field_names, rows
 
 
 def get_registrations_with_tickets(user, event):

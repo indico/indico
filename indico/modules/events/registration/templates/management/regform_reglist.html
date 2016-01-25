@@ -75,6 +75,10 @@
                         <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-reglist-form"
                            data-href="{{ url_for('.registrations_csv_export', regform) }}">CSV</a>
                     </li>
+                    <li>
+                        <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-reglist-form"
+                           data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
+                    </li>
                 </ul>
                 <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                     {%- trans %}Actions{% endtrans -%}
