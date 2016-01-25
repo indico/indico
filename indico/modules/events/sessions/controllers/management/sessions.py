@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 import random
-from collections import defaultdict
 
 from flask import request, jsonify
 from sqlalchemy.orm import subqueryload
@@ -25,9 +24,6 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
-                                                                AuthorType)
-from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
@@ -39,7 +35,7 @@ from indico.modules.events.sessions.views import WPManageSessions
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 
 
 def _get_session_list_args(event):
