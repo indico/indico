@@ -207,8 +207,12 @@ class LocationWidget(JinjaWidget):
         super(LocationWidget, self).__init__('forms/location_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
-        rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
-        venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
+        if Config.getInstance().getIsRoomBookingActive():
+            rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
+            venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
+        else:
+            rooms = {'data': []}
+            venues = {'data': []}
         parent = self._get_parent_info(field.data['source']) if field.data and field.data.get('source', None) else None
         return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent)
 
