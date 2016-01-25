@@ -208,8 +208,9 @@ class InvitationFormExisting(InvitationFormBase):
 
 class EmailRegistrantsForm(IndicoForm):
     from_address = SelectField(_("From"), [DataRequired()])
-    cc_addresses = EmailField(_("CC"),
-                              description=_("Beware, addresses in this field will receive one mail per registrant."))
+    cc_addresses = EmailListField(_("CC"),
+                                  description=_("Beware, addresses in this field will receive one mail per "
+                                                "registrant."))
     subject = StringField(_("Subject"), [DataRequired()])
     body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
 
