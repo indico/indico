@@ -98,7 +98,12 @@
                 hiddenData.inheriting = isChecked;
                 field.val(JSON.stringify(hiddenData)).trigger('change');
 
-                if (!isChecked) {
+                if (isChecked) {
+                    hiddenData = {{ field.data.source.widget_location_data | tojson }}
+                    hiddenData.inheriting = true;
+                    field.val(JSON.stringify(hiddenData)).trigger('change');
+                    initializeInputs();
+                } else {
                     clearVenue();
                 }
             };

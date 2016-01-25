@@ -249,6 +249,20 @@ class LocationMixin(object):
                     'room_name': data_source.room_name, 'venue_name': data_source.venue_name,
                     'address': data_source.address, 'inheriting': self.inherit_location}
 
+    @property
+    def widget_location_data(self):
+        """All location data for the item, meant to be used in the location
+        widget.
+        """
+        return {
+            'address': self.location_data['address'],
+            'room_id': self.location_data['room'].id if self.location_data['room'] else '',
+            'room_name': self.location_data['room_name'],
+            'venue_name': self.location_data['venue_name'],
+            'venue_id': self.location_data['room'].location.id if self.location_data['room'] else '',
+        }
+
+
     @location_data.setter
     def location_data(self, data):
         self.inherit_location = data['inheriting']
