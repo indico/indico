@@ -22,10 +22,12 @@ from wtforms.widgets.core import HTMLString
 from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
+from indico.util.string import natural_sort_key
 from indico.web.util import inject_js
 from indico.web.flask.templating import get_template_module
 
 html_commment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
+
 
 class ConcatWidget(object):
     """Renders a list of fields as a simple string joined by an optional separator."""
@@ -205,8 +207,7 @@ class LocationWidget(JinjaWidget):
         super(LocationWidget, self).__init__('forms/location_widget.html', single_line=True)
 
     def __call__(self, field, **kwargs):
-        rooms = {loc.name: {'data': [{'name': r.full_name, 'id': r.id, 'venue_id': r.location_id}
-                 for r in loc.rooms]} for loc in field.locations}
+        rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
         venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
         parent = self._get_parent_info(field.data['source']) if field.data and field.data.get('source', None) else None
         return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent)
@@ -224,6 +225,10 @@ class LocationWidget(JinjaWidget):
             return 'Event', parent.title
         else:
             raise TypeError('Unexpected parent type {}'.format(type(parent)))
+
+    def get_sorted_rooms(self, location):
+        result = [{'name': room.full_name, 'id': room.id, 'venue_id': room.location_id} for room in location.rooms]
+        return sorted(result, key=lambda x: natural_sort_key(x['name']))
 
 
 class ColorPickerWidget(JinjaWidget):
