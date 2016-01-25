@@ -484,10 +484,18 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
 class RHRegistrationCreate(RHManageRegFormBase):
     """Create new registration (management area)"""
 
-    def _checkParams(self, params):
-        RHManageRegFormBase._checkParams(self, params)
+    def _get_user_data(self):
         user_id = request.args.get('user')
-        self.user = User.find_first(User.id == user_id, ~User.is_deleted) if user_id else None
+        if user_id is None:
+            return {}
+        elif user_id.isdigit():
+            # existing indico user
+            user = User.find_first(id=user_id, is_deleted=False)
+            return {t.name: getattr(user, t.name, None) if user else '' for t in PersonalDataType}
+        else:
+            # non-indico user
+            data = GenericCache('pending_identities').get(user_id, {})
+            return {t.name: data.get(t.name) for t in PersonalDataType}
 
     def _process(self):
         form = make_registration_form(self.regform, management=True)()
@@ -501,11 +509,10 @@ class RHRegistrationCreate(RHManageRegFormBase):
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
                 flash(error, 'error')
-        user_data = {t.name: getattr(self.user, t.name, None) if self.user else '' for t in PersonalDataType}
         return WPManageRegistration.render_template('display/regform_display.html', self.event, event=self.event,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     post_url=url_for('.create_registration', self.regform),
-                                                    user_data=user_data, management=True)
+                                                    user_data=self._get_user_data(), management=True)
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
