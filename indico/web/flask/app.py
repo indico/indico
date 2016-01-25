@@ -255,6 +255,7 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
+    app.after_request(inject_current_url)
     app.register_error_handler(404, handle_404)
     app.register_error_handler(Exception, handle_exception)
 
@@ -282,6 +283,14 @@ def add_plugin_blueprints(app):
         blueprint_names.add(blueprint.name)
         with plugin.plugin_context():
             app.register_blueprint(blueprint)
+
+
+def inject_current_url(response):
+    # Make the current URL available. This is useful e.g. in case of
+    # AJAX requests that were redirected due to url normalization if
+    # we need to know the actual URL
+    response.headers['X-Indico-URL'] = request.relative_url
+    return response
 
 
 def handle_404(exception):
