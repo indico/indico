@@ -126,6 +126,16 @@
                 roomJustCleared = true;
             }
 
+            function clearVenue() {
+                delete hiddenData.venue_id;
+                delete hiddenData.venue_name;
+                venueInput.val('');
+                venueInput.parent().find('.highlighter').removeClass('visible');
+                latestVenueValue = '';
+                venueJustChanged = true;
+                clearRoomOnVenueChange();
+            }
+
             function updateResultsList(node, resultHtmlList) {
                 var resultsWrapper = node.siblings('.typeahead-results');
                 resultsWrapper.css('top', node.outerHeight() + 'px');
@@ -258,8 +268,8 @@
                             } else {
                                 venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                             }
-                            preventGuessing = false
                         }
+                        preventGuessing = false
                         validVenue = false;
                     },
                     onNavigateBefore: function(node, query, event) {
@@ -330,8 +340,8 @@
                             } else {
                                 roomInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                             }
-                            preventGuessing = false
                         }
+                        preventGuessing = false
                         validRoom = false;
                     },
                     onNavigateBefore: function(node, query, event) {
@@ -405,11 +415,15 @@
             .on('keydown', function(e) {
                 var $this = $(this);
                 if (e.keyCode == 9) {  // on tab
-                    // treat tab as the return key
-                    var returnKey = jQuery.Event("keydown");
-                    returnKey.which = 13;
-                    returnKey.keyCode = 13;
-                    $this.trigger(returnKey);
+                    if ($this.val()) {
+                        // treat tab as the return key
+                        var returnKey = jQuery.Event("keydown");
+                        returnKey.which = 13;
+                        returnKey.keyCode = 13;
+                        $this.trigger(returnKey);
+                    } else {
+                        clearVenue();
+                    }
                 } else if (e.keyCode == 13) { // on enter
                     if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
                         $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
