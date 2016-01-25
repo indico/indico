@@ -430,6 +430,7 @@
                 // Since focus remains on the field after selection, we need special handling for the click event
                 // in order to reopen the results list
                 Typeahead["#" + $(this).attr('id')].showLayout();
+                $(this).trigger('input');
             });
 
             $('.toggle-results-list').on('click', function() {
