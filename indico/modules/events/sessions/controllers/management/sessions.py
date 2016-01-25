@@ -29,9 +29,10 @@ from indico.modules.events.sessions.controllers.management import (RHManageSessi
                                                                    RHManageSessionsActionsBase)
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
-from indico.modules.events.sessions.util import (get_colors, query_active_sessions, generate_csv_from_sessions,
+from indico.modules.events.sessions.util import (get_colors, query_active_sessions, generate_spreadsheet_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -102,8 +103,16 @@ class RHExportSessionsCSV(RHManageSessionsActionsBase):
     """Export list of sessions to a CSV"""
 
     def _process(self):
-        csv_file = generate_csv_from_sessions(self.sessions)
-        return send_file('sessions.csv', csv_file, 'text/csv')
+        headers, rows = generate_spreadsheet_from_sessions(self.sessions)
+        return send_csv('sessions.csv', headers, rows)
+
+
+class RHExportSessionsExcel(RHManageSessionsActionsBase):
+    """Export list of sessions to a XLSX"""
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_sessions(self.sessions)
+        return send_xlsx('sessions.xlsx', headers, rows)
 
 
 class RHExportSessionsPDF(RHManageSessionsActionsBase):
