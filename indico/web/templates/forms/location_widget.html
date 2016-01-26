@@ -5,7 +5,7 @@
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
                value="{{ field._value() | tojson | forceescape }}">
         <div class="wrapper">
-            <div class="typeahead-container">
+            <div class="typeahead-container venue-container">
                 <div class="typeahead-field">
                     <input id="location-venue-{{ field.id }}"
                            class="i-location-input-field"
@@ -20,7 +20,7 @@
                     </div>
                 </div>
             </div>
-            <div class="typeahead-container">
+            <div class="typeahead-container room-container">
                 <div class="typeahead-field">
                     <input id="location-room-{{ field.id }}"
                            class="i-location-input-field"
@@ -35,12 +35,16 @@
                     </div>
                 </div>
             </div>
-            <input id="location-inheritance-{{ field.id }}"
-                   name="location-inheritance-{{ field.name }}"
-                   type="checkbox">
-            <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
             <textarea id="location-address-{{ field.id }}" name="location-address"
                       placeholder="{% trans %}Address{% endtrans %}"></textarea>
+            <div class="location-inheritance-field">
+                <div class="checkbox-container">
+                    <input id="location-inheritance-{{ field.id }}"
+                           name="location-inheritance-{{ field.name }}"
+                           type="checkbox">
+                    <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
+                </div>
+            </div>
         </div>
     </div>
     <div class="clearfix"></div>
