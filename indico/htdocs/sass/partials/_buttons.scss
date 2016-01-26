@@ -308,16 +308,6 @@ button::-moz-focus-inner {
     padding: 9px;
 }
 
-.i-button-mini {
-    font-size: 11px;
-    line-height: 14px;
-    padding: 2px 6px;
-}
-
-.i-button-fit {
-    width: 100%;
-}
-
 .i-button.right {
     margin-left: 5px;
     margin-top: 5px;
@@ -400,10 +390,6 @@ a.i-button-icon {
             color: #888;
         }
     }
-}
-
-.trusted, .trusted:hover {
-    color: #0B8D00 !important;
 }
 
 /* Remove special border added in Firefox */
