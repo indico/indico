@@ -111,8 +111,12 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
             data = {k: '' if v is None else v for (k, v) in data.items()}
             email = data['email'].lower()
 
-            # check if there is not already a pending user with that e-mail
-            user = User.find_first(email=email, is_pending=True)
+            # check if there is not already a (pending) user with that e-mail
+            # we need to check for non-pending users too since the search may
+            # show a user from external results even though the email belongs
+            # to an indico account in case some of the search criteria did not
+            # match the indico account
+            user = User.find_first(User.all_emails.contains(email), ~User.is_deleted)
             if not user:
                 user = User(first_name=data.get('first_name') or '', last_name=data.get('last_name') or '',
                             email=email,
