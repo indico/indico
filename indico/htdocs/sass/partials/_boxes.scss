@@ -135,7 +135,7 @@
 
     .i-box-footer {
         background-color: $light-gray;
-        box-shadow: inset 0px 15px 20px -20px $dark-gray;
+        box-shadow: inset 0px 15px 20px -20px $gray;
         overflow: auto;
         padding: 10px;
         margin: 10px -10px -10px;
@@ -232,6 +232,10 @@
             }
         }
     }
+}
+
+.i-box.no-shadow {
+    @include single-box-shadow(none);
 }
 
 
