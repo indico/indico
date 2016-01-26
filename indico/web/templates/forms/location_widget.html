@@ -75,6 +75,8 @@
             var preventGuessing = false;
             var roomJustCleared = false;
             var venueJustChanged = false;
+            var justUseOptionSelected = false;
+            var resultsWereOpen = false;
 
             function initializeInputs() {
                 address.val(hiddenData.address);
@@ -178,8 +180,10 @@
                 var firstOption = resultHtmlList.find('li.typeahead-item').first();
                 if (firstOption.length === 0) {
                     node.parent().find('.just-use-option').addClass('active');
+                    justUseOptionSelected = true;
                 } else {
                     resultHtmlList.find('li.typeahead-item').first().addClass('active');
+                    justUseOptionSelected = false;
                 }
                 return resultHtmlList;
             }
@@ -206,6 +210,7 @@
                     }
                 }
                 parent.find('.just-use-option').toggleClass('active', activeOption.length === 0);
+                justUseOptionSelected = activeOption.length === 0;
             }
 
             function postSelectionActions(inputField, value) {
@@ -279,7 +284,9 @@
                         currentScrollPos = 0;
                     },
                     onHideLayout: function(node, query) {
-                        if (!validVenue && node.val() && !preventGuessing) {
+                        if (justUseOptionSelected) {
+                            venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
+                        } else if (!validVenue && node.val() && !preventGuessing) {
                             var result = [];
                             result = $.grep(venues.data, function(venue) {
                                 return venue.name.toUpperCase() == query.toUpperCase();
@@ -297,9 +304,11 @@
                         if (event.keyCode == 9) {
                             preventGuessing = true
                         }
+                        resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
                     onResult: function(node, query, result, resultCount, resultCountPerGroup) {
                         node.parent().find('.just-use-option').toggleClass('active', resultCount === 0);
+                        justUseOptionSelected = resultCount === 0;
                     }
 
                 }
@@ -344,7 +353,9 @@
                         currentScrollPos = 0;
                     },
                     onHideLayout: function(node, query) {
-                        if (!validRoom && node.val() && !preventGuessing) {
+                        if (justUseOptionSelected) {
+                            roomInput.trigger('typeahead:click-on-custom-option', {item_name: query});
+                        } else if (!validRoom && node.val() && !preventGuessing) {
                             var result = [];
                             var venueValue = venueInput.val();
                             if (venueValue) {
@@ -369,9 +380,11 @@
                         if (event.keyCode == 9) {
                             preventGuessing = true
                         }
+                        resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
                     onResult: function(node, query, result, resultCount, resultCountPerGroup) {
                         node.parent().find('.just-use-option').toggleClass('active', resultCount === 0);
+                        justUseOptionSelected = resultCount === 0;
                     }
                 }
             });
@@ -396,6 +409,7 @@
                 postSelectionActions(venueInput, data.item_name);
                 venueInput.val(data.item_name);
                 validVenue = true;
+                justUseOptionSelected = false;
                 Typeahead["#" + venueInput.attr('id')].hideLayout();
             });
 
@@ -405,6 +419,7 @@
                 postSelectionActions(roomInput, data.item_name);
                 roomInput.val(data.item_name);
                 validRoom = true;
+                justUseOptionSelected = false;
                 Typeahead["#" + roomInput.attr('id')].hideLayout();
             });
 
@@ -435,40 +450,43 @@
             })
             .on('keydown', function(e) {
                 var $this = $(this);
-                if (e.keyCode == 9) {  // on tab
-                    if ($this.val()) {
-                        // treat tab as the return key
-                        var returnKey = jQuery.Event("keydown");
-                        returnKey.which = 13;
-                        returnKey.keyCode = 13;
-                        $this.trigger(returnKey);
-                    } else {
-                        clearField($this);
-                    }
-                } else if (e.keyCode == 13) { // on enter
-                    if ($this.val()) {
-                        if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
-                            $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
+                if (resultsWereOpen) {
+                    if (e.keyCode == 9) {  // on tab
+                        if ($this.val()) {
+                            // treat tab as the return key
+                            var returnKey = jQuery.Event("keydown");
+                            returnKey.which = 13;
+                            returnKey.keyCode = 13;
+                            $this.trigger(returnKey);
+                        } else {
+                            clearField($this);
                         }
-                    } else {
-                        clearField($this);
-                    }
-                } else if (e.keyCode == 27) {  // on esc
-                    e.preventDefault();
-                    if (latestUsedField.is(venueInput)) {
-                        venueInput.val(latestVenueValue);
-                        if (hiddenData.venue_id) {
-                            highlightOption(venueInput, latestVenueValue)
+                    } else if (e.keyCode == 13) { // on enter
+                        e.preventDefault();
+                        if ($this.val()) {
+                            if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
+                                $this.trigger('typeahead:click-on-custom-option', {item_name: $this.val()});
+                            }
+                        } else {
+                            clearField($this);
                         }
-                    } else if (latestUsedField.is(roomInput)) {
-                        roomInput.val(latestRoomValue);
-                        if (hiddenData.room_id) {
-                            highlightOption(roomInput, latestRoomValue)
+                    } else if (e.keyCode == 27) {  // on esc
+                        e.preventDefault();
+                        if (latestUsedField.is(venueInput)) {
+                            venueInput.val(latestVenueValue);
+                            if (hiddenData.venue_id) {
+                                highlightOption(venueInput, latestVenueValue)
+                            }
+                        } else if (latestUsedField.is(roomInput)) {
+                            roomInput.val(latestRoomValue);
+                            if (hiddenData.room_id) {
+                                highlightOption(roomInput, latestRoomValue)
+                            }
                         }
+                    } else if (~[38,40].indexOf(e.keyCode)) {  // on key down/up
+                        scrollResultsList($this);
+                        $this.trigger('focus.typeahead');
                     }
-                } else if (~[38,40].indexOf(e.keyCode)) {  // on key down/up
-                    scrollResultsList($this);
-                    $this.trigger('focus.typeahead');
                 }
             })
             .on('click', function() {
