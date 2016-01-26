@@ -219,7 +219,7 @@
 
             function highlightOption(inputField, value) {
                 var highlighter = inputField.parent().find('.highlighter');
-                highlighter.html(value).addClass('visible');
+                highlighter.html(value).attr('title', value).addClass('visible');
             }
 
             function cleanQuery(query) {
