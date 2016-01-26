@@ -336,6 +336,30 @@ button::-moz-focus-inner {
     vertical-align: -15%;
 }
 
+a.i-button-icon {
+    color: $dark-gray;
+    cursor: pointer;
+
+    &:hover,
+    &:active,
+    &.active {
+        color: $dark-blue;
+
+        &.accept {
+            color: $green;
+        }
+
+        &.danger {
+            color: $red;
+        }
+
+        &.warning {
+            color: $yellow;
+        }
+    }
+}
+
+
 /* ************** */
 /* Dropdown menus */
 /* ************** */
