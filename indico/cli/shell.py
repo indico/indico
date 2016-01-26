@@ -37,7 +37,7 @@ from indico.core.index import Catalog
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import strip_ansi, cformat
-from indico.util.date_time import now_utc
+from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
 from MaKaC.common import HelperMaKaCInfo
@@ -162,6 +162,8 @@ class IndicoShell(Shell):
             add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
             add_to_context(current_app, 'app', doc='flask app')
+            add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
+                           doc='like datetime() but converted from localtime to utc')
             add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id (Conference)')
             add_to_context(Event.get, 'EE', doc='get event by id (Event)')
             # Stuff from plugins
