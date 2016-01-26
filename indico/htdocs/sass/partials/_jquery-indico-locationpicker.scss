@@ -19,12 +19,9 @@
     max-width: 400px;
 
     .wrapper {
-        float: left;
-        display: inline-block;
 
         .typeahead-container,
         .typeahead-field {
-            width: inherit;
             display: inline-block;
             position: relative;
             float: left;
@@ -59,7 +56,6 @@
 
                     > li {
                         background: white;
-                        // border-bottom: 1px solid $gray;
                     }
 
                     &.empty {
@@ -133,6 +129,19 @@
             cursor: pointer;
         }
 
+        .location-inheritance-field {
+            height: 2.5em;
+
+            .checkbox-container {
+                vertical-align: middle;
+                line-height: 2.5;
+
+                input[type='checkbox'] {
+                    vertical-align: baseline;
+                }
+            }
+        }
+
         > textarea {
             @extend %form-field;
             width: 100%;
@@ -145,6 +154,8 @@
     }
 
     &.disabled {
+        background-color: inherit;
+
         .highlighter {
             display: none !important;
         }
