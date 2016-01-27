@@ -962,48 +962,6 @@ textarea.regFormDescriptionInputMgmt {
 // Contenteditable-related
 // ============================================================================
 
-.regform-section .i-box-title,
-.regform-section .i-box-description,
-.regFormText {
-    &[contenteditable]+.button-box {
-        a {
-            text-shadow: none;
-            opacity: 0.5;
-
-            &:hover {
-                opacity: 1;
-            }
-
-            &:active {
-                text-shadow: 1px 1px 1px $gray;
-            }
-        }
-
-        .input-clear {
-            color: $red;
-
-            &:hover {
-                color: $red;
-            }
-
-            &:active {
-                color: $red;
-            }
-        }
-
-        .input-action {
-            color: $green;
-
-            &:hover {
-                color: $green;
-            }
-            &:active {
-                color: $green;
-            }
-        }
-    }
-}
-
 .regform-section .i-box-description[contenteditable],
 .regFormText[contenteditable] {
     &.focus {
