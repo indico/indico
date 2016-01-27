@@ -79,7 +79,7 @@ def init_links(user, client=None, assumeEvents=False):
     all_events = set()
     event_roles = defaultdict(set)
 
-    for link in user.linked_objects.all():
+    for link in user.linked_objects.filter(UserLink.type != 'session').all():
         obj = link.object
         if obj is None:
             continue
