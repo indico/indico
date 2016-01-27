@@ -20,12 +20,13 @@ from __future__ import unicode_literals, division
 from operator import attrgetter
 
 from indico.modules.events.models.events import Event
-from indico.util.console import cformat, verbose_iterator
+from indico.modules.rb import Location
+from indico.util.console import verbose_iterator
 from indico.util.string import fix_broken_string
 from indico.util.struct.iterables import committing_iterator
 from MaKaC.conference import _get_room_mapping
 
-from indico_zodbimport import Importer, convert_to_unicode
+from indico_zodbimport import Importer
 
 
 class EventLocationsImporter(Importer):
@@ -36,7 +37,8 @@ class EventLocationsImporter(Importer):
                     .count())
 
     def migrate(self):
-        self.room_mapping = {key: room.id for key, room in _get_room_mapping().iteritems()}
+        self.venue_mapping = {location.name: location.id for location in Location.query}
+        self.room_mapping = {key: (room.location_id, room.id) for key, room in _get_room_mapping().iteritems()}
         self.migrate_event_locations()
 
     def migrate_event_locations(self):
@@ -46,7 +48,7 @@ class EventLocationsImporter(Importer):
             custom_room = old_event.rooms[0] if getattr(old_event, 'rooms', None) else None
             location_name = None
             room_name = None
-            rb_room = None
+            has_room = False
             updates = {}
             if custom_location:
                 location_name = fix_broken_string(custom_location.name, True)
@@ -55,12 +57,19 @@ class EventLocationsImporter(Importer):
             if custom_room:
                 room_name = fix_broken_string(custom_room.name, True)
             if location_name and room_name:
-                rb_room = self.room_mapping.get((location_name, room_name))
-                if rb_room:
-                    updates[Event.own_room_id] = rb_room
+                mapping = self.room_mapping.get((location_name, room_name))
+                if mapping:
+                    has_room = True
+                    updates[Event.own_venue_id] = mapping[0]
+                    updates[Event.own_room_id] = mapping[1]
             # if we don't have a RB room set, use whatever location/room name we have
-            if not rb_room:
-                updates[Event.own_venue_name] = location_name or ''
+            if not has_room:
+                venue_id = self.venue_mapping.get(location_name)
+                if venue_id is not None:
+                    updates[Event.own_venue_id] = venue_id
+                    updates[Event.own_venue_name] = ''
+                else:
+                    updates[Event.own_venue_name] = location_name or ''
                 updates[Event.own_room_name] = room_name or ''
             if updates:
                 Event.query.filter_by(id=int(old_event.id)).update(updates, synchronize_session=False)
