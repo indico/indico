@@ -642,10 +642,11 @@ class TimetableMigration(object):
             return
         # we don't inherit, so let's migrate the data we have
         # address is always allowed
-        new_entry.address = fix_broken_string(custom_location.address, True) if custom_location.address else ''
-        location_name = fix_broken_string(custom_location.name, True)
+        new_entry.address = (convert_to_unicode(fix_broken_string(custom_location.address, True))
+                             if custom_location.address else '')
+        location_name = convert_to_unicode(fix_broken_string(custom_location.name, True))
         if custom_room:
-            room_name = fix_broken_string(custom_room.name, True)
+            room_name = convert_to_unicode(fix_broken_string(custom_room.name, True))
             rb_room = self.importer.room_mapping.get((location_name, room_name))
             # if we have a room from the rb module, we only link this, otherwise we use the (custom) names
             if rb_room:
