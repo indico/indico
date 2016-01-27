@@ -32,7 +32,7 @@
             var self = this;
 
             self.buttonBox = $('<span class="button-box"></span>');
-            self.clearIcon = $('<a class="input-clear icon-close"></a>')
+            self.clearIcon = $('<a class="i-button-icon danger icon-close"></a>')
                 .css('line-height', self.element.outerHeight() + 'px')
                 .click(function() {
                     self._clear();
