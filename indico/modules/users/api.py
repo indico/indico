@@ -18,17 +18,18 @@ import itertools
 
 from flask import jsonify, session
 
-from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.modules.events.registration.util import get_events_registered
+from indico.modules.events.sessions.util import get_events_with_linked_sessions
+from indico.modules.events.surveys.util import get_events_with_submitted_surveys
 from indico.modules.events.util import get_events_managed_by, get_events_created_by
 from indico.modules.oauth import oauth
 from indico.modules.users.util import get_related_categories
-from indico.util.redis import client as redis_client
 from indico.util.redis import avatar_links
+from indico.util.redis import client as redis_client
 from indico.web.http_api.fossils import IBasicConferenceMetadataFossil
+from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder
@@ -108,6 +109,9 @@ class UserEventHook(HTTPAPIHook):
             links.setdefault(str(event_id), set()).add('conference_manager')
         for event_id in get_events_created_by(self._avatar.user, self._fromDT, self._toDT):
             links.setdefault(str(event_id), set()).add('conference_creator')
+        for event_id, principal_roles in get_events_with_linked_sessions(self._avatar.user, self._fromDT,
+                                                                         self._toDT).iteritems():
+            links.setdefault(str(event_id), set()).update(principal_roles)
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
     def export_categ_events(self, aw):
