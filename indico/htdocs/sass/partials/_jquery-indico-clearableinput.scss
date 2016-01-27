@@ -48,3 +48,8 @@
         }
     }
 }
+
+// Fix fox clearableinput within qtips
+.qtip .clearableinput {
+    line-height: normal;
+}
