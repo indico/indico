@@ -54,7 +54,8 @@ _cache = GenericCache('Rooms')
 
 class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     __tablename__ = 'rooms'
-    __table_args__ = {'schema': 'roombooking'}
+    __table_args__ = (db.UniqueConstraint('id', 'location_id'),  # useless but needed for the LocationMixin fkey
+                      {'schema': 'roombooking'})
 
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',

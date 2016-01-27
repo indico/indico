@@ -325,3 +325,6 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     is_protected = classproperty(classmethod(_fail))
     protection_repr = property(_fail)
     del _fail
+
+
+Event.register_location_events()

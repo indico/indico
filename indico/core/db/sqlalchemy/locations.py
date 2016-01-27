@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -44,11 +45,32 @@ class LocationMixin(object):
     @classmethod
     def __auto_table_args(cls):
         checks = [db.CheckConstraint("(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
-                                     'no_custom_location_if_room')]
+                                     'no_custom_location_if_room'),
+                  db.CheckConstraint("(venue_id IS NULL) OR (venue_name = '')",
+                                     'no_venue_name_if_venue_id'),
+                  db.CheckConstraint("(room_id IS NULL) OR (venue_id IS NOT NULL)",
+                                     'venue_id_if_room_id')]
         if cls.allow_location_inheritance:
-            checks.append(db.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND venue_name = '' AND "
-                                             "room_name = '' AND address = '')", 'inherited_location'))
-        return tuple(checks)
+            checks.append(db.CheckConstraint("NOT inherit_location OR (venue_id IS NULL AND room_id IS NULL AND "
+                                             "venue_name = '' AND room_name = '' AND address = '')",
+                                             'inherited_location'))
+        fkeys = [db.ForeignKeyConstraint(['venue_id', 'room_id'],
+                                         ['roombooking.rooms.location_id', 'roombooking.rooms.id'])]
+        return tuple(checks) + tuple(fkeys)
+
+    @classmethod
+    def register_location_events(cls):
+        """Registers sqlalchemy events needed by this mixin.
+
+        Call this method after the definition of a model which uses
+        this mixin class.
+        """
+
+        @listens_for(cls.own_room, 'set')
+        def _set_room_venue(target, value, *unused):
+            if value is not None:
+                target.own_venue = value.location
+
 
     @property
     def location_parent(self):
@@ -74,6 +96,16 @@ class LocationMixin(object):
             'room_id',
             db.Integer,
             db.ForeignKey('roombooking.rooms.id'),
+            nullable=True,
+            index=True
+        )
+
+    @declared_attr
+    def own_venue_id(cls):
+        return db.Column(
+            'venue_id',
+            db.Integer,
+            db.ForeignKey('roombooking.locations.id'),
             nullable=True,
             index=True
         )
@@ -106,15 +138,45 @@ class LocationMixin(object):
         )
 
     @declared_attr
-    def own_room(cls):
+    def own_venue(cls):
         return db.relationship(
-            'Room',
+            'Location',
+            foreign_keys=[cls.own_venue_id],
             lazy=True,
             backref=db.backref(
                 cls.location_backref_name,
                 lazy='dynamic'
             )
         )
+
+    @declared_attr
+    def own_room(cls):
+        return db.relationship(
+            'Room',
+            foreign_keys=[cls.own_room_id],
+            lazy=True,
+            backref=db.backref(
+                cls.location_backref_name,
+                lazy='dynamic'
+            )
+        )
+
+    @property
+    def venue(self):
+        """The venue (Location) where this item is located.
+
+        This is ``None`` if a custom venue name was entered.
+        """
+        if self.inherit_location and self.location_parent is None:
+            return None
+        venue = self.venue
+        if venue:
+            return venue
+        return self.own_venue if not self.inherit_location else self.location_parent.venue
+
+    @venue.setter
+    def venue(self, venue):
+        self.own_venue = venue
 
     @property
     def room(self):
@@ -135,9 +197,9 @@ class LocationMixin(object):
         """The name of the location where this item is located."""
         if self.inherit_location and self.location_parent is None:
             return ''
-        room = self.room
-        if room is not None:
-            return room.location.name
+        venue = self.venue
+        if venue is not None:
+            return venue.name
         return self.own_venue_name if not self.inherit_location else self.location_parent.venue_name
 
     @venue_name.setter
@@ -183,9 +245,9 @@ class LocationMixin(object):
         while data_source and data_source.inherit_location:
             data_source = data_source.location_parent
         if data_source is None:
-            return {'source': None, 'room': None, 'room_name': '', 'venue_name': '', 'address': '',
+            return {'source': None, 'venue': None, 'room': None, 'room_name': '', 'venue_name': '', 'address': '',
                     'inheriting': False}
         else:
-            return {'source': data_source, 'room': data_source.room, 'room_name': data_source.room_name,
-                    'venue_name': data_source.venue_name, 'address': data_source.address,
-                    'inheriting': self.inherit_location}
+            return {'source': data_source, 'venue': data_source.venue, 'room': data_source.room,
+                    'room_name': data_source.room_name, 'venue_name': data_source.venue_name,
+                    'address': data_source.address, 'inheriting': self.inherit_location}

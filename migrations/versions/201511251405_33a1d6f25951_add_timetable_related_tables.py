@@ -30,15 +30,20 @@ def upgrade():
         sa.Column('room_name', sa.String(), nullable=False),
         sa.Column('inherit_location', sa.Boolean(), nullable=False),
         sa.Column('address', sa.Text(), nullable=False),
+        sa.Column('venue_id', sa.Integer(), nullable=True, index=True),
         sa.Column('venue_name', sa.String(), nullable=False),
         sa.Column('room_id', sa.Integer(), nullable=True, index=True),
         sa.CheckConstraint("(room_id IS NULL) OR (venue_name = '' AND room_name = '')",
                            name='no_custom_location_if_room'),
-        sa.CheckConstraint("NOT inherit_location OR (room_id IS NULL AND venue_name = '' AND room_name = '' AND "
-                           "address = '')", name='inherited_location'),
+        sa.CheckConstraint("(venue_id IS NULL) OR (venue_name = '')", name='no_venue_name_if_venue_id'),
+        sa.CheckConstraint("(room_id IS NULL) OR (venue_id IS NOT NULL)", name='venue_id_if_room_id'),
+        sa.CheckConstraint("NOT inherit_location OR (venue_id IS NULL AND room_id IS NULL AND venue_name = '' AND "
+                           "room_name = '' AND address = '')", name='inherited_location'),
         sa.CheckConstraint("(text_color = '') = (background_color = '')", name='both_or_no_colors'),
         sa.CheckConstraint("text_color != '' AND background_color != ''", name='colors_not_empty'),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
+        sa.ForeignKeyConstraint(['venue_id'], ['roombooking.locations.id']),
+        sa.ForeignKeyConstraint(['venue_id', 'room_id'], ['roombooking.rooms.location_id', 'roombooking.rooms.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )

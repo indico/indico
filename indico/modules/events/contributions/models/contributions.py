@@ -261,6 +261,8 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
 
 @listens_for(mapper, 'after_configured', once=True)
 def _mapper_configured():
+    Contribution.register_location_events()
+
     @listens_for(Contribution.session, 'set')
     def _set_session_block(target, value, *unused):
         if value is None:

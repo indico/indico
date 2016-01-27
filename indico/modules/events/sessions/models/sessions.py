@@ -147,3 +147,6 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_poster=False, is_deleted=False, _text=self.title)
+
+
+Session.register_location_events()
