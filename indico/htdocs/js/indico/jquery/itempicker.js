@@ -32,32 +32,19 @@
             this.selectedItem = null;
             this._createItemsDict(this.options.items || this.element.data('items') || []);
 
-            var qtipContent = this._createQtipContent(this.itemsDict);
+            var qbubbleContent = this._createQbubbleContent(this.itemsDict);
 
-            this.element.qtip({
+            this.element.qbubble({
                 prerender: true,
-                overwrite: false,
+                content: {
+                    text: qbubbleContent
+                },
                 style: {
-                    classes: 'item-picker-qtip ' + this.options.containerClasses
+                    classes: 'item-picker-qbubble {0}'.format(this.options.containerClasses)
                 },
                 position: {
                     my: 'right top',
-                    at: 'left top',
-                    target: this.element,
-                    adjust: {
-                        mouse: false,
-                        scroll: false
-                    }
-                },
-                content: {
-                    text: qtipContent
-                },
-                show: {
-                    event: 'click',
-                    solo: true
-                },
-                hide: {
-                    event: 'unfocus click'
+                    at: 'left top'
                 },
                 events: {
                     show: function() {
@@ -75,7 +62,7 @@
                                 });
                             }
 
-                            qtipContent.find('.filter-input')
+                            qbubbleContent.find('.filter-input')
                                 .clearableinput({'onInput': handleInput, 'onClear': handleInput, 'focusOnStart': true})
                                 .focus();
                         });
@@ -85,7 +72,7 @@
         },
 
         _destroy: function() {
-            self.element.qtip('destroy');
+            self.element.qbubble('destroy');
         },
 
         _createItemsDict: function(items) {
@@ -97,7 +84,7 @@
             });
         },
 
-        _createQtipContent: function(items) {
+        _createQbubbleContent: function(items) {
             var self = this;
             var dropdownContainer = $('<div>', {'class': 'dropdown-container'});
             var filterWrapper = $('<div>', {'class': 'dropdown-filter-wrapper'});
@@ -118,7 +105,7 @@
                     'data': {'filter': itemData.title, 'id': itemId},
                     'on': {
                         'click': function() {
-                            self.element.qtip('hide');
+                            self.hide();
 
                             if (self.selectedItem && itemId == self.selectedItem.id) {
                                 self._handleSelect($item, null, itemData);
@@ -155,7 +142,7 @@
 
         updateItemList: function(items) {
             this._createItemsDict(items);
-            this.element.qtip('option', 'content.text', this._createQtipContent(this.itemsDict));
+            this.element.qbubble('option', 'content.text', this._createQbubbleContent(this.itemsDict));
         },
 
         selectItem: function(id) {
@@ -166,7 +153,7 @@
         },
 
         hide: function() {
-            this.element.qtip('hide');
+            this.element.qbubble('hide');
         },
 
         _handleSelect: function(newElem, newItem, oldItem) {
@@ -262,11 +249,11 @@
             $.each(footerElements, function() {
                 var $this = this;
                 var actionButton = $('<div>', {
-                    'class': 'action-button',
+                    'class': 'action-row',
                     'text': $this.title,
                     'on': {
                         'click': function() {
-                            self.element.qtip('hide');
+                            self.hide();
                             if ($.isFunction($this.onClick)) {
                                 $this.onClick.call(actionButton, self.element);
                             }
