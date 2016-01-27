@@ -18,6 +18,7 @@ import itertools
 
 from flask import jsonify, session
 
+from indico.modules.events.contributions.util import get_events_with_linked_contributions
 from indico.modules.events.registration.util import get_events_registered
 from indico.modules.events.sessions.util import get_events_with_linked_sessions
 from indico.modules.events.surveys.util import get_events_with_submitted_surveys
@@ -111,6 +112,9 @@ class UserEventHook(HTTPAPIHook):
             links.setdefault(str(event_id), set()).add('conference_creator')
         for event_id, principal_roles in get_events_with_linked_sessions(self._avatar.user, self._fromDT,
                                                                          self._toDT).iteritems():
+            links.setdefault(str(event_id), set()).update(principal_roles)
+        for event_id, principal_roles in get_events_with_linked_contributions(self._avatar.user, self._fromDT,
+                                                                              self._toDT).iteritems():
             links.setdefault(str(event_id), set()).update(principal_roles)
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
