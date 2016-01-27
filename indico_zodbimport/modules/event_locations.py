@@ -26,7 +26,7 @@ from indico.util.string import fix_broken_string
 from indico.util.struct.iterables import committing_iterator
 from MaKaC.conference import _get_room_mapping
 
-from indico_zodbimport import Importer
+from indico_zodbimport import Importer, convert_to_unicode
 
 
 class EventLocationsImporter(Importer):
@@ -51,11 +51,11 @@ class EventLocationsImporter(Importer):
             has_room = False
             updates = {}
             if custom_location:
-                location_name = fix_broken_string(custom_location.name, True)
+                location_name = convert_to_unicode(fix_broken_string(custom_location.name, True))
                 if custom_location.address:
-                    updates[Event.own_address] = fix_broken_string(custom_location.address, True)
+                    updates[Event.own_address] = convert_to_unicode(fix_broken_string(custom_location.address, True))
             if custom_room:
-                room_name = fix_broken_string(custom_room.name, True)
+                room_name = convert_to_unicode(fix_broken_string(custom_room.name, True))
             if location_name and room_name:
                 mapping = self.room_mapping.get((location_name, room_name))
                 if mapping:
