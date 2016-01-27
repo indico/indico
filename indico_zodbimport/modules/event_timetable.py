@@ -49,6 +49,7 @@ from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.rb import Location
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle
 from indico.util.console import cformat, verbose_iterator
@@ -652,6 +653,11 @@ class TimetableMigration(object):
             else:
                 new_entry.venue_name = location_name
                 new_entry.room_name = room_name
+        venue = self.importer.venue_mapping.get(new_entry.venue_name)
+        if venue is not None:
+            # store proper reference to the venue if it's a predefined one
+            new_entry.venue = venue
+            new_entry.venue_name = ''
 
 
 class EventTimetableImporter(Importer):
@@ -694,6 +700,7 @@ class EventTimetableImporter(Importer):
     def _load_data(self):
         self.print_step("Loading some data")
         self.room_mapping = _get_room_mapping()
+        self.venue_mapping = {location.name: location.id for location in Location.query}
         self.all_users_by_email = {}
         for user in User.query.options(joinedload('_all_emails')):
             if user.is_deleted:
