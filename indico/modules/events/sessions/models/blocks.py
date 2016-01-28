@@ -115,7 +115,7 @@ class SessionBlock(LocationMixin, db.Model):
             return False
 
     def can_access(self, user, allow_admin=True):
-        return self.session.can_access(user, allow_admin)
+        return self.session.can_access(user, allow_admin=allow_admin)
 
     @return_ascii
     def __repr__(self):
