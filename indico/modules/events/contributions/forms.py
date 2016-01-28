@@ -22,6 +22,7 @@ from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.events.contributions.fields import ContributionPersonListField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoEnumRadioField
 from indico.web.forms.validators import UsedIf
@@ -34,6 +35,12 @@ class ContributionForm(IndicoForm):
     duration = TimeDeltaField(_("Duration"), [DataRequired()], default=timedelta(minutes=20),
                               units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
+    people = ContributionPersonListField(_("People"), allow_authors=True)
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(ContributionForm, self).__init__(*args, **kwargs)
+        self.people.event = self.event
 
 
 class ContributionProtectionForm(IndicoForm):
