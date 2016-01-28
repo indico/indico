@@ -27,25 +27,24 @@ class RoomLinker:
         to obtain the correct linking for the requests
     """
 
-    def getHTMLLink( self, room, location=None ):
-        if room == None:
+    def getHTMLLink(self, room, location=None):
+        if room is None:
             return ""
-        roomLink = room.getName()
-        url = self.getURL( room, location )
+        url = self.getURL(room, location)
         if url != "":
-            roomLink = """<a href="%s">%s</a>"""%(url, roomLink)
+            roomLink = '<a href="{}">{}</a>'.format(url, room)
         return roomLink
 
-    def getURL( self, room, location=None ):
+    def getURL(self, room, location=None):
         if location is not None and room is not None:
-            res = RoomMapperHolder().match({"name":location.getName()},exact=True)
-            if res != []:
-                return res[0].getMapURL(room.getName())
+            res = RoomMapperHolder().match({"name": location}, exact=True)
+            if res:
+                return res[0].getMapURL(room)
         return ""
 
-    def getURLByName( self, room, location=None ):
+    def getURLByName(self, room, location=None):
         if location is not None and room is not None:
-            res = RoomMapperHolder().match({"name":location},exact=True)
+            res = RoomMapperHolder().match({"name": location}, exact=True)
             if res != []:
                 return res[0].getMapURL(room)
         return ""
