@@ -101,7 +101,7 @@ class RHContributions(RHManageContributionsBase):
 
 class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
-        form = ContributionForm()
+        form = ContributionForm(event=self.event_new)
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
@@ -111,10 +111,10 @@ class RHCreateContribution(RHManageContributionsBase):
 
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
-        form = ContributionForm(obj=FormDefaults(self.contrib))
+        form = ContributionForm(obj=FormDefaults(self.contrib, people=self.contrib.person_links), event=self.event_new)
         if form.validate_on_submit():
             update_contribution(self.contrib, form.data)
-            flash(_("Contribution '{}' successfully updated").format(self.contrib), 'success')
+            flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             return jsonify_data(html=_render_contribution_list(self.event_new))
         return jsonify_form(form)
 
