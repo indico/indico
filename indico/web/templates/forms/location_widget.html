@@ -242,6 +242,18 @@
                 return [];
             }
 
+            function toggleOpenResultsList (inputField) {
+                if (inputField.is(venueInput) && roomInput.closest('.typeahead-container').hasClass('result')) {
+                    roomInput.trigger('typeahead:close-results-list');
+                    venueInput.trigger('typeahead:close-results-list');
+                    venueInput.trigger('typeahead:open-results-list');
+                } else if (inputField.is(roomInput) && venueInput.closest('.typeahead-container').hasClass('result')) {
+                    venueInput.trigger('typeahead:close-results-list');
+                    roomInput.trigger('typeahead:close-results-list');
+                    roomInput.trigger('typeahead:open-results-list');
+                }
+            }
+
             initializeInputs();
 
             var latestVenueValue = venueInput.val();
@@ -428,6 +440,8 @@
 
             $('.i-location-input-field').on('typeahead:close-results-list', function() {
                 Typeahead["#" + this.id].hideLayout();
+            }).on('typeahead:open-results-list', function() {
+                Typeahead["#" + this.id].showLayout();
             })
             .on('focus.typeahead', function() {
                 // In case the input is cleared, this ensures that the results list will contain all available options.
@@ -442,11 +456,7 @@
                 }
                 $('.ui-dialog-content').css('overflow', 'inherit');
 
-                if ($this.is(venueInput) && roomInput.closest('.typeahead-container').hasClass('result')) {
-                    roomInput.trigger('typeahead:close-results-list');
-                } else if ($this.is(roomInput) && venueInput.closest('.typeahead-container').hasClass('result')) {
-                    venueInput.trigger('typeahead:close-results-list');
-                }
+                toggleOpenResultsList($this);
 
                 latestUsedField = $(this);
             })
