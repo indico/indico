@@ -272,14 +272,14 @@ class LocationMixin(object):
             self.room_name = ''
             self.address = ''
         else:
-            self.room = data['room']
-            self.address = data['address']
+            self.room = data.get('room')
+            self.address = data.get('address')
             if self.room:
                 self.venue_name = ''
                 self.room_name = ''
             else:
-                self.venue_name = data['venue_name']
-                self.room_name = data['room_name']
+                self.venue_name = data.get('venue_name')
+                self.room_name = data.get('room_name')
 
     @classmethod
     def get_location_for_parent(cls, parent):
