@@ -90,7 +90,7 @@
                 .i-location-input-field {
 
                     &.typeahead-hint {
-                        z-index: -1 !important;
+                        z-index: 0 !important;
                         background-color: white !important;
                     }
                 }
@@ -105,6 +105,8 @@
             width: 11.5em;
             background-color: inherit;
             padding-right: 2em !important;
+            position: relative;
+            z-index: 1;
 
             &.disabled {
                 @extend %tilted-strips-bg;
