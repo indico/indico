@@ -104,6 +104,7 @@ class SubContribution(db.Model):
     )
 
     # relationship backrefs:
+    # - attachment_folders (AttachmentFolder.subcontribution)
     # - contribution (Contribution.subcontributions)
     # - legacy_mapping (LegacySubContributionMapping.subcontribution)
     # - note (EventNote.subcontribution)

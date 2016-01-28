@@ -219,6 +219,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     )
 
     # relationship backrefs:
+    # - attachment_folders (AttachmentFolder.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - note (EventNote.contribution)
     # - timetable_entry (TimetableEntry.contribution)

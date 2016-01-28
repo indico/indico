@@ -123,6 +123,7 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     )
 
     # relationship backrefs:
+    # - attachment_folders (AttachmentFolder.session)
     # - contributions (Contribution.session)
     # - legacy_mapping (LegacySessionMapping.session)
     # - note (EventNote.session)
