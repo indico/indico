@@ -117,8 +117,8 @@ class SubContribution(db.Model):
         return dict(self.contribution.locator, subcontrib_id=self.id)
 
     @property
-    def is_protected_recursive(self):
-        return self.contribution.is_protected_recursive
+    def is_protected(self):
+        return self.contribution.is_protected
 
     @property
     def session(self):
