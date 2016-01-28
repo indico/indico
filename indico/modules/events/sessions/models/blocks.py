@@ -114,6 +114,9 @@ class SessionBlock(LocationMixin, db.Model):
         else:
             return False
 
+    def can_access(self, user, allow_admin=True):
+        return self.session.can_access(user, allow_admin)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title or None)
