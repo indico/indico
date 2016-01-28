@@ -62,7 +62,7 @@
                 // Try the first element that's not a hidden input
                 input = $this.children(':not(:input:hidden)').eq(0);
             }
-            input.stickyTooltip('error', function() {
+            input.stickyTooltip('danger', function() {
                 return $this.data('error');
             });
         });
