@@ -1,0 +1,105 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+@import 'partials/boxes';
+
+.contribution-people {
+    @extend .i-box;
+    @extend .i-box.no-shadow;
+    width: 400px;
+
+    &.no-border-top {
+        @include border-top-radius(0);
+        border-top: none;
+    }
+
+    .people-lists .titled-rule {
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+        &:first-child {
+            margin-top: -18px;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+    }
+
+    .person-row,
+    .nobody-placeholder {
+        height: 2em;
+        line-height: 2em;
+    }
+
+    .nobody-placeholder {
+        color: $gray;
+        font-style: italic;
+    }
+
+    .person-row {
+        @include single-transition(background-color);
+        padding: 0 10px;
+        margin: 0 -10px;
+
+        .person-status {
+            float: right;
+            height: 2em;
+            white-space: nowrap;
+            overflow: hidden;
+
+            .i-label {
+                @include single-transition(margin);
+                margin-right: 0;
+                margin-top: 1px;
+                vertical-align: top;
+            }
+        }
+
+        &:hover,
+        &.active {
+            background: $light-gray;
+
+            .i-label {
+                margin-right: 10px;
+            }
+
+            .person-buttons {
+                width: 30px;
+            }
+        }
+    }
+
+    .person-buttons {
+        @include single-transition(width);
+        display: inline-block;
+        height: 2em;
+        text-align: right;
+        width: 0;
+
+        .i-button-icon {
+            font-size: 1.1em;
+            vertical-align: sub;
+        }
+    }
+
+}
+
+.contribution-person-qbubble {
+    .qtip-content {
+        width: 200px;
+    }
+}
