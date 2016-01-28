@@ -29,9 +29,9 @@ class RoomLinker:
 
     def getHTMLLink(self, room, location=None):
         if room is None:
-            return ""
+            return ''
         url = self.getURL(room, location)
-        if url != "":
+        if url:
             roomLink = '<a href="{}">{}</a>'.format(url, room)
         return roomLink
 
@@ -40,11 +40,11 @@ class RoomLinker:
             res = RoomMapperHolder().match({"name": location}, exact=True)
             if res:
                 return res[0].getMapURL(room)
-        return ""
+        return ''
 
     def getURLByName(self, room, location=None):
         if location is not None and room is not None:
             res = RoomMapperHolder().match({"name": location}, exact=True)
-            if res != []:
+            if res:
                 return res[0].getMapURL(room)
-        return ""
+        return ''
