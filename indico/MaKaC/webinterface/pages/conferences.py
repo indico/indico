@@ -259,7 +259,7 @@ class WConfMetadata(wcomponents.WTemplated):
 
         event = self._conf.as_event
         v['image'] = event.logo_url if event.has_logo else Config.getInstance().getSystemIconURL("logo_indico")
-        v['description'] = strip_ml_tags(self._conf.getDescription()[:500])
+        v['description'] = strip_ml_tags(to_unicode(self._conf.getDescription())[:500].encode('utf-8'))
         return v
 
 
