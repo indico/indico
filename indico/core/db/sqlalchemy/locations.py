@@ -169,9 +169,6 @@ class LocationMixin(object):
         """
         if self.inherit_location and self.location_parent is None:
             return None
-        venue = self.venue
-        if venue:
-            return venue
         return self.own_venue if not self.inherit_location else self.location_parent.venue
 
     @venue.setter
