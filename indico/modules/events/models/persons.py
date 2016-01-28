@@ -207,6 +207,7 @@ class PersonLinkBase(db.Model):
             backref=db.backref(
                 cls.person_link_backref_name,
                 cascade='all, delete-orphan',
+                cascade_backrefs=False,
                 lazy='dynamic'
             )
         )
