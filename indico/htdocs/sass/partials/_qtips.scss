@@ -16,16 +16,26 @@
  */
 
 .qtip-default {
-    border: 1px solid $dark-blue;
-    color: $dark-blue;
-    background-color: $light-gray;
-    border-radius: 4px;
+    @include border-radius();
+    @include border-all($black);
+    color: $light-gray;
+    background-color: $black;
     font-size: 1em;
+
+    .qtip-titlebar {
+        background-color: #F0F0F0;
+        border-bottom: solid 1px #888;
+    }
 }
 
-.qtip-default .qtip-titlebar {
-    background-color: #F0F0F0;
-    border-bottom: solid 1px #888;
+.qtip-danger {
+    border-color: $red;
+    background-color: $red;
+}
+
+.qtip-warning {
+    border-color: $yellow;
+    background-color: $yellow;
 }
 
 .qtip-popup {
@@ -136,21 +146,4 @@
         margin: 0.1em 0;
         line-height: 1.5em;
     }
-}
-
-.qtip-error {
-    color: $red;
-    font-size: 1em;
-    border-color: $red;
-    background-color: $light-red;
-    box-shadow: 0 0 4px rgba($red, 0.2), 0 0 0.3em white inset;
-}
-
-
-.qtip-warning {
-    color: $dark-yellow;
-    font-size: 1em;
-    border-color: $yellow;
-    background-color: $light-yellow;
-    box-shadow: 0 0 4px rgba($yellow, 0.2), 0 0 0.3em white inset;
 }

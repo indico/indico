@@ -31,7 +31,7 @@
                 'event': 'click unfocus'
             },
             style: {
-                classes: 'qtip-rounded qtip-shadow qtip-' + category
+                classes: 'qtip-' + category
             },
             show: {
                 when: false,
