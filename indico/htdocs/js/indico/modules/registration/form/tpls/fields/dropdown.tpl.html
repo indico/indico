@@ -17,16 +17,16 @@
         </option>
     </select>
     <span ng-if="field.deletedChoice" class="icon-warning deleted-option-warning"
-          data-qtip-style="error"
+          data-qtip-style="danger"
           title="{{ 'The currently chosen option is not available anymore. If you unselect it you won\'t be able to choose it back' | i18n }}">
     </span>
     <span ng-if="field.modifiedChoice" class="icon-warning deleted-option-warning"
-          data-qtip-style="error"
+          data-qtip-style="danger"
           title="{{ 'The currently chosen option has been modified. If you unselect it you may not be able to select it again for the same price' | i18n }}">
     </span>
     <span ng-if="!regMetadata.manager && regMetadata.paid && !field.billableDisabled && hasBillableOptions(field)"
           class="icon-warning billable-items-warning right"
-          data-qtip-style="error"
+          data-qtip-style="danger"
           title="{{ 'There are options that could trigger a price change and have been blocked.' | i18n }}">
     </span>
     <div ng-repeat="item in field.choices | filter:isVisible" style="margin-top: 10px;">
