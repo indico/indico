@@ -131,21 +131,27 @@ class IndicoLocationField(JSONField):
     def process_formdata(self, valuelist):
         super(IndicoLocationField, self).process_formdata(valuelist)
         self.data['room'] = Room.query.get(int(self.data['room_id'])) if self.data.get('room_id') else None
+        self.data['venue'] = Location.query.get(int(self.data['venue_id'])) if self.data.get('venue_id') else None
 
     def _value(self):
         if not self.data:
             return {}
         result = {
             'address': self.data['address'],
-            'venue_name': self.data['venue_name'],
             'inheriting': self.data['inheriting'],
         }
         if self.data.get('room'):
             result['room_id'] = self.data['room'].id
-            result['venue_id'] = self.data['room'].location.id
             result['room_name'] = self.data['room'].name
-        else:
+            result['venue_id'] = self.data['room'].location.id
+            result['venue_name'] = self.data['room'].location.name
+        elif self.data.get('room_name'):
             result['room_name'] = self.data['room_name']
+        if self.data.get('venue'):
+            result['venue_id'] = self.data['venue'].id
+            result['venue_name'] = self.data['venue'].name
+        elif self.data.get('venue_name'):
+            result['venue_name'] = self.data['venue_name']
         return result
 
 
