@@ -480,7 +480,7 @@ class Category(CommonObjectBase):
         return AttachmentFolder.find(object=self)
 
     @property
-    def is_protected_recursive(self):
+    def is_protected(self):
         return self.isProtected()
 
     def can_access(self, user, allow_admin=True):

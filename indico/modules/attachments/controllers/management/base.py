@@ -48,7 +48,7 @@ def _render_protection_message(linked_object):
 
 def _get_parent_info(parent):
     from MaKaC.conference import Category
-    parent_data = {'is_protected': parent.is_protected_recursive}
+    parent_data = {'is_protected': parent.is_protected}
     if isinstance(parent, db.m.Event):
         parent_data['type'] = _('Event')
     elif isinstance(parent, db.m.Session):
@@ -65,7 +65,7 @@ def _get_parent_info(parent):
 
 def _get_folders_protection_info(linked_object):
     folders = AttachmentFolder.find(object=linked_object, is_deleted=False)
-    return {folder.id: folder.is_protected for folder in folders}
+    return {folder.id: folder.is_self_protected for folder in folders}
 
 
 class ManageAttachmentsMixin:
@@ -93,7 +93,7 @@ class AddAttachmentFilesMixin:
                 filename = secure_filename(f.filename, 'attachment')
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename, type=AttachmentType.file,
                                         protection_mode=form.protection_mode.data)
-                if attachment.is_protected:
+                if attachment.is_self_protected:
                     attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
@@ -119,7 +119,7 @@ class AddAttachmentLinkMixin:
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             link = Attachment(user=session.user, type=AttachmentType.link)
             form.populate_obj(link, skip={'acl'})
-            if link.is_protected:
+            if link.is_self_protected:
                 link.acl = form.acl.data
             link.folder = folder
 
@@ -137,7 +137,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
     """Edit an attachment"""
 
     def _process(self):
-        defaults = FormDefaults(self.attachment, protected=self.attachment.is_protected, skip_attrs={'file'})
+        defaults = FormDefaults(self.attachment, protected=self.attachment.is_self_protected, skip_attrs={'file'})
         if self.attachment.type == AttachmentType.file:
             file_ = self.attachment.file
             # file_attrs has to be manually "serialized", since it's going to be converted to JSON
@@ -157,7 +157,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
             logger.info('Attachment %s edited by %s', self.attachment, session.user)
             form.populate_obj(self.attachment, skip={'acl', 'file'})
             self.attachment.folder = folder
-            if self.attachment.is_protected:
+            if self.attachment.is_self_protected:
                 # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
                 self.attachment.acl |= form.acl.data
                 self.attachment.acl &= form.acl.data
@@ -189,7 +189,7 @@ class CreateFolderMixin:
         if form.validate_on_submit():
             folder = AttachmentFolder(object=self.object)
             form.populate_obj(folder, skip={'acl'})
-            if folder.is_protected:
+            if folder.is_self_protected:
                 folder.acl = form.acl.data
             db.session.add(folder)
             logger.info('Folder %s created by %s', folder, session.user)
@@ -204,11 +204,11 @@ class EditFolderMixin(SpecificFolderMixin):
     """Edit a folder"""
 
     def _process(self):
-        defaults = FormDefaults(self.folder, protected=self.folder.is_protected)
+        defaults = FormDefaults(self.folder, protected=self.folder.is_self_protected)
         form = AttachmentFolderForm(obj=defaults, linked_object=self.object)
         if form.validate_on_submit():
             form.populate_obj(self.folder, skip={'acl'})
-            if self.folder.is_protected:
+            if self.folder.is_self_protected:
                 # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
                 self.folder.acl |= form.acl.data
                 self.folder.acl &= form.acl.data
