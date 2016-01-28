@@ -17,13 +17,14 @@
 from __future__ import unicode_literals
 
 from flask import request
-from sqlalchemy.orm import load_only, noload
+from sqlalchemy.orm import load_only, noload, joinedload
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import send_email, make_email
 from indico.modules.auth.util import url_for_register
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.web.flask.templating import get_template_module
@@ -115,6 +116,33 @@ def get_events_created_by(user, from_dt=None, to_dt=None):
         query = query.join(IndexedEvent, IndexedEvent.id == Event.id)
         query = query.filter(event_date_filter)
     return {event.id for event in query}
+
+
+def get_events_with_linked_event_persons(user, from_dt=None, to_dt=None):
+    """Returns a list of all events for which the user is an EventPerson
+
+    :param user: A `User`
+    :param from_dt: The earliest event start time to look for
+    :param to_dt: The latest event start time to look for
+    """
+    event_date_filter = None
+    if from_dt and to_dt:
+        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
+    elif from_dt:
+        event_date_filter = IndexedEvent.start_date >= from_dt
+    elif to_dt:
+        event_date_filter = IndexedEvent.start_date <= to_dt
+
+    query = (user.event_persons
+             .options(load_only('event_id'))
+             .options(noload('*'))
+             .join(Event, Event.id == EventPerson.event_id)
+             .filter(EventPerson.event_links.any())
+             .filter(~Event.is_deleted))
+    if event_date_filter is not None:
+        query = query.join(IndexedEvent, IndexedEvent.id == EventPerson.event_id)
+        query = query.filter(event_date_filter)
+    return {ep.event_id for ep in query}
 
 
 def notify_pending(acl_entry):
