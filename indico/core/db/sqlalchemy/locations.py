@@ -256,30 +256,29 @@ class LocationMixin(object):
         """
         return {
             'address': self.location_data['address'],
-            'room_id': self.location_data['room'].id if self.location_data['room'] else '',
             'room_name': self.location_data['room_name'],
+            'room_id': self.location_data['room'].id if self.location_data['room'] else '',
             'venue_name': self.location_data['venue_name'],
-            'venue_id': self.location_data['room'].location.id if self.location_data['room'] else '',
+            'venue_id': self.location_data['venue'].id if self.location_data['venue'] else '',
         }
-
 
     @location_data.setter
     def location_data(self, data):
         self.inherit_location = data['inheriting']
+        self.venue_name = ''
+        self.room_name = ''
         if self.inherit_location:
             self.room = None
-            self.venue_name = ''
-            self.room_name = ''
+            self.venue = None
             self.address = ''
         else:
             self.room = data.get('room')
-            self.address = data.get('address')
-            if self.room:
-                self.venue_name = ''
-                self.room_name = ''
-            else:
-                self.venue_name = data.get('venue_name')
-                self.room_name = data.get('room_name')
+            self.venue = data.get('venue')
+            self.address = data.get('address', '')
+            if not self.room:
+                self.room_name = data.get('room_name', '')
+            if not self.venue:
+                self.venue_name = data.get('venue_name', '')
 
     @classmethod
     def get_location_for_parent(cls, parent):
