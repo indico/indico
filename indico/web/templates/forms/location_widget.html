@@ -62,7 +62,7 @@
             var address = $('#location-address-{{ field.id }}');
             var usingDefault = $('#location-inheritance-{{ field.id }}');
             var venues = {{ venues | tojson }};
-            var venueNames = $.map(venues.data, function(venue) {return venue.name;});
+            var venueNames = {{ venues.data | map(attribute='name') | list | tojson }};
             var rooms = {{ rooms | tojson }};
             var hiddenData = field.val() ? JSON.parse(field.val()) : {};
             var latestUsedField = '';
@@ -106,12 +106,12 @@
 
                 if (!isInitStep) {
                     if (isChecked) {
-                        hiddenData = {{ field.data.source.widget_location_data | tojson }}
+                        hiddenData = {{ field.data.source.widget_location_data | tojson }};
                         hiddenData.inheriting = true;
                         field.val(JSON.stringify(hiddenData)).trigger('change');
                         initializeInputs();
                     } else {
-                        clearVenue();
+                        clearField(venueInput);
                     }
                 }
             };
@@ -138,7 +138,7 @@
                 delete hiddenData.room_id;
                 delete hiddenData.room_name;
                 roomInput.val('');
-                roomInput.parent().find('.highlighter').removeClass('visible');
+                roomInput.siblings('.highlighter').removeClass('visible');
                 roomJustCleared = true;
                 postSelectionActions(roomInput, '');
             }
@@ -147,7 +147,7 @@
                 delete hiddenData.venue_id;
                 delete hiddenData.venue_name;
                 venueInput.val('');
-                venueInput.parent().find('.highlighter').removeClass('visible');
+                venueInput.siblings('.highlighter').removeClass('visible');
                 venueJustChanged = true;
                 postSelectionActions(venueInput, '');
                 clearRoom();
@@ -165,9 +165,9 @@
                 var resultsWrapper = node.siblings('.typeahead-results');
                 resultsWrapper.css('top', node.outerHeight() + 'px');
                 var justUse = node.parent().find('.just-use-option');
-                if (node.val().length > 0) {
+                if (node.val()) {
                     if (justUse.length === 0) {
-                        justUse = $('<div>').attr({
+                        justUse = $('<div>', {
                             'class': 'just-use-option'
                         })
                         .on('click', function() {
@@ -175,8 +175,8 @@
                         });
                         resultsWrapper.append(justUse);
                     }
-                    justUse.text('Just use "' + node.val() + '"');
-                } else if (justUse.length != 0) {
+                    justUse.text($T.gettext('Just use "{0}"').format(node.val()));
+                } else {
                     justUse.remove();
                 }
                 var firstOption = resultHtmlList.find('li.typeahead-item').first();
@@ -197,14 +197,12 @@
                 var resultsListHeight = parent.find('.typeahead-results').outerHeight();
                 if (activeOption.length != 0) {
                     if (activeOption.position().top + activeOption.outerHeight() > dropdownList.outerHeight()) {
-                        delta = (activeOption.position().top + activeOption.outerHeight()
-                                 - dropdownList.outerHeight());
+                        delta = activeOption.position().top + activeOption.outerHeight() - dropdownList.outerHeight();
                         currentScrollPos += delta;
                         dropdownList.animate({
                             scrollTop: currentScrollPos
                         }, 50);
-                    }
-                    else if (activeOption.position().top < dropdownList.position().top){
+                    } else if (activeOption.position().top < dropdownList.position().top){
                         currentScrollPos += activeOption.position().top;
                         dropdownList.animate({
                             scrollTop: currentScrollPos
@@ -225,7 +223,7 @@
             }
 
             function highlightOption(inputField, value) {
-                var highlighter = inputField.parent().find('.highlighter');
+                var highlighter = inputField.siblings('.highlighter');
                 highlighter.html(value).attr('title', value).addClass('visible');
             }
 
@@ -242,7 +240,7 @@
                 return [];
             }
 
-            function toggleOpenResultsList (inputField) {
+            function toggleOpenResultsList(inputField) {
                 if (inputField.is(venueInput) && roomInput.closest('.typeahead-container').hasClass('result')) {
                     roomInput.trigger('typeahead:close-results-list');
                     venueInput.trigger('typeahead:close-results-list');
@@ -254,13 +252,27 @@
                 }
             }
 
+            function resetSelectedOption() {
+                if (latestUsedField.is(venueInput)) {
+                    venueInput.val(latestVenueValue);
+                    if (hiddenData.venue_id) {
+                        highlightOption(venueInput, latestVenueValue)
+                    }
+                } else if (latestUsedField.is(roomInput)) {
+                    roomInput.val(latestRoomValue);
+                    if (hiddenData.room_id) {
+                        highlightOption(roomInput, latestRoomValue)
+                    }
+                }
+            }
+
             initializeInputs();
 
             var latestVenueValue = venueInput.val();
             var latestRoomValue = roomInput.val();
 
             usingDefault.on('click', function() {
-                toggleDefaultLocation($(this).prop('checked'));
+                toggleDefaultLocation(this.checked);
             });
 
             toggleDefaultLocation(usingDefault.prop('checked'), true);
@@ -294,7 +306,7 @@
                         this.query = cleanQuery(query);
                     },
                     onShowLayout: function(node, query) {
-                        venueInput.parent().find('.highlighter').removeClass('visible');
+                        venueInput.siblings('.highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
                     onHideLayout: function(node, query) {
@@ -315,7 +327,7 @@
                         validVenue = false;
                     },
                     onNavigateBefore: function(node, query, event) {
-                        if (event.keyCode == 9) {
+                        if (event.keyCode == K.TAB) {
                             preventGuessing = true
                         }
                         resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
@@ -363,7 +375,7 @@
                         this.query = cleanQuery(query);
                     },
                     onShowLayout: function(node, query) {
-                        roomInput.parent().find('.highlighter').removeClass('visible');
+                        roomInput.siblings('.highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
                     onHideLayout: function(node, query) {
@@ -375,10 +387,8 @@
                             if (venueValue) {
                                 result = findRoomInVenue(query, venueValue);
                             } else {
-                                var count = 0;
-                                while (count < venueNames.length && result.length == 0) {
-                                    result = findRoomInVenue(query, venueNames[count]);
-                                    count++;
+                                for (var i = 0; i < venueNames.length && !result.length; i++) {
+                                    result = findRoomInVenue(query, venueNames[i]);
                                 }
                             }
                             if (result.length > 0) {
@@ -391,7 +401,7 @@
                         validRoom = false;
                     },
                     onNavigateBefore: function(node, query, event) {
-                        if (event.keyCode == 9) {
+                        if (event.keyCode == K.TAB) {
                             preventGuessing = true
                         }
                         resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
@@ -406,7 +416,7 @@
             venueInput.on('typeahead:click-on-option', function(e, data) {
                 reorderCategories(data.item_name);
                 if (hiddenData.venue_id && data.venue_id != hiddenData.venue_id && !data.room_id) {
-                    clearRoom();
+                    clearField(roomInput);
                 }
                 hiddenData.venue_name = data.item_name;
                 hiddenData.venue_id = data.venue_id;
@@ -416,7 +426,7 @@
             })
             .on('typeahead:click-on-custom-option', function(e, data) {
                 if (hiddenData.room_id) {
-                    clearRoom();
+                    clearField(roomInput);
                 }
                 delete hiddenData.venue_id;
                 hiddenData.venue_name = data.item_name;
@@ -424,7 +434,7 @@
                 venueInput.val(data.item_name);
                 validVenue = true;
                 justUseOptionSelected = false;
-                Typeahead["#" + venueInput.attr('id')].hideLayout();
+                venueInput.trigger('typeahead:close-results-list');
             });
 
             roomInput.on('typeahead:click-on-custom-option', function(e, data) {
@@ -434,9 +444,8 @@
                 roomInput.val(data.item_name);
                 validRoom = true;
                 justUseOptionSelected = false;
-                Typeahead["#" + roomInput.attr('id')].hideLayout();
+                roomInput.trigger('typeahead:close-results-list');
             });
-
 
             $('.i-location-input-field').on('typeahead:close-results-list', function() {
                 Typeahead["#" + this.id].hideLayout();
@@ -463,17 +472,17 @@
             .on('keydown', function(e) {
                 var $this = $(this);
                 if (resultsWereOpen) {
-                    if (e.keyCode == 9) {  // on tab
+                    if (e.keyCode == K.TAB) {
                         if ($this.val()) {
                             // treat tab as the return key
                             var returnKey = jQuery.Event("keydown");
-                            returnKey.which = 13;
-                            returnKey.keyCode = 13;
+                            returnKey.which = K.ENTER;
+                            returnKey.keyCode = K.ENTER;
                             $this.trigger(returnKey);
                         } else {
                             clearField($this);
                         }
-                    } else if (e.keyCode == 13) { // on enter
+                    } else if (e.keyCode == K.ENTER) {
                         e.preventDefault();
                         if ($this.val()) {
                             if (latestSelectedOption.value == '' || latestSelectedOption.field == $this.attr('id') && latestSelectedOption.value != $this.val()) {
@@ -482,20 +491,10 @@
                         } else {
                             clearField($this);
                         }
-                    } else if (e.keyCode == 27) {  // on esc
+                    } else if (e.keyCode == K.ESCAPE) {
                         e.preventDefault();
-                        if (latestUsedField.is(venueInput)) {
-                            venueInput.val(latestVenueValue);
-                            if (hiddenData.venue_id) {
-                                highlightOption(venueInput, latestVenueValue)
-                            }
-                        } else if (latestUsedField.is(roomInput)) {
-                            roomInput.val(latestRoomValue);
-                            if (hiddenData.room_id) {
-                                highlightOption(roomInput, latestRoomValue)
-                            }
-                        }
-                    } else if (~[38,40].indexOf(e.keyCode)) {  // on key down/up
+                        resetSelectedOption();
+                    } else if (~[K.UP, K.DOWN].indexOf(e.keyCode)) {
                         scrollResultsList($this);
                         $this.trigger('focus.typeahead');
                     }
@@ -510,7 +509,7 @@
 
             $('.toggle-results-list').on('click', function() {
                 var container = $(this).parent().parent();
-                var input = $(container.find('.i-location-input-field')[0]);
+                var input = container.find('.i-location-input-field').eq(0);
                 if (container.hasClass('result')) {
                     if (!input.val()) {
                         input.trigger('typeahead:close-results-list');
@@ -526,7 +525,7 @@
             });
 
             $('.typeahead-field .highlighter').on('click', function() {
-                $($(this).parent().find('.i-location-input-field')[0]).trigger('focus.typeahead');
+                $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
             });
         })();
     </script>
