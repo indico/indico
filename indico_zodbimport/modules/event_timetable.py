@@ -701,7 +701,7 @@ class EventTimetableImporter(Importer):
     def _load_data(self):
         self.print_step("Loading some data")
         self.room_mapping = _get_room_mapping()
-        self.venue_mapping = {location.name: location.id for location in Location.query}
+        self.venue_mapping = {location.name: location for location in Location.query}
         self.all_users_by_email = {}
         for user in User.query.options(joinedload('_all_emails')):
             if user.is_deleted:
