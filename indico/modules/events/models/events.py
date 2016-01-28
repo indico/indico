@@ -276,7 +276,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
                 bool(allow_key and user and self.as_legacy.canKeyModify()))
 
     @property
-    def is_protected_recursive(self):
+    def is_protected(self):
         return self.as_legacy.isProtected()
 
     @memoize_request
@@ -322,7 +322,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         raise NotImplementedError('These properties are not usable until event ACLs are in the new DB')
     is_public = classproperty(classmethod(_fail))
     is_inheriting = classproperty(classmethod(_fail))
-    is_protected = classproperty(classmethod(_fail))
+    is_self_protected = classproperty(classmethod(_fail))
     protection_repr = property(_fail)
     del _fail
 

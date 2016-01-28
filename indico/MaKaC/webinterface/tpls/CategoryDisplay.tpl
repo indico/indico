@@ -27,7 +27,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                 ${attachment.title}
             </a>
             % endif
-            % if attachment.is_protected:
+            % if attachment.is_self_protected:
                 <i class="icon-lock"></i>
             % endif
         </li>
