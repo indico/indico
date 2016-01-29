@@ -27,30 +27,30 @@
             multiChoice: false,
             overwriteChoice: true,
             showFavoriteUsers: true,
-            render: function(users) {},
+            render: function(people) {},
+            onAdd: function(people) {},
             onRemove: function() {},
-            onSelect: function(users) {},
         },
 
         _create: function _create() {
             var self = this;
-            self.users = JSON.parse(self.element.val() || '[]');
-            self.options.render(self.users);
+            self.people = JSON.parse(self.element.val() || '[]');
+            self.options.render(self.people);
         },
 
         _update: function _update() {
             var self = this;
-            var users = self.users ? JSON.stringify(self.users) : '[]';
-            self.element.val(users);
+            var people = self.people ? JSON.stringify(self.people) : '[]';
+            self.element.val(people);
             self.element.trigger('change');
-            self.options.render(self.users);
+            self.options.render(self.people);
         },
 
         _add: function _add(people) {
             var self = this;
 
             function cleanDuplicates(people) {
-                _.each(self.users, function(person) {
+                _.each(self.people, function(person) {
                     people = _.without(people, _.findWhere(people, {
                         _type: person._type,
                         id: person.id
@@ -59,8 +59,8 @@
                 return people;
             }
 
-            self.users = self.options.overwriteChoice? people : self.users.concat(cleanDuplicates(people));
-            self.options.onSelect(self.users);
+            self.people = self.options.overwriteChoice ? people : self.people.concat(cleanDuplicates(people));
+            self.options.onAdd(self.people);
             self._update();
         },
 
@@ -84,22 +84,22 @@
 
         remove: function remove() {
             var self = this;
-            self.users = [];
+            self.people = [];
             self.options.onRemove();
             self._update();
         },
 
-        removeOne: function removeOne(userId) {
+        removeOne: function removeOne(personId) {
             var self = this;
-            var user = _.findWhere(self.users, {id: userId});
-            self.users = _.without(self.users, user);
+            var person = _.findWhere(self.people, {id: personId});
+            self.people = _.without(self.people, person);
             self._update();
         },
 
-        set: function set(userId, data) {
+        set: function set(personId, data) {
             var self = this;
-            var user = _.findWhere(self.users, {id: userId});
-            $.extend(user, data);
+            var person = _.findWhere(self.people, {id: personId});
+            $.extend(person, data);
             self._update();
         }
     });
