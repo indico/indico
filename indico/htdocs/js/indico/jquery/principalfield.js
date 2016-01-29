@@ -46,28 +46,40 @@
             self.options.render(self.users);
         },
 
-        choose: function choose() {
+        _add: function _add(people) {
             var self = this;
-            function cleanDuplicates(users) {
-                _.each(self.users, function(user) {
-                    users = _.without(users, _.findWhere(users, {
-                        _type: user._type,
-                        id: user.id
+
+            function cleanDuplicates(people) {
+                _.each(self.users, function(person) {
+                    people = _.without(people, _.findWhere(people, {
+                        _type: person._type,
+                        id: person.id
                     }));
                 });
-                return users;
+                return people;
             }
-            function handleUsersChosen(users) {
-                self.users = self.options.overwriteChoice? users : self.users.concat(cleanDuplicates(users));
-                self.options.onSelect(self.users);
-                self._update();
-            }
-            var userChoosePopup = new ChooseUsersPopup($T("Choose user"), true, self.options.eventId,
+
+            self.users = self.options.overwriteChoice? people : self.users.concat(cleanDuplicates(people));
+            self.options.onSelect(self.users);
+            self._update();
+        },
+
+        choose: function choose() {
+            var self = this;
+            function handle(people) { self._add(people); }
+            var userChoosePopup = new ChooseUsersPopup($T("Choose person"), true, self.options.eventId,
                                                        self.options.enableGroupsTab, self.options.showFavoriteUsers,
                                                        self.options.suggestedUsers, !self.options.multiChoice,
-                                                       true, false, handleUsersChosen, null,
+                                                       true, false, handle, null,
                                                        self.options.allowExternalUsers);
             userChoosePopup.execute();
+        },
+
+        enter: function enter() {
+            var self = this;
+            function handle(person) { self._add([person.getAll()]); }
+            var personCreatePopup = new UserDataPopup($T("Enter person"), $O(), handle, false, false, false, false);
+            personCreatePopup.open();
         },
 
         remove: function remove() {
