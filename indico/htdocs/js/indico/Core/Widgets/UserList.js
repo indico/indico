@@ -185,12 +185,10 @@ type("ListOfUsersManager", [], {
                 $T('Edit ') + self.userCaption + $T(' data'),
                 user,
                 function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                    	if (!all)
-                            self._manageUserList(self.methods["edit"], self._getEditParams(newData));
-                    	else
-                    	    self._manageAllConectedUserList(self.methods["edit"], self._getEditParams(newData));
-                        editUserPopup.close();
+                    if (!all) {
+                        self._manageUserList(self.methods.edit, self._getEditParams(newData));
+                    } else {
+                        self._manageAllConectedUserList(self.methods.edit, self._getEditParams(newData));
                     }
                 }, user.get('showSubmitterCB'), user.get('showManagerCB'), user.get('showCoordinatorCB'), self.allowEmptyEmail);
         editUserPopup.open();
@@ -349,10 +347,7 @@ type("ListOfUsersManager", [], {
                 $T('New ') + self.userCaption,
                 newUser,
                 function(newData) {
-                    if (newUserPopup.parameterManager.check()) {
-                        self._manageUserList(self.methods["addNew"], self._getAddNewParams(newData));
-                        newUserPopup.close();
-                    }
+                    self._manageUserList(self.methods.addNew, self._getAddNewParams(newData));
                 }, self.rightsToShow.submission, self.rightsToShow.management, self.rightsToShow.coordination, self.allowEmptyEmail);
         newUserPopup.open();
     },
@@ -509,19 +504,16 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                                        'phone': any(newData.get('phone'), ''),
                                        'fax': any(newData.get('fax'), '')
                                       };
-                    if (newUserPopup.parameterManager.check()) {
-                        if (!self._isAlreadyInList(newUserData['email'])) {
-                            newUserPopup.close();
-                            self.usersList.append(newUserData);
-                            self._drawUserList();
-                        } else {
-                            var popup = new AlertPopup($T('Add ')+self.userCaption,
-                                    $T('The email address (') + newUserData['email'] +
-                                    $T(') is already used by another participant. Please modify email field value.'));
-                            popup.open();
-                        }
+                    if (!self._isAlreadyInList(newUserData.email)) {
+                        newUserPopup.close();
+                        self.usersList.append(newUserData);
+                        self._drawUserList();
+                    } else {
+                        var popup = new AlertPopup($T.gettext("Add {0}").format(self.userCaption),
+                            $T.gettext("The email address ({0}) is already used by another participant. Please modify email field value.").format(newUserData.email));
+                        popup.open();
                     }
-                }, self.rightsToShow.submission, self.rightsToShow.management, self.rightsToShowCoordination, self.allowEmptyEmail);
+                }, self.rightsToShow.submission, self.rightsToShow.management, self.rightsToShowCoordination, self.allowEmptyEmail, false);
         newUserPopup.open();
     },
 
@@ -534,11 +526,8 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                 $T('Edit ') + self.userCaption + $T(' data'),
                 userData,
                 function(newData) {
-                    if (editUserPopup.parameterManager.check()) {
-                        self._userModifyData(user, newData);
-                        self._drawUserList();
-                        editUserPopup.close();
-                    }
+                    self._userModifyData(user, newData);
+                    self._drawUserList();
                 }, false, false);
             editUserPopup.open();
             killProgress();
