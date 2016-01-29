@@ -1106,10 +1106,13 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                         popup.open();
                         return;
                     }
-                    self.userData.set('name', '{0} {1}'.format(self.userData.get('firstName'), self.userData.get('familyName')))
-                    self.action(self.userData, function() {
-                    self.close();
-                    });
+                    self.userData.set('name', '{0} {1}'.format(self.userData.get('firstName'), self.userData.get('familyName')));
+                    if (self.parameterManager.check()) {
+                        self.action(self.userData);
+                        if (self.autoClose) {
+                            self.close();
+                        }
+                    }
                 }],
                 [$T('Cancel'), function() {
                     self.close();
@@ -1117,7 +1120,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             ];
         }
      },
-     function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail) {
+     function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail, autoClose) {
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
@@ -1125,6 +1128,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          this.grantCoordination = exists(grantCoordination)?grantCoordination:false;
          this.allowEmptyEmail = exists(allowEmptyEmail)?allowEmptyEmail:true;
          this.ExclusivePopup(title,  function(){return true;});
+         this.autoClose = exists(autoClose) ? autoClose : true;
      }
     );
 
@@ -1295,20 +1299,17 @@ type("UserListWidget", ["ListWidget"],
                 var editPopup = new UserDataPopup(
                     'Change user data',
                     userData.clone(),
-                    function(newData, suicideHook) {
-                        if (editPopup.parameterManager.check()) {
-                            //  editProcess will be passed a WatchObject representing the user.
-                            self.editProcess(userData, function(result) {
-                                if (result) {
-                                    userData.update(newData.getAll());
-                                    if (!startsWith('' + userData.get('id'), 'newUser')) {
-                                        userData.set('id', 'edited' + userData.get('id'));
-                                    }
-                                    self.userListField.inform();
+                    function(newData) {
+                        //  editProcess will be passed a WatchObject representing the user.
+                        self.editProcess(userData, function(result) {
+                            if (result) {
+                                userData.update(newData.getAll());
+                                if (!startsWith('' + userData.get('id'), 'newUser')) {
+                                    userData.set('id', 'edited' + userData.get('id'));
                                 }
-                            });
-                            suicideHook();
-                        }
+                                self.userListField.inform();
+                            }
+                        });
                     }
                  );
                  editPopup.open();
@@ -1541,19 +1542,16 @@ type("UserListField", ["IWidget"], {
                 var newUserPopup = new UserDataPopup(
                     $T('New user'),
                     newUser,
-                    function(newData, suicideHook) {
-                        if (newUserPopup.parameterManager.check()) {
-                            newUser.set('isSubmitter', newUser.get('submission'));
-                            self.newProcess([newUser], function(result) {
-                                if (result) {
-                                    self.userList.set(newUserId, newUser);
-                                    self.check(newUser);
-                                    //self._highlightNewUser(newUserId);
-                                    $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
-                                }
-                            });
-                            suicideHook();
-                        }
+                    function(newData) {
+                        newUser.set('isSubmitter', newUser.get('submission'));
+                        self.newProcess([newUser], function(result) {
+                            if (result) {
+                                self.userList.set(newUserId, newUser);
+                                self.check(newUser);
+                                //self._highlightNewUser(newUserId);
+                                $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
+                            }
+                        });
                     }, self.allowSetRights
                 );
                 newUserPopup.open();
