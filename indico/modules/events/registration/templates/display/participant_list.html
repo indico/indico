@@ -14,40 +14,45 @@
 
 {% block content %}
     {% if not published %}
-        {% call message_box('warning', fixed_width=True) %}
+        {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no published registrations.{% endtrans %}
         {% endcall %}
-    {% endif %}
-    <div class="registrations">
-        <table class="i-table tablesorter">
-            <thead>
-                <tr class="i-table">
-                    <th class="i-table">{% trans %}Full name{% endtrans %}</th>
-                    {% if show_position %}
-                        <th class="i-table">{% trans %}Position{% endtrans %}</th>
-                    {% endif %}
-                    {% if show_affiliation %}
-                        <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for name, personal_data in registrations %}
+    {% elif not registrations %}
+        {% call message_box('info', fixed_width=true) %}
+            {% trans %}There are no participants yet.{% endtrans %}
+        {% endcall %}
+    {% else %}
+        <div class="registrations">
+            <table class="i-table tablesorter">
+                <thead>
                     <tr class="i-table">
-                        <td class="i-table" data-text="{{ name }}">
-                            {{ title }} {{ name }}
-                        </td>
+                        <th class="i-table">{% trans %}Full name{% endtrans %}</th>
                         {% if show_position %}
-                            <td class="i-table">{{ personal_data.position or '' }}</td>
+                            <th class="i-table">{% trans %}Position{% endtrans %}</th>
                         {% endif %}
                         {% if show_affiliation %}
-                            <td class="i-table">{{ personal_data.affiliation or '' }}</td>
+                            <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
                         {% endif %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    {% for name, personal_data in registrations %}
+                        <tr class="i-table">
+                            <td class="i-table" data-text="{{ name }}">
+                                {{ title }} {{ name }}
+                            </td>
+                            {% if show_position %}
+                                <td class="i-table">{{ personal_data.position or '' }}</td>
+                            {% endif %}
+                            {% if show_affiliation %}
+                                <td class="i-table">{{ personal_data.affiliation or '' }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 
     <script>
         $('.registrations .tablesorter').tablesorter({
