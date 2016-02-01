@@ -63,7 +63,8 @@ def get_object_from_args(args=None):
     elif object_type == 'contribution':
         obj = event.contributions.filter_by(id=args['contrib_id'], is_deleted=False).first()
     elif object_type == 'subcontribution':
-        obj = SubContribution.find(SubContribution.contribution.has(event_new=event, id=args['contrib_id'],
+        obj = SubContribution.find(SubContribution.id == args['subcontrib_id'], ~SubContribution.is_deleted,
+                                   SubContribution.contribution.has(event_new=event, id=args['contrib_id'],
                                                                     is_deleted=False)).first()
     else:
         raise ValueError('Unexpected object type: {}'.format(object_type))
