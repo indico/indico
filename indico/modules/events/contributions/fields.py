@@ -40,6 +40,9 @@ class ContributionPersonListField(EventPersonListField):
             self.default_is_speaker = True
         super(ContributionPersonListField, self).__init__(*args, **kwargs)
 
+    def _convert_data(self, data):
+        return map(self._get_contribution_person, data)
+
     @no_autoflush
     def _get_contribution_person(self, data):
         author_type = data.pop('authorType', self.default_author_type)
@@ -54,7 +57,7 @@ class ContributionPersonListField(EventPersonListField):
             return serialize_contribution_person_link(principal)
 
     def pre_validate(self, form):
-        self.data = map(self._get_contribution_person, self.data)
+        super(ContributionPersonListField, self).pre_validate(form)
         for person in self.data:
             if not self.allow_authors and person.author_type != AuthorType.none:
                 raise ValueError(_("Author data received"))

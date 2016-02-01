@@ -40,7 +40,6 @@ class ContributionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(ContributionForm, self).__init__(*args, **kwargs)
-        self.people.event = self.event
 
 
 class ContributionProtectionForm(IndicoForm):

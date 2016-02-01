@@ -34,6 +34,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
+from indico.modules.users.models.users import User, UserTitle
 from indico.modules.users.util import serialize_user
 from indico.util.date_time import localize_as_utc
 from indico.util.i18n import _
@@ -251,30 +252,59 @@ class PrincipalListField(HiddenField):
 
 
 class EventPersonListField(PrincipalListField):
-    """"A field that lets you select a list Indico user and EventPersons"""
+    """"A field that lets you select a list Indico user and EventPersons
+
+    Requires its form to have an event set.
+    """
 
     def __init__(self, *args, **kwargs):
-        self.event = None
         super(EventPersonListField, self).__init__(*args,
                                                    groups=False, allow_external=True, serializable=False, **kwargs)
 
+    @property
+    def event(self):
+        return self.get_form().event
+
+    def _convert_data(self, data):
+        return map(self._get_event_person, data)
+
+    def _create_event_person(self, data):
+        user = User.find_first(~User.is_deleted, User.all_emails.contains(data['email'].lower()))
+        title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
+        return EventPerson(event_new=self.event, user=user, email=data['email'], _title=title,
+                           first_name=data['firstName'], last_name=data['familyName'],
+                           affiliation=data.get('affiliation'), address=data.get('address'),
+                           phone=data.get('phone'))
+
     def _get_event_person(self, data):
-        if data['_type'] == 'Avatar':
+        person_type = data.get('_type')
+        if person_type is None:
+            return self._create_event_person(data)
+        elif person_type == 'Avatar':
             user = self._convert_principal(data)
             return EventPerson.for_user(user, self.event)
-        return self.event.persons.filter_by(id=data['id']).one()
+        elif person_type == 'EventPerson':
+            return self.event.persons.filter_by(id=data['id']).one()
+        else:
+            raise ValueError(_("Uknown person type '{}'").format(person_type))
 
     def _serialize_principal(self, principal):
         if not isinstance(principal, EventPerson):
-            return super(EventPersonField, self)._serialize_principal(principal)
+            return super(EventPersonListField, self)._serialize_principal(principal)
         return serialize_event_person(principal)
 
     def pre_validate(self, form):
-        self.data = map(self._get_event_person, self.data)
+        # Override parent behavior
+        pass
 
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = json.loads(valuelist[0])
+            try:
+                self.data = self._convert_data(self.data)
+            except ValueError:
+                self.data = []
+                raise
 
 
 class PrincipalField(PrincipalListField):
