@@ -27,7 +27,7 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, check_registration_email)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
@@ -106,6 +106,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                                              event_id=int(self.event.id))
         query = (Registration
                  .find(Registration.event_id == self.event.id,
+                       Registration.state == RegistrationState.complete,
                        RegistrationForm.publish_registrations_enabled,
                        ~RegistrationForm.is_deleted,
                        ~Registration.is_deleted,

@@ -345,6 +345,7 @@ def get_unique_published_registrations(event):
     :param event: The Event to get registrations for
     """
     registrations = Registration.find_all(Registration.is_active,
+                                          Registration.state == RegistrationState.complete,
                                           ~RegistrationForm.is_deleted,
                                           RegistrationForm.event_id == event.id,
                                           RegistrationForm.publish_registrations_enabled,
