@@ -358,6 +358,7 @@ if __name__ == '__main__':
             event_participants = indico_zodbimport.modules.event_participants:EventParticipantsImporter
             event_timetable = indico_zodbimport.modules.event_timetable:EventTimetableImporter
             event_locations = indico_zodbimport.modules.event_locations:EventLocationsImporter
+            event_categories = indico_zodbimport.modules.event_categories:EventCategoriesImporter
             """,
           zip_safe=False,
           packages=foundPackages,
