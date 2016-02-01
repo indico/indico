@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSON, ARRAY
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
@@ -41,7 +41,13 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     view access!
     """
     __tablename__ = 'events'
-    __auto_table_args = (db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
+    __auto_table_args = (db.Index(None, 'category_chain', postgresql_using='gin'),
+                         db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
+                                            'category_data_set'),
+                         db.CheckConstraint("category_id = category_chain[1]", 'category_id_matches_chain'),
+                         db.CheckConstraint("category_chain[array_length(category_chain, 1)] = 0",
+                                            'category_chain_has_root'),
+                         db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                          db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                             'valid_stylesheet'),
                          {'schema': 'events'})
@@ -72,6 +78,17 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         db.ForeignKey('users.users.id'),
         nullable=False,
         index=True
+    )
+    #: The ID of immediate parent category of the event
+    category_id = db.Column(
+        db.Integer,
+        nullable=True,
+        index=True
+    )
+    #: The category chain of the event (from immediate parent to root)
+    category_chain = db.Column(
+        ARRAY(db.Integer),
+        nullable=True
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
