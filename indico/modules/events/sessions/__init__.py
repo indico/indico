@@ -24,8 +24,9 @@ from wtforms import BooleanField
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole, check_roles
+from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import can_manage_sessions
+from indico.modules.events.sessions.util import can_manage_sessions, get_sessions_for_user
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
@@ -111,3 +112,11 @@ class CoordinatorRole(ManagementRole):
     name = 'coordinate'
     friendly_name = _('Coordination')
     description = _('Grants coordination access to the session.')
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    def _visible_my_sessions(event):
+        return session.user and bool(get_sessions_for_user(event.as_event, session.user))
+    yield MenuEntryData(title=_("My Sessions"), name='my_sessions', endpoint='sessions.my_sessions', position=1,
+                        parent='my_conference', visible=_visible_my_sessions)

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.sessions.controllers.display import RHDisplaySessionList
 from indico.modules.events.sessions.controllers.management.protection import RHSessionCoordinatorPrivs
 from indico.modules.events.sessions.controllers.management.sessions import (RHSessionsList, RHCreateSession,
                                                                             RHModifySession, RHDeleteSessions,
@@ -41,3 +42,6 @@ _bp.add_url_rule('/manage/sessions/person-list/', 'person_list', RHSessionPerson
 _bp.add_url_rule('/manage/sessions/coordinator-privs/', 'coordinator_privs_rest', RHSessionCoordinatorPrivs)
 _bp.add_url_rule('/manage/sessions/coordinator-privs/<priv>', 'coordinator_privs_rest', RHSessionCoordinatorPrivs,
                  methods=('PUT', 'DELETE'))
+
+# Display
+_bp.add_url_rule('/sessions/mine', 'my_sessions', RHDisplaySessionList)
