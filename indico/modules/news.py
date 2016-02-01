@@ -19,7 +19,7 @@ from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from indico.modules import ModuleHolder, Module
 from MaKaC.common.info import HelperMaKaCInfo
-from indico.util.i18n import L_
+from indico.util.i18n import _, L_
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, \
      isTimezoneAware, setAdjustedDate
 from MaKaC.common.fossilize import Fossilizable, fossilizes
