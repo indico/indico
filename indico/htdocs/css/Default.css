@@ -1939,8 +1939,11 @@ div.filterDiv
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     background-color: #777;
-    color: white;
     display: none;
+}
+
+div.filterDiv strong {
+    color: white;
 }
 
 
