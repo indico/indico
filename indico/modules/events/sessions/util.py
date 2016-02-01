@@ -33,6 +33,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
+from indico.util.user import iter_acl
 from MaKaC.PDFinterface.base import PDFBase, Paragraph
 
 
@@ -187,3 +188,12 @@ def get_events_with_linked_sessions(user, from_dt=None, to_dt=None):
         if principal.read_access:
             roles.add('session_access')
     return data
+
+
+def get_sessions_for_user(event, user):
+    sessions = (event.sessions
+                .options(joinedload('acl_entries'))
+                .filter(Session.acl_entries.any(SessionPrincipal.has_management_role('coordinate')),
+                        ~Session.is_deleted)
+                .all())
+    return {sess for sess in sessions if any(user in entry.principal for entry in iter_acl(sess.acl_entries))}
