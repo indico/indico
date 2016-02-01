@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManageSessions(WPJinjaMixin, WPConferenceModifBase):
@@ -25,7 +25,15 @@ class WPManageSessions(WPJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'sessions'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls())
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls()
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls()
+
+
+class WPDisplayMySessionsConference(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/sessions/'
+    menu_entry_name = 'my_sessions'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)

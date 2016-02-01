@@ -176,13 +176,6 @@ def get_default_menu_entries():
             parent='my_conference'
         ),
         MenuEntryData(
-            title=_("My Sessions"),
-            name='my_sessions',
-            endpoint='event.myconference-mySessions',
-            position=1,
-            parent='my_conference'
-        ),
-        MenuEntryData(
             title=_("My Contributions"),
             name='my_contributions',
             visible=_visibility_my_contributions,
