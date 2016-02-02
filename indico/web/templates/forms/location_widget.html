@@ -43,6 +43,7 @@
                            name="location-inheritance-{{ field.name }}"
                            type="checkbox">
                     <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
+                    <i class="info-helper"></i>
                 </div>
             </div>
         </div>
@@ -56,7 +57,7 @@
             'use strict';
 
             var field = $('#{{ field.id }}');
-            var description = field.closest('.form-field').find('.form-field-description');
+            var helperText = field.closest('.form-field').find('.location-inheritance-field .info-helper');
             var venueInput = $('#location-venue-{{ field.id }}');
             var roomInput = $('#location-room-{{ field.id }}');
             var address = $('#location-address-{{ field.id }}');
@@ -95,7 +96,7 @@
                 var message = ($T.gettext('Using default location from: {0} ({1})').format({{ parent[1] | tojson }},
                                                                                            {{ parent[0] | tojson }}));
                 var text = isChecked ? message : $T.gettext('Using custom location');
-                description.html(text);
+                helperText.attr('title', text);
                 venueInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
                 roomInput.prop('disabled', isChecked).toggleClass('disabled', isChecked);
                 address.prop('disabled', isChecked).toggleClass('disabled', isChecked);

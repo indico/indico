@@ -36,7 +36,8 @@ class ContributionForm(IndicoForm):
                               units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
     person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
-    location_data = IndicoLocationField(_("Location"), description=_("Location"))
+    location_data = IndicoLocationField(_("Location"),
+                                        description=_("The physical location where the contribution takes place."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
