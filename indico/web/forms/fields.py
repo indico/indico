@@ -201,7 +201,7 @@ class PrincipalListField(HiddenField):
                          object.
     """
 
-    widget = JinjaWidget('forms/principal_list_widget.html')
+    widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
         self.groups = kwargs.pop('groups', False)
