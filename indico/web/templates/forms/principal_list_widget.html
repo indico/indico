@@ -5,7 +5,8 @@
     {% set value_json = field._value() | tojson %}
     <div class="form-row" data-tooltip-anchor>
         <div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
-        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+        <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}"
+               {{ input_args | html_params }}>
         <span></span>
     </div>
 {% endblock %}
