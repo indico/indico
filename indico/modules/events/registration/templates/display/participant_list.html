@@ -26,6 +26,9 @@
             <table class="i-table tablesorter">
                 <thead>
                     <tr class="i-table">
+                        {% if show_checkin %}
+                            <th class="i-table checkbox-column" data-sorter="false"></th>
+                        {% endif %}
                         <th class="i-table">{% trans %}Full name{% endtrans %}</th>
                         {% if show_position %}
                             <th class="i-table">{% trans %}Position{% endtrans %}</th>
@@ -33,14 +36,16 @@
                         {% if show_affiliation %}
                             <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
                         {% endif %}
-                        {% if show_checkin %}
-                            <th class="i-table">{% trans %}Checked-in{% endtrans %}</th>
-                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for name, personal_data, checked_in in registrations %}
                         <tr class="i-table">
+                            {% if show_checkin %}
+                                <td class="i-table center" {% if checked_in %}title="{% trans %}Checked in{% endtrans %}"{% endif %}>
+                                    {% if checked_in %}<i class="icon-checkmark"></i>{% endif %}
+                                </td>
+                            {% endif %}
                             <td class="i-table" data-text="{{ name }}">
                                 {{ title }} {{ name }}
                             </td>
@@ -49,11 +54,6 @@
                             {% endif %}
                             {% if show_affiliation %}
                                 <td class="i-table">{{ personal_data.affiliation or '' }}</td>
-                            {% endif %}
-                            {% if show_checkin %}
-                                <td class="i-table">
-                                    {% if checked_in %}✓{% endif %}
-                                </td>
                             {% endif %}
                         </tr>
                     {% endfor %}
