@@ -195,7 +195,11 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             query = (linked_object.event_new.all_attachment_folders
                      .filter_by(is_deleted=False)
                      .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
-                     .options(joinedload(AttachmentFolder.attachments)))
+                     .options(joinedload(AttachmentFolder.attachments),
+                              joinedload(AttachmentFolder.linked_event),
+                              joinedload(AttachmentFolder.session),
+                              joinedload(AttachmentFolder.contribution),
+                              joinedload(AttachmentFolder.subcontribution)))
 
             # populate cache
             for obj in query:
