@@ -21,6 +21,7 @@ from contextlib import contextmanager
 
 from flask import Flask, Blueprint, request
 from flask.blueprints import BlueprintSetupState
+from flask.ctx import _AppCtxGlobals
 from flask.helpers import locked_cached_property
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
@@ -28,10 +29,12 @@ from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
-from indico.core.config import Config
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
 from indico.util.json import IndicoJSONEncoder
+
+
+_notset = object()
 
 
 class IndicoRequest(Request):
@@ -57,10 +60,24 @@ class IndicoRequest(Request):
         return rv
 
 
+class _IndicoAppCtxGlobals(_AppCtxGlobals):
+    # XXX: remove this class with the next flask version which will
+    # already contain `pop` and `setdefault` in `_AppCtxGlobals`
+    def pop(self, name, default=_notset):
+        if default is _notset:
+            return self.__dict__.pop(name)
+        else:
+            return self.__dict__.pop(name, default)
+
+    def setdefault(self, name, default=None):
+        return self.__dict__.setdefault(name, default)
+
+
 class IndicoFlask(PluginFlaskMixin, Flask):
     json_encoder = IndicoJSONEncoder
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
+    app_ctx_globals_class = _IndicoAppCtxGlobals
 
     @property
     def session_cookie_name(self):
