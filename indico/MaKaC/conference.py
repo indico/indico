@@ -41,6 +41,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
+from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.rb.models.rooms import Room
@@ -828,9 +829,11 @@ class Category(CommonObjectBase):
         catIdx.unindexConf(conf)
         conf.unindexConf()
 
+    @unify_user_args
     def newConference(self, creator):
         conf = Conference()
-        ConferenceHolder().add(conf, creator)
+        event = Event(creator=creator, category_id=int(self.id))
+        ConferenceHolder().add(conf, event)
         self._addConference(conf)
 
         signals.event.created.send(conf, parent=self)
@@ -3856,10 +3859,7 @@ class ConferenceHolder( ObjectHolder ):
     def _newId(self):
         raise RuntimeError('Tried to get new event id from zodb')
 
-    @unify_user_args
-    def add(self, conf, creator):
-        from indico.modules.events import Event
-        event = Event(creator=creator)
+    def add(self, conf, event):
         db.session.add(event)
         db.session.flush()
         conf.setId(event.id)
@@ -3867,7 +3867,7 @@ class ConferenceHolder( ObjectHolder ):
             raise RuntimeError('{} is already in ConferenceHolder'.format(conf.id))
         ObjectHolder.add(self, conf)
         with event.logging_disabled:
-            event.update_principal(creator, full_access=True)
+            event.update_principal(event.creator, full_access=True)
         db.session.flush()
 
     def getById(self, id, quiet=False):
