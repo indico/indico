@@ -35,7 +35,7 @@ class ContributionForm(IndicoForm):
     duration = TimeDeltaField(_("Duration"), [DataRequired()], default=timedelta(minutes=20),
                               units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
-    people = ContributionPersonListField(_("People"), allow_authors=True)
+    person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

@@ -81,18 +81,22 @@
                 var $personRow = $('<div>').addClass('person-row');
                 var $personName = $('<span>').text(person.name);
                 var $personStatus = $('<span>').addClass('person-status');
+                var $personRoles = $('<span>').addClass('person-roles');
                 var $personButtons = $('<span>').addClass('person-buttons');
                 var $buttonRemove = $('<a>').addClass('i-button-icon danger icon-close').attr('title', $T.gettext("Remove person"));
                 var $buttonConfig = $('<a>').addClass('i-button-icon icon-settings').attr('title', $T("Configure person"));
 
+                setPersonDefaults(person);
                 $personRow.append($personName).append($personStatus);
-                $personStatus.append($personButtons);
+                $personStatus.append($personRoles).append($personButtons);
                 $personButtons.append($buttonRemove).append($buttonConfig);
+                if (person.isSubmitter) {
+                    $personRoles.append($('<span>').addClass('i-label').text($T.gettext("Submitter")));
+                }
                 if (person.isSpeaker) {
-                    $personStatus.prepend($('<span>').addClass('i-label').text($T("Speaker")));
+                    $personRoles.append($('<span>').addClass('i-label').text($T("Speaker")));
                 }
 
-                setPersonDefaults(person);
                 if (person.authorType == 0) {
                     $otherList.append($personRow);
                 } else if (person.authorType == 1) {
@@ -114,10 +118,14 @@
                 if (person.isSpeaker === undefined) {
                     person.isSpeaker = {{ field.default_is_speaker|tojson }};
                 }
+                if (person.isSubmitter === undefined) {
+                    person.isSubmitter = {{ field.default_is_submitter|tojson }};
+                }
             }
 
             function setupPersonConfig(person, $element) {
                 var $buttons = $('<div>');
+                var $buttonsSeparator = $('<div>').addClass('titled-rule').text($T.gettext("or"));
 
                 if (person.authorType != 1) {
                     var $authorButton = $('<div>').addClass('action-row').text($T.gettext("Move to authors"));
@@ -143,15 +151,24 @@
                         $element.qbubble('hide');
                         $field.principalfield('set', person.id, {authorType: 0, isSpeaker: true});
                     });
-                    var $speakerSeparator = $('<div>').addClass('titled-rule').text($T("or"));
                     var $speakerButton = $('<div">').addClass('action-row');
                     $speakerButton.text(person.isSpeaker ? $T.gettext("Not a speaker anymore") : $T.gettext("Make a speaker"))
                     $speakerButton.on('click', function() {
                         $element.qbubble('hide');
                         $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
                     });
-                    $buttons.append($nonAuthorButton).append($speakerSeparator).append($speakerButton);
+                    $buttons.append($nonAuthorButton).append($buttonsSeparator).append($speakerButton);
+                } else {
+                    $buttons.append($buttonsSeparator);
                 }
+
+                var $submitterButton = $('<div>').addClass('action-row');
+                $submitterButton.text(person.isSubmitter ? $T.gettext("Revoke submission rights") : $T.gettext("Grant submission rights"))
+                $submitterButton.on('click', function() {
+                    $element.qbubble('hide');
+                    $field.principalfield('set', person.id, {isSubmitter: !person.isSubmitter});
+                });
+                $buttons.append($submitterButton);
 
                 $element.qbubble({
                     style: {
