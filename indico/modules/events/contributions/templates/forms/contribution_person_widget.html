@@ -93,9 +93,11 @@
                 if (person.isSubmitter) {
                     $personRoles.append($('<span>').addClass('i-label').text($T.gettext("Submitter")));
                 }
-                if (person.isSpeaker) {
-                    $personRoles.append($('<span>').addClass('i-label').text($T("Speaker")));
-                }
+                {% if field.allow_authors %}
+                    if (person.isSpeaker) {
+                        $personRoles.append($('<span>').addClass('i-label').text($T("Speaker")));
+                    }
+                {% endif %}
 
                 if (person.authorType == 0) {
                     $otherList.append($personRow);
