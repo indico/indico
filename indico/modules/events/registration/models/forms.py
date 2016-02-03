@@ -131,6 +131,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether checked-in status should be displayed in the event pages and participant list
+    publish_checkin_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether registrations must be approved by a manager
     moderation_enabled = db.Column(
         db.Boolean,
