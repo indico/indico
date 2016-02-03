@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from contextlib import contextmanager
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
 
@@ -346,3 +347,10 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
 
 
 Event.register_location_events()
+
+
+@listens_for(Event.category_id, 'set')
+def _category_id_set(target, value, *unused):
+    from MaKaC.conference import CategoryManager
+    cat = CategoryManager().getById(str(value))
+    target.category_chain = map(int, reversed(cat.getCategoryPath()))

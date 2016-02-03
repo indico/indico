@@ -22,8 +22,9 @@ from MaKaC.conference import ConferenceHolder
 
 
 @pytest.yield_fixture
-def create_event(monkeypatch, monkeypatch_methods, dummy_user, db):
+def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
     """Returns a callable which lets you create dummy events"""
+    mocker.patch('MaKaC.conference.CategoryManager')
     monkeypatch_methods('MaKaC.conference.ConferenceHolder', MockConferenceHolder)
     monkeypatch.setattr('MaKaC.conference.Conference', MockConference)  # for some isinstance checks
 
@@ -34,7 +35,8 @@ def create_event(monkeypatch, monkeypatch_methods, dummy_user, db):
         conf = MockConference()
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
-        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set())
+        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1)
+        conf.as_event.category_chain = [1, 0]  # set after __init__ (setting category_id modifies it)
         db.session.flush()
         conf.id = str(conf.as_event.id)
         ch.add(conf)
