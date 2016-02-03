@@ -110,21 +110,29 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                        RegistrationForm.publish_registrations_enabled,
                        ~RegistrationForm.is_deleted,
                        ~Registration.is_deleted,
-                       _join=Registration.registration_form)
-                 .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
-        registrations = [(reg.get_full_name(), reg.get_personal_data()) for reg in query]
+                       _join=Registration.registration_form,
+                       _eager=Registration.registration_form)
+                 .order_by(*Registration.order_by_name))
+
+        def _is_checkin_visible(reg):
+            return reg.registration_form.publish_checkin_enabled and reg.checked_in
+
+        registrations = [(reg.get_full_name(), reg.get_personal_data(), _is_checkin_visible(reg)) for reg in query]
         enabled_pd_fields = {field.personal_data_type for reg in regforms for field in reg.active_fields}
         affiliation_enabled = PersonalDataType.affiliation in enabled_pd_fields
         position_enabled = PersonalDataType.position in enabled_pd_fields
+        checkin_enabled = any(checked_in for __, __, checked_in in registrations)
         published = bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
                          RegistrationForm.event_id == int(self.event.id)).count())
+
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
             event=self.event,
             regforms=regforms,
-            show_affiliation=affiliation_enabled and any(pd.get('affiliation') for reg, pd in registrations),
-            show_position=position_enabled and any(pd.get('position') for reg, pd in registrations),
+            show_affiliation=affiliation_enabled and any(pd.get('affiliation') for __, pd, __ in registrations),
+            show_position=position_enabled and any(pd.get('position') for __, pd, __ in registrations),
+            show_checkin=checkin_enabled,
             registrations=registrations,
             published=published
         )
