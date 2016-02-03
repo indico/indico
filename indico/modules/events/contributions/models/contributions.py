@@ -245,18 +245,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
 
     @property
     def person_link_data(self):
-        def _is_submitter(person_link):
-            person = person_link.person
-            return person.user_id in user_submitters or person.email in email_submitters
-        user_submitters = {principal.user_id
-                           for principal in self.acl_entries
-                           if (principal.type == PrincipalType.user and
-                               principal.has_management_role('submit', explicit=True))}
-        email_submitters = {principal.email
-                            for principal in self.acl_entries
-                            if (principal.type == PrincipalType.email and
-                                principal.has_management_role('submit', explicit=True))}
-        return {x: _is_submitter(x) for x in self.person_links}
+        return {x: x.is_submitter for x in self.person_links}
 
     @person_link_data.setter
     @no_autoflush
