@@ -56,7 +56,8 @@ def get_scheduled_notes(event):
                   .filter(TimetableEntry.parent_id.is_(None),
                           TimetableEntry.type != TimetableEntryType.BREAK)
                   .options(joinedload('children'))
-                  .options(defaultload('contribution').joinedload('subcontributions'))
+                  .options(joinedload('session_block').joinedload('contributions').joinedload('subcontributions'))
+                  .options(joinedload('contribution').joinedload('subcontributions'))
                   .all())
     # build a list of all the objects we need notes for. that way we can query
     # all notes in a single go afterwards instead of making the already-huge
