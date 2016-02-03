@@ -60,6 +60,10 @@ class ContributionPersonLink(PersonLinkBase):
     def full_name(self):
         return self.person.full_name if self.person else None
 
+    @property
+    def is_submitter(self):
+        return self.person.has_role('submit', self.contribution)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'contribution_id', 'person_id', is_speaker=False, author_type=AuthorType.none,
