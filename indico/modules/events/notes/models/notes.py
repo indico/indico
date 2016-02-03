@@ -21,6 +21,7 @@ from functools import partial
 from flask import g
 from sqlalchemy.event import listens_for, listen
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -118,7 +119,13 @@ class EventNote(LinkMixin, db.Model):
                 return linked_object.note if linked_object.note and not linked_object.note.is_deleted else None
             if 'event_notes' not in g:
                 g.event_notes = {}
-            g.event_notes[event] = {n.object: n for n in event.all_notes.filter_by(is_deleted=False)}
+            query = (event.all_notes
+                     .filter_by(is_deleted=False)
+                     .options(joinedload(EventNote.linked_event),
+                              joinedload(EventNote.session),
+                              joinedload(EventNote.contribution),
+                              joinedload(EventNote.subcontribution)))
+            g.event_notes[event] = {n.object: n for n in query}
             return g.event_notes[event].get(linked_object)
 
     @classmethod
