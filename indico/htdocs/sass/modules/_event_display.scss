@@ -175,6 +175,10 @@ li > table + .note-area-wrapper {
             &:not(first-child) {
                 margin-left: 0.1em;
             }
+
+            &.checked-in {
+                background: lighten($pastel-green, 30%);
+            }
         }
     }
 }

@@ -55,7 +55,9 @@
             <div class="participant-list-wrapper">
                 <ul class="participant-list">
                     {%- for participant in participants -%}
-                        <li>{{ participant.full_name }}</li>
+                    <li {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %}class="checked-in"{% endif %}>
+                      {{ participant.full_name }}
+                    </li>
                     {%- endfor -%}
                 </ul>
                 <div class="gradient-layer"></div>
