@@ -24,6 +24,7 @@ from sqlalchemy.orm import mapper
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
+from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
@@ -241,6 +242,31 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     @property
     def track(self):
         return self.event_new.as_legacy.getTrackById(str(self.track_id))
+
+    @property
+    def person_link_data(self):
+        def _is_submitter(person_link):
+            person = person_link.person
+            return person.user_id in user_submitters or person.email in email_submitters
+        user_submitters = {principal.user_id
+                           for principal in self.acl_entries
+                           if (principal.type == PrincipalType.user and
+                               principal.has_management_role('submit', explicit=True))}
+        email_submitters = {principal.email
+                            for principal in self.acl_entries
+                            if (principal.type == PrincipalType.email and
+                                principal.has_management_role('submit', explicit=True))}
+        return {x: _is_submitter(x) for x in self.person_links}
+
+    @person_link_data.setter
+    @no_autoflush
+    def person_link_data(self, value):
+        self.person_links = value.keys()
+        for person_link, is_submitter in value.iteritems():
+            person = person_link.person
+            principal = person.user if person.user is not None else EmailPrincipal(person.email)
+            action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
+            self.update_principal(principal, **action)
 
     @locator_property
     def locator(self):
