@@ -60,9 +60,12 @@
             height: 2em;
             white-space: nowrap;
             overflow: hidden;
+        }
+
+        .person-roles {
+            @include single-transition(margin);
 
             .i-label {
-                @include single-transition(margin);
                 margin-right: 0;
                 margin-top: 1px;
                 vertical-align: top;
@@ -73,7 +76,7 @@
         &.active {
             background: $light-gray;
 
-            .i-label {
+            .person-roles {
                 margin-right: 10px;
             }
 

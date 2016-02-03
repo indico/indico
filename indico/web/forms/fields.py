@@ -245,7 +245,7 @@ class PrincipalListField(HiddenField):
         else:
             principals = self._get_data()
         principals.sort(key=lambda x: x.full_name.lower())
-        return [self._serialize_principal(x) for x in principals]
+        return map(self._serialize_principal, principals)
 
     def _get_data(self):
         return sorted(self.data) if self.data else []
