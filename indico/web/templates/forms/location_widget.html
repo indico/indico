@@ -104,7 +104,7 @@
                 field.closest('.i-location-field').toggleClass('disabled', isChecked);
 
                 hiddenData.inheriting = isChecked;
-                field.val(JSON.stringify(hiddenData)).trigger('change');
+                field.val(JSON.stringify(hiddenData));
 
                 /* Prefill the disabled inputs with the inherited location when the default location is checked
                 (clear them otherwise) */
@@ -112,11 +112,11 @@
                     if (isChecked) {
                         hiddenData = {{ field.data.source.widget_location_data | tojson }};
                         hiddenData.inheriting = true;
-                        field.val(JSON.stringify(hiddenData)).trigger('change');
                         initializeInputs();
                     } else {
                         clearField(venueInput);
                     }
+                    field.val(JSON.stringify(hiddenData)).trigger('change');
                 }
             };
 
