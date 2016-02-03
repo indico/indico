@@ -529,13 +529,7 @@
             $('.toggle-results-list').on('click', function() {
                 var container = $(this).parent().parent();
                 var input = container.find('.i-location-input-field').eq(0);
-                if (container.hasClass('result')) {
-                    if (!input.val()) {
-                        input.trigger('typeahead:close-results-list');
-                    }
-                } else {
-                    input.trigger('focus.typeahead');
-                }
+                input.trigger(container.hasClass('result') ? 'typeahead:close-results-list' : 'focus.typeahead');
             });
 
             address.on('keyup', function() {
