@@ -33,10 +33,13 @@
                         {% if show_affiliation %}
                             <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
                         {% endif %}
+                        {% if show_checkin %}
+                            <th class="i-table">{% trans %}Checked-in{% endtrans %}</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for name, personal_data in registrations %}
+                    {% for name, personal_data, checked_in in registrations %}
                         <tr class="i-table">
                             <td class="i-table" data-text="{{ name }}">
                                 {{ title }} {{ name }}
@@ -46,6 +49,11 @@
                             {% endif %}
                             {% if show_affiliation %}
                                 <td class="i-table">{{ personal_data.affiliation or '' }}</td>
+                            {% endif %}
+                            {% if show_checkin %}
+                                <td class="i-table">
+                                    {% if checked_in %}✓{% endif %}
+                                </td>
                             {% endif %}
                         </tr>
                     {% endfor %}
