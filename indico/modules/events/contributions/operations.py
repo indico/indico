@@ -53,8 +53,6 @@ def _ensure_consistency(contrib):
 
 def create_contribution(event, data):
     contrib = Contribution(event_new=event)
-    for person in data.pop('people', []):
-        contrib.person_links.append(person)
     contrib.populate_from_dict(data)
     db.session.flush()
     logger.info('Contribution %s created by %s', contrib, session.user)
@@ -78,9 +76,6 @@ def update_contribution(contrib, data):
     """
     rv = {'unscheduled': False, 'undo_unschedule': None}
     current_session_block = contrib.session_block
-    contrib.person_links = []
-    for person in data.pop('people', []):
-        contrib.person_links.append(person)
     contrib.populate_from_dict(data)
     if 'session' in data:
         timetable_entry = contrib.timetable_entry

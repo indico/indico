@@ -32,6 +32,7 @@ class ContributionPersonListField(EventPersonListField):
     def __init__(self, *args, **kwargs):
         self.allow_authors = kwargs.pop('allow_authors', False)
         self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
+        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         if self.allow_authors:
             self.default_author_type = kwargs.pop('default_author_type', AuthorType.primary)
             self.default_is_speaker = kwargs.pop('default_is_speaker', False)
@@ -41,7 +42,7 @@ class ContributionPersonListField(EventPersonListField):
         super(ContributionPersonListField, self).__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return map(self._get_contribution_person, data)
+        return {self._get_contribution_person(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
 
     @no_autoflush
     def _get_contribution_person(self, data):
