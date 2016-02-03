@@ -65,7 +65,8 @@
             var venues = {{ venues | tojson }};
             var venueNames = {{ venues.data | map(attribute='name') | list | tojson }};
             var rooms = {{ rooms | tojson }};
-            var hiddenData = field.val() ? JSON.parse(field.val()) : {};
+            var hiddenData = field.val() ? JSON.parse(field.val()) : {};  // Contains all location related data sent to
+                                                                          // the server
             var latestUsedField = '';
             var latestSelectedOption = {field: '', value: ''};
             var latestGroup = '';
@@ -105,6 +106,8 @@
                 hiddenData.inheriting = isChecked;
                 field.val(JSON.stringify(hiddenData)).trigger('change');
 
+                /* Prefill the disabled inputs with the inherited location when the default location is checked
+                (clear them otherwise) */
                 if (!isInitStep) {
                     if (isChecked) {
                         hiddenData = {{ field.data.source.widget_location_data | tojson }};
@@ -118,6 +121,9 @@
             };
 
             function reorderCategories(venueName) {
+                /* When the choice of venue changes, the rooms of the selected venue need to appear on the top of the
+                room typeahead list, simply by updating the groupOrder option, moving the selected venue to the first
+                position of the array. */
                 var groupOrder = [venueName];
                 for (var i = venueNames.length - 1; i >= 0; i--) {
                     if (!~groupOrder.indexOf(venueNames[i])) {
@@ -128,6 +134,7 @@
             }
 
             function updateVenueOnRoomChange(item) {
+                /* Override the venue based on the room selection */
                 if (item.venue_id != hiddenData.venue_id) {
                     venueJustChanged = true;
                     var data = {item_name: item.group, venue_id: item.venue_id, room_id: item.id};
@@ -163,8 +170,11 @@
             }
 
             function updateResultsList(node, resultHtmlList) {
+                /* Make sure the result dropdown is displayed just below the input field */
                 var resultsWrapper = node.siblings('.typeahead-results');
                 resultsWrapper.css('top', node.outerHeight() + 'px');
+
+                /* Create/delete the 'just-use' option based on the input */
                 var justUse = node.parent().find('.just-use-option');
                 if (node.val()) {
                     if (justUse.length === 0) {
@@ -180,6 +190,8 @@
                 } else {
                     justUse.remove();
                 }
+
+                /* Always mark the first option as active in order for the keyboard inputs to work */
                 var firstOption = resultHtmlList.find('li.typeahead-item').first();
                 if (firstOption.length === 0) {
                     node.parent().find('.just-use-option').addClass('active');
@@ -284,15 +296,17 @@
                 searchOnFocus: true,
                 resultContainer: '#' + venueInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
                 template: {% raw %}'<span id="location-venue-{{id}}">{{name}}</span>'{% endraw %},
-                emptyTemplate: function(query) { return ""; },
+                emptyTemplate: function(query) { return ""; },  // Used to keep the dropdown list open while there are
+                                                                // no results (required by the 'just-use' option)
                 display: 'name',
                 hint: true,
                 callback: {
                     onInit: function(node) {
-                        this.query = node.val();
+                        this.query = node.val();  // Updates the results dropdown on init
                     },
                     onClickBefore: function(node, a, item, event) {
-                        validVenue = true;
+                        validVenue = true;  // Used in the onHideLayout callback to identify the reason of the dropdown
+                                            // closure.
                     },
                     onClickAfter: function(node, a, item, event) {
                         venueInput.trigger('typeahead:click-on-option', {
@@ -314,6 +328,8 @@
                         if (justUseOptionSelected) {
                             venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                         } else if (!validVenue && node.val() && !preventGuessing) {
+                            /* Try to guess the choice of the user in case the results dropdown closes without a
+                            selection. If an exact match is found, select it, otherwise use the 'just-use' option */
                             var result = [];
                             result = $.grep(venues.data, function(venue) {
                                 return venue.name.toUpperCase() == query.toUpperCase();
@@ -331,13 +347,14 @@
                         if (event.keyCode == K.TAB) {
                             preventGuessing = true
                         }
+                        /* Used in the keydown event handler of the input fields to identify whether the results
+                        dropdown were open before the keydown (since the focus remains on the field even after a selection). */
                         resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
                     onResult: function(node, query, result, resultCount, resultCountPerGroup) {
                         node.parent().find('.just-use-option').toggleClass('active', resultCount === 0);
                         justUseOptionSelected = resultCount === 0;
                     }
-
                 }
             });
 
@@ -416,6 +433,7 @@
 
             venueInput.on('typeahead:click-on-option', function(e, data) {
                 reorderCategories(data.item_name);
+                /* The room needs to be cleared when the venue changes */
                 if (hiddenData.venue_id && data.venue_id != hiddenData.venue_id && !data.room_id) {
                     clearField(roomInput);
                 }
@@ -454,7 +472,8 @@
                 Typeahead["#" + this.id].showLayout();
             })
             .on('focus.typeahead', function() {
-                // In case the input is cleared, this ensures that the results list will contain all available options.
+                /* In case the input is cleared, this ensures that the results dropdown will contain all available
+                options. */
                 var $this = $(this);
                 if (roomJustCleared && $this.is(roomInput)) {
                     $this.trigger('input.typeahead');
@@ -464,10 +483,9 @@
                     $this.trigger('input.typeahead');
                     venueJustChanged = false;
                 }
-                $('.ui-dialog-content').css('overflow', 'inherit');
-
+                $('.ui-dialog-content').css('overflow', 'inherit');  // Make sure the results dropdown are displayed
+                                                                     // above the dialog.
                 toggleOpenResultsList($this);
-
                 latestUsedField = $(this);
             })
             .on('keydown', function(e) {
@@ -475,7 +493,7 @@
                 if (resultsWereOpen) {
                     if (e.keyCode == K.TAB) {
                         if ($this.val()) {
-                            // treat tab as the return key
+                            // Treat tab as the return key
                             var returnKey = jQuery.Event("keydown");
                             returnKey.which = K.ENTER;
                             returnKey.keyCode = K.ENTER;
@@ -502,8 +520,8 @@
                 }
             })
             .on('click', function() {
-                // Since focus remains on the field after selection, we need special handling for the click event
-                // in order to reopen the results list
+                /* Since focus remains on the field after selection, we need special handling for the click event in
+                order to reopen the results list */
                 Typeahead["#" + $(this).attr('id')].showLayout();
                 $(this).trigger('input');
             });
@@ -526,6 +544,7 @@
             });
 
             $('.typeahead-field .highlighter').on('click', function() {
+                /* Focus will trigger the results dropdown to open */
                 $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
             });
         })();
