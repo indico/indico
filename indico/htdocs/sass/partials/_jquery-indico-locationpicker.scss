@@ -129,6 +129,7 @@
             right: 0;
             line-height: 1.5;
             cursor: pointer;
+            z-index: 2;
         }
 
         .location-inheritance-field {
@@ -161,6 +162,10 @@
         .highlighter {
             display: none !important;
         }
+
+        .toggle-results-list {
+            cursor: inherit;
+        }
     }
 }
 
@@ -171,11 +176,12 @@
     padding: 2px;
     position: absolute;
     top: 0.5em;
-    left: 1em;
+    left: 0.95em;
     max-width: 84%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: transparent;
 
     &.visible {
         display: block !important;
