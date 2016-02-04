@@ -110,10 +110,7 @@
 
             &.disabled {
                 @extend %tilted-strips-bg;
-            }
-
-            &.bring-to-front {
-                background: white;
+                opacity: 1;
             }
 
             &:focus {
