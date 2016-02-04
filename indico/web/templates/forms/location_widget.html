@@ -237,7 +237,7 @@
 
             function highlightOption(inputField, value) {
                 var highlighter = inputField.siblings('.highlighter');
-                highlighter.html(value).attr('title', value).addClass('visible');
+                highlighter.html(value).addClass('visible');
             }
 
             function cleanQuery(query) {
@@ -385,6 +385,7 @@
                         postSelectionActions(roomInput, item.name);
                         latestSelectedOption = {field: node.attr('id'), value: item.name}
                         highlightOption(roomInput, item.name);
+                        roomInput.attr('title', item.name);
                     },
                     onLayoutBuiltBefore: function(node, query, result, resultHtmlList) {
                         return updateResultsList(node, resultHtmlList);
@@ -441,6 +442,7 @@
                 hiddenData.venue_id = data.venue_id;
                 postSelectionActions(venueInput, data.item_name);
                 highlightOption(venueInput, data.item_name);
+                venueInput.attr('title', data.item_name);
                 latestSelectedOption = {field: venueInput.attr('id'), value: data.item_name};
             })
             .on('typeahead:click-on-custom-option', function(e, data) {
