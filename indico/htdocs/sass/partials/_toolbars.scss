@@ -236,15 +236,15 @@ $toolbar-thin-height: 1.9em;
     > input[type=text]:first-child,
     > input[type=password]:first-child,
     > .clearableinput:first-child input[type=text] {
-        @include border-bottom-left-radius();
-        @include border-top-left-radius();
+        @include border-bottom-right-radius();
+        @include border-top-right-radius();
     }
 
     > input[type=text]:last-child,
     > input[type=password]:last-child,
     > .clearableinput:last-child input[type=text] {
-        @include border-bottom-right-radius();
-        @include border-top-right-radius();
+        @include border-bottom-left-radius(0);
+        @include border-top-left-radius(0);
     }
 
     > input[type=text]:not(:last-child),
