@@ -155,7 +155,7 @@
                                         </a>
                                         <ul class="dropdown">
                                           <li><a href="#" class="icon-file-pdf" id="export_pdf">${_("PDF")}</a></li>
-                                          <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                                          <li><a href="#" class="icon-file-spreadsheet" id="export_csv">${_("CSV")}</a></li>
                                           <li><a href="#" class="icon-file-xml" id="export_xml">${_("XML")}</a></li>
                                         </ul>
 
