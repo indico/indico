@@ -20,10 +20,13 @@
 
 %text-input {
     @include border-all();
+    @include border-radius();
     @include box-sizing(border-box);
     @include single-transition(border-color);
 
+    color: $black;
     font-family: inherit;
+    outline: none;
     padding: 0 4px;
 
     &:hover,
@@ -33,12 +36,18 @@
 
     &:focus {
         @include border-all($blue);
-        outline: none;
     }
 
     &.hasError {
-        @include border-all($red);
-        background-color: $light-red;
+        @extend %input-invalid;
+    }
+}
+
+%input-invalid {
+    @include border-all($red);
+
+    &:-moz-ui-invalid {
+        box-shadow: none;
     }
 }
 
@@ -47,9 +56,9 @@ input[type=email],
 input[type=number],
 input[type=password],
 input[type=search],
-input[type=time] {
+input[type=time],
+input[type=url] {
     @extend %text-input;
-
     height: 1.6em;
     -webkit-appearance: textfield;
 }
@@ -92,6 +101,17 @@ input[type=number], input[type=time] {
 
 textarea {
     @extend %text-input;
+    resize: vertical;
+}
+
+select {
+    @extend %text-input;
+    background: white;
+
+    &:-moz-focusring {
+        color: transparent !important;
+        text-shadow: 0 0 0 $black !important;
+    }
 }
 
 select, ul {
@@ -197,18 +217,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                         opacity $dropdown-transition,
                         height $dropdown-transition,
                         padding $dropdown-transition);
-}
-
-%form-field {
-    @include border-radius();
-    height: 2.5em;
-    padding: 0.5em 1em;
-    line-height: 1.5;
-    color: $black;
-    border: 1px solid $gray;
-    @include transition-property(border-color, box-shadow);
-    @include transition-duration(0.12s, 0.12s);
-    @include transition-timing-function(ease-in-out, ease-in-out);
 }
 
 /* inspired by https://github.com/brianreavis/selectize.js/blob/master/examples/github.html */

@@ -22,8 +22,10 @@
         float: left;
         display: inline-block;
 
-        > .color-preview {
-            @extend %form-field;
+        .color-preview {
+            @extend %form-field-input;
+            @include border-all();
+            @include border-radius();
             display: inline-block;
             width: 3em;
             float: left;
@@ -34,8 +36,8 @@
             }
         }
 
-        > input[type='text'],
-        > .clearableinput input[type='text'] {
+        input[type='text'],
+        .clearableinput input[type='text'] {
             width: 7em;
         }
 
@@ -44,7 +46,7 @@
         }
     }
 
-    > a.clear-color-btn {
+    a.clear-color-btn {
         color: $gray;
         font-size: 1.2em;
 
