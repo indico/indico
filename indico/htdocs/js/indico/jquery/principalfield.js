@@ -75,6 +75,14 @@
             userChoosePopup.execute();
         },
 
+        edit: function edit(personId) {
+            var self = this;
+            var person = _.findWhere(self.people, {id: personId});
+            function handle(person) { self.set(person.get('id'), person.getAll()); }
+            var personEditPopup = new UserDataPopup($T("Edit information"), $O(person), handle, false, false, false, false);
+            personEditPopup.open();
+        },
+
         enter: function enter() {
             var self = this;
             function handle(person) { self._add([person.getAll()]); }
