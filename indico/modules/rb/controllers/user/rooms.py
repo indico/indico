@@ -22,6 +22,7 @@ from flask import request, session
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
+from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
@@ -165,7 +166,7 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
         elif self._occupancy_period == 'sinceever':
-            oldest = Reservation.query.with_entities(func.min(Reservation.start_dt)).one()[0]
+            oldest = db.session.query(func.min(Reservation.start_dt)).filter_by(room_id=self._room.id).one()[0]
             self._start = oldest_booking_date = oldest.date() if oldest else self._end
         else:
             match = re.match(r'(\d{4})(?:-(\d{2}))?', self._occupancy_period)
