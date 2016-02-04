@@ -84,12 +84,13 @@
                 var $personRoles = $('<span>').addClass('person-roles');
                 var $personButtons = $('<span>').addClass('person-buttons');
                 var $buttonRemove = $('<a>').addClass('i-button-icon danger icon-close').attr('title', $T.gettext("Remove person"));
-                var $buttonConfig = $('<a>').addClass('i-button-icon icon-settings').attr('title', $T("Configure person"));
+                var $buttonEdit = $('<a>').addClass('i-button-icon icon-edit').attr('title', $T.gettext("Edit information"));
+                var $buttonConfig = $('<a>').addClass('i-button-icon icon-settings').attr('title', $T.gettext("Configure roles"));
 
                 setPersonDefaults(person);
                 $personRow.append($personName).append($personStatus);
                 $personStatus.append($personRoles).append($personButtons);
-                $personButtons.append($buttonRemove).append($buttonConfig);
+                $personButtons.append($buttonRemove).append($buttonEdit).append($buttonConfig);
                 if (person.isSubmitter) {
                     $personRoles.append($('<span>').addClass('i-label').text($T.gettext("Submitter")));
                 }
@@ -108,6 +109,9 @@
                 }
 
                 setupPersonConfig(person, $buttonConfig);
+                $buttonEdit.on('click', function() {
+                    $field.principalfield('edit', person.id);
+                });
                 $buttonRemove.on('click', function() {
                     $field.principalfield('removeOne', person.id);
                 });

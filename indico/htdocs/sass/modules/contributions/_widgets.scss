@@ -72,6 +72,18 @@
             }
         }
 
+        .i-button-icon {
+            margin: 0 1px;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
         &:hover,
         &.active {
             background: $light-gray;
@@ -81,7 +93,7 @@
             }
 
             .person-buttons {
-                width: 30px;
+                width: 47px;
             }
         }
     }
