@@ -448,17 +448,17 @@ var IndicoUtil = {
         // passive - don't check actively for changes / keypresses
         if (component.dom.type) {
             if ( startsWith(component.dom.type, 'select')) {
-                if (component.dom.className.slice(-13) != "invalidSelect") {
-                    component.dom.className += ' invalidSelect';
+                if (component.dom.className.slice(-13) != "hasError") {
+                    component.dom.className += ' hasError';
                 }
             } else {
-                if (component.dom.className.slice(-7) != "invalid") {
-                    component.dom.className += ' invalid';
+                if (component.dom.className.slice(-7) != "hasError") {
+                    component.dom.className += ' hasError';
                 }
             }
         } else {
-            if (component.dom.className.slice(-7) != "invalid") {
-                component.dom.className += ' invalid';
+            if (component.dom.className.slice(-7) != "hasError") {
+                component.dom.className += ' hasError';
             }
         }
 
