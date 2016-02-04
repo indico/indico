@@ -22,20 +22,18 @@
     @include border-all();
     @include border-radius();
     @include box-sizing(border-box);
-    @include single-transition(border-color);
-
+    @include transition();
+    @include transition-duration(.12s, .12s);
+    @include transition-property(border-color, box-shadow);
+    box-shadow: inset 0 0 0 1px white;
     color: $black;
     font-family: inherit;
     outline: none;
     padding: 0 4px;
 
-    &:hover,
-    &:focus {
-        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-    }
-
     &:focus {
         @include border-all($blue);
+        box-shadow: inset 0 0 0 1px $blue;
     }
 
     &.hasError {
