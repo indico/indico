@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from datetime import date, datetime, timedelta, time
 
 from dateutil.relativedelta import relativedelta
@@ -156,19 +157,45 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         self._room = Room.get(request.view_args['roomID'])
         self._occupancy_period = request.args.get('period', 'pastmonth')
         self._end = date.today()
+        year = None
+        month = None
         if self._occupancy_period == 'pastmonth':
             self._end = self._end - relativedelta(days=1)
             self._start = self._end - relativedelta(days=29)
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
         elif self._occupancy_period == 'sinceever':
-            self._start = Reservation.query.with_entities(func.min(Reservation.start_dt)).one()[0].date()
+            oldest = Reservation.query.with_entities(func.min(Reservation.start_dt)).one()[0]
+            self._start = oldest_booking_date = oldest.date() if oldest else self._end
         else:
-            raise IndicoError('Invalid period specified')
+            match = re.match(r'(\d{4})(?:-(\d{2}))?', self._occupancy_period)
+            if match is None:
+                raise IndicoError('Invalid period specified')
+            year = int(match.group(1))
+            month = int(match.group(2)) if match.group(2) else None
+            if month:
+                try:
+                    self._start = date(year, month, 1)
+                except ValueError:
+                    raise IndicoError('Invalid year or month specified')
+                self._end = self._start + relativedelta(months=1)
+                self._occupancy_period = '{:d}-{:02d}'.format(year, month)
+            else:
+                try:
+                    self._start = date(year, 1, 1)
+                except ValueError:
+                    raise IndicoError('Invalid year specified')
+                self._end = self._start + relativedelta(years=1)
+                self._occupancy_period = str(year)
 
     def _process(self):
+        last_year = str(date.today().year - 1)
+        last_month_date = date.today() - relativedelta(months=1, day=1)
+        last_month = '{:d}-{:02d}'.format(last_month_date.year, last_month_date.month)
         return WPRoomBookingRoomStats(self,
                                       room=self._room,
                                       period=self._occupancy_period,
+                                      last_year=last_year,
+                                      last_month=last_month,
                                       occupancy=calculate_rooms_occupancy([self._room], self._start, self._end),
                                       stats=compose_rooms_stats([self._room])).display()
