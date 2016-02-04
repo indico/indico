@@ -81,6 +81,7 @@ class IndicoSession(BaseSession):
             self.pop('_user_id', None)
         else:
             self['_user_id'] = user.id
+        self._refresh_sid = True
 
     @property
     def avatar(self):
@@ -153,7 +154,11 @@ class IndicoSessionInterface(SessionInterface):
         return session['_expires'] - datetime.now() < threshold
 
     def should_refresh_sid(self, app, session):
-        return self.get_cookie_secure(app) and not session.get('_secure')
+        if self.get_cookie_secure(app) and not session.get('_secure'):
+            return True
+        if getattr(session, '_refresh_sid', False):
+            return True
+        return False
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
