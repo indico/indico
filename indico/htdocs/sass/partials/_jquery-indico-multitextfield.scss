@@ -1,0 +1,109 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.multi-text-fields {
+    $height: 1.6em;
+    $width: 200px;
+    $input-width: 160px;
+
+    margin: 0 2px;
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .handle {
+        @include icon-before('icon-handle');
+        @include border-left-radius();
+        @include border-left();
+        @include border-vert();
+        @include box-sizing(border-box);
+        @include single-transition(background);
+        @include single-transition(color);
+        @include user-select(none);
+
+        background: $light-gray;
+        color: $gray;
+        cursor: move;
+        display: inline-block;
+        height: $height;
+        line-height: $height;
+        width: 1.1em;
+        float: left;
+    }
+
+    .ui-sortable-placeholder {
+        height: $height;
+    }
+
+    .ui-sortable-helper {
+        input,
+        .handle {
+            box-shadow: 2px 2px 3px $gray;
+        }
+    }
+
+    input {
+        display: inline-block;
+        float: left;
+        margin: 0;
+        max-width: $input-width;
+
+        &.width-scrolling {
+            width: ($input-width - 10);
+        }
+    }
+
+    a.i-button-remove {
+        @include i-button-custom($height);
+
+        display: inline-block;
+        float: left;
+        visibility: hidden;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        height: $height;
+        width: $width;
+        margin: 3px 0;
+
+        &:hover a.i-button-remove {
+            visibility: visible;
+        }
+
+        &:last-of-type {
+            .handle {
+                cursor: default;
+                background: white;
+                color: white;
+            }
+
+            a.i-button-remove {
+                visibility: hidden;
+            }
+        }
+
+        &.ui-sortable-helper a.i-button-remove {
+            visibility: hidden;
+        }
+    }
+}
