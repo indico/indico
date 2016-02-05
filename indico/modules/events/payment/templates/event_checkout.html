@@ -25,10 +25,10 @@
     {% if not force_plugin %}
         <div class="i-form horizontal">
             <div class="form-group">
-                <div class="form-block form-label form-label-middle">
+                <div class="form-label form-label-middle">
                     <label for="description">{% trans %}Payment method{% endtrans %}</label>
                 </div>
-                <div class="form-block form-field">
+                <div class="form-field">
                     <select id="payment-method">
                         <option value="">{% trans %}Please choose an option{% endtrans %}</option>
                         {% for name, plugin in plugins %}

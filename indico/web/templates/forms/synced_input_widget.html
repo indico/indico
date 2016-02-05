@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="i-has-action i-synced-input form-row">
+    <div class="i-has-action i-synced-input i-form-field-fixed-width">
         <input id="{{ field.id }}-action-button" name="synced_fields" type="checkbox" value="{{ field.short_name }}"
                {%- if field.synced %} checked {% endif %}>
       {%- if textarea -%}

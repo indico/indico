@@ -22,10 +22,10 @@
         {% call form_fieldset(_('Theme')) %}
             {{ form_row(form.use_custom_css) }}
             {% call form_row(form.theme) %}
-                <a class="i-button i-form-field-button js-theme-preview-btn icon-eye" target="_blank"
+                <button class="i-button js-theme-preview-btn icon-eye" target="_blank"
                    href="{{ url_for('event_layout.css_preview', event) }}">
                     {%- trans %}Preview{% endtrans -%}
-                </a>
+                </button>
             {% endcall %}
         {% endcall %}
     {% call form_footer(form) %}
@@ -36,12 +36,12 @@
     {{ form_header(css_form, classes='css-form', action=url_for('event_layout.upload_css', event)) }}
         <div class="flashed-messages"></div>
         {% call form_row(css_form.css_file, skip_label=true) %}
-            <a class="i-button i-form-field-button i-form-field-width icon-eye js-preview-button
+            <button class="i-button i-form-field-fixed-width icon-eye js-preview-button
                       {%- if not css_form.css_file.data %} weak-hidden{% endif %}"
                target="_blank"
                href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}">
                 {%- trans %}Preview{% endtrans -%}
-            </a>
+            </button>
         {% endcall %}
     {% call form_footer(css_form) %}
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>

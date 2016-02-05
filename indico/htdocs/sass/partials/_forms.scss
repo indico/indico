@@ -15,11 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+%form-field-block {
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-bottom: 0.7em;
+}
+
 %form-field-input {
     line-height: 1.5;
     height: 2.5em;
     padding: 0.5em 1em;
     vertical-align: top;
+}
+
+%form-field-button {
+    height: 2.5em;
+}
+
+.i-form-field-fixed-width {
+    width: 400px;
 }
 
 .i-form {
@@ -42,279 +56,8 @@
         background-color: $light-gray;
     }
 
-    .form-group {
-        clear: both;
-        display: inline-block;
-        width: 100%;
-
-        .form-block {
-            padding-left: 1em;
-            padding-right: 1em;
-            margin-bottom: 0.7em;
-
-            > .i-linking {
-                width: 400px;
-                > label {
-                    width: 28%;
-                    padding: 0.7em 0;
-                }
-                > .i-linking-dropdown,
-                > span.static-text {
-                    display: inline-block !important;
-                    width: 65% !important;
-                }
-                > .i-linking-dropdown > select { width: 100%; }
-
-                > input:checked + label {
-                    + .i-linking-dropdown,
-                    + span {
-                        @extend %dropdown-visible;
-                    }
-                }
-
-                > input:not(:checked) + label {
-                    + .i-linking-dropdown,
-                    + span {
-                        @extend %dropdown-hidden;
-                    }
-                }
-            }
-        }
-
-        .form-label {
-            margin-top: 0;
-            margin-bottom: 0;
-            display: inline-block;
-            min-height: 2.5em;
-            line-height: 1.5;
-            position: relative;
-            word-wrap: break-word;
-        }
-
-        .form-label-middle {
-            padding-top: 0.5em;
-
-            .required {
-                top: 0.4em;
-            }
-        }
-
-        .form-label-empty {
-            height: 1px;
-        }
-
-        .form-field {
-            > .form-row,
-            > .datetime-widget,
-            > textarea,
-            > select,
-            > input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
-            input.clearabletext,
-            .clearableinput,
-            .i-form-field-width {
-                width: 400px;
-            }
-
-            textarea,
-            select,
-            input:not(.i-button):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
-            .i-form-field-button {
-                @extend %form-field-input;
-            }
-
-            .i-has-action > input {
-                @include border-top-right-radius(0 !important);
-                @include border-bottom-right-radius(0 !important);
-            }
-
-            > .form-row.i-has-action > input {
-                width: 10em;
-            }
-
-            > .form-row.i-has-action.i-synced-input {
-                padding-right: 0;
-
-                > textarea,
-                > input {
-                   width: 90%;
-                }
-
-                > .i-button {
-                    width: 10%;
-                }
-            }
-
-            > .form-row .i-button {
-                height: 2.5em;
-                line-height: 1.5em;
-
-                &:before {
-                    vertical-align: middle;
-                    font-size: 1.3em;
-                }
-            }
-
-            > .enable-input {
-                &, > span {
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-                > span:first-child {
-                    margin-right: 1em;
-                }
-                margin-left: 2em;
-            }
-
-            input[type="checkbox"],
-            input[type="radio"] {
-                margin: 0;
-                vertical-align: middle;
-            }
-
-            input[type=number], input[type=time] {
-                padding-right: 0 !important;
-
-                &::-webkit-inner-spin-button {
-                    height: 2.3em;
-                    margin-left: 1em;
-                    margin-top: -0.5em;
-                }
-            }
-
-            button {
-                height: 2.5em;
-                vertical-align: top;
-            }
-
-            input.table-input {
-                width: 100% !important;
-            }
-
-            textarea {
-                height: auto;
-            }
-
-            select {
-                padding-left: 0.7em;
-            }
-
-            .static-text {
-                display: block;
-                padding: 0.5em 0.5em 0 0;
-                line-height: 1.5;
-                color: $black;
-                width: 400px;
-
-                .form-field-description {
-                    font-style: italic;
-                    color: $light-black;
-                }
-            }
-
-            .hasDatepicker {
-                margin: 0;
-                padding-right: 26px !important;
-            }
-
-            .ui-datepicker-trigger {
-                right: 24px;
-            }
-
-            .multi-text-fields {
-                max-height: none;
-                max-width: 400px;
-
-                li {
-                    height: auto;
-                    width: auto;
-
-                    &:last-of-type .handle {
-                        color: white;
-                    }
-                }
-
-                .handle {
-                    @extend %form-field-input;
-                    border-right: 0;
-                    border-top-right-radius: 0;
-                    border-bottom-right-radius: 0;
-                    padding: 0;
-                    line-height: 2.5em;
-                    width: 2em;
-                    text-align: center;
-                }
-
-                input {
-                    border-top-left-radius: 0 !important;
-                    border-bottom-left-radius: 0 !important;
-                    float: none;
-                }
-
-                .i-button-remove {
-                    float: none;
-                    height: auto;
-
-                    i:before {
-                        cursor: pointer;
-                    }
-                }
-            }
-        }
-
-        &.horizontal {
-            .form-label {
-                float: left;
-                text-align: right;
-                width: 20%;
-            }
-
-            .form-field {
-                float: left;
-                width: 80%;
-            }
-        }
-
-        &.vertical {
-            .form-label {
-                float: none;
-                text-align: left;
-            }
-
-            .form-field {
-                width: 100%;
-                margin-top: 0;
-            }
-        }
-
-        &.has-error {
-            .form-label, .form-field-error {
-                color: $red;
-            }
-
-            .form-field {
-                input, select, textarea, .i-table-widget {
-                    @extend %input-invalid;
-                }
-            }
-        }
-
-        .form-field-description {
-            font-style: italic;
-            margin-top: 0.25em;
-            margin-bottom: 0.5em;
-            width: 400px;
-        }
-
-        .checkbox-label {
-            display: inline-block;
-            margin-left: 0.5em;
-            position: relative;
-            bottom: 1px;
-            vertical-align: middle;
-        }
-    }
-
-    &.horizontal {
+    &.horizontal,
+    .form-group.horizontal {
         .form-label {
             float: left;
             text-align: right;
@@ -327,7 +70,8 @@
         }
     }
 
-    &.vertical {
+    &.vertical,
+    .form-group.vertical {
         .form-label {
             float: none;
             height: 1em;
@@ -336,7 +80,6 @@
         }
 
         .form-label-empty {
-            height: 1px;
             margin-top: 0;
         }
 
@@ -350,58 +93,229 @@
         }
     }
 
-    // Override CKEditor's width so it matches
-    // the rest of the form fields.
+    &.no-block-padding {
+        .form-label,
+        .form-field {
+            padding-left: 0;
+        }
+    }
+}
+
+.i-form .form-group {
+    clear: both;
+    display: inline-block;
+    width: 100%;
+
+    .form-field {
+        .form-field-description {
+            font-style: italic;
+            margin-top: 0.25em;
+            margin-bottom: 0.5em;
+            width: 400px;
+        }
+
+        .static-text {
+            display: block;
+            padding: 0.5em 0.5em 0 0;
+            line-height: 1.5;
+            color: $black;
+            width: 400px;
+
+            .form-field-description {
+                font-style: italic;
+                color: $light-black;
+            }
+        }
+    }
+
+    &.has-error {
+        .form-label,
+        .form-field-error {
+            color: $red;
+        }
+
+        .form-field {
+            input, select, textarea, .i-table-widget {
+                @extend %input-invalid;
+            }
+        }
+    }
+}
+
+.i-form .form-group .form-label {
+    @extend %form-field-block;
+    display: inline-block;
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 0;
+    min-height: 2.5em;
+    position: relative;
+    word-wrap: break-word;
+
+    &.form-label-empty {
+        height: 1px;
+    }
+
+    &.form-label-middle {
+        padding-top: 0.5em;
+
+        .required {
+            top: 0.4em;
+        }
+    }
+}
+
+.i-form .form-group .form-checkbox-label {
+    bottom: 1px;
+    display: inline-block;
+    margin-left: 0.5em;
+    position: relative;
+    vertical-align: middle;
+}
+
+.i-form .form-group .form-field {
+    @extend %form-field-block;
+
+    > textarea,
+    > select,
+    > input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+    input.clearabletext,
+    .clearableinput {
+        @extend .i-form-field-fixed-width;
+    }
+
+    select,
+    input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
+        @extend %form-field-input;
+    }
+
+    input[type=number],
+    input[type=time] {
+        @extend %form-field-input;
+        padding-right: 0 !important;
+
+        &::-webkit-inner-spin-button {
+            height: 2.3em;
+            margin-left: 1em;
+            margin-top: -0.5em;
+        }
+    }
+
+    textarea {
+        @extend %form-field-input;
+        height: auto;
+    }
+
+    button,
+    input[type="submit"] {
+        @extend %form-field-button;
+    }
+
+    select {
+        padding-left: 0.7em;
+    }
+
+    .i-has-action.i-synced-input.i-form-field-fixed-width {
+        > textarea,
+        > input {
+           width: 90%;
+        }
+
+        > label.i-synced-label {
+            @extend %form-field-button;
+            width: 10%;
+        }
+    }
+
     .cke {
         width: 100% !important;
     }
 
-    .i-form-button {
-        margin: 0.5em 0;
+    .hasDatepicker {
+        margin: 0;
+        padding-right: 26px !important;
     }
 
-    fieldset {
-        border: 0;
-        margin-bottom: 1em;
-        padding: 0;
-
-        legend {
-            font-weight: bold;
-            font-size: 1.3em;
-            border-bottom: 1px solid #ebebeb;
-            width: 100%;
-            padding-left: 0;
-            padding-bottom: 0.5em;
-            margin-bottom: 0.3em;
-        }
-
-        p.description {
-            margin: 0.2em 0 0 0;
-            font-size: 1.1em;
-            padding-left: 2px; // align it with the legend
-            color: $dark-gray;
-        }
-
-        .form-group:first-of-type {
-            margin-top: 2em;
-        }
-
-        & + .form-group-footer {
-            margin-top: -1em;
-        }
-
-        &.collapsible legend {
-            cursor: pointer;
-        }
-
-        &.initially-collapsed div.fieldset-content {
-            display: none;
-        }
+    .ui-datepicker-trigger {
+        right: 24px;
     }
 
-    &.no-block-padding {
-        .form-block {
-            padding-left: 0;
+    .multi-text-fields {
+        max-height: none;
+        max-width: 400px;
+
+        li {
+            height: auto;
+            width: auto;
+
+            &:last-of-type .handle {
+                color: white;
+            }
         }
+
+        .handle {
+            @extend %form-field-input;
+            border-right: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            padding: 0;
+            line-height: 2.5em;
+            width: 2em;
+            text-align: center;
+        }
+
+        input {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            float: none;
+        }
+
+        .i-button-remove {
+            float: none;
+            height: auto;
+
+            i:before {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.i-form fieldset {
+    border: 0;
+    margin-bottom: 1em;
+    padding: 0;
+
+    legend {
+        font-weight: bold;
+        font-size: 1.3em;
+        border-bottom: 1px solid #ebebeb;
+        width: 100%;
+        padding-left: 0;
+        padding-bottom: 0.5em;
+        margin-bottom: 0.3em;
+    }
+
+    p.description {
+        margin: 0.2em 0 0 0;
+        font-size: 1.1em;
+        padding-left: 2px; // align it with the legend
+        color: $dark-gray;
+    }
+
+    .form-group:first-of-type {
+        margin-top: 2em;
+    }
+
+    & + .form-group-footer {
+        margin-top: -1em;
+    }
+
+    &.collapsible legend {
+        cursor: pointer;
+    }
+
+    &.initially-collapsed div.fieldset-content {
+        display: none;
     }
 }

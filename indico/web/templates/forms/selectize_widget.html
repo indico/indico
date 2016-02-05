@@ -2,7 +2,7 @@
 
 
 {% block html %}
-    <div class="form-row" data-tooltip-anchor>
+    <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <input id="{{ field.id }}" class="typeahead" type="text" name="{{ field.name }}"
                {%- if field.data is not none -%}value="{{ field._value() | tojson }}"{%- endif -%}>
         <span></span>

@@ -64,3 +64,34 @@ i.info-helper {
         display: table;
     }
 }
+
+.i-linking {
+    width: 400px;
+
+    > label {
+        width: 28%;
+        padding: 0.7em 0;
+    }
+
+    > .i-linking-dropdown,
+    > span.static-text {
+        display: inline-block !important;
+        width: 65% !important;
+    }
+
+    > .i-linking-dropdown > select { width: 100%; }
+
+    > input:checked + label {
+        + .i-linking-dropdown,
+        + span {
+            @extend %dropdown-visible;
+        }
+    }
+
+    > input:not(:checked) + label {
+        + .i-linking-dropdown,
+        + span {
+            @extend %dropdown-hidden;
+        }
+    }
+}

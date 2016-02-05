@@ -19,7 +19,7 @@
             </thead>
             <tbody></tbody>
         </table>
-        <button id="{{ field.id }}-add-button" class="js-add-row i-button icon-plus i-form-button">{% trans %}Add{% endtrans %}</button>
+        <button id="{{ field.id }}-add-button" class="js-add-row i-button icon-plus">{% trans %}Add{% endtrans %}</button>
     </div>
 {% endblock %}
 
@@ -147,7 +147,7 @@
                     widget.find('tbody.ui-sortable').sortable('refresh');
                 }
                 fixWidths();
-                addButton.prop('disabled', !!widget.find('.table-input').length);
+                addButton.prop('disabled', !!widget.find('.js-table-input').length);
                 repositionTooltips();
             }
 
@@ -157,7 +157,7 @@
                 } : {
                     html: $('<input>', {
                         'type': 'text',
-                        'class': 'table-input',
+                        'class': 'js-table-input',
                         'value': item ? item[col[0]] : ''
                         // can't set placeholder here due to the jquery.placeholder plugin
                     }).attr('placeholder', col[1])

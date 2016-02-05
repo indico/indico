@@ -92,7 +92,7 @@
 
         forms.find('fieldset.collapsible.initially-collapsed').each(function() {
             var $this = $(this);
-            if ($this.find('div.form-block[data-error]').length) {
+            if ($this.find('div.form-field[data-error]').length) {
                 $this.find('legend').trigger('click');
             }
         });
