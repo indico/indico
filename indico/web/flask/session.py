@@ -105,6 +105,9 @@ class IndicoSession(BaseSession):
     @cached_property
     def csrf_token(self):
         if '_csrf_token' not in self:
+            if not self.csrf_protected:
+                # don't store a token in the session if we don't really need CSRF protection
+                return '00000000-0000-0000-0000-000000000000'
             self['_csrf_token'] = str(uuid.uuid4())
         return self['_csrf_token']
 
