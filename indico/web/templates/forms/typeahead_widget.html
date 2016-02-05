@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="form-row typeahead-container" data-tooltip-anchor>
+    <div class="typeahead-container i-form-field-fixed-width" data-tooltip-anchor>
         <div class="typeahead-field">
             <input id="{{ field.id }}" autocomplete="off" class="typeahead" type="text" name="{{ field.name }}"
                    {%- if field.data is not none -%}value="{{ field._value() }}"{%- endif -%}>
