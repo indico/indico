@@ -159,7 +159,7 @@ class IndicoSessionInterface(SessionInterface):
         return session['_expires'] - datetime.now() < threshold
 
     def should_refresh_sid(self, app, session):
-        if self.get_cookie_secure(app) and not session.get('_secure'):
+        if not session.new and self.get_cookie_secure(app) and not session.get('_secure'):
             return True
         if getattr(session, '_refresh_sid', False):
             return True
