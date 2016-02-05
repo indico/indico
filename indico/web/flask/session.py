@@ -20,7 +20,7 @@ import cPickle
 import uuid
 from datetime import datetime, timedelta
 
-from flask import request, flash
+from flask import request, flash, g
 from flask.sessions import SessionInterface, SessionMixin
 from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
@@ -91,6 +91,8 @@ class IndicoSession(BaseSession):
     def lang(self):
         if '_lang' in self:
             return self['_lang']
+        elif 'lang' in g:
+            return g.lang
         elif self.user:
             return self.user.settings.get('lang')
         else:
