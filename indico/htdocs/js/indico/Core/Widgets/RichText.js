@@ -391,6 +391,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
             height  : height - 75,
             //CKEDITOR Custom Config
             blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
+            keystrokes : [[CKEDITOR.CTRL + 75 /* CTRL + K */, 'link']],
             removeButtons      : '',
             disableNativeSpellChecker: false,
             font_names: ['Sans Serif/"Liberation Sans", sans-serif',
