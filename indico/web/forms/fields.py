@@ -24,7 +24,7 @@ from markupsafe import escape
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
-from wtforms.widgets.core import CheckboxInput, Select
+from wtforms.widgets.core import CheckboxInput, Select, RadioInput
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase, Field
 from wtforms.validators import StopValidation
 
@@ -604,3 +604,8 @@ class IndicoPalettePickerField(JSONField):
 
     def _value(self):
         return self.data._asdict()
+
+
+class IndicoEnumRadioField(IndicoEnumSelectField):
+    widget = JinjaWidget('forms/radio_buttons_widget.html', orientation='horizontal', single_kwargs=True)
+    option_widget = RadioInput()
