@@ -20,7 +20,7 @@ from wtforms.fields import RadioField, BooleanField
 from wtforms.widgets.core import Input, Select, HiddenInput
 from wtforms.validators import Length, Regexp, NumberRange
 
-from indico.web.forms.fields import IndicoSelectMultipleCheckboxField
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoEnumRadioField
 from indico.web.forms.validators import ConfirmPassword, HiddenUnless
 
 
@@ -51,7 +51,7 @@ def _attrs_for_validators(field, validators):
             attrs['data-confirm-password'] = field.get_form()[validator.fieldname].name
         elif isinstance(validator, HiddenUnless):
             condition_field = field.get_form()[validator.field]
-            checked_only = (isinstance(condition_field, (RadioField, BooleanField)) or
+            checked_only = (isinstance(condition_field, (RadioField, BooleanField, IndicoEnumRadioField)) or
                             isinstance(condition_field.widget, Select))
             attrs['data-hidden-unless'] = json.dumps({'field': condition_field.name,
                                                       'value': validator.value,
