@@ -19,13 +19,13 @@
 {% macro form_row_static(label='', content=none, single_row=true, skip_label=false) -%}
     <div class="form-group">
         {% if not skip_label %}
-            <div class="form-label form-block {%- if single_row %} form-label-middle{% endif %}">
+            <div class="form-label {%- if single_row %} form-label-middle{% endif %}">
                 {% if label %}
                     <label>{{ label }}</label>
                 {% endif %}
             </div>
         {% endif %}
-        <div class="form-field form-block">
+        <div class="form-field">
             <div class="static-text">
                 {{ content or caller() }}
             </div>
@@ -37,7 +37,7 @@
     <div class="{{ field_classes }}"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
         {{ _render_field(field, widget_attrs, disabled) }}
         {% if field.widget.input_type == 'checkbox' %}
-            <div class="checkbox-label">{{ field.label() }}</div>
+            <div class="form-checkbox-label">{{ field.label() }}</div>
         {% endif %}
         {%- if caller -%}
             {{ caller() }}
@@ -56,7 +56,7 @@
                     {% if field.errors %}has-error{% endif %}
                     {% if field.flags.initially_hidden %}weak-hidden{% endif %}">
             {% if not skip_label %}
-                <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
+                <div class="form-label{% if _is_single_line_field(field) %} form-label-middle{% endif %}
                             {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
                     {%- if field.widget.input_type != 'checkbox' and (not field.widget.input_type or not placeholder) -%}
                         {{ field.label() }}
@@ -67,11 +67,11 @@
             {% set widget_attrs = dict(widget_attrs, placeholder=(field.label.text if placeholder else widget_attrs.get('placeholder', ''))) %}
             {%- if caller -%}
                 {% set caller_ = caller %}
-                {% call form_field(field, "form-field form-block", widget_attrs, disabled=disabled) -%}
+                {% call form_field(field, "form-field", widget_attrs, disabled=disabled) -%}
                     {{ caller_() }}
                 {%- endcall %}
             {%- else -%}
-                {{ form_field(field, "form-field form-block", widget_attrs, disabled=disabled) }}
+                {{ form_field(field, "form-field", widget_attrs, disabled=disabled) }}
             {%- endif -%}
         </div>
     {% endif %}
@@ -88,8 +88,8 @@
 {% macro form_footer(form, i_form=true) -%}
     {% if caller %}
         <div class="form-group form-group-footer">
-            <div class="form-label form-block"></div>
-            <div class="form-field form-block">
+            <div class="form-label"></div>
+            <div class="form-field">
                 {{ caller() }}
             </div>
         </div>

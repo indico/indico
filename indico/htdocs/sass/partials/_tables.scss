@@ -295,4 +295,12 @@ tr.i-table.content {
             }
         }
     }
+
+    input {
+        width: 100%;
+    }
+
+    & + .i-button {
+        margin-top: 0.5em;
+    }
 }

@@ -23,9 +23,8 @@
     @include border-radius();
     @include box-sizing(border-box);
     @include transition();
-    @include transition-duration(.12s, .12s);
-    @include transition-property(border-color, box-shadow);
-    box-shadow: inset 0 0 0 1px white;
+    @include transition-duration(.12s);
+    @include transition-property(border-color);
     color: $black;
     font-family: inherit;
     outline: none;
@@ -33,7 +32,6 @@
 
     &:focus {
         @include border-all($blue);
-        box-shadow: inset 0 0 0 1px $blue;
     }
 
     &.hasError {
@@ -69,6 +67,12 @@ input[type=file] {
     }
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+    margin: 0;
+    vertical-align: middle;
+}
+
 input[type=checkbox].validate {
     &:not(:checked) + label {
         @extend .text-error;
@@ -84,7 +88,8 @@ input[type=time] {
     }
 }
 
-input[type=number], input[type=time] {
+input[type=number],
+input[type=time] {
     -moz-appearance: textfield;
     padding-right: 0;
 
@@ -338,6 +343,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 .i-has-action {
     @extend %toolbar-group;
     position: relative;
+
     > input {
         display: inline-block;
     }
@@ -377,9 +383,10 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         display: none;
         opacity: 0;
     }
-    > label.i-synced-label {
-        text-align: center;
-        line-height: 2.3em;
+
+    > label.i-synced-label:before {
+        // Fixes label vertical-align
+        line-height: 1.4;
     }
 
     > input[type=checkbox]:not(:checked) ~ .i-synced-label:before { color: $light-black; }
@@ -388,6 +395,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     > input[type=text], textarea {
         &[readonly] {
             @extend %tilted-strips-bg;
+            border-color: $gray;
         }
     }
 }

@@ -2,7 +2,7 @@
 {% from 'forms/_form.html' import form_field %}
 
 {% block html %}
-    <div class="form-row datetime-widget">
+    <div class="datetime-widget i-form-field-fixed-width">
         <input type="hidden" autofocus>
         <input type="text" name="{{ field.name }}" id="{{ field.id }}-date" class="datepicker" readonly
                {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}
