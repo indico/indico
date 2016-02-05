@@ -377,7 +377,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             captions = self.form_item.data['captions']
             places_used_dict = self.get_places_used()
             if (item and item['places_limit'] and
-                    (item['places_limit'] - places_used_dict.get(field.data['choice'], 0)) <= 0):
+                    (item['places_limit'] < places_used_dict.get(field.data['choice'], 0))):
                 raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 

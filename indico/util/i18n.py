@@ -25,7 +25,7 @@ from babel import negotiate_locale
 from babel.core import Locale, LOCALE_ALIASES
 from babel.messages.pofile import read_po
 from babel.support import Translations, NullTranslations
-from flask import session, request, has_request_context, current_app, has_app_context
+from flask import session, request, has_request_context, current_app, has_app_context, g
 from flask_babelex import Babel, get_domain, Domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
@@ -219,7 +219,11 @@ def set_best_lang():
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
             resolved_lang = minfo.getLang()
 
-    session.lang = resolved_lang
+    # As soon as we looked up a language, cache it during the request.
+    # This will be returned when accessing `session.lang` since there's code
+    # which reads the language from there and might fail (e.g. by returning
+    # lazy strings) if it's not set.
+    g.lang = resolved_lang
     return resolved_lang
 
 

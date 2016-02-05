@@ -20,7 +20,7 @@ import cPickle
 import uuid
 from datetime import datetime, timedelta
 
-from flask import request, flash
+from flask import request, flash, g
 from flask.sessions import SessionInterface, SessionMixin
 from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
@@ -81,6 +81,7 @@ class IndicoSession(BaseSession):
             self.pop('_user_id', None)
         else:
             self['_user_id'] = user.id
+        self._refresh_sid = True
 
     @property
     def avatar(self):
@@ -90,6 +91,8 @@ class IndicoSession(BaseSession):
     def lang(self):
         if '_lang' in self:
             return self['_lang']
+        elif 'lang' in g:
+            return g.lang
         elif self.user:
             return self.user.settings.get('lang')
         else:
@@ -102,6 +105,9 @@ class IndicoSession(BaseSession):
     @cached_property
     def csrf_token(self):
         if '_csrf_token' not in self:
+            if not self.csrf_protected:
+                # don't store a token in the session if we don't really need CSRF protection
+                return '00000000-0000-0000-0000-000000000000'
             self['_csrf_token'] = str(uuid.uuid4())
         return self['_csrf_token']
 
@@ -153,7 +159,11 @@ class IndicoSessionInterface(SessionInterface):
         return session['_expires'] - datetime.now() < threshold
 
     def should_refresh_sid(self, app, session):
-        return self.get_cookie_secure(app) and not session.get('_secure')
+        if not session.new and self.get_cookie_secure(app) and not session.get('_secure'):
+            return True
+        if getattr(session, '_refresh_sid', False):
+            return True
+        return False
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)

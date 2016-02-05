@@ -61,7 +61,7 @@ def redirect_to_login(next_url=None, reason=None):
     if not next_url:
         next_url = request.relative_url
     if reason:
-        session['login_reason'] = reason
+        session['login_reason'] = unicode(reason)
     return redirect(url_for_login(next_url))
 
 

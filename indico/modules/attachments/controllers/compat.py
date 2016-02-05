@@ -62,10 +62,22 @@ def compat_folder_old():
     return compat_folder(**kwargs)
 
 
+def _redirect_to_note(**kwargs):
+    del kwargs['material_id']
+    del kwargs['resource_id']
+    kwargs['confId'] = kwargs.pop('event_id')
+    return redirect(url_for('event_notes.view', **kwargs), 302 if current_app.debug else 301)
+
+
 @RHSimple.wrap_function
 def compat_attachment(**kwargs):
     _clean_args(kwargs)
-    attachment = LegacyAttachmentMapping.find(**kwargs).first_or_404().attachment
+    mapping = LegacyAttachmentMapping.find_first(**kwargs)
+    if mapping is None:
+        if kwargs['material_id'] == 'minutes' and kwargs['resource_id'] == 'minutes':
+            return _redirect_to_note(**kwargs)
+        raise NotFound
+    attachment = mapping.attachment
     if attachment.is_deleted or attachment.folder.is_deleted or attachment.folder.linked_object is None:
         raise NotFound
     return redirect(attachment.download_url, 302 if current_app.debug else 301)
