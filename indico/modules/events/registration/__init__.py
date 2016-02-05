@@ -85,7 +85,8 @@ def _inject_event_header(event, **kwargs):
                            _eager=Registration.registration_form)
                      .order_by(db.func.lower(Registration.first_name),
                                db.func.lower(Registration.last_name),
-                               Registration.friendly_id))
+                               Registration.friendly_id)
+                     .all())
 
     # A participant could appear more than once in the list in case he register to multiple registration form.
     # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
