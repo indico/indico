@@ -22,13 +22,13 @@ from operator import itemgetter
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
-from indico.util.string import to_unicode
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import CategoryManager
 
@@ -90,15 +90,6 @@ def serialize_user(user):
     }
 
 
-def _build_match(column, value, exact):
-    value = to_unicode(value).replace('%', r'\%').replace('_', r'\_').lower()
-    if not exact:
-        value = '%{}%'.format(value)
-    # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is
-    # actually faster than `=`
-    return db.func.indico_unaccent(db.func.lower(column)).ilike(db.func.indico_unaccent(value))
-
-
 def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
     """Searches for users.
 
@@ -136,14 +127,14 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
 
     organisation = criteria.pop('affiliation', unspecified)
     if organisation is not unspecified:
-        query = query.join(UserAffiliation).filter(_build_match(UserAffiliation.name, organisation, exact))
+        query = query.join(UserAffiliation).filter(unaccent_match(UserAffiliation.name, organisation, exact))
 
     email = criteria.pop('email', unspecified)
     if email is not unspecified:
-        query = query.join(UserEmail).filter(_build_match(UserEmail.email, email, exact))
+        query = query.join(UserEmail).filter(unaccent_match(UserEmail.email, email, exact))
 
     for k, v in criteria.iteritems():
-        query = query.filter(_build_match(getattr(User, k), v, exact))
+        query = query.filter(unaccent_match(getattr(User, k), v, exact))
 
     found_emails = {}
     found_identities = {}

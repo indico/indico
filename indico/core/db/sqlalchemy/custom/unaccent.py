@@ -23,6 +23,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.sql.elements import conv
 
 from indico.core.db.sqlalchemy.util.queries import has_extension
+from indico.util.string import to_unicode
 
 
 # if you wonder why search_path is set and the two-argument `unaccent` function is used,
@@ -97,3 +98,13 @@ def define_unaccented_lowercase_index(column):
         elif not current_app.config['TESTING']:
             print 'Warning: pg_trgm extension is not available'
         Index(conv('ix_{}_{}_unaccent'.format(column.table.name, column.name)), col_func, **index_kwargs).create(conn)
+
+
+def unaccent_match(column, value, exact):
+    from indico.core.db import db
+    value = to_unicode(value).replace('%', r'\%').replace('_', r'\_').lower()
+    if not exact:
+        value = '%{}%'.format(value)
+    # we always use LIKE, even for an exact match. when using the pg_trgm indexes this is
+    # actually faster than `=`
+    return db.func.indico_unaccent(db.func.lower(column)).ilike(db.func.indico_unaccent(value))
