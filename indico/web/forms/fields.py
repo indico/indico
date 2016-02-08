@@ -29,9 +29,9 @@ from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase
 from wtforms.validators import StopValidation
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
-from indico.modules.users import User
 from indico.modules.users.util import serialize_user
 from indico.util.date_time import localize_as_utc
 from indico.util.i18n import _
@@ -228,13 +228,21 @@ class PrincipalListField(HiddenField):
         elif self.serializable and any(p[0] == 'Group' for p in self._get_data()):
             raise ValueError(u'You cannot select groups')
 
+    def _serialize_principal(self, principal):
+        if principal.principal_type == PrincipalType.email:
+            return principal.fossilize()
+        elif principal.principal_type == PrincipalType.user:
+            return serialize_user(principal)
+        else:
+            return serialize_group(principal)
+
     def _value(self):
         if self.serializable:
             data = retrieve_principals(self._get_data(), legacy=False)
         else:
             data = self._get_data()
         data.sort(key=lambda x: x.name.lower())
-        return [serialize_user(x) if isinstance(x, User) else serialize_group(x) for x in data]
+        return map(self._serialize_principal, data)
 
     def _get_data(self):
         return sorted(self.data) if self.data else []
