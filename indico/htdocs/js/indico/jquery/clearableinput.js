@@ -31,15 +31,16 @@
         _create: function() {
             var self = this;
 
-            self.buttonBox = $('<span class="button-box"></span>');
-            self.clearIcon = $('<a class="i-button-icon danger icon-close"></a>')
+            self.buttonBox = $('<span>').addClass('button-box');
+            self.clearIcon = $('<a>').addClass('i-button-icon danger icon-close')
                 .css('line-height', self.element.outerHeight() + 'px')
                 .click(function() {
                     self._clear();
                 });
 
-            self.element.addClass('clearabletext');
-            self.element.wrap($('<span>', {'class': self.options.clearClass}))
+            var display = self.element.css('display');
+            var wrapper = $('<span>').css('display', display).addClass(self.options.clearClass);
+            self.element.addClass('clearabletext').wrap(wrapper)
                 .on('input', function() {
                     self._handleInput();
                 })
