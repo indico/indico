@@ -1,0 +1,38 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
+
+{% block content %}
+    {{ form_header(form, id='protection-form') }}
+    {{ form_row(form.protection_mode) }}
+    {{ protection_message | safe }}
+    {{ form_rows(form, fields=('acl', 'managers', 'submitters')) }}
+    {% call form_footer(form) %}
+        <input class="i-button big highlight" type="submit"
+               value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
+        <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    {% endcall %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            var protectionMode = $('#protection-form [name=protection_mode]');
+
+            protectionMode.on('change', function() {
+                var $this = $(this);
+                var isProtected = $this.val() === 'protected' || ($this.val() === 'inheriting'
+                        && {{ contrib.protection_parent.is_protected | tojson }});
+
+                if (this.checked) {
+                    $('#form-group-protected .message-only').hide();
+                    $('#form-group-protected .' + $this.val() + '-protection-message').show();
+
+                    toggleAclField($('#protection-form [name=acl]'), !isProtected);
+                }
+            });
+
+            _.defer(function() {
+                $('#protection-form [name=protection_mode]').trigger('change');
+            });
+        })();
+    </script>
+{% endblock %}
