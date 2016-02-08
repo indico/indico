@@ -40,6 +40,7 @@ from indico.modules.events.registration.notifications import (notify_registratio
                                                               notify_registration_modification)
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.users.util import get_user_by_email
+from indico.util.spreadsheets import unique_col
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.core.db import db
@@ -265,14 +266,6 @@ def modify_registration(registration, data, management=False, notify_user=True):
     logger.info('Registration %s modified by %s', registration, session.user)
 
 
-def _prepare_data(data):
-    if isinstance(data, list):
-        data = ', '.join(data)
-    elif data is None:
-        data = ''
-    return re.sub(r'(\r?\n)+', '    ', unicode(data)).encode('utf-8')
-
-
 def generate_spreadsheet_from_registrations(registrations, regform_items, special_items):
     """Generates a spreadsheet data from a given registration list.
 
@@ -290,10 +283,10 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, specia
                                                          else '')))
     ])
     for item in regform_items:
-        field_names.append('{}_{}'.format(item.title, item.id))
+        field_names.append(unique_col(item.title, item.id))
         if item.input_type == 'accommodation':
-            field_names.append('{}_{}_{}'.format(item.title, 'Arrival', item.id))
-            field_names.append('{}_{}_{}'.format(item.title, 'Departure', item.id))
+            field_names.append(unique_col('{}_{}'.format(item.title, 'Arrival'), item.id))
+            field_names.append(unique_col('{}_{}'.format(item.title, 'Departure'), item.id))
     field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in special_items)
     rows = []
     for registration in registrations:
@@ -303,18 +296,17 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, specia
             'Name': "{} {}".format(registration.first_name, registration.last_name)
         }
         for item in regform_items:
-            key = '{}_{}'.format(item.title, item.id)
+            key = unique_col(item.title, item.id)
             if item.input_type == 'accommodation':
-                registration_dict[key] = _prepare_data(data[item.id].friendly_data.get('choice')
-                                                       if item.id in data else '')
+                registration_dict[key] = data[item.id].friendly_data.get('choice') if item.id in data else ''
                 key = '{}_{}_{}'.format(item.title, 'Arrival', item.id)
                 arrival_date = data[item.id].friendly_data.get('arrival_date') if item.id in data else None
-                registration_dict[key] = _prepare_data(format_date(arrival_date) if arrival_date else '')
+                registration_dict[key] = format_date(arrival_date) if arrival_date else ''
                 key = '{}_{}_{}'.format(item.title, 'Departure', item.id)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
-                registration_dict[key] = _prepare_data(format_date(departure_date) if departure_date else '')
+                registration_dict[key] = format_date(departure_date) if departure_date else ''
             else:
-                registration_dict[key] = _prepare_data(data[item.id].friendly_data if item.id in data else '')
+                registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
         for name, (title, fn) in special_item_mapping.iteritems():
             if name not in special_items:
                 continue
