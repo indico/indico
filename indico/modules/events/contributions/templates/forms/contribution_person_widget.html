@@ -99,7 +99,7 @@
                 }
                 {% if field.allow_authors %}
                     if (person.isSpeaker) {
-                        $personRoles.append($('<span>').addClass('i-label').text($T("Speaker")));
+                        $personRoles.prepend($('<span>').addClass('i-label').text($T.gettext("Speaker")));
                     }
                 {% endif %}
 
