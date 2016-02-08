@@ -84,7 +84,7 @@
                 {%- trans -%}Send new request{%- endtrans -%}
             {%- endif -%}
         ">
-        {% if req and req.state.name in ('pending', 'accepted') %}
+        {% if not protection_overridden and req and req.state.name in ('pending', 'accepted') %}
             <input type="button" class="i-button big warning" id="withdraw-request"
                data-href="{{ url_for('.event_requests_withdraw', req) }}"
                data-method="POST"

@@ -102,7 +102,8 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
 
         form_html = self.definition.render_form(event=self.event_new, definition=self.definition, req=self.request,
                                                 form=self.form, manager_form=self.manager_form,
-                                                is_manager=self.is_manager)
+                                                is_manager=self.is_manager,
+                                                protection_overridden=self.protection_overridden)
         return WPRequestsEventManagement.render_string(form_html, self._conf)
 
     def process_form(self):
@@ -177,6 +178,11 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
 class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
     """Withdraw a request"""
+
+    def _checkProtection(self):
+        EventOrRequestManagerMixin._checkProtection(self)
+        if self.protection_overridden:
+            raise Forbidden
 
     def _process(self):
         if self.request.state not in {RequestState.pending, RequestState.accepted}:
