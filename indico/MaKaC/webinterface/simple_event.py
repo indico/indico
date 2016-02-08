@@ -67,10 +67,11 @@ class WSEConfModifMainData(meeting.WMConfModifMainData):
 #####Tools # Stays the same as conference for now
 class WPSEConfClone(conferences.WPConfClone):
     def _getPageContent(self, params):
-        p = conferences.WConferenceClone( self._conf )
+        p = conferences.WConferenceClone(self._conf)
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "startTime": self._conf.getUnixStartDate(),
             "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         }
         return p.getHTML(pars)

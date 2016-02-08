@@ -76,6 +76,7 @@ class WPMConfClone(conferences.WPConfClone):
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "startTime": self._conf.getUnixStartDate(),
             "cloneOptions": ''
         }
         pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')

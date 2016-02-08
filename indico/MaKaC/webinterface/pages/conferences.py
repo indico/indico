@@ -1077,6 +1077,7 @@ class WPConfClone(WPConferenceModifBase):
         p = WConferenceClone(self._conf)
         pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
                 "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+                "startTime": self._conf.getUnixStartDate(),
                 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1">_("Tracks")</li>""")}
         pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)

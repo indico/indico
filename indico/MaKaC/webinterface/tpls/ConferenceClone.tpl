@@ -1,12 +1,43 @@
 <script type="text/javascript">
-    var date = new Date();
-    var formattedDate = Util.formatDateTime(date, IndicoDateTimeFormats.DefaultHourless);
+
+    /* Return the 1st day of the month for next monthly occurrence. */
+    function nextMonthly(current) {
+        var date = new Date();
+        if (current < date) {
+            date.setMonth(date.getMonth() + 1);
+        } else {
+            date.setMonth(current.getMonth() + 1);
+        }
+        date.setDate(1);
+        return date;
+    };
+
+    /* Find the next weekly occurrence of current. */
+    function nextWeekly(current) {
+        var now = moment();
+        var next = moment(current).add(7, 'days');
+        if (next < now) {
+            var day = next.day < now.day ? 7 + next.day : next.day
+            next = now.day(day);
+        }
+        return next.toDate();
+    };
+
+    var startTime = new Date(${ startTime } * 1000);
+
+    // Clone on given date
+    var formattedDate = Util.formatDateTime(nextWeekly(startTime), IndicoDateTimeFormats.DefaultHourless);
     var dateOnce = IndicoUI.Widgets.Generic.dateField_sdate(false, null, ['stddo', 'stdmo', 'stdyo']);
     dateOnce.set(formattedDate);
+
+    // Clone on given interval
     var dateInterval_start = IndicoUI.Widgets.Generic.dateField(false, null, ['inddi', 'indmi', 'indyi']);
     dateInterval_start.set(formattedDate);
     var dateInterval_until = IndicoUI.Widgets.Generic.dateField(false, null, ['stddi', 'stdmi', 'stdyi']);
+
+    // Clone on given days
     var dateDays_start = IndicoUI.Widgets.Generic.dateField(false, null, ['inddd', 'indmd', 'indyd']);
+    formattedDate = Util.formatDateTime(nextMonthly(startTime), IndicoDateTimeFormats.DefaultHourless);
     dateDays_start.set(formattedDate);
     var dateDays_until = IndicoUI.Widgets.Generic.dateField(false, null, ['stddd', 'stdmd', 'stdyd']);
 
@@ -89,6 +120,7 @@
         $E('cloneIntervalPlace_until').addContent(dateInterval_until);
         $E('cloneDaysPlace_start').addContent(dateDays_start);
         $E('cloneDaysPlace_until').addContent(dateDays_until);
+        $('#cloneDaysDay').val(moment(startTime).weekday());
     });
 </script>
 
@@ -188,7 +220,7 @@
                         <option value="4">${ _("fourth")}</option>
                         <option value="last">${ _("last")}</option>
                     </select>
-                    <select name="day">
+                    <select id="cloneDaysDay" name="day">
                         <option value="0">${ _("Monday")}</option>
                         <option value="1">${ _("Tuesday")}</option>
                         <option value="2">${ _("Wednesday")}</option>
