@@ -305,7 +305,7 @@ class PrincipalMixin(object):
         updated = set()
         query = (cls
                  .find(cls.email.in_(user.all_emails))
-                 .options(noload('user'), noload('local_group'), joinedload('event_new').load_only('id')))
+                 .options(noload('user'), noload('local_group'), joinedload(relationship_attr).load_only('id')))
         for entry in query:
             parent = getattr(entry, relationship_attr)
             existing = (cls.query
