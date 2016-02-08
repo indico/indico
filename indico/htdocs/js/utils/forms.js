@@ -98,11 +98,16 @@
         });
     };
 
+    global.toggleAclField = function toogleAclField(aclField, state) {
+        aclField.closest('.form-group')
+                .find('input.i-button').prop('disabled', state).end()
+                .find('.PluginOptionPeopleListDiv').toggleClass('disabled', state);
+    };
+
     global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection, folderField, folderProtection) {
         protectionField.on('change', function() {
-            aclField.closest('.form-group')
-                .find('input.i-button').prop('disabled', !this.checked).end()
-                .find('.PluginOptionPeopleListDiv').toggleClass('disabled', !this.checked);
+            toggleAclField(aclField, !this.checked);
+
             if (selfProtection && inheritedProtection) {
                 selfProtection.toggle(this.checked);
                 inheritedProtection.toggle(!this.checked);
