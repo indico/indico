@@ -164,3 +164,36 @@ def notify_pending(acl_entry):
     template = get_template_module(template_name, event=event, email=email,
                                    url=url_for_register(url_for(endpoint, event), email=email))
     send_email(make_email(to_list={email}, template=template), event.as_legacy, module='Protection')
+
+
+def update_object_principals(obj, new_principals, read_access=False, full_access=False, role=None):
+    """Updates an object's ACL with a new list of principals
+
+    Exactly one argument out of `read_access`, `full_access` and `role` must be specified.
+
+    :param obj: The object to update. Must have ``acl_entries``
+    :param new_principals: The set containing the new principals
+    :param read_access: Whether the read access ACL should be updated
+    :param full_access: Whether the full access ACL should be updated
+    :param role: The role ACL that should be updated
+    """
+
+    if read_access + full_access + bool(role) != 1:
+        raise ValueError('Only one ACL property can be specified')
+    if full_access:
+        existing = {acl.principal for acl in obj.acl_entries if acl.full_access}
+        grant = {'full_access': True}
+        revoke = {'full_access': False}
+    elif read_access:
+        existing = {acl.principal for acl in obj.acl_entries if acl.read_access}
+        grant = {'read_access': True}
+        revoke = {'read_access': False}
+    elif role:
+        existing = {acl.principal for acl in obj.acl_entries if acl.has_management_role(role, explicit=True)}
+        grant = {'add_roles': {role}}
+        revoke = {'del_roles': {role}}
+
+    for principal in new_principals - existing:
+        obj.update_principal(principal, **grant)
+    for principal in existing - new_principals:
+        obj.update_principal(principal, **revoke)

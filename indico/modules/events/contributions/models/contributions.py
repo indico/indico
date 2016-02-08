@@ -24,7 +24,7 @@ from sqlalchemy.orm import mapper
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -53,6 +53,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
                          {'schema': 'events'})
     location_backref_name = 'contributions'
     disallowed_protection_modes = frozenset()
+    inheriting_have_acl = True
 
     @declared_attr
     def __table_args__(cls):
