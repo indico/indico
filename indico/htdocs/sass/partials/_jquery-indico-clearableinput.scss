@@ -16,14 +16,13 @@
  */
 
 .clearableinput {
-    display: inline-block;
     position: relative;
 
     .clearabletext {
         padding-right: 1.7em !important;
 
         &.actionabletext {
-            padding-right: 2.7em !important;
+            padding-right: 3.1em !important;
             word-break: break-all;
         }
     }
@@ -36,8 +35,12 @@
 
         a.i-button-icon {
             font-size: 1.2em;
-            padding: 0 2px;
+            padding-left: 2px;
             visibility: hidden;
+
+            &:last-child {
+                padding-right: 2px;
+            }
         }
     }
 }

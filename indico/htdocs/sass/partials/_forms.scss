@@ -178,9 +178,7 @@
 
     > textarea,
     > select,
-    > input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]),
-    input.clearabletext,
-    .clearableinput {
+    > input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
         @extend .i-form-field-fixed-width;
     }
 
