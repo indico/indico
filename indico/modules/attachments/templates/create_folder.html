@@ -10,7 +10,7 @@
         <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     {% endcall %}
     <script>
-        aclIfProtected($('#protected'), $('#acl'), $('.self-protection-message'), $('.inherited-protection-message'), null,
-                       $('.folder-protection-message'));
+        aclIfProtected($('#protected'), $('#acl'), $('.protected-protection-message'), $('.inheriting-protection-message'),
+                      null, $('.folder-protection-message'));
     </script>
 {%- endblock %}
