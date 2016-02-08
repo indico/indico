@@ -166,6 +166,7 @@ li > table + .note-area-wrapper {
             margin-bottom: 0.1em;
             color: $black;
             background: $pastel-gray;
+            border: 1px solid $pastel-gray;
 
             &:before {
                 color: $gray;
@@ -178,6 +179,12 @@ li > table + .note-area-wrapper {
 
             &.checked-in {
                 background: lighten($pastel-green, 30%);
+                border: 1px solid $pastel-green;
+                color: darken($pastel-green, 20%);
+
+                &:before {
+                    color: $pastel-green;
+                }
             }
         }
     }
