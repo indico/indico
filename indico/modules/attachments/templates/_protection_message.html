@@ -1,49 +1,10 @@
+{% from '_protection_messages.html' import render_protected_protection_message, render_inherited_protection_message %}
+
 <div class="form-group" id="form-group-protected">
     <div class="form-label form-block"></div>
     <div class="form-field form-block">
-
-        <div class="action-box message-only for-form self-protection-message danger">
-            <div class="section">
-                <div class="icon icon-lock"></div>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Protected{% endtrans %}
-                    </div>
-                    <div>
-                        {% trans -%}
-                            This object is not publicly accessible since it is set as protected.
-                        {%- endtrans %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="action-box message-only for-form inherited-protection-message {%- if parent.is_protected %} warning{% else %} accept{% endif %}">
-            <div class="section">
-                <div class="icon {%- if parent.is_protected %} icon-lock{% else %} icon-unlocked{% endif %}"></div>
-                <div class="text">
-                    {% if parent.is_protected %}
-                        <div class="label">
-                            {% trans %}Protected{% endtrans %}
-                        </div>
-                        <div>
-                            {% trans parent_type=parent.type, parent_title = parent.title|ensure_unicode -%}
-                                This object is not publicly accessible since <strong>{{ parent_title }}</strong> ({{ parent_type }}) is protected.
-                            {%- endtrans %}
-                        </div>
-                    {% else %}
-                        <div class="label">
-                            {% trans %}Public{% endtrans %}
-                        </div>
-                        <div>
-                            {% trans parent_type=parent.type, parent_title=parent.title|ensure_unicode -%}
-                                This object is publicly accessible since <strong>{{ parent_title }}</strong> ({{ parent_type }}) is not protected.
-                            {%- endtrans %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {{ render_protected_protection_message() }}
+        {{ render_inherited_protection_message(parent, parent.type) }}
 
         <div class="action-box message-only for-form folder-protection-message warning">
             <div class="section">

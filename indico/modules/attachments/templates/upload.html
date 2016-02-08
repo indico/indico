@@ -29,10 +29,10 @@
             'use strict';
 
             $('#folder').nullableselector();
-            aclIfProtected($('#protected'), $('#acl'), $('.self-protection-message'), $('.inherited-protection-message'),
+            aclIfProtected($('#protected'), $('#acl'), $('.protected-protection-message'), $('.inheriting-protection-message'),
                            $('#folder'));
             messageIfFolderProtected($('#protected'), $('#folder'), {{ folders_protection_info | tojson }},
-                                     $('.self-protection-message'), $('.inherited-protection-message'),
+                                     $('.protected-protection-message'), $('.inheriting-protection-message'),
                                      $('.folder-protection-message'));
         })();
 
