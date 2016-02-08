@@ -20,7 +20,7 @@ from indico.modules.events.static.controllers import RHStaticSiteBuild, RHStatic
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('static_site', __name__, template_folder='templates', virtual_template_folder='events/static',
-                      url_prefix='/event/<confId>/manage/tools/static-site')
+                      url_prefix='/event/<confId>/manage/offline-copy')
 
 # Event management
 _bp.add_url_rule('/', 'list', RHStaticSiteList)

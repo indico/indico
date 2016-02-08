@@ -114,7 +114,7 @@ for object_type, prefixes in items:
 # Package
 _bp.add_url_rule('/event/<confId>/attachments/package', 'package',
                  RHPackageEventAttachmentsDisplay, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/tools/attachments-package', 'package_management',
+_bp.add_url_rule('/event/<confId>/manage/attachments/package', 'package_management',
                  RHPackageEventAttachmentsManagement, methods=('GET', 'POST'))
 
 
