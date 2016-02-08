@@ -1335,7 +1335,12 @@ type("UserListWidget", ["ListWidget"],
                 }
                 buttonDiv.append(new Html(remove_button.get(0)));
 
-                var userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
+                var userName;
+                if (userData.get('_type') == 'Email') {
+                    userName = Html.span("info", $B(Html.span("name"), userData.accessor('email')));
+                } else {
+                    userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
+                }
                 return [userName, buttonDiv];
             }
          }
