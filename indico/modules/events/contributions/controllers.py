@@ -16,20 +16,22 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify
+from flask import flash, request, jsonify, render_template
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
-from indico.modules.events.contributions.forms import ContributionForm
+from indico.modules.events.contributions.forms import ContributionForm, ContributionProtectionForm
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.models.events import Event
+from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _, ngettext
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -50,6 +52,11 @@ def _get_contribution_list_args(event):
 def _render_contribution_list(event):
     tpl = get_template_module('events/contributions/management/_contribution_list.html')
     return tpl.render_contribution_list(event=event, **_get_contribution_list_args(event))
+
+
+def _render_contrib_protection_message(contrib):
+    return render_template('events/contributions/management/_contribution_protection_message.html', contrib=contrib,
+                           parent_type=(_('Event') if isinstance(contrib.protection_parent, Event) else _('Session')))
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -175,3 +182,27 @@ class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributi
     def _membership_filter(self):
         contribution_ids = {contrib.id for contrib in self.contribs}
         return Contribution.id.in_(contribution_ids)
+
+
+class RHContributionProtection(RHManageContributionBase):
+    """Manage contribution protection"""
+
+    def _process(self):
+        form = ContributionProtectionForm(obj=FormDefaults(**self._get_defaults()), contrib=self.contrib)
+        if form.validate_on_submit():
+            self.contrib.protection_mode = form.protection_mode.data
+            update_object_principals(self.contrib, form.managers.data, full_access=True)
+            if self.contrib.is_protected:
+                update_object_principals(self.contrib, form.acl.data, read_access=True)
+            update_object_principals(self.contrib, form.submitters.data, role='submit')
+            return jsonify_data(flash=False)
+        return jsonify_template('events/contributions/management/contribution_protection.html', form=form,
+                                protection_message=_render_contrib_protection_message(self.contrib),
+                                contrib=self.contrib)
+
+    def _get_defaults(self):
+        managers = {p.principal for p in self.contrib.acl_entries if p.full_access}
+        submitters = {p.principal for p in self.contrib.acl_entries if p.has_management_role('submit', explicit=True)}
+        acl = {p.principal for p in self.contrib.acl_entries if p.read_access}
+        return {'managers': managers, 'submitters': submitters, 'protection_mode': self.contrib.protection_mode,
+                'acl': acl}

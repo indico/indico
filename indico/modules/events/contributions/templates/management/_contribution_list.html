@@ -126,6 +126,11 @@
                                     data-title="{% trans title=contrib.title %}Manage materials for '{{ title }}'{% endtrans %}"
                                     data-locator="{{ contrib.locator|tojson|forceescape }}">
                                 </a>
+                                <a href="#" class="icon-lock-center"
+                                   data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
+                                   data-title="{% trans %}Manage contribution protection{% endtrans %}"
+                                   data-ajax-dialog>
+                                </a>
                                 <a href="#" class="icon-remove"
                                    data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
                                    data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
