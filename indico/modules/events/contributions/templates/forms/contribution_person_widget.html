@@ -34,11 +34,14 @@
             {% endif %}
         </div>
         <div class="i-box-footer" style="text-align: right;">
-            <span id="add-existing-{{ field.id }}" class="i-button">
-                {% trans %}Add existing{% endtrans %}
+            <i class="info-helper"
+               title="{% trans %}Added people can be modified by moving the cursor over them.{% endtrans %}"></i>
+            <span id="add-existing-{{ field.id }}" class="i-button highlight">
+                {% trans %}Choose{% endtrans %}
             </span>
-            <span id="add-new-{{ field.id }}" class="i-button">
-                {% trans %}Add new{% endtrans %}
+            <span id="add-new-{{ field.id }}" class="i-button"
+                  title="{% trans %}Enter a person manually{% endtrans %}">
+                {% trans %}Enter{% endtrans %}
             </span>
         </div>
     </div>
