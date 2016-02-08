@@ -60,6 +60,7 @@
             }
 
             self.people = self.options.overwriteChoice ? people : self.people.concat(cleanDuplicates(people));
+            self.people = _.sortBy(self.people, 'name');
             self.options.onAdd(self.people);
             self._update();
         },
