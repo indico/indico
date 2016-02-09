@@ -156,7 +156,7 @@
     &.disabled {
         background-color: inherit;
 
-        .highlighter {
+        .keyword-highlighter {
             display: none !important;
         }
 
@@ -166,7 +166,7 @@
     }
 }
 
-.highlighter {
+.keyword-highlighter {
     @include border-radius();
     display: none !important;
     background-color: $pastel-blue;
