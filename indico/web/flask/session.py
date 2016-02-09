@@ -20,7 +20,7 @@ import cPickle
 import uuid
 from datetime import datetime, timedelta
 
-from flask import request, flash, g
+from flask import request, flash
 from flask.sessions import SessionInterface, SessionMixin
 from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
@@ -29,7 +29,7 @@ from werkzeug.utils import cached_property
 from indico.core.config import Config
 from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
-from indico.util.i18n import _
+from indico.util.i18n import _, set_best_lang
 from MaKaC.common.cache import GenericCache
 
 
@@ -90,13 +90,11 @@ class IndicoSession(BaseSession):
     @property
     def lang(self):
         if '_lang' in self:
+            # explicit language set in the session
             return self['_lang']
-        elif 'lang' in g:
-            return g.lang
-        elif self.user:
-            return self.user.settings.get('lang')
         else:
-            return None
+            # guess language based on accept-languages or use default
+            return set_best_lang(check_session=False)
 
     @lang.setter
     def lang(self, lang):
