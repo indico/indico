@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="i-location-field">
+    <div class="i-location-field" id="{{ field.id }}-wrapper">
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
                value="{{ field._value() | tojson | forceescape }}">
         <div class="wrapper">
@@ -13,7 +13,7 @@
                            type="text"
                            placeholder="{% trans %}Venue{% endtrans %}"
                            autocomplete="off">
-                    <span class="highlighter"></span>
+                    <span class="keyword-highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
                     <div class="typeahead-results">
                         <div class="results-list-container" id="location-venue-{{ field.id }}-results"></div>
@@ -28,7 +28,7 @@
                            type="text"
                            placeholder="{% trans %}Room{% endtrans %}"
                            autocomplete="off">
-                    <span class="highlighter"></span>
+                    <span class="keyword-highlighter"></span>
                     <span class="toggle-results-list icon-arrow-down"></span>
                     <div class="typeahead-results">
                         <div class="results-list-container" id="location-room-{{ field.id }}-results"></div>
@@ -53,7 +53,7 @@
 
 {% block javascript %}
     <script>
-        (function() {
+        (function(global) {
             'use strict';
 
             var field = $('#{{ field.id }}');
@@ -67,9 +67,8 @@
             var rooms = {{ rooms | tojson }};
             var hiddenData = field.val() ? JSON.parse(field.val()) : {};  // Contains all location related data sent to
                                                                           // the server
-            var latestUsedField = '';
+            var latestUsedField = null;
             var latestSelectedOption = {field: '', value: ''};
-            var latestGroup = '';
             var currentScrollPos = 0;
             var delta = 0;
             var validRoom = false;
@@ -118,7 +117,7 @@
                     }
                     field.val(JSON.stringify(hiddenData)).trigger('change');
                 }
-            };
+            }
 
             function reorderCategories(venueName) {
                 /* When the choice of venue changes, the rooms of the selected venue need to appear on the top of the
@@ -130,7 +129,7 @@
                         groupOrder.push(venueNames[i]);
                     }
                 }
-                Typeahead[roomInput.selector].options.groupOrder = groupOrder;
+                global.Typeahead[roomInput.selector].options.groupOrder = groupOrder;
             }
 
             function updateVenueOnRoomChange(item) {
@@ -146,7 +145,7 @@
                 delete hiddenData.room_id;
                 delete hiddenData.room_name;
                 roomInput.val('');
-                roomInput.siblings('.highlighter').removeClass('visible');
+                roomInput.siblings('.keyword-highlighter').removeClass('visible');
                 roomJustCleared = true;
                 postSelectionActions(roomInput, '');
             }
@@ -155,7 +154,7 @@
                 delete hiddenData.venue_id;
                 delete hiddenData.venue_name;
                 venueInput.val('');
-                venueInput.siblings('.highlighter').removeClass('visible');
+                venueInput.siblings('.keyword-highlighter').removeClass('visible');
                 venueJustChanged = true;
                 postSelectionActions(venueInput, '');
                 clearRoom();
@@ -177,7 +176,7 @@
                 /* Create/delete the 'just-use' option based on the input */
                 var justUse = node.parent().find('.just-use-option');
                 if (node.val()) {
-                    if (justUse.length === 0) {
+                    if (!justUse.length) {
                         justUse = $('<div>', {
                             'class': 'just-use-option'
                         })
@@ -193,7 +192,7 @@
 
                 /* Always mark the first option as active in order for the keyboard inputs to work */
                 var firstOption = resultHtmlList.find('li.typeahead-item').first();
-                if (firstOption.length === 0) {
+                if (!firstOption.length) {
                     node.parent().find('.just-use-option').addClass('active');
                     justUseOptionSelected = true;
                 } else {
@@ -207,7 +206,6 @@
                 var parent = inputField.parent();
                 var activeOption = parent.find('.typeahead-results').find('.typeahead-item.active');
                 var dropdownList = parent.find('.typeahead-list');
-                var resultsListHeight = parent.find('.typeahead-results').outerHeight();
                 if (activeOption.length != 0) {
                     if (activeOption.position().top + activeOption.outerHeight() > dropdownList.outerHeight()) {
                         delta = activeOption.position().top + activeOption.outerHeight() - dropdownList.outerHeight();
@@ -222,8 +220,8 @@
                         }, 50);
                     }
                 }
-                parent.find('.just-use-option').toggleClass('active', activeOption.length === 0);
-                justUseOptionSelected = activeOption.length === 0;
+                parent.find('.just-use-option').toggleClass('active', !activeOption.length);
+                justUseOptionSelected = !activeOption.length;
             }
 
             function postSelectionActions(inputField, value) {
@@ -236,7 +234,7 @@
             }
 
             function highlightOption(inputField, value) {
-                var highlighter = inputField.siblings('.highlighter');
+                var highlighter = inputField.siblings('.keyword-highlighter');
                 highlighter.html(value).addClass('visible');
             }
 
@@ -296,19 +294,19 @@
                 searchOnFocus: true,
                 resultContainer: '#' + venueInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
                 template: {% raw %}'<span id="location-venue-{{id}}">{{name}}</span>'{% endraw %},
-                emptyTemplate: function(query) { return ""; },  // Used to keep the dropdown list open while there are
-                                                                // no results (required by the 'just-use' option)
+                // Used to keep the dropdown list open while there are no results (required by the 'just-use' option)
+                emptyTemplate: function() { return ''; },
                 display: 'name',
                 hint: true,
                 callback: {
                     onInit: function(node) {
                         this.query = node.val();  // Updates the results dropdown on init
                     },
-                    onClickBefore: function(node, a, item, event) {
-                        validVenue = true;  // Used in the onHideLayout callback to identify the reason of the dropdown
-                                            // closure.
+                    onClickBefore: function() {
+                        // Used in the onHideLayout callback to identify the reason of the dropdown closure
+                        validVenue = true;
                     },
-                    onClickAfter: function(node, a, item, event) {
+                    onClickAfter: function(node, a, item) {
                         venueInput.trigger('typeahead:click-on-option', {
                             item_name: item.name,
                             venue_id: item.id
@@ -320,8 +318,8 @@
                     onSearch: function(node, query) {
                         this.query = cleanQuery(query);
                     },
-                    onShowLayout: function(node, query) {
-                        venueInput.siblings('.highlighter').removeClass('visible');
+                    onShowLayout: function() {
+                        venueInput.siblings('.keyword-highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
                     onHideLayout: function(node, query) {
@@ -330,17 +328,16 @@
                         } else if (!validVenue && node.val() && !preventGuessing) {
                             /* Try to guess the choice of the user in case the results dropdown closes without a
                             selection. If an exact match is found, select it, otherwise use the 'just-use' option */
-                            var result = [];
-                            result = $.grep(venues.data, function(venue) {
+                            var result = $.grep(venues.data, function(venue) {
                                 return venue.name.toUpperCase() == query.toUpperCase();
                             });
-                            if (result.length > 0) {
+                            if (result.length) {
                                 $('#location-venue-' + result[0].id).parent().trigger('click');
                             } else {
                                 venueInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                             }
                         }
-                        preventGuessing = false
+                        preventGuessing = false;
                         validVenue = false;
                     },
                     onNavigateBefore: function(node, query, event) {
@@ -351,9 +348,9 @@
                         dropdown were open before the keydown (since the focus remains on the field even after a selection). */
                         resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
-                    onResult: function(node, query, result, resultCount, resultCountPerGroup) {
-                        node.parent().find('.just-use-option').toggleClass('active', resultCount === 0);
-                        justUseOptionSelected = resultCount === 0;
+                    onResult: function(node, query, result, resultCount) {
+                        node.parent().find('.just-use-option').toggleClass('active', !resultCount);
+                        justUseOptionSelected = !resultCount;
                     }
                 }
             });
@@ -367,23 +364,23 @@
                 maxItem: 0,
                 resultContainer: '#' + roomInput.siblings('.typeahead-results').find('.results-list-container').attr('id'),
                 template: {% raw %}'<span id="location-room-{{id}}">{{name}}</span>'{% endraw %},
-                emptyTemplate: function(query) { return ""; },
+                emptyTemplate: function() { return ''; },
                 display: 'name',
                 callback: {
                     onInit: function(node) {
                         this.query = node.val();
                     },
-                    onClickBefore: function(node, a, item, event) {
+                    onClickBefore: function() {
                         validRoom = true;
                     },
-                    onClickAfter: function(node, a, item, event) {
+                    onClickAfter: function(node, a, item) {
                         updateVenueOnRoomChange(item);
 
                         hiddenData.room_id = item.id;
                         delete hiddenData.room_name;
 
                         postSelectionActions(roomInput, item.name);
-                        latestSelectedOption = {field: node.attr('id'), value: item.name}
+                        latestSelectedOption = {field: node.attr('id'), value: item.name};
                         highlightOption(roomInput, item.name);
                         roomInput.attr('title', item.name);
                     },
@@ -393,8 +390,8 @@
                     onSearch: function(node, query) {
                         this.query = cleanQuery(query);
                     },
-                    onShowLayout: function(node, query) {
-                        roomInput.siblings('.highlighter').removeClass('visible');
+                    onShowLayout: function() {
+                        roomInput.siblings('.keyword-highlighter').removeClass('visible');
                         currentScrollPos = 0;
                     },
                     onHideLayout: function(node, query) {
@@ -410,24 +407,24 @@
                                     result = findRoomInVenue(query, venueNames[i]);
                                 }
                             }
-                            if (result.length > 0) {
+                            if (result.length) {
                                 $('#location-room-' + result[0].id).parent().trigger('click');
                             } else {
                                 roomInput.trigger('typeahead:click-on-custom-option', {item_name: query});
                             }
                         }
-                        preventGuessing = false
+                        preventGuessing = false;
                         validRoom = false;
                     },
                     onNavigateBefore: function(node, query, event) {
                         if (event.keyCode == K.TAB) {
-                            preventGuessing = true
+                            preventGuessing = true;
                         }
                         resultsWereOpen = node.closest('.typeahead-container').hasClass('result');
                     },
-                    onResult: function(node, query, result, resultCount, resultCountPerGroup) {
-                        node.parent().find('.just-use-option').toggleClass('active', resultCount === 0);
-                        justUseOptionSelected = resultCount === 0;
+                    onResult: function(node, query, result, resultCount) {
+                        node.parent().find('.just-use-option').toggleClass('active', !resultCount);
+                        justUseOptionSelected = !resultCount;
                     }
                 }
             });
@@ -468,10 +465,10 @@
                 roomInput.trigger('typeahead:close-results-list');
             });
 
-            $('.i-location-input-field').on('typeahead:close-results-list', function() {
-                Typeahead["#" + this.id].hideLayout();
+            $('#{{ field.id }}-wrapper .i-location-input-field').on('typeahead:close-results-list', function() {
+                global.Typeahead["#" + this.id].hideLayout();
             }).on('typeahead:open-results-list', function() {
-                Typeahead["#" + this.id].showLayout();
+                global.Typeahead["#" + this.id].showLayout();
             })
             .on('focus.typeahead', function() {
                 /* In case the input is cleared, this ensures that the results dropdown will contain all available
@@ -485,8 +482,8 @@
                     $this.trigger('input.typeahead');
                     venueJustChanged = false;
                 }
-                $('.ui-dialog-content').css('overflow', 'inherit');  // Make sure the results dropdown are displayed
-                                                                     // above the dialog.
+                field.closest('.ui-dialog-content').css('overflow', 'inherit');  // Make sure the results dropdown are
+                                                                                 // displayed above the dialog.
                 toggleOpenResultsList($this);
                 latestUsedField = $(this);
             })
@@ -524,11 +521,11 @@
             .on('click', function() {
                 /* Since focus remains on the field after selection, we need special handling for the click event in
                 order to reopen the results list */
-                Typeahead["#" + $(this).attr('id')].showLayout();
+                global.Typeahead["#" + this.id].showLayout();
                 $(this).trigger('input');
             });
 
-            $('.toggle-results-list').on('click', function() {
+            $('#{{ field.id }}-wrapper .toggle-results-list').on('click', function() {
                 var container = $(this).parent().parent();
                 var input = container.find('.i-location-input-field').eq(0);
                 input.trigger(container.hasClass('result') ? 'typeahead:close-results-list' : 'focus.typeahead');
@@ -539,10 +536,10 @@
                 field.val(JSON.stringify(hiddenData)).trigger('change');
             });
 
-            $('.typeahead-field .highlighter').on('click', function() {
+            $('#{{ field.id }}-wrapper .keyword-highlighter').on('click', function() {
                 /* Focus will trigger the results dropdown to open */
                 $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
             });
-        })();
+        })(window);
     </script>
 {% endblock %}
