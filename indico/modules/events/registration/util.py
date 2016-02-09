@@ -346,26 +346,23 @@ def get_registrations_with_tickets(user, event):
                              _join=Registration.registration_form).all()
 
 
-def get_unique_published_registrations(event):
-    """Get a list of unique published registrations for an event.
+def get_published_registrations(event):
+    """Get a list of published registrations for an event.
 
-    Uniqueness is determined by associated user, so if someone has
-    registered in more than one registration form in the event, they
-    will be included only once.
-
-    :param event: The Event to get registrations for
+    :param event: the `Event` to get registrations for
+    :return: list of `Registration` objects
     """
-    registrations = Registration.find_all(Registration.is_active,
-                                          Registration.state == RegistrationState.complete,
-                                          ~RegistrationForm.is_deleted,
-                                          RegistrationForm.event_id == event.id,
-                                          RegistrationForm.publish_registrations_enabled,
-                                          _join=Registration.registration_form)
-
-    linked_participants = {reg.user_id: reg for reg in registrations if reg.user_id is not None}
-    non_linked_participants = {reg for reg in registrations if reg.user_id is None}
-    return sorted(set(linked_participants.viewvalues()) | non_linked_participants,
-                  key=lambda x: (x.first_name.lower(), x.last_name.lower(), x.id))
+    return (Registration
+            .find(Registration.is_active,
+                  ~RegistrationForm.is_deleted,
+                  RegistrationForm.event_id == event.id,
+                  RegistrationForm.publish_registrations_enabled,
+                  _join=Registration.registration_form,
+                  _eager=Registration.registration_form)
+            .order_by(db.func.lower(Registration.first_name),
+                      db.func.lower(Registration.last_name),
+                      Registration.friendly_id)
+            .all())
 
 
 def get_events_registered(user, from_dt=None, to_dt=None):
