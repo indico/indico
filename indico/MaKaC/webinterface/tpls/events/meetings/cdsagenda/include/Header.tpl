@@ -87,8 +87,8 @@
         %endif
 
         <%
-        from indico.modules.events.registration.util import get_unique_published_registrations
-        participants = get_unique_published_registrations(conf)
+        from indico.modules.events.registration.util import get_published_registrations
+        participants = get_published_registrations(conf)
         %>
         % if participants:
         <tr>
