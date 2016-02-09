@@ -1381,10 +1381,6 @@ type("UserListWidget", ["ListWidget"],
  */
 type("UserListField", ["IWidget"], {
 
-    _highlightNewUser: function(userId) {
-        IndicoUI.Effect.highLightBackground($E(this.userList.getId() + '_' + userId));
-    },
-
     getUsers: function() {
         return $L(this.userList);
     },
@@ -1517,7 +1513,6 @@ type("UserListField", ["IWidget"], {
                                 self.userList.set(key, $O(person));
                                 $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProctChange', [{isSubmitter: person.isSubmitter}]);
                             }
-                            //self._highlightNewUser(id);
                         });
                     }
                 });
@@ -1548,7 +1543,6 @@ type("UserListField", ["IWidget"], {
                             if (result) {
                                 self.userList.set(newUserId, newUser);
                                 self.check(newUser);
-                                //self._highlightNewUser(newUserId);
                                 $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
                             }
                         });
