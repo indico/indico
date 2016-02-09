@@ -69,6 +69,7 @@ def _inject_regform_announcement(event, **kwargs):
 def _inject_event_header(event, **kwargs):
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.events.registration.models.registrations import Registration
+    from indico.modules.events.registration.util import get_published_registrations
 
     event = event.as_event
     regforms = (event.registration_forms
@@ -76,18 +77,7 @@ def _inject_event_header(event, **kwargs):
                 .order_by(db.func.lower(RegistrationForm.title))
                 .all())
 
-    registrations = (Registration
-                     .find(Registration.is_active,
-                           ~RegistrationForm.is_deleted,
-                           RegistrationForm.event_id == event.id,
-                           RegistrationForm.publish_registrations_enabled,
-                           _join=Registration.registration_form,
-                           _eager=Registration.registration_form)
-                     .order_by(db.func.lower(Registration.first_name),
-                               db.func.lower(Registration.last_name),
-                               Registration.friendly_id)
-                     .all())
-
+    registrations = get_published_registrations(event)
     # A participant could appear more than once in the list in case he register to multiple registration form.
     # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
     return render_template('events/registration/display/event_header.html', event=event, regforms=regforms,

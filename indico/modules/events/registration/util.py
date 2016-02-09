@@ -335,6 +335,25 @@ def get_registrations_with_tickets(user, event):
                              _join=Registration.registration_form).all()
 
 
+def get_published_registrations(event):
+    """Get a list of published registrations for an event.
+
+    :param event: the `Event` to get registrations for
+    :return: list of `Registration` objects
+    """
+    return (Registration
+            .find(Registration.is_active,
+                  ~RegistrationForm.is_deleted,
+                  RegistrationForm.event_id == event.id,
+                  RegistrationForm.publish_registrations_enabled,
+                  _join=Registration.registration_form,
+                  _eager=Registration.registration_form)
+            .order_by(db.func.lower(Registration.first_name),
+                      db.func.lower(Registration.last_name),
+                      Registration.friendly_id)
+            .all())
+
+
 def get_events_registered(user, from_dt=None, to_dt=None):
     """Gets the IDs of events where the user is registered.
 
