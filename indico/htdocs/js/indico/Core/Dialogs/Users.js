@@ -1254,14 +1254,14 @@ $(function() {
                                             .css('marginRight', '8px').css('verticalAlign', 'middle');
 
                 submissionCheckbox.click(function(){
-                    $('.icon-shield[data-id="author_'+self.options.userData.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: submissionCheckbox.is(':checked')}]);
+                    $('.icon-shield[data-id="author_'+self.options.userData.get('email')+'"]').trigger('participantProtChange', [{isSubmitter: submissionCheckbox.is(':checked')}]);
                 });
 
                 privelegeCheckboxes.push({'checkbox': submissionCheckbox, 'text': $T("Submission rights")});
             }
 
             // Listen to protection changes
-            this.element.on('participantProctChange', function(event, args){
+            this.element.on('participantProtChange', function(event, args){
                 if (self.options.submission && 'isSubmitter' in args) {
                     self.element.css('color', args.isSubmitter ? '#cc4646' : '#aaa');
                     self.options.userData.set('isSubmitter', args.isSubmitter);
@@ -1511,7 +1511,7 @@ type("UserListField", ["IWidget"], {
                                     self.userList.set(key, null);
                                 }
                                 self.userList.set(key, $O(person));
-                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProctChange', [{isSubmitter: person.isSubmitter}]);
+                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProtChange', [{isSubmitter: person.isSubmitter}]);
                             }
                         });
                     }
@@ -1543,7 +1543,7 @@ type("UserListField", ["IWidget"], {
                             if (result) {
                                 self.userList.set(newUserId, newUser);
                                 self.check(newUser);
-                                $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
+                                $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProtChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
                             }
                         });
                     }, self.allowSetRights
