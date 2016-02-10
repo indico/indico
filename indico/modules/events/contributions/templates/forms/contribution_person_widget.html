@@ -136,40 +136,42 @@
                 var $buttons = $('<div>');
                 var $buttonsSeparator = $('<div>').addClass('titled-rule').text($T.gettext("or"));
 
-                if (person.authorType != authorTypes.primary) {
-                    var $authorButton = $('<div>').addClass('action-row').text($T.gettext("Move to authors"));
-                    $authorButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {authorType: 1});
-                    });
-                    $buttons.append($authorButton);
-                }
+                {% if field.allow_authors %}
+                    if (person.authorType != authorTypes.primary) {
+                        var $authorButton = $('<div>').addClass('action-row').text($T.gettext("Move to authors"));
+                        $authorButton.on('click', function() {
+                            $element.qbubble('hide');
+                            $field.principalfield('set', person.id, {authorType: 1});
+                        });
+                        $buttons.append($authorButton);
+                    }
 
-                if (person.authorType != authorTypes.secondary) {
-                    var $coAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to co-authors"));
-                    $coAuthorButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {authorType: 2});
-                    });
-                    $buttons.append($coAuthorButton);
-                }
+                    if (person.authorType != authorTypes.secondary) {
+                        var $coAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to co-authors"));
+                        $coAuthorButton.on('click', function() {
+                            $element.qbubble('hide');
+                            $field.principalfield('set', person.id, {authorType: 2});
+                        });
+                        $buttons.append($coAuthorButton);
+                    }
 
-                if (person.authorType != authorTypes.none) {
-                    var $nonAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to others"));
-                    $nonAuthorButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {authorType: 0, isSpeaker: true});
-                    });
-                    var $speakerButton = $('<div">').addClass('action-row');
-                    $speakerButton.text(person.isSpeaker ? $T.gettext("Not a speaker anymore") : $T.gettext("Make a speaker"))
-                    $speakerButton.on('click', function() {
-                        $element.qbubble('hide');
-                        $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
-                    });
-                    $buttons.append($nonAuthorButton).append($buttonsSeparator).append($speakerButton);
-                } else {
-                    $buttons.append($buttonsSeparator);
-                }
+                    if (person.authorType != authorTypes.none) {
+                        var $nonAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to others"));
+                        $nonAuthorButton.on('click', function() {
+                            $element.qbubble('hide');
+                            $field.principalfield('set', person.id, {authorType: 0, isSpeaker: true});
+                        });
+                        var $speakerButton = $('<div">').addClass('action-row');
+                        $speakerButton.text(person.isSpeaker ? $T.gettext("Not a speaker anymore") : $T.gettext("Make a speaker"))
+                        $speakerButton.on('click', function() {
+                            $element.qbubble('hide');
+                            $field.principalfield('set', person.id, {isSpeaker: !person.isSpeaker});
+                        });
+                        $buttons.append($nonAuthorButton).append($buttonsSeparator).append($speakerButton);
+                    } else {
+                        $buttons.append($buttonsSeparator);
+                    }
+                {% endif %}
 
                 var $submitterButton = $('<div>').addClass('action-row');
                 $submitterButton.text(person.isSubmitter ? $T.gettext("Revoke submission rights") : $T.gettext("Grant submission rights"))
