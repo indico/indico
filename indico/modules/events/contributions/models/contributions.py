@@ -23,8 +23,10 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import mapper
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
+from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
@@ -44,7 +46,8 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_contribution_id, Event.id == event_id)
 
 
-class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, db.Model):
+class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
+                   AttachedNotesMixin, db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
                          db.Index(None, 'event_id', 'track_id'),
@@ -57,6 +60,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, db.
     location_backref_name = 'contributions'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+
+    PRELOAD_EVENT_ATTACHED_ITEMS = True
+    PRELOAD_EVENT_ATTACHED_NOTES = True
 
     @declared_attr
     def __table_args__(cls):
