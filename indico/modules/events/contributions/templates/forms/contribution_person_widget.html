@@ -1,6 +1,5 @@
 {% extends 'forms/base_widget.html' %}
 
-
 {% block html %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
     <div class="contribution-people {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
@@ -64,6 +63,7 @@
             var $nobodyPlaceholder = $fieldDisplay.find('#nobody-placeholder-{{ field.id }}');
             var $buttonAddExisting = $('#add-existing-{{ field.id }}');
             var $buttonAddNew = $('#add-new-{{ field.id }}');
+            var authorTypes = {{ field.author_types|safe }};
 
             function renderPeople(people) {
                 $authorList.html('');
@@ -103,11 +103,11 @@
                     }
                 {% endif %}
 
-                if (person.authorType == 0) {
+                if (person.authorType == authorTypes.none) {
                     $otherList.append($personRow);
-                } else if (person.authorType == 1) {
+                } else if (person.authorType == authorTypes.primary) {
                     $authorList.append($personRow);
-                } else if (person.authorType == 2) {
+                } else if (person.authorType == authorTypes.secondary) {
                     $coauthorList.append($personRow);
                 }
 
@@ -136,7 +136,7 @@
                 var $buttons = $('<div>');
                 var $buttonsSeparator = $('<div>').addClass('titled-rule').text($T.gettext("or"));
 
-                if (person.authorType != 1) {
+                if (person.authorType != authorTypes.primary) {
                     var $authorButton = $('<div>').addClass('action-row').text($T.gettext("Move to authors"));
                     $authorButton.on('click', function() {
                         $element.qbubble('hide');
@@ -145,7 +145,7 @@
                     $buttons.append($authorButton);
                 }
 
-                if (person.authorType != 2) {
+                if (person.authorType != authorTypes.secondary) {
                     var $coAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to co-authors"));
                     $coAuthorButton.on('click', function() {
                         $element.qbubble('hide');
@@ -154,7 +154,7 @@
                     $buttons.append($coAuthorButton);
                 }
 
-                if (person.authorType != 0) {
+                if (person.authorType != authorTypes.none) {
                     var $nonAuthorButton = $('<div>').addClass('action-row').text($T.gettext("Move to others"));
                     $nonAuthorButton.on('click', function() {
                         $element.qbubble('hide');
