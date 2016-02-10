@@ -37,7 +37,6 @@
 
 .regform-section-title {
     @extend %i-box-title;
-
     margin-right: 10px;
 }
 
@@ -961,6 +960,10 @@ textarea.regFormDescriptionInputMgmt {
 // ============================================================================
 // Contenteditable-related
 // ============================================================================
+
+.regform-section .i-box-title[contenteditable] {
+    display: block;
+}
 
 .regform-section .i-box-description[contenteditable],
 .regFormText[contenteditable] {

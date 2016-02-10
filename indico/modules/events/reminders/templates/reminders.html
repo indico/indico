@@ -41,9 +41,11 @@
         <div class="i-box titled no-padding">
             <div class="i-box-header">
                 <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
-                <a class="i-button icon-plus right" href="{{ url_for('.add', event) }}">
-                    {%- trans %}Add Reminder{% endtrans -%}
-                </a>
+                <div class="i-box-buttons">
+                    <a class="i-button icon-plus" href="{{ url_for('.add', event) }}">
+                        {%- trans %}Add Reminder{% endtrans -%}
+                    </a>
+                </div>
             </div>
             <div class="i-box-content">
                 {% if pending_reminders %}
