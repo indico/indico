@@ -265,6 +265,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, db.
         return self.timetable_entry is not None
 
     @property
+    def start_dt(self):
+        return self.timetable_entry.start_dt if self.is_scheduled else None
+
+    @property
     def person_link_data(self):
         return {x: x.is_submitter for x in self.person_links}
 
