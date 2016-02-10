@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
@@ -55,7 +56,7 @@ class SessionBlock(LocationMixin, db.Model):
         nullable=False
     )
 
-    #: Persons associated with this contribution
+    #: Persons associated with this session block
     person_links = db.relationship(
         'SessionBlockPersonLink',
         lazy=True,
@@ -90,12 +91,24 @@ class SessionBlock(LocationMixin, db.Model):
     def event_new(self):
         return self.session.event_new
 
+    @locator_property
+    def locator(self):
+        return dict(self.session.locator, block_id=self.id)
+
     @property
     def location_parent(self):
         return self.session
 
     def can_access(self, user, allow_admin=True):
         return self.session.can_access(user, allow_admin=allow_admin)
+
+    @property
+    def has_note(self):
+        return self.session.has_note
+
+    @property
+    def note(self):
+        return self.session.note
 
     def can_manage(self, user, allow_admin=True):
         """Check whether a user can manage this session block.
