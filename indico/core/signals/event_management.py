@@ -24,6 +24,11 @@ Expected to return an instance of a ``EventCloner`` subclass implementing
 the cloning behavior. The *sender* is the event object.
 """)
 
+get_cloners = _signals.signal('get_cloners', """
+Expected to return one or more ``EventCloner`` subclasses implementing
+a cloning operation for something within an event.
+""")
+
 management_url = _signals.signal('management-url', """
 Expected to return a URL for the event management page of the plugin.
 This is used when someone who does not have event management access wants

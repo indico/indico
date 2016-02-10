@@ -20,12 +20,12 @@ import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
-from MaKaC.conference import EventCloner
+from MaKaC.conference import EventCloner as LegacyEventCloner
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
+from indico.modules.events.cloning import EventCloner
 from indico.util.date_time import format_date
 import MaKaC.common.timezoneUtils as timezoneUtils
 from pytz import timezone
@@ -111,7 +111,8 @@ class WPSEConfClone(conferences.WPConfClone):
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
             "cloneOptions": ''
         }
-        pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
+        pars['cloneOptions'] += LegacyEventCloner.get_plugin_items(self._conf)
+        pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)
 
 
