@@ -30,6 +30,7 @@ class ContributionPersonListField(EventPersonListField):
     widget = JinjaWidget('events/contributions/forms/contribution_person_widget.html')
 
     def __init__(self, *args, **kwargs):
+        self.author_types = AuthorType.serialize()
         self.allow_authors = kwargs.pop('allow_authors', False)
         self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
