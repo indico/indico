@@ -3559,6 +3559,7 @@ class Conference(CommonObjectBase, Locatable):
         EventCloner.clone_event(self, conf)
         from indico.modules.events.cloning import EventCloner as NewEventCloner
         NewEventCloner.run_cloners(self.as_event, conf.as_event)
+        signals.event.cloned.send(self.as_event, new_event=conf.as_event)
         return conf
 
     def getCoordinatedTracks( self, av ):
