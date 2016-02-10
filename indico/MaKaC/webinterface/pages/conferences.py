@@ -42,7 +42,7 @@ from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.PDFinterface.base import PDFSizes
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.conference import EventCloner
+from MaKaC.conference import EventCloner as LegacyEventCloner
 from MaKaC.badgeDesignConf import BadgeDesignConfiguration
 from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
@@ -63,6 +63,7 @@ from MaKaC.common.TemplateExec import render, mako_call_template_hook
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
@@ -1708,7 +1709,8 @@ class WPConfClone(WPConferenceModifBase):
                 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
                                      <li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" />_("Full timetable")</li>
                                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>""") }
-        pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
+        pars['cloneOptions'] += LegacyEventCloner.get_plugin_items(self._conf)
+        pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)
 
 

@@ -1,0 +1,40 @@
+{% for cloner in cloners if cloner.is_visible %}
+    {% set available = cloner.is_available -%}
+    <li>
+        <input type="checkbox" name="cloners" id="cloner-{{ cloner.name }}" value="cloner_{{ cloner.name }}"
+               class="js-cloner-option"
+               data-requires="{{ cloner.requires_deep | list | tojson | forceescape }}"
+               data-required-by="{{ cloner.required_by_deep | list | tojson | forceescape }}"
+               {{ 'checked' if available and cloner.is_default }}
+               {{ 'disabled' if not available }}>
+        {#--#}
+        <label for="cloner-{{ cloner.name }}" style="font-weight: normal;">{{- cloner.friendly_name -}}</label>
+    </li>
+
+    <script>
+        (function() {
+            'use strict';
+
+            function _update() {
+                var $this = $(this);
+                if (this.checked) {
+                    $this.data('requires').forEach(function(name) {
+                        $('#cloner-' + name).prop('checked', true);
+                    });
+                } else {
+                    $this.data('required-by').forEach(function(name) {
+                        $('#cloner-' + name).prop('checked', false);
+                    });
+                }
+            }
+
+            $('.js-cloner-option').on('click', _update);
+            var initiallyChecked = $('.js-cloner-option:checked');
+            var initiallyUnchecked = $('.js-cloner-option:not(:checked)');
+            // first check requirements of checked items
+            initiallyChecked.each(_update);
+            // then ensure that nothing is checked that shouldn't be checked
+            initiallyUnchecked.each(_update);
+        })();
+    </script>
+{% endfor %}
