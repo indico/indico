@@ -1038,7 +1038,7 @@ type("SingleUserField", ["IWidget"], {
  * Creates a data creation / edit pop-up dialog.
  * @param {String} title The title of the popup.
  * @param {Object} userData A WatchObject that has to have the following keys/attributes:
- *                          id, title, familyName, firstName, affiliation, email, address, telephone, fax, submission.
+ *                          id, title, familyName, firstName, affiliation, email, address, telephone, submission.
  *                          Its information will be displayed as initial values in the dialog.
  * @param {Function} action A callback function that will be called if the user presses ok. The function will be passed
  *                          a WatchObject with the new values.
@@ -1091,7 +1091,6 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Email'),  $B(self.parameterManager.add(Html.edit({id: "email",  style: {width: '300px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
                [$T('Address'), $B(Html.textarea({style:{width:'300px'}}), userData.accessor('address'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('phone'))],
-               [$T('Fax'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('fax'))],
                grantSubmission, grantManagement, grantCoordination, warning]);
 
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);

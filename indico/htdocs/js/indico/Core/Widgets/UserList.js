@@ -473,8 +473,6 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                         userList[i]['existing'] = true;
                         if (!userList[i]['address'])
                             userList[i]['address'] = '';
-                        if (!userList[i]['fax'])
-                            userList[i]['fax'] = '';
                         self.usersList.append(userList[i]);
                     } else {
                         var popup = new AlertPopup($T('Add ')+self.userCaption,
@@ -501,8 +499,7 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
                                        'affiliation': any(newData.get('affiliation'), ''),
                                        'email': any(newData.get('email'), ''),
                                        'address': any(newData.get('address'), ''),
-                                       'phone': any(newData.get('phone'), ''),
-                                       'fax': any(newData.get('fax'), '')
+                                       'phone': any(newData.get('phone'), '')
                                       };
                     if (!self._isAlreadyInList(newUserData.email)) {
                         newUserPopup.close();
@@ -570,7 +567,6 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
         user.email = any(newData.get('email'), '');
         user.address = any(newData.get('address'), '');
         user.phone = any(newData.get('phone'), '');
-        user.fax = any(newData.get('fax'), '');
     }
 
 },
