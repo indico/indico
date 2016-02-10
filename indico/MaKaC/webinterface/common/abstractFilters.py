@@ -135,7 +135,7 @@ class ContribTypeFilterField(filters.FilterField):
         elif not abstract.getContribType():
             return self._showNoValue
         else:
-            return abstract.getContribType().getId() in self._values
+            return abstract.getContribType().getId() in {value.getId() for value in self._values}
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
