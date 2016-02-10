@@ -202,6 +202,7 @@
     global.setupRegistrationListFilter = function setupRegistrationListFilter() {
         $('.reglist-filter').dropdown({selector: '.reglist-column .title'});
         colorizeActiveFilters();
+        $('.report-filter-dialog .toolbar').dropdown();
 
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
         var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
@@ -248,6 +249,14 @@
 
         $('.reglist-filter input:checkbox').on('change', function() {
             colorizeFilter($(this).closest('.filter'));
+        });
+
+        $('#report-filter-select-all').on('click', function() {
+            $('.report-filter-dialog .trigger:not(.enabled)').trigger('click');
+        });
+
+        $('#report-filter-select-none').on('click', function() {
+            $('.report-filter-dialog .trigger.enabled').trigger('click');
         });
     };
 })(window);
