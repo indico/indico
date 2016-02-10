@@ -261,6 +261,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, db.
         return self.event_new.as_legacy.getTrackById(str(self.track_id))
 
     @property
+    def is_scheduled(self):
+        return self.timetable_entry is not None
+
+    @property
     def person_link_data(self):
         return {x: x.is_submitter for x in self.person_links}
 
