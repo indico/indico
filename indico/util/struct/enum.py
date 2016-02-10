@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 
+import json
 from enum import Enum
 
 
@@ -30,6 +31,10 @@ class IndicoEnum(Enum):
             return cls[name]
         except KeyError:
             return default
+
+    @classmethod
+    def serialize(cls):
+        return json.dumps({x.name: x.value for x in cls})
 
 
 class TitledEnum(IndicoEnum):
