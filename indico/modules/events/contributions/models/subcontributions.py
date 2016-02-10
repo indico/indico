@@ -17,7 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -38,10 +40,13 @@ def _get_next_position(context):
     return (res[0] or 0) + 1
 
 
-class SubContribution(DescriptionMixin, db.Model):
+class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, db.Model):
     __tablename__ = 'subcontributions'
     __table_args__ = (db.Index(None, 'friendly_id', 'contribution_id', unique=True),
                       {'schema': 'events'})
+
+    PRELOAD_EVENT_ATTACHED_ITEMS = True
+    PRELOAD_EVENT_ATTACHED_NOTES = True
 
     id = db.Column(
         db.Integer,

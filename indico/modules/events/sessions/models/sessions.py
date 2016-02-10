@@ -21,9 +21,11 @@ from datetime import timedelta
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
+from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
@@ -40,12 +42,16 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_session_id, Event.id == event_id)
 
 
-class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
+class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
+              AttachedNotesMixin, db.Model):
     __tablename__ = 'sessions'
     __auto_table_args = {'schema': 'events'}
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
     default_colors = ColorTuple('#202020', '#e3f2d3')
+
+    PRELOAD_EVENT_ATTACHED_ITEMS = True
+    PRELOAD_EVENT_ATTACHED_NOTES = True
 
     @declared_attr
     def __table_args__(cls):
