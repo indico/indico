@@ -114,6 +114,8 @@
                         initializeInputs();
                     } else {
                         clearField(venueInput);
+                        address.val('');
+                        delete hiddenData.address;
                     }
                     field.val(JSON.stringify(hiddenData)).trigger('change');
                 }
@@ -531,7 +533,7 @@
                 input.trigger(container.hasClass('result') ? 'typeahead:close-results-list' : 'focus.typeahead');
             });
 
-            address.on('keyup', function() {
+            address.on('keyup input', function() {
                 hiddenData.address = address.val();
                 field.val(JSON.stringify(hiddenData)).trigger('change');
             });
