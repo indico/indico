@@ -49,6 +49,25 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 
 
+def get_title_uuid(regform, title):
+    """Convert a string title to its UUID value
+
+    If the title does not exist in the title PD field, it will be
+    ignored and returned as ``None``.
+    """
+    if not title:
+        return None
+    title_field = next((x
+                        for x in regform.active_fields
+                        if (x.type == RegistrationFormItemType.field_pd and
+                            x.personal_data_type == PersonalDataType.title)), None)
+    if title_field is None:  # should never happen
+        return None
+    valid_choices = {x['id'] for x in title_field.current_data.versioned_data['choices']}
+    uuid = next((k for k, v in title_field.data['captions'].iteritems() if v == title), None)
+    return {uuid: 1} if uuid in valid_choices else None
+
+
 def user_registered_in_event(user, event):
     """
     Check whether there is a `Registration` entry for a user in any

@@ -29,7 +29,7 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     create_registration, check_registration_email)
+                                                     create_registration, check_registration_email, get_title_uuid)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture,
@@ -197,6 +197,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
+        user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
                                                sections=get_event_section_data(self.regform), regform=self.regform,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
