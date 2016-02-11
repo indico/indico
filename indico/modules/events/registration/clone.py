@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -26,65 +28,57 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.util.i18n import _
 
-from MaKaC.conference import EventCloner
-
 
 class RegistrationFormCloner(EventCloner):
-    def __init__(self, *args, **kwargs):
-        super(RegistrationFormCloner, self).__init__(*args, **kwargs)
-        self._field_data_map = {}
-        self._clone_with_registrations = False
+    name = 'registration_forms'
+    friendly_name = _('Registration forms')
 
-    def get_options(self):
-        if not is_feature_enabled(self.event, 'registration'):
-            return {}
-        forms_cloner_enabled = bool(self._find_registration_forms().count())
-        regs_cloner_enabled = bool(self._find_registration_forms()
-                                   .filter(RegistrationForm.registrations.any(Registration.is_active))
-                                   .count())
-        selected = self.event.getType() == 'meeting'
-        return {
-            'form': (_('Registration forms'), forms_cloner_enabled, False),
-            'registrations': (_('Registrations'), regs_cloner_enabled, selected)
-        }
+    @property
+    def is_visible(self):
+        return is_feature_enabled(self.old_event, 'registration')
+
+    @property
+    def is_available(self):
+        return bool(self._find_registration_forms().count())
 
     def _find_registration_forms(self):
-        return RegistrationForm.find(~RegistrationForm.is_deleted,
-                                     RegistrationForm.event_id == int(self.event.id))
+        return self.old_event.registration_forms.filter(~RegistrationForm.is_deleted)
 
-    def clone(self, new_event, options):
-        if not options:
-            return
-        self._clone_with_registrations = 'registrations' in options
+    @no_autoflush
+    def run(self, new_event, cloners, shared_data):
+        # if the registration cloner is also enabled, we have to keep
+        # all revisions since they are likely to be in use
+        clone_all_revisions = 'registrations' in cloners
         attrs = get_simple_column_attrs(RegistrationForm) - {'start_dt', 'end_dt', 'modification_end_dt'}
-        with db.session.no_autoflush:
-            for old_form in self._find_registration_forms():
-                new_form = RegistrationForm(event_new=new_event.as_event,
-                                            **{attr: getattr(old_form, attr) for attr in attrs})
-                self._clone_form_items(old_form, new_form)
-                if self._clone_with_registrations:
-                    self._clone_registrations(old_form, new_form, new_event)
-                db.session.add(new_form)
-                db.session.flush()
+        self._field_data_map = {}
+        self._form_map = {}
+        for old_form in self._find_registration_forms():
+            new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
+            self._clone_form_items(old_form, new_form, clone_all_revisions)
+            new_event.registration_forms.append(new_form)
+            db.session.flush()
+            self._form_map[old_form] = new_form
+        return {'form_map': self._form_map,
+                'field_data_map': self._field_data_map}
 
-    def _clone_form_items(self, old_form, new_form):
+    def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.find(RegistrationFormSection.registration_form_id == old_form.id)
         items_attrs = get_simple_column_attrs(RegistrationFormSection)
         for old_section in old_sections:
-            new_section = RegistrationFormSection(registration_form=new_form, **{attr: getattr(old_section, attr)
-                                                                                 for attr in items_attrs})
+            new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
             for old_item in old_section.children:
                 new_item = RegistrationFormItem(parent=new_section, registration_form=new_form,
                                                 **{attr: getattr(old_item, attr) for attr in items_attrs})
                 if new_item.is_field:
-                    if self._clone_with_registrations:
+                    if clone_all_revisions:
                         self._clone_all_field_versions(old_item, new_item)
                     else:
                         field_data = RegistrationFormFieldData(field=new_item,
                                                                versioned_data=old_item.versioned_data)
                         new_item.current_data = field_data
+                        self._field_data_map[old_item.current_data] = field_data
                 new_section.children.append(new_item)
-            db.session.add(new_section)
+            new_form.form_items.append(new_section)
             db.session.flush()
 
     def _clone_all_field_versions(self, old_item, new_item):
@@ -95,7 +89,35 @@ class RegistrationFormCloner(EventCloner):
             new_item.data_versions.append(new_version)
             self._field_data_map[old_version] = new_version
 
-    def _clone_registrations(self, old_form, new_form, new_event):
+
+class RegistrationCloner(EventCloner):
+    name = 'registrations'
+    friendly_name = _('Registrations')
+    requires = {'registration_forms'}
+
+    @property
+    def is_visible(self):
+        return is_feature_enabled(self.old_event, 'registration')
+
+    @property
+    def is_available(self):
+        return bool(self.old_event.registration_forms
+                    .filter(~RegistrationForm.is_deleted, RegistrationForm.registrations.any(Registration.is_active))
+                    .count())
+
+    @property
+    def is_default(self):
+        return self.old_event.as_legacy.getType() == 'meeting'
+
+    def run(self, new_event, cloners, shared_data):
+        form_map = shared_data['registration_forms']['form_map']
+        field_data_map = shared_data['registration_forms']['field_data_map']
+        for old_form, new_form in form_map.iteritems():
+            self._clone_registrations(old_form, new_form, field_data_map)
+        self._synchronize_registration_friendly_id(new_event)
+        db.session.flush()
+
+    def _clone_registrations(self, old_form, new_form, field_data_map):
         registration_attrs = get_simple_column_attrs(Registration) - {'uuid', 'ticket_uuid'}
         for old_registration in old_form.registrations:
             if old_registration.is_deleted:
@@ -107,16 +129,15 @@ class RegistrationFormCloner(EventCloner):
                 new_registration_data = RegistrationData(registration=new_registration,
                                                          **{attr: getattr(old_registration_data, attr)
                                                             for attr in reg_data_attrs})
-                new_registration_data.field_data = self._field_data_map[old_registration_data.field_data]
+                new_registration_data.field_data = field_data_map[old_registration_data.field_data]
                 if old_registration_data.storage_file_id is not None:
                     with old_registration_data.open() as fd:
                         new_registration_data.save(fd)
             db.session.flush()
             signals.event.registration_state_updated.send(new_registration)
-            self._synchronize_registration_friendly_id(new_event)
 
     def _synchronize_registration_friendly_id(self, new_event):
-        new_event.as_event._last_friendly_registration_id = (
+        new_event._last_friendly_registration_id = (
             db.session
             .query(db.func.max(Registration.friendly_id))
             .filter(Registration.event_id == new_event.id)
