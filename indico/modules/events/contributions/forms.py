@@ -22,10 +22,10 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
-from indico.modules.events.contributions.fields import ContributionPersonListField
+from indico.modules.events.contributions.fields import ContributionPersonListField, SubContributionPersonListField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.validators import UsedIf, MaxDuration
 from indico.util.i18n import _
 
 
@@ -61,3 +61,16 @@ class ContributionProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = kwargs.pop('contrib')
         super(ContributionProtectionForm, self).__init__(*args, **kwargs)
+
+
+class SubContributionForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()])
+    description = TextAreaField(_('Description'))
+    duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
+                              default=timedelta(minutes=20), units=('minutes', 'hours'),
+                              description=_('The duration of the subcontribution'))
+    speakers = SubContributionPersonListField(_('Speakers'), description=_('List of the subcontributions speakers'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(SubContributionForm, self).__init__(*args, **kwargs)

@@ -18,8 +18,8 @@
 (function(global) {
     'use strict';
 
-    function setupTableSorter() {
-        $('#contribution-list .tablesorter').tablesorter({
+    function setupTableSorter(selector) {
+        $(selector).tablesorter({
             cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
             cssInfoBlock: 'avoid-sort',
@@ -199,17 +199,23 @@
             createTrackURL: null,
             timetableRESTURL: null
         }, options);
-        setupTableSorter();
+        setupTableSorter('#contribution-list .tablesorter');
         setupSearchBox();
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
-            setupTableSorter();
+            setupTableSorter('#contribution-list .tablesorter');
             applyFilters();
             setupSessionPicker(options.createSessionURL);
             setupTrackPicker(options.createTrackURL);
         });
         setupReporter();
+    };
+
+    global.setupSubContributionList = function() {
+        $('#subcontribution-list [data-toggle=dropdown]').closest('.group').dropdown();
+        setupTableSorter('#subcontribution-list .tablesorter');
+        enableIfChecked('#subcontribution-list', 'input[name=subcontribution_id]', '.js-enable-if-checked');
     };
 })(window);

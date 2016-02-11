@@ -20,7 +20,10 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHEditContribution, RHContributionREST,
                                                              RHDeleteContributions, RHContributionPersonList,
                                                              RHContributionProtection, RHContributionsReportCustomize,
-                                                             RHContributionsReportStaticURL)
+                                                             RHContributionsReportStaticURL,
+                                                             RHContributionSubContributions, RHCreateSubContribution,
+                                                             RHEditSubContribution, RHSubContributionREST,
+                                                             RHDeleteSubContributions)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -45,3 +48,15 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/edit',
                  'manage_update_contrib', RHEditContribution, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/protection', 'manage_contrib_protection',
                  RHContributionProtection, methods=('GET', 'POST'))
+
+# Subcontributions
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/', 'manage_subcontributions',
+                 RHContributionSubContributions)
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/delete', 'manage_delete_subcontribs',
+                 RHDeleteSubContributions, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/create', 'manage_create_subcontrib',
+                 RHCreateSubContribution, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
+                 'manage_subcontrib_rest', RHSubContributionREST, methods=('DELETE',))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>/edit',
+                 'manage_edit_subcontrib', RHEditSubContribution, methods=('GET', 'POST'))
