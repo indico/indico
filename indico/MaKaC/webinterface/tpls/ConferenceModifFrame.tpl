@@ -23,16 +23,10 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
 </div>
 
-<table cellpadding="0" cellspacing="0" style="width:100%">
-    <tbody>
-        <tr>
-            <td style="vertical-align: top; width:200px" id="event-sidemenu">${ sideMenu }</td>
-            <td style="vertical-align: top">
-                <div class="body" style="padding:20px;">
-                    ${ render_template('flashed_messages.html') }
-                    ${ body }
-                </div>
-            </td>
-        </tr>
-    </tbody>
-</table>
+<div class="layout-sidemenu">
+    <div id="event-sidemenu" class="sidemenu">${ sideMenu }</div>
+    <div class="body">
+        ${ render_template('flashed_messages.html') }
+        ${ body }
+    </div>
+</div>
