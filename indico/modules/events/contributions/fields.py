@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
+from indico.modules.events.contributions.models.persons import (ContributionPersonLink, AuthorType,
+                                                                SubContributionPersonLink)
 from indico.modules.events.contributions.util import serialize_contribution_person_link
 from indico.util.i18n import _
 from indico.web.forms.fields import EventPersonListField
@@ -53,7 +54,7 @@ class ContributionPersonListField(EventPersonListField):
         return ContributionPersonLink(person=person, author_type=author_type, is_speaker=is_speaker)
 
     def _serialize_principal(self, principal):
-        if not isinstance(principal, ContributionPersonLink):
+        if not isinstance(principal, (ContributionPersonLink, SubContributionPersonLink)):
             return super(ContributionPersonListField, self)._serialize_principal(principal)
         else:
             return serialize_contribution_person_link(principal)
@@ -65,3 +66,10 @@ class ContributionPersonListField(EventPersonListField):
                 raise ValueError(_("Author data received"))
             if person.author_type == AuthorType.none and not person.is_speaker:
                 raise ValueError(_("{} has no role").format(person.full_name))
+
+
+class SubContributionPersonListField(ContributionPersonListField):
+    """A field to configure a list of subcontribution persons"""
+
+    def _get_contribution_person(self, data):
+        return SubContributionPersonLink(person=self._get_event_person(data))
