@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
@@ -35,6 +36,7 @@ class ContributionForm(IndicoForm):
     duration = TimeDeltaField(_("Duration"), [DataRequired()], default=timedelta(minutes=20),
                               units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
+    type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
     person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
     location_data = IndicoLocationField(_("Location"),
                                         description=_("The physical location where the contribution takes place."))
@@ -42,6 +44,7 @@ class ContributionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(ContributionForm, self).__init__(*args, **kwargs)
+        self.type.query = self.event.contribution_types
 
 
 class ContributionProtectionForm(IndicoForm):

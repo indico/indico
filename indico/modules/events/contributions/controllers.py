@@ -114,6 +114,7 @@ class RHCreateContribution(RHManageContributionsBase):
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
         form = ContributionForm(obj=FormDefaults(self.contrib), event=self.event_new)
+        form.type.query = self.event_new.contribution_types
         if form.validate_on_submit():
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
