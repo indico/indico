@@ -24,6 +24,7 @@ from sqlalchemy.orm import load_only, contains_eager, noload, joinedload
 from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_event_person, ReporterBase
 from indico.modules.fulltextindexes.models.events import IndexedEvent
@@ -75,7 +76,8 @@ def serialize_contribution_person_link(person_link):
     data = serialize_event_person(person_link.person)
     data['isSpeaker'] = person_link.is_speaker
     data['authorType'] = person_link.author_type.value
-    data['isSubmitter'] = person_link.is_submitter
+    if not isinstance(person_link, SubContributionPersonLink):
+        data['isSubmitter'] = person_link.is_submitter
     return data
 
 
