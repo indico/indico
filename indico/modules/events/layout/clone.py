@@ -18,65 +18,54 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, EventPage
-from indico.modules.events.layout.util import get_images_for_event
 from indico.modules.events.features.util import is_feature_enabled
 from indico.util.i18n import _
 
-from MaKaC.conference import EventCloner
-
 
 class ImageCloner(EventCloner):
+    name = 'images'
+    friendly_name = _('Images')
+
+    @property
+    def is_visible(self):
+        return is_feature_enabled(self.old_event, 'images')
+
+    @property
+    def is_available(self):
+        return bool(self._find_images().count())
+
     def _find_images(self):
-        from indico.modules.events.layout.models.images import ImageFile
-        return ImageFile.find(event_id=self.event.id)
+        return self.old_event.layout_images
 
-    def get_options(self):
-        if is_feature_enabled(self.event, 'images'):
-            enabled = bool(self._find_images().count())
-            return {'images': (_("Images"), enabled, False)}
-        else:
-            return {}
-
-    def clone(self, new_event, options):
+    def run(self, new_event, cloners, shared_data):
         from indico.modules.events.layout.models.images import ImageFile
-        if 'images' not in options:
-            return
-        for old_image in get_images_for_event(self.event):
-            new_image = ImageFile(event_id=new_event.id,
-                                  filename=old_image.filename,
-                                  content_type=old_image.content_type)
+        for old_image in self._find_images():
+            new_image = ImageFile(filename=old_image.filename, content_type=old_image.content_type)
+            new_event.layout_images.append(new_image)
             with old_image.open() as fd:
                 new_image.save(fd)
-            db.session.add(new_image)
             db.session.flush()
 
 
 class LayoutCloner(EventCloner):
-    def get_options(self):
-        if self.event.getType() != 'conference':
-            return {}
-        return {'layout': (_('Layout settings and menu customization'), True, False)}
+    name = 'layout'
+    friendly_name = _('Layout settings and menu customization')
 
-    def clone(self, new_event, options):
-        if self.event.getType() != 'conference':
-            # for meetings/lecture we want to keep the default timetable style in all cases
-            theme = layout_settings.get(self.event, 'timetable_theme')
-            if theme is not None:
-                layout_settings.set(new_event, 'timetable_theme', theme)
-            return
+    @property
+    def is_visible(self):
+        return self.old_event.as_legacy.getType() == 'conference'
 
-        if 'layout' not in options:
-            return
-
+    def run(self, new_event, cloners, shared_data):
         for col in ('logo_metadata', 'logo', 'stylesheet_metadata', 'stylesheet'):
-            setattr(new_event.as_event, col, getattr(self.event.as_event, col))
+            setattr(new_event, col, getattr(self.old_event, col))
 
-        layout_settings.set_multi(new_event, layout_settings.get_all(self.event, no_defaults=True))
-        if layout_settings.get(self.event, 'use_custom_menu'):
-            for menu_entry in MenuEntry.get_for_event(self.event):
-                self._copy_menu_entry(menu_entry, new_event, new_event.as_event.menu_entries)
+        layout_settings.set_multi(new_event, layout_settings.get_all(self.old_event, no_defaults=True))
+        if layout_settings.get(self.old_event, 'use_custom_menu'):
+            for menu_entry in MenuEntry.get_for_event(self.old_event):
+                self._copy_menu_entry(menu_entry, new_event, new_event.menu_entries)
         db.session.flush()
 
     def _copy_menu_entry(self, menu_entry, new_event, container, include_children=True):
@@ -84,10 +73,10 @@ class LayoutCloner(EventCloner):
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
             with db.session.no_autoflush:  # menu_entry.page is lazy-loaded
-                page = EventPage(event_id=new_event.id, html=menu_entry.page.html)
+                page = EventPage(event_new=new_event, html=menu_entry.page.html)
             new_menu_entry.page = page
             if menu_entry.page.is_default:
-                new_event.as_event.default_page = new_menu_entry.page
+                new_event.default_page = new_menu_entry.page
         container.append(new_menu_entry)
         if include_children:
             for child in menu_entry.children:

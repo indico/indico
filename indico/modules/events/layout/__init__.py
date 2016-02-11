@@ -67,10 +67,21 @@ def _get_default_menu_entries(sender, **kwargs):
         yield entry
 
 
-@signals.event_management.clone.connect
-def _get_image_cloner(event, **kwargs):
-    from indico.modules.events.layout.clone import ImageCloner
-    return ImageCloner(event)
+@signals.event.cloned.connect
+def _event_cloned(old_event, new_event, **kwargs):
+    if old_event.as_legacy.getType() == 'conference':
+        return
+    # for meetings/lecture we want to keep the default timetable style in all cases
+    theme = layout_settings.get(old_event, 'timetable_theme')
+    if theme is not None:
+        layout_settings.set(new_event, 'timetable_theme', theme)
+
+
+@signals.event_management.get_cloners.connect
+def _get_cloners(sender, **kwargs):
+    from indico.modules.events.layout.clone import ImageCloner, LayoutCloner
+    yield ImageCloner
+    yield LayoutCloner
 
 
 @signals.event.get_feature_definitions.connect
@@ -105,9 +116,3 @@ class ImagesFeature(EventFeature):
     @classmethod
     def is_default_for_event(cls, event):
         return event.getType() == 'conference'
-
-
-@signals.event_management.clone.connect
-def _get_layout_cloner(event, **kwargs):
-    from indico.modules.events.layout.clone import LayoutCloner
-    return LayoutCloner(event)
