@@ -16,21 +16,30 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify, redirect
+from flask import flash, request, jsonify, redirect, render_template
 from werkzeug.exceptions import BadRequest
 
+from indico.modules.events.contributions.forms import ContributionForm, ContributionProtectionForm, SubContributionForm
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
-from indico.modules.events.contributions.forms import ContributionForm, ContributionProtectionForm
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
+                                                            delete_contribution, create_subcontribution,
+                                                            update_subcontribution, delete_subcontribution)
 from indico.modules.events.contributions.util import ContributionReporter
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _, ngettext
+from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+def _render_subcontribution_list(contrib):
+    tpl = get_template_module('events/contributions/management/_subcontribution_list.html')
+    return tpl.render_subcontribution_list(contrib.event_new, contrib)
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -59,13 +68,39 @@ class RHManageContributionBase(RHManageContributionsBase):
         self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
 
 
+class RHManageSubContributionBase(RHManageContributionBase):
+    """Base RH for a specific subcontribution"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.subcontrib
+        }
+    }
+
+    def _checkParams(self, params):
+        RHManageContributionBase._checkParams(self, params)
+        self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
+
+
 class RHManageContributionsActionsBase(RHManageContributionsBase):
-    """Base class for classes performing actions on registrations"""
+    """Base class for classes performing actions on event contributions"""
 
     def _checkParams(self, params):
         RHManageContributionsBase._checkParams(self, params)
-        ids = set(map(int, request.form.getlist('contribution_id')))
+        ids = {int(x) for x in request.form.getlist('contribution_id')}
         self.contribs = self.event_new.contributions.filter(Contribution.id.in_(ids), ~Contribution.is_deleted).all()
+
+
+class RHManageSubContributionsActionsBase(RHManageContributionBase):
+    """Base class for RHs performing actions on subcontributions"""
+
+    def _checkParams(self, params):
+        RHManageContributionBase._checkParams(self, params)
+        ids = {int(x) for x in request.form.getlist('subcontribution_id')}
+        self.subcontribs = (SubContribution.query
+                            .with_parent(self.contrib)
+                            .filter(SubContribution.id.in_(ids), ~SubContribution.is_deleted)
+                            .all())
 
 
 class RHContributions(RHManageContributionsBase):
@@ -213,3 +248,50 @@ class RHContributionProtection(RHManageContributionBase):
         acl = {p.principal for p in self.contrib.acl_entries if p.read_access}
         return {'managers': managers, 'submitters': submitters, 'protection_mode': self.contrib.protection_mode,
                 'acl': acl}
+
+
+class RHContributionSubContributions(RHManageContributionBase):
+    """Get a list of subcontributions"""
+
+    def _process(self):
+        return jsonify_data(html=_render_subcontribution_list(self.contrib))
+
+
+class RHCreateSubContribution(RHManageContributionBase):
+    """Create a subcontribution"""
+
+    def _process(self):
+        form = SubContributionForm(event=self.event_new)
+        if form.validate_on_submit():
+            subcontrib = create_subcontribution(self.contrib, form.data)
+            flash(_("Subcontribution '{}' created successfully").format(subcontrib.title), 'success')
+            return jsonify_data(html=_render_subcontribution_list(self.contrib))
+        return jsonify_form(form)
+
+
+class RHEditSubContribution(RHManageSubContributionBase):
+    """Edit the subcontribution"""
+
+    def _process(self):
+        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event_new)
+        if form.validate_on_submit():
+            update_subcontribution(self.subcontrib, form.data)
+            flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
+            return jsonify_data(html=_render_subcontribution_list(self.contrib))
+        return jsonify_form(form)
+
+
+class RHSubContributionREST(RHManageSubContributionBase):
+    """REST endpoint for management of a single subcontribution"""
+
+    def _process_DELETE(self):
+        delete_subcontribution(self.subcontrib)
+        flash(_("Subcontribution '{}' deleted successfully").format(self.subcontrib.title), 'success')
+        return jsonify_data(html=_render_subcontribution_list(self.contrib))
+
+
+class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
+    def _process(self):
+        for subcontrib in self.subcontribs:
+            delete_subcontribution(subcontrib)
+        return jsonify_data(html=_render_subcontribution_list(self.contrib))
