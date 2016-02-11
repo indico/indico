@@ -67,6 +67,16 @@
             margin-right: 5px;
         }
     }
+
+    .scrollable {
+        overflow-x: auto;
+        width: 100%;
+
+        table {
+            width: auto;
+            table-layout: auto;
+        }
+    }
 }
 
 .report-filter-dialog {
