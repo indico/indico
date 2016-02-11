@@ -181,10 +181,11 @@ def _get_management_roles(sender, **kwargs):
     return RegistrationRole
 
 
-@signals.event_management.clone.connect
-def _get_registration_form_cloner(event, **kwargs):
-    from indico.modules.events.registration.clone import RegistrationFormCloner
-    return RegistrationFormCloner(event)
+@signals.event_management.get_cloners.connect
+def _get_registration_cloners(sender, **kwargs):
+    from indico.modules.events.registration.clone import RegistrationFormCloner, RegistrationCloner
+    yield RegistrationFormCloner
+    yield RegistrationCloner
 
 
 class RegistrationFeature(EventFeature):
