@@ -1,4 +1,10 @@
 {% extends 'layout/base.html' %}
+{% set pending_reminders = reminders|rejectattr('is_sent')|list %}
+{% set sent_reminders = reminders|selectattr('is_sent')|list %}
+
+{% block title %}
+    {% trans %}Reminders{% endtrans %}
+{% endblock %}
 
 {% macro render_reminders(reminders) %}
     <ul class="group-list with-buttons no-content-before">
@@ -30,11 +36,6 @@
         {% endfor %}
     </ul>
 {% endmacro %}
-
-{% set pending_reminders = reminders|rejectattr('is_sent')|list %}
-{% set sent_reminders = reminders|selectattr('is_sent')|list %}
-
-{% block title %}{% trans %}Reminders{% endtrans %}{% endblock %}
 
 {% block content %}
     <div class="i-box-group vert fixed-width reminders">
