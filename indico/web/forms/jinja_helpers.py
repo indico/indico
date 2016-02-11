@@ -17,7 +17,7 @@
 import json
 
 from wtforms.fields import RadioField, BooleanField
-from wtforms.widgets.core import Input, Select, HiddenInput
+from wtforms.widgets.core import Input, Select, TextArea, HiddenInput
 from wtforms.validators import Length, Regexp, NumberRange
 
 from indico.util.struct.enum import TitledEnum
@@ -30,6 +30,8 @@ def is_single_line_field(field):
         return not field.widget.multiple
     if isinstance(field.widget, Input):
         return field.widget.input_type not in {'checkbox', 'radio', 'hidden'}
+    if isinstance(field.widget, TextArea):
+        return True
     return getattr(field.widget, 'single_line', False)
 
 
