@@ -17,6 +17,23 @@
 
 @import "compass/css3/box-sizing";
 
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+body > .main {
+    flex-grow: 1;
+}
+
+/* Work around issues in WebKit (used by Safari) which shrinks the contained
+ * elements instead of growing the container. The following prevents the
+ * children of the flexbox to be shrinked which is ok since we want the page to
+ * scroll anyway. */
+body > * {
+    flex-shrink: 0;
+}
+
 .fixed-width {
     max-width: 800px !important;
 }
@@ -75,4 +92,15 @@
             visibility: hidden;
         }
     }
+}
+
+.layout-sidemenu {
+    display: flex;
+    min-height: 100%;
+}
+
+.layout-sidemenu > .body {
+    flex-grow: 1;
+    width: 0;
+    margin-top: 19px;
 }

@@ -15,25 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-   A wrapper that wraps around everything except the footer.
-   Used to place the footer correctly at the bottom
-*/
-div.wrapper {
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-}
-
-div.main {
-    padding-bottom: 100px; /* Equal to the height of the footer */
-}
-
-/*
-    Used to create empty space in end of wrapper
-    which is used but the footer
-*/
-
 .smallLabel {
     font-size: 10px;
 }
@@ -2228,17 +2209,11 @@ ul.listCompact {
 
 .footer {
     color: #555;
-    position: relative;
-    margin-top: -60px; /* negative value of footer height */
-    height: 40px;
-    clear:both;
     padding: 10px 5px 5px 5px;
     font-size: 11px;
 }
 
 .footer.footerCERN {
-    margin-top: -100px;
-    height: 90px;
     padding-bottom: 0;
 }
 

@@ -256,9 +256,8 @@ class WPDecorated(WPBase):
         return wc.getHTML({ "subArea": self._getSiteArea() })
 
     def _applyDecoration(self, body):
-        return u'<div class="wrapper"><div class="main">{}{}</div></div>{}'.format(to_unicode(self._getHeader()),
-                                                                                   to_unicode(body),
-                                                                                   to_unicode(self._getFooter()))
+        return u'<div class="header">{}</div><div class="main">{}</div><div class="footer">{}</div>'.format(
+            to_unicode(self._getHeader()), to_unicode(body), to_unicode(self._getFooter()))
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
