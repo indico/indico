@@ -62,6 +62,7 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
             roles.add('contribution_manager')
         if principal.read_access:
             roles.add('contribution_access')
+    return data
 
 
 def serialize_contribution_person_link(person_link):
