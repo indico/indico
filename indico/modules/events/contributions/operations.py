@@ -21,6 +21,7 @@ from flask import session
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 
@@ -99,3 +100,30 @@ def delete_contribution(contrib):
     logger.info('Contribution %s deleted by %s', contrib, session.user)
     contrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                           'Contribution "{}" has been deleted'.format(contrib.title), session.user)
+
+
+def create_subcontribution(contrib, data):
+    subcontrib = SubContribution()
+    subcontrib.populate_from_dict(data)
+    contrib.subcontributions.append(subcontrib)
+    db.session.flush()
+    logger.info('Subcontribution %s created by %s', subcontrib, session.user)
+    subcontrib.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Subcontributions',
+                             'Subcontribution "{}" has been created'.format(subcontrib.title), session.user)
+    return subcontrib
+
+
+def update_subcontribution(subcontrib, data):
+    subcontrib.populate_from_dict(data)
+    db.session.flush()
+    logger.info('Subcontribution %s updated by %s', subcontrib, session.user)
+    subcontrib.event_new.log(EventLogRealm.management, EventLogKind.change, 'Subcontributions',
+                             'Subcontribution "{}" has been updated'.format(subcontrib.title), session.user)
+
+
+def delete_subcontribution(subcontrib):
+    subcontrib.is_deleted = True
+    db.session.flush()
+    logger.info('Subcontribution %s deleted by %s', subcontrib, session.user)
+    subcontrib.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Subcontributions',
+                             'Subcontribution "{}" has been deleted'.format(subcontrib.title), session.user)
