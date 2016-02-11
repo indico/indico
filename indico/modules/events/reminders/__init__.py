@@ -22,12 +22,11 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.logger import Logger
+from indico.modules.events.cloning import EventCloner
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
-
-from MaKaC.conference import EventCloner
 
 
 logger = Logger.get('events.reminders')
@@ -58,42 +57,42 @@ def _event_data_changed(event, **kwargs):
             reminder.scheduled_dt = new_dt
 
 
-@signals.event_management.clone.connect
-def _get_reminder_cloner(event, **kwargs):
-    return ReminderCloner(event)
-
-
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
     EventReminder.find(creator_id=source.id).update({EventReminder.creator_id: target.id})
 
 
+@signals.event_management.get_cloners.connect
+def _get_reminder_cloner(sender, **kwargs):
+    return ReminderCloner
+
+
 class ReminderCloner(EventCloner):
-    def find_reminders(self):
-        from indico.modules.events.reminders.models.reminders import EventReminder
-        return EventReminder.find(EventReminder.is_relative, EventReminder.event_id == int(self.event.id))
+    name = 'reminders'
+    friendly_name = _('Reminders')
+    is_default = True
 
-    def get_options(self):
-        enabled = bool(self.find_reminders().count())
-        return {'reminders': (_('Reminders'), enabled, True)}
+    @property
+    def is_available(self):
+        return bool(self._find_reminders().count())
 
-    def clone(self, new_event, options):
-        from indico.modules.events.reminders.models.reminders import EventReminder
-        if 'reminders' not in options:
-            return
-        attrs = get_simple_column_attrs(EventReminder) - {'created_dt', 'scheduled_dt', 'is_sent'}
+    def _find_reminders(self):
+        return self.old_event.reminders.filter(db.m.EventReminder.is_relative)
+
+    def run(self, new_event, cloners, shared_data):
+        attrs = get_simple_column_attrs(db.m.EventReminder) - {'created_dt', 'scheduled_dt', 'is_sent'}
         attrs |= {'creator_id'}
-        for old_reminder in self.find_reminders():
-            scheduled_dt = new_event.getStartDate() - old_reminder.event_start_delta
+        for old_reminder in self._find_reminders():
+            scheduled_dt = new_event.as_legacy.getStartDate() - old_reminder.event_start_delta
             # Skip anything that's would have been sent on a past date.
             # We ignore the time on purpose so cloning an event shortly before will
             # still trigger a reminder that's just a few hours overdue.
             if scheduled_dt.date() < now_utc().date():
                 logger.info('Not cloning reminder %s which would trigger at %s', old_reminder, scheduled_dt)
                 continue
-            reminder = EventReminder(event=new_event, **{attr: getattr(old_reminder, attr) for attr in attrs})
+            reminder = db.m.EventReminder(**{attr: getattr(old_reminder, attr) for attr in attrs})
             reminder.scheduled_dt = scheduled_dt
-            db.session.add(reminder)
+            new_event.reminders.append(reminder)
             db.session.flush()
             logger.info('Added reminder during event cloning: %s', reminder)
