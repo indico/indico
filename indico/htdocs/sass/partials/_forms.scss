@@ -275,6 +275,12 @@
     }
 }
 
+.i-form .form-group-footer {
+    .i-button {
+        @extend %form-field-button;
+    }
+}
+
 .i-form fieldset {
     border: 0;
     margin-bottom: 1em;
