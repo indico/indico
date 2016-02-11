@@ -25,6 +25,7 @@ $toolbar-thin-height: 1.9em;
 .toolbar {
     $toolbar-button-height: 1.7em;
 
+    overflow: hidden;
     min-height: $toolbar-height;
     margin-bottom: 0.5em;
     padding: 3px 0;
@@ -156,7 +157,7 @@ $toolbar-thin-height: 1.9em;
     @extend %toolbar-group-slider;
     display: inline-block;
     padding: 0 0.4em;
-    margin-bottom: -2px;
+    margin-bottom: 0.2rem;
 
     &:first-child,
     &.right:last-child {
