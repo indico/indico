@@ -72,7 +72,9 @@
                                 TODO
                             </td>
                             <td class="i-table">
-                                {% if not contrib.type %}
+                                {% if contrib.type %}
+                                    {{ contrib.type.name }}
+                                {% else %}
                                     {% trans %}n/a{% endtrans %}
                                 {% endif %}
                             </td>
