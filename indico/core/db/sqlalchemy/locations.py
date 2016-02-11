@@ -210,7 +210,7 @@ class LocationMixin(object):
             return ''
         room = self.room
         if room is not None:
-            return room.name
+            return room.full_name
         return self.own_room_name if not self.inherit_location else self.location_parent.room_name
 
     @room_name.setter
@@ -254,13 +254,18 @@ class LocationMixin(object):
         """All location data for the item, meant to be used in the location
         widget.
         """
+        location_data = self.location_data
         return {
-            'address': self.location_data['address'],
-            'room_name': self.location_data['room_name'],
-            'room_id': self.location_data['room'].id if self.location_data['room'] else '',
-            'venue_name': self.location_data['venue_name'],
-            'venue_id': self.location_data['venue'].id if self.location_data['venue'] else '',
+            'address': location_data['address'],
+            'room_name': location_data['room_name'],
+            'room_id': location_data['room'].id if location_data['room'] else '',
+            'venue_name': location_data['venue_name'],
+            'venue_id': location_data['venue'].id if location_data['venue'] else '',
         }
+
+    @property
+    def inherited_widget_location_data(self):
+        return self.location_parent.widget_location_data if self.location_parent else self.widget_location_data
 
     @location_data.setter
     def location_data(self, data):
@@ -279,12 +284,3 @@ class LocationMixin(object):
                 self.room_name = data.get('room_name', '')
             if not self.venue:
                 self.venue_name = data.get('venue_name', '')
-
-    @classmethod
-    def get_location_for_parent(cls, parent):
-        return {'source': parent,
-                'address': parent.location_data.get('address'),
-                'venue_name': parent.location_data.get('venue_name'),
-                'inheriting': True,
-                'room': parent.location_data.get('room'),
-                'room_name': parent.location_data.get('room_name')}
