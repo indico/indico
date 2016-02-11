@@ -18,7 +18,7 @@
 @import "partials/toolbars";
 
 
-%text-input {
+%text-input-base {
     @include border-all();
     @include border-radius();
     @include box-sizing(border-box);
@@ -39,6 +39,12 @@
     }
 }
 
+%text-input {
+    @extend %text-input-base;
+    height: 1.6em;
+    -webkit-appearance: textfield;
+}
+
 %input-invalid {
     @include border-all($red);
 
@@ -47,17 +53,7 @@
     }
 }
 
-input[type=text],
-input[type=email],
-input[type=number],
-input[type=password],
-input[type=search],
-input[type=time],
-input[type=url] {
-    @extend %text-input;
-    height: 1.6em;
-    -webkit-appearance: textfield;
-}
+@include apply-to-text-inputs('%text-input');
 
 input[type=file] {
     &.hasError {
@@ -103,12 +99,12 @@ input[type=time] {
 }
 
 textarea {
-    @extend %text-input;
+    @extend %text-input-base;
     resize: vertical;
 }
 
 select {
-    @extend %text-input;
+    @extend %text-input-base;
     background: white;
 
     &:-moz-focusring {
@@ -248,7 +244,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 .timedelta-widget {
     input[type=number] {
         display: inline;
-        width: 6em;
+        width: 6em !important;
     }
 
     select {
@@ -259,11 +255,11 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 .datetime-widget {
     .datepicker {
-        width: 40%;
+        width: 40% !important;
     }
 
     .timepicker {
-        width: 30%;
+        width: 30% !important;
     }
 
     .timezone {

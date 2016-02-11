@@ -176,20 +176,24 @@
 .i-form .form-group .form-field {
     @extend %form-field-block;
 
-    > textarea,
+    @include apply-to-text-inputs('.i-form-field-fixed-width');
     > select,
-    > input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
+    > textarea {
         @extend .i-form-field-fixed-width;
     }
 
-    select,
-    input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
+    @include apply-to-text-inputs('%form-field-input');
+    textarea {
         @extend %form-field-input;
+        height: auto;
+    }
+    select {
+        @extend %form-field-input;
+        padding-left: 0.7em;
     }
 
     input[type=number],
     input[type=time] {
-        @extend %form-field-input;
         padding-right: 0 !important;
 
         &::-webkit-inner-spin-button {
@@ -199,18 +203,10 @@
         }
     }
 
-    textarea {
-        @extend %form-field-input;
-        height: auto;
-    }
-
     button,
+    input[type="button"],
     input[type="submit"] {
         @extend %form-field-button;
-    }
-
-    select {
-        padding-left: 0.7em;
     }
 
     .i-has-action.i-synced-input.i-form-field-fixed-width {
