@@ -70,9 +70,8 @@ class RHImageUpload(RHManageImagesBase):
             if image_type not in {'jpeg', 'gif', 'png'}:
                 continue
             content_type = 'image/' + image_type
-            image = ImageFile(event_id=self._conf.id, filename=filename, content_type=content_type)
+            image = ImageFile(event_new=self.event_new, filename=filename, content_type=content_type)
             image.save(data)
-            db.session.add(image)
             db.session.flush()
             logger.info('Image %s uploaded by %s', image, session.user)
             signals.event_management.image_created.send(image, user=session.user)
