@@ -142,7 +142,7 @@ class IndicoLocationField(JSONField):
         }
         if self.data.get('room'):
             result['room_id'] = self.data['room'].id
-            result['room_name'] = self.data['room'].name
+            result['room_name'] = self.data['room'].full_name
             result['venue_id'] = self.data['room'].location.id
             result['venue_name'] = self.data['room'].location.name
         elif self.data.get('room_name'):
