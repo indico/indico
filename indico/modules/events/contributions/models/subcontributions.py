@@ -131,6 +131,14 @@ class SubContribution(db.Model):
         """Convenience property so all event entities have it"""
         return self.contribution.timetable_entry
 
+    @property
+    def speakers(self):
+        return self.person_links
+
+    @speakers.setter
+    def speakers(self, value):
+        self.person_links = value.keys()
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title)
