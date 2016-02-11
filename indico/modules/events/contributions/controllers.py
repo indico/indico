@@ -199,7 +199,7 @@ class RHContributionProtection(RHManageContributionBase):
     def _process(self):
         form = ContributionProtectionForm(obj=FormDefaults(**self._get_defaults()), contrib=self.contrib)
         if form.validate_on_submit():
-            self.contrib.protection_mode = form.protection_mode.data
+            update_contribution(self.contrib, {'protection_mode': form.protection_mode.data})
             update_object_principals(self.contrib, form.managers.data, full_access=True)
             if self.contrib.is_protected:
                 update_object_principals(self.contrib, form.acl.data, read_access=True)
