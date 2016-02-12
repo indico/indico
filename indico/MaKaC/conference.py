@@ -1876,13 +1876,6 @@ class Conference(CommonObjectBase, Locatable):
         return EventNote.get_for_linked_object(self.as_event)
 
     @property
-    @memoize_request
-    def scheduled_notes(self):
-        # XXX: remove this when rewriting ManageButton.tpl
-        from indico.modules.events.notes.util import get_scheduled_notes
-        return get_scheduled_notes(self.as_event)
-
-    @property
     def tz(self):
         from MaKaC.common.timezoneUtils import DisplayTZ
         return DisplayTZ(conf=self).getDisplayTZ()
