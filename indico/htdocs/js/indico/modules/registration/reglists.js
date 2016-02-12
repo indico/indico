@@ -71,7 +71,7 @@
             e.preventDefault();
             var $this = $(this);
             ajaxDialog({
-                dialogClasses: 'management-list-filter-dialog',
+                dialogClasses: 'report-filter-dialog',
                 trigger: this,
                 url: $this.data('href'),
                 title: $this.data('title'),
