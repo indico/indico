@@ -16,7 +16,7 @@
  */
 
 
-.management-list {
+.report {
     thead {
         font-weight: bold;
 
@@ -51,7 +51,7 @@
     }
 }
 
-.management-list-filter-dialog {
+.report-filter-dialog {
     max-width: 1200px;
 }
 
@@ -64,7 +64,7 @@
     color: $red !important;
 }
 
-.management-list-filter {
+.report-filter {
     padding-bottom: 14em;
     position: relative;
 
@@ -81,7 +81,7 @@
             vertical-align: middle;
         }
 
-        &.management-list-column {
+        &.report-column {
             width: 12em;
 
             > .title {
