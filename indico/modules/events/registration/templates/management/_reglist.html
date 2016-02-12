@@ -4,17 +4,17 @@
     {% if registrations %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <div class="registrations-table-wrapper">
-                {% set filtered_registrations = registrations | length %}
-                {% if filtered_registrations !=  total_registrations %}
-                    <div class="info-message-box">
-                        <div class="message-text">
-                            {%- trans -%}
-                                Filtering is enabled. Displaying {{ filtered_registrations }} out of {{ total_registrations }} registrants.
-                            {%- endtrans -%}
-                        </div>
+            {% set filtered_registrations = registrations | length %}
+            {% if filtered_registrations !=  total_registrations %}
+                <div class="info-message-box">
+                    <div class="message-text">
+                        {%- trans -%}
+                            Filtering is enabled. Displaying {{ filtered_registrations }} out of {{ total_registrations }} registrants.
+                        {%- endtrans -%}
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
+            <div class="registrations-table-wrapper">
                 <table class="i-table tablesorter">
                     <thead>
                         <tr class="i-table">
