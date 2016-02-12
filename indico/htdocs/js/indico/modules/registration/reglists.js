@@ -94,8 +94,9 @@
             $('table.i-table input.select-row').prop('checked', false).trigger('change');
         });
 
-        $('#change-columns-width').on('click', function() {
-            $('.registrations-table-wrapper').toggleClass('scrollable')
+        $('.change-columns-width').on('click', function() {
+            $('.registrations-table-wrapper').toggleClass('scrollable');
+            $('.change-columns-width').toggleClass('active');
         });
 
         $('.js-dialog-send-email').ajaxDialog({
