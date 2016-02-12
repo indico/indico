@@ -22,7 +22,6 @@ from collections import OrderedDict
 from copy import deepcopy
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from uuid import uuid4
 from zipfile import ZipFile
 
 from flask import session, request, redirect, jsonify, flash, render_template
@@ -35,6 +34,7 @@ from indico.core import signals
 from indico.core.errors import FormValuesError
 from indico.core.notifications import make_email, send_email
 from indico.modules.attachments.controllers.event_package import adjust_path_length
+from indico.modules.events.models.report_links import ReportLink
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
@@ -65,6 +65,8 @@ from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
+
+REPORT_LINK_TYPE = 'registration_list'
 
 PERSONAL_COLUMNS = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address', 'phone',
                     'country')
@@ -102,9 +104,6 @@ DEFAULT_REPORT_CONFIG = {
     'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
     'filters': {'fields': {}, 'items': {}}
 }
-
-
-cache = GenericCache('reglist-config')
 
 
 def _get_filters_from_request(regform):
@@ -227,7 +226,7 @@ def _get_reg_list_config(regform):
     session_key = 'reglist_config_{}'.format(regform.id)
     report_config_uuid = request.args.get('config')
     if report_config_uuid:
-        configuration = cache.get(report_config_uuid)
+        configuration = ReportLink.load(regform.event_new, REPORT_LINK_TYPE, report_config_uuid)
         if configuration and configuration['regform_id'] == regform.id:
             session[session_key] = configuration['data']
     return session.get(session_key, DEFAULT_REPORT_CONFIG)
@@ -334,7 +333,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
         reglist_config = session.setdefault(session_key, {})
         reglist_config['filters'] = filters
-        reglist_config['items'] = visible_regform_items
+        reglist_config['items'] = sorted(visible_regform_items)
 
         session.modified = True
         registrations_query = _query_registrations(self.regform)
@@ -356,9 +355,8 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
         }
         url = url_for('.manage_reglist', self.regform, _external=True)
         if configuration['data']:
-            uuid = unicode(uuid4())
-            url = url_for('.manage_reglist', self.regform, config=uuid, _external=True)
-            cache.set(uuid, configuration)
+            link = ReportLink.create(self.event_new, REPORT_LINK_TYPE, configuration)
+            url = url_for('.manage_reglist', self.regform, config=link.uuid, _external=True)
         return jsonify(url=url)
 
 
