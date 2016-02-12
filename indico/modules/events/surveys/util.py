@@ -25,6 +25,7 @@ from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
+from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm
 
@@ -73,7 +74,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     :param submission_ids: The list of submissions to include in the file
     """
     field_names = ['Submitter', 'Submission Date']
-    field_names += ['{}_{}'.format(question.title, question.id) for question in survey.questions]
+    field_names += [unique_col(question.title, question.id) for question in survey.questions]
 
     submissions = _filter_submissions(survey, submission_ids)
     rows = []
@@ -84,7 +85,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
         }
 
         for answer in submission.answers:
-            key = '{}_{}'.format(answer.question.title, answer.question.id)
+            key = unique_col(answer.question.title, answer.question.id)
             submission_dict[key] = answer.answer_data
         rows.append(submission_dict)
     return field_names, rows

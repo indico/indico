@@ -26,6 +26,23 @@ from xlsxwriter import Workbook
 from indico.web.flask.util import send_file
 
 
+def unique_col(name, id_):
+    """Ensure uniqueness of a header/data entry.
+
+    Simply apply this to both the entry in `headers` and the
+    dict keys in `rows` before passing them to one of the spreadsheet
+    functions.
+
+    :param name: The actual column name/title
+    :param id_: The id or whatever is needed to ensure uniqueness
+    """
+    return name, id_
+
+
+def _prepare_header(header):
+    return header[0] if isinstance(header, tuple) else header
+
+
 def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+')):
     if isinstance(data, (list, tuple)):
         data = ', '.join(data)
@@ -50,10 +67,12 @@ def generate_csv(headers, rows):
     :return: an `io.BytesIO` containing the CSV data
     """
     buf = BytesIO()
-    writer = csv.DictWriter(buf, fieldnames=headers)
-    writer.writeheader()
+    writer = csv.writer(buf)
+    writer.writerow(map(_prepare_header, headers))
+    header_positions = {name: i for i, name in enumerate(headers)}
     for row in rows:
-        writer.writerow({k: _prepare_csv_data(v) for k, v in row.iteritems()})
+        row = sorted(row.items(), key=lambda x: header_positions[x[0]])
+        writer.writerow([_prepare_csv_data(v) for k, v in row])
     buf.seek(0)
     return buf
 
@@ -84,7 +103,7 @@ def generate_xlsx(headers, rows):
     with Workbook(buf, workbook_options) as workbook:
         bold = workbook.add_format({'bold': True})
         sheet = workbook.add_worksheet()
-        for col, name in enumerate(headers):
+        for col, name in enumerate(map(_prepare_header, headers)):
             sheet.write(0, col, name, bold)
         for row, values in enumerate(rows, 1):
             sheet.write_row(row, 0, map(_prepare_excel_data, values))

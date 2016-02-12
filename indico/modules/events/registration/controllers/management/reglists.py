@@ -49,7 +49,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     create_registration, generate_spreadsheet_from_registrations)
+                                                     create_registration, generate_spreadsheet_from_registrations,
+                                                     get_title_uuid)
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.users import User
@@ -492,11 +493,13 @@ class RHRegistrationCreate(RHManageRegFormBase):
         elif user_id.isdigit():
             # existing indico user
             user = User.find_first(id=user_id, is_deleted=False)
-            return {t.name: getattr(user, t.name, None) if user else '' for t in PersonalDataType}
+            user_data = {t.name: getattr(user, t.name, None) if user else '' for t in PersonalDataType}
         else:
             # non-indico user
             data = GenericCache('pending_identities').get(user_id, {})
-            return {t.name: data.get(t.name) for t in PersonalDataType}
+            user_data = {t.name: data.get(t.name) for t in PersonalDataType}
+        user_data['title'] = get_title_uuid(self.regform, user_data['title'])
+        return user_data
 
     def _process(self):
         form = make_registration_form(self.regform, management=True)()

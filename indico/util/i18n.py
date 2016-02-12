@@ -96,10 +96,9 @@ def smart_func(func_name, plugin_name=None):
         Returns either a translated string or a lazy-translatable object,
         depending on whether there is a session language or not (respectively)
         """
-        if (has_request_context() and session.lang) or func_name != 'ugettext':
+        if has_request_context() or func_name != 'ugettext':
             # straight translation
             return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
-
         else:
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
@@ -193,17 +192,18 @@ IndicoTranslations().install(unicode=True)
 
 
 @babel.localeselector
-def set_best_lang():
+def set_best_lang(check_session=True):
     """
     Get the best language/locale for the current user. This means that first
     the session will be checked, and then in the absence of an explicitly-set
     language, we will try to guess it from the browser settings and only
     after that fall back to the server's default.
     """
-
     if not has_request_context():
         return 'en_GB' if current_app.config['TESTING'] else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
-    elif session.lang is not None:
+    elif 'lang' in g:
+        return g.lang
+    elif check_session and session.lang is not None:
         return session.lang
 
     # try to use browser language
