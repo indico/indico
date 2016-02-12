@@ -20,7 +20,6 @@ import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
-from MaKaC.conference import EventCloner as LegacyEventCloner
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface import meeting
@@ -109,10 +108,8 @@ class WPSEConfClone(conferences.WPConfClone):
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
-            "cloneOptions": ''
+            "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         }
-        pars['cloneOptions'] += LegacyEventCloner.get_plugin_items(self._conf)
-        pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)
 
 
