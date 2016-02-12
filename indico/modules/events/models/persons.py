@@ -131,6 +131,9 @@ class EventPerson(db.Model):
         """Returns the person's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
 
+    # Convenience property to have a common `name` property
+    name = full_name
+
     def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False):
         """Returns the person's name in the specified notation.
 
@@ -220,6 +223,9 @@ class PersonLinkBase(db.Model):
     @property
     def full_name(self):
         return self.person.full_name if self.person else None
+
+    # Convenience property to have a common `name` property
+    name = full_name
 
 
 class EventPersonLink(PersonLinkBase):
