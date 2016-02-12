@@ -24,7 +24,8 @@
             effect_off: 'fadeOut',
             time_on: 200,
             time_off: 200,
-            positioning: {}
+            positioning: {},
+            relative_to: undefined
         },
 
         _close: function(elem, effect) {
@@ -50,13 +51,14 @@
         _open: function(elem) {
             var self = this;
             var sibl = elem.next('ul.dropdown');
+            var positionReference = this.options.relative_to || elem;
 
             elem.addClass('open');
 
             this._effect('on', sibl);
             elem.data('on', true);
             elem.parent().addClass('selected');
-            sibl.position($.extend({of: elem}, this.options.positioning[sibl.data('level')] ||
+            sibl.position($.extend({of: positionReference}, this.options.positioning[sibl.data('level')] ||
                                    {my: 'left top', at: 'left bottom', offset: '0px 0px'}));
             this.element.find('a').each(function() {
                 if (this != elem.get(0)) {

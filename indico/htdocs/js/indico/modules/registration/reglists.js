@@ -194,7 +194,8 @@
 
 
     function colorizeFilter(filter) {
-        filter.toggleClass('active', filter.find(':checked').length > 0);
+        var dropdown = filter.next('.dropdown');
+        filter.toggleClass('active', dropdown.find(':checked').length > 0);
     }
 
     function colorizeActiveFilters() {
@@ -204,7 +205,10 @@
     }
 
     global.setupRegistrationListFilter = function setupRegistrationListFilter() {
-        $('.reglist-filter').dropdown({selector: '.reglist-column .title'});
+        $('.reglist-filter .filter').each(function() {
+            var filter = $(this).parent();
+            filter.dropdown({selector: '.filter', relative_to: filter.parent()});
+        });
         colorizeActiveFilters();
         $('.report-filter-dialog .toolbar').dropdown();
 
@@ -212,11 +216,15 @@
         var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
 
         $('.reglist-column')
-        .on('click', '.trigger', function() {
+        .on('click', function(evt) {
+            if ($(evt.target).hasClass('filter')) {
+                return;
+            }
             var $this = $(this);
             var field = $this.closest('.reglist-column');
             var fieldId = field.data('id');
-            var enabled = $this.hasClass('enabled');
+            var visibilityIcon = field.find('.trigger');
+            var enabled = visibilityIcon.hasClass('enabled');
 
             if (enabled) {
                 regItemsData.splice(regItemsData.indexOf(fieldId), 1);
@@ -224,7 +232,7 @@
                 regItemsData.push(fieldId);
             }
 
-            $this.toggleClass('enabled', !enabled);
+            visibilityIcon.toggleClass('enabled', !enabled);
             field.toggleClass('striped', enabled);
             visibleColumnsRegItemsField.val(JSON.stringify(regItemsData)).trigger('change');
         })
@@ -237,6 +245,10 @@
             } else {
                 field.addClass('striped');
             }
+        });
+
+        $('.reglist-column .dropdown').on('click', function(evt) {
+            evt.stopPropagation();
         });
 
         $('.js-reset-btn').on('click', function() {
@@ -252,7 +264,7 @@
         });
 
         $('.reglist-filter input:checkbox').on('change', function() {
-            colorizeFilter($(this).closest('.filter'));
+            colorizeFilter($(this).closest('.dropdown').siblings('.filter'));
         });
 
         $('#report-filter-select-all').on('click', function() {
