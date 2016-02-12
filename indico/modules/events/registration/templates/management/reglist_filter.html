@@ -2,30 +2,31 @@
 
 {% macro _render_column_selector(item, filter_choices, special_item=false) %}
     {% set filters = filters['items'] if special_item else filters['fields'] %}
-    <div class="i-label report-column reglist-column js-regform-item {%- if filter_choices %} filter{% endif %}"
+    <div class="i-label report-column reglist-column js-regform-item"
          data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
-        <a class="title {% if filter_choices %}icon-filter{% endif %}" data-toggle="dropdown">
-            {{- item.title -}}
-        </a>
         {% if filter_choices %}
-            <ul class="dropdown" style="display: none">
-                {% for value, caption in filter_choices.iteritems() %}
-                    <li>
-                        <input type="checkbox" name="field_{{ item.id }}" value="{{ value }}"
-                               id="field_{{ item.id }}_option_{{ value }}"
-                               {% if value in filters[item.id] %}
-                                   checked
-                               {% endif %}>
-                        <label for="field_{{ item.id }}_option_{{ value }}">
-                            {{ caption }}
-                        </label>
-                    </li>
-                {% endfor %}
-            </ul>
+            <div class="actions">
+                <a class="filter icon-filter" data-toggle="dropdown"></a>
+                <ul class="dropdown" style="display: none">
+                    {% for value, caption in filter_choices.iteritems() %}
+                        <li>
+                            <input type="checkbox" name="field_{{ item.id }}" value="{{ value }}"
+                                   id="field_{{ item.id }}_option_{{ value }}"
+                                   {% if value in filters[item.id] %}
+                                       checked
+                                   {% endif %}>
+                            <label for="field_{{ item.id }}_option_{{ value }}">
+                                {{ caption }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endif %}
-        <span class="right actions">
+        <div class="title">{{ item.title }}</div>
+        <div class="actions">
             <span class="trigger icon-eye"></span>
-        </span>
+        </div>
     </div>
 {% endmacro %}
 

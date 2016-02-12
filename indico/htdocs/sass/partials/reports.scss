@@ -98,81 +98,65 @@
 
     > .i-label {
         margin: 5px;
-        padding-bottom: 0;
-        padding-left: 0;
         text-align: left;
         font-weight: bold;
-
-        > * {
-            line-height: 1.2em;
-            height: 1.2em;
-            vertical-align: middle;
-        }
+        min-height: 2em;
 
         &.report-column {
             width: 12em;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
 
             > .title {
-                max-width: 90%;
-                min-width: 90%;
-                height: 100%;
-                padding-bottom: 4px;
-                padding-left: 10px;
-                box-sizing: border-box;
+                flex-grow: 1;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                display: inline-block;
                 overflow: hidden;
                 color: $light-black;
+                margin-left: 4px;
 
                 &:before {
                     margin-right: 0.5em;
                 }
             }
 
-            &:hover {
-                .title:before {
-                    color: $yellow;
-                }
-            }
-
             > .actions {
-                max-width: 10%;
-                visibility: hidden;
+                flex-shrink: 0;
 
-                .trigger {
-                    cursor: pointer;
-                }
-
-                > span.enabled {
-                    @extend %enabled-action;
-                    &:hover {
-                        @extend %not-enabled-action;
-                    }
-                }
-                > span:not(.enabled) {
-                    @extend %not-enabled-action;
-                    &:hover {
+                > .icon-eye {
+                    &.enabled {
                         @extend %enabled-action;
+                        display: none;
+                        &:hover {
+                            @extend %not-enabled-action;
+                        }
                     }
+                    &:not(.enabled) {
+                        @extend %not-enabled-action;
+                        &:hover {
+                            @extend %enabled-action;
+                        }
+                    }
+
                 }
             }
 
-            &:hover > .actions {
-                visibility: visible;
-                > .not-default {
-                    display: inline !important;
-                }
+            &:hover > .actions > .icon-eye {
+                display: inline;
             }
 
-            &.filter {
+            .filter {
                 cursor: pointer;
+                color: $light-black;
             }
-        }
 
-        &.active {
-            .title:before {
+            .filter.active:before {
                 color: $indico-blue;
+            }
+
+            .filter:hover:before {
+                color: $yellow !important;
             }
         }
     }
