@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from wtforms.validators import StopValidation, ValidationError, EqualTo
 
-from indico.util.date_time import as_utc, format_datetime, now_utc
+from indico.util.date_time import as_utc, format_datetime, now_utc, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 
@@ -209,3 +211,16 @@ class UsedIfChecked(UsedIf):
             return form._fields.get(field_name).data
 
         super(UsedIfChecked, self).__init__(_condition)
+
+
+class MaxDuration(object):
+    """Validates if TimeDeltaField value doesn't exceed `max_duration`"""
+
+    def __init__(self, max_duration=None, **kwargs):
+        assert max_duration or kwargs
+        assert max_duration is None or not kwargs
+        self.max_duration = max_duration if max_duration is not None else timedelta(**kwargs)
+
+    def __call__(self, form, field):
+        if field.data is not None and field.data > self.max_duration:
+            raise ValidationError(_('Duration may not exceed {}').format(format_human_timedelta(self.max_duration)))
