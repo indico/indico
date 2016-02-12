@@ -130,6 +130,9 @@ class SessionBlock(LocationMixin, db.Model):
     def can_access(self, user, allow_admin=True):
         return self.session.can_access(user, allow_admin=allow_admin)
 
+    def can_manage_attachments(self, user):
+        return self.session.can_manage_attachments(user)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title or None)

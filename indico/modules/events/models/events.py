@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
+from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.util.caching import memoize_request
@@ -406,6 +407,9 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
+
+    def can_manage_attachments(self, user):
+        return can_manage_attachments(self, user)
 
     @memoize_request
     def has_feature(self, feature):
