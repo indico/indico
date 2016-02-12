@@ -103,6 +103,13 @@ class Location(db.Model):
         lazy='dynamic'
     )
 
+    # relationship backrefs:
+    # - breaks (Break.own_venue)
+    # - contributions (Contribution.own_venue)
+    # - events (Event.own_venue)
+    # - session_blocks (SessionBlock.own_venue)
+    # - sessions (Session.own_venue)
+
     @return_ascii
     def __repr__(self):
         return u'<Location({0}, {1}, {2})>'.format(
