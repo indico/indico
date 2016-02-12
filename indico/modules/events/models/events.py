@@ -413,6 +413,12 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
         from indico.modules.events.features.util import is_feature_enabled
         return is_feature_enabled(self, feature)
 
+    @property
+    @memoize_request
+    def scheduled_notes(self):
+        from indico.modules.events.notes.util import get_scheduled_notes
+        return get_scheduled_notes(self)
+
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
         """Creates a new log entry for the event
 
