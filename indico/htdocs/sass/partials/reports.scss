@@ -77,6 +77,13 @@
             table-layout: auto;
         }
     }
+
+    .change-columns-width:not(.active) {
+        @include icon-before('icon-enlarge');
+    }
+    .change-columns-width.active {
+        @include icon-before('icon-shrink');
+    }
 }
 
 .report-filter-dialog {
