@@ -217,6 +217,10 @@ class PersonLinkBase(db.Model):
             )
         )
 
+    @property
+    def full_name(self):
+        return self.person.full_name if self.person else None
+
 
 class EventPersonLink(PersonLinkBase):
     """Association between EventPerson and Event.

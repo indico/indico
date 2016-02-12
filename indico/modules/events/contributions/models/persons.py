@@ -57,10 +57,6 @@ class ContributionPersonLink(PersonLinkBase):
     # - contribution (Contribution.person_links)
 
     @property
-    def full_name(self):
-        return self.person.full_name if self.person else None
-
-    @property
     def is_submitter(self):
         return self.person.has_role('submit', self.contribution)
 
