@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
-from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.core.db.sqlalchemy.util.models import auto_table_args, override_attr
 from indico.modules.users.models.users import UserTitle, PersonMixin
 from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii, format_repr
@@ -167,6 +167,54 @@ class PersonLinkBase(PersonMixin, db.Model):
         )
 
     @declared_attr
+    def _first_name(cls):
+        return db.Column(
+            'first_name',
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def _last_name(cls):
+        return db.Column(
+            'last_name',
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def _title(cls):
+        return db.Column(
+            'title',
+            PyIntEnum(UserTitle),
+            nullable=True
+        )
+
+    @declared_attr
+    def _affiliation(cls):
+        return db.Column(
+            'affiliation',
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
+    def _address(cls):
+        return db.Column(
+            'address',
+            db.Text,
+            nullable=True
+        )
+
+    @declared_attr
+    def _phone(cls):
+        return db.Column(
+            'phone',
+            db.String,
+            nullable=True
+        )
+
+    @declared_attr
     def person(cls):
         return db.relationship(
             'EventPerson',
@@ -178,6 +226,18 @@ class PersonLinkBase(PersonMixin, db.Model):
                 lazy='dynamic'
             )
         )
+
+    first_name = override_attr('first_name', 'person')
+    last_name = override_attr('last_name', 'person')
+    title = override_attr('title', 'person', fget=lambda self, __: self._get_title())
+    affiliation = override_attr('affiliation', 'person')
+    address = override_attr('address', 'person')
+    phone = override_attr('phone', 'person')
+
+    def __init__(self, *args, **kwargs):
+        # Needed in order to ensure `person` is set before the overridable attrs
+        self.person = kwargs.pop('person', None)
+        super(PersonLinkBase, self).__init__(*args, **kwargs)
 
 
 class EventPersonLink(PersonLinkBase):
