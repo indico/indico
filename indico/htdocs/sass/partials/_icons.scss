@@ -154,6 +154,9 @@ i[class^="icon-"]:before {
 .icon-edit:before {
     content: "\2e";
 }
+.icon-enlarge:before {
+    content: "\eb48";
+}
 .icon-enter:before {
     content: "\e37b";
 }
@@ -366,6 +369,9 @@ i[class^="icon-"]:before {
 }
 .icon-shield:before {
     content: "\2b";
+}
+.icon-shrink:before {
+    content: "\eb49";
 }
 .icon-sort:before {
     content: "\e00e";
