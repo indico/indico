@@ -267,6 +267,14 @@
             colorizeFilter($(this).closest('.dropdown').siblings('.filter'));
         });
 
+        $('.reglist-filter .title').on('mouseover', function() {
+            var title = $(this);
+            // Show a qtip if the text is ellipsized
+            if (this.offsetWidth < this.scrollWidth) {
+                title.qtip({hide: 'mouseout', content: title.text(), overwrite: false}).qtip('show');
+            }
+        });
+
         $('#report-filter-select-all').on('click', function() {
             $('.report-filter-dialog .trigger:not(.enabled)').trigger('click');
         });
