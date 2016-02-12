@@ -35,7 +35,7 @@
                 width: 60%;
 
                 input[type='text'] {
-                    width: 100%;
+                    width: 100% !important;
                 }
             }
 
@@ -102,7 +102,7 @@
         }
 
         input.i-location-input-field {
-            width: 11.5em;
+            width: 11.5em !important;
             background-color: inherit;
             padding-right: 2em !important;
             position: relative;
@@ -143,7 +143,6 @@
         }
 
         > textarea {
-            @extend %form-field;
             width: 100%;
             margin-top: 0.4em;
 
