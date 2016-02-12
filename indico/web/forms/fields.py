@@ -283,7 +283,7 @@ class PrincipalListField(HiddenField):
             principals = retrieve_principals(self._get_data(), legacy=False)
         else:
             principals = self._get_data()
-        principals.sort(key=lambda x: x.full_name.lower())
+        principals.sort(key=lambda x: x.name.lower())
         return map(self._serialize_principal, principals)
 
     def _get_data(self):
