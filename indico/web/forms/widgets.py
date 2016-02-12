@@ -213,8 +213,11 @@ class LocationWidget(JinjaWidget):
         else:
             rooms = {'data': []}
             venues = {'data': []}
-        parent = self._get_parent_info(field.data['source']) if field.data and field.data.get('source', None) else None
-        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent)
+        parent = (self._get_parent_info(field.object_data['source'])
+                  if field.object_data and field.object_data.get('source')
+                  else None)
+        return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent,
+                                                    source=field.object_data.get('source'))
 
     def _get_parent_info(self, parent):
         if isinstance(parent, db.m.Contribution):
