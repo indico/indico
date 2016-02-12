@@ -23,7 +23,6 @@ import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.navigation as navigation
-from MaKaC.conference import EventCloner as LegacyEventCloner
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
@@ -477,7 +476,6 @@ class WPMConfClone(conferences.WPConfClone):
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                """)
         }
-        pars['cloneOptions'] += LegacyEventCloner.get_plugin_items(self._conf)
         pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
         return p.getHTML(pars)
 
