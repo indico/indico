@@ -311,9 +311,8 @@ class EventPersonListField(PrincipalListField):
         return map(self._get_event_person, data)
 
     def _create_event_person(self, data):
-        user = User.find_first(~User.is_deleted, User.all_emails.contains(data['email'].lower()))
         title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-        return EventPerson(event_new=self.event, user=user, email=data['email'], _title=title,
+        return EventPerson(event_new=self.event, email=data['email'], _title=title,
                            first_name=data['firstName'], last_name=data['familyName'],
                            affiliation=data.get('affiliation'), address=data.get('address'),
                            phone=data.get('phone'))
@@ -321,7 +320,8 @@ class EventPersonListField(PrincipalListField):
     def _get_event_person(self, data):
         person_type = data.get('_type')
         if person_type is None:
-            return self._create_event_person(data)
+            user = User.find_first(~User.is_deleted, User.all_emails.contains(data['email'].lower()))
+            return EventPerson.for_user(user, self.event) if user else self._create_event_person(data)
         elif person_type == 'Avatar':
             user = self._convert_principal(data)
             return EventPerson.for_user(user, self.event)
