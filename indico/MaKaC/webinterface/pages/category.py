@@ -31,7 +31,6 @@ from MaKaC.conference import CategoryManager
 from indico.core.config import Config
 from indico.core.db import db
 import MaKaC.webinterface.wcalendar as wcalendar
-import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
@@ -62,10 +61,9 @@ def format_location(obj):
         return ''
 
     room_name = obj.room_name
-    if room_name:
-        url = linking.RoomLinker().getURL(room_name, obj.venue_name)
-        if url:
-            room_name = u'<a href="{}">{}</a>'.format(url, room_name)
+    if obj.room:
+        if obj.room.map_url:
+            room_name = u'<a href="{}">{}</a>'.format(obj.room.map_url, room_name)
 
     if not obj.venue_name and not room_name:
         label = u''

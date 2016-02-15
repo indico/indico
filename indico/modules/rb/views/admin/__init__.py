@@ -54,11 +54,6 @@ class WPRoomsBase(WPAdminsBase):
             _('Management'),
             urlHandlers.UHRoomBookingAdmin.getURL()
         )
-        self._subTabRoomMappers = self._tabCtrl.newTab(
-            'mappers',
-            _('Room Mappers'),
-            urlHandlers.UHRoomMappers.getURL()
-        )
 
     def _getNavigationDrawer(self):
         if self._rh._getUser().isAdmin():

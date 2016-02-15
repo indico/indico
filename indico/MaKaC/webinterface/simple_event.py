@@ -16,7 +16,6 @@
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
@@ -208,15 +207,6 @@ class WSimpleEventBaseDisplay(wcomponents.WTemplated):
                                 fsdate, fstime, fedate, fetime, tz)
         vars["title"] = self._conf.getTitle()
         vars["description"] =  self.__getHTMLRow(  _("Description"), self._conf.getDescription(), 0 )
-        vars["location"] = ""
-        location = self._conf.getLocation()
-        if location:
-            vars["location"] = self.__getHTMLRow(  _("Location"), "%s<br><small>%s</small>"%(location.getName(), location.getAddress()) )
-        vars["room"] = ""
-        room = self._conf.getRoom()
-        if room:
-            roomLink = linking.RoomLinker().getHTMLLink( room, location )
-            vars["room"] = self.__getHTMLRow( _("Room"), roomLink )
         vars["moreInfo"] = self.__getHTMLRow(  _("Additional Info"), self._conf.getContactInfo(), 0 )
         al = []
         if self._conf.getChairmanText() != "":
