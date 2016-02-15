@@ -18,7 +18,6 @@ import MaKaC.conference as conference
 import MaKaC.errors as errors
 import MaKaC.domain as domain
 from MaKaC.paperReviewing import reviewing_factory_get
-import MaKaC.roomMapping as roomMapping
 from MaKaC.i18n import _
 
 
@@ -63,17 +62,6 @@ class DomainWebLocator:
     def getObject( self ):
         return self._dom
 
-class RoomMapperWebLocator:
-
-    def __init__( self, params ):
-        rmId = params.get("roomMapperId", "")
-        if rmId == "":
-            raise errors.MaKaCError( _("room mapper id not set"))
-        rmh = roomMapping.RoomMapperHolder()
-        self._rm = rmh.getById( rmId )
-
-    def getObject( self ):
-        return self._rm
 
 class WebLocator:
 

@@ -47,7 +47,6 @@ methodMap = {
     'roomBooking.rooms.availabilitySearch': rb_room_services.RoomBookingAvailabilitySearchRooms,
     'roomBooking.rooms.fullNameList': rb_room_services.RoomBookingFullNameListRooms,
     'roomBooking.locationsAndRooms.listWithGuids': rb_room_services.RoomBookingListLocationsAndRoomsWithGuids,
-    'roomBooking.locationsAndRooms.getLink': rb_room_services.RoomBookingLocationsAndRoomsGetLink,
     'roomBooking.room.bookingPermission': rb_room_services.BookingPermission,
     # rb aspects
     'roomBooking.mapaspects.create': rb_aspect_services.RoomBookingMapCreateAspect,
