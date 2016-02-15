@@ -16,21 +16,29 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.contributions.controllers import (RHContributions, RHCreateContribution,
-                                                             RHEditContribution, RHContributionREST,
-                                                             RHDeleteContributions, RHContributionPersonList,
-                                                             RHContributionProtection, RHContributionsReportCustomize,
-                                                             RHContributionsReportStaticURL,
-                                                             RHContributionSubContributions, RHCreateSubContribution,
-                                                             RHEditSubContribution, RHSubContributionREST,
-                                                             RHDeleteSubContributions, RHContributionUpdateStartDate,
-                                                             RHContributionUpdateDuration,
-                                                             RHContributionsMaterialPackage, RHContributionsExportCSV,
-                                                             RHContributionsExportExcel, RHContributionsExportPDF,
-                                                             RHContributionsExportPDFBook,
-                                                             RHContributionsExportPDFBookSorted,
-                                                             RHManageContributionTypes, RHEditContributionType,
-                                                             RHCreateContributionType, RHDeleteContributionType)
+
+from indico.modules.events.contributions.controllers.management import (RHContributions, RHCreateContribution,
+                                                                        RHEditContribution, RHContributionREST,
+                                                                        RHDeleteContributions, RHContributionPersonList,
+                                                                        RHContributionProtection,
+                                                                        RHContributionsReportCustomize,
+                                                                        RHContributionsReportStaticURL,
+                                                                        RHContributionSubContributions,
+                                                                        RHCreateSubContribution,
+                                                                        RHEditSubContribution, RHSubContributionREST,
+                                                                        RHDeleteSubContributions,
+                                                                        RHContributionUpdateStartDate,
+                                                                        RHContributionUpdateDuration,
+                                                                        RHContributionsMaterialPackage,
+                                                                        RHContributionsExportCSV,
+                                                                        RHContributionsExportExcel,
+                                                                        RHContributionsExportPDF,
+                                                                        RHContributionsExportPDFBook,
+                                                                        RHContributionsExportPDFBookSorted,
+                                                                        RHManageContributionTypes,
+                                                                        RHEditContributionType,
+                                                                        RHCreateContributionType,
+                                                                        RHDeleteContributionType)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
