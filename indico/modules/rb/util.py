@@ -54,7 +54,7 @@ def get_default_booking_interval(duration=90, precision=15, force_today=False):
     minutes (15 by default).
 
     The end time corresponds to the start time plus the given duration in
-    minutes. If the booking is ends after the end of work time, it is
+    minutes. If the booking ends after the end of work time, it is
     automatically moved to the next day.
 
     :param duration: int -- The duration of a booking in minutes (must be
