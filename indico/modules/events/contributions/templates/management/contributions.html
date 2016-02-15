@@ -1,5 +1,6 @@
 {% extends 'layout/full_content_base.html' %}
-{% from 'events/contributions/management/_contribution_list.html' import render_contribution_list %}
+{% from 'events/contributions/management/_contribution_report.html' import render_contrib_report,
+                                                                           render_displayed_entries_fragment %}
 
 {% block title %}
     {% trans %}Contributions{% endtrans %}
@@ -60,22 +61,20 @@
             <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
         </div>
         <div class="right">
-            <div class="group">
-                <span id="filtering-state" class="i-button label icon-list">
-                    <strong>{{ contribs|length }}</strong> / {{ contribs|length }}
-                </span>
+            <div class="group" id="displayed-records-fragment">
+                {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
             </div>
             <div class="group">
                 <button id="filter-button"
-                        class="i-button icon-filter"
-                        data-title="{% trans %}Registration list configuration{% endtrans %}">
+                        class="i-button icon-filter js-dialog-action js-customize-report"
+                        data-href="{{ url_for('.customize_contrib_report', event) }}">
                     {% trans %}Filters{% endtrans %}
                 </button>
             </div>
         </div>
     </div>
-    <div id="contribution-list">
-        {{ render_contribution_list(event, contribs, sessions, tracks) }}
+    <div class="report" id="contribution-list">
+        {{ render_contrib_report(event, contribs, sessions, tracks) }}
     </div>
     <div id="filter-placeholder"></div>
     <script>

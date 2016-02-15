@@ -1,6 +1,13 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_contribution_list(event, contribs, sessions, tracks) %}
+{% macro render_displayed_entries_fragment(displayed_num, total_num) -%}
+    <span id="filtering-state" class="i-button label icon-list"
+          title="{% trans %}Displaying {{displayed_num}} out of {{total_num}} contributions{% endtrans %}">
+        <strong>{{ displayed_num }}</strong> / {{ total_num }}
+    </span>
+{%- endmacro %}
+
+{% macro render_contrib_report(event, contribs, sessions, tracks) %}
     {% if not contribs %}
         {%- call message_box('info') -%}
             {% trans %}There are no contributions yet.{% endtrans %}

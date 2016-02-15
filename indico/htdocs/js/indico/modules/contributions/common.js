@@ -193,6 +193,18 @@
         });
     }
 
+    function setupFilterDialog() {
+        $('#filter-button').ajaxDialog({
+            title: $T.gettext('Contribution list configuration'),
+            onClose: function(data) {
+                if (data) {
+                    $('#contribution-list').html(data.html);
+                    $('#displayed-records-fragment').html(data.displayed_records_fragment);
+                }
+            }
+        });
+    }
+
     global.setupContributionList = function setupContributionList(options) {
         options = $.extend({
             createSessionURL: null,
@@ -201,6 +213,7 @@
         }, options);
         setupTableSorter();
         setupSearchBox();
+        setupFilterDialog();
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');

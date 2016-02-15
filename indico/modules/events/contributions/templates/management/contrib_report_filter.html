@@ -1,0 +1,99 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+
+{% macro _render_column_selector(item_id, item) %}
+    {% set filters = filters['items'] %}
+    <div class="i-label report-column {%- if item.filter_choices %} filter{% endif %}"
+         data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
+        <a class="title {% if item.filter_choices %}icon-filter{% endif %}" data-toggle="dropdown">
+            {{- item.title -}}
+        </a>
+        {% if item.filter_choices %}
+            <ul class="dropdown" style="display: none">
+                {% for value, caption in item.filter_choices.iteritems() %}
+                    <li>
+                        <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
+                               id="field-{{ item_id }}-option-{{ value }}"
+                               {% if value in filters[item_id] %} checked {% endif %}>
+                        <label for="field-{{ item_id }}-option-{{ value }}">
+                            {{ caption }}
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+<div class="action-box">
+    <div class="section">
+        <div class="icon icon-wrench"></div>
+        <div class="toolbar right">
+            <a class="i-button js-reset-btn icon-close warning" type="button">
+                {%- trans %}Clear filters{% endtrans -%}
+            </a>
+        </div>
+        <div class="text">
+            <div class="label">Customize contribution list</div>
+            <div>
+                {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
+                {%- trans -%}
+                    Change the configuration of the contribution list by applying filtering ({{ filter_icon }}) options.
+                {%- endtrans -%}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="success-message-box js-clear-filters-message" style="display: none;">
+    <div class="message-text">
+        {%- trans -%}All filters have been cleared.{%- endtrans -%}
+    </div>
+</div>
+<form class="report-filter" method="POST">
+    <h3>{% trans %}Available filtering options{% endtrans %}</h3>
+
+    {% for item_id, item in filterable_items.iteritems() %}
+        {{ _render_column_selector(item_id, item) }}
+    {% endfor %}
+
+    <div class="bottom-buttons">
+        <input class="i-button big highlight" type="submit" data-disabled-until-change
+               value="{% trans %}Apply{% endtrans %}">
+        <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    </div>
+</form>
+<script>
+    (function(global) {
+        'use strict';
+
+        function colorizeFilter(filter) {
+            filter.toggleClass('active', filter.find(':checked').length > 0);
+        }
+
+        function colorizeActiveFilters() {
+            $('.report-filter .filter').each(function() {
+                colorizeFilter($(this));
+            });
+        }
+
+        function setupListFilter() {
+            $('.report-filter').dropdown({selector: '.report-column .title'});
+
+            colorizeActiveFilters();
+
+            $('.js-reset-btn').on('click', function() {
+                $('.report-filter input:checkbox:checked').prop('checked', false).trigger('change');
+                $('.js-clear-filters-message').slideDown({
+                    done: function() {
+                        $(this).delay(4000).slideUp();
+                    }
+                });
+            });
+
+            $('.report-filter input:checkbox').on('change', function() {
+                colorizeFilter($(this).closest('.filter'));
+            });
+        };
+
+        setupListFilter();
+    })(window);
+</script>
