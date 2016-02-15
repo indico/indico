@@ -17,16 +17,15 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
-from indico.core.db.sqlalchemy.util.models import auto_table_args, get_default_values
-from indico.modules.users.models.users import UserTitle
+from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.modules.users.models.users import UserTitle, PersonMixin
 from indico.util.decorators import strict_classproperty
-from indico.util.string import return_ascii, format_repr, format_full_name
+from indico.util.string import return_ascii, format_repr
 
 
-class EventPerson(db.Model):
+class EventPerson(PersonMixin, db.Model):
     """A person inside an event, e.g. a speaker/author etc."""
 
     __tablename__ = 'persons'
@@ -111,46 +110,6 @@ class EventPerson(db.Model):
     # - session_block_links (SessionBlockPersonLink.person)
     # - subcontribution_links (SubContributionPersonLink.person)
 
-    @hybrid_property
-    def title(self):
-        """the title of the person"""
-        if self._title is None:
-            return get_default_values(type(self))['_title'].title
-        return self._title.title
-
-    @title.expression
-    def title(cls):
-        return cls._title
-
-    @title.setter
-    def title(self, value):
-        self._title = value
-
-    @property
-    def full_name(self):
-        """Returns the person's name in 'Firstname Lastname' notation."""
-        return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
-
-    # Convenience property to have a common `name` property
-    name = full_name
-
-    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False):
-        """Returns the person's name in the specified notation.
-
-        Note: Do not use positional arguments when calling this method.
-        Always use keyword arguments!
-
-        :param last_name_first: if "lastname, firstname" instead of
-                                "firstname lastname" should be used
-        :param last_name_upper: if the last name should be all-uppercase
-        :param abbrev_first_name: if the first name should be abbreviated to
-                                  use only the first character
-        :param show_title: if the title of the person should be included
-        """
-        return format_full_name(self.first_name, self.last_name, self.title,
-                                last_name_first=last_name_first, last_name_upper=last_name_upper,
-                                abbrev_first_name=abbrev_first_name, show_title=show_title)
-
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.full_name)
@@ -180,7 +139,7 @@ class EventPerson(db.Model):
         return any(x for x in principals if self.user_id == x.user_id or self.email == x.email)
 
 
-class PersonLinkBase(db.Model):
+class PersonLinkBase(PersonMixin, db.Model):
     """Base class for EventPerson associations."""
 
     __abstract__ = True
@@ -220,13 +179,6 @@ class PersonLinkBase(db.Model):
             )
         )
 
-    @property
-    def full_name(self):
-        return self.person.full_name if self.person else None
-
-    # Convenience property to have a common `name` property
-    name = full_name
-
 
 class EventPersonLink(PersonLinkBase):
     """Association between EventPerson and Event.
@@ -251,4 +203,4 @@ class EventPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'event_id', 'person_id', _text=self.person.full_name)
+        return format_repr(self, 'event_id', 'person_id', _text=self.full_name)

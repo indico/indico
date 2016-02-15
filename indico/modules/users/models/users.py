@@ -51,6 +51,61 @@ class UserTitle(TitledIntEnum):
     prof = 5
 
 
+class PersonMixin(object):
+    """Add convenience properties and methods to person classes.
+
+    Assumes the following attributes exist:
+    * first_name
+    * last_name
+    * title
+    """
+
+    def _get_title(self):
+        """Return title text"""
+        if self._title is None:
+            return get_default_values(type(self))['_title'].title
+        return self._title.title
+
+    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False,
+                      _show_empty_names=False):
+        """Return the person's name in the specified notation.
+
+        Note: Do not use positional arguments when calling this method.
+        Always use keyword arguments!
+
+        :param last_name_first: if "lastname, firstname" instead of
+                                "firstname lastname" should be used
+        :param last_name_upper: if the last name should be all-uppercase
+        :param abbrev_first_name: if the first name should be abbreviated to
+                                  use only the first character
+        :param show_title: if the title of the person should be included
+        """
+        first_name = self.first_name if self.first_name or not _show_empty_names else 'Unknown'
+        last_name = self.last_name if self.last_name or not _show_empty_names else 'Unknown'
+        return format_full_name(first_name, last_name, self.title,
+                                last_name_first=last_name_first, last_name_upper=last_name_upper,
+                                abbrev_first_name=abbrev_first_name, show_title=show_title)
+
+    #: The title of the user
+    title = hybrid_property(_get_title)
+
+    @title.expression
+    def title(cls):
+        return cls._title
+
+    @title.setter
+    def title(self, value):
+        self._title = value
+
+    @property
+    def full_name(self):
+        """Return the person's name in 'Firstname Lastname' notation."""
+        return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
+
+    # Convenience property to have a canonical `name` property
+    name = full_name
+
+
 #: Fields which can be synced as keys and a mapping to a more human
 #: readable version, used for flashing messages
 syncable_fields = {
@@ -62,7 +117,7 @@ syncable_fields = {
 }
 
 
-class User(db.Model):
+class User(PersonMixin, db.Model):
     """Indico users"""
 
     # Useful when dealing with both users and groups in the same code
@@ -319,34 +374,11 @@ class User(db.Model):
     def locator(self):
         return {'user_id': self.id}
 
-    @hybrid_property
-    def title(self):
-        """the title of the user"""
-        if self._title is None:
-            return get_default_values(type(self))['_title'].title
-        return self._title.title
-
-    @title.expression
-    def title(cls):
-        return cls._title
-
-    @title.setter
-    def title(self, value):
-        self._title = value
-
     @cached_property
     def settings(self):
         """Returns the user settings proxy for this user"""
         from indico.modules.users import user_settings
         return user_settings.bind(self)
-
-    @property
-    def full_name(self):
-        """Returns the user's name in 'Firstname Lastname' notation."""
-        return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
-
-    # Convenience property to have a common `name` property for both groups and users
-    name = full_name
 
     @property
     def synced_fields(self):
@@ -394,26 +426,6 @@ class User(db.Model):
         """If this user can be modified by the given user"""
         return self == user or user.is_admin
 
-    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False):
-        """Returns the user's name in the specified notation.
-
-        Note: Do not use positional arguments when calling this method.
-        Always use keyword arguments!
-
-        :param last_name_first: if "lastname, firstname" instead of
-                                "firstname lastname" should be used
-        :param last_name_upper: if the last name should be all-uppercase
-        :param abbrev_first_name: if the first name should be abbreviated to
-                                  use only the first character
-        :param show_title: if the title of the user should be included
-        """
-        # Pending users might not have a first/last name...
-        first_name = self.first_name or 'Unknown'
-        last_name = self.last_name or 'Unknown'
-        return format_full_name(first_name, last_name, self.title,
-                                last_name_first=last_name_first, last_name_upper=last_name_upper,
-                                abbrev_first_name=abbrev_first_name, show_title=show_title)
-
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.
 
@@ -437,6 +449,10 @@ class User(db.Model):
             item = (identity_info.provider.name, identity_info.identifier)
             if item not in done:
                 yield item
+
+    def get_full_name(self, *args, **kwargs):
+        kwargs['_show_empty_names'] = True
+        return super(User, self).get_full_name(*args, **kwargs)
 
     def make_email_primary(self, email):
         """Promotes a secondary email address to the primary email address

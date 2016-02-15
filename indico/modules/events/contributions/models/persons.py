@@ -91,5 +91,4 @@ class SubContributionPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'subcontribution_id', 'person_id',
-                           _text=self.person.full_name if self.person else None)
+        return format_repr(self, 'subcontribution_id', 'person_id', _text=self.full_name)
