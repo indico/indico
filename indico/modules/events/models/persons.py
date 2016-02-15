@@ -114,23 +114,15 @@ class EventPerson(PersonMixin, db.Model):
     def __repr__(self):
         return format_repr(self, 'id', _text=self.full_name)
 
-    @staticmethod
-    def _build_user_filter(user):
-        return {'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email,
-                'affiliation': user.affiliation,
-                'address': user.address,
-                'phone': user.phone}
-
     @classmethod
     def create_from_user(cls, user, event):
-        return EventPerson(user=user, event_new=event, **cls._build_user_filter(user))
+        return EventPerson(user=user, event_new=event, first_name=user.first_name, last_name=user.last_name,
+                           email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone)
 
     @classmethod
     def for_user(cls, user, event):
         """Return EventPerson for a matching User in Event creating if needed"""
-        person = event.persons.filter_by(**cls._build_user_filter(user)).first()
+        person = event.persons.filter_by(user=user).first()
         return person or cls.create_from_user(user, event)
 
     def has_role(self, role, obj):
