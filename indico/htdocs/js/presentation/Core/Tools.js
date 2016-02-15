@@ -329,20 +329,3 @@ function pathGet(source, path) {
 	});
 	return source;
 }
-
-function redirectToRoomLoc(room, loc){
-    indicoRequest(
-            'roomBooking.locationsAndRooms.getLink',
-            {
-                room: room,
-                location: loc
-            },
-            function(result,error) {
-                if (!error && result) {
-                    window.location = result
-                } else{
-                    new AlertPopup($T("Warning"),$T("Location not available")).open();
-                }
-            }
-        );
-}

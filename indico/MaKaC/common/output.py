@@ -29,7 +29,6 @@ from lxml import etree
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.linking import RoomLinker
 from xmlGen import XMLGen
 import os
 from math import ceil
@@ -57,6 +56,10 @@ def stringToDate( str ):
     months = { "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
     [ day, month, year ] = str.split("-")
     return datetime(int(year),months[month],int(day))
+
+
+def get_map_url(item):
+    return item.room.map_url if item.room else None
 
 
 class XSLTransformer:
@@ -315,6 +318,7 @@ class outputGenerator(object):
 
         out.writeTag("closed", str(conf.isClosed()))
 
+        # TODO: port location code
         if conf.getLocationList()!=[] or conf.getRoom():
             out.openTag("location")
             loc=None
@@ -326,8 +330,8 @@ class outputGenerator(object):
             if conf.getRoom():
                 roomName = self._getRoom(conf.getRoom(), loc)
                 out.writeTag("room", roomName)
-                url=RoomLinker().getURL(conf.getRoom(), loc)
-                if url != "":
+                url = get_map_url(conf.as_event)
+                if url:
                     out.writeTag("roomMapURL",url)
             else:
                 out.writeTag("room","")
@@ -498,7 +502,7 @@ class outputGenerator(object):
             if session.getRoom():
                 roomName = self._getRoom(session.getRoom(), l)
                 out.writeTag("room", roomName)
-                url=RoomLinker().getURL(session.getRoom(), l)
+                url = get_map_url(session)
                 if url != "":
                     out.writeTag("roomMapURL",url)
             else:
@@ -590,7 +594,7 @@ class outputGenerator(object):
             if room:
                 roomName = self._getRoom(room, l)
                 out.writeTag("room", roomName)
-                url=RoomLinker().getURL(room, l)
+                url = get_map_url(slot)
                 if url != "":
                     out.writeTag("roomMapURL",url)
             else:
@@ -692,7 +696,7 @@ class outputGenerator(object):
             if contribution.getRoom():
                 roomName = self._getRoom(contribution.getRoom(), l)
                 out.writeTag("room", roomName)
-                url=RoomLinker().getURL(contribution.getRoom(), l)
+                url = get_map_url(contribution)
                 if url != "":
                     out.writeTag("roomMapURL",url)
             else:
@@ -785,7 +789,7 @@ class outputGenerator(object):
             if br.getRoom():
                 roomName = self._getRoom(br.getRoom(), l)
                 out.writeTag("room", roomName)
-                url=RoomLinker().getURL(br.getRoom(), l)
+                url = get_map_url(br)
                 if url != "":
                     out.writeTag("roomMapURL",url)
             else:

@@ -26,7 +26,6 @@ from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
 from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
-from MaKaC.webinterface.linking import RoomLinker
 
 
 class RoomBookingListRooms(ServiceBase):
@@ -76,17 +75,6 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
             criteria['is_active'] = self._isActive
         rooms = Room.find_all(**criteria)
         return {room.id: '{}: {}'.format(room.location_name, room.full_name) for room in rooms}
-
-
-class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
-    UNICODE_PARAMS = True
-
-    def _checkParams(self):
-        self._location = self._params['location']
-        self._room = self._params['room']
-
-    def _getAnswer(self):
-        return RoomLinker().getURLByName(self._room, self._location)
 
 
 class BookingPermission(LoggedOnlyService):

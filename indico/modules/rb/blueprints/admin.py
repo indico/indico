@@ -17,7 +17,6 @@
 from indico.modules.rb.controllers.admin import (
     index as index_handler,
     locations as location_handlers,
-    mappers as mapper_handlers,
     rooms as room_handlers
 )
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -93,36 +92,4 @@ _bp.add_url_rule('/room/<roomLocation>/create',
 _bp.add_url_rule('/room/<roomLocation>/<int:roomID>/modify',
                  'modify_room',
                  room_handlers.RHRoomBookingModifyRoom,
-                 methods=('GET', 'POST'))
-
-
-# Mappers
-_bp.add_url_rule('/mappers/',
-                 'roomMapper',
-                 mapper_handlers.RHRoomMappers,
-                 methods=('GET', 'POST'))
-
-_bp.add_url_rule('/mappers/create',
-                 'roomMapper-creation',
-                 mapper_handlers.RHRoomMapperCreation,
-                 methods=('GET', 'POST'))
-
-_bp.add_url_rule('/mappers/create/save',
-                 'roomMapper-performCreation',
-                 mapper_handlers.RHRoomMapperPerformCreation,
-                 methods=('GET', 'POST'))
-
-_bp.add_url_rule('/mappers/<roomMapperId>/',
-                 'roomMapper-details',
-                 mapper_handlers.RHRoomMapperDetails,
-                 methods=('GET', 'POST'))
-
-_bp.add_url_rule('/mappers/<roomMapperId>/modify',
-                 'roomMapper-modify',
-                 mapper_handlers.RHRoomMapperModification,
-                 methods=('GET', 'POST'))
-
-_bp.add_url_rule('/mappers/<roomMapperId>/modify/save',
-                 'roomMapper-performModify',
-                 mapper_handlers.RHRoomMapperPerformModification,
                  methods=('GET', 'POST'))

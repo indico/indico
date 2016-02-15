@@ -25,7 +25,6 @@ from indico.modules.events.notes.util import build_note_api_data
 from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.fossils.conference import ISessionSlotFossil, ISessionFossil
 
 
@@ -235,7 +234,7 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFoss
 
     def getRoomMapURL(self):
         pass
-    getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
+    getRoomMapURL.produce = lambda x: x.as_event.room.map_url if x.as_event.room else None
 
 
 class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFossil):

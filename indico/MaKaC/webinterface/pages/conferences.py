@@ -24,7 +24,6 @@ from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
@@ -343,16 +342,6 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["location"] = None
         vars["address"] = None
         vars["room"] = None
-
-        location = self._conf.getLocation()
-        if location:
-            vars["location"] = location.getName()
-            vars["address"] = location.getAddress()
-
-            room = self._conf.getRoom()
-            if room and room.getName():
-                roomLink = linking.RoomLinker().getHTMLLink(room, location)
-                vars["room"] = roomLink
 
         vars["chairs"] = self._conf.getChairList()
         vars["attachments"] = self._conf.attached_items
@@ -788,31 +777,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             return ""
         return WPConferenceBase._getHTMLFooter(self)
 
-    @staticmethod
-    def getLocationInfo(item, roomLink=True, fullName=False):
-        """Return a tuple (location, room, url) containing
-        information about the location of the item."""
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        location = item.getLocation().getName() if item.getLocation() else ""
-        customRoom = item.getRoom()
-        if not customRoom:
-            roomName = ''
-        elif fullName and location and Config.getInstance().getIsRoomBookingActive():
-            # if we want the full name and we have a RB DB to search in
-            roomName = customRoom.getFullName()
-            if not roomName:
-                customRoom.retrieveFullName(location) # try to fetch the full name
-                roomName = customRoom.getFullName() or customRoom.getName()
-        else:
-            roomName = customRoom.getName()
-        # TODO check if the following if is required
-        if roomName in ['', '0--', 'Select:']:
-            roomName = ''
-        if roomLink:
-            url = linking.RoomLinker().getURL(item.getRoom(), item.getLocation())
-        else:
-            url = ""
-        return (location, roomName, url)
 
     def _getBody(self, params):
         """Return main information about the event."""
@@ -828,7 +792,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
             vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
             vars['getItemType'] = lambda item : self._getItemType(item)
-            vars['getLocationInfo'] = WPTPLConferenceDisplay.getLocationInfo
             vars['dumps'] = json.dumps
             vars['timedelta'] = timedelta
         else:
