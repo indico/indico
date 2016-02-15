@@ -55,21 +55,21 @@
                             </td>
                             <td class="i-table">
                                 <div class="group right">
-                                    <a href="#" class="icon-edit highlight edit-session action-icon"
+                                    <a href="#" class="icon-edit highlight edit-session i-button-icon"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
                                        data-href="{{ url_for('.modify_session', sess) }}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-time highlight action-icon"
+                                    <a href="#" class="icon-time highlight i-button-icon"
                                        title="{% trans %}Go to this session timetable{% endtrans %}"></a>
-                                    <a href="#" class="icon-attachment highlight action-icon"
+                                    <a href="#" class="icon-attachment highlight i-button-icon"
                                        title="{% trans %}Manage materials{% endtrans %}"
                                        data-attachment-editor
                                        data-title="{% trans title=sess.title %}Manage materials for '{{ title }}'{% endtrans %}"
                                        data-locator="{{ sess.locator|tojson|forceescape }}">
                                     </a>
-                                    <a href="#" class="icon-remove highlight action-icon"
+                                    <a href="#" class="icon-remove highlight i-button-icon"
                                        title="{% trans %}Remove this session{% endtrans %}"
                                        data-method="DELETE"
                                        data-href="{{ url_for('.session_rest', sess)}}"
