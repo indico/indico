@@ -60,6 +60,11 @@ class Location(db.Model):
             ondelete='SET NULL'
         )
     )
+    map_url_template = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
 
     aspects = db.relationship(
         'Aspect',

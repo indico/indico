@@ -293,6 +293,17 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return url_for('rooms.photo', self, size='small')
 
     @property
+    def map_url(self):
+        if self.location.map_url_template:
+            return self.location.map_url_template.format(
+                building=self.building,
+                floor=self.floor,
+                number=self.number
+            )
+        else:
+            return None
+
+    @property
     def has_photo(self):
         return self.photo_id is not None
 
