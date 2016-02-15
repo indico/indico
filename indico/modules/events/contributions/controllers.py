@@ -16,42 +16,25 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify, render_template
-from sqlalchemy.orm import joinedload
+
+from flask import flash, request, jsonify, redirect, session, render_template
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.operations import create_contribution, update_contribution, delete_contribution
 from indico.modules.events.contributions.forms import ContributionForm, ContributionProtectionForm
+from indico.modules.events.contributions.util import ContributionReporter
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _, ngettext
 from indico.util.string import to_unicode
-from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-
-
-def _get_contribution_list_args(event):
-    timetable_entry_strategy = joinedload('timetable_entry')
-    timetable_entry_strategy.lazyload('*')
-    contribs = (event.contributions
-                .filter_by(is_deleted=False)
-                .order_by(Contribution.friendly_id)
-                .options(timetable_entry_strategy)
-                .all())
-    sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in event.sessions.filter_by(is_deleted=False)]
-    tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())} for t in event.as_legacy.getTrackList()]
-    return {'contribs': contribs, 'sessions': sessions, 'tracks': tracks}
-
-
-def _render_contribution_list(event):
-    tpl = get_template_module('events/contributions/management/_contribution_list.html')
-    return tpl.render_contribution_list(event=event, **_get_contribution_list_args(event))
 
 
 def _render_contrib_protection_message(contrib):
@@ -61,7 +44,6 @@ def _render_contrib_protection_message(contrib):
 
 class RHManageContributionsBase(RHConferenceModifBase):
     """Base class for all contributions management RHs"""
-
     CSRF_ENABLED = True
 
     def _process(self):
@@ -95,8 +77,40 @@ class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
+        report_config = ContributionReporter.get_config(self.event_new.id)
+        if 'config' in request.args:
+            return redirect(url_for('.manage_contributions', self.event_new))
+
+        contrib_report_args = ContributionReporter.get_contrib_report_args(self.event_new, report_config['filters'])
+
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
-                                                     **_get_contribution_list_args(self.event_new))
+                                                     **contrib_report_args)
+
+
+class RHContributionsReportCustomize(RHManageContributionsBase):
+    """Filter options for the contributions report of an event"""
+
+    def _process_GET(self):
+        report_config = ContributionReporter.get_config(self.event_new.id)
+        filterable_items = ContributionReporter.FILTERABLE_ITEMS
+        filterable_items['session']['filter_choices'] = {unicode(s.id): s.title
+                                                         for s in self.event_new.sessions.filter_by(is_deleted=False)}
+        filterable_items['track']['filter_choices'] = {unicode(t.id): to_unicode(t.getTitle())
+                                                       for t in self.event_new.as_legacy.getTrackList()}
+        filterable_items['type']['filter_choices'] = {unicode(t.id): t.name
+                                                      for t in self.event_new.contribution_types}
+        # TODO: Handle contribution status
+        return WPManageContributions.render_template('management/contrib_report_filter.html', self._conf,
+                                                     event=self.event_new, filters=report_config['filters'],
+                                                     filterable_items=filterable_items)
+
+    def _process_POST(self):
+        filters = ContributionReporter.get_filters_from_request()
+        session_key = ContributionReporter.get_config_session_key(self.event_new.id)
+        report_config = session.setdefault(session_key, {})
+        report_config['filters'] = filters
+        session.modified = True
+        return jsonify_data(**ContributionReporter.render_contrib_report(self.event_new, filters))
 
 
 class RHCreateContribution(RHManageContributionsBase):
@@ -107,18 +121,25 @@ class RHCreateContribution(RHManageContributionsBase):
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
-            return jsonify_data(html=_render_contribution_list(self.event_new))
+            report_config = ContributionReporter.get_config(self.event_new.id)
+            tpl_components = ContributionReporter.render_contrib_report(self.event_new, report_config['filters'],
+                                                                        contrib)
+            ContributionReporter.flash_info_message(contrib, tpl_components['hide_contrib'])
+            return jsonify_data(**tpl_components)
         return jsonify_form(form)
 
 
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
         form = ContributionForm(obj=FormDefaults(self.contrib), event=self.event_new)
-        form.type.query = self.event_new.contribution_types
         if form.validate_on_submit():
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
-            return jsonify_data(html=_render_contribution_list(self.event_new))
+            report_config = ContributionReporter.get_config(self.event_new.id)
+            tpl_components = ContributionReporter.render_contrib_report(self.event_new, report_config['filters'],
+                                                                        self.contrib)
+            ContributionReporter.flash_info_message(self.contrib, tpl_components['hide_contrib'])
+            return jsonify_data(**tpl_components)
         return jsonify_form(form)
 
 
@@ -130,14 +151,16 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         flash(ngettext("The contribution has been deleted.",
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
-        return jsonify_data(html=_render_contribution_list(self.event_new))
+        report_config = ContributionReporter.get_config(self.event_new.id)
+        return jsonify_data(**ContributionReporter.render_contrib_report(self.event_new, report_config['filters']))
 
 
 class RHContributionREST(RHManageContributionBase):
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
-        return jsonify_data(html=_render_contribution_list(self.event_new))
+        report_config = ContributionReporter.get_config(self.event_new.id)
+        return jsonify_data(**ContributionReporter.render_contrib_report(self.event_new, report_config['filters']))
 
     def _process_PATCH(self):
         data = request.json
