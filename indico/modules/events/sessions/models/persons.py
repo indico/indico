@@ -44,4 +44,4 @@ class SessionBlockPersonLink(PersonLinkBase):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'session_block_id', 'person_id', _text=self.person.full_name)
+        return format_repr(self, 'session_block_id', 'person_id', _text=self.full_name)
