@@ -151,23 +151,23 @@
                     }
 
                 }
+
+                > .filter {
+                    cursor: pointer;
+                    color: $light-black;
+
+                    &.active:before {
+                        color: $indico-blue;
+                    }
+
+                    &:hover:before {
+                        color: $yellow !important;
+                    }
+                }
             }
 
             &:hover > .actions > .visibility {
                 display: inline;
-            }
-
-            .filter {
-                cursor: pointer;
-                color: $light-black;
-            }
-
-            .filter.active:before {
-                color: $indico-blue;
-            }
-
-            .filter:hover:before {
-                color: $yellow !important;
             }
         }
     }
