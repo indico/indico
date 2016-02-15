@@ -37,6 +37,12 @@
       </td>
     </tr>
     <tr>
+        <td class="titleUpCellTD">
+            <span class="titleCellFormat">${ _('Map URL Template') }</span>
+        </td>
+        <td>${ location.map_url_template }</td>
+    </tr>
+    <tr>
       <td class="titleUpCellTD" style="width: 160px;">
         <span class="titleCellFormat">${ _('Available Rooms') }</span>
       </td>
