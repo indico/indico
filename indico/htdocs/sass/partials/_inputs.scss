@@ -286,12 +286,18 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .i-radio, .i-checkbox {
-    white-space: nowrap;
+    display: flex;
+
+    input {
+        flex-shrink: 0;
+        flex-grow: 0;
+        margin-top: 2px;
+    }
+
     label {
         display: inline-block;
+        flex-grow: 1;
         margin-left: 0.5em;
-        position: relative;
-        bottom: 1px;
     }
 }
 
