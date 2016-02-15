@@ -22,6 +22,7 @@ from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy import inspect, orm
 from sqlalchemy.event import listens_for
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload, contains_eager
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
@@ -292,3 +293,33 @@ def populate_one_to_one_backrefs(model, *relationships):
                 # __dict__ to avoid triggering lazy-loaded relationships
                 if target.__dict__.get(name) is not None:
                     set_committed_value(getattr(target, name), backref, target)
+
+
+def override_attr(attr_name, parent_name, fget=None):
+    """Create property that overrides an attribute coming from parent.
+
+    In order to ensure setter functionality at creation time, ``parent`` must be
+    initialized before the overriden attribute.
+
+    :param attr_name: The name of the attribute to be overriden.
+    :param parent_name: The name of the attribute from which to override the attribute.
+    :param fget: Getter for own property
+    """
+
+    own_attr_name = '_' + attr_name
+
+    def _get(self):
+        parent = getattr(self, parent_name)
+        attr = getattr(self, own_attr_name)
+        fget_ = (lambda self, __: attr) if fget is None else fget
+        return fget_(self, own_attr_name) if attr is not None or not parent else getattr(parent, attr_name)
+
+    def _set(self, value):
+        parent = getattr(self, parent_name)
+        if not parent or value != getattr(parent, attr_name):
+            setattr(self, own_attr_name, value)
+
+    def _expr(cls):
+        return getattr(cls, own_attr_name)
+
+    return hybrid_property(_get, _set, expr=_expr)
