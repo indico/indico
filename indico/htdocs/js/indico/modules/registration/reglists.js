@@ -77,7 +77,7 @@
                 title: $this.data('title'),
                 onClose: function(data) {
                     if (data) {
-                        $('.registrations-table-wrapper').html(data.registration_list);
+                        $('.report-content').html(data.registration_list);
                         handleRowSelection();
                         setupTableSorter();
                         $('.js-customize-report').toggleClass('highlight', data.filtering_enabled);
@@ -166,7 +166,7 @@
                 error: handleAjaxError,
                 success: function(data) {
                     if (data) {
-                        $('.registrations-table-wrapper').html(data.registration_list);
+                        $('.report-content').html(data.registration_list);
                         handleRowSelection();
                         setupTableSorter();
                     }
@@ -200,13 +200,13 @@
     }
 
     function colorizeActiveFilters() {
-        $('.reglist-filter .filter').each(function() {
+        $('.report-filter .filter').each(function() {
             colorizeFilter($(this));
         });
     }
 
     global.setupRegistrationListFilter = function setupRegistrationListFilter() {
-        $('.reglist-filter .filter').each(function() {
+        $('.report-filter .filter').each(function() {
             var filter = $(this).parent();
             filter.dropdown({selector: '.filter', relative_to: filter.parent()});
         });
@@ -216,13 +216,13 @@
         var visibleColumnsRegItemsField = $('#visible-columns-reg-items');
         var regItemsData = JSON.parse(visibleColumnsRegItemsField.val());
 
-        $('.reglist-column')
+        $('.report-column')
         .on('click', function(evt) {
             if ($(evt.target).hasClass('filter')) {
                 return;
             }
             var $this = $(this);
-            var field = $this.closest('.reglist-column');
+            var field = $this.closest('.report-column');
             var fieldId = field.data('id');
             var visibilityIcon = field.find('.trigger');
             var enabled = visibilityIcon.hasClass('enabled');
@@ -248,12 +248,12 @@
             }
         });
 
-        $('.reglist-column .dropdown').on('click', function(evt) {
+        $('.report-column .dropdown').on('click', function(evt) {
             evt.stopPropagation();
         });
 
         $('.js-reset-btn').on('click', function() {
-            $('.reglist-filter input:checkbox:checked').prop('checked', false).trigger('change');
+            $('.report-filter input:checkbox:checked').prop('checked', false).trigger('change');
             $('.js-clear-filters-message').show({
                 done: function() {
                     var $this = $(this);
@@ -264,11 +264,11 @@
             });
         });
 
-        $('.reglist-filter input:checkbox').on('change', function() {
+        $('.report-filter input:checkbox').on('change', function() {
             colorizeFilter($(this).closest('.dropdown').siblings('.filter'));
         });
 
-        $('.reglist-filter .title').on('mouseover', function() {
+        $('.report-filter .title').on('mouseover', function() {
             var title = $(this);
             // Show a qtip if the text is ellipsized
             if (this.offsetWidth < this.scrollWidth) {

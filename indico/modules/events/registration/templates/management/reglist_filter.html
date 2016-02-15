@@ -2,7 +2,7 @@
 
 {% macro _render_column_selector(item, filter_choices, special_item=false) %}
     {% set filters = filters['items'] if special_item else filters['fields'] %}
-    <div class="i-label report-column reglist-column js-regform-item"
+    <div class="i-label report-column"
          data-id="{{ item.personal_data_type.name if item.personal_data_type else item.id }}">
         {% if filter_choices %}
             <div class="actions">
@@ -74,7 +74,7 @@
         {%- endtrans -%}
     </div>
 </div>
-<form class="report-filter reglist-filter" method="POST">
+<form class="report-filter" method="POST">
     <input id="visible-columns-reg-items" type="hidden" name="visible_cols_regform_items"
            value="{{ visible_cols_regform_items | tojson | forceescape }}">
     <h3>{% trans %}General registration info{% endtrans %}</h3>
