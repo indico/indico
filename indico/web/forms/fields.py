@@ -327,6 +327,8 @@ class EventPersonListField(PrincipalListField):
             return EventPerson.for_user(user, self.event)
         elif person_type == 'EventPerson':
             return self.event.persons.filter_by(id=data['id']).one()
+        elif person_type == 'PersonLink':
+            return self.event.persons.filter_by(id=data['personId']).one()
         else:
             raise ValueError(_("Uknown person type '{}'").format(person_type))
 
