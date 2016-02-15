@@ -224,7 +224,7 @@
             var $this = $(this);
             var field = $this.closest('.report-column');
             var fieldId = field.data('id');
-            var visibilityIcon = field.find('.trigger');
+            var visibilityIcon = field.find('.visibility');
             var enabled = visibilityIcon.hasClass('enabled');
 
             if (enabled) {
@@ -242,7 +242,7 @@
             var fieldId = field.data('id');
 
             if (regItemsData.indexOf(fieldId) != -1) {
-                field.find('.trigger').addClass('enabled');
+                field.find('.visibility').addClass('enabled');
             } else {
                 field.addClass('striped');
             }
@@ -277,11 +277,11 @@
         });
 
         $('#report-filter-select-all').on('click', function() {
-            $('.report-filter-dialog .trigger:not(.enabled)').trigger('click');
+            $('.report-filter-dialog .visibility:not(.enabled)').trigger('click');
         });
 
         $('#report-filter-select-none').on('click', function() {
-            $('.report-filter-dialog .trigger.enabled').trigger('click');
+            $('.report-filter-dialog .visibility.enabled').trigger('click');
         });
     };
 })(window);
