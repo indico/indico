@@ -184,6 +184,20 @@ def serialize_event_person(person):
             'address': person.address}
 
 
+def serialize_person_link(person_link):
+    """Serialize PersonLink to JSON-like object"""
+    return {'_type': 'PersonLink',
+            'personId': person_link.person.id,
+            'email': person_link.person.email,
+            'name': person_link.full_name,
+            'firstName': person_link.first_name,
+            'familyName': person_link.last_name,
+            'title': person_link.title,
+            'affiliation': person_link.affiliation,
+            'phone': person_link.phone,
+            'address': person_link.address}
+
+
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, role=None):
     """Updates an object's ACL with a new list of principals
 
