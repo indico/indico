@@ -26,7 +26,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
-from indico.modules.events.util import serialize_event_person, ReporterBase
+from indico.modules.events.util import serialize_person_link, ReporterBase
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -73,7 +73,7 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
 
 def serialize_contribution_person_link(person_link):
     """Serialize ContributionPersonLink to JSON-like object"""
-    data = serialize_event_person(person_link.person)
+    data = serialize_person_link(person_link)
     data['isSpeaker'] = person_link.is_speaker
     data['authorType'] = person_link.author_type.value
     if not isinstance(person_link, SubContributionPersonLink):
