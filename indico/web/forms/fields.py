@@ -20,7 +20,8 @@ from collections import OrderedDict
 from datetime import time, timedelta
 from operator import attrgetter
 
-from markupsafe import escape
+from flask import render_template
+from markupsafe import escape, Markup
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
@@ -31,6 +32,8 @@ from wtforms.validators import StopValidation
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
@@ -716,3 +719,18 @@ class IndicoPalettePickerField(JSONField):
 class IndicoEnumRadioField(IndicoEnumSelectField):
     widget = JinjaWidget('forms/radio_buttons_widget.html', orientation='horizontal', single_kwargs=True)
     option_widget = RadioInput()
+
+
+class IndicoProtectionField(IndicoEnumRadioField):
+    widget = JinjaWidget('forms/protection_widget.html', single_kwargs=True)
+    radio_widget = JinjaWidget('forms/radio_buttons_widget.html', orientation='horizontal', single_kwargs=True)
+
+    def __init__(self, *args, **kwargs):
+        super(IndicoProtectionField, self).__init__(*args, enum=ProtectionMode, **kwargs)
+
+    def render_protection_message(self):
+        protected_object = self.get_form().protected_object
+        parent_type = _('Event') if isinstance(protected_object.protection_parent, Event) else _('Session')
+        rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
+                             parent_type=parent_type)
+        return Markup(rv)

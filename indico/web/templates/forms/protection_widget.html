@@ -1,0 +1,33 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html -%}
+    {{ field.radio_widget(field, **input_args)  }}
+    {{ field.render_protection_message() }}
+{%- endblock %}
+
+{% block javascript -%}
+    <script>
+        (function() {
+            'use strict';
+
+            var inputs = $('input[name={{ field.name }}][id^={{ field.id }}]');
+            var parentProtected = {{ field.get_form().protected_object.protection_parent.is_protected | tojson }};
+
+            inputs.on('change', function() {
+                var $this = $(this);
+                var isProtected = $this.val() === 'protected' || ($this.val() === 'inheriting' && parentProtected);
+
+                if (this.checked) {
+                    $('#form-group-protected-{{ field.id }} .message-only').hide();
+                    $('#form-group-protected-{{ field.id }} .' + $this.val() + '-protection-message').show();
+
+                    toggleAclField($('#{{ field.get_form().acl.id }}'), !isProtected);
+                }
+            });
+
+            _.defer(function() {
+                inputs.trigger('change');
+            });
+        })();
+    </script>
+{%- endblock %}

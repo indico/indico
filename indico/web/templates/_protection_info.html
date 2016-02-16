@@ -1,0 +1,8 @@
+{% from '_protection_messages.html' import render_public_protection_message, render_inherited_protection_message,
+                                           render_protected_protection_message %}
+
+<div class="form-group" id="form-group-protected-{{ field.id }}" style="margin-top: 5px;">
+    {{ render_public_protection_message() }}
+    {{ render_inherited_protection_message(protected_object.protection_parent, parent_type) }}
+    {{ render_protected_protection_message() }}
+</div>
