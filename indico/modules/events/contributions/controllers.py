@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify, redirect, render_template
+from flask import flash, request, jsonify, redirect
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -25,18 +25,12 @@ from indico.modules.events.contributions.forms import ContributionForm, Contribu
 from indico.modules.events.contributions.util import ContributionReporter
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
-from indico.modules.events.models.events import Event
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-
-
-def _render_contrib_protection_message(contrib):
-    return render_template('events/contributions/management/_contribution_protection_message.html', contrib=contrib,
-                           parent_type=(_('Event') if isinstance(contrib.protection_parent, Event) else _('Session')))
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
@@ -211,7 +205,7 @@ class RHContributionProtection(RHManageContributionBase):
                 update_object_principals(self.contrib, form.acl.data, read_access=True)
             update_object_principals(self.contrib, form.submitters.data, role='submit')
             return jsonify_data(flash=False, **self.reporter.render_contrib_report(self.contrib))
-        return jsonify_form(form, form_header_kwargs={'id': 'protection-form'})
+        return jsonify_form(form)
 
     def _get_defaults(self):
         managers = {p.principal for p in self.contrib.acl_entries if p.full_access}
