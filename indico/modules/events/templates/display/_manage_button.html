@@ -1,0 +1,130 @@
+{% from 'events/notes/_note.html' import render_toggle_button %}
+
+{% macro _render_note_editor(item) -%}
+    <li>
+        <a class="notes-editor"
+           data-href="{{ url_for('event_notes.edit', item) }}"
+           data-title="{% trans %}Edit minutes{% endtrans %}">
+            {% if item.has_note -%}
+                {% trans %}Edit minutes{% endtrans %}
+            {%- else -%}
+                {% trans %}Add minutes{% endtrans %}
+            {%- endif %}
+        </a>
+        {% if item.has_note %}
+            <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="notes-delete">
+                {% trans %}Delete minutes{% endtrans %}
+            </a>
+        {% endif %}
+    </li>
+{%- endmacro %}
+
+{% macro _render_dropdown(item, item_type, show_note_operations=false) -%}
+    <ul class="dropdown">
+        {% if item_type == 'EVENT' %}
+            {% if item.can_manage(session.user) %}
+                <li>
+                    <a href="{{ url_for('event_mgmt.conferenceModification', item) }}">
+                        {% trans %}Edit Event{% endtrans %}
+                    </a>
+                </li>
+            {% endif %}
+            {% if item.can_manage_attachments(session.user) %}
+                {% if item.as_legacy.getType() != 'simple_event' %}
+                    {{ _render_note_editor(item) }}
+                    {% if item.scheduled_notes %}
+                        <li>
+                            <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="notes-compile"
+                               data-href="{{ url_for('event_notes.compile', item) }}"
+                               data-title="{% trans %}Edit minutes{% endtrans %}">
+                                {% trans %}Compile Minutes{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% elif item_type == 'SESSION_BLOCK' %}
+            {% set session_ = item.session %}
+            {% if item.can_manage_attachments(session.user) %}
+                {% if not session_.has_note or show_note_operations %}
+                    {{ _render_note_editor(session_) }}
+                {% endif %}
+                <li>
+                    <a href="" class="js-material-editor"
+                               data-attachment-editor
+                               data-reload-on-change
+                               data-title="{% trans title=session_.title %}Manage materials for '{{ title }}'{% endtrans %}"
+                               data-locator="{{ session_.locator |tojson|forceescape }}">
+                        {%- trans %}Material Editor{% endtrans -%}
+                    </a>
+                </li>
+
+            {% endif %}
+            {% if item.can_manage(session.user) %}
+                <li>
+                    <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="session-basic-edit">
+                        {% trans %}Edit Session (basic){% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="">
+                        {% trans %}Edit Session (full){% endtrans %}
+                    </a>
+                </li>
+            {% endif %}
+        {% elif item_type == 'CONTRIBUTION' %}
+            {% if item.can_manage_attachments(session.user) %}
+                {% if not item.has_note or show_note_operations %}
+                    {{ _render_note_editor(item) }}
+                {% endif %}
+            {% endif %}
+            {% if item.can_manage(session.user) %}
+                <li>
+                    <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="contribution-edit">
+                        {% trans %}Edit Contribution{% endtrans %}
+                    </a>
+                </li>
+            {% endif %}
+        {% elif item_type == 'SUBCONTRIBUTION' %}
+                {% if item.can_manage_attachments(session.user) %}
+                    {% if not item.has_note or show_note_operations %}
+                        {{ _render_note_editor(item) }}
+                    {% endif %}
+                {% endif %}
+                {% if item.can_manage(session.user) %}
+                    <li>
+                        <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="subcontribution-edit">
+                            {% trans %}Edit Sub-contribution{% endtrans %}
+                        </a>
+                    </li>
+                {% endif %}
+
+        {% endif %}
+        {% if item_type != 'SESSION_BLOCK' and item.can_manage_attachments(session.user) %}
+        <li>
+            <a href="" class="js-material-editor"
+                       data-attachment-editor
+                       data-reload-on-change
+                       data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
+                       data-locator="{{ item.locator |tojson|forceescape }}">
+                {%- trans %}Material Editor{% endtrans -%}
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+{%- endmacro %}
+
+{% macro render_manage_button(item, item_type, align_right=false, manage_link=false, show_notes=true,
+                              toggle_notes=true, show_note_operations=false, show_button=true) -%}
+    <div class="toolbar right thin">
+        {% if toggle_notes and item.has_note %}
+            {{ render_toggle_button(note=item.note, note_is_hidden=not show_notes) }}
+        {% endif %}
+        {% if show_button %}
+            <div class="group manage-button">
+                <a class="i-button icon-edit arrow js-dropdown" data-toggle="dropdown"></a>
+                {{ _render_dropdown(item, item_type, show_note_operations=show_note_operations) }}
+            </div>
+        {% endif %}
+        </div>
+{%- endmacro %}

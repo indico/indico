@@ -395,7 +395,7 @@ class StyleManager(Persistent):
             return False
 
         correctCSS = self.existsCSSFile(styleId) or not self.getCSSFilename(styleId)
-        return styleId == 'static' or (self.existsTPLFile(styleId) and correctCSS) or (self.existsXSLFile(styleId) and correctCSS)
+        return styleId == 'static' or correctCSS or self.existsXSLFile(styleId)
 
     def getExistingStylesForEventType(self, eventType):
         result = []
@@ -420,23 +420,9 @@ class StyleManager(Persistent):
         else:
             return ""
 
-    def getBaseTPLPath(self):
-        tplDir = Config.getInstance().getTPLDir()
-        return os.path.join(tplDir, "events")
-
     def getBaseXSLPath(self):
         xslDir = Config.getInstance().getStylesheetsDir()
         return os.path.join(xslDir, "events")
-
-    def existsTPLFile(self, styleId):
-        if styleId.strip() != "":
-            tplFile = self.getTemplateFilename(styleId)
-            if not tplFile:
-                return False
-            path = os.path.join(self.getBaseTPLPath(), tplFile)
-            if os.path.exists(path):
-                return True
-        return False
 
     def existsXSLFile(self, styleId):
         if styleId.strip() != "":
@@ -518,4 +504,3 @@ class IPBasedACLMgr(Persistent):
 
     def notify_modification(self):
         self._p_changed = 1
-

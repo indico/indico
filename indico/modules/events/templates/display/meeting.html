@@ -1,0 +1,61 @@
+{% from 'events/display/_manage_button.html' import render_manage_button %}
+{% from 'events/display/_common.html' import render_location, render_users, render_event_time %}
+{% from 'events/notes/_note.html' import render_note %}
+
+<div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
+    {% block header %}
+        <div class="meetingEventHeader">
+            {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
+            <div class="event-manage-button">
+                {{ render_manage_button(event, 'EVENT', align_right=true, manage_link=true, show_button=show_button) }}
+            </div>
+
+            {% block logo %}
+                {# extending templates can add their logo(s) here #}
+            {% endblock %}
+
+            <h1 itemprop="name">{{ event.title }}</h1>
+            {% set chairpersons = event.person_links %}
+            {% if chairpersons %}
+                <span class="chairedBy">
+                    {% trans %}chaired by{% endtrans %}
+                    {{ render_users(chairpersons, span_class='author', title=False) }}
+                </span>
+            {% endif %}
+            <div class="details">
+                <div class="meetingEventDate">
+                    {{ render_event_time(conf, timezone) }}
+                </div>
+                {% if event.venue_name or event.room_name or event.address %}
+                    <div class="meetingEventLocation">
+                        {{ render_location(event, class='header-data') }}
+                        {% if event.address %}
+                            <div class="address">{{ event.address }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endblock %}
+
+    {% block body %}
+        <div class="meetingEventSubHeader">
+            <table class="eventDetails">
+                <tbody>
+                    {% include 'events/display/_details.html' %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if conf.note or event.can_manage(session.user) %}
+            {{ render_note(conf.note, hidden=not show_notes, can_edit=event.can_manage(session.user), for_event=conf) }}
+        {% endif %}
+
+        <div class="meetingEventBody">
+            {{ template_hook('meeting-body', event=event) }}
+        </div>
+    {% endblock %}
+
+    {% block footer %}
+    {% endblock %}
+</div>

@@ -1,0 +1,40 @@
+{% from 'events/display/_manage_button.html' import render_manage_button %}
+{% from 'events/timetable/display/_common.html' import render_speakers, render_references, render_attachments,
+                                                       render_notes, render_description %}
+
+
+{% macro render_subcontribution(subcontrib, event, show_notes=true) %}
+    <li class="timetable-subcontrib">
+        {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', align_right=true, show_notes=show_notes,
+                                show_button=(not event.as_legacy.isClosed() and
+                                             subcontrib.can_manage_attachments(session.user))) }}
+        <span class="subLevelTitle confModifPadding">{{ subcontrib.title }}</span>
+
+        {% if subcontrib.duration %}
+            <span class="icon-time timetable-duration">
+                {{ subcontrib.duration |format_human_timedelta }}
+            </span>
+        {% endif %}
+
+        {% if subcontrib.description %}
+            <span class="description">{{ render_description(subcontrib) }}</span>
+        {% endif %}
+
+        <table class="timetable-subcontrib-details sessionDetails">
+            <tbody>
+                {% if subcontrib.references -%}
+                    ({{ render_references(subcontrib) }})
+                {% endif %}
+
+                {% set speakers = subcontrib.person_links|selectattr("is_speaker")|list %}
+                {% if speakers %}
+                    {{ render_speakers(speakers) }}
+                {% endif %}
+
+                {{ render_attachments(subcontrib) }}
+            </tbody>
+        </table>
+
+        {{ render_notes(subcontrib) }}
+    </li>
+{% endmacro %}

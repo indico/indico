@@ -1,0 +1,58 @@
+{% from 'events/timetable/display/_session_block.html' import render_session_block %}
+{% from 'events/timetable/display/_contribution.html' import render_contribution %}
+{% from 'events/timetable/display/_break.html' import render_break %}
+
+{% if days|length > 1 %}
+    <div class="toolbar">
+        <div class="group right js-go-to-day">
+            <a href="" class="i-button icon-calendar arrow" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                {% for day in days %}
+                    <li>
+                        <a href="#day-{{ day.isoformat() }}">
+                            {{ day |format_date(format='full', timezone=timezone) }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
+<ul class="dayList">
+    {% set previous_date = none %}
+    {% for item in entries -%}
+        {% set date = item.start_dt.astimezone(tz_object).date() %}
+
+        {% if previous_date and previous_date != date -%}
+                </ul>
+            </li>
+        {%- endif -%}
+
+        {%- if not previous_date or date != previous_date -%}
+            <li>
+                <div style="width: 100%;">
+                    <a name="day-{{ item.start_dt.date().isoformat() }}"></a>
+                    <span class="day">{{ item.start_dt |format_date(format='full', timezone=timezone) }}</span>
+                </div>
+                <ul class="meetingTimetable">
+        {%- endif %}
+
+        {% if item.type.name == 'CONTRIBUTION' -%}
+            {{ render_contribution(item.object, event, nested=false, timezone=timezone, show_notes=show_notes,
+                                   parent=event) }}
+        {%- elif item.type.name == 'SESSION_BLOCK' -%}
+            {{ render_session_block(item.object, event, timezone=timezone, show_notes=show_notes, parent=event,
+                                    hide_contribs=hide_contribs) }}
+        {%- elif item.type.name == 'BREAK' -%}
+            {{ render_break(item.object, event, nested=false, timezone=timezone, show_notes=show_notes, parent=event) }}
+        {%- endif %}
+
+        {% set previous_date = date %}
+    {%- endfor %}
+
+    {% if entries -%}
+            </ul>
+        </li>
+    {%- endif %}
+</ul>

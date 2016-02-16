@@ -1,0 +1,74 @@
+{% macro render_location(item, parent=none, class='') -%}
+    {% set show_venue = not parent or (parent.venue_name != item.venue_name) %}
+    {% set show_room = item.room_name != '' %}
+    {% set show_url = item.room and item.room.map_url %}
+    <span class="icon-location item-location {{ class }}">
+        {%- if show_url %}
+            <a href="{{ item.room.map_url }}">
+        {%- endif -%}
+        {%- if show_venue and show_room -%}
+            {{ item.room_name }} ({{ item.venue_name }})
+        {%- elif show_venue -%}
+            {{ item.venue_name }}
+        {%- else -%}
+            {{ item.room_name }}
+        {%- endif -%}
+        {% if show_url -%}
+            </a>
+        {%- endif %}
+    </span>
+{%- endmacro %}
+
+{% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ', use_span=true) -%}
+    {% for link in user_list -%}
+        {% set user = link.person %}
+        {%- if use_span -%}
+            <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
+                {% if user.title -%}
+                    {{ user.title }}
+                {%- endif %}
+                <span itemprop="givenName">{{ user.first_name }}</span>
+                <span itemprop="lastName">{{ user.last_name }}</span>
+            </span>
+        {%- else -%}
+            {{ user.first_name }} {{ user.last_name }}
+        {% endif %}
+        {% if user.affiliation %}
+            <span class="affiliation">(
+            {%- if italic_affiliation -%}
+                <em>
+            {%- endif -%}
+            {{ user.affiliation }}
+            {%- if italic_affiliation -%}
+                </em>
+            {%- endif -%}
+            )</span>
+        {% endif %}
+        {% if not loop.last %}
+            {{ separator }}
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
+{% macro render_event_time(conf, timezone) -%}
+    <i class="icon-calendar header-data"></i>
+    <span class="event-time-data">
+        {% if conf.getStartDate().date() == conf.getEndDate().date() %}
+            <time itemprop="startDate" datetime="{{ conf.getStartDate().isoformat() }}">
+                {{ conf.getStartDate() |format_datetime(format='medium', timezone=timezone) }}
+            </time>
+            &rarr;
+            <time itemprop="endDate" datetime="{{ conf.getEndDate().isoformat() }}">
+                {{ conf.getEndDate() |format_time(format='medium', timezone=timezone) }}
+            </time>
+        {% else %}
+            <time itemprop="startDate" datetime="{{ conf.getStartDate().isoformat() }}">
+                {{ conf.getStartDate() |format_datetime(format='medium', timezone=timezone) }}
+            </time>
+            &rarr;
+            <time itemprop="endDate" datetime="{{ conf.getEndDate().isoformat() }}">
+                {{ conf.getEndDate() |format_datetime(format='medium', timezone=timezone) }}
+            </time>
+        {% endif %}
+    </span>
+{%- endmacro %}

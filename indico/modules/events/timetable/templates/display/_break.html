@@ -1,0 +1,31 @@
+{% from 'events/display/_manage_button.html' import render_manage_button %}
+{% from 'events/display/_common.html' import render_location %}
+{% from 'events/timetable/display/_common.html' import render_description %}
+
+{% macro render_break(item, event, parent=none, timezone=none, show_notes=true, hide_end_time=false, nested=false) %}
+    <li class="timetable-item breakListItem">
+        <span class="{{ 'subEventLevelTime' if nested else 'topLevelTime' }}">
+            {{ item.timetable_entry.start_dt |format_time(timezone=timezone) }}
+            {% if not hide_end_time %}
+                - {{ (item.timetable_entry.start_dt + item.duration) |format_time(timezone=timezone) }}
+            {% endif %}
+        </span>
+
+        <span class="confModifPadding">
+            <span class="{{ 'subEventLevelTitle' if nested else 'topLevelTitle' }}" style="color: #69856e;">
+                {{ item.title }}
+            </span>
+            {% if hide_end_time and item.duration -%}
+                <em>{{ item.duration |format_human_timedelta }}</em>
+            {%- endif %}
+        </span>
+
+        {% if not item.inherit_location -%}
+            ({{ render_location(item, parent=parent) }})
+        {%- endif %}
+
+        {% if item.description %}
+            <span class="description">{{ render_description(item) }}</span>
+        {% endif %}
+    </li>
+{% endmacro %}

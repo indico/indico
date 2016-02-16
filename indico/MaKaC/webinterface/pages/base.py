@@ -26,7 +26,7 @@ from indico.core.config import Config
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
-from indico.util.string import to_unicode
+from indico.util.string import to_unicode, encode_if_unicode
 from indico.web.util import jsonify_template
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
@@ -214,9 +214,9 @@ class WPBase():
     def display( self, **params ):
         """
         """
-        return "%s%s%s"%( self._getHTMLHeader(), \
-                            self._display( params ), \
-                            self._getHTMLFooter() )
+        return "%s%s%s" % (self._getHTMLHeader(),
+                           encode_if_unicode(self._display(params)),
+                           self._getHTMLFooter())
 
 
     # auxiliar functions
