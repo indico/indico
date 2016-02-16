@@ -1,3 +1,49 @@
+
+function setupEventDisplay() {
+    $('.js-go-to-day').dropdown({
+        always_listen: true
+    }).find('li a').on('menu_select', function() {
+        window.location = $(this).attr('href');
+        return false;
+    });
+
+    $('.notes-editor').on('click', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        ajaxDialog({
+            title: $this.data('title'),
+            url: $this.data('href'),
+            confirmCloseUnsaved: true,
+            onClose: function(data, customData) {
+                if (data || customData) {
+                    location.reload();
+                }
+            }
+        });
+        return false;
+    });
+
+    $('.notes-compile').on('click', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        ajaxDialog({
+            title: $this.data('title'),
+            url: $this.data('href'),
+            confirmCloseUnsaved: true,
+            onClose: function(data, customData) {
+                if (data || customData) {
+                    location.reload();
+                }
+            }
+        });
+        return false;
+    });
+
+    $(document).ready(function() {
+        $('h1, .subLevelTitle, .subEventLevelTitle, .topLevelTitle').mathJax();
+    });
+}
+
 $(document).ready(function() {
     'use strict';
 
@@ -103,4 +149,7 @@ $(document).ready(function() {
             }
         }
     });
+
+    setupEventDisplay();
+
 });
