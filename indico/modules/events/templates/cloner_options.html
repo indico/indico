@@ -17,6 +17,8 @@
 
             function _update() {
                 var $this = $(this);
+                // note that the data attributes also contain names of internal cloners which will not
+                // have corresponding checkboxes.  take this into account when changing the code below
                 if (this.checked) {
                     $this.data('requires').forEach(function(name) {
                         $('#cloner-' + name).prop('checked', true);

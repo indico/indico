@@ -49,6 +49,15 @@ class EventCloner(object):
     #: Use this to deselect options which are less common and thus
     #: should not be enabled by default when cloning an event.
     is_default = False
+    #: Whether this cloner is internal and never shown in the list.
+    #: An internal cloner is executed when `is_default` is set to
+    #: ``True`` or another cloner depends on it (always use `requires`
+    #: for this; `uses` will not enable an internal cloner).  If
+    #: you override `is_visible` for an internal cloner (which only
+    #: makes sense when turning `is_internal` into a property), make
+    #: sure to check the super return value of `is_visible` to prevent
+    #: an internal cloner from showing up in the cloner selection.
+    is_internal = False
 
     @classmethod
     def get_form_items(cls, old_event):
@@ -59,10 +68,16 @@ class EventCloner(object):
     @classmethod
     def run_cloners(cls, old_event, new_event):
         selected = {x[7:] for x in request.values.getlist('cloners') if x.startswith('cloner_')}
-        active_cloners = OrderedDict((name, cloner_cls(old_event))
-                                     for name, cloner_cls in get_event_cloners().iteritems()
-                                     if name in selected)
-        if not all(c.is_visible and c.is_available for c in active_cloners.itervalues()):
+        all_cloners = OrderedDict((name, cloner_cls(old_event))
+                                  for name, cloner_cls in get_event_cloners().iteritems())
+        if any(cloner.is_internal for name, cloner in all_cloners.iteritems() if name in selected):
+            raise Exception('An internal cloner was selected')
+        # enable internal cloners that are enabled by default or required by another cloner
+        selected |= {c.name
+                     for c in all_cloners.itervalues()
+                     if c.is_internal and (c.is_default or c.required_by_deep & selected)}
+        active_cloners = OrderedDict((name, cloner) for name, cloner in all_cloners.iteritems() if name in selected)
+        if not all((c.is_internal or c.is_visible) and c.is_available for c in active_cloners.itervalues()):
             raise Exception('An invisible/unavailable cloner was selected')
         for name, cloner in active_cloners.iteritems():
             if not (selected >= cloner.requires_deep):
@@ -131,7 +146,7 @@ class EventCloner(object):
         Use this to hide an option because of a feature not being
         enabled or because of the event type not supporting it.
         """
-        return True
+        return not self.is_internal
 
     @property
     def is_available(self):
