@@ -133,7 +133,7 @@
                                    data-title="{% trans title=contrib.title %}Manage materials for '{{ title }}'{% endtrans %}"
                                    data-locator="{{ contrib.locator|tojson|forceescape }}">
                                 </a>
-                                <a href="#" class="icon-lock-center"
+                                <a href="#" class="icon-shield"
                                    data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
                                    data-title="{% trans %}Manage contribution protection{% endtrans %}"
                                    data-update="#contribution-list"
