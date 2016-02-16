@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- (function(global) {
+(function(global) {
     'use strict';
 
     global.initMenuSortable = function initMenuSortable() {
@@ -224,4 +224,4 @@
             }
         });
     });
- })(window);
+})(window);
