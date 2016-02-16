@@ -251,14 +251,14 @@ class OfflineEventCreator(object):
         return secure_filename(remove_tags(path))
 
     def _getAllMaterial(self):
-        self._addMaterialFrom(self._conf, "events/conference")
-        for contrib in self._conf.getContributionList():
-            self._addMaterialFrom(contrib, "agenda/%s-contribution" % contrib.getId())
-            if contrib.getSubContributionList():
-                for sc in contrib.getSubContributionList():
-                    self._addMaterialFrom(sc, "agenda/%s-subcontribution" % sc.getId())
-        for session in self._conf.getSessionList():
-            self._addMaterialFrom(session, "agenda/%s-session" % session.getId())
+        event = self._conf.as_event
+        self._addMaterialFrom(event, "events/conference")
+        for contrib in event.contributions:
+            self._addMaterialFrom(contrib, "agenda/%s-contribution" % contrib.id)
+            for sc in contrib.subcontributions:
+                self._addMaterialFrom(sc, "agenda/%s-subcontribution" % sc.id)
+        for session in event.sessions:
+            self._addMaterialFrom(session, "agenda/%s-session" % session.id)
 
     def _addMaterialFrom(self, target, categoryPath):
         for folder in AttachmentFolder.get_for_linked_object(target, preload_event=True):
