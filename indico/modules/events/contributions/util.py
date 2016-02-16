@@ -19,11 +19,12 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from copy import deepcopy
 
-from flask import flash, url_for
+from flask import flash, session
 from sqlalchemy.orm import load_only, contains_eager, noload, joinedload
 
 from indico.core.db import db
 from indico.modules.events.models.events import Event
+from indico.modules.events.models.report_links import ReportLink
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_event_person
@@ -33,6 +34,7 @@ from indico.util.i18n import _
 from indico.util.reporter import ReporterBase
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 
 
 def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
@@ -166,7 +168,9 @@ class ContributionReporter(ReporterBase):
             flash(_("The contribution '{}' is not displayed in the list due to the enabled filters")
                   .format(contrib.title), 'info')
 
-    def get_report_url(self):
+    def get_report_url(self, uuid=None):
+        if uuid:
+            return url_for('.manage_contributions', self.report_event, config=uuid, _external=True)
         return url_for('.manage_contributions', self.report_event)
 
     @memoize_request
@@ -182,3 +186,13 @@ class ContributionReporter(ReporterBase):
         return filterable_items
         # TODO: Handle contribution status
 
+    def generate_static_url(self):
+        session_key = self.get_config_session_key()
+        configuration = {
+            'entry_parent_id': self.report_event.id,
+            'data': session.get(session_key)
+        }
+        if configuration['data']:
+            link = ReportLink.create(self.report_event, self.report_link_type, configuration)
+            return self.get_report_url(uuid=link.uuid)
+        return self.get_report_url()

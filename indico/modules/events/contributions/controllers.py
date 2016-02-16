@@ -105,6 +105,12 @@ class RHContributionsReportCustomize(RHManageContributionsBase):
         return jsonify_data(**self.reporter.render_contrib_report(filters))
 
 
+class RHContributionsReportStaticURL(RHManageContributionsBase):
+    """Generate a static URL for the configuration of the contribution report"""
+
+    def _process(self):
+        return jsonify(url=self.reporter.generate_static_url())
+
 
 class RHCreateContribution(RHManageContributionsBase):
     def _process(self):

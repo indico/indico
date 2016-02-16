@@ -71,6 +71,11 @@
                     {% trans %}Filters{% endtrans %}
                 </button>
             </div>
+            <div class="group">
+                <button class="i-button icon-link js-static-url"
+                        data-href="{{ url_for('.generate_static_url', event) }}"
+                        title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+            </div>
         </div>
     </div>
     <div class="report" id="contribution-list">

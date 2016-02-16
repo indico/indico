@@ -205,6 +205,21 @@
         });
     }
 
+    function setupStaticURLGeneration() {
+        $('.js-static-url').on('click', function() {
+            var $this = $(this);
+            $.ajax({
+                method: 'POST',
+                url: $this.data('href'),
+                error: handleAjaxError,
+                complete: IndicoUI.Dialogs.Util.progress(),
+                success: function(data) {
+                    $this.copyURLTooltip(data.url);
+                }
+            });
+        });
+    }
+
     global.setupContributionList = function setupContributionList(options) {
         options = $.extend({
             createSessionURL: null,
@@ -214,6 +229,7 @@
         setupTableSorter();
         setupSearchBox();
         setupFilterDialog();
+        setupStaticURLGeneration();
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
