@@ -61,14 +61,20 @@
                                        data-href="{{ url_for('.modify_session', sess) }}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-time highlight i-button-icon"
-                                       title="{% trans %}Go to this session timetable{% endtrans %}"></a>
+                                    <a href="#" class="icon-shield i-button-icon"
+                                       title="{% trans %}Manage protection{% endtrans %}"
+                                       data-href="{{ url_for('.session_protection', sess) }}"
+                                       data-title={% trans %}Manage session protection{% endtrans %}"
+                                       data-update="#sessions-wrapper"
+                                       data-ajax-dialog></a>
                                     <a href="#" class="icon-attachment highlight i-button-icon"
                                        title="{% trans %}Manage materials{% endtrans %}"
                                        data-attachment-editor
                                        data-title="{% trans title=sess.title %}Manage materials for '{{ title }}'{% endtrans %}"
                                        data-locator="{{ sess.locator|tojson|forceescape }}">
                                     </a>
+                                    <a href="#" class="icon-time highlight i-button-icon"
+                                       title="{% trans %}Go to this session timetable{% endtrans %}"></a>
                                     <a href="#" class="icon-remove highlight i-button-icon"
                                        title="{% trans %}Remove this session{% endtrans %}"
                                        data-method="DELETE"
@@ -81,11 +87,11 @@
                         </tr>
                         {% for block in sess.blocks -%}
                             <tr class="i-table session-blocks-row" style="display: none;">
-                                <td class="i-table" colspan="8">
+                                <td class="i-table" colspan="9">
                                     <table class="i-table no-margin">
                                         <colgroup>
                                             <col span="2">
-                                            <col span="6">
+                                            <col span="7">
                                         </colgroup>
                                         <tr class="i-table content">
                                             <td class="i-table caption">
