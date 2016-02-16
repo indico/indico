@@ -20,6 +20,8 @@
 @import 'partials/buttons';
 
 
+$header-blue = #1a64a0;
+
 #flashed-messages {
     margin: 1em auto 0 auto;
     width: 1000px;
@@ -193,5 +195,76 @@ li > table + .note-area-wrapper {
 .contrib-description {
     &.plain {
         white-space: pre-line;
+    }
+}
+
+.item-location {
+    box-sizing: border-box;
+    background-color: $pastel-gray;
+    border-radius: 0.2em;
+    padding: 0.15em 0.5em 0.15em 0.25em;
+    color: $black;
+
+    &:before {
+        color: $light-black;
+        margin-right: 0.2em;
+        vertical-align: middle;
+    }
+
+    &.header-data {
+        padding: 0;
+    }
+}
+
+.event-time-data {
+    line-height: 1.15em;
+    time {
+        display: inline-block;
+        padding: 0.15em 0.25em 0.15em 0.25em;
+        background-color: darken($header-blue, 5%);
+        color: $light-gray;
+        border-radius: 0.2em;
+    }
+
+    .date {
+        color: $gray;
+    }
+}
+
+.header-data {
+    &:before {
+        color: white;
+        margin-right: 0.4em;
+        vertical-align: middle;
+    }
+
+    a {
+        color: $light-gray !important;
+    }
+    color: $light-gray;
+    background-color: transparent;
+}
+
+.timetable-contrib-title {
+    margin-right: 0.2em;
+}
+
+.timetable-duration {
+    box-sizing: border-box;
+    padding: 0.15em 0.5em 0.15em 0.25em;
+    color: $dark-gray;
+
+    &:before {
+        color: $dark-gray;
+        margin-right: 0.2em;
+    }
+}
+
+.speaker-list {
+    color: $light-black;
+
+    .affiliation {
+        font-size: 0.9em;
+        color: $dark-gray;
     }
 }

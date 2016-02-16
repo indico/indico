@@ -15,35 +15,35 @@
       </div>
   </div>
 
-  % if location:
+  % if event.has_location_info or event.address:
     <div class="infoline location">
         <span title="${_("Location")}" class="icon icon-location" aria-hidden="true"></span>
         <div class="place text">
-          ${location}
+          ${event.venue_name}
         </div>
-      % if room:
-        <div class="room text">${room}</div>
+      % if event.room_name:
+        <div class="room text">${event.room_name}</div>
       % endif
-      % if address:
-        <div class="address text nohtml">${address}</div>
+      % if event.address:
+        <div class="address text nohtml">${event.address}</div>
       % endif
     </div>
   % endif
 
-  % if chairs:
+  % if event.person_links:
   <div class="infoline chairs clear">
       <span  title="${_("Chairpersons")}" class="icon icon-user-chairperson" aria-hidden="true"></span>
       <ul class="chair_list text">
-        % for chair in chairs:
+        % for link in event.person_links:
         <li>
-          % if chair.getEmail():
-            % if self_._aw.getUser():
-              <a href="mailto:${chair.getEmail()}">${chair.getFullName()}</a>
+          % if link.person.email:
+            % if _session.user:
+              <a href="mailto:${link.person.email}">${link.person.full_name}</a>
             % else:
-              <a href="#" class="nomail">${chair.getFullName()}</a>
+              <a href="#" class="nomail">${link.person.full_name}</a>
             % endif
           % else:
-            ${chair.getFullName()}
+            ${link.person.full_name}
           % endif
         </li>
         % endfor

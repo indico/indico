@@ -455,14 +455,6 @@ div.meetingEventHeader h1 {
     margin-bottom: 10px;
 }
 
-div.meetingEventHeader a {
-    color: white;
-}
-
-div.meetingEventHeader a:hover {
-    color: #AAAAAA;
-}
-
 div.meetingEventHeader .iCal {
     position: absolute;
     top: 0px;
@@ -473,7 +465,6 @@ div.meetingEventHeader .iCal {
 div.meetingEventHeader .details {
     padding-top: 10px;
     margin: 0;
-    text-shadow: 1px 1px 1px #555;
 }
 
 div.meetingEventSubHeader {
@@ -570,10 +561,6 @@ li.meetingSession, li.meetingContrib, li.breakListItem {
     margin: 0 0 0 0;
 }
 
-li.meetingContrib a.meeting-timetable-item-edit {
-    margin-top: 0;
-}
-
 li.breakListItem pre {
     margin: 0;
 }
@@ -618,7 +605,6 @@ table.sessionDetails {
 }
 
 table.sessionDetails td {
-    color: #444444;
     vertical-align: top;
     padding: 2px;
     padding-left: 0;
@@ -660,7 +646,9 @@ div.materialList h3, div.partList h3{
     -moz-border-radius-topleft: 0.2em;
     -moz-border-radius-topright: 0.2em;
 }
-.manageLink div {
+.manageLink .dropDownMenu {
+    color: #0b63a5;
+    display: block;
     padding-top: 7px;
     padding-bottom: 4px;
     padding-left: 12px;
@@ -681,4 +669,9 @@ span.description pre, p {
 
 .materialDisplayName {
     font-size: 14px;
+}
+
+.event-manage-button {
+    margin-top: 10px;
+    font-size: 10pt;
 }

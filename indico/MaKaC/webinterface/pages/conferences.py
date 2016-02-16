@@ -15,8 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import collections
-from flask import session, request
+from flask import session, render_template, request
 import os
+import posixpath
 import re
 
 from datetime import timedelta, datetime
@@ -54,7 +55,6 @@ from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
-from MaKaC.conference import Session, Contribution
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.TemplateExec import render, mako_call_template_hook
@@ -339,13 +339,12 @@ class WConfDetailsBase( wcomponents.WTemplated ):
 
         vars["dateInterval"] = (fsdate, fstime, fedate, fetime)
 
-        vars["location"] = None
         vars["address"] = None
         vars["room"] = None
 
-        vars["chairs"] = self._conf.getChairList()
         vars["attachments"] = self._conf.attached_items
         vars["conf"] = self._conf
+        vars["event"] = self._conf.as_event
 
         info = self._conf.getContactInfo()
         vars["moreInfo_html"] = isStringHTML(info)
@@ -511,30 +510,12 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
     def __init__(self, rh, conference, view, type, params):
         WPXSLConferenceDisplay.__init__(self, rh, conference, view, type, params)
         imagesBaseURL = Config.getInstance().getImagesBaseURL()
-        self._types = {
-            "pdf"   :{"mapsTo" : "pdf",   "imgURL" : os.path.join(imagesBaseURL, "pdf_small.png"),  "imgAlt" : "pdf file"},
-            "doc"   :{"mapsTo" : "doc",   "imgURL" : os.path.join(imagesBaseURL, "word.png"),       "imgAlt" : "word file"},
-            "docx"  :{"mapsTo" : "doc",   "imgURL" : os.path.join(imagesBaseURL, "word.png"),       "imgAlt" : "word file"},
-            "ppt"   :{"mapsTo" : "ppt",   "imgURL" : os.path.join(imagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
-            "pptx"  :{"mapsTo" : "ppt",   "imgURL" : os.path.join(imagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
-            "xls"   :{"mapsTo" : "xls",   "imgURL" : os.path.join(imagesBaseURL, "excel.png"),      "imgAlt" : "excel file"},
-            "xlsx"  :{"mapsTo" : "xls",   "imgURL" : os.path.join(imagesBaseURL, "excel.png"),      "imgAlt" : "excel file"},
-            "sxi"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(imagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
-            "odp"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(imagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
-            "sxw"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(imagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
-            "odt"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(imagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
-            "sxc"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(imagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
-            "ods"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(imagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
-            "other" :{"mapsTo" : "other", "imgURL" : os.path.join(imagesBaseURL, "file_small.png"), "imgAlt" : "unknown type file"},
-            "link"  :{"mapsTo" : "link",  "imgURL" : os.path.join(imagesBaseURL, "link.png"),       "imgAlt" : "link"}
-        }
 
     def _getVariables(self, conf):
         wvars = {}
         wvars['INCLUDE'] = '../include'
 
         wvars['accessWrapper'] = accessWrapper = self._rh._aw
-        wvars['conf'] = conf
         if conf.getOwnerList():
             wvars['category'] = conf.getOwnerList()[0].getName()
         else:
@@ -542,12 +523,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
         tz = timezoneUtil.getDisplayTZ()
-        wvars['startDate'] = conf.getAdjustedStartDate(tz)
-        wvars['endDate'] = conf.getAdjustedEndDate(tz)
         wvars['timezone'] = tz
 
         attached_items = conf.attached_items
-
         lectures, folders = [], []
 
         for folder in attached_items.get('folders', []):
@@ -564,44 +542,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             'lectures': sorted(lectures, cmp=cmp_title_number)
         })
 
-        wvars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
-
-        wvars['types'] = self._types
-
-        wvars['entries'] = []
-        confSchedule = conf.getSchedule()
-        showSession = self._params.get("showSession","all")
-        detailLevel = self._params.get("detailLevel", "contribution")
-        showDate = self._params.get("showDate", "all")
-        # Filter by day
-        if showDate == "all":
-            entrylist = confSchedule.getEntries()
-        else:
-            entrylist = confSchedule.getEntriesOnDay(timezone(tz).localize(stringToDate(showDate)))
-        # Check entries filters and access rights
-        for entry in entrylist:
-            sessionCand = entry.getOwner().getOwner()
-            # Filter by session
-            if isinstance(sessionCand, Session) and (showSession != "all" and sessionCand.getId() != showSession):
-                continue
-            # Hide/Show contributions
-            if isinstance(entry.getOwner(), Contribution) and detailLevel != "contribution":
-                continue
-            if entry.getOwner().canView(accessWrapper):
-                if type(entry) is schedule.BreakTimeSchEntry:
-                    newItem = entry
-                else:
-                    newItem = entry.getOwner()
-                wvars['entries'].append(newItem)
-
-        wvars['entries'].sort(key=lambda entry: entry.getEndDate(), reverse=True)
-        wvars['entries'].sort(key=lambda entry: (entry.getStartDate(),
-                                                 entry.getFullTitle() if hasattr(entry, 'getFullTitle') else None))
         wvars["daysPerRow"] = self._daysPerRow
         wvars["firstDay"] = self._firstDay
         wvars["lastDay"] = self._lastDay
-        wvars["currentUser"] = self._rh._aw.getUser()
-        wvars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return wvars
 
     def _getItemType(self, item):
@@ -630,10 +573,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             if item.canModify(self._rh._aw):
                 info["modifyLink"] = urlHandlers.UHConferenceModification.getURL(item)
                 info["minutesLink"] = self._type != 'simple_event'
-                info["materialLink"] = True
                 info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
             elif item.as_event.can_manage(session.user, 'submit'):
-                info["minutesLink"] = self._type != 'simple_event'
                 info["materialLink"] = True
 
         elif itemType == 'Session':
@@ -645,7 +586,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             info['sessId'] = sess.getId()
             if sess.canModify(self._rh._aw) or sess.canCoordinate(self._rh._aw):
                 info["minutesLink"] = True
-                info["materialLink"] = True
                 url = urlHandlers.UHSessionModifSchedule.getURL(sess)
                 ttLink = "%s#%s.s%sl%s" % (url, sess.getStartDate().strftime('%Y%m%d'), sess.getId(), info['slotId'])
                 info["sessionTimetableLink"] = ttLink
@@ -656,7 +596,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                 info["modifyLink"] = urlHandlers.UHContributionModification.getURL(item)
             if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
                 info["minutesLink"] = True
-                info["materialLink"] = True
             info["contId"] = item.getId()
             owner = item.getOwner()
             if self._getItemType(owner) == 'Session':
@@ -668,7 +607,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                 info["modifyLink"] = urlHandlers.UHSubContributionModification.getURL(item)
             if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
                 info["minutesLink"] = True
-                info["materialLink"] = True
             info["subContId"] = item.getId()
             info["contId"] = item.getContribution().getId()
             owner = item.getOwner()
@@ -783,30 +721,18 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         if self._view != 'xml':
             vars = self._getVariables(self._conf)
-            vars['getTime'] = lambda date : format_time(date.time(), format="HH:mm")
-            vars['isTime0H0M'] = lambda date : (date.hour, date.minute) == (0,0)
-            vars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
-            vars['prettyDate'] = lambda date : format_date(date, format='full')
-            vars['prettyDuration'] = MaKaC.common.utils.prettyDuration
-            vars['parseDate'] = MaKaC.common.utils.parseDate
             vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
-            vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
-            vars['getItemType'] = lambda item : self._getItemType(item)
-            vars['dumps'] = json.dumps
-            vars['timedelta'] = timedelta
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()
             vars = {}
             vars['xml'] = outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)
 
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        if styleMgr.existsTPLFile(self._view):
-            fileName = os.path.splitext(styleMgr.getTemplateFilename(self._view))[0]
-            body = wcomponents.WTemplated(os.path.join("events", fileName)).getHTML(vars)
-        else:
-            return _("Template could not be found.")
-        return body
+        theme = self._view or layout_settings.get(self._conf, 'theme', self._conf.getDefaultStyle())
+        file_name = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getTemplateFilename(theme)
+
+        return render_template(posixpath.join('events/display', file_name), event=self._conf.as_event,
+                               conf=self._conf, show_notes=(theme == 'standard_inline_minutes'), **vars).encode('utf-8')
 
 
 class WPrintPageFrame (wcomponents.WTemplated):

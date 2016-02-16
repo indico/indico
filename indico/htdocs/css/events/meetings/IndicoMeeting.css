@@ -33,7 +33,7 @@ div.meetingEventHeader {
     border-top-right-radius: 0.2em;
 }
 
-div.meetingEventHeader > div.details,  div.meetingEventHeader a{
+div.meetingEventHeader > div.details {
     color: #CCC;
 }
 

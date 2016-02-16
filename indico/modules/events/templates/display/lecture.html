@@ -1,0 +1,43 @@
+{% from 'events/display/_manage_button.html' import render_manage_button %}
+{% from 'events/display/_common.html' import render_location, render_users, render_event_time %}
+{% from 'events/notes/_note.html' import render_note %}
+
+<div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
+    {% block header %}
+        <div class="lectureEventHeader">
+            <div class="lectureCategory">{{ category }}</div>
+            {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
+            <div class="event-manage-button">
+                {{ render_manage_button(event, 'EVENT', align_right=true, manage_link=true, show_button=show_button) }}
+            </div>
+
+            <h1 itemprop="name">{{ event.title }}</h1>
+            {% set chairpersons = event.person_links %}
+            {% if chairpersons %}
+                <h2>
+                    {% trans %}by{% endtrans %}
+                    {{ render_users(chairpersons, spanClass='author', title=False) }}
+                </h2>
+            {% endif %}
+            <div class="details">
+                {% if event.venue_name or event.room_name or event.address %}
+                    <div class="lectureEventLocation">
+                        {{ render_location(event) }}
+                        {% if event.address %}
+                            <div class="address">{{ event.address }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endblock %}
+
+    {% block body %}
+        <div class="lectureEventBody">
+            {% include 'events/display/_details.html' %}
+        </div>
+    {% endblock %}
+
+    {% block footer %}
+    {% endblock %}
+</div>

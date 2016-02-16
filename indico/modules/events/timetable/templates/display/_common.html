@@ -1,0 +1,43 @@
+{% from 'events/notes/_note.html' import render_note %}
+{% from 'attachments/_display.html' import render_attachments_folders %}
+{% from 'events/display/_common.html' import render_users %}
+
+{% macro render_description(item) %}
+    <span itemprop="description" class="contrib-description html">
+        {{ item.description | safe }}
+    </span>
+{% endmacro %}
+
+{% macro render_references(item) -%}
+    {%- for reference in item.references: -%}
+        {% if reference.url -%}
+            <a href="{{ reference.url }}" target="_blank">{{ reference.urn }}</a>
+        {%- else -%}
+            {{ reference.urn }}
+        {%- endif %}
+    {%- endfor -%}
+{%- endmacro %}
+
+{% macro render_speakers(speakers) -%}
+        <div class="speaker-list">
+            {{ ngettext("Speaker", "Speakers", speakers|length) }}: {{ render_users(speakers) }}
+        </div>
+{%- endmacro %}
+
+{% macro render_attachments(item) -%}
+    <tr class="js-attachment-container">
+        {% if item.attached_items %}
+            <td class="leftCol icon-attachment inline-attachments-icon"></td>
+            <td class="material-list">
+                {{ render_attachments_folders(item=item) }}
+            </td>
+        {% endif %}
+    </tr>
+{%- endmacro %}
+
+{% macro render_notes(item) -%}
+    {% if item.has_note %}
+        {{ render_note(note=item.note, can_edit=(item.can_manage(session.user)
+                                                 or item.can_manage(session.user, 'submit'))) }}
+    {% endif %}
+{%- endmacro %}

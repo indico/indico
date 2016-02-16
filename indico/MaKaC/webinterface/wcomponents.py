@@ -56,7 +56,7 @@ from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.util import preload_events
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
-from indico.util.date_time import utc_timestamp, is_same_month
+from indico.util.date_time import utc_timestamp, is_same_month, format_date
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
 from indico.web.flask.templating import get_template_module
@@ -540,12 +540,10 @@ class WMenuMeetingHeader( WConferenceHeader ):
         else:
             selectedDate = "all"
         dates = [ i18nformat(""" <option value="all" %s>- -  _("all days") - -</option> """)%selected]
-        while sdate.strftime("%Y-%m-%d") <= edate.strftime("%Y-%m-%d"):
-            selected = ""
-            if selectedDate == sdate.strftime("%d-%B-%Y"):
-                selected = "selected"
-            d = sdate.strftime("%d-%B-%Y")
-            dates.append(""" <option value="%s" %s>%s</option> """%(d, selected, d))
+        while sdate.date() <= edate.date():
+            iso_date = sdate.date().isoformat()
+            selected = 'selected' if selectedDate == iso_date else ''
+            dates.append('<option value="{}" {}>{}</option>'.format(iso_date, selected, format_date(sdate)))
             sdate = sdate + timedelta(days=1)
         vars["datesMenu"] = "".join(dates);
 
@@ -559,15 +557,12 @@ class WMenuMeetingHeader( WConferenceHeader ):
         else:
             selectedSession = "all"
         sessions = [ i18nformat(""" <option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
-        for session in self._conf.getSessionList():
-            selected = ""
-            id = session.getId()
-            if id == selectedSession:
-                selected = "selected"
-            title = session.getTitle()
+        for session_ in self._conf.as_event.sessions:
+            selected = "selected" if str(session_.id) == selectedSession else ''
+            title = session_.title
             if len(title) > 60:
                 title = title[0:40] + "..."
-            sessions.append(""" <option value="%s" %s>%s</option> """%(id, selected, title))
+            sessions.append(""" <option value="%s" %s>%s</option> """%(session_.id, selected, title))
         vars["sessionsMenu"] = "".join(sessions);
 
         # Handle hide/show contributions option
