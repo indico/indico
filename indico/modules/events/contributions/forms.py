@@ -32,8 +32,8 @@ from indico.util.i18n import _
 class ContributionForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"))
-    duration = TimeDeltaField(_("Duration"), [DataRequired()], default=timedelta(minutes=20),
-                              units=('minutes', 'hours'),
+    duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
+                              default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
     type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
     person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
