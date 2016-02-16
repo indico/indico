@@ -18,45 +18,38 @@ from copy import deepcopy
 
 from flask import session, request
 
+from indico.modules.events.models.report_links import ReportLink
+
 
 class ReporterBase(object):
     """Serves as a base class for classes performing actions on reports."""
 
-    #: A unique ID for the report
-    REPORT_ID = ''
-    #: Dict containing the default visible columns and filtering options
-    DEFAULT_REPORT_CONFIG = {}
-    #: OrderedDict containing the filterable columns of the report
-    FILTERABLE_ITEMS = None
-    cache = None
+    def __init__(self, event, entry_parent):
+        self.report_event = event
+        self.entry_parent = entry_parent
+        self.report_link_type = ''
+        self.default_report_config = {}
+        self.filterable_items = None
 
-    @classmethod
-    def get_config_session_key(cls, entry_parent_id):
+    def get_config_session_key(self):
         """Compose the unique configuration ID.
 
         This ID will be used as a key to set the report's configuration to the
         session.
-
-        :param entry_parent_id: The ID of the parent of the report's entries
         """
-        return '{}_config_{}'.format(cls.REPORT_ID, entry_parent_id)
+        return '{}_config_{}'.format(self.report_link_type, self.entry_parent.id)
 
-    @classmethod
-    def get_config(cls, entry_parent_id):
-        """Get the report's configuration from the session and return it.
-
-        :param entry_parent_id: The ID of the parent of the report's entries
-        """
-        session_key = cls.get_config_session_key(entry_parent_id)
+    def get_config(self):
+        """Load the report's configuration from the DB and return it."""
+        session_key = self.get_config_session_key()
         report_config_uuid = request.args.get('config')
         if report_config_uuid:
-            configuration = cls.cache.get(report_config_uuid)
-            if configuration and configuration['entry_parent_id'] == entry_parent_id:
+            configuration = ReportLink.load(self.report_event, self.report_link_type, report_config_uuid)
+            if configuration and configuration['entry_parent_id'] == self.entry_parent.id:
                 session[session_key] = configuration['data']
-        return session.get(session_key, cls.DEFAULT_REPORT_CONFIG)
+        return session.get(session_key, self.default_report_config)
 
-    @classmethod
-    def build_query(cls):
+    def build_query(self):
         """Return the query of the report's entries.
 
         The query should not take into account the user's filtering
@@ -65,18 +58,23 @@ class ReporterBase(object):
         """
         raise NotImplementedError
 
-    @classmethod
-    def filter_report_entries(cls):
+    def filter_report_entries(self):
         """Apply user's filters to query and return it."""
         raise NotImplementedError
 
-    @classmethod
-    def get_filters_from_request(cls):
+    def get_filters_from_request(self):
         """Get the new filters after the filter form is submitted."""
-        filters = deepcopy(cls.DEFAULT_REPORT_CONFIG['filters'])
-        for item_id, item in cls.FILTERABLE_ITEMS.iteritems():
+        filters = deepcopy(self.default_report_config['filters'])
+        for item_id, item in self.filterable_items.iteritems():
             if item.get('filter_choices'):
                 options = request.form.getlist('field_{}'.format(item_id))
                 if options:
                     filters['items'][item_id] = options
         return filters
+
+    def get_report_url(*args, **kwargs):
+        """Return the URL of the report management page."""
+        raise NotImplementedError
+
+    def has_config(self):
+        return 'config' in request.args
