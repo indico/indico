@@ -22,10 +22,9 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
-from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.contributions.fields import ContributionPersonListField
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoEnumRadioField, IndicoLocationField
+from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField
 from indico.web.forms.validators import UsedIf
 from indico.util.i18n import _
 
@@ -48,17 +47,17 @@ class ContributionForm(IndicoForm):
 
 
 class ContributionProtectionForm(IndicoForm):
-    protection_mode = IndicoEnumRadioField(_('Protection mode'), enum=ProtectionMode)
-    acl = PrincipalListField(_('Access control list'), [UsedIf(lambda form, field: form.contrib.is_protected)],
+    protection_mode = IndicoProtectionField(_('Protection mode'))
+    acl = PrincipalListField(_('Access control list'), [UsedIf(lambda form, field: form.protected_object.is_protected)],
                              serializable=False, groups=True,
                              description=_('List of users allowed to access the contribution. If the protection mode '
                                            'is set to inheriting, these users have access in addition to the users '
                                            'who can access the parent object.'))
-    managers = PrincipalListField(_('Managers'), description=_('List of users allowed to modify the contribution'),
-                                  serializable=False, groups=True)
+    managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
+                                  description=_('List of users allowed to modify the contribution'))
     submitters = PrincipalListField(_('Submitters'), serializable=False, groups=True,
                                     description=_('List of users allowed to submit materials for this contribution'))
 
     def __init__(self, *args, **kwargs):
-        self.contrib = kwargs.pop('contrib')
+        self.protected_object = kwargs.pop('contrib')
         super(ContributionProtectionForm, self).__init__(*args, **kwargs)
