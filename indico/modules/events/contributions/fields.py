@@ -20,6 +20,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, AuthorType,
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.util import serialize_contribution_person_link
+from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _
 from indico.web.forms.fields import EventPersonListField
 from indico.web.forms.widgets import JinjaWidget
@@ -51,7 +52,11 @@ class ContributionPersonListField(EventPersonListField):
         author_type = data.pop('authorType', self.default_author_type)
         is_speaker = data.pop('isSpeaker', self.default_is_speaker)
         person = self._get_event_person(data)
-        return ContributionPersonLink(person=person, author_type=author_type, is_speaker=is_speaker)
+        title = next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none)
+        return ContributionPersonLink(person=person, first_name=data.get('firstName', ''), last_name=data['familyName'],
+                                      title=title, affiliation=data.get('affiliation', ''),
+                                      address=data.get('address', ''), phone=data.get('phone', ''),
+                                      author_type=author_type, is_speaker=is_speaker)
 
     def _serialize_principal(self, principal):
         if not isinstance(principal, (ContributionPersonLink, SubContributionPersonLink)):
