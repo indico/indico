@@ -23,6 +23,7 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.logger import Logger
 from indico.core.roles import check_roles, ManagementRole, get_available_roles
+from indico.modules.events.cloning import get_event_cloners
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
@@ -231,3 +232,9 @@ def _category_moved(category, old_parent, new_parent, **kwargs):
         assert int(event.as_legacy.getOwner().id) == int(category.id)
         # this will also update the chain (sqlalchemy hook)
         event.category_id = int(category.id)
+
+
+@signals.app_created.connect
+def _check_cloners(app, **kwargs):
+    # This will raise RuntimeError if the cloner names are not unique
+    get_event_cloners()
