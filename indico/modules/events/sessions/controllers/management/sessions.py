@@ -27,11 +27,12 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
-from indico.modules.events.sessions.forms import SessionForm
+from indico.modules.events.sessions.forms import SessionForm, SessionProtectionForm
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
 from indico.modules.events.sessions.util import (get_colors, query_active_sessions, generate_spreadsheet_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
+from indico.modules.events.util import update_object_principals
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -153,3 +154,25 @@ class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActions
     def _membership_filter(self):
         session_ids = {s.id for s in self.sessions}
         return Contribution.session_id.in_(session_ids)
+
+
+class RHSessionProtection(RHManageSessionBase):
+    """Manage session protection"""
+
+    def _process(self):
+        form = SessionProtectionForm(obj=FormDefaults(**self._get_defaults()), session=self.session)
+        if form.validate_on_submit():
+            update_session(self.session, {'protection_mode': form.protection_mode.data})
+            if self.session.is_protected:
+                update_object_principals(self.session, form.acl.data, read_access=True)
+            update_object_principals(self.session, form.managers.data, full_access=True)
+            update_object_principals(self.session, form.coordinators.data, role='coordinate')
+            return jsonify_data(flash=False, html=_render_session_list(self.event_new))
+        return jsonify_form(form)
+
+    def _get_defaults(self):
+        acl = {x.principal for x in self.session.acl_entries if x.read_access}
+        managers = {x.principal for x in self.session.acl_entries if x.full_access}
+        coordinators = {x.principal for x in self.session.acl_entries if x.has_management_role(role='coordinate')}
+        return {'managers': managers, 'protection_mode': self.session.protection_mode, 'coordinators': coordinators,
+                'acl': acl}

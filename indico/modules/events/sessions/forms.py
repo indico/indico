@@ -24,8 +24,10 @@ from wtforms.validators import DataRequired
 from indico.modules.events.sessions.util import get_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoPalettePickerField, TimeDeltaField, IndicoLocationField
+from indico.web.forms.fields import (IndicoPalettePickerField, TimeDeltaField, IndicoLocationField, PrincipalListField,
+                                     IndicoProtectionField)
 from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.validators import UsedIf
 
 
 class SessionForm(IndicoForm):
@@ -42,3 +44,19 @@ class SessionForm(IndicoForm):
                                       description=_('Specify text and background colours for the session.'))
     is_poster = BooleanField(_('Poster session'), widget=SwitchWidget(),
                              description=_('Whether the session is a poster session.'))
+
+
+class SessionProtectionForm(IndicoForm):
+    protection_mode = IndicoProtectionField(_('Protection mode'))
+    acl = PrincipalListField(_('Access control list'), [UsedIf(lambda form, field: form.protected_object.is_protected)],
+                             serializable=False, groups=True,
+                             description=_('List of users allowed to access the session. If the protection mode '
+                                           'is set to inheriting, these users have access in addition to the users '
+                                           'who can access the parent object.'))
+    managers = PrincipalListField(_('Managers'), serializable=False, groups=True,
+                                  description=_('List of users allowed to modify the session'))
+    coordinators = PrincipalListField(_('Coordinators'), serializable=False, groups=True)
+
+    def __init__(self, *args, **kwargs):
+        self.protected_object = kwargs.pop('session')
+        super(SessionProtectionForm, self).__init__(*args, **kwargs)
