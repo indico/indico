@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict, OrderedDict
+from copy import deepcopy
 
-from flask import flash
+from flask import flash, url_for
 from sqlalchemy.orm import load_only, contains_eager, noload, joinedload
 
 from indico.core.db import db
@@ -27,11 +28,11 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_event_person
 from indico.modules.fulltextindexes.models.events import IndexedEvent
+from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.reporter import ReporterBase
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
-from MaKaC.common.cache import GenericCache
 
 
 def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
@@ -82,43 +83,42 @@ def serialize_contribution_person_link(person_link):
 
 
 class ContributionReporter(ReporterBase):
-    """Class performing reporting and filtering actions in the contribution
-    report
-    """
-    REPORT_ID = 'contribution_report'
-    DEFAULT_REPORT_CONFIG = {'filters': {'items': {}}}
-    FILTERABLE_ITEMS = OrderedDict([
-        ('session', {
-            'title': _('Session'),
-            'filter_choices': {}
-        }),
-        ('track', {
-            'title': _('Track'),
-            'filter_choices': {}
-        }),
-        ('type', {
-            'title': _('Type'),
-            'filter_choices': {}
-        }),
-        ('status', {
-            'title': _('Status'),
-            'filter_choices': {}
-        })
-    ])
+    """Reporting and filtering actions in the contribution report."""
 
-    cache = GenericCache('contrib-report-config')
+    def __init__(self, event, entry_parent=None):
+        entry_parent = entry_parent if entry_parent else event
+        ReporterBase.__init__(self, event, entry_parent)
 
-    @classmethod
-    def build_query(cls, event):
+        self.report_link_type = 'contribution'
+        self.default_report_config = {'filters': {'items': {}}}
+        self.filterable_items = OrderedDict([
+            ('session', {
+                'title': _('Session'),
+                'filter_choices': {}
+            }),
+            ('track', {
+                'title': _('Track'),
+                'filter_choices': {}
+            }),
+            ('type', {
+                'title': _('Type'),
+                'filter_choices': {}
+            }),
+            ('status', {
+                'title': _('Status'),
+                'filter_choices': {}
+            })
+        ])
+
+    def build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
         timetable_entry_strategy.lazyload('*')
-        return (event.contributions
+        return (self.report_event.contributions
                 .filter_by(is_deleted=False)
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy))
 
-    @classmethod
-    def filter_report_entries(cls, query, filters):
+    def filter_report_entries(self, query, filters):
         if not filters.get('items'):
             return query
         item_criteria = []
@@ -134,20 +134,18 @@ class ContributionReporter(ReporterBase):
         # TODO: Handle contribution status
         return query.filter(db.or_(*item_criteria))
 
-    @classmethod
-    def get_contrib_report_args(cls, event, filters):
-        contributions_query = cls.build_query(event)
+    def get_contrib_report_args(self, filters):
+        contributions_query = self.build_query()
         total_entries = contributions_query.count()
-        contributions = cls.filter_report_entries(contributions_query, filters).all()
-        sessions = [{'id': s.id, 'title': s.title} for s in event.sessions.filter_by(is_deleted=False)]
-        tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())} for t in event.as_legacy.getTrackList()]
+        contributions = self.filter_report_entries(contributions_query, filters).all()
+        sessions = [{'id': s.id, 'title': s.title} for s in self.report_event.sessions.filter_by(is_deleted=False)]
+        tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
+                  for t in self.report_event.as_legacy.getTrackList()]
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries}
 
-    @classmethod
-    def render_contrib_report(cls, event, filters, contrib=None):
+    def render_contrib_report(self, filters, contrib=None):
         """Render the contribution report template components.
 
-        :param event: The event of the contribution report.
         :param filters: The user specified filters.
         :param contrib: Used in RHs responsible for CRUD operations on a
         contribution.
@@ -155,16 +153,32 @@ class ContributionReporter(ReporterBase):
         displayed entries and whether the contrib passed is displayed in the
         results.
         """
-        contr_report_args = cls.get_contrib_report_args(event, filters)
+        contr_report_args = self.get_contrib_report_args(filters)
         total_entries = contr_report_args.pop('total_entries')
         tpl = get_template_module('events/contributions/management/_contribution_report.html')
         fragment = tpl.render_displayed_entries_fragment(len(contr_report_args['contribs']), total_entries)
-        return {'html': tpl.render_contrib_report(event=event, **contr_report_args),
+        return {'html': tpl.render_contrib_report(event=self.report_event, **contr_report_args),
                 'displayed_records_fragment': fragment,
                 'hide_contrib': contrib not in contr_report_args['contribs'] if contrib else None}
 
-    @classmethod
-    def flash_info_message(cls, contrib, hide_contrib):
+    def flash_info_message(self, contrib, hide_contrib):
         if hide_contrib:
             flash(_("The contribution '{}' is not displayed in the list due to the enabled filters")
                   .format(contrib.title), 'info')
+
+    def get_report_url(self):
+        return url_for('.manage_contributions', self.report_event)
+
+    @memoize_request
+    def get_filterable_items_choices(self):
+        filterable_items = deepcopy(self.filterable_items)
+        filterable_items['session']['filter_choices'] = {
+            unicode(s.id): s.title for s in self.report_event.sessions.filter_by(is_deleted=False)
+        }
+        filterable_items['track']['filter_choices'] = {unicode(t.id): to_unicode(t.getTitle())
+                                                       for t in self.report_event.as_legacy.getTrackList()}
+        filterable_items['type']['filter_choices'] = {unicode(t.id): t.name
+                                                      for t in self.report_event.contribution_types}
+        return filterable_items
+        # TODO: Handle contribution status
+
