@@ -39,6 +39,14 @@
                     <a href="#" class="js-show-note-toggle">{% trans %}Show them{% endtrans %}</a>.
                 </div>
             {% endif %}
+            {% if can_edit %}
+                <div class="note-metadata {{ _togglable_classes(hidden=hidden) }}">
+                    <span class="icon-time modification-date">
+                        {{ note.current_revision.created_dt |format_datetime(format='short') }}
+                    </span>
+                    <span class="event-user no-label">{{ note.current_revision.user.full_name }}</span>
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
