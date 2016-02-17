@@ -7,81 +7,83 @@
 {% endblock %}
 
 {% block content %}
-    <div class="toolbar">
-        <div class="group">
-            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-            <ul class="dropdown">
-                <li><a href="#" data-select-all="#contribution-list input:checkbox">
-                    {% trans %}All{% endtrans %}
-                </a></li>
-                <li><a href="#" data-select-none="#contribution-list input:checkbox">
-                    {% trans %}None{% endtrans %}
-                </a></li>
-            </ul>
-        </div>
-        <div class="group">
-            <button class="i-button highlight icon-plus"
-                    title="{% trans %}Add new contribution{% endtrans %}"
-                    data-title="{% trans %}Add new contribution{% endtrans %}"
-                    data-href="{{ url_for('.manage_create_contrib', event) }}"
-                    data-ajax-dialog
-                    data-update="#contribution-list">
-                {% trans %}New contribution{% endtrans %}
-            </button>
-        </div>
-        <div class="group">
-            <button class="i-button js-enable-if-checked icon-remove" disabled
-                    title="{% trans %}Remove{% endtrans %}"
-                    data-method="POST"
-                    data-href="{{ url_for('.manage_delete_contribs', event) }}"
-                    data-params-selector="#contribution-list input[name=contribution_id]:checked"
-                    data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
-                    data-title="{% trans %}Confirm deletion{% endtrans %}"
-                    data-update="#contribution-list">
-                {%- trans %}Remove{% endtrans -%}
-            </button>
-        </div>
-        <div class="group">
-            <button class="i-button icon-users js-enable-if-checked disabled"
-                    data-title="{% trans %}Author list{% endtrans %}"
-                    data-href="{{ url_for('contributions.person_list', event) }}"
-                    data-params-selector="#contribution-list input[name=contribution_id]:checked"
-                    data-method="POST"
-                    data-dialog-classes="event-persons-dialog"
-                    data-ajax-dialog>
-                {%- trans %}Author list{% endtrans -%}
-            </button>
-            <button class="i-button js-enable-if-checked arrow" disabled
-                    title="{% trans %}Export data{% endtrans %}">
-                    {% trans %}Export{% endtrans %}
-            </button>
-        </div>
-        <div class="group right">
-            <span class="i-button label icon-search"></span>
-            <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
-        </div>
-        <div class="right">
-            <div class="group" id="displayed-records-fragment">
-                {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+    <div class="report-section">
+        <div class="toolbar">
+            <div class="group">
+                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li><a href="#" data-select-all="#contribution-list input:checkbox">
+                        {% trans %}All{% endtrans %}
+                    </a></li>
+                    <li><a href="#" data-select-none="#contribution-list input:checkbox">
+                        {% trans %}None{% endtrans %}
+                    </a></li>
+                </ul>
             </div>
             <div class="group">
-                <button id="filter-button"
-                        class="i-button icon-filter js-dialog-action js-customize-report"
-                        data-href="{{ url_for('.customize_contrib_report', event) }}">
-                    {% trans %}Filters{% endtrans %}
+                <button class="i-button highlight icon-plus"
+                        title="{% trans %}Add new contribution{% endtrans %}"
+                        data-title="{% trans %}Add new contribution{% endtrans %}"
+                        data-href="{{ url_for('.manage_create_contrib', event) }}"
+                        data-ajax-dialog
+                        data-update="#contribution-list">
+                    {% trans %}New contribution{% endtrans %}
                 </button>
             </div>
             <div class="group">
-                <button class="i-button icon-link js-static-url"
-                        data-href="{{ url_for('.generate_static_url', event) }}"
-                        title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+                <button class="i-button js-enable-if-checked icon-remove" disabled
+                        title="{% trans %}Remove{% endtrans %}"
+                        data-method="POST"
+                        data-href="{{ url_for('.manage_delete_contribs', event) }}"
+                        data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                        data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
+                        data-title="{% trans %}Confirm deletion{% endtrans %}"
+                        data-update="#contribution-list">
+                    {%- trans %}Remove{% endtrans -%}
+                </button>
+            </div>
+            <div class="group">
+                <button class="i-button icon-users js-enable-if-checked disabled"
+                        data-title="{% trans %}Author list{% endtrans %}"
+                        data-href="{{ url_for('contributions.person_list', event) }}"
+                        data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                        data-method="POST"
+                        data-dialog-classes="event-persons-dialog"
+                        data-ajax-dialog>
+                    {%- trans %}Author list{% endtrans -%}
+                </button>
+                <button class="i-button js-enable-if-checked arrow" disabled
+                        title="{% trans %}Export data{% endtrans %}">
+                        {% trans %}Export{% endtrans %}
+                </button>
+            </div>
+            <div class="group right">
+                <span class="i-button label icon-search"></span>
+                <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+            </div>
+            <div class="right">
+                <div class="group" id="displayed-records-fragment">
+                    {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+                </div>
+                <div class="group">
+                    <button class="i-button icon-filter js-dialog-action js-customize-report"
+                            data-href="{{ url_for('.customize_contrib_report', event) }}"
+                            data-title="{% trans %}Contribution list configuration{% endtrans %}">
+                        {% trans %}Filters{% endtrans %}
+                    </button>
+                </div>
+                <div class="group">
+                    <button class="i-button icon-link js-static-url"
+                            data-href="{{ url_for('.generate_static_url', event) }}"
+                            title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+                </div>
             </div>
         </div>
+        <div class="report" id="contribution-list">
+            {{ render_contrib_report(event, contribs, sessions, tracks) }}
+        </div>
+        <div id="filter-placeholder"></div>
     </div>
-    <div class="report" id="contribution-list">
-        {{ render_contrib_report(event, contribs, sessions, tracks) }}
-    </div>
-    <div id="filter-placeholder"></div>
     <script>
         setupContributionList({
             createSessionURL: {{ url_for('sessions.create_session', event) | tojson }},
