@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify, redirect, session, render_template
+from flask import flash, request, jsonify, redirect, render_template
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -78,10 +78,9 @@ class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        report_config = self.reporter.get_config()
         if self.reporter.has_config():
             return redirect(self.reporter.get_report_url())
-        contrib_report_args = self.reporter.get_contrib_report_args(report_config['filters'])
+        contrib_report_args = self.reporter.get_contrib_report_args()
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
                                                      **contrib_report_args)
 
@@ -90,19 +89,14 @@ class RHContributionsReportCustomize(RHManageContributionsBase):
     """Filter options for the contributions report of an event"""
 
     def _process_GET(self):
-        report_config = self.reporter.get_config()
         return WPManageContributions.render_template('management/contrib_report_filter.html', self._conf,
-                                                     event=self.event_new, filters=report_config['filters'],
+                                                     event=self.event_new,
+                                                     filters=self.reporter.report_config['filters'],
                                                      filterable_items=self.reporter.get_filterable_items_choices())
 
     def _process_POST(self):
-        self.reporter.filterable_items = self.reporter.get_filterable_items_choices()
-        filters = self.reporter.get_filters_from_request()
-        session_key = self.reporter.get_config_session_key()
-        report_config = session.setdefault(session_key, {})
-        report_config['filters'] = filters
-        session.modified = True
-        return jsonify_data(**self.reporter.render_contrib_report(filters))
+        self.reporter.store_filters()
+        return jsonify_data(**self.reporter.render_contrib_report())
 
 
 class RHContributionsReportStaticURL(RHManageContributionsBase):
@@ -120,8 +114,7 @@ class RHCreateContribution(RHManageContributionsBase):
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
-            report_config = self.reporter.get_config()
-            tpl_components = self.reporter.render_contrib_report(report_config['filters'], contrib)
+            tpl_components = self.reporter.render_contrib_report(contrib)
             self.reporter.flash_info_message(contrib, tpl_components['hide_contrib'])
             return jsonify_data(**tpl_components)
         return jsonify_form(form)
@@ -133,8 +126,7 @@ class RHEditContribution(RHManageContributionBase):
         if form.validate_on_submit():
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
-            report_config = self.reporter.get_config()
-            tpl_components = self.reporter.render_contrib_report(report_config['filters'], self.contrib)
+            tpl_components = self.reporter.render_contrib_report(self.contrib)
             self.reporter.flash_info_message(self.contrib, tpl_components['hide_contrib'])
             return jsonify_data(**tpl_components)
         return jsonify_form(form)
@@ -148,16 +140,14 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         flash(ngettext("The contribution has been deleted.",
                        "{count} contributions have been deleted.", deleted_count)
               .format(count=deleted_count), 'success')
-        report_config = self.reporter.get_config()
-        return jsonify_data(**self.reporter.render_contrib_report(report_config['filters']))
+        return jsonify_data(**self.reporter.render_contrib_report())
 
 
 class RHContributionREST(RHManageContributionBase):
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
-        report_config = self.reporter.get_config()
-        return jsonify_data(**self.reporter.render_contrib_report(report_config['filters']))
+        return jsonify_data(**self.reporter.render_contrib_report())
 
     def _process_PATCH(self):
         data = request.json
