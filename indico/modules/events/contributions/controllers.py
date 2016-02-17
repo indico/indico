@@ -78,7 +78,7 @@ class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        if self.reporter.must_renew_config:
+        if self.reporter.static_link_used:
             return redirect(self.reporter.get_report_url())
         contrib_report_args = self.reporter.get_contrib_report_kwargs()
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,

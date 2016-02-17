@@ -25,10 +25,9 @@ from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
-from indico.modules.events.util import serialize_event_person
+from indico.modules.events.util import serialize_event_person, ReporterBase
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
-from indico.util.reporter import ReporterBase
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 
@@ -84,10 +83,10 @@ class ContributionReporter(ReporterBase):
     """Reporting and filtering actions in the contribution report."""
 
     endpoint = '.manage_contributions'
+    report_link_type = 'contribution'
 
     def __init__(self, event):
         super(ContributionReporter, self).__init__(event)
-        self.report_link_type = 'contribution'
         self.default_report_config = {'filters': {'items': {}}}
 
         session_choices = {unicode(s.id): s.title for s in self.report_event.sessions.filter_by(is_deleted=False)}
@@ -101,7 +100,7 @@ class ContributionReporter(ReporterBase):
             ('status', {'title': _('Status'), 'filter_choices': {}})
         ])
 
-        self.report_config = self.get_config()
+        self.report_config = self._get_config()
 
     def build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
