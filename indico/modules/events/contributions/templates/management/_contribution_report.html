@@ -22,6 +22,7 @@
                         <th class="i-table id-column">
                             {% trans %}ID{% endtrans %}
                         </th>
+                        <th class="i-table protection-column" data-sorter="false"></th>
                         <th class="i-table">
                             {% trans %}Title{% endtrans %}
                         </th>
@@ -57,10 +58,11 @@
                                 <input type="checkbox" class="select-row" name="contribution_id" value="{{ contrib.id }}">
                             </td>
                             <td class="i-table id-column">#{{ contrib.friendly_id }}</td>
+                            <td class="i-table {% if contrib.is_self_protected %}self-protection-icon
+                                               {% elif contrib.is_public %}public-protection-icon{% endif %}">
+                            </td>
                             <td class="i-table" data-searchable="{{ contrib.title }}">
-                                <strong>
-                                    {{ contrib.title }}
-                                </strong>
+                                <strong>{{ contrib.title }}</strong>
                             </td>
                             <td class="i-table start-date">
                                 {% if contrib.timetable_entry %}
@@ -138,6 +140,7 @@
                                 <a href="#" class="icon-lock-center"
                                    data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
                                    data-title="{% trans %}Manage contribution protection{% endtrans %}"
+                                   data-update="#contribution-list"
                                    data-ajax-dialog>
                                 </a>
                                 <a href="#" class="icon-remove js-delete"
