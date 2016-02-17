@@ -111,6 +111,7 @@ class ContributionReporter(ReporterBase):
                 'filter_choices': {}
             })
         ])
+        self.report_config = self.get_config()
 
     def build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
@@ -136,26 +137,25 @@ class ContributionReporter(ReporterBase):
         # TODO: Handle contribution status
         return query.filter(db.or_(*item_criteria))
 
-    def get_contrib_report_args(self, filters):
+    def get_contrib_report_args(self):
         contributions_query = self.build_query()
         total_entries = contributions_query.count()
-        contributions = self.filter_report_entries(contributions_query, filters).all()
+        contributions = self.filter_report_entries(contributions_query, self.report_config['filters']).all()
         sessions = [{'id': s.id, 'title': s.title} for s in self.report_event.sessions.filter_by(is_deleted=False)]
         tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
                   for t in self.report_event.as_legacy.getTrackList()]
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries}
 
-    def render_contrib_report(self, filters, contrib=None):
+    def render_contrib_report(self, contrib=None):
         """Render the contribution report template components.
 
-        :param filters: The user specified filters.
         :param contrib: Used in RHs responsible for CRUD operations on a
         contribution.
         :returns: dict - dict containing the report's entries, the fragment of
         displayed entries and whether the contrib passed is displayed in the
         results.
         """
-        contr_report_args = self.get_contrib_report_args(filters)
+        contr_report_args = self.get_contrib_report_args()
         total_entries = contr_report_args.pop('total_entries')
         tpl = get_template_module('events/contributions/management/_contribution_report.html')
         fragment = tpl.render_displayed_entries_fragment(len(contr_report_args['contribs']), total_entries)
@@ -196,3 +196,11 @@ class ContributionReporter(ReporterBase):
             link = ReportLink.create(self.report_event, self.report_link_type, configuration)
             return self.get_report_url(uuid=link.uuid)
         return self.get_report_url()
+
+    def store_filters(self):
+        self.filterable_items = self.get_filterable_items_choices()
+        filters = self.get_filters_from_request()
+        session_key = self.get_config_session_key()
+        self.report_config = session.setdefault(session_key, {})
+        self.report_config['filters'] = filters
+        session.modified = True
