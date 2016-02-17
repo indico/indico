@@ -29,7 +29,9 @@ class EventPerson(PersonMixin, db.Model):
     """A person inside an event, e.g. a speaker/author etc."""
 
     __tablename__ = 'persons'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = (db.UniqueConstraint('event_id', 'user_id'),
+                      db.Index(None, 'event_id', 'email', unique=True, postgresql_where=db.text("email != ''")),
+                      {'schema': 'events'})
 
     id = db.Column(
         db.Integer,
