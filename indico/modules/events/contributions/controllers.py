@@ -78,9 +78,9 @@ class RHContributions(RHManageContributionsBase):
     """Display contributions management page"""
 
     def _process(self):
-        if self.reporter.has_config():
+        if self.reporter.must_renew_config:
             return redirect(self.reporter.get_report_url())
-        contrib_report_args = self.reporter.get_contrib_report_args()
+        contrib_report_args = self.reporter.get_contrib_report_kwargs()
         return WPManageContributions.render_template('management/contributions.html', self._conf, event=self.event_new,
                                                      **contrib_report_args)
 
@@ -92,7 +92,7 @@ class RHContributionsReportCustomize(RHManageContributionsBase):
         return WPManageContributions.render_template('management/contrib_report_filter.html', self._conf,
                                                      event=self.event_new,
                                                      filters=self.reporter.report_config['filters'],
-                                                     filterable_items=self.reporter.get_filterable_items_choices())
+                                                     filterable_items=self.reporter.filterable_items)
 
     def _process_POST(self):
         self.reporter.store_filters()
@@ -115,7 +115,8 @@ class RHCreateContribution(RHManageContributionsBase):
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.reporter.render_contrib_report(contrib)
-            self.reporter.flash_info_message(contrib, tpl_components['hide_contrib'])
+            if tpl_components['hide_contrib']:
+                self.reporter.flash_info_message(contrib)
             return jsonify_data(**tpl_components)
         return jsonify_form(form)
 
@@ -127,7 +128,8 @@ class RHEditContribution(RHManageContributionBase):
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.reporter.render_contrib_report(self.contrib)
-            self.reporter.flash_info_message(self.contrib, tpl_components['hide_contrib'])
+            if tpl_components['hide_contrib']:
+                self.reporter.flash_info_message(self.contrib)
             return jsonify_data(**tpl_components)
         return jsonify_form(form)
 

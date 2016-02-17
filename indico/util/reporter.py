@@ -19,19 +19,29 @@ from copy import deepcopy
 from flask import session, request
 
 from indico.modules.events.models.report_links import ReportLink
+from indico.web.flask.util import url_for
 
 
 class ReporterBase(object):
-    """Serves as a base class for classes performing actions on reports."""
+    """Base class for classes performing actions on reports.
 
-    def __init__(self, event, entry_parent):
+    :param event: The associated `Event`
+    :param entry_parent: The parent of the entries of the report. If it's None,
+                         the parent is assumed to be the event itself.
+    """
+
+    #: The endpoint to the report management page
+    endpoint = ''
+
+    def __init__(self, event, entry_parent=None):
         self.report_event = event
-        self.entry_parent = entry_parent
+        self.entry_parent = entry_parent if entry_parent else event
         self.report_link_type = ''
         self.default_report_config = {}
         self.filterable_items = None
+        self.must_renew_config = 'config' in request.args
 
-    def get_config_session_key(self):
+    def _get_config_session_key(self):
         """Compose the unique configuration ID.
 
         This ID will be used as a key to set the report's configuration to the
@@ -41,7 +51,7 @@ class ReporterBase(object):
 
     def get_config(self):
         """Load the report's configuration from the DB and return it."""
-        session_key = self.get_config_session_key()
+        session_key = self._get_config_session_key()
         report_config_uuid = request.args.get('config')
         if report_config_uuid:
             configuration = ReportLink.load(self.report_event, self.report_link_type, report_config_uuid)
@@ -72,9 +82,27 @@ class ReporterBase(object):
                     filters['items'][item_id] = options
         return filters
 
-    def get_report_url(*args, **kwargs):
+    def get_report_url(self, uuid=None):
         """Return the URL of the report management page."""
-        raise NotImplementedError
+        kwargs = {'config': uuid, '_external': True} if uuid else {}
+        return url_for(self.endpoint, self.entry_parent, **kwargs)
 
-    def has_config(self):
-        return 'config' in request.args
+    def generate_static_url(self):
+        """Return a URL with a uuid referring to the report's configuration."""
+        session_key = self._get_config_session_key()
+        configuration = {
+            'entry_parent_id': self.entry_parent.id,
+            'data': session.get(session_key)
+        }
+        if configuration['data']:
+            link = ReportLink.create(self.report_event, self.report_link_type, configuration)
+            return self.get_report_url(uuid=link.uuid)
+        return self.get_report_url()
+
+    def store_filters(self):
+        """Load the filters from the request and store them in the session."""
+        filters = self.get_filters_from_request()
+        session_key = self._get_config_session_key()
+        self.report_config = session.setdefault(session_key, {})
+        self.report_config['filters'] = filters
+        session.modified = True
