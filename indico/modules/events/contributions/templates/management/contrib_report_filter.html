@@ -62,38 +62,5 @@
     </div>
 </form>
 <script>
-    (function(global) {
-        'use strict';
-
-        function colorizeFilter(filter) {
-            filter.toggleClass('active', filter.find(':checked').length > 0);
-        }
-
-        function colorizeActiveFilters() {
-            $('.report-filter .filter').each(function() {
-                colorizeFilter($(this));
-            });
-        }
-
-        function setupListFilter() {
-            $('.report-filter').dropdown({selector: '.report-column .title'});
-
-            colorizeActiveFilters();
-
-            $('.js-reset-btn').on('click', function() {
-                $('.report-filter input:checkbox:checked').prop('checked', false).trigger('change');
-                $('.js-clear-filters-message').slideDown({
-                    done: function() {
-                        $(this).delay(4000).slideUp();
-                    }
-                });
-            });
-
-            $('.report-filter input:checkbox').on('change', function() {
-                colorizeFilter($(this).closest('.filter'));
-            });
-        };
-
-        setupListFilter();
-    })(window);
+    setupReportFilter();
 </script>
