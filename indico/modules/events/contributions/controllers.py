@@ -210,7 +210,7 @@ class RHContributionProtection(RHManageContributionBase):
             if self.contrib.is_protected:
                 update_object_principals(self.contrib, form.acl.data, read_access=True)
             update_object_principals(self.contrib, form.submitters.data, role='submit')
-            return jsonify_data(flash=False)
+            return jsonify_data(flash=False, html=_render_contribution_list(self.event_new))
         return jsonify_template('events/contributions/management/contribution_protection.html', form=form,
                                 protection_message=_render_contrib_protection_message(self.contrib),
                                 contrib=self.contrib)
