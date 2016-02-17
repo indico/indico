@@ -9,6 +9,7 @@
                     <tr class="i-table">
                         <th class="i-table checkbox-column" data-sorter="false"></th>
                         <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
+                        <th class="i-table protection-column" data-sorter="false"></th>
                         <th class="i-table">{% trans %}Title{% endtrans %}</th>
                         <th class="i-table">{% trans %}Code{% endtrans %}</th>
                         <th class="i-table">{%- trans %}Type{% endtrans -%}</th>
@@ -24,6 +25,9 @@
                                 <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
                             </td>
                             <td class="i-table id-column">#{{ sess.friendly_id }}</td>
+                            <td class="i-table {% if sess.is_self_protected %}self-protection-icon
+                                               {% elif sess.is_public %}public-protection-icon{% endif %}">
+                            </td>
                             <td class="i-table"><strong>{{ sess.title }}</strong></td>
                             <td class="i-table">{{ sess.code }}</td>
                             <td class="i-table">
