@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import request
-from sqlalchemy.orm import load_only, noload, joinedload
+from copy import deepcopy
+
+from flask import session, request
+from sqlalchemy.orm import load_only, noload
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import send_email, make_email
@@ -26,6 +28,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.report_links import ReportLink
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -211,3 +214,92 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
         obj.update_principal(principal, **grant)
     for principal in existing - new_principals:
         obj.update_principal(principal, **revoke)
+
+
+class ReporterBase(object):
+    """Base class for classes performing actions on reports.
+
+    :param event: The associated `Event`
+    :param entry_parent: The parent of the entries of the report. If it's None,
+                         the parent is assumed to be the event itself.
+    """
+
+    #: The endpoint of the report management page
+    endpoint = None
+    #: Unique report identifier
+    report_link_type = None
+    #: The default report configuration dictionary
+    default_report_config = None
+
+    def __init__(self, event, entry_parent=None):
+        self.report_event = event
+        self.entry_parent = entry_parent or event
+        self.filterable_items = None
+        self.static_link_used = 'config' in request.args
+
+    def _get_config_session_key(self):
+        """Compose the unique configuration ID.
+
+        This ID will be used as a key to set the report's configuration to the
+        session.
+        """
+        return '{}_config_{}'.format(self.report_link_type, self.entry_parent.id)
+
+    def _get_config(self):
+        """Load the report's configuration from the DB and return it."""
+        session_key = self._get_config_session_key()
+        if self.static_link_used:
+            uuid = request.args['config']
+            configuration = ReportLink.load(self.report_event, self.report_link_type, uuid)
+            if configuration and configuration['entry_parent_id'] == self.entry_parent.id:
+                session[session_key] = configuration['data']
+        return session.get(session_key, self.default_report_config)
+
+    def build_query(self):
+        """Return the query of the report's entries.
+
+        The query should not take into account the user's filtering
+        configuration, for example::
+
+            return event.contributions.filter_by(is_deleted=False)
+        """
+        raise NotImplementedError
+
+    def filter_report_entries(self):
+        """Apply user's filters to query and return it."""
+        raise NotImplementedError
+
+    def get_filters_from_request(self):
+        """Get the new filters after the filter form is submitted."""
+        filters = deepcopy(self.default_report_config['filters'])
+        for item_id, item in self.filterable_items.iteritems():
+            if item.get('filter_choices'):
+                options = request.form.getlist('field_{}'.format(item_id))
+                if options:
+                    filters['items'][item_id] = options
+        return filters
+
+    def get_report_url(self, uuid=None):
+        """Return the URL of the report management page."""
+        kwargs = {'config': uuid, '_external': True} if uuid else {}
+        return url_for(self.endpoint, self.entry_parent, **kwargs)
+
+    def generate_static_url(self):
+        """Return a URL with a uuid referring to the report's configuration."""
+        session_key = self._get_config_session_key()
+        configuration = {
+            'entry_parent_id': self.entry_parent.id,
+            'data': session.get(session_key)
+        }
+        if configuration['data']:
+            link = ReportLink.create(self.report_event, self.report_link_type, configuration)
+            return self.get_report_url(uuid=link.uuid)
+        return self.get_report_url()
+
+    def store_filters(self):
+        """Load the filters from the request and store them in the session."""
+        filters = self.get_filters_from_request()
+        session_key = self._get_config_session_key()
+        self.report_config = session.setdefault(session_key, {})
+        self.report_config['filters'] = filters
+        session.modified = True
