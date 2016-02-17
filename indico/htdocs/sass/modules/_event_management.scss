@@ -408,3 +408,27 @@ form#upload-images.full-width .dropzone {
         margin-left: 0.5em;
     }
 }
+
+th.i-table {
+    &.protection-column {
+        width: 1.5em;
+    }
+}
+
+td.i-table {
+    &.self-protection-icon {
+        @include icon-before('icon-lock');
+
+        &:before {
+            color: $red;
+        }
+    }
+
+    &.public-protection-icon {
+        @include icon-before('icon-unlocked');
+
+        &:before {
+            color: $green;
+        }
+    }
+}
