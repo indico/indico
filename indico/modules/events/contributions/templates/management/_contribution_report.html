@@ -78,7 +78,7 @@
                                 {# people (don't forget data-searchable above) #}
                                 TODO
                             </td>
-                            <td class="i-table">
+                            <td class="i-table" data-text="{{ contrib.type.name if contrib.type else '' }}">
                                 {% if contrib.type %}
                                     {{ contrib.type.name }}
                                 {% else %}
