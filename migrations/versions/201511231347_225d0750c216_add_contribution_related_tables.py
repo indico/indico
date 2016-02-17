@@ -350,6 +350,8 @@ def upgrade():
         sa.Column('phone', sa.String(), nullable=False),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.UniqueConstraint('event_id', 'user_id'),
+        sa.Index(None, 'event_id', 'email', unique=True, postgresql_where=sa.text("email != ''")),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
     )
