@@ -101,6 +101,18 @@ li > table + .note-area-wrapper {
         font-style: italic;
         font-size: 1.1em;
     }
+
+    .note-metadata {
+        float: right;
+        clear: both;
+        opacity: 0.6;
+        margin-top: 0.5em;
+        font-size: 0.9em;
+
+        .modification-date {
+            color: $dark-gray;
+        }
+    }
 }
 .participant-list-wrapper {
     position: relative;
@@ -157,39 +169,51 @@ li > table + .note-area-wrapper {
         padding: 0;
         margin: 0;
         list-style-type: none;
+    }
+}
 
-        li {
-            @include border-radius(2px);
-            @include icon-before('icon-user');
+.event-user {
+    @include border-radius(2px);
+    @include icon-before('icon-user');
 
-            display: inline-block;
-            font-size: 0.95em;
-            padding: 0.2em 0.5em;
-            margin-bottom: 0.1em;
-            color: $black;
-            background: $pastel-gray;
-            border: 1px solid $pastel-gray;
+    display: inline-block;
+    font-size: 0.95em;
+    padding: 0.2em 0.5em;
+    margin-bottom: 0.1em;
+    color: $black;
+    background: $pastel-gray;
+    border: 1px solid $pastel-gray;
 
-            &:before {
-                color: $gray;
-                margin-right: 0.4em;
-            }
+    &:before {
+        color: $gray;
+        margin-right: 0.4em;
+    }
 
-            &:not(first-child) {
-                margin-left: 0.1em;
-            }
+    &:not(first-child) {
+        margin-left: 0.1em;
+    }
 
-            &.checked-in {
-                background: lighten($pastel-green, 30%);
-                border: 1px solid $pastel-green;
-                color: darken($pastel-green, 20%);
+    &.checked-in {
+        background: lighten($pastel-green, 30%);
+        border: 1px solid $pastel-green;
+        color: darken($pastel-green, 20%);
 
-                &:before {
-                    color: $pastel-green;
-                }
-            }
+        &:before {
+            color: $pastel-green;
         }
     }
+
+    &.no-label {
+        background: none;
+        border: none;
+        color: $dark-gray;
+        padding: 0;
+
+        &:before {
+            color: $gray;
+        }
+    }
+
 }
 
 .contrib-description {
