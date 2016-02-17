@@ -114,9 +114,8 @@ def remove_non_alpha(text):
 
 def unicode_to_ascii(text):
     if not isinstance(text, unicode):
-        return text
-    else:
-        text = text.encode('translit/long')
+        text = to_unicode(text)
+    text = text.encode('translit/long')
     return text.encode('ascii', 'ignore')
 
 
