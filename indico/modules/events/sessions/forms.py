@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired
 from indico.modules.events.sessions.util import get_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoPalettePickerField, TimeDeltaField
+from indico.web.forms.fields import IndicoPalettePickerField, TimeDeltaField, IndicoLocationField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -36,6 +36,8 @@ class SessionForm(IndicoForm):
                                                    description=_('Specify the default duration of contributions '
                                                                  'within the session'),
                                                    default=timedelta(minutes=20))
+    location_data = IndicoLocationField(_("Location"),
+                                        description=_("Default location for blocks inside the session."))
     colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors(),
                                       description=_('Specify text and background colours for the session.'))
     is_poster = BooleanField(_('Poster session'), widget=SwitchWidget(),
