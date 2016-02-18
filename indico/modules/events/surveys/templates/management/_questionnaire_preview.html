@@ -104,6 +104,10 @@
                data-title="{% trans %}Edit question{% endtrans %}"
                data-question-id="{{ question.id }}"
                class="i-button js-survey-item-dialog icon-edit"></a>
+            <a href="#" data-href="{{ url_for('.add_question', question.parent, type=question.field_type, clone=question.id) }}"
+               data-title="{% trans %}Clone question{% endtrans %}"
+               data-question-id="{{ question.id }}"
+               class="i-button icon-copy js-survey-item-dialog"></a>
         </div>
     {% endcall %}
 {% endmacro %}
