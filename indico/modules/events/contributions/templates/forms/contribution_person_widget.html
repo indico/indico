@@ -2,36 +2,34 @@
 
 {% block html %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
-    <div class="contribution-people {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
-        <div id="people-list-{{ field.id }}" class="people-lists">
-            {% if field.allow_authors %}
-                <div id="author-list-title-{{ field.id }}" class="titled-rule">
-                    {% trans %}Authors{% endtrans %}
-                </div>
-                <div id="no-author-placeholder-{{ field.id }}" class="nobody-placeholder">
-                    {% trans %}There are no authors{% endtrans %}
-                </div>
-                <div id="author-list-{{ field.id }}"></div>
-                <div id="coauthor-list-title-{{ field.id }}" class="titled-rule">
-                    {% trans %}Co-authors{% endtrans %}
-                </div>
-                {% if field.show_empty_coauthors %}
-                    <div id="no-coauthor-placeholder-{{ field.id }}" class="nobody-placeholder">
-                        {% trans %}There are no co-authors{% endtrans %}
-                    </div>
-                {% endif %}
-                <div id="coauthor-list-{{ field.id }}"></div>
-                <div id="other-list-title-{{ field.id }}" class="titled-rule">
-                    {% trans %}Others{% endtrans %}
-                </div>
-                <div id="other-list-{{ field.id }}"></div>
-            {% else %}
-                <div id="other-list-{{ field.id }}"></div>
-                <div id="nobody-placeholder-{{ field.id }}" class="nobody-placeholder">
-                    {% trans %}There are no speakers{% endtrans %}
+    <div id="people-list-{{ field.id }}" class="contribution-people {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
+        {% if field.allow_authors %}
+            <div id="author-list-title-{{ field.id }}" class="titled-rule">
+                {% trans %}Authors{% endtrans %}
+            </div>
+            <div id="no-author-placeholder-{{ field.id }}" class="nobody-placeholder">
+                {% trans %}There are no authors{% endtrans %}
+            </div>
+            <div id="author-list-{{ field.id }}" class="person-list"></div>
+            <div id="coauthor-list-title-{{ field.id }}" class="titled-rule">
+                {% trans %}Co-authors{% endtrans %}
+            </div>
+            {% if field.show_empty_coauthors %}
+                <div id="no-coauthor-placeholder-{{ field.id }}" class="nobody-placeholder">
+                    {% trans %}There are no co-authors{% endtrans %}
                 </div>
             {% endif %}
-        </div>
+            <div id="coauthor-list-{{ field.id }}" class="person-list"></div>
+            <div id="other-list-title-{{ field.id }}" class="titled-rule">
+                {% trans %}Others{% endtrans %}
+            </div>
+            <div id="other-list-{{ field.id }}" class="person-list"></div>
+        {% else %}
+            <div id="other-list-{{ field.id }}" class="person-list"></div>
+            <div id="nobody-placeholder-{{ field.id }}" class="nobody-placeholder">
+                {% trans %}There are no speakers{% endtrans %}
+            </div>
+        {% endif %}
         <div class="i-box-footer" style="text-align: right;">
             <i class="info-helper"
                title="{% trans %}Added people can be modified by moving the cursor over them.{% endtrans %}"></i>
@@ -82,8 +80,8 @@
 
             function renderPerson(person) {
                 var $personRow = $('<div>').addClass('person-row');
-                var $personName = $('<span>').text(person.name);
-                var $personStatus = $('<span>').addClass('person-status');
+                var $personName = $('<div>').addClass('name').text(person.name);
+                var $personStatus = $('<div>').addClass('person-status');
                 var $personRoles = $('<span>').addClass('person-roles');
                 var $personButtons = $('<span>').addClass('person-buttons');
                 var $buttonRemove = $('<a>').addClass('i-button-icon danger icon-close').attr('title', $T.gettext("Remove person"));

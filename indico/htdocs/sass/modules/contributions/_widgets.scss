@@ -28,15 +28,8 @@
         border-top: none;
     }
 
-    .people-lists .titled-rule {
-        margin-top: 5px;
-        margin-bottom: 5px;
-
-        &:first-child {
-            margin-top: -18px;
-            margin-left: -10px;
-            margin-right: -10px;
-        }
+    .person-list {
+        @include i-box-cancel-horizontal-padding;
     }
 
     .person-row,
@@ -51,12 +44,24 @@
     }
 
     .person-row {
+        @include i-box-horizontal-padding;
         @include single-transition(background-color);
-        padding: 0 10px;
-        margin: 0 -10px;
+        display: flex;
+
+        .name {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         .person-status {
-            float: right;
+            flex-grow: 0;
+        }
+
+        .person-status {
             height: 2em;
             white-space: nowrap;
             overflow: hidden;
