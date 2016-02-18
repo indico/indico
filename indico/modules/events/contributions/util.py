@@ -149,7 +149,7 @@ class ContributionReporter(ReporterBase):
         tpl = get_template_module('events/contributions/management/_contribution_report.html')
         fragment = tpl.render_displayed_entries_fragment(len(contrib_report_kwargs['contribs']), total_entries)
         return {'html': tpl.render_contrib_report(event=self.report_event, **contrib_report_kwargs),
-                'displayed_records_fragment': fragment,
+                'counter': fragment,
                 'hide_contrib': contrib not in contrib_report_kwargs['contribs'] if contrib else None}
 
     def flash_info_message(self, contrib):
