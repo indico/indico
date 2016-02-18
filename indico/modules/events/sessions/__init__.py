@@ -97,6 +97,12 @@ def _inject_conference_protection_coordinator_privs(event, **kwargs):
     return render_template('events/sessions/management/coordinator_privs.html', event=event, form=form)
 
 
+@signals.event_management.get_cloners.connect
+def _get_session_cloner(sender, **kwargs):
+    from indico.modules.events.sessions.clone import SessionCloner
+    return SessionCloner
+
+
 @signals.app_created.connect
 def _check_roles(app, **kwargs):
     check_roles(Session)

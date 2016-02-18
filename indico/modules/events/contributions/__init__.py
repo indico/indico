@@ -56,6 +56,14 @@ def _convert_email_principals(user, **kwargs):
               'info')
 
 
+@signals.event_management.get_cloners.connect
+def _get_contribution_cloner(sender, **kwargs):
+    from indico.modules.events.contributions import clone
+    yield clone.ContributionFieldCloner
+    yield clone.ContributionTypeCloner
+    yield clone.ContributionCloner
+
+
 @signals.app_created.connect
 def _check_roles(app, **kwargs):
     check_roles(Contribution)
