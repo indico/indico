@@ -17,7 +17,9 @@
 
 from __future__ import unicode_literals, division
 
+import itertools
 import traceback
+from collections import defaultdict
 from math import ceil
 from operator import attrgetter
 from uuid import uuid4
@@ -83,7 +85,7 @@ class TimetableMigration(object):
         self.importer = importer
         self.old_event = old_event
         self.event = event
-        self.legacy_person_map = {}
+        self.event_person_map = {}
         self.legacy_session_map = {}
         self.legacy_session_ids_used = set()
         self.legacy_contribution_map = {}
@@ -97,7 +99,8 @@ class TimetableMigration(object):
     def run(self):
         self.importer.print_success('Importing {}'.format(self.old_event), event_id=self.event.id)
         self.event.references = list(self._process_references(EventReference, self.old_event))
-        self.event.person_links = list(self._migrate_event_persons())
+        self._migrate_event_persons()
+        self._migrate_event_persons_links()
         self._migrate_contribution_types()
         self._migrate_contribution_fields()
         self._migrate_sessions()
@@ -194,10 +197,81 @@ class TimetableMigration(object):
     def _process_keywords(self, keywords):
         return map(convert_to_unicode, keywords.splitlines())
 
+    def _create_person(self, old_person, with_event=False, skip_empty_email=False):
+        email = getattr(old_person, '_email', None)
+        email = sanitize_email(convert_to_unicode(email).lower()) if email else email
+        if not is_valid_mail(email, False):
+            email = None
+            if not skip_empty_email:
+                self.importer.print_warning(cformat('%{yellow!}Skipping invalid email {}').format(email),
+                                            event_id=self.event.id)
+        if not email and skip_empty_email:
+            return None
+        person = EventPerson(event_new=self.event if with_event else None,
+                             email=email, **self._get_person_data(old_person))
+        if not person.first_name and not person.last_name:
+            self.importer.print_warning(cformat('%{yellow!}Skipping nameless event person'), event_id=self.event.id)
+            return None
+        return person
+
+    def _get_person(self, old_person):
+        email = getattr(old_person, '_email', None)
+        email = sanitize_email(convert_to_unicode(email).lower()) if email else email
+        if not is_valid_mail(email, False):
+            email = None
+        return self.event_person_map[email] if email else self._create_person(old_person, with_event=True)
+
+    def _get_person_data(self, old_person):
+        data = {}
+        for old_attr, new_attr in PERSON_INFO_MAP.iteritems():
+            data[new_attr] = convert_to_unicode(getattr(old_person, old_attr, ''))
+        data['_title'] = USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none)
+        return data
+
     def _migrate_event_persons(self):
+        all_persons = defaultdict(list)
+        old_people = []
+        for chairperson in getattr(self.old_event, '_chairs', []):
+            old_people.append(chairperson)
+        for old_contrib in self.old_event.contributions.itervalues():
+            for speaker in getattr(old_contrib, '_speakers', []):
+                old_people.append(speaker)
+            for author in getattr(old_contrib, '_primaryAuthors', []):
+                old_people.append(author)
+            for coauthor in getattr(old_contrib, '_coAuthors', []):
+                old_people.append(coauthor)
+            for old_subcontrib in old_contrib._subConts:
+                for speaker in getattr(old_subcontrib, 'speakers', []):
+                    old_people.append(speaker)
+        for old_entry in self.old_event._Conference__schedule._entries:
+            entry_type = old_entry.__class__.__name__
+            if entry_type == 'LinkedTimeSchEntry':
+                old_block = old_entry._LinkedTimeSchEntry__owner
+                for convener in getattr(old_block, '_conveners', []):
+                    old_people.append(convener)
+        for old_person in old_people:
+            person = self._create_person(old_person, skip_empty_email=True)
+            if person:
+                all_persons[person.email].append(person)
+        for email, persons in all_persons.iteritems():
+            person = EventPerson(email=email,
+                                 event_new=self.event,
+                                 user=self.importer.all_users_by_email.get(email),
+                                 first_name=most_common(persons, key=attrgetter('first_name')),
+                                 last_name=most_common(persons, key=attrgetter('last_name')),
+                                 _title=most_common(persons, key=attrgetter('_title')),
+                                 affiliation=most_common(persons, key=attrgetter('affiliation')),
+                                 address=most_common(persons, key=attrgetter('address')),
+                                 phone=most_common(persons, key=attrgetter('phone')))
+            self.event_person_map[email] = person
+            if not self.importer.quiet:
+                msg = cformat('%{magenta!}Event Person%{reset} {}({})').format(person.full_name, person.email)
+                self.importer.print_info(msg)
+
+    def _migrate_event_persons_links(self):
         person_link_map = {}
         for chair in getattr(self.old_event, '_chairs', []):
-            person = self._migrate_person(chair)
+            person = self._get_person(chair)
             if not person:
                 continue
             link = person_link_map.get(person)
@@ -207,9 +281,9 @@ class TimetableMigration(object):
                     event_id=self.event.id
                 )
             else:
-                link = EventPersonLink(person=person)
+                link = EventPersonLink(person=person, **self._get_person_data(chair))
                 person_link_map[person] = link
-                yield link
+                self.event.person_links.append(link)
 
     def _migrate_contribution_types(self):
         name_map = {}
@@ -393,7 +467,7 @@ class TimetableMigration(object):
                                        'Submitter', roles={'submit'})
         contrib.acl_entries = set(principals.itervalues())
         # speakers, authors and co-authors
-        contrib.person_links = list(self._migrate_contribution_persons(old_contrib))
+        contrib.person_links = list(self._migrate_contribution_person_links(old_contrib))
         # references ("report numbers")
         contrib.references = list(self._process_references(ContributionReference, old_contrib))
         # contribution/abstract fields
@@ -448,35 +522,36 @@ class TimetableMigration(object):
                                                                  legacy_contribution_id=old_contrib.id,
                                                                  legacy_subcontribution_id=old_subcontrib.id)
         subcontrib.references = list(self._process_references(SubContributionReference, old_subcontrib))
-        subcontrib.person_links = list(self._migrate_subcontribution_persons(old_subcontrib))
+        subcontrib.person_links = list(self._migrate_subcontribution_person_links(old_subcontrib))
         return subcontrib
 
-    def _migrate_contribution_persons(self, old_entry):
+    def _migrate_contribution_person_links(self, old_entry):
         person_link_map = {}
         for speaker in getattr(old_entry, '_speakers', []):
-            person = self._migrate_person(speaker)
+            person = self._get_person(speaker)
             if not person:
                 continue
             link = person_link_map.get(person)
             if link:
                 link.is_speaker = True
             else:
-                link = ContributionPersonLink(person=person, is_speaker=True)
+                link = ContributionPersonLink(person=person, is_speaker=True, **self._get_person_data(speaker))
                 person_link_map[person] = link
                 yield link
         for author in getattr(old_entry, '_primaryAuthors', []):
-            person = self._migrate_person(author)
+            person = self._get_person(author)
             if not person:
                 continue
             link = person_link_map.get(person)
             if link:
                 link.author_type = AuthorType.primary
             else:
-                link = ContributionPersonLink(person=person, author_type=AuthorType.primary)
+                link = ContributionPersonLink(person=person, author_type=AuthorType.primary,
+                                              **self._get_person_data(author))
                 person_link_map[person] = link
                 yield link
         for coauthor in getattr(old_entry, '_coAuthors', []):
-            person = self._migrate_person(coauthor)
+            person = self._get_person(coauthor)
             if not person:
                 continue
             link = person_link_map.get(person)
@@ -487,14 +562,15 @@ class TimetableMigration(object):
                 else:
                     link.author_type = AuthorType.secondary
             else:
-                link = ContributionPersonLink(person=person, author_type=AuthorType.secondary)
+                link = ContributionPersonLink(person=person, author_type=AuthorType.secondary,
+                                              **self._get_person_data(coauthor))
                 person_link_map[person] = link
                 yield link
 
-    def _migrate_subcontribution_persons(self, old_entry):
+    def _migrate_subcontribution_person_links(self, old_entry):
         person_link_map = {}
         for speaker in getattr(old_entry, 'speakers', []):
-            person = self._migrate_person(speaker)
+            person = self._get_person(speaker)
             if not person:
                 continue
             link = person_link_map.get(person)
@@ -504,14 +580,14 @@ class TimetableMigration(object):
                     event_id=self.event.id
                 )
             else:
-                link = SubContributionPersonLink(person=person)
+                link = SubContributionPersonLink(person=person, **self._get_person_data(speaker))
                 person_link_map[person] = link
                 yield link
 
-    def _migrate_session_block_persons(self, old_entry):
+    def _migrate_session_block_person_links(self, old_entry):
         person_link_map = {}
         for convener in getattr(old_entry, '_conveners', []):
-            person = self._migrate_person(convener)
+            person = self._get_person(convener)
             if not person:
                 continue
             link = person_link_map.get(person)
@@ -521,49 +597,9 @@ class TimetableMigration(object):
                     event_id=self.event.id
                 )
             else:
-                link = SessionBlockPersonLink(person=person)
+                link = SessionBlockPersonLink(person=person, **self._get_person_data(convener))
                 person_link_map[person] = link
                 yield link
-
-    def _migrate_person(self, old_person):
-        first_name = convert_to_unicode(getattr(old_person, '_firstName', ''))
-        last_name = convert_to_unicode(getattr(old_person, '_surName', ''))
-        email = convert_to_unicode(getattr(old_person, '_email', ''))
-        affiliation = convert_to_unicode(getattr(old_person, '_affiliation', ''))
-        if not first_name and not last_name:
-            if email or affiliation:
-                self.importer.print_warning(cformat('%{yellow!}Skipping nameless event person'), event_id=self.event.id)
-            return None
-        key = (first_name, last_name, email, affiliation)
-        existing_person = self.legacy_person_map.get(key)
-        if existing_person:
-            self._build_person(old_person, existing_person, key)
-            return existing_person
-        person = EventPerson(event_new=self.event)
-        self._build_person(old_person, person, key)
-        if not self.importer.quiet:
-            self.importer.print_info(cformat(' %{magenta!}- [event_person]%{reset} {}').format(person.full_name))
-        if person.email:
-            user = self.importer.all_users_by_email.get(person.email)
-            if user:
-                person.user = user
-        return person
-
-    def _build_person(self, old_person, person, map_key):
-        for old_attr, new_attr in PERSON_INFO_MAP.iteritems():
-            if not getattr(person, new_attr, None):
-                setattr(person, new_attr, convert_to_unicode(getattr(old_person, old_attr, '')))
-        if not person._title:
-            person.title = USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none)
-        if not person.email:
-            email = getattr(old_person, '_email', '')
-            email = sanitize_email(convert_to_unicode(email).lower()) if email else ''
-            if is_valid_mail(email, False):
-                person.email = email
-            else:
-                self.importer.print_warning(cformat('%{yellow!}Skipping invalid email {}').format(email),
-                                            event_id=self.event.id)
-        self.legacy_person_map[map_key] = person
 
     def _migrate_timetable(self):
         if not self.importer.quiet:
@@ -629,7 +665,7 @@ class TimetableMigration(object):
                                      duration=old_block.duration)
         session_block.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_block.startDate)
         self._migrate_location(old_block, session_block)
-        session_block.person_links = list(self._migrate_session_block_persons(old_block))
+        session_block.person_links = list(self._migrate_session_block_person_links(old_block))
         self._migrate_timetable_entries(old_block._schedule._entries, session_block)
 
     def _migrate_location(self, old_entry, new_entry):
@@ -759,3 +795,9 @@ class EventTimetableImporter(Importer):
                 self.print_error(cformat('%{red!}Event is only in ZODB but not in SQL'), event_id=old_event.id)
                 continue
             yield old_event, event
+
+
+def most_common(iterable, key=None):
+    """Return the most common element of an iterable."""
+    groups = itertools.groupby(sorted(iterable), key=key)
+    return max(groups, key=lambda x: sum(1 for _ in x[1]))[0]
