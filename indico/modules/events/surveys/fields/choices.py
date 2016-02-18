@@ -29,6 +29,16 @@ from indico.web.forms.fields import IndicoRadioField, MultiStringField, IndicoSe
 from indico.web.forms.validators import HiddenUnless
 
 
+class RemoveOptionIDMixin(object):
+
+    def copy_field_data(self):
+        """Return a copy of the field's configuration data without the IDs used to identify answer options."""
+        field_data_copy = super(RemoveOptionIDMixin, self).copy_field_data()
+        for option in field_data_copy['options']:
+            del option['id']
+        return field_data_copy
+
+
 class SingleChoiceConfigForm(FieldConfigForm):
     display_type = IndicoRadioField(_('Display type'), [DataRequired()],
                                     description=_('Widget that will be used to render the available options'),
@@ -59,7 +69,7 @@ class _EmptyNoneRadioField(IndicoRadioField):
             self.data = None
 
 
-class SingleChoiceField(SurveyField):
+class SingleChoiceField(RemoveOptionIDMixin, SurveyField):
     name = 'single_choice'
     friendly_name = _('Single Choice')
     config_form = SingleChoiceConfigForm
@@ -129,7 +139,7 @@ class MultiSelectConfigForm(FieldConfigForm):
             raise ValidationError(_("Maximum choices must be fewer or equal than the total number of options."))
 
 
-class MultiSelectField(SurveyField):
+class MultiSelectField(RemoveOptionIDMixin, SurveyField):
     name = 'multiselect'
     friendly_name = _('Select multiple')
     config_form = MultiSelectConfigForm

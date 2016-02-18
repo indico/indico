@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from copy import deepcopy
+
 from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Optional
 
@@ -74,6 +76,10 @@ class SurveyField(object):
     def create_wtf_field(self):
         """Returns a WTForms field for this field"""
         return self._make_wtforms_field(self.wtf_field_class, self.validators, **self.wtf_field_kwargs)
+
+    def copy_field_data(self):
+        """Return a copy of the field's configuration data"""
+        return deepcopy(self.question.field_data)
 
     def get_summary(self):
         """Returns the summary of answers submitted for this field."""

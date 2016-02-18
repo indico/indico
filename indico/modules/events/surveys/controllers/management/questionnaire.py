@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request, flash, session, jsonify
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -188,7 +189,18 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
         except KeyError:
             raise NotFound
 
-        form = field_cls.config_form()
+        clone_id = request.args.get('clone')
+        form = None
+        if clone_id is not None:
+            try:
+                question_to_clone = SurveyQuestion.query.with_parent(self.survey).filter_by(id=int(clone_id)).one()
+                form = question_to_clone.field.config_form(
+                        obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
+            except (NoResultFound, ValueError):
+                pass
+        if form is None:
+            form = field_cls.config_form()
+
         if form.validate_on_submit():
             question = SurveyQuestion()
             field_cls(question).save_config(form)
