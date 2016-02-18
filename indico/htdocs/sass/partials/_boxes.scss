@@ -247,36 +247,6 @@ $i-box-padding: 10px;
     }
 }
 
-.i-box.no-padding {
-    padding: 0;
-
-    &.titled > .i-box-content {
-        margin-top: 0;
-    }
-
-    > .i-box-header {
-        @include i-box-padding;
-        margin: 0;
-    }
-
-    > .i-box-content {
-        > .empty {
-            @include i-box-padding;
-        }
-
-        > ul.group-list {
-            margin: 0;
-
-            > li {
-                margin: 0;
-                margin-right: 0;
-                margin-left: 0;
-                padding: 10px;
-            }
-        }
-    }
-}
-
 .i-box.no-shadow {
     @include single-box-shadow(none);
 }
