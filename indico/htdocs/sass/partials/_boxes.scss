@@ -183,15 +183,14 @@ $i-box-padding: 10px;
         padding: $i-box-padding;
         margin-top: $i-box-padding;
     }
-}
 
-.i-box.titled {
     .i-box-header {
         @include border-bottom();
         @include i-box-cancel-padding;
         @include i-box-padding;
         background-color: $light-gray;
         overflow: hidden;
+        margin-bottom: $i-box-padding;
 
         .i-box-header-text {
             float: left;
