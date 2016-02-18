@@ -22,6 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property, Comparator
 from sqlalchemy.orm import joinedload, noload
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.roles import get_available_roles
 from indico.util.decorators import strict_classproperty, classproperty
 from indico.util.fossilize import fossilizes, Fossilizable, IFossil
@@ -432,3 +433,20 @@ class PrincipalComparator(Comparator):
         else:
             raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
         return db.and_(self.cls.type == other.principal_type, *criteria)
+
+
+def clone_principals(cls, principals):
+    """Clone a list of principals.
+
+    :param cls: the principal type to use (a `PrincipalMixin` subclass)
+    :param principals: a collection of these principals
+    :return: A new set of principals that can be added to an object
+    """
+    rv = set()
+    assert all(isinstance(x, cls) for x in principals)
+    attrs = get_simple_column_attrs(cls) | {'user', 'local_group'}
+    for old_principal in principals:
+        principal = cls()
+        principal.populate_from_dict({attr: getattr(old_principal, attr) for attr in attrs})
+        rv.add(principal)
+    return rv
