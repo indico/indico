@@ -82,6 +82,25 @@
                 params = $.extend({}, fieldParams, params);
             }
 
+            function updateHtml(selector, html, triggeredBy) {
+                var elem = $(selector);
+                elem.html(html).trigger('indico:htmlUpdated', [triggeredBy]);
+            }
+
+            function handleHtmlUpdate(data, update, triggeredBy) {
+                if (typeof update === 'string') {
+                    updateHtml(update, data.html, triggeredBy);
+                } else {
+                    for (var key in update) {
+                        if (!(key in data)) {
+                            console.error('Invalid key: ' + key);
+                        } else {
+                            updateHtml(update[key], data[key], triggeredBy);
+                        }
+                    }
+                }
+            }
+
             function execute() {
                 var evt = $.Event('indico:confirmed');
                 $this.trigger(evt);
@@ -104,8 +123,7 @@
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
-                                    var elem = $(update);
-                                    elem.html(data.html).trigger('indico:htmlUpdated', [$this]);
+                                    handleHtmlUpdate(data, update, $this);
                                 }
                             }
                         }
@@ -123,8 +141,7 @@
                         complete: IndicoUI.Dialogs.Util.progress(),
                         success: function(data) {
                             handleFlashes(data, true, $this);
-                            var elem = $(update);
-                            elem.html(data.html).trigger('indico:htmlUpdated', [$this]);
+                            handleHtmlUpdate(data, update, $this);
                         }
                     });
                     return;
