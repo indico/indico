@@ -279,10 +279,9 @@ class ReporterBase(object):
                     filters['items'][item_id] = options
         return filters
 
-    def get_report_url(self, uuid=None):
+    def get_report_url(self, uuid=None, external=False):
         """Return the URL of the report management page."""
-        kwargs = {'config': uuid, '_external': True} if uuid else {}
-        return url_for(self.endpoint, self.entry_parent, **kwargs)
+        return url_for(self.endpoint, self.entry_parent, config=uuid, _external=external)
 
     def generate_static_url(self):
         """Return a URL with a uuid referring to the report's configuration."""
@@ -293,8 +292,9 @@ class ReporterBase(object):
         }
         if configuration['data']:
             link = ReportLink.create(self.report_event, self.report_link_type, configuration)
-            return self.get_report_url(uuid=link.uuid)
-        return self.get_report_url()
+            return self.get_report_url(uuid=link.uuid, external=True)
+        else:
+            return self.get_report_url(external=True)
 
     def store_filters(self):
         """Load the filters from the request and store them in the session."""
