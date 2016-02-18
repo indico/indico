@@ -30,22 +30,6 @@
         });
     };
 
-    function setupFilterDialog() {
-        $('.js-customize-report').each(function() {
-            var $this = $(this);
-            $this.ajaxDialog({
-                dialogClasses: 'report-filter-dialog',
-                onClose: function(data) {
-                    if (data) {
-                        var reportSection = $this.closest('.report-section');
-                        reportSection.find('.report').html(data.html);
-                        reportSection.find('.displayed-records-fragment').html(data.displayed_records_fragment);
-                    }
-                }
-            });
-        });
-    }
-
     function setupStaticURLGeneration() {
         $('.js-static-url').on('click', function() {
             var $this = $(this);
@@ -62,7 +46,6 @@
     }
 
     global.setupReporter = function() {
-        setupFilterDialog();
         setupStaticURLGeneration();
     };
 })(window);

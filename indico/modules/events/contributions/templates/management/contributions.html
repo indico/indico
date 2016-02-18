@@ -21,12 +21,12 @@
                 </ul>
             </div>
             <div class="group">
-                <button class="i-button highlight icon-plus"
+                <button class="i-button highlight icon-plus js-dialog-action"
                         title="{% trans %}Add new contribution{% endtrans %}"
                         data-title="{% trans %}Add new contribution{% endtrans %}"
                         data-href="{{ url_for('.manage_create_contrib', event) }}"
-                        data-ajax-dialog
-                        data-update="#contribution-list">
+                        data-update='{"html": "#contribution-list", "counter": "#contributions-counter"}'
+                        data-ajax-dialog>
                     {% trans %}New contribution{% endtrans %}
                 </button>
             </div>
@@ -38,7 +38,7 @@
                         data-params-selector="#contribution-list input[name=contribution_id]:checked"
                         data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
                         data-title="{% trans %}Confirm deletion{% endtrans %}"
-                        data-update="#contribution-list">
+                        data-update='{"html": "#contribution-list", "counter": "#contributions-counter"}'>
                     {%- trans %}Remove{% endtrans -%}
                 </button>
             </div>
@@ -62,13 +62,16 @@
                 <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
             </div>
             <div class="right">
-                <div class="group displayed-records-fragment">
+                <div class="group" id="contributions-counter">
                     {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
                 </div>
                 <div class="group">
-                    <button class="i-button icon-filter js-dialog-action js-customize-report"
+                    <button class="i-button icon-filter js-dialog-action"
                             data-href="{{ url_for('.customize_contrib_report', event) }}"
-                            data-title="{% trans %}Contribution list configuration{% endtrans %}">
+                            data-title="{% trans %}Contribution list configuration{% endtrans %}"
+                            data-dialog-classes="report-filter-dialog"
+                            data-update='{"html": "#contribution-list", "counter": "#contributions-counter"}'
+                            data-ajax-dialog>
                         {% trans %}Filters{% endtrans %}
                     </button>
                 </div>
