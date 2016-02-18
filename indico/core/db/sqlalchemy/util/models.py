@@ -143,6 +143,18 @@ class IndicoModel(Model):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
             setattr(self, key, value)
 
+    def populate_from_attrs(self, obj, attrs):
+        """Populates the object from another object's attributes
+
+        :param obj: an object
+        :param attrs: a set containing the attributes to copy
+        """
+        cls = type(self)
+        for attr in attrs:
+            if not hasattr(cls, attr):
+                raise ValueError("{} has no attribute '{}'".format(cls.__name__, attr))
+            setattr(self, attr, getattr(obj, attr))
+
     def __committed__(self, change):
         """Called after a commit for this object.
 
