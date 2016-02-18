@@ -33,3 +33,9 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, allow_key=True):
         return
     return SideMenuItem('timetable', _('Timetable'), url_for('timetable.timetable', event), weight=80, icon='calendar')
+
+
+@signals.event_management.get_cloners.connect
+def _get_timetable_cloner(sender, **kwargs):
+    from indico.modules.events.timetable.clone import TimetableCloner
+    return TimetableCloner
