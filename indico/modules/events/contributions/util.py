@@ -130,7 +130,8 @@ class ContributionReporter(ReporterBase):
         contributions_query = self.build_query()
         total_entries = contributions_query.count()
         contributions = self.filter_report_entries(contributions_query, self.report_config['filters']).all()
-        sessions = [{'id': s.id, 'title': s.title} for s in self.report_event.sessions.filter_by(is_deleted=False)]
+        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors}
+                    for s in self.report_event.sessions.filter_by(is_deleted=False)]
         tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
                   for t in self.report_event.as_legacy.getTrackList()]
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries}
