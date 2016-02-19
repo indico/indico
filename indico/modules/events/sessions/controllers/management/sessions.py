@@ -69,7 +69,9 @@ class RHCreateSession(RHManageSessionsBase):
         return random.choice(tuple(unused_colors) or get_colors())
 
     def _process(self):
-        form = SessionForm(obj=FormDefaults(colors=self._get_random_color()))
+        inherited_location = self.event_new.location_data
+        inherited_location['inheriting'] = True
+        form = SessionForm(obj=FormDefaults(colors=self._get_random_color(), location_data=inherited_location))
         if form.validate_on_submit():
             new_session = create_session(self.event_new, form.data)
             sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors}
