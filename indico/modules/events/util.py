@@ -274,7 +274,7 @@ class ReporterBase(object):
         filters = deepcopy(self.default_report_config['filters'])
         for item_id, item in self.filterable_items.iteritems():
             if item.get('filter_choices'):
-                options = request.form.getlist('field_{}'.format(item_id))
+                options = [x if x != 'None' else None for x in request.form.getlist('field_{}'.format(item_id))]
                 if options:
                     filters['items'][item_id] = options
         return filters
