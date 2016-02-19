@@ -48,7 +48,7 @@
                                 </div>
                             </td>
                             <td class="i-table">
-                                <span class="i-label show-session-blocks">
+                                <span class="i-label show-session-blocks" data-count="{{ sess.blocks | length }}">
                                     {%- trans %}Session blocks {% endtrans -%}
                                     <span class="badge">{{ sess.blocks | length }}</span>
                                 </span>

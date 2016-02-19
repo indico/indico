@@ -46,7 +46,10 @@
             setupTableSorter();
             setupPalettePickers();
         }).on('click', '.show-session-blocks', function() {
-            $(this).closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
+            var $this = $(this);
+            if ($this.data('count')) {
+                $this.closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
+            }
         });
 
         $('.js-submit-session-form').on('click', function(evt) {
