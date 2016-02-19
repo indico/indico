@@ -14,10 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.pages import authors
-from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.rh.contribDisplay import RHContributionDisplayBase
+from werkzeug.exceptions import Forbidden
+
+from indico.modules.events.layout.util import is_menu_entry_enabled
+from indico.util.i18n import _
 from MaKaC.errors import MaKaCError
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.pages import authors
+from MaKaC.webinterface.rh.contribDisplay import RHContributionDisplayBase
+
 
 class RHAuthorDisplayBase( RHContributionDisplayBase ):
 
@@ -27,6 +32,11 @@ class RHAuthorDisplayBase( RHContributionDisplayBase ):
         if self._authorId == "":
             raise MaKaCError(_("Author ID not found. The URL you are trying to access might be wrong."))
 
+    def _checkProtection(self):
+        RHContributionDisplayBase._checkProtection(self)
+        if not is_menu_entry_enabled('author_index', self._conf):
+            raise Forbidden()
+
 
 class RHAuthorDisplay( RHAuthorDisplayBase ):
     _uh = urlHandlers.UHContribAuthorDisplay
@@ -34,6 +44,3 @@ class RHAuthorDisplay( RHAuthorDisplayBase ):
     def _process( self ):
         p = authors.WPAuthorDisplay( self, self._contrib, self._authorId )
         return p.display()
-
-
-
