@@ -28,13 +28,10 @@
 table.palette-picker {
     border-spacing: 8px;
 
-    td {
-        &.palette-color {
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-            border-radius: 15px;
-        }
+    .palette-color {
+        cursor: pointer;
+        padding: 2px;
+        border-radius: 15px;
 
         .text-box {
             width: 8px;
@@ -44,7 +41,21 @@ table.palette-picker {
         }
 
         .background-box {
-            text-align: center;
+            display: flex;
+            width: 22px;
+            height: 22px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            align-items: center;
+            justify-content: center;
+        }
+
+        &.selected {
+            background-color: black;
+
+            .background-box {
+                border-color: white;
+            }
         }
     }
 }

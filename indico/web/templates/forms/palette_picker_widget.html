@@ -18,6 +18,7 @@
     <script>
         $('#{{ field.id }}-palette-picker').palettepicker({
             availableColors: {{ field.color_list | tojson }},
+            selectedColor: {{ field._value() | tojson }},
             onSelect: function(background, text) {
                 var colorsValue = JSON.stringify({background: background, text: text});
                 $('#{{ field.id }}').val(colorsValue).trigger('change');

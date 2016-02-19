@@ -21,7 +21,8 @@
         options: {
             availableColors: [],
             onSelect: null,
-            numColumns: 5
+            numColumns: 5,
+            selectedColor: null
         },
 
         _create: function() {
@@ -31,14 +32,16 @@
             var availableColors = this.options.availableColors;
             var tr = this._createTableRow();
 
+            self._paletteTable = paletteTable;
+
             $.each(availableColors, function(index, color) {
                 var td = $('<td>', {
-                    'css': {'background': '#' + color.background},
                     'class': 'palette-color',
                     'data': {color: color}
                 });
 
                 var colorBox = $('<div>', {
+                    'css': {'background': '#' + color.background},
                     'class': 'background-box'
                 });
 
@@ -66,6 +69,9 @@
                     backgroundColor = '#' + color.background,
                     textColor = '#' + color.text,
                     styleObject = element[0].style;
+
+                self.options.selectedColor = color;
+                self._updateSelection();
 
                 styleObject.setProperty('color', textColor, 'important');
                 styleObject.setProperty('background', backgroundColor, 'important');
@@ -101,11 +107,30 @@
                 },
                 hide: {
                     event: 'unfocus'
+                },
+                events: {
+                    show: self._updateSelection.bind(self)
                 }
             });
         },
+
         _createTableRow: function() {
             return $('<tr>', {'height': 13});
+        },
+
+        _updateSelection: function() {
+            var selectedColor = this.options.selectedColor;
+            this._paletteTable.find('.palette-color').each(function() {
+                var $this = $(this);
+                var color = $this.data('color');
+                if (selectedColor != null
+                        && color.background == selectedColor.background
+                        && color.text == selectedColor.text) {
+                    $this.addClass('selected');
+                } else {
+                    $this.removeClass('selected');
+                }
+            });
         }
     });
 })(jQuery);
