@@ -29,7 +29,7 @@
     }
 
     .person-list {
-        @include i-box-cancel-horizontal-padding;
+        @extend %i-box-cancel-horizontal-padding;
     }
 
     .person-row,
@@ -44,7 +44,7 @@
     }
 
     .person-row {
-        @include i-box-horizontal-padding;
+        @extend %i-box-horizontal-padding;
         @include single-transition(background-color);
         display: flex;
 

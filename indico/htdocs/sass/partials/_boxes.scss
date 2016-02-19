@@ -107,13 +107,13 @@ $i-box-padding: 10px;
 }
 
 %i-box-padding {
-    @include i-box-horizontal-padding;
-    @include i-box-vertical-padding;
+    @extend %i-box-horizontal-padding;
+    @extend %i-box-vertical-padding;
 }
 
 %i-box-cancel-padding {
-    @include i-box-cancel-horizontal-padding;
-    @include i-box-cancel-vertical-padding;
+    @extend %i-box-cancel-horizontal-padding;
+    @extend %i-box-cancel-vertical-padding;
 }
 
 .i-box {
@@ -121,10 +121,10 @@ $i-box-padding: 10px;
     @include box-sizing(border-box);
     @include border-all();
     @include single-box-shadow();
+    @extend %i-box-padding;
 
     background: white;
     color: $black;
-    @include i-box-padding;
 
     hr {
         @extend %box-hr;
@@ -171,12 +171,12 @@ $i-box-padding: 10px;
     }
 
     > .titled-rule:first-child {
-        @include i-box-cancel-horizontal-padding;
+        @extend %i-box-cancel-horizontal-padding;
         margin-top: -18px; // Pure magic number to align the rule with the i-box border
     }
 
     .i-box-footer {
-        @include i-box-cancel-padding;
+        @extend %i-box-cancel-padding;
         background-color: $light-gray;
         box-shadow: inset 0px 15px 20px -20px $gray;
         overflow: auto;
@@ -186,8 +186,8 @@ $i-box-padding: 10px;
 
     .i-box-header {
         @include border-bottom();
-        @include i-box-cancel-padding;
-        @include i-box-padding;
+        @extend %i-box-cancel-padding;
+        @extend %i-box-padding;
         background-color: $light-gray;
         overflow: hidden;
         margin-bottom: $i-box-padding;
@@ -235,14 +235,14 @@ $i-box-padding: 10px;
     }
 
     .i-box-table-widget {
-        @include i-box-cancel-padding;
+        @extend %i-box-cancel-padding;
 
         > table.i-table-widget {
             border: 0;
         }
 
         > *:not(table) {
-            @include i-box-padding;
+            @extend %i-box-padding;
         }
     }
 }
