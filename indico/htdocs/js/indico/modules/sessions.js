@@ -17,6 +17,7 @@
             var $this = $(this);
             $this.palettepicker({
                 availableColors: $this.data('colors'),
+                selectedColor: $this.data('color'),
                 onSelect: function(background, text) {
                     $.ajax({
                         url: $(this).data('href'),

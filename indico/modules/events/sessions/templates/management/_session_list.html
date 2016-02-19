@@ -43,7 +43,8 @@
                                        style="{{ sess.colors.css }}"
                                        data-method="PATCH"
                                        data-href="{{ url_for('.session_rest', sess) }}"
-                                       data-colors="{{ default_colors | tojson | forceescape }}">
+                                       data-colors="{{ default_colors | tojson | forceescape }}"
+                                       data-color="{{ sess.colors | tojson | forceescape }}">
                                     </a>
                                 </div>
                             </td>
