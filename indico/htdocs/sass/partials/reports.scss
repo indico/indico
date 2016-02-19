@@ -49,6 +49,13 @@
             }
         }
     }
+
+    .entry-action-buttons {
+        > a {
+            font-size: 1.2em;
+            margin-left: 3px;
+        }
+    }
 }
 
 .report-filter-dialog {
