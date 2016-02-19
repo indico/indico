@@ -57,7 +57,7 @@ class ContributionType(db.Model):
         backref=db.backref(
             'contribution_types',
             cascade='all, delete-orphan',
-            lazy=True
+            lazy='dynamic'
         )
     )
 
