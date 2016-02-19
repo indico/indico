@@ -122,24 +122,24 @@
                                 </a>
                             </td>
                             <td class="i-table" style="text-align: right;">
-                                <a href="#" class="icon-edit js-dialog-action"
+                                <a href="#" class="icon-edit i-button-icon js-dialog-action"
                                    data-href="{{ url_for('.manage_update_contrib', contrib) }}"
                                    data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
                                    data-update='{"html": "#contribution-list", "counter": "#contributions-counter"}'
                                    data-ajax-dialog>
                                 </a>
-                                <a href="#" class="icon-attachment"
-                                   data-attachment-editor
-                                   data-title="{% trans title=contrib.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                                   data-locator="{{ contrib.locator|tojson|forceescape }}">
-                                </a>
-                                <a href="#" class="icon-shield"
+                                <a href="#" class="icon-shield i-button-icon "
                                    data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
                                    data-title="{% trans %}Manage contribution protection{% endtrans %}"
                                    data-update="#contribution-list"
                                    data-ajax-dialog>
                                 </a>
-                                <a href="#" class="icon-remove js-delete"
+                                <a href="#" class="icon-attachment i-button-icon "
+                                   data-attachment-editor
+                                   data-title="{% trans title=contrib.title %}Manage materials for '{{ title }}'{% endtrans %}"
+                                   data-locator="{{ contrib.locator|tojson|forceescape }}">
+                                </a>
+                                <a href="#" class="icon-remove i-button-icon js-delete"
                                    data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
                                    data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
                                    data-update='{"html": "#contribution-list", "counter": "#contributions-counter"}'
