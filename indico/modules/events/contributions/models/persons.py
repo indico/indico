@@ -58,6 +58,8 @@ class ContributionPersonLink(PersonLinkBase):
 
     @property
     def is_submitter(self):
+        if not self.contribution:
+            raise Exception("No contribution to check submission rights against")
         return self.person.has_role('submit', self.contribution)
 
     @return_ascii
