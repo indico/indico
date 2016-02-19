@@ -20,7 +20,6 @@
     $width: 200px;
     $input-width: 160px;
 
-    margin: 0 2px;
     max-height: 150px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -34,15 +33,14 @@
         @include single-transition(background);
         @include single-transition(color);
         @include user-select(none);
-
         background: $light-gray;
         color: $gray;
         cursor: move;
         display: inline-block;
         height: $height;
         line-height: $height;
+        text-align: center;
         width: 1.1em;
-        float: left;
     }
 
     .ui-sortable-placeholder {
@@ -57,9 +55,10 @@
     }
 
     input {
+        @include border-left-radius(0);
         display: inline-block;
-        float: left;
         margin: 0;
+        vertical-align: top;
         max-width: $input-width;
 
         &.width-scrolling {
@@ -69,9 +68,8 @@
 
     a.i-button-remove {
         @include i-button-custom($height);
-
         display: inline-block;
-        float: left;
+        vertical-align: middle;
         visibility: hidden;
     }
 
@@ -82,15 +80,17 @@
     }
 
     li {
-        height: $height;
+        margin-bottom: 3px;
+        overflow: initial;
         width: $width;
-        margin: 3px 0;
 
         &:hover a.i-button-remove {
             visibility: visible;
         }
 
         &:last-of-type {
+            margin-bottom: 1px;
+
             .handle {
                 cursor: default;
                 background: white;

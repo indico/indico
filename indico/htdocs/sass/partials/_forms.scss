@@ -241,39 +241,9 @@ $i-form-line-height: 1.5;
         max-height: none;
         max-width: 400px;
 
-        li {
-            height: auto;
-            width: auto;
-
-            &:last-of-type .handle {
-                color: white;
-            }
-        }
-
         .handle {
-            @extend %form-field-input;
-            border-right: 0;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            padding: 0;
-            line-height: 2.5em;
-            width: 2em;
-            text-align: center;
-        }
-
-        input {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-            float: none;
-        }
-
-        .i-button-remove {
-            float: none;
-            height: auto;
-
-            i:before {
-                cursor: pointer;
-            }
+            height: $i-form-height;
+            line-height: $i-form-height;
         }
     }
 }
