@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$i-form-height: 2.5em;
+$i-form-line-height: 1.5;
+
 %form-field-block {
     padding-left: 1em;
     padding-right: 1em;
@@ -22,14 +25,14 @@
 }
 
 %form-field-input {
-    line-height: 1.5;
-    height: 2.5em;
+    line-height: $i-form-line-height;
+    height: $i-form-height;
     padding: 0.5em 1em;
     vertical-align: top;
 }
 
 %form-field-button {
-    height: 2.5em;
+    height: $i-form-height;
 }
 
 .i-form-field-fixed-width {
@@ -117,7 +120,7 @@
         .static-text {
             display: block;
             padding: 0.5em 0.5em 0 0;
-            line-height: 1.5;
+            line-height: $i-form-line-height;
             color: $black;
             width: 400px;
 
@@ -145,7 +148,7 @@
 .i-form .form-group .form-label {
     @extend %form-field-block;
     display: inline-block;
-    line-height: 1.5;
+    line-height: $i-form-line-height;
     margin-top: 0;
     margin-bottom: 0;
     min-height: 2.5em;
