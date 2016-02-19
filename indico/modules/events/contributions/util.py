@@ -89,13 +89,19 @@ class ContributionReporter(ReporterBase):
         super(ContributionReporter, self).__init__(event)
         self.default_report_config = {'filters': {'items': {}}}
 
+        session_empty = {None: 'No session'}
+        track_empty = {None: 'No track'}
+        type_empty = {None: 'No type'}
         session_choices = {unicode(s.id): s.title for s in self.report_event.sessions.filter_by(is_deleted=False)}
         track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.report_event.as_legacy.getTrackList()}
         type_choices = {unicode(t.id): t.name for t in self.report_event.contribution_types}
         self.filterable_items = OrderedDict([
-            ('session', {'title': _('Session'), 'filter_choices': session_choices}),
-            ('track', {'title': _('Track'), 'filter_choices': track_choices}),
-            ('type', {'title': _('Type'), 'filter_choices': type_choices}),
+            ('session', {'title': _('Session'),
+                         'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
+            ('track', {'title': _('Track'),
+                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+            ('type', {'title': _('Type'),
+                      'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
             # TODO: Handle contribution status
             ('status', {'title': _('Status'), 'filter_choices': {}})
         ])
@@ -114,17 +120,21 @@ class ContributionReporter(ReporterBase):
         if not filters.get('items'):
             return query
         criteria = []
-        if 'session' in filters['items']:
-            session_ids = filters['items']['session']
-            criteria.append(Contribution.session_id.in_(session_ids))
-        if 'track' in filters['items']:
-            track_ids = filters['items']['track']
-            criteria.append(Contribution.track_id.in_(track_ids))
-        if 'type' in filters['items']:
-            type_ids = filters['items']['type']
-            criteria.append(Contribution.type_id.in_(type_ids))
         # TODO: Handle contribution status
-        return query.filter(db.or_(*criteria))
+        filter_cols = {'session': Contribution.session_id,
+                       'track': Contribution.track_id,
+                       'type': Contribution.type_id}
+        for key, column in filter_cols.iteritems():
+            ids = set(filters['items'].get(key, ()))
+            if not ids:
+                continue
+            column_criteria = []
+            if None in ids:
+                column_criteria.append(column.is_(None))
+            if ids - {None}:
+                column_criteria.append(column.in_(ids - {None}))
+            criteria.append(db.or_(*column_criteria))
+        return query.filter(*criteria)
 
     def get_contrib_report_kwargs(self):
         contributions_query = self.build_query()
