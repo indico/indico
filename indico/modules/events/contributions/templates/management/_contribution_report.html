@@ -7,12 +7,8 @@
     </span>
 {%- endmacro %}
 
-{% macro render_contrib_report(event, contribs, sessions, tracks) %}
-    {% if not contribs %}
-        {%- call message_box('info') -%}
-            {% trans %}There are no contributions yet.{% endtrans %}
-        {%- endcall %}
-    {% else %}
+{% macro render_contrib_report(event, total_entries, contribs, sessions, tracks) %}
+    {% if contribs %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <table class="i-table tablesorter">
@@ -155,5 +151,15 @@
                 </tbody>
             </table>
         </form>
-    {% endif %}
+    {%- else %}
+        {%- call message_box('info') %}
+            {%- if total_entries %}
+                {%- trans -%}
+                    The filtering criteria do not match with any of the existing contributions. Try to clear the filters.
+                {%- endtrans %}
+            {%- else %}
+                {%- trans %}There are no contributions yet.{% endtrans %}
+            {%- endif %}
+        {%- endcall %}
+    {%- endif %}
 {% endmacro %}
