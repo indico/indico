@@ -62,7 +62,8 @@ class ContributionPersonListField(EventPersonListField):
         if not isinstance(principal, (ContributionPersonLink, SubContributionPersonLink)):
             return super(ContributionPersonListField, self)._serialize_principal(principal)
         else:
-            return serialize_contribution_person_link(principal)
+            is_submitter = self.data[principal] if self.get_form().is_submitted() else None
+            return serialize_contribution_person_link(principal, is_submitter=is_submitter)
 
     def pre_validate(self, form):
         super(ContributionPersonListField, self).pre_validate(form)
