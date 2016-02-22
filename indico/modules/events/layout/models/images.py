@@ -18,11 +18,10 @@ from __future__ import unicode_literals
 
 import posixpath
 
-
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, strict_unicode
 
 
 class ImageFile(StoredFileMixin, db.Model):
@@ -63,7 +62,7 @@ class ImageFile(StoredFileMixin, db.Model):
         return dict(self.event_new.locator, image_id=self.id, filename=self.filename)
 
     def _build_storage_path(self):
-        path_segments = ['event', unicode(self.event_new.id), 'images']
+        path_segments = ['event', strict_unicode(self.event_new.id), 'images']
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))

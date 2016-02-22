@@ -40,7 +40,7 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr, format_full_name
+from indico.util.string import return_ascii, format_repr, format_full_name, strict_unicode
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -568,8 +568,8 @@ class RegistrationData(StoredFileMixin, db.Model):
     def _build_storage_path(self):
         self.registration.registration_form.assign_id()
         self.registration.assign_id()
-        path_segments = ['event', unicode(self.registration.event_id), 'registrations',
-                         unicode(self.registration.registration_form.id), unicode(self.registration.id)]
+        path_segments = ['event', strict_unicode(self.registration.event_id), 'registrations',
+                         strict_unicode(self.registration.registration_form.id), strict_unicode(self.registration.id)]
         assert None not in path_segments
         # add timestamp in case someone uploads the same file again
         filename = '{}-{}-{}'.format(self.field_data.field_id, int(time.time()), self.filename)
