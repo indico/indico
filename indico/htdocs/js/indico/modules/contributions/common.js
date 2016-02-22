@@ -217,5 +217,12 @@
         $('#subcontribution-list [data-toggle=dropdown]').closest('.group').dropdown();
         setupTableSorter('#subcontribution-list .tablesorter');
         enableIfChecked('#subcontribution-list', 'input[name=subcontribution_id]', '.js-enable-if-checked');
+
+        $('#subcontribution-list td.subcontribution-title').on('mouseenter', function() {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.attr('title', $this.text());
+            }
+        });
     };
 })(window);
