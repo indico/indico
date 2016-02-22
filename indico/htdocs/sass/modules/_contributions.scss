@@ -75,4 +75,13 @@
 
 #subcontribution-list {
     width: 600px;
+
+    table {
+        td.subcontribution-title {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
 }
