@@ -62,3 +62,6 @@
 [submodule "ext_modules/moment.js"]
 	path = ext_modules/moment.js
 	url = https://github.com/moment/moment.git
+[submodule "ext_modules/clipboard.js"]
+	path = ext_modules/clipboard.js
+	url = https://github.com/zenorocha/clipboard.js.git

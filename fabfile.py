@@ -376,6 +376,17 @@ def install_zeroclipboard():
         local('cp dist/ZeroClipboard.swf {0}/'.format(dest_dir))
 
 
+@recipe('clipboard.js')
+def install_clipboard_js():
+    """
+    Install clipboard.js from Git
+    """
+    with lcd(os.path.join(env.ext_dir, 'clipboard.js')):
+        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'clipboard.js/')
+        local('mkdir -p {0}'.format(dest_dir))
+        local('cp dist/clipboard.js {0}/'.format(dest_dir))
+
+
 @recipe('dropzone.js')
 def install_dropzone_js():
     """
