@@ -71,13 +71,13 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
     return data
 
 
-def serialize_contribution_person_link(person_link):
+def serialize_contribution_person_link(person_link, is_submitter=None):
     """Serialize ContributionPersonLink to JSON-like object"""
     data = serialize_person_link(person_link)
     data['isSpeaker'] = person_link.is_speaker
     data['authorType'] = person_link.author_type.value
     if not isinstance(person_link, SubContributionPersonLink):
-        data['isSubmitter'] = person_link.is_submitter
+        data['isSubmitter'] = person_link.is_submitter if is_submitter is None else is_submitter
     return data
 
 
