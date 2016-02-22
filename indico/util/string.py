@@ -119,6 +119,18 @@ def unicode_to_ascii(text):
     return text.encode('ascii', 'ignore')
 
 
+def strict_unicode(value):
+    """Convert a value to unicode or fails if it is None.
+
+    Useful when converting e.g. IDs to path segments.  Usually they
+    should not be ``None`` so we do not want to fail silently (and end
+    up with a literal ``None`` in the path).
+    """
+    if value is None:
+        raise TypeError('strict_unicode does not accept `None`')
+    return unicode(value)
+
+
 def slugify(value, lower=True):
     """Converts a string to a simpler version useful for URL slugs.
 
