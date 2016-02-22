@@ -32,7 +32,7 @@ from indico.modules.attachments.util import can_manage_attachments
 from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, strict_unicode
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 
@@ -91,19 +91,19 @@ class AttachmentFile(StoredFileMixin, db.Model):
         assert folder.object is not None
         if folder.link_type == LinkType.category:
             # category/<id>/...
-            path_segments = ['category', unicode(folder.category_id)]
+            path_segments = ['category', strict_unicode(folder.category_id)]
         else:
             # event/<id>/event/...
-            path_segments = ['event', unicode(folder.event_id), folder.link_type.name]
+            path_segments = ['event', strict_unicode(folder.event_new.id), folder.link_type.name]
             if folder.link_type == LinkType.session:
                 # event/<id>/session/<session_id>/...
-                path_segments.append(unicode(folder.session_id))
+                path_segments.append(strict_unicode(folder.session.id))
             elif folder.link_type == LinkType.contribution:
                 # event/<id>/contribution/<contribution_id>/...
-                path_segments.append(unicode(folder.contribution_id))
+                path_segments.append(strict_unicode(folder.contribution.id))
             elif folder.link_type == LinkType.subcontribution:
                 # event/<id>/subcontribution/<contribution_id>-<subcontribution_id>/...
-                path_segments.append('{}-{}'.format(folder.contribution_id, folder.subcontribution_id))
+                path_segments.append('{}-{}'.format(folder.contribution.id, folder.subcontribution.id))
         self.attachment.assign_id()
         self.assign_id()
         filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
