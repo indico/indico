@@ -61,10 +61,10 @@ def _extend_category_management_menu(sender, category, **kwargs):
     return SideMenuItem('attachments', _('Materials'), url_for('attachments.management', category), icon='upload')
 
 
-@signals.event_management.clone.connect
-def _get_attachment_cloner(event, **kwargs):
+@signals.event_management.get_cloners.connect
+def _get_attachment_cloner(sender, **kwargs):
     from indico.modules.attachments.clone import AttachmentCloner
-    return AttachmentCloner(event)
+    return AttachmentCloner
 
 
 @signals.acl.can_access.connect_via(Attachment)

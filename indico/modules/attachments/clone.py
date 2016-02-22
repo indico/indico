@@ -16,56 +16,78 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.orm import subqueryload, joinedload
+
 from indico.core.db import db
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.events.cloning import EventCloner
 from indico.util.i18n import _
-from MaKaC.conference import EventCloner
 
 
 class AttachmentCloner(EventCloner):
-    def find_attachments(self):
-        return Attachment.find(~AttachmentFolder.is_deleted, ~Attachment.is_deleted,
-                               AttachmentFolder.event_id == int(self.event.id), _join=AttachmentFolder)
+    name = 'attachments'
+    friendly_name = _('Materials')
+    uses = {'sessions', 'contributions'}
 
-    def find_folders(self):
-        return self.event.as_event.attachment_folders.filter_by(is_deleted=False)
+    @property
+    def is_available(self):
+        return bool(self.old_event.all_attachment_folders.filter(AttachmentFolder.attachments.any()).count())
 
-    def get_options(self):
-        enabled = bool(self.find_attachments().count())
-        return {'attachments': (_("Materials"), enabled, False)}
-
-    def clone(self, new_event, options):
-        if 'attachments' not in options:
-            return
-        folder_mapping = {}
-        attrs = get_simple_column_attrs(AttachmentFolder)
-        for old_folder in self.find_folders():
-            new_folder = AttachmentFolder(event_id=new_event.id, **{attr: getattr(old_folder, attr) for attr in attrs})
-            if new_folder.linked_object is None:
-                continue
-            new_folder.acl = old_folder.acl
-            db.session.add(new_folder)
-            folder_mapping[old_folder] = new_folder
-
-        attrs = get_simple_column_attrs(Attachment) - {'modified_dt'}
-        for old_attachment in self.find_attachments():
-            folder = folder_mapping.get(old_attachment.folder)
-            if not folder:
-                continue
-            new_attachment = Attachment(folder=folder, user_id=old_attachment.user_id, acl=old_attachment.acl,
-                                        **{attr: getattr(old_attachment, attr) for attr in attrs})
-            if new_attachment.type == AttachmentType.file:
-                old_file = old_attachment.file
-                new_attachment.file = AttachmentFile(
-                    attachment=new_attachment,
-                    user_id=old_file.user_id,
-                    filename=old_file.filename,
-                    content_type=old_file.content_type
-                )
-                with old_file.open() as fd:
-                    new_attachment.file.save(fd)
-            db.session.add(new_attachment)
-
+    def run(self, new_event, cloners, shared_data):
+        self._clone_nested_attachments = False
+        self._session_map = self._contrib_map = self._subcontrib_map = None
+        if cloners >= {'sessions', 'contributions'}:
+            self._clone_nested_attachments = True
+            self._session_map = shared_data['sessions']['session_map']
+            self._contrib_map = shared_data['contributions']['contrib_map']
+            self._subcontrib_map = shared_data['contributions']['subcontrib_map']
+        with db.session.no_autoflush:
+            self._clone_attachments(new_event)
         db.session.flush()
+
+    def _query_folders(self, base_query, for_event):
+        query = (base_query
+                 .filter_by(is_deleted=False)
+                 .options(subqueryload('acl_entries'),
+                          subqueryload('attachments').subqueryload('acl_entries')))
+        if not for_event:
+            query = (query
+                     .options(joinedload('session'),
+                              joinedload('contribution'),
+                              joinedload('subcontribution'))
+                     .filter(AttachmentFolder.link_type.in_([LinkType.session, LinkType.contribution,
+                                                             LinkType.subcontribution])))
+        return query
+
+    def _clone_attachments(self, new_event):
+        # event attachments
+        for old_folder in self._query_folders(self.old_event.attachment_folders, True):
+            self._clone_attachment_folder(old_folder, new_event)
+        # session/contrib/subcontrib attachments
+        if self._clone_nested_attachments:
+            mapping = {LinkType.session: self._session_map,
+                       LinkType.contribution: self._contrib_map,
+                       LinkType.subcontribution: self._subcontrib_map}
+            query = self._query_folders(self.old_event.all_attachment_folders, False)
+            for old_folder in query:
+                if old_folder.object.is_deleted:
+                    continue
+                self._clone_attachment_folder(old_folder, mapping[old_folder.link_type][old_folder.object])
+
+    def _clone_attachment_folder(self, old_folder, new_object):
+        folder_attrs = get_simple_column_attrs(AttachmentFolder) | {'acl'}
+        attachment_attrs = (get_simple_column_attrs(Attachment) | {'user', 'acl'}) - {'modified_dt'}
+        folder = AttachmentFolder(object=new_object)
+        folder.populate_from_attrs(old_folder, folder_attrs)
+        for old_attachment in old_folder.attachments:
+            attachment = Attachment(folder=folder)
+            attachment.populate_from_attrs(old_attachment, attachment_attrs)
+            if attachment.type == AttachmentType.file:
+                old_file = old_attachment.file
+                attachment.file = AttachmentFile(attachment=attachment, user=old_file.user, filename=old_file.filename,
+                                                 content_type=old_file.content_type)
+                with old_file.open() as fd:
+                    attachment.file.save(fd)
