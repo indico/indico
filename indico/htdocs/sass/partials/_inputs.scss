@@ -37,6 +37,10 @@
     &.hasError {
         @extend %input-invalid;
     }
+
+    &:-moz-ui-invalid {
+        box-shadow: none;
+    }
 }
 
 %text-input {
@@ -47,10 +51,6 @@
 
 %input-invalid {
     @include border-all($red);
-
-    &:-moz-ui-invalid {
-        box-shadow: none;
-    }
 }
 
 @include apply-to-text-inputs('%text-input');
