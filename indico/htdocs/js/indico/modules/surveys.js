@@ -28,12 +28,15 @@
         });
 
         $('#survey-results .survey-bar-chart').each(function(idx, elem) {
+            var labels = $(elem).data('labels');
+            var labelsHeight = labels.length * 20;
+            var containerHeight = $(elem).parents('.i-box-content').outerHeight();
             new Chartist.Bar(elem, {
-                labels: $(elem).data('labels'),
+                labels: labels,
                 series: [$(elem).data('series-absolute')]
             }, {
                 horizontalBars: true,
-                height: $(elem).parents('.i-box-content').outerHeight(),
+                height: Math.max(labelsHeight, containerHeight) + 'px',
                 reverseData: true,
                 axisX: {
                     onlyInteger: true,
