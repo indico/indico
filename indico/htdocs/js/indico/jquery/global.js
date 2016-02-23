@@ -53,16 +53,27 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
-    $(document).on("mouseenter", '[title]:not([title=""]):not(iframe)', function(event) {
-        if (!$(this).attr('title').trim()) {
+    $(document).on("mouseenter", '[title]:not([title=""]):not(iframe), [data-qtip-oldtitle]:not(iframe)', function(event) {
+        var $target = $(this);
+        var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
+
+        if (!title) {
             return;
         }
 
-        var extraOpts = $(this).data('qtipOpts') || {},
+        var extraOpts = $(this).data('qtip-opts') || {},
             qtipClass = $(this).data('qtip-style');
 
-        $(this).qtip($.extend(true, {}, {
+        $target.attr('data-qtip-oldtitle', title);
+        $target.removeAttr('title');
+
+        /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
+        var container = $('<span>').qtip($.extend(true, {}, {
             overwrite: false,
+            position: {
+                target: $target
+            },
+
             show: {
                 event: event.type,
                 ready: true
@@ -70,8 +81,7 @@ $(document).ready(function() {
 
             content: {
                 text: function() {
-                    var html = $(this).attr('title') || $(this).attr('alt');
-                    return html ? html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+                    return title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 }
             },
 
@@ -80,19 +90,20 @@ $(document).ready(function() {
                     if ($(event.originalEvent.target).hasClass('open')) {
                         event.preventDefault();
                     }
+                },
+
+                hide: function(event) {
+                    $(this).qtip('destroy');
                 }
             },
+
             hide: {
-                event: "mouseleave"
+                event: 'mouseleave',
+                target: $target
             },
 
             style: {
                 classes: qtipClass ? 'qtip-' + qtipClass : null
-            },
-
-            onHide: function() {
-                // If the parent element is destroyed we need to destroy the qTip too
-                $(this).qtip('destroy');
             }
         }, extraOpts), event);
     });

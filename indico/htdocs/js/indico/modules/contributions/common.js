@@ -34,15 +34,9 @@
     }
 
     function setState(visible, total) {
-        var $state = $('#filtering-state'),
-            title = '{0} out of {1} contributions displayed'.format(visible.length, total.length);
+        var $state = $('#filtering-state');
         $state.html(formatState(visible, total));
-
-        // oldtitle needs to be updated too, because of qTip
-        $state.attr({
-            oldtitle: title,
-            title: title
-        });
+        $state.attr('title', $T.gettext("{0} out of {1} contributions displayed").format(visible.length, total.length));
     }
 
     function applyFilters() {
