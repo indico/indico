@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManageContributions(WPJinjaMixin, WPConferenceModifBase):
@@ -29,3 +29,28 @@ class WPManageContributions(WPJinjaMixin, WPConferenceModifBase):
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls()
+
+
+class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/contributions/'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
+
+    def getCSSFiles(self):
+        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls() +
+                self._asset_env['event_display_sass'].urls())
+
+
+class WPMyContributions(WPContributionsDisplayBase):
+    menu_entry_name = 'my_contributions'
+
+
+class WPContributions(WPContributionsDisplayBase):
+    menu_entry_name = 'contributions'
+
+    def getJSFiles(self):
+        return WPContributionsDisplayBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
