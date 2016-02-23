@@ -19,12 +19,11 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 from flask import request, render_template
-from flask_pluginengine import plugin_context
 from indico.util.decorators import cached_classproperty
 
 from indico.core import signals
 from indico.util.caching import memoize_request
-from indico.util.signals import values_from_signal, named_objects_from_signal
+from indico.util.signals import named_objects_from_signal
 
 
 class EventCloner(object):
@@ -191,60 +190,3 @@ def get_event_cloners():
     """
     cloners = named_objects_from_signal(signals.event_management.get_cloners.send(), plugin_attr='plugin')
     return OrderedDict(_resolve_dependencies(cloners))
-
-
-class LegacyEventCloner(object):
-    """Base class to let plugins/modules plug into the event cloning mechanism"""
-
-    @staticmethod
-    def get_plugin_items(conf):
-        """Returns the items/checkboxes for the clone options provided by EventCloner"""
-        plugin_options = []
-        for plugin_cloner in values_from_signal(signals.event_management.clone.send(conf), single_value=True):
-            with plugin_context(plugin_cloner.plugin):
-                for name, (title, enabled, checked) in plugin_cloner.get_options().iteritems():
-                    full_name = plugin_cloner.full_option_name(name)
-                    plugin_options.append((
-                        title,
-                        """<li><input type="checkbox" name="cloners" id="cloner-{0}" value="{0}" {2} {3}>{1}</li>"""
-                        .format(full_name, title,
-                                'disabled' if not enabled else '',
-                                'checked' if checked and enabled else '')
-                        .encode('utf-8')
-                    ))
-        return '\n'.join(x[1] for x in sorted(plugin_options))
-
-    @staticmethod
-    def clone_event(old_conf, new_conf):
-        """Calls the various cloning methods"""
-        selected = set(request.values.getlist('cloners'))
-        for plugin_cloner in values_from_signal(signals.event_management.clone.send(old_conf), single_value=True):
-            with plugin_context(plugin_cloner.plugin):
-                selected_options = {name for name, (_, enabled, _) in plugin_cloner.get_options().iteritems()
-                                    if enabled and plugin_cloner.full_option_name(name) in selected}
-                plugin_cloner.clone(new_conf, selected_options)
-
-    def __init__(self, conf, plugin=None):
-        self.event = conf
-        self.plugin = plugin
-
-    def full_option_name(self, option):
-        return '{}-{}'.format(self.__module__, option)
-
-    def get_options(self):
-        """Returns a dict containing the clone options.
-
-        :return: dict mapping option names to ``title, enabled, checked`` tuples
-        """
-        raise NotImplementedError
-
-    def clone(self, new_conf, options):
-        """Performs the actual cloning.
-
-        This method is always called, even if no options are selected!
-
-        :param new_conf: The new event created during the clone
-        :param options: A set containing the options provided by
-                        this class which the user has selected
-        """
-        raise NotImplementedError
