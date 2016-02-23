@@ -339,10 +339,10 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 .i-has-action {
     @extend %toolbar-group;
-    position: relative;
+    display: flex;
 
     > input {
-        display: inline-block;
+        flex-grow: 1;
     }
 
     > textarea {
@@ -358,8 +358,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 
     > textarea + .i-button {
-        position: absolute;
-        top: 0;
         border-left: 0;
     }
 
