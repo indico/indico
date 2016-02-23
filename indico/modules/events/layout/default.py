@@ -39,10 +39,6 @@ def _visibility_abstracts_book(event):
     return event.getAbstractMgr().isActive() and event.hasEnabledSection('cfa')
 
 
-def _visibility_my_contributions(event):
-    return event.getContribsForSubmitter(session.avatar)
-
-
 def _visibility_paper_review(event):
     return event.getConfPaperReview().hasReviewing()
 
@@ -145,13 +141,6 @@ def get_default_menu_entries():
             static_site=True
         ),
         MenuEntryData(
-            title=_("Contribution List"),
-            name='contributions',
-            endpoint='event.contributionListDisplay',
-            position=4,
-            static_site=True
-        ),
-        MenuEntryData(
             title=_("Author List"),
             name='author_index',
             endpoint='event.confAuthorIndex',
@@ -180,14 +169,6 @@ def get_default_menu_entries():
             name='my_tracks',
             visible=_visibility_my_tracks,
             position=0,
-            parent='my_conference'
-        ),
-        MenuEntryData(
-            title=_("My Contributions"),
-            name='my_contributions',
-            visible=_visibility_my_contributions,
-            endpoint='event.myconference-myContributions',
-            position=2,
             parent='my_conference'
         ),
         MenuEntryData(
