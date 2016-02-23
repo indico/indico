@@ -1,0 +1,79 @@
+<div id="icalExportPopup{{ item.id }}" style="display: none;" class="icalExportPopup">
+    <div class="iCalExportSection">
+        <div class="exportIcalHeader">{% block download_text %}{% endblock %}</div>
+        <a href="{{ ics_url }}" class="icon-calendar">
+            <span>{%- trans %}Calendar file{% endtrans -%}</span>
+        </a>
+    </div>
+
+    {% block extra_download %}{% endblock %}
+
+    <div id="iCalSeparator{{ item.id }}" class="icalSeparator" style="display: none;"></div>
+    <div id="exportICalDialogs" style="display: none;">
+        <div id="agreementApiKey{{ item.id }}">
+            <div id="agreementApiKeyText" class="agreement">
+                {{ api_key_user_agreement }}
+            </div>
+            <input type="checkbox" id="agreeCheckBoxKey{{ item.id }}" data-id="{{ item.id }}" class="agreeCheckBoxKey">
+            <label for="agreeCheckBoxKey{{ item.id }}">{% trans %}I have read and understood the above.{% endtrans %}</label>
+            <input id="agreementButtonKey{{ item.id }}"
+                   type="submit"
+                   value="{% trans %}Accept & Create{% endtrans %}"
+                   class="agreementButtonKey"
+                   data-id="{{ item.id }}" disabled>
+            <div style="display:inline;" id="progressPersistentKey{{ item.id }}" data-id="{{ item.id }}"></div>
+        </div>
+        <div id="agreementPersistentSignatures{{ item.id }}">
+            <div id="agreementPersistentSignaturesText" class="agreement">
+                {{ api_persistent_user_agreement }}
+            </div>
+            <div>
+                <input type="checkbox" id="agreeCheckBoxPersistent{{ item.id }}"
+                       class="agreeCheckBoxPersistent"
+                       data-id="{{ item.id }}">
+                <label for="agreeCheckBoxPersistent{{ item.id }}">{% trans %}I have read and understood the above.{% endtrans %}</label>
+            </div>
+            <div>
+                <input id="agreementButtonPersistent{{ item.id }}"
+                       type="submit"
+                       value="{% trans %}Accept & Create{% endtrans %}"
+                       class="agreementButtonPersistent"
+                       data-id="{{ item.id }}" disabled>
+            </div>
+            <div style="display:inline;" id="progressPersistentSignatures{{ item.id }}" data-id="{{ item.id }}"></div>
+        </div>
+        <input id="publicLink{{ item.id }}" type="text" class="apiURL" readonly>
+        <input id="authLink{{ item.id }}" type="text" class="apiURL" readonly>
+    </div>
+
+    <div id="publicLinkWrapper{{ item.id }}" class="iCalExportSection" style="display: none;">
+        <div class="exportIcalHeader">{% trans %}Permanent link for public information only:{% endtrans %}</div>
+    </div>
+
+    <div id="authLinkWrapper{{ item.id }}" class="iCalExportSection" style="display: none;">
+        <div id="exportIcalHeader{{ item.id }}" class="exportIcalHeader" style="display: none;">
+            {% trans %}Permanent link for all public and protected information:{% endtrans %}
+        </div>
+    </div>
+
+    <div style="display: none;">
+        <div id="extraInformation{{ item.id }}">
+            <div class="note">Please use <strong>CTRL + C</strong> to copy this URL</div>
+            {% block extra_info %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+{% block javascript %}
+    <script>
+        var setURLs = function(urls){
+            if ($('#detailExport{{ item.id }}').prop("checked")) {
+                $('#publicLink{{ item.id }}').val(urls["publicRequestDetailedURL"]).attr('title', urls["publicRequestDetailedURL"]);
+                $('#authLink{{ item.id }}').val(urls["authRequestDetailedURL"]).attr('title', urls["authRequestDetailedURL"]);
+            } else {
+                $('#publicLink{{ item.id }}').val(urls["publicRequestURL"]).attr('title', urls["publicRequestURL"]);
+                $('#authLink{{ item.id }}').val(urls["authRequestURL"]).attr('title', urls["authRequestURL"]);
+            }
+        };
+    </script>
+{% endblock %}
