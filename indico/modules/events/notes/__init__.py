@@ -17,10 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.db import db
 from indico.core.logger import Logger
-from indico.util.i18n import _
-from MaKaC.conference import EventCloner
 
 
 logger = Logger.get('events.notes')
@@ -32,35 +29,10 @@ def _merge_users(target, source, **kwargs):
     EventNoteRevision.find(user_id=source.id).update({EventNoteRevision.user_id: target.id})
 
 
-class NoteCloner(EventCloner):
-    def find_notes(self):
-        return self.event.as_event.all_notes.filter_by(is_deleted=False)
-
-    def get_options(self):
-        enabled = bool(self.find_notes().count())
-        return {'notes': (_("Minutes"), enabled, False)}
-
-    def clone(self, new_event, options):
-        from indico.modules.events.notes.models.notes import EventNote
-        if 'notes' not in options:
-            return
-        for old_note in self.find_notes():
-            revision = old_note.current_revision
-            new_note = EventNote(link_type=old_note.link_type,
-                                 event_id=new_event.id,
-                                 session_id=old_note.session_id,
-                                 contribution_id=old_note.contribution_id,
-                                 subcontribution_id=old_note.subcontribution_id)
-            new_note.create_revision(render_mode=revision.render_mode,
-                                     source=revision.source,
-                                     user=revision.user)
-            db.session.add(new_note)
-            db.session.flush()
-
-
-@signals.event_management.clone.connect
-def _get_note_cloner(event, **kwargs):
-    return NoteCloner(event)
+@signals.event_management.get_cloners.connect
+def _get_attachment_cloner(sender, **kwargs):
+    from indico.modules.events.notes.clone import NoteCloner
+    return NoteCloner
 
 
 @signals.event.session_deleted.connect
