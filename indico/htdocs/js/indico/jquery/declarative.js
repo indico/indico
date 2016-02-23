@@ -67,6 +67,7 @@
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
             var dialog = $this.data('ajax-dialog') !== undefined;
+            var reload = $this.data('reload-after') !== undefined;
             if (!$.isPlainObject(params)) {
                 throw new Error('Invalid params. Must be valid JSON if set.');
             }
@@ -124,6 +125,8 @@
                                 handleFlashes(data, true, $this);
                                 if (update) {
                                     handleHtmlUpdate(data, update, $this);
+                                } else if (reload) {
+                                    location.reload();
                                 }
                             }
                         }
