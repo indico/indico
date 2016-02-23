@@ -1,0 +1,10 @@
+{% from 'events/management/_reference_list.html' import render_event_references_list %}
+
+{{ render_event_references_list(references) }}
+<button class="i-button icon-gear js-dialog-action"
+        data-href="{{ url_for('events.manage_event_references', event) }}"
+        data-title="{% trans %}Manage external IDs{% endtrans %}"
+        data-update="#reference-list"
+        data-ajax-dialog>
+    {%- trans %}Manage{% endtrans -%}
+</button>

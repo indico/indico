@@ -35,6 +35,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
@@ -441,12 +442,11 @@ class MultipleItemsField(HiddenField):
     widget = JinjaWidget('forms/multiple_items_widget.html')
 
     def __init__(self, *args, **kwargs):
-        self.reference_class = kwargs.pop('reference_class')
-        self.fields = kwargs.pop('fields')
+        self.fields = getattr(self, 'fields', None) or kwargs.pop('fields')
         self.uuid_field = kwargs.pop('uuid_field', None)
         self.unique_field = kwargs.pop('unique_field', None)
         self.sortable = kwargs.pop('sortable', False)
-        self.choices = {}
+        self.choices = getattr(self, 'choices', {})
         self.data_as_dict = {}
         if self.uuid_field:
             assert self.uuid_field != self.unique_field
@@ -488,6 +488,25 @@ class MultipleItemsField(HiddenField):
 
     def _value(self):
         return self.data or []
+
+
+class ReferencesField(MultipleItemsField):
+    """Extend `MultipleItemsField` to use a list of reference objects as the
+    field value."""
+    def __init__(self, *args, **kwargs):
+        self.reference_class = kwargs.pop('reference_class')
+        self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
+                       {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
+        self.choices = {'type': {unicode(r.id): r.name for r in ReferenceType.find_all()}}
+        super(ReferencesField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        super(ReferencesField, self).process_formdata(valuelist)
+        if valuelist:
+            self.data = [self.reference_class(reference_type_id=int(r['type']), value=r['value']) for r in self.data]
+
+    def _value(self):
+        return [{'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data] if self.data else []
 
 
 class OverrideMultipleItemsField(HiddenField):

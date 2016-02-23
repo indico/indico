@@ -1,0 +1,16 @@
+{% macro render_event_references_list(references) %}
+    <div id="reference-list">
+        {% if not references -%}
+            <p>{% trans %}There are no external IDs yet.{% endtrans %}</p>
+        {%- else %}
+            <ul>
+                {% for reference in references -%}
+                    <li>
+                        <span class="reference-type">{{ reference.reference_type.name }}</span>:
+                        <span>{{ reference.value }}</span>
+                    </li>
+                {%- endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
