@@ -773,7 +773,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                     self._includeJSPackage('Display') +
                     self._asset_env['modules_vc_js'].urls() +
                     self._asset_env['modules_event_display_js'].urls() +
-                    self._asset_env['zero_clipboard_js'].urls())
+                    self._asset_env['clipboard_js'].urls())
         return modules
 
     def _applyDecoration( self, body ):

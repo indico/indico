@@ -31,10 +31,7 @@
                 $('.image-container').html(response.image_list);
             });
 
-            $('.image-container').on('click', '.menu .get-link', function(event) {
-                var $this = $(this);
-                $this.copyURLTooltip($this.data('href'))
-            }).on('indico:confirmed', '.menu .delete', function(e) {
+            $('.image-container').on('indico:confirmed', '.menu .delete', function(e) {
                 var $this = $(this);
                 e.preventDefault();
 
