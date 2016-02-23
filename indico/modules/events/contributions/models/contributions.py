@@ -234,6 +234,14 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
                  .correlate_except(SubContribution))
         return db.column_property(query, deferred=True)
 
+    def __init__(self, **kwargs):
+        # explicitly initialize those relationships with None to avoid
+        # an extra query to check whether there is an object associated
+        # when assigning a new one (e.g. during cloning)
+        kwargs.setdefault('note', None)
+        kwargs.setdefault('timetable_entry', None)
+        super(Contribution, self).__init__(**kwargs)
+
     @property
     def location_parent(self):
         if self.session_block_id is not None:

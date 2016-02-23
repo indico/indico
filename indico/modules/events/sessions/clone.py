@@ -64,10 +64,7 @@ class SessionCloner(EventCloner):
     def _clone_session_blocks(self, blocks):
         attrs = get_simple_column_attrs(SessionBlock) | {'own_room', 'own_venue'}
         for old_block in blocks:
-            # the explicit ``timetable_entry=None`` prevents sqlalchemy
-            # from trying to load it when assigning a new one e.g. in
-            # the timetable cloner.
-            block = SessionBlock(timetable_entry=None)
+            block = SessionBlock()
             block.populate_from_attrs(old_block, attrs)
             self._session_block_map[old_block] = block
             # TODO: person links
