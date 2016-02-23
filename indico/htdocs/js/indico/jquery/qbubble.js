@@ -28,7 +28,7 @@
                 }
             },
             show: {
-                event: '',
+                event: 'click',
                 solo: true
             },
             hide: {
@@ -40,34 +40,29 @@
             var self = this;
             var classes = self.options.style ? self.options.style.classes : '';
 
-            self.container = $('<span>').qtip($.extend(true, {}, self.defaultQtipOptions, self.options, {
-                position: {target: self.element},
+            self.element.qtip($.extend(true, {}, self.defaultQtipOptions, self.options, {
                 style: {classes: 'qbubble ' + classes}
             }));
-
-            self.element.on('click', function() {
-                self.container.qtip('api').show();
-            });
         },
 
         api: function() {
             var self = this;
-            return self.container.qtip('api');
+            return self.element.qtip('api');
         },
 
         destroy: function() {
             var self = this;
-            self.container.qtip('destroy');
+            self.element.qtip('destroy');
         },
 
         hide: function() {
             var self = this;
-            self.container.qtip('hide');
+            self.element.qtip('hide');
         },
 
         option: function(entry, value) {
             var self = this;
-            self.container.qtip('option', entry, value);
+            self.element.qtip('option', entry, value);
         }
     });
 })(jQuery);
