@@ -35,7 +35,7 @@ def _get_all_reference_types():
 
 
 def _render_reference_type_list():
-    tpl = get_template_module('events/references/_reference_type_list.html')
+    tpl = get_template_module('events/admin/_reference_type_list.html')
     return tpl.render_reference_type_list(_get_all_reference_types())
 
 
@@ -52,7 +52,7 @@ class RHReferenceTypes(RHAdminBase):
 
     def _process(self):
         types = _get_all_reference_types()
-        return WPReferenceTypes.render_template('references/reference_types.html', reference_types=types)
+        return WPReferenceTypes.render_template('admin/reference_types.html', reference_types=types)
 
 
 class RHCreateReferenceType(RHAdminBase):
