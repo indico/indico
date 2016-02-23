@@ -239,6 +239,10 @@ zero_clipboard_js = rjs_bundle('zero_clipboard_js',
                                'js/lib/zeroclipboard/ZeroClipboard.js',
                                'js/custom/zeroclipboard.js')
 
+clipboard_js = rjs_bundle('clipboard_js',
+                          'js/lib/clipboard.js/clipboard.js',
+                          'js/custom/clipboard.js')
+
 dropzone_js = rjs_bundle('dropzone_js',
                          'js/custom/dropzone.js',
                          'js/lib/dropzone.js/dropzone.js')
@@ -383,7 +387,7 @@ abstracts_js = rjs_bundle(
                'Markdown.Sanitizer.js'))
 
 base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
-                 indico_core, indico_legacy, indico_common)
+                 indico_core, indico_legacy, indico_common, clipboard_js)
 
 module_js = {
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
@@ -476,6 +480,7 @@ def register_all_js(env):
     env.register('mathjax_js', mathjax_js)
     env.register('jqplot_js', jqplot_js)
     env.register('zero_clipboard_js', zero_clipboard_js)
+    env.register('clipboard_js', clipboard_js)
     env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
     env.register('chartist_js', chartist_js)
