@@ -2,8 +2,10 @@
     <%include file="EventModifMainData.tpl" args="evtType='meeting', confObj=self_._conf"/>
     % if Config.getInstance().getReportNumberSystems():
     <tr>
-        <td class="dataCaptionTD"><a name="reportNumber"></a><span class="dataCaptionFormat">Report numbers</span></td>
-        <td colspan="2" class="blacktext">${ reportNumbersTable }</td>
+        <td class="dataCaptionTD"><a name="reportNumber"></a><span class="dataCaptionFormat">External IDs</span></td>
+        <td colspan="2" class="blacktext">
+            ${ template_hook('event-references-list', event=self_._conf.as_event) }
+        </td>
     </tr>
 
     <tr>

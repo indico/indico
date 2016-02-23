@@ -24,8 +24,8 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.modules.events.models.references import ReferenceType
-from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField
+from indico.modules.events.models.references import ReferenceType, EventReference
+from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField, ReferencesField
 from indico.web.forms.widgets import CKEditorWidget
 
 
@@ -68,3 +68,8 @@ class EmailEventPersonsForm(IndicoForm):
 
     def is_submitted(self):
         return super(EmailEventPersonsForm, self).is_submitted() and 'submitted' in request.form
+
+
+class EventReferencesForm(IndicoForm):
+    references = ReferencesField(_('External IDs'), reference_class=EventReference,
+                                 description=_("Manage external resources for this event"))

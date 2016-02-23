@@ -81,3 +81,21 @@ dl.i-data-list {
         @include user-select(none);
     }
 }
+
+// TODO: Re-examine if needed after the General Settings page is moved to Jinja
+#reference-list {
+    p {
+        margin-top: 0;
+    }
+
+    ul {
+        margin-top: 0;
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .reference-type {
+        font-weight: bold;
+        color: $light-black;
+    }
+}

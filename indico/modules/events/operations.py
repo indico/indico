@@ -42,3 +42,10 @@ def delete_reference_type(reference_type):
     db.session.delete(reference_type)
     db.session.flush()
     logger.info('Reference type "%s" deleted by %s', reference_type, session.user)
+
+
+def create_event_references(event, data):
+    event.references = data['references']
+    db.session.flush()
+    for reference in event.references:
+        logger.info('Reference "%s" created by %s', reference, session.user)

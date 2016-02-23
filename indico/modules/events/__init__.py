@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, flash, session, g
+from flask import request, redirect, flash, session, g, render_template
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
@@ -30,6 +30,7 @@ from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.util import notify_pending
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -245,3 +246,8 @@ def _get_cloners(sender, **kwargs):
     from indico.modules.events import clone
     yield clone.EventPersonCloner
     yield clone.EventPersonLinkCloner
+
+
+@template_hook('event-references-list')
+def _inject_event_references(event, **kwargs):
+    return render_template('events/management/reference_list.html', event=event, references=event.references, **kwargs)
