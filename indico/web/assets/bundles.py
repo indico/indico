@@ -394,7 +394,8 @@ module_js = {
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
     'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/category_statistics.js'),
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
-    'event_display': rjs_bundle('modules_event_display', 'js/indico/modules/eventdisplay.js'),
+    'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'eventdisplay.js',
+                                                                    'reporter.js')),
     'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/eventlayout.js'),
     'event_management': rjs_bundle('modules_event_management',
                                    *namespace('js/indico/modules', 'eventmanagement.js', 'reporter.js')),
@@ -424,7 +425,7 @@ def sass_module_bundle(module_name, depends=[]):
     return Bundle('sass/modules/_{0}.scss'.format(module_name),
                   filters=("pyscss", "cssrewrite", "cssmin"),
                   output="sass/{0}_%(version)s.min.css".format(module_name),
-                  depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
+                  depends=SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
 
 agreements_sass = sass_module_bundle('agreements')
 attachments_sass = sass_module_bundle('attachments')
