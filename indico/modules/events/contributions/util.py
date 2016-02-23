@@ -31,6 +31,7 @@ from indico.modules.attachments.util import get_attached_items
 from indico.util.date_time import format_human_timedelta, format_date
 from indico.util.i18n import _
 from indico.util.string import to_unicode
+from indico.util.user import iter_acl
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data
 
@@ -221,3 +222,12 @@ def contribution_type_row(contrib_type):
     template = get_template_module('events/contributions/management/_types_table.html')
     html = template.types_table_row(contrib_type=contrib_type)
     return jsonify_data(html_row=html, flash=False)
+
+
+def get_contributions_with_user_as_submitter(event, user):
+    """Get a list of contributions in which the `user` has submission rights"""
+    contribs = (Contribution.query.with_parent(event)
+                .options(joinedload('acl_entries'))
+                .filter(Contribution.acl_entries.any(ContributionPrincipal.has_management_role('submit')))
+                .all())
+    return {c for c in contribs if any(user in entry.principal for entry in iter_acl(c.acl_entries))}
