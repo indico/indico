@@ -20,7 +20,6 @@ from flask import render_template, has_request_context, session
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db import db
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.users import User
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType, VCRoom
@@ -31,7 +30,7 @@ from indico.web.flask.templating import get_overridable_template_name, template_
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry, SideMenuItem
 from indico.util.i18n import _
-from MaKaC.conference import EventCloner
+
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 
@@ -103,28 +102,10 @@ def extend_header_menu(sender, **kwargs):
     return HeaderMenuEntry(url_for('vc.vc_room_list'), _('Videoconference'), _('Services'))
 
 
-class VCCloner(EventCloner):
-    def get_options(self):
-        enabled = bool(VCRoomEventAssociation.find_for_event(self.event, include_hidden=True).count())
-        return {'vc_rooms': (_('Videoconference rooms'), enabled, True)}
-
-    def clone(self, new_event, options):
-        if 'vc_rooms' not in options:
-            return
-        for old_event_vc_room in VCRoomEventAssociation.find_for_event(self.event, include_hidden=True):
-            event_vc_room = VCRoomEventAssociation(event_id=int(new_event.id),
-                                                   link_type=old_event_vc_room.link_type,
-                                                   link_id=old_event_vc_room.link_id,
-                                                   show=old_event_vc_room.show,
-                                                   data=old_event_vc_room.data)
-            if event_vc_room.link_object is not None:
-                event_vc_room.vc_room = old_event_vc_room.vc_room
-                db.session.add(event_vc_room)
-
-
-@signals.event_management.clone.connect
-def _get_vc_cloner(event, **kwargs):
-    return VCCloner(event)
+@signals.event_management.get_cloners.connect
+def _get_vc_cloner(sender, **kwargs):
+    from indico.modules.vc.clone import VCCloner
+    return VCCloner
 
 
 @signals.users.merged.connect
