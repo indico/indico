@@ -109,6 +109,13 @@ class SubContribution(db.Model):
     # - legacy_mapping (LegacySubContributionMapping.subcontribution)
     # - note (EventNote.subcontribution)
 
+    def __init__(self, **kwargs):
+        # explicitly initialize this relationship with None to avoid
+        # an extra query to check whether there is an object associated
+        # when assigning a new one (e.g. during cloning)
+        kwargs.setdefault('note', None)
+        super(SubContribution, self).__init__(**kwargs)
+
     @property
     def event_new(self):
         return self.contribution.event_new

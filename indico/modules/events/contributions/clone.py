@@ -118,10 +118,7 @@ class ContributionCloner(EventCloner):
                           subqueryload('person_links'),
                           subqueryload('field_values')))
         for old_contrib in query:
-            # the explicit ``timetable_entry=None`` prevents sqlalchemy
-            # from trying to load it when assigning a new one e.g. in
-            # the timetable cloner.
-            contrib = Contribution(timetable_entry=None)
+            contrib = Contribution()
             contrib.populate_from_attrs(old_contrib, attrs)
             contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions))
             contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries)

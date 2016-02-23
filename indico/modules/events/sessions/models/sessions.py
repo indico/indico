@@ -128,6 +128,13 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     # - legacy_mapping (LegacySessionMapping.session)
     # - note (EventNote.session)
 
+    def __init__(self, **kwargs):
+        # explicitly initialize this relationship with None to avoid
+        # an extra query to check whether there is an object associated
+        # when assigning a new one (e.g. during cloning)
+        kwargs.setdefault('note', None)
+        super(Session, self).__init__(**kwargs)
+
     @property
     def location_parent(self):
         return self.event_new

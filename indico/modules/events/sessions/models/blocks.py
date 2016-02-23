@@ -71,6 +71,13 @@ class SessionBlock(LocationMixin, db.Model):
     # - session (Session.blocks)
     # - timetable_entry (TimetableEntry.session_block)
 
+    def __init__(self, **kwargs):
+        # explicitly initialize those relationships with None to avoid
+        # an extra query to check whether there is an object associated
+        # when assigning a new one (e.g. during cloning)
+        kwargs.setdefault('timetable_entry', None)
+        super(SessionBlock, self).__init__(**kwargs)
+
     @property
     def event_new(self):
         return self.session.event_new
