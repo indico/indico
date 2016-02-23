@@ -15,10 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from itertools import ifilter
+
 from sqlalchemy.orm import lazyload, joinedload, noload
 from werkzeug.urls import url_parse
 
-from indico.modules.events.cloning import LegacyEventCloner as EventCloner  # XXX update code importing it from here
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.features import event_settings as features_event_settings
 from indico.modules.events.features.util import get_feature_definitions, get_enabled_features
@@ -41,6 +41,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
@@ -110,7 +111,6 @@ from indico.modules.attachments.models.attachments import AttachmentType, Attach
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_attached_items
 from indico.util.date_time import utc_timestamp, format_datetime, format_human_timedelta
-from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
 from indico.util.user import unify_user_args
 from indico.util.redis import avatar_links
@@ -3556,9 +3556,7 @@ class Conference(CommonObjectBase, Locatable):
             feature_definitions[feature].enabled(conf)
 
         # Run the new modular cloning system
-        EventCloner.clone_event(self, conf)
-        from indico.modules.events.cloning import EventCloner as NewEventCloner
-        NewEventCloner.run_cloners(self.as_event, conf.as_event)
+        EventCloner.run_cloners(self.as_event, conf.as_event)
         signals.event.cloned.send(self.as_event, new_event=conf.as_event)
         return conf
 

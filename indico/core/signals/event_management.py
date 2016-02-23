@@ -19,11 +19,6 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-clone = _signals.signal('clone', """
-Expected to return an instance of a ``EventCloner`` subclass implementing
-the cloning behavior. The *sender* is the event object.
-""")
-
 get_cloners = _signals.signal('get_cloners', """
 Expected to return one or more ``EventCloner`` subclasses implementing
 a cloning operation for something within an event.
