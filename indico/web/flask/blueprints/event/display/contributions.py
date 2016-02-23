@@ -19,23 +19,23 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Contribution list
-event.add_url_rule('/contributions', 'contributionListDisplay', conferenceDisplay.RHContributionList)
-event.add_url_rule('/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
+event.add_url_rule('/contributions-old', 'contributionListDisplay', conferenceDisplay.RHContributionList)
+event.add_url_rule('/contributions-old.pdf', 'contributionListDisplay-contributionsToPDF',
                    conferenceDisplay.RHContributionListToPDF, methods=('POST',))
 
-with event.add_prefixed_rules('/session/<sessionId>'):
+with event.add_prefixed_rules('/session-old/<sessionId>'):
     # Display contribution
-    event.add_url_rule('/contribution/<contribId>', 'contributionDisplay', contribDisplay.RHContributionDisplay)
-    event.add_url_rule('/contribution/<contribId>.ics', 'contributionDisplay-ical', contribDisplay.RHContributionToiCal)
-    event.add_url_rule('/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
+    event.add_url_rule('/contribution-old/<contribId>', 'contributionDisplay', contribDisplay.RHContributionDisplay)
+    event.add_url_rule('/contribution-old/<contribId>.ics', 'contributionDisplay-ical', contribDisplay.RHContributionToiCal)
+    event.add_url_rule('/contribution-old/<contribId>.marc.xml', 'contributionDisplay-marcxml',
                        contribDisplay.RHContributionToMarcXML)
-    event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml', contribDisplay.RHContributionToXML)
-    event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf', contribDisplay.RHContributionToPDF)
-    event.add_url_rule('/contribution/<contribId>/<subContId>', 'subContributionDisplay',
+    event.add_url_rule('/contribution-old/<contribId>.xml', 'contributionDisplay-xml', contribDisplay.RHContributionToXML)
+    event.add_url_rule('/contribution-old/<contribId>.pdf', 'contributionDisplay-pdf', contribDisplay.RHContributionToPDF)
+    event.add_url_rule('/contribution-old/<contribId>/<subContId>', 'subContributionDisplay',
                        subContribDisplay.RHSubContributionDisplay)
-    event.add_url_rule('/contribution/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
+    event.add_url_rule('/contribution-old/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
                        subContribDisplay.RHSubContributionToMarcXML)
-    event.add_url_rule('/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
+    event.add_url_rule('/contribution-old/<contribId>/author/<authorId>', 'contribAuthorDisplay',
                        authorDisplay.RHAuthorDisplay)
 
 # Authors/Speakers
