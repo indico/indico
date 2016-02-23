@@ -423,7 +423,14 @@ class MultiStringField(HiddenField):
 class MultipleItemsField(HiddenField):
     """A field with multiple items consisting of multiple string values.
 
-    :param fields: A list of ``(fieldname, title)`` tuples
+    :param fields: A list of dicts with the following arguments:
+                   'id': the unique ID of the field
+                   'caption': the title of the column and the placeholder
+                   'type': 'text|select' the type of the field
+                   In case the type is 'select', the property 'choices' of the
+                   `MultipleItemsField` needs to be a dict where the key is the
+                   'id' of the select field and the value is another dict
+                   mapping the option's id to it's caption.
     :param uuid_field: If set, each item will have a UUID assigned and
                        stored in the field specified here.  The name
                        specified here may not be in `fields`.
@@ -434,19 +441,24 @@ class MultipleItemsField(HiddenField):
     widget = JinjaWidget('forms/multiple_items_widget.html')
 
     def __init__(self, *args, **kwargs):
+        self.reference_class = kwargs.pop('reference_class')
         self.fields = kwargs.pop('fields')
         self.uuid_field = kwargs.pop('uuid_field', None)
         self.unique_field = kwargs.pop('unique_field', None)
         self.sortable = kwargs.pop('sortable', False)
+        self.choices = {}
+        self.data_as_dict = {}
         if self.uuid_field:
             assert self.uuid_field != self.unique_field
             assert self.uuid_field not in self.fields
-        self.field_names = dict(self.fields)
+        self.field_names = {item['id']: item['caption'] for item in self.fields}
         super(MultipleItemsField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = json.loads(valuelist[0])
+            # Preserve dict data, because the self.data can be modified by a subclass
+            self.data_as_dict = json.loads(valuelist[0])
             if self.uuid_field:
                 for item in self.data:
                     if self.uuid_field not in item:
@@ -455,13 +467,13 @@ class MultipleItemsField(HiddenField):
     def pre_validate(self, form):
         unique_used = set()
         uuid_used = set()
-        for item in self.data:
+        for item in self.data_as_dict:
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
             item_keys = set(item)
             if self.uuid_field:
                 item_keys.discard(self.uuid_field)
-            if item_keys != {x[0] for x in self.fields}:
+            if item_keys != {x['id'] for x in self.fields}:
                 raise ValueError(u'Invalid item (bad keys): {}'.format(escape(u', '.join(item.viewkeys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:

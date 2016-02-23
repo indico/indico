@@ -36,7 +36,8 @@ CHECKOUT_SESSION_TIMEOUT_MSG = _('Time in minutes a checkout session will be ali
 
 class AdminSettingsForm(IndicoForm):
     currencies = MultipleItemsField(_('Currencies'), [DataRequired()],
-                                    fields=(('code', _('Code')), ('name', _('Name'))),
+                                    fields=[{'id': 'code', 'caption': _('Code')},
+                                            {'id': 'name', 'caption': _('Name')}],
                                     unique_field='code',
                                     description=_("List of currencies that can be selected for an event. When deleting "
                                                   "a currency, existing events will keep using it. The currency code "

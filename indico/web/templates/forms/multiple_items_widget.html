@@ -11,8 +11,8 @@
                     {% if field.sortable %}
                         <th class="small-column"></th>
                     {% endif %}
-                    {% for _, title in field.fields -%}
-                        <th>{{ title }}</th>
+                    {% for item in field.fields -%}
+                        <th>{{ item.caption }}</th>
                     {% endfor -%}
                     <th class="action-column">Action</th>
                 </tr>
@@ -32,6 +32,7 @@
             var uuidField = {{ field.uuid_field | tojson }};
             var columns = {{ field.fields | tojson }};
             var sortable = {{ field.sortable | tojson }};
+            var columnChoices = {{ field.choices | tojson }};
             var widget = $('#{{ field.id }}-widget');
             var widgetBody = widget.children('table').children('tbody');
             var field = $('#{{ field.id }}');
@@ -93,7 +94,7 @@
                     item[uuidField] = row.data('uuid');
                 }
                 columns.forEach(function(col, i) {
-                    item[col[0]] = row.find('input').eq(i).val();
+                    item[col.id] = row.find('.js-table-input').eq(i).val();
                 });
                 if (row.data('hasItem')) {
                     data[row.index()] = item;
@@ -152,15 +153,29 @@
             }
 
             function makeColData(item, col, forceEditable) {
-                return (item && !forceEditable) ? {
-                    text: item[col[0]]
-                } : {
-                    html: $('<input>', {
-                        'type': 'text',
-                        'class': 'js-table-input',
-                        'value': item ? item[col[0]] : ''
-                        // can't set placeholder here due to the jquery.placeholder plugin
-                    }).attr('placeholder', col[1])
+                if (item && !forceEditable) {
+                    return col.type === 'select' ? {text: columnChoices[col.id][item[col.id]]} : {text: item[col.id]};
+                } else {
+                    if (col.type === 'select') {
+                        var sel = $('<select>').addClass('js-table-input');
+                        for (var choiceID in columnChoices[col.id]) {
+                            sel.append($('<option>', {
+                                value: choiceID,
+                                text: columnChoices[col.id][choiceID],
+                                selected: item ? item[col.id] === choiceID : false
+                            }));
+                        }
+                        return {html: sel};
+                    } else { // Assuming the type is 'text'
+                        return {
+                            html: $('<input>', {
+                                'type': 'text',
+                                'class': 'js-table-input',
+                                'value': item ? item[col.id] : '',
+                                'placeholder': col.caption
+                            })
+                        };
+                    }
                 };
             }
 
