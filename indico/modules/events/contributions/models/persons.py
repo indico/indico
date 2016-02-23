@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db, PyIntEnum
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.util.struct.enum import IndicoEnum
@@ -62,6 +63,10 @@ class ContributionPersonLink(PersonLinkBase):
         if not self.contribution:
             raise Exception("No contribution to check submission rights against")
         return self.person.has_role('submit', self.contribution)
+
+    @locator_property
+    def locator(self):
+        return dict(self.contribution.locator, person_id=self.id)
 
     @return_ascii
     def __repr__(self):
