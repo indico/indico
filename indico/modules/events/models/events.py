@@ -22,14 +22,15 @@ from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
 
-from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
-from indico.util.decorators import classproperty
-from indico.util.string import return_ascii, to_unicode, format_repr
+from indico.util.decorators import classproperty, strict_classproperty
+from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
@@ -42,21 +43,28 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     view access!
     """
     __tablename__ = 'events'
-    __auto_table_args = (db.Index(None, 'category_chain', postgresql_using='gin'),
-                         db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
-                                            'category_data_set'),
-                         db.CheckConstraint("category_id = category_chain[1]", 'category_id_matches_chain'),
-                         db.CheckConstraint("category_chain[array_length(category_chain, 1)] = 0",
-                                            'category_chain_has_root'),
-                         db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
-                         db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
-                                            'valid_stylesheet'),
-                         {'schema': 'events'})
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
     location_backref_name = 'events'
     allow_location_inheritance = False
     __logging_disabled = False
+
+    @strict_classproperty
+    @classmethod
+    def __auto_table_args(cls):
+        return (db.Index(None, 'category_chain', postgresql_using='gin'),
+                db.Index('ix_events_title_fts', db.func.to_tsvector('simple', cls.title), postgresql_using='gin'),
+                db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
+                                   'category_data_set'),
+                db.CheckConstraint("category_id = category_chain[1]", 'category_id_matches_chain'),
+                db.CheckConstraint("category_chain[array_length(category_chain, 1)] = 0",
+                                   'category_chain_has_root'),
+                db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
+                db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
+                                   'valid_stylesheet'),
+                db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
+                db.CheckConstraint("title != ''", 'valid_title'),
+                {'schema': 'events'})
 
     @declared_attr
     def __table_args__(cls):
@@ -90,6 +98,34 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     category_chain = db.Column(
         ARRAY(db.Integer),
         nullable=True
+    )
+    #: The start date of the event
+    start_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        index=True
+    )
+    #: The end date of the event
+    end_dt = db.Column(
+        UTCDateTime,
+        nullable=False,
+        index=True
+    )
+    #: The timezone of the event
+    timezone = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The title of the event
+    title = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The description of the event
+    description = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
@@ -259,10 +295,6 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         return self.registration_forms.filter_by(is_participation=True, is_deleted=False).first()
 
     @property
-    def title(self):
-        return to_unicode(self.as_legacy.getTitle())
-
-    @property
     def type(self):
         event_type = self.as_legacy.getType()
         if event_type == 'simple_event':
@@ -283,6 +315,21 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
             yield
         finally:
             self.__logging_disabled = False
+
+    @classmethod
+    def title_matches(cls, search_string, exact=False):
+        """Check whether the title matches a search string.
+
+        To be used in a SQLAlchemy `filter` call.
+
+        :param search_string: A string to search for
+        :param exact: Whether to search for the exact string
+        """
+        crit = db.func.to_tsvector('simple', cls.title).match(preprocess_ts_string(search_string),
+                                                              postgresql_regconfig='simple')
+        if exact:
+            crit = crit & cls.title.ilike('%{}%'.format(escape_like(search_string)))
+        return crit
 
     def can_access(self, user, allow_admin=True):
         if not allow_admin:
@@ -334,8 +381,9 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        # TODO: add self.protection_repr once we use it and the title once we store it here
-        return format_repr(self, 'id', is_deleted=False)
+        # TODO: add self.protection_repr once we use it
+        return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False,
+                           _text=text_to_repr(self.title, max_length=75))
 
     # TODO: Remove the next block of code once event acls (read access) are migrated
     def _fail(self, *args, **kwargs):
