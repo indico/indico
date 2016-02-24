@@ -27,22 +27,3 @@ div.meetingEventBody {
     border-bottom-left-radius: 0.2em;
     border-bottom-right-radius: 0.2em;
 }
-
-div.meetingEventHeader {
-    border-top-left-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-}
-
-div.meetingEventHeader > div.details {
-    color: #CCC;
-}
-
-div.meetingEventHeader > span.chairedBy {
-    color: #CCC;
-}
-
-.details .address {
-    color: #aaa;
-    font-size: 12px;
-    text-shadow: none;
-}

@@ -16,13 +16,16 @@
             {% if chairpersons %}
                 <h2>
                     {% trans %}by{% endtrans %}
-                    {{ render_users(chairpersons, spanClass='author', title=False) }}
+                    {{ render_users(chairpersons, span_class='author', title=False) }}
                 </h2>
             {% endif %}
             <div class="details">
+                <div class="event-date">
+                    {{ render_event_time(conf, timezone) }}
+                </div>
                 {% if event.venue_name or event.room_name or event.address %}
-                    <div class="lectureEventLocation">
-                        {{ render_location(event) }}
+                    <div class="event-location">
+                        {{ render_location(event, class='header-data') }}
                         {% if event.address %}
                             <div class="address">{{ event.address }}</div>
                         {% endif %}

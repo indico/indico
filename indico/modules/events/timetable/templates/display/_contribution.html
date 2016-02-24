@@ -2,7 +2,7 @@
 {% from 'events/display/_common.html' import render_location %}
 {% from 'events/timetable/display/_subcontribution.html' import render_subcontribution %}
 {% from 'events/timetable/display/_common.html' import render_speakers, render_references, render_attachments,
-                                                       render_notes, render_description %}
+                                                       render_notes, render_description, render_time %}
 
 {% macro render_contribution(contrib, event, parent=none, nested=false, hide_end_time=false, timezone=none,
                              show_notes=false) -%}
@@ -12,24 +12,22 @@
                                              contrib.can_manage_attachments(session.user))) }}
         {{ template_hook('vc-actions', event=event, item=contrib) }}
 
-        <span class="{{ 'subEventLevelTime' if nested else 'topLevelTime' }}">
-            {{ contrib.timetable_entry.start_dt |format_time(timezone=timezone) }}
-            {% if not hide_end_time %}
-                - {{ (contrib.timetable_entry.start_dt + contrib.duration) |format_time(timezone=timezone) }}
-            {% endif %}
+        {% if not contrib.inherit_location -%}
+            {{ render_location(contrib, parent=parent) }}
+        {%- endif %}
+
+        <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
+            {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
 
         <span class="confModifPadding">
-            <span class="timetable-contrib-title {{ 'subEventLevelTitle' if nested else 'topLevelTitle' }}">
+            <span class="timetable-contrib-title {{ 'topLevelTitle' if not nested }}">
                 {{ contrib.title }}
             </span>
             {% if contrib.duration -%}
                 <span class="icon-time timetable-duration">
                     {{ contrib.duration |format_timedelta(format='narrow') }}
                 </span>
-            {%- endif %}
-            {% if not contrib.inherit_location -%}
-                {{ render_location(contrib, parent=parent) }}
             {%- endif %}
         </span>
 
