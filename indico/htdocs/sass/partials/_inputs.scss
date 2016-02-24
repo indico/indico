@@ -342,20 +342,18 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     padding: 0;
     display: flex;
 
-    > input {
-        flex-grow: 1;
-    }
-
+    > input,
     > textarea {
-        @include border-top-right-radius(0 !important);
-    }
-
-    > textarea, > input {
+        flex-grow: 1;
         height: 2.5em;
         vertical-align: middle;
         line-height: 1.2em;
         margin: 0;
         padding: 0 0.8em;
+    }
+
+    > textarea {
+        @include border-top-right-radius(0 !important);
     }
 
     > textarea + .i-button {
