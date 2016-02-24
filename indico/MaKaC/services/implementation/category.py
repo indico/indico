@@ -30,6 +30,7 @@ import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
 from indico.core.index import Catalog
+from indico.modules.events.util import preload_events
 from indico.web.http_api.util import generate_public_auth_request
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.user import principal_from_fossil
@@ -159,7 +160,9 @@ class GetPastEventsList(CategoryDisplayBase):
         skip = max(0, self._lastIdx - 100)
         pastEvents = {}
         num = 0
-        for event in islice(index.itervalues(), skip, self._lastIdx):
+        events = list(islice(index.itervalues(), skip, self._lastIdx))
+        preload_events(events)
+        for event in events:
             sd = event.getStartDate()
             key = (sd.year, sd.month)
             if key not in pastEvents:
