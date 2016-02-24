@@ -9,7 +9,6 @@
                 <div class="typeahead-field">
                     <input id="location-venue-{{ field.id }}"
                            class="i-location-input-field"
-                           name="location-venue-{{ field.name }}"
                            type="text"
                            placeholder="{% trans %}Venue{% endtrans %}"
                            autocomplete="off">
@@ -24,7 +23,6 @@
                 <div class="typeahead-field">
                     <input id="location-room-{{ field.id }}"
                            class="i-location-input-field"
-                           name="location-room-{{ field.name }}"
                            type="text"
                            placeholder="{% trans %}Room{% endtrans %}"
                            autocomplete="off">
@@ -35,12 +33,11 @@
                     </div>
                 </div>
             </div>
-            <textarea id="location-address-{{ field.id }}" name="location-address"
+            <textarea id="location-address-{{ field.id }}"
                       placeholder="{% trans %}Address{% endtrans %}"></textarea>
             <div class="location-inheritance-field">
                 <div class="checkbox-container">
                     <input id="location-inheritance-{{ field.id }}"
-                           name="location-inheritance-{{ field.name }}"
                            type="checkbox">
                     <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
                     <i class="info-helper"></i>
