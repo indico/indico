@@ -14,10 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import timedelta
+
 import pytest
 
 from indico.modules.events import Event
 from indico.testing.mocks import MockConference, MockConferenceHolder
+from indico.util.date_time import now_utc
 from MaKaC.conference import ConferenceHolder
 
 
@@ -35,7 +38,9 @@ def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
         conf = MockConference()
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
-        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1)
+        now = now_utc(exact=False)
+        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1, title='dummy#{}'.format(id),
+                              start_dt=now, end_dt=now + timedelta(hours=1), timezone='UTC')
         conf.as_event.category_chain = [1, 0]  # set after __init__ (setting category_id modifies it)
         db.session.flush()
         conf.id = str(conf.as_event.id)
