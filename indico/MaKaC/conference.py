@@ -1851,18 +1851,19 @@ class Conference(CommonObjectBase, Locatable):
         :rtype: indico.modules.events.models.events.Event
         """
         from indico.modules.events.models.events import Event
-        query = Event.find(id=int(self.id))
         # this is pretty ugly, but the api sends queries in a loop and we can't
         # really avoid this for now. so let's at least not query things we
         # clearly don't need
-        if has_request_context() and request.blueprint == 'api':
+        if has_request_context() and request.blueprint == 'api' and request.endpoint != 'api.jsonrpc':
             acl_user_strategy = joinedload('acl_entries').defaultload('user')
             # remote group membership checks will trigger a load on _all_emails
             # but not all events use this so there's no need to eager-load them
             acl_user_strategy.noload('_primary_email')
             acl_user_strategy.noload('_affiliation')
-            query = query.options(acl_user_strategy)
-        return query.one()
+            return Event.find(id=int(self.id)).options(acl_user_strategy).one()
+        else:
+            # use get() so sqlalchemy can make use of the identity cache
+            return Event.get_one(int(self.id))
 
     @property
     @memoize_request

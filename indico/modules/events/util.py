@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
-from flask import session, request
+from flask import session, request, g
 from sqlalchemy.orm import load_only, noload
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -32,6 +32,24 @@ from indico.modules.events.models.report_links import ReportLink
 from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+
+
+def preload_events(ids, lightweight=True):
+    """Preload events so they are in SA's identity cache
+
+    This is useful for legacy pages where we have to show large
+    numbers of events without being able to query them from the
+    db cleanly.
+
+    :param ids: An iterable of IDs or Conference objects
+    :param lightweight: Only load dates and title
+    """
+    cache = g.setdefault('_event_cache', {})
+    ids = {int(getattr(id_, 'id', id_)) for id_ in ids} - cache.viewkeys()
+    query = Event.find(Event.id.in_(ids))
+    if lightweight:
+        query = query.options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
+    cache.update((e.id, e) for e in query)
 
 
 def get_object_from_args(args=None):

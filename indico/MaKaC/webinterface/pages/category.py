@@ -34,6 +34,7 @@ from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from indico.modules.events.util import preload_events
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import i18nformat
@@ -1184,6 +1185,8 @@ class WCategModifMain(wcomponents.WTemplated):
 
     def __getConferenceItems(self, cl, modifURLGen):
         temp = []
+        cl = list(cl)
+        preload_events(cl)
         for conf in cl:
             temp.append("""
                 <tr>

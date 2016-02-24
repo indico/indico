@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-
+import itertools
 import os
 import types
 import exceptions
@@ -22,7 +22,7 @@ import pkg_resources
 import binascii
 import uuid
 from collections import OrderedDict
-from flask import session
+from flask import session, g
 from lxml import etree
 from pytz import timezone
 from speaklater import _LazyString
@@ -54,6 +54,7 @@ from indico.core.db import DBMgr
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.util import preload_events
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.util.signals import values_from_signal
@@ -1196,6 +1197,7 @@ class WConferenceList(WTemplated):
             prevMonthTS = utc_timestamp(maxDT.replace(day=1))
             present = index.values(prevMonthTS)
         numPast = self._categ.getNumConferences() - len(present) - len(future)
+        preload_events(itertools.chain(present, future))
         return present, future, len(future), numPast
 
     def getVars( self ):
