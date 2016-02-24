@@ -216,7 +216,7 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
             self._redirect(url)
 
     def _createEvent(self, params):
-        c = self._target.newConference( self._getUser() )
+        c = self._target.newConference(self._getUser(), **UtilsConference.get_new_conference_kwargs(self._params))
 
         UtilsConference.setValues(c, self._params)
 
@@ -366,10 +366,42 @@ class UtilPersons:
         if grantSubmission and chair.getEmail():
             conf.as_event.update_principal(EmailPrincipal(chair.getEmail()), add_roles={'submit'})
 
+
 class UtilsConference:
+    @staticmethod
+    def get_start_dt(params):
+        tz = params['Timezone']
+        try:
+            return timezone(tz).localize(datetime(int(params['sYear']), int(params['sMonth']), int(params['sDay']),
+                                                  int(params['sHour']), int(params['sMinute'])))
+        except ValueError as e:
+            raise FormValuesError('The start date you have entered is not correct: {}'.format(e), 'Event')
 
     @staticmethod
-    def setValues(c, confData, notify=False):
+    def get_end_dt(params, start_dt):
+        tz = params['Timezone']
+        if params.get('duration'):
+            end_dt = start_dt + timedelta(minutes=params['duration'])
+        else:
+            try:
+                end_dt = timezone(tz).localize(datetime(int(params['eYear']), int(params['eMonth']),
+                                                        int(params['eDay']), int(params['eHour']),
+                                                        int(params['eMinute'])))
+            except ValueError as e:
+                raise FormValuesError('The end date you have entered is not correct: {}'.format(e), 'Event')
+        return end_dt
+
+    @classmethod
+    def get_new_conference_kwargs(cls, params):
+        start_dt = cls.get_start_dt(params)
+        end_dt = cls.get_end_dt(params, start_dt)
+        return {'title': params['title'],
+                'timezone': unicode(params['Timezone']),
+                'start_dt': start_dt,
+                'end_dt': end_dt}
+
+    @classmethod
+    def setValues(cls, c, confData, notify=False):
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
         c.setOrgText(confData.get("orgText",""))
@@ -394,27 +426,8 @@ class UtilsConference:
         # Fermi timezone awareness      #
         #################################
         c.setTimezone(confData["Timezone"])
-        tz = confData["Timezone"]
-        try:
-            sDate = timezone(tz).localize(datetime(int(confData["sYear"]), \
-                                 int(confData["sMonth"]), \
-                                 int(confData["sDay"]), \
-                                 int(confData["sHour"]), \
-                                 int(confData[ "sMinute"])))
-        except ValueError,e:
-            raise FormValuesError("The start date you have entered is not correct: %s"%e, "Event")
-
-        if confData.get("duration","") != "":
-            eDate = sDate + timedelta(minutes=confData["duration"])
-        else:
-            try:
-                eDate = timezone(tz).localize(datetime(   int(confData["eYear"]), \
-                                     int(confData["eMonth"]), \
-                                     int(confData["eDay"]), \
-                                     int(confData["eHour"]), \
-                                     int(confData[ "eMinute"])))
-            except ValueError,e:
-                raise FormValuesError("The end date you have entered is not correct: %s"%e)
+        sDate = cls.get_start_dt(confData)
+        eDate = cls.get_end_dt(confData, sDate)
         moveEntries = int(confData.get("move",0))
         c.setDates( sDate.astimezone(timezone('UTC')), \
                     eDate.astimezone(timezone('UTC')), moveEntries=moveEntries)

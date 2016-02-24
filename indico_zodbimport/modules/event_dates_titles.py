@@ -43,16 +43,21 @@ class EventDatesTitlesImporter(Importer):
     def migrate_event_dates_titles(self):
         self.print_step("Migrating event dates and titles")
         for old_event in committing_iterator(self._iter_events()):
+            if 'title' not in old_event.__dict__:
+                self.print_error('Event has no title in ZODB', old_event.id)
+                continue
             updates = {
-                Event.title: convert_to_unicode(old_event.title) or '(no title)',
-                Event.description: convert_to_unicode(old_event.description) or '',
-                Event.timezone: getattr(old_event, 'timezone', 'UTC'),
-                Event.start_dt: old_event.startDate,
-                Event.end_dt: old_event.endDate
+                Event.title: convert_to_unicode(old_event.__dict__['title']) or '(no title)',
+                Event.description: convert_to_unicode(old_event.__dict__['description']) or '',
+                Event.timezone: old_event.__dict__.get('timezone', 'UTC'),
+                Event.start_dt: old_event.__dict__['startDate'],
+                Event.end_dt: old_event.__dict__['endDate']
             }
             Event.query.filter_by(id=int(old_event.id)).update(updates, synchronize_session=False)
             if not self.quiet:
                 self.print_success('', event_id=old_event.id)
+
+        # deleted events are not in zodb but also need data
         updates = {Event.title: '***deleted***',
                    Event.description: '',
                    Event.timezone: 'UTC',
@@ -62,9 +67,13 @@ class EventDatesTitlesImporter(Importer):
         db.session.commit()
 
     def _iter_events(self):
-        it = self.zodb_root['conferences'].itervalues()
+        def _it():
+            for conf in self.zodb_root['conferences'].itervalues():
+                dir(conf)  # make zodb load attrs
+                yield conf
+        it = _it()
         total = len(self.zodb_root['conferences'])
         if self.quiet:
-            it = verbose_iterator(it, total, attrgetter('id'), attrgetter('title'))
+            it = verbose_iterator(it, total, attrgetter('id'), lambda x: x.__dict__.get('title', ''))
         for old_event in self.flushing_iterator(it):
             yield old_event

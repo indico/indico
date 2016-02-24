@@ -830,9 +830,10 @@ class Category(CommonObjectBase):
         conf.unindexConf()
 
     @unify_user_args
-    def newConference(self, creator):
+    def newConference(self, creator, title, start_dt, end_dt, timezone):
         conf = Conference()
-        event = Event(creator=creator, category_id=int(self.id))
+        event = Event(creator=creator, category_id=int(self.id), title=to_unicode(title).strip(),
+                      start_dt=start_dt, end_dt=end_dt, timezone=timezone)
         ConferenceHolder().add(conf, event)
         self._addConference(conf)
 
@@ -1725,19 +1726,8 @@ class Conference(CommonObjectBase, Locatable):
 
     def __init__(self, id=''):
         self.id = id
-        self.title = ""
-        self.description = ""
         self.places = []
         self.rooms = []
-        ###################################
-        # Fermi timezone awareness        #
-        ###################################
-        self.startDate = nowutc()
-        self.endDate = nowutc()
-        self.timezone = ""
-        ###################################
-        # Fermi timezone awareness(end)   #
-        ###################################
         self._screenStartDate = None
         self._screenEndDate = None
         self.contactInfo =""
@@ -1806,6 +1796,46 @@ class Conference(CommonObjectBase, Locatable):
     @return_ascii
     def __repr__(self):
         return '<Conference({0}, {1}, {2})>'.format(self.getId(), self.getTitle(), self.getStartDate())
+
+    @property
+    def startDate(self):
+        return self.as_event.start_dt
+
+    @startDate.setter
+    def startDate(self, dt):
+        self.as_event.start_dt = dt
+
+    @property
+    def endDate(self):
+        return self.as_event.end_dt
+
+    @endDate.setter
+    def endDate(self, dt):
+        self.as_event.end_dt = dt
+
+    @property
+    def timezone(self):
+        return self.as_event.timezone.encode('utf-8')
+
+    @timezone.setter
+    def timezone(self, timezone):
+        self.as_event.timezone = to_unicode(timezone).strip()
+
+    @property
+    def title(self):
+        return self.as_event.title.encode('utf-8')
+
+    @title.setter
+    def title(self, title):
+        self.as_event.title = to_unicode(title).strip()
+
+    @property
+    def description(self):
+        return self.as_event.description.encode('utf-8')
+
+    @description.setter
+    def description(self, description):
+        self.as_event.description = to_unicode(description).strip()
 
     @property
     def all_manager_emails(self):
@@ -3458,7 +3488,8 @@ class Conference(CommonObjectBase, Locatable):
             creator = managing
         else:
             creator = self.as_event.creator
-        conf = cat.newConference(creator)
+        conf = cat.newConference(creator, title=self.getTitle(), start_dt=self.getStartDate(), end_dt=self.getEndDate(),
+                                 timezone=self.getTimezone())
         if managing is not None:
             with conf.as_event.logging_disabled:
                 conf.as_event.update_principal(managing.user, full_access=True)
