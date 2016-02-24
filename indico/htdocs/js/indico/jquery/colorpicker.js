@@ -34,7 +34,7 @@
                 preview.css('background', color).removeClass('no-value');;
             };
 
-            colorInput.on('keyup', function() {
+            var updateWidget = function() {
                 preview.toggleClass('no-value', !colorInput.val().length)
                 if (colorInput.val()) {
                     updateColorPreview(colorInput.val());
@@ -43,9 +43,9 @@
                 else {
                     preview.attr('style', null);
                 }
-            });
+            };
 
-            colorInput.trigger('keyup');
+            colorInput.on('input change', updateWidget);
 
             clickableWrapper.ColorPicker({
                 color: opt.defaultColor,
@@ -68,6 +68,8 @@
                     return false;
                 }
             });
+
+            updateWidget();
         }
     });
 })(jQuery);
