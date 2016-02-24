@@ -31,7 +31,7 @@
             var colorInput = element.find('input');
 
             var updateColorPreview = function(color){
-                preview.css('background', color);
+                preview.css('background', color).removeClass('no-value');;
             };
 
             colorInput.on('keyup', function() {
