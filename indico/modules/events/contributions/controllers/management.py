@@ -139,7 +139,7 @@ class RHContributionsReportCustomize(RHManageContributionsBase):
     """Filter options for the contributions report of an event"""
 
     def _process_GET(self):
-        return WPManageContributions.render_template('management/contrib_report_filter.html', self._conf,
+        return WPManageContributions.render_template('contrib_report_filter.html', self._conf,
                                                      event=self.event_new,
                                                      filters=self.reporter.report_config['filters'],
                                                      filterable_items=self.reporter.filterable_items)
