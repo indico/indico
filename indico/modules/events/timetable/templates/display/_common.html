@@ -3,8 +3,8 @@
 {% from 'events/display/_common.html' import render_users %}
 
 {% macro render_description(item) %}
-    <span itemprop="description" class="contrib-description html">
-        {{ item.description | safe }}
+    <span itemprop="description" class="item-description">
+        {{ item.description }}
     </span>
 {% endmacro %}
 
@@ -18,10 +18,23 @@
     {%- endfor -%}
 {%- endmacro %}
 
+{% macro render_time(item, timezone=none, hide_end_time=false) -%}
+    <span class="start-time">
+        {{ item.timetable_entry.start_dt |format_time(timezone=timezone) }}
+    </span>
+    {% if not hide_end_time %}
+        &rarr;
+        <span class="end-time">
+            {{ (item.timetable_entry.start_dt + item.duration) |format_time(timezone=timezone) }}
+        </span>
+    {% endif %}
+{%- endmacro %}
+
 {% macro render_speakers(speakers) -%}
-        <div class="speaker-list">
-            {{ ngettext("Speaker", "Speakers", speakers|length) }}: {{ render_users(speakers) }}
-        </div>
+    <div class="speaker-list">
+        <span class="label">{{ ngettext("Speaker", "Speakers", speakers|length) }}</span>:
+        {{ render_users(speakers) }}
+    </div>
 {%- endmacro %}
 
 {% macro render_attachments(item) -%}
