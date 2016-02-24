@@ -1,6 +1,7 @@
 {% from 'events/display/_manage_button.html' import render_manage_button %}
 {% from 'events/display/_common.html' import render_location, render_users %}
-{% from 'events/timetable/display/_common.html' import render_attachments, render_notes, render_description %}
+{% from 'events/timetable/display/_common.html' import render_attachments, render_notes, render_description,
+                                                       render_time %}
 {% from 'events/timetable/display/_contribution.html' import render_contribution %}
 {% from 'events/timetable/display/_break.html' import render_break %}
 
@@ -16,9 +17,12 @@
                                                  block.can_manage_attachments(session.user))) }}
             {{ template_hook('vc-actions', event=event, item=block) }}
 
-            <span class="topLevelTime">
-                {{ block.timetable_entry.start_dt |format_time(timezone=timezone) }} -
-                {{ (block.timetable_entry.start_dt + block.duration) |format_time(timezone=timezone) }}
+            {% if not block.inherit_location -%}
+                {{ render_location(block, parent=event) }}
+            {%- endif %}
+
+            <span class="timetable-time top-level">
+                {{ render_time(block, timezone=timezone, hide_end_time=hide_end_time) }}
             </span>
             <span class="topLevelTitle">
                 {% if block.title and block.title != session_.title %}
@@ -30,30 +34,21 @@
         </span>
 
         {% if session_.description %}
-        <span class="description">{{ session }}</span>
+            <div class="description">{{ session_.description }}</div>
         {% endif %}
 
         <table class="timetable-item-details sessionDetails">
             <tbody>
-
-            {% set conveners = block.person_links %}
-            {% if conveners %}
-                <tr>
-                    <td class="leftCol">
-                        {{ ngettext("Convener", "Conveners", conveners|length) }}:
-                    </td>
-                    <td>
+                {% set conveners = block.person_links %}
+                {% if conveners %}
+                    <div class="convener-list">
+                        <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
                         {{ render_users(conveners) }}
-                    </td>
-                </tr>
-            {% endif %}
+                    </div>
+                {% endif %}
 
-            {% if not block.inherit_location -%}
-                {{ render_location(block, parent=event) }}
-            {%- endif %}
-
-            {{ render_attachments(session) }}
-            </tbody>
+                {{ render_attachments(session) }}
+                </tbody>
         </table>
 
         {{ render_notes(block.session) }}

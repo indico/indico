@@ -1,0 +1,193 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+ @import 'base';
+
+ $header-blue: #1a63a0;
+ $timetable-blue: #3875a8;
+ $timetable-teal: #32b17e;
+
+.contrib-description {
+    &.plain {
+        white-space: pre-line;
+    }
+}
+
+.item-location {
+    box-sizing: border-box;
+    border-radius: 0.2em;
+    padding: 0.15em 0.5em 0.15em 0.25em;
+    color: $timetable-teal;
+    font-size: 0.9em;
+    float: right;
+    margin-right: 0.5em;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:before {
+        color: $timetable-teal;
+        margin-right: 0.2em;
+        vertical-align: middle;
+    }
+
+    &.header-data {
+        padding: 0;
+    }
+}
+
+%highlighted-data {
+    display: inline-block;
+    padding: 0.15em 0.25em 0.15em 0.25em;
+    background-color: $timetable-blue;
+    color: $light-gray;
+    border-radius: 0.2em;
+}
+
+%highlighted-header-data {
+    @extend %highlighted-data;
+    background-color: darken($header-blue, 5%);
+}
+
+.event-time-data {
+    time {
+        @extend %highlighted-header-data;
+    }
+
+    .date {
+        color: $gray;
+    }
+
+    .timezone {
+        font-size: 0.8em;
+    }
+}
+
+.header-data {
+    &:before {
+        color: $light-gray;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        margin-right: 0.4em;
+        vertical-align: middle;
+    }
+
+    a {
+        color: $light-gray !important;
+    }
+    color: $light-gray;
+    background-color: transparent;
+}
+
+.event-location .text {
+    @extend %highlighted-header-data;
+}
+
+.event-location, .event-chairs {
+    margin-top: 0.5em;
+}
+
+.timetable-contrib-title {
+    margin-right: 0.2em;
+}
+
+.timetable-duration {
+    box-sizing: border-box;
+    padding: 0.15em 0.5em 0.15em 0.25em;
+    color: $dark-gray;
+
+    &:before {
+        color: $dark-gray;
+        margin-right: 0.2em;
+    }
+}
+
+.speaker-list, .chairperson-list, .convener-list {
+    margin: 0.1em 55px 0 0;
+
+    .label {
+        font-weight: bold;
+    }
+
+    .affiliation {
+        font-size: 0.8em;
+        opacity: 0.7;
+    }
+}
+
+.chairperson-list .author {
+    @extend %highlighted-header-data;
+}
+
+.speaker-list, .convener-list {
+    color: $light-black;
+}
+
+.details .address {
+    color: #aaa;
+    font-size: 12px;
+    text-shadow: none;
+}
+
+.meetingEventHeader {
+    @extend %font-family-title-light;
+}
+
+.timetable-time {
+    color: $timetable-blue !important;
+
+    position: absolute;
+    left: 0;
+
+    &.top-level {
+        &.start-time {
+            background-color: $timetable-blue;
+        }
+    }
+
+    &.nested {
+        margin-right: 0.5em;
+        .start-time {
+            background-color: $timetable-teal;
+        }
+    }
+
+    .start-time {
+        @extend %highlighted-data;
+        color: $light-gray !important;
+    }
+
+    .end-time {
+        color: $timetable-blue;
+    }
+}
+
+.day {
+    display: block;
+    margin: 10px 0;
+    @extend %font-family-title-light;
+    font-size: 1.2em;
+    color: white;
+    background-color: $header-blue;
+    border-radius: 3px;
+    padding: 5px 10px;
+}
+
+.break {
+    color: $light-gray !important;
+    @extend %highlighted-data;
+}
