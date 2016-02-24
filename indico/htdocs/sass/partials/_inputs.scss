@@ -339,6 +339,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 .i-has-action {
     @extend %toolbar-group;
+    padding: 0;
     display: flex;
 
     > input {
