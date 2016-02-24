@@ -36,7 +36,16 @@
                         {{ invitation.affiliation }}
                     </td>
                     <td class="actions">
-                        <a class="icon-remove js-delete-invitation"
+                        {% if invitation.state.name == 'pending' %}
+                            <a class="icon-disable js-invitation-action"
+                               title="{% trans %}Mark as declined{% endtrans %}"
+                               data-href="{{ url_for('.manager_decline_invitation', invitation) }}"
+                               data-method="POST"
+                               data-title="{% trans %}Mark invitation as declined{% endtrans %}"
+                               data-confirm="{% trans %}Do you really want to mark this invitation as declined by the invitee?{% endtrans %}"></a>
+                        {% endif %}
+                        <a class="icon-remove js-invitation-action"
+                           title="{% trans %}Delete invitation{% endtrans %}"
                            data-href="{{ url_for('.delete_invitation', invitation) }}"
                            data-method="DELETE"
                            data-title="{% trans %}Delete invitation{% endtrans %}"
