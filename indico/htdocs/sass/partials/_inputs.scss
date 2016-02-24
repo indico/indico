@@ -346,7 +346,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     > textarea {
         flex-grow: 1;
         height: 2.5em;
-        vertical-align: middle;
         line-height: 1.2em;
         margin: 0;
         padding: 0 0.8em;
@@ -365,7 +364,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         visibility: hidden;
         opacity: 0;
         height: 1em;
-        vertical-align: middle;
     }
 }
 
