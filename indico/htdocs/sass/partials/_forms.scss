@@ -213,14 +213,8 @@ $i-form-line-height: 1.5;
     }
 
     .i-has-action.i-synced-input.i-form-field-fixed-width {
-        > textarea,
-        > input {
-           width: 90%;
-        }
-
         > label.i-synced-label {
             @extend %form-field-button;
-            width: 10%;
         }
     }
 
