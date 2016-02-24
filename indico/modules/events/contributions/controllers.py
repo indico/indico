@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify, redirect, render_template
+from flask import flash, request, jsonify, redirect
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.forms import ContributionForm, ContributionProtectionForm, SubContributionForm
@@ -32,7 +32,7 @@ from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -147,7 +147,7 @@ class RHCreateContribution(RHManageContributionsBase):
             if tpl_components['hide_contrib']:
                 self.reporter.flash_info_message(contrib)
             return jsonify_data(**tpl_components)
-        return jsonify_form(form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
 
 class RHEditContribution(RHManageContributionBase):
@@ -160,7 +160,7 @@ class RHEditContribution(RHManageContributionBase):
             if tpl_components['hide_contrib']:
                 self.reporter.flash_info_message(self.contrib)
             return jsonify_data(**tpl_components)
-        return jsonify_form(form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
 
 class RHDeleteContributions(RHManageContributionsActionsBase):

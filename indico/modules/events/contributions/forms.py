@@ -23,8 +23,10 @@ from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.modules.events.contributions.fields import ContributionPersonListField, SubContributionPersonListField
+from indico.modules.events.contributions.models.references import ContributionReference
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField
+from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField,
+                                     ReferencesField)
 from indico.web.forms.validators import UsedIf, MaxDuration
 from indico.util.i18n import _
 
@@ -39,6 +41,8 @@ class ContributionForm(IndicoForm):
     person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
     location_data = IndicoLocationField(_("Location"),
                                         description=_("The physical location where the contribution takes place."))
+    references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
+                                 description=_("Manage external resources for this contribution"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
