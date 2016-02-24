@@ -581,6 +581,9 @@ table.eventDetails td.leftCol {
     text-align: right;
     padding-right: 6px;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 200px;
     width: 120px;
 }
 
