@@ -22,7 +22,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.db import db
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import InvitationFormExisting, InvitationFormNew
-from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
 from indico.modules.events.registration.notifications import notify_invitation
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import ngettext
@@ -92,8 +92,8 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)
 
 
-class RHRegistrationFormDeleteInvitation(RHManageRegFormBase):
-    """Delete a registration invitation"""
+class RHRegistrationFormInvitationBase(RHManageRegFormBase):
+    """Base class for RH working on one invitation."""
 
     normalize_url_spec = {
         'locators': {
@@ -105,6 +105,20 @@ class RHRegistrationFormDeleteInvitation(RHManageRegFormBase):
         RHManageRegFormBase._checkParams(self, params)
         self.invitation = RegistrationInvitation.get_one(request.view_args['invitation_id'])
 
+
+class RHRegistrationFormDeleteInvitation(RHRegistrationFormInvitationBase):
+    """Delete a registration invitation"""
+
     def _process(self):
         db.session.delete(self.invitation)
+        return jsonify_data(invitation_list=_render_invitation_list(self.regform))
+
+
+class RHRegistrationFormManagerDeclineInvitation(RHRegistrationFormInvitationBase):
+    """Mark a registration is declined by the invitee."""
+
+    def _process(self):
+        if self.invitation.state == InvitationState.pending:
+            self.invitation.state = InvitationState.declined
+            db.session.flush()
         return jsonify_data(invitation_list=_render_invitation_list(self.regform))

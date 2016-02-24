@@ -34,9 +34,10 @@ from indico.modules.events.registration.controllers.management.fields import (RH
                                                                               RHRegistrationFormMoveText,
                                                                               RHRegistrationFormAddField,
                                                                               RHRegistrationFormAddText)
-from indico.modules.events.registration.controllers.management.invitations import (RHRegistrationFormInvitations,
-                                                                                   RHRegistrationFormInvite,
-                                                                                   RHRegistrationFormDeleteInvitation)
+from indico.modules.events.registration.controllers.management.invitations import (
+    RHRegistrationFormInvitations, RHRegistrationFormInvite, RHRegistrationFormDeleteInvitation,
+    RHRegistrationFormManagerDeclineInvitation
+)
 from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
                                                                                 RHManageRegistrationForms,
                                                                                 RHRegistrationFormCreate,
@@ -151,6 +152,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'i
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
                  RHRegistrationFormDeleteInvitation, methods=('DELETE',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>/decline',
+                 'manager_decline_invitation', RHRegistrationFormManagerDeclineInvitation, methods=('POST',))
 
 # E-ticket management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets', 'tickets', RHRegistrationFormTickets,

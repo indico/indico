@@ -19,7 +19,7 @@
     'use strict';
 
     global.setupInvitationPage = function setupInvitationPage() {
-        $('#invitation-list').on('indico:confirmed', '.js-delete-invitation', function(evt) {
+        $('#invitation-list').on('indico:confirmed', '.js-invitation-action', function(evt) {
             evt.preventDefault();
 
             var $this = $(this);
