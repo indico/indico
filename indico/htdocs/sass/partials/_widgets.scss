@@ -63,8 +63,11 @@ i.info-helper {
     .ui-sortable-helper {
         display: table;
     }
+}
 
-    input, select {
+.multiple-items-widget,
+.override-multiple-items-widget {
+     input, select {
         width: 100% !important;
     }
 }
