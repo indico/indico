@@ -937,7 +937,7 @@ class WConferenceTimeTable(WConfDisplayBodyBase):
 
 class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEConferenceTimeTable
-    menu_entry_name = 'timetable'
+    menu_entry_name = 'timetable_old'
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \

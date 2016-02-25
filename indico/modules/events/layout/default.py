@@ -133,6 +133,13 @@ def get_default_menu_entries():
         MenuEntryData(
             title=_("Timetable"),
             name='timetable',
+            endpoint='timetable.timetable',
+            position=3,
+            static_site=True
+        ),
+        MenuEntryData(
+            title=_("Timetable (Old)"),
+            name='timetable_old',
             endpoint='event.conferenceTimeTable',
             position=3,
             static_site=True

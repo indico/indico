@@ -16,17 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.timetable.controllers import RHManageTimetable, RHTimetableREST, RHTimetable
-from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.schedule import ScheduleToJson
 
 
-_bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtual_template_folder='events/timetable',
-                      url_prefix='/event/<confId>')
-
-# Management
-_bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
-_bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/<int:timetable_entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH',))
-
-# Display
-_bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
+def serialize_timetable(event, aw):
+    return ScheduleToJson.process(event.getSchedule(), event.tz, aw, useAttrCache=True, hideWeekends=True)

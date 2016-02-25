@@ -1,0 +1,21 @@
+{% macro render_timetable(timetable_data, event_info, timetable_layout) %}
+    <div id="timetable" style="position: relative;">
+        <div class="timetablePreLoading" style="height: 300px;">
+            <div class="text" style="padding-top: 200px;">
+                {% trans %}Building timetable...{% endtrans %}
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <script>
+        $(window).on('load', function() {
+            var timetableLayout = {{ timetable_layout|tojson }};
+            var timetable = new TopLevelDisplayTimeTable({{ timetable_data|tojson }}, {{ event_info|tojson }}, 710,
+                                                         $E('timetable'), 'session', new BrowserHistoryBroker(),
+                                                         timetableLayout);
+            $('#timetable').html(timetable.draw());
+            timetable.postDraw();
+        });
+    </script>
+{% endmacro %}

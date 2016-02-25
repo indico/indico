@@ -1,0 +1,10 @@
+{% extends 'layout/conference_page_base.html' %}
+{% from 'events/timetable/_timetable.html' import render_timetable %}
+
+{% block title %}
+    {%- trans %}Timetable{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    {{ render_timetable(timetable_data, event_info, timetable_layout) }}
+{% endblock %}

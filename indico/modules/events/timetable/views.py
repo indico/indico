@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
@@ -29,3 +29,17 @@ class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['timetable_sass'].urls()
+
+
+class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+    template_prefix = 'events/timetable/'
+    menu_entry_name = 'timetable'
+
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['timetable_sass'].urls()

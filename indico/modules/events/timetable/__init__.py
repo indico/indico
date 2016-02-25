@@ -32,7 +32,7 @@ logger = Logger.get('events.timetable')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, allow_key=True):
         return
-    return SideMenuItem('timetable', _('Timetable'), url_for('timetable.timetable', event), weight=80, icon='calendar')
+    return SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80, icon='calendar')
 
 
 @signals.event_management.get_cloners.connect
