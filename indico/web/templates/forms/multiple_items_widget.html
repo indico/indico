@@ -90,20 +90,35 @@
                 e.preventDefault();
                 var row = $(this).closest('tr');
                 var item = {};
+                var invalidInput = false;
                 if (uuidField && row.data('uuid')) {
                     item[uuidField] = row.data('uuid');
                 }
                 columns.forEach(function(col, i) {
-                    item[col.id] = row.find('.js-table-input').eq(i).val();
+                    var inputField = row.find('.js-table-input').eq(i);
+                    var value = inputField.val();
+                    if (!value.trim() && inputField.data('required')){
+                        invalidInput = true;
+                        inputField.addClass('hasError');
+                    } else {
+                        item[col.id] = value
+                        inputField.removeClass('hasError');
+                    }
                 });
-                if (row.data('hasItem')) {
-                    data[row.index()] = item;
+                if (!invalidInput) {
+                    row.trigger('multipleItemsWidget:hideError');
+                    invalidInput = false;
+                    if (row.data('hasItem')) {
+                        data[row.index()] = item;
+                    } else {
+                        data.push(item);
+                        row.data('hasItem', true);
+                    }
+                    updateField();
+                    updateRow(row, false);
                 } else {
-                    data.push(item);
-                    row.data('hasItem', true);
+                    row.trigger('multipleItemsWidget:showError');
                 }
-                updateField();
-                updateRow(row, false);
             }).on('click', '.js-add-row', function(e) {
                 e.preventDefault();
                 createRow();
@@ -157,7 +172,11 @@
                     return col.type === 'select' ? {text: columnChoices[col.id][item[col.id]]} : {text: item[col.id]};
                 } else {
                     if (col.type === 'select') {
-                        var sel = $('<select>').addClass('js-table-input');
+                        var sel = $('<select>', {
+                            'class': 'js-table-input',
+                            'data-required': col.required
+                        });
+                        sel.append($('<option>')); // Default empty option
                         for (var choiceID in columnChoices[col.id]) {
                             sel.append($('<option>', {
                                 value: choiceID,
@@ -172,15 +191,39 @@
                                 'type': 'text',
                                 'class': 'js-table-input',
                                 'value': item ? item[col.id] : '',
-                                'placeholder': col.caption
+                                'placeholder': col.caption,
+                                'data-required': col.required
                             })
                         };
                     }
                 };
             }
 
+            function initErrorMessage($element) {
+                $element.qtip({
+                    style: {
+                        classes: 'qtip-danger'
+                    },
+                    content: {
+                        text: $T("Please fill in the required fields.")
+                    },
+                    position: {
+                        my: 'left middle',
+                        at: 'right middle',
+                        adjust: {x: 15}
+                    },
+                    show: {
+                        event: 'multipleItemsWidget:showError'
+                    },
+                    hide: {
+                        event: 'multipleItemsWidget:hideError'
+                    }
+                });
+            }
+
             function createRow(item) {
                 var row = $('<tr>');
+                initErrorMessage(row);
                 row.data('hasItem', !!item);
                 if (uuidField && item) {
                     row.data('uuid', item[uuidField]);

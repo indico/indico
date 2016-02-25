@@ -505,6 +505,12 @@ class ReferencesField(MultipleItemsField):
         if valuelist:
             self.data = [self.reference_class(reference_type_id=int(r['type']), value=r['value']) for r in self.data]
 
+    def pre_validate(self, form):
+        super(ReferencesField, self).pre_validate(form)
+        for reference in self.data_as_dict:
+            if reference['type'] not in self.choices['type']:
+                raise ValueError(u'Invalid type choice: {}'.format(reference['type']))
+
     def _value(self):
         return [{'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data] if self.data else []
 
