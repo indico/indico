@@ -226,6 +226,14 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     # - note (EventNote.contribution)
     # - timetable_entry (TimetableEntry.contribution)
 
+    @declared_attr
+    def subcontribution_count(cls):
+        from indico.modules.events.contributions.models.subcontributions import SubContribution
+        query = (db.select([db.func.count(SubContribution.id)])
+                 .where((SubContribution.contribution_id == cls.id) & ~SubContribution.is_deleted)
+                 .correlate_except(SubContribution))
+        return db.column_property(query, deferred=True)
+
     @property
     def location_parent(self):
         if self.session_block_id is not None:
