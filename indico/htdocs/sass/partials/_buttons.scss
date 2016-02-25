@@ -186,7 +186,7 @@
         box-shadow: none !important;
         color: $dark-gray !important;
         cursor: default;
-        font-weight: normal;
+        font-weight: normal !important;
 
         &.heavy {
             background: $light-gray;
