@@ -18,15 +18,17 @@ from __future__ import unicode_literals
 
 from contextlib import contextmanager
 
+from indico.util.date_time import overlaps
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
+from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like
+from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty, strict_classproperty
@@ -330,6 +332,35 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         if exact:
             crit = crit & cls.title.ilike('%{}%'.format(escape_like(search_string)))
         return crit
+
+    @hybrid_method
+    def in_date_range(self, from_dt=None, to_dt=None):
+        """Check whether the event takes place within two dates"""
+        if from_dt is not None and to_dt is not None:
+            # any event that takes place during the specified range
+            return overlaps((self.start_dt, self.end_dt), (from_dt, to_dt), inclusive=True)
+        elif from_dt is not None:
+            # any event that starts on/after the specified date
+            return self.start_dt >= from_dt
+        elif to_dt is not None:
+            # any event that ends on/before the specifed date
+            return self.end_dt <= to_dt
+        else:
+            return True
+
+    @in_date_range.expression
+    def in_date_range(cls, from_dt=None, to_dt=None):
+        if from_dt is not None and to_dt is not None:
+            # any event that takes place during the specified range
+            return db_dates_overlap(cls, 'start_dt', from_dt, 'end_dt', to_dt, inclusive=True)
+        elif from_dt is not None:
+            # any event that starts on/after the specified date
+            return cls.start_dt >= from_dt
+        elif to_dt is not None:
+            # any event that ends on/before the specifed date
+            return cls.end_dt <= to_dt
+        else:
+            return True
 
     def can_access(self, user, allow_admin=True):
         if not allow_admin:
