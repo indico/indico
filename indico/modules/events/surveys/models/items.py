@@ -149,6 +149,13 @@ class SurveyItem(db.Model):
     # - parent (SurveySection.children)
     # - survey (Survey.items)
 
+    def to_dict(self):
+        """Return a json-serializable representation of this object.
+
+        Subclasses must add their own data to the dict.
+        """
+        return {'type': self.type.name, 'title': self.title, 'description': self.description}
+
 
 class SurveyQuestion(SurveyItem):
     __mapper_args__ = {
@@ -183,6 +190,12 @@ class SurveyQuestion(SurveyItem):
     def __repr__(self):
         return '<SurveyQuestion({}, {}, {}, {})>'.format(self.id, self.survey_id, self.field_type, self.title)
 
+    def to_dict(self):
+        data = super(SurveyQuestion, self).to_dict()
+        data.update({'is_required': self.is_required, 'field_type': self.field_type,
+                     'field_data': self.field.copy_field_data()})
+        return data
+
 
 class SurveySection(SurveyItem):
     __mapper_args__ = {
@@ -208,6 +221,12 @@ class SurveySection(SurveyItem):
     def __repr__(self):
         return '<SurveySection({}, {}, {})>'.format(self.id, self.survey_id, self.title)
 
+    def to_dict(self):
+        data = super(SurveySection, self).to_dict()
+        content = [child.to_dict() for child in self.children]
+        data.update({'content': content, 'display_as_section': self.display_as_section})
+        return data
+
 
 class SurveyText(SurveyItem):
     __mapper_args__ = {
@@ -222,6 +241,11 @@ class SurveyText(SurveyItem):
     def __repr__(self):
         desc = text_to_repr(self.description)
         return '<SurveyText({}, {}): "{}")>'.format(self.id, self.survey_id, desc)
+
+    def to_dict(self):
+        data = super(SurveyText, self).to_dict()
+        del data['title']
+        return data
 
 
 @listens_for(SurveySection.children, 'append')

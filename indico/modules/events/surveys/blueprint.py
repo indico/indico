@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.surveys.controllers.display import RHSurveyList, RHSubmitSurvey
 from indico.modules.events.surveys.controllers.management.questionnaire import (RHManageSurveyQuestionnaire,
+                                                                                RHExportSurveyQuestionnaire,
                                                                                 RHAddSurveyText, RHEditSurveyText,
                                                                                 RHDeleteSurveyText, RHAddSurveyQuestion,
                                                                                 RHEditSurveyQuestion,
@@ -67,6 +68,9 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/sort', 'sort_items', RHSortSurveyItems,
                  methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/survey.json', 'export_questionnaire',
+                 RHExportSurveyQuestionnaire)
+
 # sections
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/add-section', 'add_section', RHAddSurveySection,
                  methods=('GET', 'POST'))
