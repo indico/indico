@@ -47,6 +47,16 @@ class RHManageSurveyQuestionnaire(RHManageSurveyBase):
                                               field_types=field_types, preview_form=preview_form)
 
 
+class RHExportSurveyQuestionnaire(RHManageSurveyBase):
+    """Export the questionnaire to JSON format"""
+
+    def _process(self):
+        sections = [section.to_dict() for section in self.survey.sections]
+        response = jsonify(version=1, sections=sections)
+        response.headers['Content-Disposition'] = 'attachment; filename="survey.json"'
+        return response
+
+
 class RHManageSurveySectionBase(RHManageSurveysBase):
     """Base class for RHs that deal with a specific survey section"""
 

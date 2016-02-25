@@ -8,6 +8,13 @@
 {% endblock %}
 
 {% block content %}
+    <div class="toolbar">
+        <a href="{{ url_for('.export_questionnaire', survey) }}"
+           class="i-button">
+            Export
+        </a>
+    </div>
+
     <div class="flashed-messages"></div>
 
     <div class="action-box">
