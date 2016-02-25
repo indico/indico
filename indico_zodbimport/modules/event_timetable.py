@@ -21,7 +21,7 @@ import itertools
 import traceback
 from collections import defaultdict
 from math import ceil
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 from uuid import uuid4
 
 import click
@@ -227,6 +227,12 @@ class TimetableMigration(object):
             data[new_attr] = convert_to_unicode(getattr(old_person, old_attr, ''))
         data['_title'] = USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none)
         return data
+
+    def _update_link_data(self, link, data_list):
+        for attr in PERSON_INFO_MAP.itervalues():
+            value = most_common(data_list, key=itemgetter(attr))
+            if value and value != getattr(link, attr):
+                setattr(link, attr, value)
 
     def _migrate_event_persons(self):
         all_persons = defaultdict(list)
@@ -527,77 +533,93 @@ class TimetableMigration(object):
 
     def _migrate_contribution_person_links(self, old_entry):
         person_link_map = {}
+        person_link_data_map = defaultdict(list)
         for speaker in getattr(old_entry, '_speakers', []):
             person = self._get_person(speaker)
             if not person:
                 continue
+            person_link_data = self._get_person_data(speaker)
+            person_link_data_map[person].append(person_link_data)
             link = person_link_map.get(person)
             if link:
+                self._update_link_data(link, person_link_data_map[person])
                 link.is_speaker = True
             else:
-                link = ContributionPersonLink(person=person, is_speaker=True, **self._get_person_data(speaker))
+                link = ContributionPersonLink(person=person, is_speaker=True, **person_link_data)
                 person_link_map[person] = link
                 yield link
         for author in getattr(old_entry, '_primaryAuthors', []):
             person = self._get_person(author)
             if not person:
                 continue
+            person_link_data = self._get_person_data(author)
+            person_link_data_map[person].append(person_link_data)
             link = person_link_map.get(person)
             if link:
+                self._update_link_data(link, person_link_data_map[person])
                 link.author_type = AuthorType.primary
             else:
-                link = ContributionPersonLink(person=person, author_type=AuthorType.primary,
-                                              **self._get_person_data(author))
+                link = ContributionPersonLink(person=person, author_type=AuthorType.primary, **person_link_data)
                 person_link_map[person] = link
                 yield link
         for coauthor in getattr(old_entry, '_coAuthors', []):
             person = self._get_person(coauthor)
             if not person:
                 continue
+            person_link_data = self._get_person_data(coauthor)
+            person_link_data_map[person].append(person_link_data)
             link = person_link_map.get(person)
             if link:
+                self._update_link_data(link, person_link_data_map[person])
                 if link.author_type == AuthorType.primary:
                     self.importer.print_warning(cformat('%{yellow!}Primary author "{}" is also co-author')
                                                 .format(person.full_name), event_id=self.event.id)
                 else:
                     link.author_type = AuthorType.secondary
             else:
-                link = ContributionPersonLink(person=person, author_type=AuthorType.secondary,
-                                              **self._get_person_data(coauthor))
+                link = ContributionPersonLink(person=person, author_type=AuthorType.secondary, **person_link_data)
                 person_link_map[person] = link
                 yield link
 
     def _migrate_subcontribution_person_links(self, old_entry):
         person_link_map = {}
+        person_link_data_map = defaultdict(list)
         for speaker in getattr(old_entry, 'speakers', []):
             person = self._get_person(speaker)
             if not person:
                 continue
+            person_link_data = self._get_person_data(speaker)
+            person_link_data_map[person].append(person_link_data)
             link = person_link_map.get(person)
             if link:
+                self._update_link_data(link, person_link_data_map[person])
                 self.importer.print_warning(
                     cformat('%{yellow!}Duplicated speaker "{}" for sub-contribution').format(person.full_name),
                     event_id=self.event.id
                 )
             else:
-                link = SubContributionPersonLink(person=person, **self._get_person_data(speaker))
+                link = SubContributionPersonLink(person=person, **person_link_data)
                 person_link_map[person] = link
                 yield link
 
     def _migrate_session_block_person_links(self, old_entry):
         person_link_map = {}
+        person_link_data_map = defaultdict(list)
         for convener in getattr(old_entry, '_conveners', []):
             person = self._get_person(convener)
             if not person:
                 continue
+            person_link_data = self._get_person_data(convener)
+            person_link_data_map[person].append(person_link_data)
             link = person_link_map.get(person)
             if link:
+                self._update_link_data(link, person_link_data_map[person])
                 self.importer.print_warning(
                     cformat('%{yellow!}Duplicated session block convener "{}"').format(person.full_name),
                     event_id=self.event.id
                 )
             else:
-                link = SessionBlockPersonLink(person=person, **self._get_person_data(convener))
+                link = SessionBlockPersonLink(person=person, **person_link_data)
                 person_link_map[person] = link
                 yield link
 
