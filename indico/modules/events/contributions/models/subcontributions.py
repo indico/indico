@@ -141,7 +141,7 @@ class SubContribution(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', is_deleted=False, _text=self.title)
 
     def can_access(self, user, **kwargs):
         return self.contribution.can_access(user, **kwargs)

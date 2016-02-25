@@ -263,7 +263,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.title)
+        return format_repr(self, 'id', is_deleted=False, _text=self.title)
 
     def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
         if super(Contribution, self).can_manage(user, role, allow_admin=allow_admin, check_parent=check_parent,
