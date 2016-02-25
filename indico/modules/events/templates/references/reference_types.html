@@ -5,7 +5,7 @@
 {% block title %}{% trans %}External ID types{% endtrans %}{% endblock %}
 
 {%- block content %}
-    <div class="i-box titled no-padding">
+    <div class="i-box titled">
         <div class="i-box-header">
             <div class="i-box-title">{%- trans %}Existing external ID types{% endtrans -%}</div>
             <div class="i-box-buttons toolbar right">
@@ -18,7 +18,7 @@
                 </a>
             </div>
         </div>
-        <div id="external-id-types" class="i-box-content">
+        <div id="external-id-types" class="i-box-table-widget">
             {{ render_reference_type_list(reference_types) }}
         </div>
     </div>
