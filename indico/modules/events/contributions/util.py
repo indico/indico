@@ -116,7 +116,9 @@ class ContributionReporter(ReporterBase):
         return (self.report_event.contributions
                 .filter_by(is_deleted=False)
                 .order_by(Contribution.friendly_id)
-                .options(timetable_entry_strategy))
+                .options(timetable_entry_strategy,
+                         joinedload('session'),
+                         db.undefer('subcontribution_count')))
 
     def filter_report_entries(self, query, filters):
         if not filters.get('items'):

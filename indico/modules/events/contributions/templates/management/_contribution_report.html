@@ -94,7 +94,7 @@
                                    data-ajax-dialog>
                                     {%- trans %}Subcontributions{% endtrans -%}
                                     <span class="badge">
-                                        {{- contrib.subcontributions|selectattr('is_deleted', 'equalto', false)|list|length -}}
+                                        {{- contrib.subcontribution_count -}}
                                     </span>
                                 </a>
                             </td>
