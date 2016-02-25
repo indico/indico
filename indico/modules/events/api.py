@@ -14,27 +14,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
-# python stdlib imports
 import fnmatch
 import itertools
 import re
 import pytz
 from datetime import datetime
 
-# indico imports
+from sqlalchemy.orm import joinedload
+
+from indico.modules.events import Event
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 
-from indico.web.http_api.fossils import IConferenceMetadataWithContribsFossil, IConferenceMetadataFossil, \
-    IConferenceMetadataWithSubContribsFossil, IConferenceMetadataWithSessionsFossil, IPeriodFossil, \
-    ICategoryMetadataFossil, ICategoryProtectedMetadataFossil, ISessionMetadataWithContributionsFossil, \
-    ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil, IContributionMetadataWithSubContribsFossil
+from indico.web.http_api.fossils import (IConferenceMetadataWithContribsFossil, IConferenceMetadataFossil,
+                                         IConferenceMetadataWithSubContribsFossil,
+                                         IConferenceMetadataWithSessionsFossil, IPeriodFossil,
+                                         ICategoryMetadataFossil, ICategoryProtectedMetadataFossil,
+                                         ISessionMetadataWithContributionsFossil,
+                                         ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil,
+                                         IContributionMetadataWithSubContribsFossil)
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 
-# indico legacy imports
 from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder
@@ -217,8 +219,6 @@ class CategoryEventFetcher(IteratedDataFetcher):
                          mapClassType={'AcceptedContribution': 'Contribution'})
 
     def category(self, idlist):
-        idx = IndexesHolder().getById('categoryDateAll')
-
         filter = None
         if self._room or self._location or self._eventType:
             def filter(obj):
@@ -234,8 +234,17 @@ class CategoryEventFetcher(IteratedDataFetcher):
                         return False
                 return True
 
-        iters = itertools.chain(*(idx.iterateObjectsIn(catId, self._fromDT, self._toDT) for catId in idlist))
-        return self._process(iters, filter)
+        acl_user_strategy = joinedload('acl_entries').joinedload('user')
+        # remote group membership checks will trigger a load on _all_emails
+        # but not all events use this so there's no need to eager-load them
+        acl_user_strategy.noload('_primary_email')
+        acl_user_strategy.noload('_affiliation')
+        query = (Event.query
+                 .filter(~Event.is_deleted,
+                         Event.category_chain.overlap(map(int, idlist)),
+                         Event.in_date_range(self._fromDT, self._toDT))
+                 .options(acl_user_strategy))
+        return self._process((x.as_legacy for x in query), filter)
 
     def event(self, idlist):
         ch = ConferenceHolder()
