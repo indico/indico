@@ -23,7 +23,7 @@ from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.modules.events.contributions.fields import ContributionPersonListField, SubContributionPersonListField
-from indico.modules.events.contributions.models.references import ContributionReference
+from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField,
                                      ReferencesField)
@@ -74,6 +74,8 @@ class SubContributionForm(IndicoForm):
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_('The duration of the subcontribution'))
     speakers = SubContributionPersonListField(_('Speakers'), description=_('List of the subcontributions speakers'))
+    references = ReferencesField(_("External IDs"), reference_class=SubContributionReference,
+                                 description=_("Manage external resources for this sub-contribution"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
