@@ -90,7 +90,8 @@
                 e.preventDefault();
                 var row = $(this).closest('tr');
                 var item = {};
-                var invalidInput = false;
+                var requiredFieldIsEmpty = false;
+                var invalidNumber = false;
                 if (uuidField && row.data('uuid')) {
                     item[uuidField] = row.data('uuid');
                 }
@@ -98,16 +99,31 @@
                     var inputField = row.find('.js-table-input').eq(i);
                     var value = inputField.val();
                     if (!value.trim() && inputField.data('required')){
-                        invalidInput = true;
+                        requiredFieldIsEmpty = true;
                         inputField.addClass('hasError');
                     } else {
-                        item[col.id] = value
+                        item[col.id] = value;
                         inputField.removeClass('hasError');
                     }
+                    if (inputField.attr('type') === 'number' && !requiredFieldIsEmpty) {
+                        value = parseFloat(value);
+                        if ((inputField.attr('min') && value < parseFloat(inputField.attr('min'))) ||
+                            (inputField.attr('max') && value > parseFloat(inputField.attr('max')))) {
+                            invalidNumber = true;
+                            inputField.addClass('hasError');
+                            inputField.trigger('multipleItemsWidget:showNumberError');
+                        } else {
+                            inputField.removeClass('hasError');
+                            inputField.trigger('multipleItemsWidget:hideNumberError');
+                        }
+                    }
                 });
-                if (!invalidInput) {
-                    row.trigger('multipleItemsWidget:hideError');
-                    invalidInput = false;
+                if (requiredFieldIsEmpty) {
+                    row.trigger('multipleItemsWidget:showRequiredError');
+                } else {
+                    row.trigger('multipleItemsWidget:hideRequiredError');
+                }
+                if (!requiredFieldIsEmpty && !invalidNumber) {
                     if (row.data('hasItem')) {
                         data[row.index()] = item;
                     } else {
@@ -116,8 +132,6 @@
                     }
                     updateField();
                     updateRow(row, false);
-                } else {
-                    row.trigger('multipleItemsWidget:showError');
                 }
             }).on('click', '.js-add-row', function(e) {
                 e.preventDefault();
@@ -185,6 +199,19 @@
                             }));
                         }
                         return {html: sel};
+                    } else if(col.type === 'number') {
+                        var numberInput = $('<input>', {
+                            'type': 'number',
+                            'class': 'js-table-input',
+                            'value': item ? item[col.id] : '',
+                            'placeholder': col.caption,
+                            'data-required': col.required,
+                            'min': col.min,
+                            'max': col.max,
+                            'step': col.step ? col.step : 'any'
+                        });
+                        initNumberErrorMessage(numberInput, col.min, col.max);
+                        return {html: numberInput};
                     } else { // Assuming the type is 'text'
                         return {
                             html: $('<input>', {
@@ -199,7 +226,32 @@
                 };
             }
 
-            function initErrorMessage($element) {
+            function initNumberErrorMessage($element, min, max) {
+                $element.qtip({
+                    style: {
+                        classes: 'qtip-danger'
+                    },
+                    content: {
+                        text: function() {
+                            if(min && max) {
+                                return $T.gettext("Must be between {0} and {1}").format(min, max);
+                            } else if (min) {
+                                return $T.gettext("Must be above {0}").format(min);
+                            } else {
+                                return $T.gettext("Must be below {0}").format(max);
+                            }
+                        }
+                    },
+                    show: {
+                        event: 'multipleItemsWidget:showNumberError'
+                    },
+                    hide: {
+                        event: 'multipleItemsWidget:hideNumberError'
+                    }
+                });
+            }
+
+            function initRequiredErrorMessage($element) {
                 $element.qtip({
                     style: {
                         classes: 'qtip-danger'
@@ -213,17 +265,17 @@
                         adjust: {x: 15}
                     },
                     show: {
-                        event: 'multipleItemsWidget:showError'
+                        event: 'multipleItemsWidget:showRequiredError'
                     },
                     hide: {
-                        event: 'multipleItemsWidget:hideError'
+                        event: 'multipleItemsWidget:hideRequiredError'
                     }
                 });
             }
 
             function createRow(item) {
                 var row = $('<tr>');
-                initErrorMessage(row);
+                initRequiredErrorMessage(row);
                 row.data('hasItem', !!item);
                 if (uuidField && item) {
                     row.data('uuid', item[uuidField]);
