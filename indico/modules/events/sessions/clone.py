@@ -24,6 +24,7 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.util.i18n import _
 
@@ -31,12 +32,14 @@ from indico.util.i18n import _
 class SessionCloner(EventCloner):
     name = 'sessions'
     friendly_name = _('Sessions')
+    requires = {'event_persons'}
     is_internal = True
 
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
     def run(self, new_event, cloners, shared_data):
+        self._person_map = shared_data['event_persons']['person_map']
         self._session_map = {}
         self._session_block_map = {}
         with db.session.no_autoflush:
@@ -66,9 +69,17 @@ class SessionCloner(EventCloner):
         for old_block in blocks:
             block = SessionBlock()
             block.populate_from_attrs(old_block, attrs)
+            block.person_links = list(self._clone_person_links(old_block.person_links))
             self._session_block_map[old_block] = block
-            # TODO: person links
             yield block
+
+    def _clone_person_links(self, person_links):
+        attrs = get_simple_column_attrs(SessionBlockPersonLink)
+        for old_link in person_links:
+            link = SessionBlockPersonLink()
+            link.populate_from_attrs(old_link, attrs)
+            link.person = self._person_map[old_link.person]
+            yield link
 
     def _synchronize_friendly_id(self, new_event):
         new_event._last_friendly_session_id = (
