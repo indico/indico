@@ -59,6 +59,7 @@ def upgrade():
         sa.Column('break_id', sa.Integer(), nullable=True, index=True, unique=True),
         sa.Column('type', PyIntEnum(TimetableEntryType), nullable=False),
         sa.Column('start_dt', UTCDateTime, nullable=False),
+        sa.Index('ix_timetable_entries_start_dt_desc', sa.text('start_dt DESC')),
         sa.CheckConstraint('type != 1 OR parent_id IS NULL', name='valid_parent'),
         sa.CheckConstraint('type != 1 OR (contribution_id IS NULL AND break_id IS NULL AND '
                            'session_block_id IS NOT NULL)', name='valid_session_block'),

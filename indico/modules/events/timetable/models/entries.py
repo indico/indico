@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
+from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
@@ -45,12 +46,16 @@ def _make_check(type_, *cols):
 
 class TimetableEntry(db.Model):
     __tablename__ = 'timetable_entries'
-    __table_args__ = (_make_check(TimetableEntryType.SESSION_BLOCK, 'session_block_id'),
-                      _make_check(TimetableEntryType.CONTRIBUTION, 'contribution_id'),
-                      _make_check(TimetableEntryType.BREAK, 'break_id'),
-                      db.CheckConstraint("type != {} OR parent_id IS NULL".format(TimetableEntryType.SESSION_BLOCK),
-                                         'valid_parent'),
-                      {'schema': 'events'})
+
+    @declared_attr
+    def __table_args__(cls):
+        return (db.Index('ix_timetable_entries_start_dt_desc', cls.start_dt.desc()),
+                _make_check(TimetableEntryType.SESSION_BLOCK, 'session_block_id'),
+                _make_check(TimetableEntryType.CONTRIBUTION, 'contribution_id'),
+                _make_check(TimetableEntryType.BREAK, 'break_id'),
+                db.CheckConstraint("type != {} OR parent_id IS NULL".format(TimetableEntryType.SESSION_BLOCK),
+                                   'valid_parent'),
+                {'schema': 'events'})
 
     id = db.Column(
         db.Integer,
