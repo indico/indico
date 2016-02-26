@@ -238,3 +238,10 @@ def _category_moved(category, old_parent, new_parent, **kwargs):
 def _check_cloners(app, **kwargs):
     # This will raise RuntimeError if the cloner names are not unique
     get_event_cloners()
+
+
+@signals.event_management.get_cloners.connect
+def _get_cloners(sender, **kwargs):
+    from indico.modules.events import clone
+    yield clone.EventPersonCloner
+    yield clone.EventPersonLinkCloner

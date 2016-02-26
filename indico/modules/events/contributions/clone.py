@@ -26,6 +26,7 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -83,13 +84,14 @@ class ContributionFieldCloner(EventCloner):
 class ContributionCloner(EventCloner):
     name = 'contributions'
     friendly_name = _('Contributions')
-    requires = {'sessions', 'contribution_types', 'contribution_fields'}
+    requires = {'event_persons', 'sessions', 'contribution_types', 'contribution_fields'}
     is_internal = True
 
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
     def run(self, new_event, cloners, shared_data):
+        self._person_map = shared_data['event_persons']['person_map']
         self._session_map = shared_data['sessions']['session_map']
         self._session_block_map = shared_data['sessions']['session_block_map']
         self._contrib_type_map = shared_data['contribution_types']['contrib_type_map']
@@ -123,6 +125,7 @@ class ContributionCloner(EventCloner):
             contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions))
             contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries)
             contrib.references = list(self._clone_references(ContributionReference, old_contrib.references))
+            contrib.person_links = list(self._clone_person_links(ContributionPersonLink, old_contrib.person_links))
             contrib.field_values = list(self._clone_fields(old_contrib.field_values))
             if old_contrib.type is not None:
                 contrib.type = self._contrib_type_map[old_contrib.type]
@@ -130,7 +133,6 @@ class ContributionCloner(EventCloner):
                 contrib.session = self._session_map[old_contrib.session]
             if old_contrib.session_block is not None:
                 contrib.session_block = self._session_block_map[old_contrib.session_block]
-            # TODO: person links
             new_event.contributions.append(contrib)
             self._contrib_map[old_contrib] = contrib
 
@@ -142,8 +144,9 @@ class ContributionCloner(EventCloner):
             subcontrib = SubContribution()
             subcontrib.populate_from_attrs(old_subcontrib, attrs)
             subcontrib.references = list(self._clone_references(SubContributionReference, old_subcontrib.references))
+            subcontrib.person_links = list(self._clone_person_links(SubContributionPersonLink,
+                                                                    old_subcontrib.person_links))
             self._subcontrib_map[old_subcontrib] = subcontrib
-            # TODO: person links
             yield subcontrib
 
     def _clone_references(self, cls, references):
@@ -152,6 +155,14 @@ class ContributionCloner(EventCloner):
             ref = cls()
             ref.populate_from_attrs(old_ref, attrs)
             yield ref
+
+    def _clone_person_links(self, cls, person_links):
+        attrs = get_simple_column_attrs(cls)
+        for old_link in person_links:
+            link = cls()
+            link.populate_from_attrs(old_link, attrs)
+            link.person = self._person_map[old_link.person]
+            yield link
 
     def _clone_fields(self, fields):
         attrs = get_simple_column_attrs(ContributionFieldValue)
