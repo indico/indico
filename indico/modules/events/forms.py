@@ -24,8 +24,9 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.modules.events.fields import ReferencesField
 from indico.modules.events.models.references import ReferenceType, EventReference
-from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField, ReferencesField
+from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField
 from indico.web.forms.widgets import CKEditorWidget
 
 
