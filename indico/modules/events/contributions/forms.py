@@ -24,9 +24,9 @@ from wtforms.validators import DataRequired
 
 from indico.modules.events.contributions.fields import ContributionPersonListField, SubContributionPersonListField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
+from indico.modules.events.fields import ReferencesField
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField,
-                                     ReferencesField)
+from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField
 from indico.web.forms.validators import UsedIf, MaxDuration
 from indico.util.i18n import _
 

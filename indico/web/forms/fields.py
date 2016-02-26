@@ -35,7 +35,6 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
@@ -488,31 +487,6 @@ class MultipleItemsField(HiddenField):
 
     def _value(self):
         return self.data or []
-
-
-class ReferencesField(MultipleItemsField):
-    """Extend `MultipleItemsField` to use a list of reference objects as the
-    field value."""
-    def __init__(self, *args, **kwargs):
-        self.reference_class = kwargs.pop('reference_class')
-        self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
-                       {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
-        self.choices = {'type': {unicode(r.id): r.name for r in ReferenceType.find_all()}}
-        super(ReferencesField, self).__init__(*args, **kwargs)
-
-    def process_formdata(self, valuelist):
-        super(ReferencesField, self).process_formdata(valuelist)
-        if valuelist:
-            self.data = [self.reference_class(reference_type_id=int(r['type']), value=r['value']) for r in self.data]
-
-    def pre_validate(self, form):
-        super(ReferencesField, self).pre_validate(form)
-        for reference in self.data_as_dict:
-            if reference['type'] not in self.choices['type']:
-                raise ValueError(u'Invalid type choice: {}'.format(reference['type']))
-
-    def _value(self):
-        return [{'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data] if self.data else []
 
 
 class OverrideMultipleItemsField(HiddenField):
