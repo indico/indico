@@ -30,12 +30,12 @@
             var preview = element.find('.color-preview');
             var colorInput = element.find('input');
 
-            var updateColorPreview = function(color){
-                preview.css('background', color).removeClass('no-value');;
-            };
+            function updateColorPreview(color) {
+                preview.css('background', color).removeClass('no-value');
+            }
 
-            var updateWidget = function() {
-                preview.toggleClass('no-value', !colorInput.val().length)
+            function updateWidget() {
+                preview.toggleClass('no-value', !colorInput.val().length);
                 if (colorInput.val()) {
                     updateColorPreview(colorInput.val());
                     clickableWrapper.ColorPickerSetColor(colorInput.val());
@@ -43,21 +43,21 @@
                 else {
                     preview.attr('style', null);
                 }
-            };
+            }
 
             colorInput.on('input change', updateWidget);
 
             clickableWrapper.ColorPicker({
                 color: opt.defaultColor,
                 onSubmit: function(hsb, hex, rgb, el) {
-                        $(el).val(hex);
-                        updateColorPreview('#' + hex);
-                        $(el).ColorPickerHide();
+                    $(el).val(hex);
+                    updateColorPreview('#' + hex);
+                    $(el).ColorPickerHide();
                 },
                 onChange: function (hsb, hex, rgb) {
-                        colorInput.val('#' + hex);
-                        updateColorPreview('#' + hex);
-                        colorInput.trigger('input');
+                    colorInput.val('#' + hex);
+                    updateColorPreview('#' + hex);
+                    colorInput.trigger('input');
                 },
                 onShow: function (colorpicker) {
                     $(colorpicker).fadeIn(500);
