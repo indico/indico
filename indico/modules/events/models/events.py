@@ -56,6 +56,8 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     def __auto_table_args(cls):
         return (db.Index(None, 'category_chain', postgresql_using='gin'),
                 db.Index('ix_events_title_fts', db.func.to_tsvector('simple', cls.title), postgresql_using='gin'),
+                db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
+                db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
                 db.CheckConstraint("(category_id IS NOT NULL AND category_chain IS NOT NULL) OR is_deleted",
                                    'category_data_set'),
                 db.CheckConstraint("category_id = category_chain[1]", 'category_id_matches_chain'),

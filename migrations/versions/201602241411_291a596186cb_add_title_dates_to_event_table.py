@@ -25,6 +25,8 @@ def upgrade():
     op.create_index(None, 'events', ['start_dt'], schema='events')
     op.create_index(op.f('ix_events_title_fts'), 'events', [sa.text("to_tsvector('simple', title)")], schema='events',
                     postgresql_using='gin')
+    op.create_index(op.f('ix_events_start_dt_desc'), 'events', [sa.text('start_dt DESC')], schema='events')
+    op.create_index(op.f('ix_events_end_dt_desc'), 'events', [sa.text('end_dt DESC')], schema='events')
     op.create_check_constraint('valid_dates', 'events', "end_dt >= start_dt", schema='events')
     op.create_check_constraint('valid_title', 'events', "title != ''", schema='events')
 
