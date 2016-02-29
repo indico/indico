@@ -11,6 +11,12 @@
         });
     }
 
+    function handleRowSelection() {
+        $('table.i-table input.select-row').on('change', function() {
+            $(this).closest('tr').toggleClass('selected', this.checked);
+        }).trigger('change');
+    }
+
     global.setupReportFilter = function() {
         $('.report-filter').dropdown({selector: '.report-column .title'});
 
@@ -47,5 +53,10 @@
 
     global.setupReporter = function() {
         setupStaticURLGeneration();
+        handleRowSelection();
+
+        $('.report').on('indico:htmlUpdated', function() {
+            handleRowSelection();
+        });
     };
 })(window);
