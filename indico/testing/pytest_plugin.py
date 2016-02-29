@@ -55,6 +55,9 @@ def pytest_configure(config):
     Logger.reset()
     del logging.root.handlers[:]
     logging.root.addHandler(logging.NullHandler())
+    # Silence the annoying pycountry logger
+    import pycountry.db
+    pycountry.db.logger.addHandler(logging.NullHandler())
 
 
 def pytest_unconfigure(config):
