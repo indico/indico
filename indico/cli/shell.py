@@ -90,7 +90,6 @@ class IndicoShell(Shell):
         super(IndicoShell, self).__init__(banner=banner, use_bpython=False)
         self._context = None
         self._info = None
-        self._quiet = False
 
     def __call__(self, app, *args, **kwargs):
         with app.test_request_context(base_url=Config.getInstance().getBaseURL()):
@@ -107,7 +106,34 @@ class IndicoShell(Shell):
             self.banner = strip_ansi(self.banner)
         clearCache()
         with context['dbi'].global_connection():
-            super(IndicoShell, self).run(no_ipython or use_bpython, not use_bpython)
+            self.run_shell(no_ipython or use_bpython, not use_bpython, quiet)
+
+    def run_shell(self, no_ipython, no_bpython, quiet):
+        # based on the flask-script Shell.run() method
+        context = self.get_context()
+
+        if not no_bpython:
+            try:
+                from bpython import embed
+                embed(banner=self.banner, locals_=context)
+                return
+            except ImportError:
+                pass
+
+        if not no_ipython:
+            try:
+                from IPython.terminal.ipapp import TerminalIPythonApp
+                ipython_app = TerminalIPythonApp.instance(user_ns=context, display_banner=not quiet)
+                ipython_app.initialize(argv=[])
+                ipython_app.shell.show_banner(self.banner)
+                ipython_app.start()
+                return
+            except ImportError:
+                pass
+
+        # Use basic python shell
+        import code
+        code.interact(self.banner, local=context)
 
     def get_options(self):
         return (
