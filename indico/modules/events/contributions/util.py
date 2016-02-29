@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 
 from flask import flash
-from sqlalchemy.orm import load_only, contains_eager, noload, joinedload
+from sqlalchemy.orm import load_only, contains_eager, noload, joinedload, subqueryload
 
 from indico.core.db import db
 from indico.modules.events.models.events import Event
@@ -106,6 +106,7 @@ class ContributionReporter(ReporterBase):
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),
+                         subqueryload('person_links'),
                          db.undefer('subcontribution_count')))
 
     def filter_report_entries(self, query, filters):

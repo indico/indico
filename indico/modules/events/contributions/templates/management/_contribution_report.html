@@ -29,7 +29,7 @@
                             {% trans %}Duration{% endtrans %}
                         </th>
                         <th class="i-table">
-                            {% trans %}People{% endtrans %}
+                            {% trans %}Presenters{% endtrans %}
                         </th>
                         <th class="i-table">
                             {% trans %}Type{% endtrans %}
@@ -75,9 +75,10 @@
                             <td class="i-table">
                                 {{ contrib.duration|format_timedelta(format='medium') }}
                             </td>
-                            <td class="i-table" data-searchable="TODO">
-                                {# people (don't forget data-searchable above) #}
-                                TODO
+                            <td class="i-table person-row-cell" data-searchable="{{ contrib.speaker_names | join(', ') }}">
+                                {% for speaker in contrib.speakers | sort(attribute='full_name') %}
+                                    <div class="person-row icon-user">{{ speaker.full_name }}</div>
+                                {% endfor %}
                             </td>
                             <td class="i-table" data-text="{{ contrib.type.name if contrib.type else '' }}">
                                 {% if contrib.type %}
