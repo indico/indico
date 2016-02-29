@@ -37,7 +37,7 @@ class ReferencesField(MultipleItemsField):
 
     def pre_validate(self, form):
         super(ReferencesField, self).pre_validate(form)
-        for reference in self.data_as_dict:
+        for reference in self.serialized_data:
             if reference['type'] not in self.choices['type']:
                 raise ValueError(u'Invalid type choice: {}'.format(reference['type']))
 
