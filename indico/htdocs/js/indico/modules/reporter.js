@@ -53,9 +53,10 @@
 
     global.setupReporter = function() {
         setupStaticURLGeneration();
+        handleRowSelection();
 
         $('.report').on('indico:htmlUpdated', function() {
             handleRowSelection();
-        }).trigger('indico:htmlUpdated');
+        });
     };
 })(window);

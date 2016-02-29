@@ -56,6 +56,17 @@
             margin-left: 3px;
         }
     }
+
+    .person-row-cell {
+        position: relative;
+    }
+
+    .person-row {
+        &:before {
+            color: $gray;
+            margin-right: 5px;
+        }
+    }
 }
 
 .report-filter-dialog {
