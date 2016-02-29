@@ -48,45 +48,24 @@ def get_icons(detailed_data):
 
 class Day:
 
-    def __init__( self, cal, day ):
+    def __init__(self, cal, day):
         self._calendar = cal
         self._day = day
-        self._confs = OOBTree()
-        self._categs = []
+        self._categories = set()
+        for __, event in self._calendar._data['events'][self._day.date()]:
+            for categ_id in event.category_chain:
+                categ = CategoryManager().getById(categ_id)
+                if categ in self._calendar._categList:
+                    self._categories.add(categ)
 
     def _getCalendar( self ):
         return self._calendar
 
-    def addConference(self,conf,categList,tz):
-        for categ in categList:
-            if categ not in self._categs:
-                self._categs.append(categ)
-        t = conf.getStartDate().astimezone(tz).time()
-        if not self._confs.has_key(t):
-            self._confs[t]=set()
-        self._confs[t].add(conf)
-
-    #sorting functions that caches calculated start times for every conf
-    def _sortFunc(self, x,y):
-        return cmp(self._cache[x], self._cache[y])
-
-    def _calculateCache(self, confs):
-        self._cache = {}
-        for conf in confs:
-            self._cache[conf] = conf.calculateDayStartTime(self._day).time()
-
     def getConferences(self):
-        return [conf for confs in self._confs.values() for conf in confs]
-
-    def getConferencesWithStartTime(self):
-        res= [conf for confs in self._confs.values() for conf in confs]
-        self._calculateCache(res)
-        if res!=[]:
-            res.sort(self._sortFunc)
-        return [(event, self._cache[event]) for event in res]
+        return self._calendar._data['events'][self._day.date()]
 
     def getCategories(self):
-        return self._categs
+        return list(self._categories)
 
     def getWeekDay( self ):
         return calendar.weekday( self._day.year, \
@@ -98,9 +77,6 @@ class Day:
 
     def getDate( self ):
         return self._day
-
-    def __str__( self ):
-        return "CalendarDay at '%s': %s --> %s"%(self._day, self._confs, self._categs)
 
 
 class Calendar:
@@ -127,7 +103,17 @@ class Calendar:
         self._eDate = eDate.replace(hour=23, minute=59, second=59, microsecond=0)
         self._categList = categList
         self._icons = {}
-        self._days = None
+        self._days = {}
+        self._data = self.getData()
+        self._conf_categories = defaultdict(set)
+        categ_id_list = {c.id for c in self._categList}
+
+        for day, data in self._data['events'].viewitems():
+            for __, event in data:
+                for categ_id in event.category_chain:
+                    if str(categ_id) in categ_id_list:
+                        categ = CategoryManager().getById(str(categ_id))
+                        self._conf_categories[event.id].add(categ)
 
     def getStartDate( self ):
         return self._sDate
@@ -137,6 +123,12 @@ class Calendar:
 
     def getCategoryList( self ):
         return self._categList
+
+    def getDay(self, day):
+        return self._days.setdefault(day, Day(self, day))
+
+    def getConferenceCategories(self, conf):
+        return list(self._conf_categories[int(conf.getId())])
 
     def getLocator( self ):
         """Returns the generic locator for the current object. This locator
@@ -155,79 +147,12 @@ class Calendar:
         l["eDate"] = self.getStartDate().strftime("%Y-%m-%d")
         return l
 
-    def _mapConferenceToDays(self,conf,categList):
-        """Registers a given conference for the days on which it is taking place
-            whithin the calendar date interval.
-
-           Parameters:
-            conf - (conference.Conference) Conference to be mapped.
-            categList - (List) List of calendar categories in which the
-                specified conference is found.
-        """
-
-        inc = timedelta(1)
-        d = max(conf.getStartDate().astimezone(self._tz).replace(hour=0,minute=0,second=0),
-                self.getStartDate().astimezone(self._tz).replace(hour=0,minute=0,second=0))
-        ed = min(conf.getEndDate().astimezone(self._tz), self.getEndDate().astimezone(self._tz))
-        if ed > self.getEndDate():
-            ed = self.getEndDate()
-
-        while d <= ed:
-            #norm_date=d.tzinfo.normalize(d)
-            #norm_date=norm_date.replace(hour=0)
-            norm_date=self.getNormDate(d)
-            if not self._days.has_key( norm_date ):
-                self._days[norm_date] = Day( self, d )
-
-            self._days[norm_date].addConference( conf, categList, self._tz )
-            d += inc
-
-    def _initialiseDays( self ):
-        """
-        """
-        self._days = OOBTree()
-        res = set()
-        self._categIdx = {}
-        self._icons={}
-        catDayIdx = indexes.IndexesHolder().getIndex("categoryDate")
-        for categ in self.getCategoryList():
-            confs = catDayIdx.getObjectsInDays(categ.getId(), self.getStartDate(), self.getEndDate())
-            for conf in confs:
-                confId = conf.getId()
-                if not self._categIdx.has_key(confId):
-                    self._categIdx[confId]=[]
-                self._categIdx[confId].append(categ)
-            res.update(confs)
-        for conf in res:
-            #getting icon from the nearest owner category
-            owner = conf.getOwner()
-            while owner != None and owner.getId() != "0":
-                if owner.getIcon():
-                    if self._icons.has_key(owner.getId()):
-                        self._icons[owner.getId()].append(conf.getId())
-                    else:
-                        self._icons[owner.getId()] = [conf.getId()]
-                    break
-                owner = owner.getOwner()
-            #mapping conf to days
-            self._mapConferenceToDays(conf ,self._categIdx[conf.getId()])
-
-
-
     def getNormDate(self,date):
         # we have to normalize, but as we are going over all the days, we have to keep the date
         # and just normalize the tzinfo.
         norm_date=date.tzinfo.normalize(date)
         norm_date=norm_date.replace(year=date.year, month=date.month,day=date.day, hour=0)
         return norm_date
-
-    def getDay( self, date ):
-        if not self._days:
-            self._initialiseDays()
-        norm_date=self.getNormDate(date)
-        if not self._days.has_key( norm_date ):
-            self._days[norm_date] = Day( self, date )
-        return self._days[norm_date]
 
     def getDayList( self ):
         inc = timedelta( 1 )
@@ -237,9 +162,6 @@ class Calendar:
             l.append( self.getDay( d ) )
             d += inc
         return l
-
-    def getConferenceCategories( self, conf ):
-        return self._categIdx[conf.getId()]
 
     def __str__(self):
         l = []
@@ -287,6 +209,7 @@ class MonthCalendar( Calendar ):
         sd = sDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         ed = sd + timedelta( 30*self._nrMonths )
         Calendar.__init__( self, aw, sd, ed, categList )
+        self._data = self.getData()
 
     def getLocator( self ):
         l = Locators.Locator()
@@ -313,6 +236,16 @@ class MonthCalendar( Calendar ):
             sd += inc
         return l
 
+    def getData(self):
+        categ_ids = tuple(int(cat.id) for cat in self._categList)
+        tz = timezone(DisplayTZ(session.user, None, useServerTZ=True).getDisplayTZ())
+        self._data = get_category_timetable(categ_ids,
+                                            self.getStartDate(),
+                                            self.getEndDate() + timedelta(days=1) - timedelta(seconds=1),
+                                            detail_level='event',
+                                            tz=tz,
+                                            from_categ=self._categList[0])
+        return self._data
 
 class Overview:
     _allowedDetailLevels = ("conference", "session", "contribution")
