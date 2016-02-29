@@ -2119,8 +2119,6 @@ class Conference(CommonObjectBase, Locatable):
         catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.indexConf(self)
         catDateAllIdx.indexConf(self)
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.index(self)
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
 
@@ -2131,8 +2129,6 @@ class Conference(CommonObjectBase, Locatable):
         catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.unindexConf(self)
         catDateAllIdx.unindexConf(self)
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.unindex(self)
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 
@@ -2727,10 +2723,6 @@ class Conference(CommonObjectBase, Locatable):
 
         self.title = title
         self.notifyModification()
-
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.unindex(self)
-        nameIdx.index(self)
 
         if oldTitle != title:
             signals.event.data_changed.send(self, attr='title', old=oldTitle, new=title)
