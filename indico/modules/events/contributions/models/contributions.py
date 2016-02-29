@@ -273,6 +273,14 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
             action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
             self.update_principal(principal, **action)
 
+    @property
+    def speakers(self):
+        return [person_link for person_link in self.person_links if person_link.is_speaker]
+
+    @property
+    def speaker_names(self):
+        return [person_link.full_name for person_link in self.person_links if person_link.is_speaker]
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, contrib_id=self.id)
