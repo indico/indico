@@ -23,17 +23,33 @@ from indico.web.forms.fields import MultipleItemsField
 
 class ReferencesField(MultipleItemsField):
     """A field to manage external references."""
+
     def __init__(self, *args, **kwargs):
         self.reference_class = kwargs.pop('reference_class')
         self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
                        {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
         self.choices = {'type': {unicode(r.id): r.name for r in ReferenceType.find_all()}}
-        super(ReferencesField, self).__init__(*args, **kwargs)
+        super(ReferencesField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True, **kwargs)
 
     def process_formdata(self, valuelist):
         super(ReferencesField, self).process_formdata(valuelist)
         if valuelist:
-            self.data = [self.reference_class(reference_type_id=int(r['type']), value=r['value']) for r in self.data]
+            existing = {x.id: x for x in self.object_data}
+            data = []
+            for entry in self.data:
+                ref = existing[int(entry['id'])] if entry.get('id') is not None else None
+                type_id = int(entry['type'])
+                value = entry['value']
+                if ref is None or (ref.reference_type_id, ref.value) != (type_id, value):
+                    # Create a new ref if it's a new entry or something changed.
+                    # We never UPDATE entries as modifying persistent objects
+                    # here would result in them being committed even in case
+                    # form validation fails somewhere else...
+                    ref = self.reference_class()
+                ref.reference_type_id = type_id
+                ref.value = value
+                data.append(ref)
+            self.data = data
 
     def pre_validate(self, form):
         super(ReferencesField, self).pre_validate(form)
@@ -42,4 +58,7 @@ class ReferencesField(MultipleItemsField):
                 raise ValueError(u'Invalid type choice: {}'.format(reference['type']))
 
     def _value(self):
-        return [{'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data] if self.data else []
+        if not self.data:
+            return []
+        else:
+            return [{'id': r.id, 'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data]

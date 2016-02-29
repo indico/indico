@@ -434,6 +434,10 @@ class MultipleItemsField(HiddenField):
     :param uuid_field: If set, each item will have a UUID assigned and
                        stored in the field specified here.  The name
                        specified here may not be in `fields`.
+    :param uuid_field_opaque: If set, the `uuid_field` is considered opaque,
+                              i.e. it is never touched by this field.  This
+                              is useful when you subclass the field and use
+                              e.g. actual database IDs instead of UUIDs.
     :param unique_field: The name of a field in `fields` that needs
                          to be unique.
     :param sortable: Whether items should be sortable.
@@ -443,6 +447,7 @@ class MultipleItemsField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.fields = getattr(self, 'fields', None) or kwargs.pop('fields')
         self.uuid_field = kwargs.pop('uuid_field', None)
+        self.uuid_field_opaque = kwargs.pop('uuid_field_opaque', False)
         self.unique_field = kwargs.pop('unique_field', None)
         self.sortable = kwargs.pop('sortable', False)
         self.choices = getattr(self, 'choices', {})
@@ -458,7 +463,7 @@ class MultipleItemsField(HiddenField):
             self.data = json.loads(valuelist[0])
             # Preserve dict data, because the self.data can be modified by a subclass
             self.serialized_data = json.loads(valuelist[0])
-            if self.uuid_field:
+            if self.uuid_field and not self.uuid_field_opaque:
                 for item in self.data:
                     if self.uuid_field not in item:
                         item[self.uuid_field] = unicode(uuid.uuid4())
@@ -478,7 +483,7 @@ class MultipleItemsField(HiddenField):
                 if item[self.unique_field] in unique_used:
                     raise ValueError(u'{} must be unique'.format(self.field_names[self.unique_field]))
                 unique_used.add(item[self.unique_field])
-            if self.uuid_field:
+            if self.uuid_field and not self.uuid_field_opaque:
                 if item[self.uuid_field] in uuid_used:
                     raise ValueError(u'UUID must be unique')
                 # raises ValueError if uuid is invalid
