@@ -33,8 +33,6 @@ from indico.core.logger import Logger
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.util.string import remove_accents
-from indico.modules.events import Event
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.fulltextindexes.models.categories import IndexedCategory
 
 from MaKaC.common.ObjectHolders import ObjectHolder
@@ -1157,53 +1155,11 @@ class CategoryTitleIndex(object):
         IndexedCategory.query.delete()
 
 
-class ConferenceIndex(object):
-
-    def index(self, obj):
-        self.unindex(obj)
-        event = IndexedEvent(id=obj.getId(), title=obj.getTitle(),
-                             start_date=obj.getStartDate(), end_date=obj.getEndDate())
-        db.session.add(event)
-        with retry_request_on_conflict():
-            db.session.flush()
-
-    def unindex(self, obj):
-        IndexedEvent.find(id=obj.getId()).delete()
-        db.session.flush()
-
-    def search(self, search_string, order_by='start'):
-        if order_by == 'start':
-            order = IndexedEvent.start_date.desc()
-        elif order_by == 'id':
-            order = IndexedEvent.id
-        else:
-            order = None
-
-        return (db.session.query(IndexedEvent.id)
-                  .join(Event, Event.id == IndexedEvent.id)
-                  .filter(~Event.is_deleted)
-                  .filter(IndexedEvent.title_vector.op('@@')(
-                      func.to_tsquery('simple', preprocess_ts_string(search_string))))
-                  .order_by(order))
-
-    def initialize(self, items):
-        for i, conf in enumerate(items, 1):
-            event = IndexedEvent(id=conf.getId(), title=conf.getTitle(),
-                                 start_date=conf.getStartDate(), end_date=conf.getEndDate())
-            db.session.add(event)
-            if i % 20000 == 0:
-                db.session.commit()
-        db.session.commit()
-
-    def clear(self):
-        IndexedEvent.query.delete()
-
-
 class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
-    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll', 'categoryName', 'conferenceTitle',
+    __allowedIdxs = ['calendar', 'category', 'categoryDate', 'categoryDateAll', 'categoryName',
                      'pendingSubmitters', 'pendingManagers', 'pendingCoordinators']
 
     def getIndex( self, name ):
@@ -1236,6 +1192,4 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="categoryName":
                 return CategoryTitleIndex()
-            elif id=="conferenceTitle":
-                return ConferenceIndex()
             return Idx[str(id)]

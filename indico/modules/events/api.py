@@ -26,6 +26,7 @@ from indico.modules.events import Event
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
+from indico.util.string import to_unicode
 
 from indico.web.http_api.fossils import (IConferenceMetadataWithContribsFossil, IConferenceMetadataFossil,
                                          IConferenceMetadataWithSubContribsFossil,
@@ -350,18 +351,17 @@ class EventSearchFetcher(IteratedDataFetcher):
     }
 
     def event(self, query):
-        ch = ConferenceHolder()
-        index = IndexesHolder().getById("conferenceTitle")
-
         def _iterate_objs(query_string):
-            query = index.search(query_string, self._orderBy)
-            counter = 0
+            query = Event.find(Event.title_matches(to_unicode(query_string)), ~Event.is_deleted)
+            if self._orderBy == 'start':
+                query = query.order_by(Event.start_dt)
+            elif self._orderBy == 'id':
+                query = query.order_by(Event.id)
 
+            counter = 0
             # Query the DB in chunks of 1000 records per query until the limit is satisfied
-            for row in query.yield_per(1000):
-                event_id = row[0]
-                event = ch.getById(event_id, True)
-                if event is not None and event.canAccess(self._aw):
+            for event in query.yield_per(1000):
+                if event.can_access(self._aw.getUser().user if self._aw.getUser() else None):
                     counter += 1
                     # Start yielding only when the counter reaches the given offset
                     if (self._offset is None) or (counter > self._offset):
@@ -376,8 +376,8 @@ class EventSearchFetcher(IteratedDataFetcher):
             obj_list = sorted(_iterate_objs(query), key=self._sortingKeys.get(self._orderBy), reverse=self._descending)
         for event in obj_list:
             yield {
-                'id': event.getId(),
-                'title': event.getTitle(),
-                'startDate': event.getStartDate(),
-                'hasAnyProtection': event.hasAnyProtection()
+                'id': event.id,
+                'title': event.title,
+                'startDate': event.start_dt,
+                'hasAnyProtection': event.as_legacy.hasAnyProtection()
             }
