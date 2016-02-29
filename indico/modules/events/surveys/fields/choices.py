@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals, division
 
+import uuid
 from collections import Counter, OrderedDict
+from copy import deepcopy
 
 from wtforms.fields import SelectField
 from wtforms.fields.html5 import IntegerField
@@ -29,14 +31,23 @@ from indico.web.forms.fields import IndicoRadioField, MultiStringField, IndicoSe
 from indico.web.forms.validators import HiddenUnless
 
 
-class RemoveOptionIDMixin(object):
+class OptionIDMixin(object):
 
     def copy_field_data(self):
         """Return a copy of the field's configuration data without the IDs used to identify answer options."""
-        field_data_copy = super(RemoveOptionIDMixin, self).copy_field_data()
+        field_data_copy = super(OptionIDMixin, self).copy_field_data()
         for option in field_data_copy['options']:
             del option['id']
         return field_data_copy
+
+    @staticmethod
+    def process_imported_data(data):
+        """Generate the options' IDs"""
+        data = deepcopy(data)
+        if 'options' in data:
+            for option in data['options']:
+                option['id'] = unicode(uuid.uuid4())
+        return data
 
 
 class SingleChoiceConfigForm(FieldConfigForm):
@@ -69,7 +80,7 @@ class _EmptyNoneRadioField(IndicoRadioField):
             self.data = None
 
 
-class SingleChoiceField(RemoveOptionIDMixin, SurveyField):
+class SingleChoiceField(OptionIDMixin, SurveyField):
     name = 'single_choice'
     friendly_name = _('Single Choice')
     config_form = SingleChoiceConfigForm
@@ -139,7 +150,7 @@ class MultiSelectConfigForm(FieldConfigForm):
             raise ValidationError(_("Maximum choices must be fewer or equal than the total number of options."))
 
 
-class MultiSelectField(RemoveOptionIDMixin, SurveyField):
+class MultiSelectField(OptionIDMixin, SurveyField):
     name = 'multiselect'
     friendly_name = _('Select multiple')
     config_form = MultiSelectConfigForm
