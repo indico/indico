@@ -20,20 +20,31 @@
 """
 
 import calendar
-
+from collections import defaultdict
 from BTrees.OOBTree import OOBTree
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
-import MaKaC.conference as conference
 from MaKaC.errors import MaKaCError
-from MaKaC.common import Locators,indexes
-from indico.core.config import Config
+from MaKaC.common import Locators, indexes
 from MaKaC.conference import CategoryManager
-from MaKaC.conference import Category
 from MaKaC.i18n import _
+from flask import session
 from pytz import timezone
-from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ
+from indico.modules.events.timetable.util import get_category_timetable
+
+
+def get_icons(detailed_data):
+    icons = defaultdict(set)
+
+    for __, day in detailed_data['events'].viewitems():
+        for __, event in day:
+            for categ_id in event.category_chain:
+                if CategoryManager().getById(categ_id).getIcon():
+                    icons[categ_id].add(event.id)
+    return icons
+
 
 class Day:
 
@@ -117,23 +128,6 @@ class Calendar:
         self._categList = categList
         self._icons = {}
         self._days = None
-
-    def getIcons( self ):
-        try:
-            return self._icons
-        except:
-            self._icons = {}
-            return {}
-
-    def setIcons(self, categ):
-        """Retrieves the list of icons in a given category tree
-        """
-        if categ.getIcon() != None:
-            return [categ.getId()]
-        res = []
-        for subcat in categ.getSubCategoryList():
-            res += self.setIcons(subcat)
-        return res
 
     def getStartDate( self ):
         return self._sDate
@@ -330,6 +324,9 @@ class Overview:
         self._aw = aw
         self._cal = None
 
+    def getIcons(self):
+        return get_icons(self._data)
+
     def getLocator( self ):
         l = Locators.Locator()
         ids = []
@@ -367,13 +364,16 @@ class Overview:
     def getEndDate( self ):
         return self.getDate()
 
-    def getConferencesWithStartTime( self, date=None ):
-        if not self._cal:
-            self._cal = Calendar( self._aw, self.getStartDate(), \
-                                    self.getEndDate(), self.getCategoryList() )
-        if not date:
-            date = self.getDate()
-        return self._cal.getDay( date ).getConferencesWithStartTime()
+    def getData(self):
+        categ_ids = tuple(int(cat.id) for cat in self._categList)
+        tz = timezone(DisplayTZ(session.user, None, useServerTZ=True).getDisplayTZ())
+        self._data = get_category_timetable(categ_ids,
+                                            self.getStartDate(),
+                                            self.getEndDate() + timedelta(days=1) - timedelta(seconds=1),
+                                            detail_level=self.getDetailLevel(),
+                                            tz=tz,
+                                            from_categ=self._categList[0])
+        return self._data
 
     def getDayList( self ):
         if not self._cal:
