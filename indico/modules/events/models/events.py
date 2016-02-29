@@ -364,6 +364,29 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         else:
             return True
 
+    @hybrid_method
+    def starts_in_range(self, from_dt=None, to_dt=None):
+        """Check whether the event starts within two dates"""
+        if from_dt is not None and to_dt is not None:
+            return from_dt <= self.start_dt <= to_dt
+        elif from_dt is not None:
+            return self.start_dt >= from_dt
+        elif to_dt is not None:
+            return self.start_dt <= to_dt
+        else:
+            return True
+
+    @starts_in_range.expression
+    def starts_in_range(cls, from_dt=None, to_dt=None):
+        if from_dt is not None and to_dt is not None:
+            return cls.start_dt.between(from_dt, to_dt)
+        elif from_dt is not None:
+            return cls.start_dt >= from_dt
+        elif to_dt is not None:
+            return cls.start_dt <= to_dt
+        else:
+            return True
+
     def can_access(self, user, allow_admin=True):
         if not allow_admin:
             raise NotImplementedError('can_access(..., allow_admin=False) is unsupported until ACLs are migrated')
