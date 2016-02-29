@@ -336,7 +336,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         return crit
 
     @hybrid_method
-    def in_date_range(self, from_dt=None, to_dt=None):
+    def happens_between(self, from_dt=None, to_dt=None):
         """Check whether the event takes place within two dates"""
         if from_dt is not None and to_dt is not None:
             # any event that takes place during the specified range
@@ -350,8 +350,8 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         else:
             return True
 
-    @in_date_range.expression
-    def in_date_range(cls, from_dt=None, to_dt=None):
+    @happens_between.expression
+    def happens_between(cls, from_dt=None, to_dt=None):
         if from_dt is not None and to_dt is not None:
             # any event that takes place during the specified range
             return db_dates_overlap(cls, 'start_dt', from_dt, 'end_dt', to_dt, inclusive=True)
@@ -365,7 +365,7 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
             return True
 
     @hybrid_method
-    def starts_in_range(self, from_dt=None, to_dt=None):
+    def starts_between(self, from_dt=None, to_dt=None):
         """Check whether the event starts within two dates"""
         if from_dt is not None and to_dt is not None:
             return from_dt <= self.start_dt <= to_dt
@@ -376,8 +376,8 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         else:
             return True
 
-    @starts_in_range.expression
-    def starts_in_range(cls, from_dt=None, to_dt=None):
+    @starts_between.expression
+    def starts_between(cls, from_dt=None, to_dt=None):
         if from_dt is not None and to_dt is not None:
             return cls.start_dt.between(from_dt, to_dt)
         elif from_dt is not None:

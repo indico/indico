@@ -243,7 +243,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
         query = (Event.query
                  .filter(~Event.is_deleted,
                          Event.category_chain.overlap(map(int, idlist)),
-                         Event.in_date_range(self._fromDT, self._toDT))
+                         Event.happens_between(self._fromDT, self._toDT))
                  .options(acl_user_strategy))
         return self._process((x.as_legacy for x in query), filter)
 
