@@ -1036,7 +1036,6 @@ class WConfModifMainData(wcomponents.WTemplated):
                 type.getDescription()))
         vars["typeList"] = "".join(typeList)
         #------------------------------------------------------
-        vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._conf).getHTML()
         vars["eventType"] = self._conf.getType()
         vars["keywords"] = self._conf.getKeywords()
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()

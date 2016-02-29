@@ -43,7 +43,7 @@
         <table class="timetable-contrib-details sessionDetails">
             <tbody>
                 {% if contrib.references -%}
-                    ({{ render_references(contrib) }})
+                    {{ render_references(contrib) }}
                 {%- endif %}
                 {{ render_attachments(contrib) }}
             </tbody>

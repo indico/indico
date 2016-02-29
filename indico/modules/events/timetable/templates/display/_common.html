@@ -9,13 +9,20 @@
 {% endmacro %}
 
 {% macro render_references(item) -%}
-    {%- for reference in item.references: -%}
-        {% if reference.url -%}
-            <a href="{{ reference.url }}" target="_blank">{{ reference.urn }}</a>
-        {%- else -%}
-            {{ reference.urn }}
-        {%- endif %}
-    {%- endfor -%}
+    <ul class="reference-list">
+        {%- for reference in item.references: -%}
+            <li title="{% trans title=reference.reference_type.name %}External reference ({{ title }}){% endtrans %}"
+                class="icon-link">
+            {% if reference.url -%}
+                <a href="{{ reference.url }}" class="title" target="_blank">
+                    {{ reference.urn or reference.value }}
+                </a>
+            {%- else -%}
+                <span class="title">{{ reference.urn or reference.value }}</span>
+            {%- endif %}
+            </li>
+        {%- endfor -%}
+    </ul>
 {%- endmacro %}
 
 {% macro render_time(item, timezone=none, hide_end_time=false) -%}

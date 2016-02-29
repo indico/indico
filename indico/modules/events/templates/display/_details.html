@@ -16,7 +16,7 @@
     {% if event.references and conf.getType() == "meeting" %}
         <tr id="eventReportNumbers">
             <td class="leftCol">
-                {%- trans %}Report Numbers{% endtrans -%}
+                {% trans %}External references{% endtrans %}
             </td>
             <td>
                 {{ render_references(event) }}
