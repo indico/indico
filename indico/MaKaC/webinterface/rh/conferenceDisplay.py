@@ -128,7 +128,7 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
                 if event.default_page_id is None:
                     p = conferences.WPConferenceDisplay(self, self._conf)
                 else:
-                    p = WPPage.render_template('page.html', self._conf, page=event.default_page).encode('utf-8')
+                    p = WPPage.render_template('page.html', self._conf, page=event.default_page)
         elif view in styleMgr.getXSLStyles():
             if not isLibxml:
                 warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
