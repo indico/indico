@@ -446,7 +446,7 @@ class MultipleItemsField(HiddenField):
         self.unique_field = kwargs.pop('unique_field', None)
         self.sortable = kwargs.pop('sortable', False)
         self.choices = getattr(self, 'choices', {})
-        self.data_as_dict = {}
+        self.serialized_data = {}
         if self.uuid_field:
             assert self.uuid_field != self.unique_field
             assert self.uuid_field not in self.fields
@@ -457,7 +457,7 @@ class MultipleItemsField(HiddenField):
         if valuelist:
             self.data = json.loads(valuelist[0])
             # Preserve dict data, because the self.data can be modified by a subclass
-            self.data_as_dict = json.loads(valuelist[0])
+            self.serialized_data = json.loads(valuelist[0])
             if self.uuid_field:
                 for item in self.data:
                     if self.uuid_field not in item:
@@ -466,7 +466,7 @@ class MultipleItemsField(HiddenField):
     def pre_validate(self, form):
         unique_used = set()
         uuid_used = set()
-        for item in self.data_as_dict:
+        for item in self.serialized_data:
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
             item_keys = set(item)
