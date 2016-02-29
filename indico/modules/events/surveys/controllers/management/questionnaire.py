@@ -185,7 +185,11 @@ class RHAddSurveySection(RHManageSurveyBase):
         form = SectionForm()
         if form.validate_on_submit():
             section = add_survey_section(self.survey, form.data)
-            flash(_('Section "{title}" added').format(title=section.title), 'success')
+            if section.title:
+                message = _('Section "{title}" added').format(title=section.title)
+            else:
+                message = _('Standalone section added')
+            flash(message, 'success')
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -199,7 +203,11 @@ class RHEditSurveySection(RHManageSurveySectionBase):
             old_title = self.section.title
             form.populate_obj(self.section)
             db.session.flush()
-            flash(_('Section "{title}" updated').format(title=old_title), 'success')
+            if old_title:
+                message = _('Section "{title}" updated').format(title=old_title)
+            else:
+                message = _('Standalone section updated')
+            flash(message, 'success')
             logger.info('Survey section %s modified by %s', self.section, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
@@ -211,7 +219,11 @@ class RHDeleteSurveySection(RHManageSurveySectionBase):
     def _process(self):
         db.session.delete(self.section)
         db.session.flush()
-        flash(_('Section "{title}" deleted').format(title=self.section.title), 'success')
+        if self.section.title:
+            message = _('Section "{title}" deleted').format(title=self.section.title)
+        else:
+            message = _('Standalone section deleted')
+        flash(message, 'success')
         logger.info('Survey section %s deleted by %s', self.section, session.user)
         return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
 
