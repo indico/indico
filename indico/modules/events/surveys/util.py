@@ -110,5 +110,5 @@ def get_events_with_submitted_surveys(user, from_dt=None, to_dt=None):
              .options(joinedload(SurveySubmission.survey).load_only('event_id'))
              .join(Survey)
              .join(Event)
-             .filter(~Survey.is_deleted, ~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
+             .filter(~Survey.is_deleted, ~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
     return {submission.survey.event_id for submission in query}

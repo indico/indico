@@ -377,7 +377,7 @@ def get_events_registered(user, from_dt=None, to_dt=None):
              .join(Registration.registration_form)
              .join(RegistrationForm.event_new)
              .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted,
-                     Event.starts_in_range(from_dt, to_dt)))
+                     Event.starts_between(from_dt, to_dt)))
     return {registration.event_id for registration in query}
 
 

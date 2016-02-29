@@ -46,7 +46,7 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
              .options(contains_eager(ContributionPrincipal.contribution).load_only('event_id'))
              .join(Contribution)
              .join(Event, Event.id == Contribution.event_id)
-             .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
+             .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
     data = defaultdict(set)
     for principal in query:
         roles = data[principal.contribution.event_id]

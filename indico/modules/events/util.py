@@ -101,7 +101,7 @@ def get_events_managed_by(user, from_dt=None, to_dt=None):
     query = (user.in_event_acls
              .join(Event)
              .options(noload('user'), noload('local_group'), load_only('event_id'))
-             .filter(~Event.is_deleted, Event.starts_in_range(from_dt, to_dt))
+             .filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt))
              .filter(EventPrincipal.has_management_role('ANY')))
     return {principal.event_id for principal in query}
 
@@ -114,7 +114,7 @@ def get_events_created_by(user, from_dt=None, to_dt=None):
     :param to_dt: The latest event start time to look for
     :return: A set of event ids
     """
-    query = user.created_events.filter(~Event.is_deleted, Event.starts_in_range(from_dt, to_dt))
+    query = user.created_events.filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt))
     return {event.id for event in query}
 
 
@@ -130,7 +130,7 @@ def get_events_with_linked_event_persons(user, from_dt=None, to_dt=None):
              .options(noload('*'))
              .join(Event, Event.id == EventPerson.event_id)
              .filter(EventPerson.event_links.any())
-             .filter(~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
+             .filter(~Event.is_deleted, Event.starts_between(from_dt, to_dt)))
     return {ep.event_id for ep in query}
 
 
