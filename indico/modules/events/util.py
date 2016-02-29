@@ -29,7 +29,6 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.report_links import ReportLink
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
@@ -71,7 +70,6 @@ def get_object_from_args(args=None):
         args = request.view_args
     object_type = args['object_type']
     event = Event.find_first(id=args['confId'], is_deleted=False)
-    obj = None
     if event is None:
         obj = None
     elif object_type == 'event':
@@ -100,21 +98,11 @@ def get_events_managed_by(user, from_dt=None, to_dt=None):
     :param to_dt: The latest event start time to look for
     :return: A set of event ids
     """
-    event_date_filter = None
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
     query = (user.in_event_acls
              .join(Event)
              .options(noload('user'), noload('local_group'), load_only('event_id'))
-             .filter(~Event.is_deleted)
+             .filter(~Event.is_deleted, Event.starts_in_range(from_dt, to_dt))
              .filter(EventPrincipal.has_management_role('ANY')))
-    if event_date_filter is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == EventPrincipal.event_id)
-        query = query.filter(event_date_filter)
     return {principal.event_id for principal in query}
 
 
@@ -126,17 +114,7 @@ def get_events_created_by(user, from_dt=None, to_dt=None):
     :param to_dt: The latest event start time to look for
     :return: A set of event ids
     """
-    event_date_filter = None
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
-    query = (user.created_events.filter(~Event.is_deleted))
-    if event_date_filter is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == Event.id)
-        query = query.filter(event_date_filter)
+    query = user.created_events.filter(~Event.is_deleted, Event.starts_in_range(from_dt, to_dt))
     return {event.id for event in query}
 
 
@@ -147,23 +125,12 @@ def get_events_with_linked_event_persons(user, from_dt=None, to_dt=None):
     :param from_dt: The earliest event start time to look for
     :param to_dt: The latest event start time to look for
     """
-    event_date_filter = None
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
-
     query = (user.event_persons
              .options(load_only('event_id'))
              .options(noload('*'))
              .join(Event, Event.id == EventPerson.event_id)
              .filter(EventPerson.event_links.any())
-             .filter(~Event.is_deleted))
-    if event_date_filter is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == EventPerson.event_id)
-        query = query.filter(event_date_filter)
+             .filter(~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
     return {ep.event_id for ep in query}
 
 
