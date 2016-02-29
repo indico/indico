@@ -469,7 +469,6 @@ class Config:
         'SupportEmail'              : 'root@localhost',
         'PublicSupportEmail'        : 'root@localhost',
         'NoReplyEmail'              : 'noreply-root@localhost',
-        'ReportNumberSystems'       : {},
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
         'AuthenticatedEnforceSecure': 'no',

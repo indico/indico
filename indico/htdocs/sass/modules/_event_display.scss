@@ -213,3 +213,30 @@ li > table + .note-area-wrapper {
     }
 
 }
+
+.meetingTimetable .reference-list {
+    font-size: 0.9em;
+}
+
+.reference-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: block;
+
+    li {
+        &:before {
+            color: $yellow;
+        }
+
+        display: inline-block;
+        margin: 0.2em 0.2em;
+        @include border-radius(2px);
+        padding: 0.2em 0.5em;
+        background-color: lighten($light-yellow, 5%);
+
+        .type-name {
+            color: $light-black;
+        }
+    }
+}

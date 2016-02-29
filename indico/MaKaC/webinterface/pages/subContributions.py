@@ -71,7 +71,6 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         vars["duration"] =(datetime(1900,1,1)+self._subContrib.getDuration()).strftime("%H:%M")
         vars["SubContrib"] = self._subContrib
         vars["accessWrapper"] = self._aw
-        vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
 
         return vars
 
@@ -289,5 +288,3 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._subContrib.getConference(), 10))
         vars["eventType"] = self._subContrib.getConference().getType()
         return vars
-
-
