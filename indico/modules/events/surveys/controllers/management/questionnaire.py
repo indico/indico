@@ -16,25 +16,29 @@
 
 from __future__ import unicode_literals
 
+import json
+
 from flask import request, flash, session, jsonify
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug import MultiDict
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
 from indico.modules.events.surveys.fields import get_field_types
-from indico.modules.events.surveys.forms import TextForm, SectionForm
+from indico.modules.events.surveys.forms import TextForm, SectionForm, ImportQuestionnaireForm
 from indico.modules.events.surveys.models.items import (SurveyItem, SurveyItemType, SurveySection, SurveyText,
                                                         SurveyQuestion)
 from indico.modules.events.surveys.models.surveys import Survey
+from indico.modules.events.surveys.operations import add_survey_section, add_survey_question, add_survey_text
 from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageSurveyQuestionnaire(RHManageSurveyBase):
@@ -55,6 +59,73 @@ class RHExportSurveyQuestionnaire(RHManageSurveyBase):
         response = jsonify(version=1, sections=sections)
         response.headers['Content-Disposition'] = 'attachment; filename="survey.json"'
         return response
+
+
+class RHImportSurveyQuestionnaire(RHManageSurveyBase):
+    """Import a questionnaire in JSON format"""
+
+    def _remove_false_values(self, data):
+        # The forms consider a missing key as False (and a False value as True)
+        for key, value in data.items():
+            if value is False:
+                del data[key]
+
+    def _import_data(self, data):
+        if data['version'] != 1:
+            raise ValueError("Unsupported document format")
+
+        # If the survey currently contains only one empty section, remove it.
+        if len(self.survey.items) == 1 and isinstance(self.survey.items[0], SurveySection):
+            db.session.delete(self.survey.items[0])
+
+        for section in data['sections']:
+            self._import_section(section)
+
+    def _import_section(self, data):
+        self._remove_false_values(data)
+        form = SectionForm(formdata=MultiDict(data.items()), csrf_enabled=False)
+        if form.validate():
+            section = add_survey_section(self.survey, form.data)
+            for item in data['content']:
+                self._import_section_item(section, item)
+        else:
+            raise ValueError('Invalid section')
+
+    def _import_section_item(self, section, data):
+        self._remove_false_values(data)
+        if data['type'] == 'text':
+            form = TextForm(formdata=MultiDict(data.items()), csrf_enabled=False)
+            if form.validate():
+                add_survey_text(section, form.data)
+            else:
+                raise ValueError('Invalid text item')
+        elif data['type'] == 'question':
+            for key, value in data['field_data'].iteritems():
+                if value is not None:
+                    data[key] = value
+            field_cls = get_field_types()[data['field_type']]
+            form_cls = field_cls.config_form
+            data = field_cls.process_imported_data(data)
+            form = form_cls(formdata=MultiDict(data.items()), csrf_enabled=False)
+            if not form.validate():
+                raise ValueError('Invalid question')
+            add_survey_question(section, field_cls, form.data)
+
+    def _process(self):
+        form = ImportQuestionnaireForm()
+        if form.validate_on_submit():
+            try:
+                data = json.load(request.files['file'].file)
+                self._import_data(data)
+            except ValueError as exception:
+                logger.info('%s tried to import an invalid JSON file: %s', session.user, exception.message)
+                flash(_("Invalid file selected."), 'error')
+            else:
+                sections = len(data['sections'])
+                flash(_("The questionnaire has been imported."), 'success')
+                logger.info('Questionnaire imported from JSON document by %s', session.user)
+            return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
+        return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 
 class RHManageSurveySectionBase(RHManageSurveysBase):
@@ -113,12 +184,8 @@ class RHAddSurveySection(RHManageSurveyBase):
     def _process(self):
         form = SectionForm()
         if form.validate_on_submit():
-            section = SurveySection(survey=self.survey)
-            form.populate_obj(section)
-            db.session.add(section)
-            db.session.flush()
+            section = add_survey_section(self.survey, form.data)
             flash(_('Section "{title}" added').format(title=section.title), 'success')
-            logger.info('Survey section %s added by %s', section, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -155,12 +222,8 @@ class RHAddSurveyText(RHManageSurveySectionBase):
     def _process(self):
         form = TextForm()
         if form.validate_on_submit():
-            text = SurveyText()
-            form.populate_obj(text)
-            self.section.children.append(text)
-            db.session.flush()
+            add_survey_text(self.section, form.data)
             flash(_('Text item added'), 'success')
-            logger.info('Survey text item %s added by %s', text, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -199,25 +262,22 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
         except KeyError:
             raise NotFound
 
-        clone_id = request.args.get('clone')
-        form = None
-        if clone_id is not None:
+        form = field_cls.config_form()
+        try:
+            clone_id = int(request.args['clone'])
+        except (KeyError, ValueError):
+            pass
+        else:
             try:
-                question_to_clone = SurveyQuestion.query.with_parent(self.survey).filter_by(id=int(clone_id)).one()
+                question_to_clone = SurveyQuestion.query.with_parent(self.survey).filter_by(id=clone_id).one()
                 form = question_to_clone.field.config_form(
-                        obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
-            except (NoResultFound, ValueError):
+                    obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
+            except NoResultFound:
                 pass
-        if form is None:
-            form = field_cls.config_form()
 
         if form.validate_on_submit():
-            question = SurveyQuestion()
-            field_cls(question).save_config(form)
-            self.section.children.append(question)
-            db.session.flush()
+            question = add_survey_question(self.section, field_cls, form.data)
             flash(_('Question "{title}" added').format(title=question.title), 'success')
-            logger.info('Survey question %s added by %s', question, session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_template('events/surveys/management/edit_survey_item.html', form=form)
 
@@ -229,7 +289,7 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
         form = self.question.field.config_form(obj=FormDefaults(self.question, **self.question.field_data))
         if form.validate_on_submit():
             old_title = self.question.title
-            self.question.field.save_config(form)
+            self.question.field.update_question(form.data)
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=old_title), 'success')
             logger.info('Survey question %s modified by %s', self.question, session.user)

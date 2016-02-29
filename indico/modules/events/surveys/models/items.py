@@ -225,6 +225,9 @@ class SurveySection(SurveyItem):
         data = super(SurveySection, self).to_dict()
         content = [child.to_dict() for child in self.children]
         data.update({'content': content, 'display_as_section': self.display_as_section})
+        if not self.display_as_section:
+            del data['title']
+            del data['description']
         return data
 
 

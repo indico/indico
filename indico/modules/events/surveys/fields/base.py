@@ -27,9 +27,6 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class FieldConfigForm(IndicoForm):
-    # data that is stored directly on the question and not in data
-    _common_fields = {'title', 'description', 'is_required'}
-
     title = StringField(_('Title'), [DataRequired()], description=_("The title of the question"))
     description = TextAreaField(_('Description'), description=_("The description (shown below the question's field.)"))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
@@ -88,16 +85,18 @@ class SurveyField(object):
     def is_answer_empty(self, answer):
         return answer.data is None
 
-    def save_config(self, form):
-        """Populates an object with the field settings
+    def update_question(self, data):
+        """Update the question of this field.
 
-        :param form: A `FieldConfigForm` instance
+        :param data: A dict containing already validated data from form submission.
         """
-        form.populate_obj(self.question, fields=form._common_fields)
+        common_fields = {'title', 'description', 'is_required'}
+        for field in common_fields:
+            setattr(self.question, field, data[field])
         self.question.field_type = self.name
-        self.question.field_data = {name: field.data
-                                    for name, field in form._fields.iteritems()
-                                    if name not in form._common_fields and name != 'csrf_token'}
+        self.question.field_data = {name: value
+                                    for name, value in data.iteritems()
+                                    if name not in common_fields and name != 'csrf_token'}
 
     def render_answer(self, answer):
         """Returns the human-friendly version of the answer"""
@@ -119,3 +118,8 @@ class SurveyField(object):
         elif self.not_required_validator:
             validators.append(self.not_required_validator())
         return field_cls(self.question.title, validators, description=self.question.description, **kwargs)
+
+    @staticmethod
+    def process_imported_data(data):
+        """Process the form's data imported from a dict."""
+        return data
