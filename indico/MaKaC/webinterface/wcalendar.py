@@ -22,7 +22,8 @@
 import calendar
 
 from BTrees.OOBTree import OOBTree
-from datetime import timedelta,datetime
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 import MaKaC.conference as conference
 from MaKaC.errors import MaKaCError
@@ -383,72 +384,42 @@ class Overview:
     def getAW( self ):
         return self._aw
 
-    def getOverviewNextPeriod( self ):
+    def getOverviewNextPeriod(self):
         """Returns an exact copy of the current overview object for the next
             day"""
-        ow = Overview( self.getAW(), \
-                        self.getDate()+timedelta(1), \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = Overview(self.getAW(),
+                      self.getDate() + relativedelta(days=1),
+                      self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewPrevPeriod( self ):
+    def getOverviewPrevPeriod(self):
         """Returns an exact copy of the current overview object for the previous
             day"""
-        ow = Overview( self.getAW(), \
-                        self.getDate()-timedelta(1), \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = Overview(self.getAW(),
+                      self.getDate() - relativedelta(days=1),
+                      self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewNextBigPeriod( self ):
+    def getOverviewNextBigPeriod(self):
         """Returns an exact copy of the current overview object for the next
             day"""
         d = self.getDate()
-        month = d.month
-        year = d.year
-        if month == 12:
-            nextmonth = 1
-            nextyear = year + 1
-        else:
-            nextmonth = month + 1
-            nextyear = year
-        day = d.day
-        while True:
-            try:
-                d = d.replace(year=nextyear,month=nextmonth,day=day)
-                break
-            except:
-                day = day-1
-        ow = Overview( self.getAW(), \
-                        d, \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = Overview(self.getAW(),
+                      d - relativedelta(months=1),
+                      self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewPrevBigPeriod( self ):
+    def getOverviewPrevBigPeriod(self):
         """Returns an exact copy of the current overview object for the previous
             day"""
         d = self.getDate()
-        month = d.month
-        year = d.year
-        if month == 1:
-            prevmonth = 12
-            prevyear = year -1
-        else:
-            prevmonth = month - 1
-            prevyear = year
-        day = d.day
-        while True:
-            try:
-                d = d.replace(year=prevyear,month=prevmonth,day=day)
-                break
-            except:
-                day = day-1
-        ow = Overview( self.getAW(), \
-                        d, \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = Overview(self.getAW(),
+                      d + relativedelta(months=1),
+                      self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
     def getOverviewOtherCateg( self, categid ):
@@ -479,22 +450,22 @@ class WeekOverview( Overview ):
         inc = timedelta( 6 - calendar.weekday( d.year, d.month, d.day ) )
         return d+inc
 
-    def getOverviewNextPeriod( self ):
+    def getOverviewNextPeriod(self):
         """Returns an exact copy of the current overview object for the next
             week"""
-        ow = WeekOverview( self.getAW(), \
-                        self.getDate()+timedelta(7), \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = WeekOverview(self.getAW(),
+                          self.getDate() + relativedelta(weeks=1),
+                          self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewPrevPeriod( self ):
+    def getOverviewPrevPeriod(self):
         """Returns an exact copy of the current overview object for the previous
             week"""
-        ow = WeekOverview( self.getAW(), \
-                        self.getDate()-timedelta(7), \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = WeekOverview(self.getAW(),
+                          self.getDate() - relativedelta(weeks=1),
+                          self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
     def getOverviewOtherCateg( self, categid ):
@@ -525,50 +496,42 @@ class MonthOverview( Overview ):
             d = self.getStartDate().replace(year=self.getDate().year+1,month=1) - timedelta(1)
         return d
 
-    def getOverviewNextPeriod( self ):
+    def getOverviewNextPeriod(self):
         """Returns an exact copy of the current overview object for the next
             month"""
-        ow  = MonthOverview( self.getAW(), \
-                        self.getDate()+timedelta(30), \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = MonthOverview(self.getAW(),
+                           self.getDate() + relativedelta(months=1),
+                           self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewPrevPeriod( self ):
+    def getOverviewPrevPeriod(self):
         """Returns an exact copy of the current overview object for the previous
             month"""
-        ow = MonthOverview( self.getAW(), \
-                        self.getDate()-timedelta(30), \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = MonthOverview(self.getAW(),
+                           self.getDate() - relativedelta(months=1),
+                           self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewNextBigPeriod( self ):
+    def getOverviewNextBigPeriod(self):
         """Returns an exact copy of the current overview object for the next
             day"""
         d = self.getDate()
-        offset = {'year': d.year+1}
-        if d.month == 2 and d.day == 29:
-            offset['day'] = 28
-        d = d.replace(**offset)
-        ow = MonthOverview( self.getAW(), \
-                        d, \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = MonthOverview(self.getAW(),
+                           d + relativedelta(years=1),
+                           self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
-    def getOverviewPrevBigPeriod( self ):
+    def getOverviewPrevBigPeriod(self):
         """Returns an exact copy of the current overview object for the previous
             day"""
         d = self.getDate()
-        offset = {'year': d.year-1}
-        if d.month == 2 and d.day == 29:
-            offset['day'] = 28
-        d = d.replace(**offset)
-        ow = MonthOverview( self.getAW(), \
-                        d, \
-                        self.getCategoryList() )
-        ow.setDetailLevel( self.getDetailLevel() )
+        ow = MonthOverview(self.getAW(),
+                           d - relativedelta(years=1),
+                           self.getCategoryList())
+        ow.setDetailLevel(self.getDetailLevel())
         return ow
 
     def getOverviewOtherCateg( self, categid ):
