@@ -31,7 +31,6 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
 from indico.util.user import iter_acl
 from MaKaC.PDFinterface.base import PDFBase, Paragraph
@@ -158,24 +157,13 @@ def get_events_with_linked_sessions(user, from_dt=None, to_dt=None):
     :param from_dt: The earliest event start time to look for
     :param to_dt: The latest event start time to look for
     """
-    event_date_filter = None
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
-
     query = (user.in_session_acls
              .options(load_only('session_id', 'roles', 'full_access', 'read_access'))
              .options(noload('*'))
              .options(contains_eager(SessionPrincipal.session).load_only('event_id'))
              .join(Session)
              .join(Event, Event.id == Session.event_id)
-             .filter(~Session.is_deleted, ~Event.is_deleted))
-    if event_date_filter is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == Session.event_id)
-        query = query.filter(event_date_filter)
+             .filter(~Session.is_deleted, ~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
     data = defaultdict(set)
     for principal in query:
         roles = data[principal.session.event_id]

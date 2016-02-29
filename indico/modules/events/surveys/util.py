@@ -20,7 +20,6 @@ from flask import session
 from sqlalchemy.orm import load_only, joinedload
 
 from indico.modules.events import Event
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.util.caching import memoize_request
@@ -105,20 +104,11 @@ def get_events_with_submitted_surveys(user, from_dt=None, to_dt=None):
     :param to_dt: The latest event start time to look for
     :return: A set of event ids
     """
-    event_date_filter = True
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
     # Survey submissions are not stored in links anymore, so we need to get them directly
     query = (user.survey_submissions
              .options(load_only('survey_id'))
              .options(joinedload(SurveySubmission.survey).load_only('event_id'))
              .join(Survey)
              .join(Event)
-             .join(IndexedEvent, IndexedEvent.id == Survey.event_id)
-             .filter(~Survey.is_deleted, ~Event.is_deleted)
-             .filter(event_date_filter))
+             .filter(~Survey.is_deleted, ~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
     return {submission.survey.event_id for submission in query}

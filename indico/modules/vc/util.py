@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.orm import contains_eager
+
 from indico.core.plugins import plugin_engine
-from indico.modules.fulltextindexes.models.events import IndexedEvent
+from indico.modules.events import Event
 from indico.util.i18n import _
 
 from MaKaC.conference import SessionSlot
@@ -65,14 +67,14 @@ def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
                      that event)
     """
     from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
-    query = VCRoomEventAssociation.find()
+    query = VCRoomEventAssociation.query.options(contains_eager('event_new'))
     if distinct:
         query = query.distinct(VCRoomEventAssociation.event_id, VCRoomEventAssociation.vc_room_id)
     if from_dt is not None or to_dt is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == VCRoomEventAssociation.event_id)
+        query = query.join(Event)
         if from_dt is not None:
-            query = query.filter(IndexedEvent.start_date >= from_dt)
+            query = query.filter(Event.start_dt >= from_dt)
         if to_dt is not None:
-            query = query.filter(IndexedEvent.start_date < to_dt)
+            query = query.filter(Event.start_dt < to_dt)
     for vc_room in query:
         yield vc_room

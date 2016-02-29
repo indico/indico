@@ -27,7 +27,6 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_person_link, ReporterBase
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
@@ -41,24 +40,13 @@ def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
     :param from_dt: The earliest event start time to look for
     :param to_dt: The latest event start time to look for
     """
-    event_date_filter = None
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
-
     query = (user.in_contribution_acls
              .options(load_only('contribution_id', 'roles', 'full_access', 'read_access'))
              .options(noload('*'))
              .options(contains_eager(ContributionPrincipal.contribution).load_only('event_id'))
              .join(Contribution)
              .join(Event, Event.id == Contribution.event_id)
-             .filter(~Contribution.is_deleted, ~Event.is_deleted))
-    if event_date_filter is not None:
-        query = query.join(IndexedEvent, IndexedEvent.id == Contribution.event_id)
-        query = query.filter(event_date_filter)
+             .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.starts_in_range(from_dt, to_dt)))
     data = defaultdict(set)
     for principal in query:
         roles = data[principal.contribution.event_id]

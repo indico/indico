@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import re
 from collections import OrderedDict
 
 from flask import current_app, session
@@ -38,7 +37,6 @@ from indico.modules.events.registration.models.items import (RegistrationFormPer
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_creation,
                                                               notify_registration_modification)
-from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.modules.users.util import get_user_by_email
 from indico.util.spreadsheets import unique_col
 from indico.web.forms.base import IndicoForm
@@ -373,21 +371,13 @@ def get_events_registered(user, from_dt=None, to_dt=None):
     :param to_dt: The latest event start time to look for
     :return: A set of event ids
     """
-    event_date_filter = True
-    if from_dt and to_dt:
-        event_date_filter = IndexedEvent.start_date.between(from_dt, to_dt)
-    elif from_dt:
-        event_date_filter = IndexedEvent.start_date >= from_dt
-    elif to_dt:
-        event_date_filter = IndexedEvent.start_date <= to_dt
     query = (user.registrations
              .options(load_only('event_id'))
              .options(joinedload(Registration.registration_form).load_only('event_id'))
              .join(Registration.registration_form)
              .join(RegistrationForm.event_new)
-             .join(IndexedEvent, IndexedEvent.id == Registration.event_id)
-             .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted)
-             .filter(event_date_filter))
+             .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted,
+                     Event.starts_in_range(from_dt, to_dt)))
     return {registration.event_id for registration in query}
 
 
