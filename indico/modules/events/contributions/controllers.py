@@ -266,7 +266,7 @@ class RHCreateSubContribution(RHManageContributionBase):
             subcontrib = create_subcontribution(self.contrib, form.data)
             flash(_("Subcontribution '{}' created successfully").format(subcontrib.title), 'success')
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
-        return jsonify_form(form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
 
 class RHEditSubContribution(RHManageSubContributionBase):
@@ -278,7 +278,7 @@ class RHEditSubContribution(RHManageSubContributionBase):
             update_subcontribution(self.subcontrib, form.data)
             flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
-        return jsonify_form(form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form)
 
 
 class RHSubContributionREST(RHManageSubContributionBase):
