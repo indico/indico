@@ -24,23 +24,22 @@
 
 {% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ', use_span=true) -%}
     {% for link in user_list -%}
-        {% set user = link.person %}
         {%- if use_span -%}
             <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
-                {% if user.title -%}
-                    {{ user.title }}
+                {% if link.title -%}
+                    {{ link.title }}
                 {%- endif %}
-                <span itemprop="givenName">{{ user.first_name }}</span>
-                <span itemprop="lastName">{{ user.last_name }}</span>
+                <span itemprop="givenName">{{ link.first_name }}</span>
+                <span itemprop="lastName">{{ link.last_name }}</span>
         {%- else -%}
-            {{ user.first_name }} {{ user.last_name }}
+            {{ link.first_name }} {{ link.last_name }}
         {% endif %}
-        {% if user.affiliation %}
+        {% if link.affiliation %}
             <span class="affiliation">(
             {%- if italic_affiliation -%}
                 <em>
             {%- endif -%}
-            {{ user.affiliation }}
+            {{ link.affiliation }}
             {%- if italic_affiliation -%}
                 </em>
             {%- endif -%}
