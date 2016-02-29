@@ -34,13 +34,16 @@ def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
     _events = []
     ch = ConferenceHolder()
 
-    def _create_event(id_=None, legacy=False):
+    def _create_event(id_=None, legacy=False, **kwargs):
         conf = MockConference()
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
         now = now_utc(exact=False)
-        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1, title='dummy#{}'.format(id),
-                              start_dt=now, end_dt=now + timedelta(hours=1), timezone='UTC')
+        kwargs.setdefault('title', u'dummy#{}'.format(id))
+        kwargs.setdefault('start_dt', now)
+        kwargs.setdefault('end_dt', now + timedelta(hours=1))
+        kwargs.setdefault('timezone', 'UTC')
+        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), category_id=1, **kwargs)
         conf.as_event.category_chain = [1, 0]  # set after __init__ (setting category_id modifies it)
         db.session.flush()
         conf.id = str(conf.as_event.id)
