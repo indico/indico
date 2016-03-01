@@ -60,7 +60,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for subcontribution in contrib.subcontributions if not subcontribution.is_deleted -%}
+                        {% for subcontribution in contrib.subcontributions -%}
                             <tr class="i-table">
                                 <td class="i-table">
                                     <input type="checkbox" class="select-row" name="subcontribution_id"

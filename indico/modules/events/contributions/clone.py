@@ -107,7 +107,6 @@ class ContributionCloner(EventCloner):
     def _clone_contribs(self, new_event):
         attrs = (get_simple_column_attrs(Contribution) | {'own_room', 'own_venue'}) - {'abstract_id'}
         query = (self.old_event.contributions
-                 .filter_by(is_deleted=False)
                  .options(undefer('_last_friendly_subcontribution_id'),
                           joinedload('own_venue'),
                           joinedload('own_room').lazyload('*'),
@@ -139,8 +138,6 @@ class ContributionCloner(EventCloner):
     def _clone_subcontribs(self, subcontribs):
         attrs = get_simple_column_attrs(SubContribution)
         for old_subcontrib in subcontribs:
-            if old_subcontrib.is_deleted:
-                continue
             subcontrib = SubContribution()
             subcontrib.populate_from_attrs(old_subcontrib, attrs)
             subcontrib.references = list(self._clone_references(SubContributionReference, old_subcontrib.references))

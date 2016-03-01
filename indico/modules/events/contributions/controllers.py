@@ -88,7 +88,7 @@ class RHManageContributionsActionsBase(RHManageContributionsBase):
     def _checkParams(self, params):
         RHManageContributionsBase._checkParams(self, params)
         ids = {int(x) for x in request.form.getlist('contribution_id')}
-        self.contribs = self.event_new.contributions.filter(Contribution.id.in_(ids), ~Contribution.is_deleted).all()
+        self.contribs = self.event_new.contributions.filter(Contribution.id.in_(ids)).all()
 
 
 class RHManageSubContributionsActionsBase(RHManageContributionBase):
@@ -99,7 +99,7 @@ class RHManageSubContributionsActionsBase(RHManageContributionBase):
         ids = {int(x) for x in request.form.getlist('subcontribution_id')}
         self.subcontribs = (SubContribution.query
                             .with_parent(self.contrib)
-                            .filter(SubContribution.id.in_(ids), ~SubContribution.is_deleted)
+                            .filter(SubContribution.id.in_(ids))
                             .all())
 
 
@@ -199,7 +199,7 @@ class RHContributionREST(RHManageContributionBase):
         if session_id is None:
             updates['session'] = None
         else:
-            session = self.event_new.sessions.filter_by(id=session_id, is_deleted=False).one()
+            session = self.event_new.sessions.filter_by(id=session_id).one()
             if not session:
                 raise BadRequest('Invalid session id')
             if session != self.contrib.session:
