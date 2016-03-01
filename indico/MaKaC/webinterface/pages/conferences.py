@@ -688,6 +688,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
     def getCSSFiles(self):
         return (WPConferenceBase.getCSSFiles(self) +
                 self._asset_env['eventservices_sass'].urls() +
+                self._asset_env['contributions_sass'].urls() +
                 self._asset_env['event_display_sass'].urls() +
                 self._asset_env['themes_sass'].urls())
 
