@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from contextlib import contextmanager
 
-from indico.util.date_time import overlaps
+import pytz
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.dialects.postgresql import JSON, ARRAY
@@ -31,6 +31,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
 from indico.modules.events.logs import EventLogEntry
 from indico.util.caching import memoize_request
+from indico.util.date_time import overlaps
 from indico.util.decorators import classproperty, strict_classproperty
 from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
@@ -304,6 +305,10 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         if event_type == 'simple_event':
             event_type = 'lecture'
         return event_type
+
+    @property
+    def tzinfo(self):
+        return pytz.timezone(self.timezone)
 
     @property
     @contextmanager
