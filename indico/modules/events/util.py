@@ -172,6 +172,7 @@ def serialize_event_person(person):
 def serialize_person_link(person_link):
     """Serialize PersonLink to JSON-like object"""
     return {'_type': 'PersonLink',
+            'id': person_link.person.id,
             'personId': person_link.person.id,
             'email': person_link.person.email,
             'name': person_link.full_name,
