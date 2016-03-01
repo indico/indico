@@ -53,16 +53,19 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
-    $(document).on("mouseenter", '[title]:not([title=""]):not(iframe), [data-qtip-oldtitle]:not(iframe)', function(event) {
-        var $target = $(this);
-        var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
+    $(document).on("mouseenter",
+                   '[title]:not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)',
+                   function(event) {
+        var $target = $(this),
+            title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim(),
+            extraOpts = $(this).data('qtip-opts') || {},
+            qtipClass = $(this).data('qtip-style'),
+            qtipHTMLContainer = $(this).data('qtip-html'),
+            qtipHTML = (qtipHTMLContainer && qtipHTMLContainer.length) ? $(this).next(qtipHTMLContainer) : null;
 
-        if (!title) {
+        if (!qtipHTML && !title) {
             return;
         }
-
-        var extraOpts = $(this).data('qtip-opts') || {},
-            qtipClass = $(this).data('qtip-style');
 
         $target.attr('data-qtip-oldtitle', title);
         $target.removeAttr('title');
@@ -81,7 +84,11 @@ $(document).ready(function() {
 
             content: {
                 text: function() {
-                    return title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    if (qtipHTML) {
+                        return qtipHTML.html();
+                    } else {
+                        return title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    }
                 }
             },
 
