@@ -80,6 +80,6 @@ class EventLocationsImporter(Importer):
         it = self.zodb_root['conferences'].itervalues()
         total = len(self.zodb_root['conferences'])
         if self.quiet:
-            it = verbose_iterator(it, total, attrgetter('id'), attrgetter('title'))
+            it = verbose_iterator(it, total, attrgetter('id'), lambda x: x.__dict__.get('title', ''))
         for old_event in self.flushing_iterator(it):
             yield old_event
