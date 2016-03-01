@@ -82,7 +82,7 @@ class ContributionReporter(ReporterBase):
         session_empty = {None: 'No session'}
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
-        session_choices = {unicode(s.id): s.title for s in self.report_event.sessions.filter_by(is_deleted=False)}
+        session_choices = {unicode(s.id): s.title for s in self.report_event.sessions}
         track_choices = {unicode(t.id): to_unicode(t.getTitle()) for t in self.report_event.as_legacy.getTrackList()}
         type_choices = {unicode(t.id): t.name for t in self.report_event.contribution_types}
         self.filterable_items = OrderedDict([
@@ -102,7 +102,6 @@ class ContributionReporter(ReporterBase):
         timetable_entry_strategy = joinedload('timetable_entry')
         timetable_entry_strategy.lazyload('*')
         return (self.report_event.contributions
-                .filter_by(is_deleted=False)
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),
@@ -133,8 +132,7 @@ class ContributionReporter(ReporterBase):
         contributions_query = self.build_query()
         total_entries = contributions_query.count()
         contributions = self.filter_report_entries(contributions_query, self.report_config['filters']).all()
-        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors}
-                    for s in self.report_event.sessions.filter_by(is_deleted=False)]
+        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.report_event.sessions]
         tracks = [{'id': int(t.id), 'title': to_unicode(t.getTitle())}
                   for t in self.report_event.as_legacy.getTrackList()]
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries}
