@@ -37,11 +37,12 @@
 
     {% if lectures %}
         <tr id="lectureLinks">
-            <td class="leftCol">{% trans %}Other occasions{% endtrans %}</td>
+            <td class="leftCol">{% trans %}From the same series{% endtrans %}</td>
             <td>
             {% for lecture in lectures %}
-                <a href="{{ lecture.attachments[0].link_url }}">
-                    <img src="{{ config.getBaseURL() }}/images/{{ lecture.title }}.png" alt="{{ lecture.title }}">
+                <a href="{{ lecture.attachments[0].link_url }}" class="lecture-series-link">
+                    {# We'll have to chop off the 'part' prefix #}
+                    {{ lecture.title[4:] }}
                 </a>
             {% endfor %}
             </td>
