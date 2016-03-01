@@ -1,7 +1,7 @@
 """Add trigger for consistent timetable
 
 Revision ID: 43f6a1414c75
-Revises: 29232c09e58a
+Revises: 421ef2bc48ae
 Create Date: 2016-01-19 17:50:14.391523
 """
 
@@ -12,7 +12,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '43f6a1414c75'
-down_revision = '29232c09e58a'
+down_revision = '421ef2bc48ae'
 
 
 def upgrade():

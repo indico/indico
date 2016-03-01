@@ -1,7 +1,7 @@
 """Add CHECK for category columns
 
 Revision ID: ae00a6a1edd
-Revises: ce6c3f7f35e
+Revises: b09db13d8da
 Create Date: 2016-02-04 10:36:57.350102
 """
 
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'ae00a6a1edd'
-down_revision = 'ce6c3f7f35e'
+down_revision = 'b09db13d8da'
 
 
 def upgrade():
