@@ -12,7 +12,7 @@
                                              contrib.can_manage_attachments(session.user))) }}
         {{ template_hook('vc-actions', event=event, item=contrib) }}
 
-        {% if not contrib.inherit_location -%}
+        {% if not contrib.inherit_location and contrib.has_location_info -%}
             {{ render_location(contrib, parent=parent) }}
         {%- endif %}
 
