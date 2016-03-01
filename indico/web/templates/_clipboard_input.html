@@ -1,8 +1,11 @@
-{%- macro clipboard_input(value, name='') -%}
-    <div class="i-has-action i-has-action-clip">
-        <input name="{{ name }}" type="text" value="{{ value }}" readonly>{#
-        #}<button type="button"
-         class="i-button icon-clipboard" title="Click to copy the URL"></button>
+{%- macro clipboard_input(value, name='', title=none) -%}
+    {% set id = 'clipboard-' + uuid() %}
+    <div class="i-has-action">
+        <input id="{{ id }}" name="{{ name }}" type="text" value="{{ value }}" readonly>
+        {#--#}
+        <button type="button" class="i-button icon-clipboard js-copy-to-clipboard"
+                title="{{ title or _('Copy URL to clipboard') }}"
+                data-clipboard-target="#{{ id }}"></button>
     </div>
     <span class="i-has-action-message icon-checkmark"></span>
 {%- endmacro -%}
