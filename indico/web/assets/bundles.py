@@ -235,10 +235,6 @@ chartist_css = Bundle('css/lib/chartist.js/chartist.scss',
                       'css/lib/chartist.js/settings/_chartist-settings.scss',
                       filters=('pyscss', 'cssmin'), output='css/chartist_css_%(version)s.min.css')
 
-zero_clipboard_js = rjs_bundle('zero_clipboard_js',
-                               'js/lib/zeroclipboard/ZeroClipboard.js',
-                               'js/custom/zeroclipboard.js')
-
 clipboard_js = rjs_bundle('clipboard_js',
                           'js/lib/clipboard.js/clipboard.js',
                           'js/custom/clipboard.js')
@@ -479,7 +475,6 @@ def register_all_js(env):
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
     env.register('jqplot_js', jqplot_js)
-    env.register('zero_clipboard_js', zero_clipboard_js)
     env.register('clipboard_js', clipboard_js)
     env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
