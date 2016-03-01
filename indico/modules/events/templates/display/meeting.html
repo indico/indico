@@ -22,9 +22,6 @@
                 {% if event.venue_name or event.room_name or event.address %}
                     <div class="event-location">
                         {{ render_location(event, class='header-data') }}
-                        {% if event.address %}
-                            <div class="address">{{ event.address }}</div>
-                        {% endif %}
                     </div>
                 {% endif %}
                 {% set chairpersons = event.person_links %}

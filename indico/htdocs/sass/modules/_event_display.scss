@@ -240,3 +240,16 @@ li > table + .note-area-wrapper {
         }
     }
 }
+
+.location-info-tip {
+    width: 250px;
+
+    .location-address {
+        color: $gray;
+        white-space: pre;
+    }
+
+    .map-link {
+        float: right;
+    }
+}
