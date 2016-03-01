@@ -190,4 +190,13 @@
 .break {
     color: $light-gray !important;
     @extend %highlighted-data;
+    background-color: $dark-gray;
+}
+
+a.lecture-series-link {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    background: $header-blue;
+    color: $light-gray !important;
+    margin-right: 0.1em;
 }
