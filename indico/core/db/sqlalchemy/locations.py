@@ -217,6 +217,11 @@ class LocationMixin(object):
         self.own_room_name = room_name
 
     @property
+    def has_location_info(self):
+        """Whether the object has basic location information set"""
+        return bool(self.venue_name or self.room_name)
+
+    @property
     def address(self):
         """The address where this item is located."""
         if self.inherit_location and self.location_parent is None:

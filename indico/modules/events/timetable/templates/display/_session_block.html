@@ -17,7 +17,7 @@
                                                  block.can_manage_attachments(session.user))) }}
             {{ template_hook('vc-actions', event=event, item=block) }}
 
-            {% if not block.inherit_location -%}
+            {% if not block.inherit_location and block.has_location_info -%}
                 {{ render_location(block, parent=event) }}
             {%- endif %}
 
