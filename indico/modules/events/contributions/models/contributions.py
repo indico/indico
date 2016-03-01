@@ -143,6 +143,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'contributions',
+            primaryjoin='(Contribution.event_id == Event.id) & ~Contribution.is_deleted',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
@@ -152,6 +153,7 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'contributions',
+            primaryjoin='(Contribution.session_id == Session.id) & ~Contribution.is_deleted',
             lazy=True
         )
     )
@@ -182,10 +184,12 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     subcontributions = db.relationship(
         'SubContribution',
         lazy=True,
+        primaryjoin='(SubContribution.contribution_id == Contribution.id) & ~SubContribution.is_deleted',
         order_by='SubContribution.position',
         cascade='all, delete-orphan',
         backref=db.backref(
             'contribution',
+            primaryjoin='SubContribution.contribution_id == Contribution.id',
             lazy=True
         )
     )
