@@ -80,25 +80,28 @@
             {% endif %}
             {% if item.can_manage(session.user) %}
                 <li>
-                    <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="contribution-edit">
+                    <a href="" class="contribution-edit"
+                               data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
+                               data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
                         {% trans %}Edit Contribution{% endtrans %}
                     </a>
                 </li>
             {% endif %}
         {% elif item_type == 'SUBCONTRIBUTION' %}
-                {% if item.can_manage_attachments(session.user) %}
-                    {% if not item.has_note or show_note_operations %}
-                        {{ _render_note_editor(item) }}
-                    {% endif %}
+            {% if item.can_manage_attachments(session.user) %}
+                {% if not item.has_note or show_note_operations %}
+                    {{ _render_note_editor(item) }}
                 {% endif %}
-                {% if item.can_manage(session.user) %}
-                    <li>
-                        <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="subcontribution-edit">
-                            {% trans %}Edit Sub-contribution{% endtrans %}
-                        </a>
-                    </li>
-                {% endif %}
-
+            {% endif %}
+            {% if item.can_manage(session.user) %}
+                <li>
+                    <a href="" class="subcontribution-edit"
+                       data-title="{% trans %}Edit the subcontribution{% endtrans %}"
+                       data-href="{{ url_for('contributions.manage_edit_subcontrib', item) }}">
+                        {% trans %}Edit Sub-contribution{% endtrans %}
+                    </a>
+                </li>
+            {% endif %}
         {% endif %}
         {% if item_type != 'SESSION_BLOCK' and item.can_manage_attachments(session.user) %}
         <li>

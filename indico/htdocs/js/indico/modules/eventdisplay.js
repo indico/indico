@@ -26,23 +26,9 @@
             return false;
         });
 
-        $('.notes-editor').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            ajaxDialog({
-                title: $this.data('title'),
-                url: $this.data('href'),
-                confirmCloseUnsaved: true,
-                onClose: function(data, customData) {
-                    if (data || customData) {
-                        location.reload();
-                    }
-                }
-            });
-            return false;
-        });
-
-        $('.notes-compile').on('click', function(e) {
+        var selectors = ['.notes-editor', '.notes-compile',
+                         '.contribution-edit', '.subcontribution-edit'].join(', ');
+        $(selectors).on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
             ajaxDialog({
