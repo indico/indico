@@ -20,6 +20,7 @@ from operator import attrgetter
 
 from flask import render_template, request, session
 from pytz import timezone
+from sqlalchemy.orm import joinedload
 
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
@@ -64,8 +65,32 @@ def _inject_meeting_body(event, **kwargs):
     detail_level = request.args.get('detailLevel', 'contribution')
     view = request.args.get('view')
 
+    children_strategy = joinedload('children')
+    children_strategy.joinedload('session_block').joinedload('*')
+    children_strategy.joinedload('break_')
+
+    children_contrib_strategy = children_strategy.joinedload('contribution')
+    children_contrib_strategy.joinedload('*'),
+    children_contrib_strategy.joinedload('subcontributions')
+    children_contrib_strategy.lazyload('attachment_folders')
+
+    children_subcontrib_strategy = children_contrib_strategy.joinedload('subcontributions')
+    children_subcontrib_strategy.joinedload('*')
+    children_subcontrib_strategy.lazyload('attachment_folders')
+
+    contrib_strategy = joinedload('contribution')
+    contrib_strategy.joinedload('*')
+    contrib_strategy.joinedload('subcontributions')
+    contrib_strategy.lazyload('attachment_folders')
+
+    # try to minimize the number of DB queries
+    options = [contrib_strategy,
+               children_strategy,
+               joinedload('session_block').joinedload('*'),
+               joinedload('break_')]
+
     entries = []
-    for entry in event.timetable_entries.filter_by(parent=None):
+    for entry in event.timetable_entries.filter_by(parent=None).options(*options):
         if show_date != 'all' and entry.start_dt.astimezone(event_tz).date().isoformat() != show_date:
             continue
         if entry.type == TimetableEntryType.CONTRIBUTION and (detail_level != 'contribution' or show_session != 'all'):

@@ -58,10 +58,10 @@
                 {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
                 {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
                     {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
-                        {{ render_contribution(entry.object, event, nested=true, hide_end_time=true,
+                        {{ render_contribution(entry.contribution, event, nested=true, hide_end_time=true,
                                                show_notes=show_notes, timezone=timezone, parent=block) }}
                     {% elif entry.type.name == 'BREAK' %}
-                        {{ render_break(entry.object, event, nested=true, hide_end_time=true, timezone=timezone) }}
+                        {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone) }}
                     {% endif %}
                 {% endfor %}
             </ul>
