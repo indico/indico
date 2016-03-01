@@ -38,7 +38,11 @@ favoriteRooms = confObj.getFavoriteRooms()
 additionalInfo = confObj.getContactInfo()
 
 %>
-<div class="groupTitle">${ _("General Settings")}</div>
+<header>
+    <div class="title">
+        <h2>${ _("General Settings")}</h2>
+    </div>
+</header>
 
 <tr>
     <td class="dataCaptionTD">
