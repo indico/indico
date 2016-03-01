@@ -276,28 +276,32 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         return self
 
     @property
-    def protection_parent(self):
-        return self.as_legacy.getOwner()
-
-    @property
     def has_logo(self):
         return self.logo_metadata is not None
-
-    @property
-    def logo_url(self):
-        return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'])
 
     @property
     def has_stylesheet(self):
         return self.stylesheet_metadata is not None
 
     @property
+    def is_protected(self):
+        return self.as_legacy.isProtected()
+
+    @property
     def locator(self):
         return {'confId': self.id}
 
     @property
+    def logo_url(self):
+        return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'])
+
+    @property
     def participation_regform(self):
         return self.registration_forms.filter_by(is_participation=True, is_deleted=False).first()
+
+    @property
+    def protection_parent(self):
+        return self.as_legacy.getOwner()
 
     @property
     def type(self):
@@ -402,10 +406,6 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
         # XXX: Remove this method once modification keys are gone!
         return (super(Event, self).can_manage(user, role, *args, **kwargs) or
                 bool(allow_key and user and self.as_legacy.canKeyModify()))
-
-    @property
-    def is_protected(self):
-        return self.as_legacy.isProtected()
 
     @memoize_request
     def has_feature(self, feature):
