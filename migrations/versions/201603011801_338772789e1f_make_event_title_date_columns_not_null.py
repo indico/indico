@@ -1,7 +1,7 @@
 """Make event title/date columns not null
 
 Revision ID: 338772789e1f
-Revises: 291a596186cb
+Revises: ae00a6a1edd
 Create Date: 2016-02-24 14:21:29.617383
 """
 
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '338772789e1f'
-down_revision = '291a596186cb'
+down_revision = 'ae00a6a1edd'
 
 
 def upgrade():

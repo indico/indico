@@ -1,7 +1,7 @@
 """Add report_links table
 
 Revision ID: 3e7a0c029abb
-Revises: ae00a6a1edd
+Revises: ce6c3f7f35e
 Create Date: 2016-02-12 13:44:26.447430
 """
 
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '3e7a0c029abb'
-down_revision = 'ae00a6a1edd'
+down_revision = 'ce6c3f7f35e'
 
 
 def upgrade():

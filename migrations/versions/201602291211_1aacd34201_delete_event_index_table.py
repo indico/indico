@@ -1,7 +1,7 @@
 """Delete event_index table
 
 Revision ID: 1aacd34201
-Revises: 338772789e1f
+Revises: 291a596186cb
 Create Date: 2016-02-29 12:11:20.976101
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql as pg
 
 # revision identifiers, used by Alembic.
 revision = '1aacd34201'
-down_revision = '338772789e1f'
+down_revision = '291a596186cb'
 
 
 def upgrade():
