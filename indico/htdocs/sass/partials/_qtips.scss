@@ -18,6 +18,8 @@
 .qtip-default {
     @include border-radius();
     @include border-all($black);
+    box-shadow: 1px 0px 0px 1px rgba(0, 0, 0, 0.2);
+
     color: $light-gray;
     background-color: $black;
     font-size: 1em;
@@ -25,6 +27,14 @@
     .qtip-titlebar {
         background-color: #F0F0F0;
         border-bottom: solid 1px #888;
+    }
+
+    h1, h2, h3, h4, h5 {
+        color: $light-blue;
+    }
+
+    a {
+        color: $pastel-blue !important;
     }
 }
 
@@ -42,6 +52,9 @@
     border: solid 1px #E2E2E2;
     color: #454545;
     background-color: white;
+    a {
+        color: $dark-blue !important;
+    }
 }
 
 .qtip-balloon {
