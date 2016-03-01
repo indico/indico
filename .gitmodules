@@ -38,9 +38,6 @@
 [submodule "ext_modules/jqplot"]
 	path = ext_modules/jqplot
 	url = https://github.com/svandecappelle/jQPlot.git
-[submodule "ext_modules/zeroclipboard"]
-	path = ext_modules/zeroclipboard
-	url = https://github.com/zeroclipboard/zeroclipboard
 [submodule "ext_modules/Jed"]
 	path = ext_modules/Jed
 	url = https://github.com/SlexAxton/Jed.git
