@@ -101,6 +101,7 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'sessions',
+            primaryjoin='(Session.event_id == Event.id) & ~Session.is_deleted',
             cascade='all, delete-orphan',
             lazy='dynamic'
         )
