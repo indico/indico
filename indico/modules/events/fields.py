@@ -34,7 +34,7 @@ class ReferencesField(MultipleItemsField):
     def process_formdata(self, valuelist):
         super(ReferencesField, self).process_formdata(valuelist)
         if valuelist:
-            existing = {x.id: x for x in self.object_data}
+            existing = {x.id: x for x in self.object_data or ()}
             data = []
             for entry in self.data:
                 ref = existing[int(entry['id'])] if entry.get('id') is not None else None
