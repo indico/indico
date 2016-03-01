@@ -2,24 +2,26 @@
     {% set show_venue = not parent or (parent.venue_name != item.venue_name) %}
     {% set show_room = item.room_name != '' %}
     {% set show_url = item.room and item.room.map_url %}
-    <span class="icon-location {{ class }}"
-          title="{{ item.venue_name }} {{ '-' if item.venue_name else '' }} {{ item.room_name }}">
-        <span class="text">
-            {%- if show_url %}
-                <a href="{{ item.room.map_url }}">
-            {%- endif -%}
-            {%- if show_venue and show_room -%}
-                {{ item.room_name }} ({{ item.venue_name }})
-            {%- elif show_venue -%}
-                {{ item.venue_name }}
-            {%- else -%}
-                {{ item.room_name }}
-            {%- endif -%}
-            {% if show_url -%}
-                </a>
-            {%- endif %}
+    {% if show_venue or show_room %}
+        <span class="icon-location {{ class }}"
+              title="{{ item.venue_name }} {{ '-' if item.venue_name else '' }} {{ item.room_name }}">
+            <span class="text">
+                {%- if show_url %}
+                    <a href="{{ item.room.map_url }}">
+                {%- endif -%}
+                {%- if show_venue and show_room -%}
+                    {{ item.room_name }} ({{ item.venue_name }})
+                {%- elif show_venue -%}
+                    {{ item.venue_name }}
+                {%- else -%}
+                    {{ item.room_name }}
+                {%- endif -%}
+                {% if show_url -%}
+                    </a>
+                {%- endif %}
+            </span>
         </span>
-    </span>
+    {% endif %}
 {%- endmacro %}
 
 {% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ', use_span=true) -%}
