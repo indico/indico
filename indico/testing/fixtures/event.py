@@ -39,7 +39,7 @@ def create_event(monkeypatch, monkeypatch_methods, mocker, dummy_user, db):
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
         now = now_utc(exact=False)
-        kwargs.setdefault('title', u'dummy#{}'.format(id))
+        kwargs.setdefault('title', u'dummy#{}'.format(id_) if id_ is not None else u'dummy')
         kwargs.setdefault('start_dt', now)
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')
