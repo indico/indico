@@ -10,7 +10,7 @@
                 {% for day in days %}
                     <li>
                         <a href="#day-{{ day.isoformat() }}">
-                            {{ day |format_date(format='full', timezone=timezone) }}
+                            {{ day | format_date(format='full', timezone=timezone) }}
                         </a>
                     </li>
                 {% endfor %}
@@ -30,10 +30,9 @@
         {%- endif -%}
 
         {%- if not previous_date or date != previous_date -%}
-            <li>
+            <li id="day-{{ item.start_dt.date().isoformat() }}">
                 <div style="width: 100%;">
-                    <a name="day-{{ item.start_dt.date().isoformat() }}"></a>
-                    <span class="day">{{ item.start_dt |format_date(format='full', timezone=timezone) }}</span>
+                    <span class="day">{{ item.start_dt | format_date(format='full', timezone=timezone) }}</span>
                 </div>
                 <ul class="meetingTimetable">
         {%- endif %}

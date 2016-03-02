@@ -42,7 +42,7 @@
             {% if can_edit %}
                 <div class="note-metadata {{ _togglable_classes(hidden=hidden) }}">
                     <span class="icon-time modification-date">
-                        {{ note.current_revision.created_dt |format_datetime(format='short') }}
+                        {{ note.current_revision.created_dt | format_datetime(format='short') }}
                     </span>
                     <span class="event-user no-label">{{ note.current_revision.user.full_name }}</span>
                 </div>

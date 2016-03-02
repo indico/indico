@@ -12,7 +12,7 @@
             {%- endif %}
         </a>
         {% if item.has_note %}
-            <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="notes-delete">
+            <a href="" data-locator="{{ item.locator | tojson | forceescape }}" class="notes-delete">
                 {% trans %}Delete minutes{% endtrans %}
             </a>
         {% endif %}
@@ -34,7 +34,9 @@
                     {{ _render_note_editor(item) }}
                     {% if item.scheduled_notes %}
                         <li>
-                            <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="notes-compile"
+                            <a href=""
+                               data-locator="{{ item.locator | tojson | forceescape }}"
+                               class="notes-compile"
                                data-href="{{ url_for('event_notes.compile', item) }}"
                                data-title="{% trans %}Edit minutes{% endtrans %}">
                                 {% trans %}Compile Minutes{% endtrans %}
@@ -54,7 +56,7 @@
                                data-attachment-editor
                                data-reload-on-change
                                data-title="{% trans title=session_.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                               data-locator="{{ session_.locator |tojson|forceescape }}">
+                               data-locator="{{ session_.locator | tojson | forceescape }}">
                         {%- trans %}Material Editor{% endtrans -%}
                     </a>
                 </li>
@@ -62,7 +64,7 @@
             {% endif %}
             {% if item.can_manage(session.user) %}
                 <li>
-                    <a href="" data-locator="{{ item.locator |tojson|forceescape }}" class="session-basic-edit">
+                    <a href="" data-locator="{{ item.locator | tojson | forceescape }}" class="session-basic-edit">
                         {% trans %}Edit Session (basic){% endtrans %}
                     </a>
                 </li>
@@ -109,7 +111,7 @@
                        data-attachment-editor
                        data-reload-on-change
                        data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                       data-locator="{{ item.locator |tojson|forceescape }}">
+                       data-locator="{{ item.locator | tojson | forceescape }}">
                 {%- trans %}Material Editor{% endtrans -%}
             </a>
         </li>
