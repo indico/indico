@@ -27,6 +27,7 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from indico.core.db.sqlalchemy import db, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
+from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
@@ -40,7 +41,7 @@ from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
-class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
+class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedNotesMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
