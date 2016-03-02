@@ -106,6 +106,10 @@ $(document).ready(function() {
                 classes: qtipClass ? 'qtip-' + qtipClass : null
             }
         }, extraOpts), event);
+
+        $target.one('remove', function(evt) {
+            container.qtip('hide');
+        });
     });
 
     // Enable colorbox for links with .js-lightbox
