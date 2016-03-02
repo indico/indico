@@ -18,7 +18,7 @@
                 var isProtected = $this.val() === 'protected' || ($this.val() === 'inheriting' && parentProtected);
 
                 if (this.checked) {
-                    $('#form-group-protected-{{ field.id }} .message-only').hide();
+                    $('#form-group-protected-{{ field.id }} .protection-message').hide();
                     $('#form-group-protected-{{ field.id }} .' + $this.val() + '-protection-message').show();
 
                     toggleAclField($('#{{ field.get_form().acl.id }}'), !isProtected);
