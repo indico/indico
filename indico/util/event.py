@@ -132,11 +132,10 @@ def unify_event_args(fn, legacy=False):
                    a :class:`Conference`. Otherwise, they will receive
                    a :class:`.Event`.
     """
-    from indico.modules.events import Event
 
     if legacy:
         def _convert(arg):
-            return arg.as_legacy if isinstance(arg, Event) else arg
+            return arg.as_legacy if isinstance(arg, db.m.Event) else arg
     else:
         def _convert(arg):
             from MaKaC.conference import Conference

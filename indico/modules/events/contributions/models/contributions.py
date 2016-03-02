@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -298,6 +299,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, db.
                 session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
             return True
         return False
+
+    def get_non_inheriting_objects(self):
+        """Get a set of child objects that do not inherit protection"""
+        return get_non_inheriting_objects(self)
 
 
 @listens_for(mapper, 'after_configured', once=True)

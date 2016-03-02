@@ -31,6 +31,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
 from indico.modules.events.logs import EventLogEntry
+from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps
 from indico.util.decorators import classproperty, strict_classproperty
@@ -401,6 +402,10 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
         # XXX: Remove this method once modification keys are gone!
         return (super(Event, self).can_manage(user, role, *args, **kwargs) or
                 bool(allow_key and user and self.as_legacy.canKeyModify()))
+
+    def get_non_inheriting_objects(self):
+        """Get a set of child objects that do not inherit protection"""
+        return get_non_inheriting_objects(self)
 
     @memoize_request
     def has_feature(self, feature):
