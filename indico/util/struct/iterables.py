@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
+from functools import wraps
 from itertools import groupby, chain, combinations, izip_longest
 
 from flask import render_template_string
@@ -111,3 +112,26 @@ def grouper(iterable, n, fillvalue=None, skip_missing=False):
         fillvalue = object()
         return (tuple(x for x in chunk if x is not fillvalue)
                 for chunk in izip_longest(fillvalue=fillvalue, *args))
+
+
+def materialize_iterable(type_=list):
+    """Decorator that materializes an iterable.
+
+    Iterates over the result of the decorated function and stores
+    the returned values into a collection.  This makes most sense
+    on functions that use `yield` for simplicity but should return
+    a collection instead of a generator.
+
+    :param type_: The collection type to return. Can be any callable
+                  that accepts an iterable.
+    """
+
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            rv = fn(*args, **kwargs)
+            return None if rv is None else type_(rv)
+
+        return wrapper
+
+    return decorator
