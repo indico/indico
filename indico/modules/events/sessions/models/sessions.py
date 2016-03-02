@@ -20,14 +20,14 @@ from datetime import timedelta
 
 from sqlalchemy.ext.declarative import declared_attr
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
-
-from indico.core.db import db
+from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -148,6 +148,10 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, session_id=self.id)
+
+    def get_non_inheriting_objects(self):
+        """Get a set of child objects that do not inherit protection"""
+        return get_non_inheriting_objects(self)
 
     @return_ascii
     def __repr__(self):
