@@ -623,16 +623,6 @@ a.menuaddlink:hover {
    padding-right: 5px;
 }
 
-.header {
-   background-image: url(../images/bg_header.png);
-   border-bottom: 2px solid #234173;
-}
-
-.mngheader {
-   background-image: url(../images/bg_mng_header.png);
-   border-bottom: 2px solid #E25300;
-}
-
 .managerheadertitle {
    font-weight: bold;
    font-size: 16px;
