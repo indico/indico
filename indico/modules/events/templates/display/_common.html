@@ -63,11 +63,9 @@
         {% if link.affiliation %}
             <span class="affiliation">(
             {%- if italic_affiliation -%}
-                <em>
-            {%- endif -%}
-            {{ link.affiliation }}
-            {%- if italic_affiliation -%}
-                </em>
+                <em>{{ link.affiliation }}</em>
+            {%- else -%}
+                {{ link.affiliation }}
             {%- endif -%}
             )</span>
         {% endif %}

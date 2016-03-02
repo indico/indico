@@ -2,7 +2,8 @@
 
 {% macro _render_note_editor(item) -%}
     <li>
-        <a class="notes-editor"
+        <a href=""
+           class="notes-editor"
            data-href="{{ url_for('event_notes.edit', item) }}"
            data-title="{% trans %}Edit minutes{% endtrans %}">
             {% if item.has_note -%}
@@ -11,11 +12,6 @@
                 {% trans %}Add minutes{% endtrans %}
             {%- endif %}
         </a>
-        {% if item.has_note %}
-            <a href="" data-locator="{{ item.locator | tojson | forceescape }}" class="notes-delete">
-                {% trans %}Delete minutes{% endtrans %}
-            </a>
-        {% endif %}
     </li>
 {%- endmacro %}
 
