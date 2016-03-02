@@ -1,5 +1,5 @@
 {% macro render_public_protection_message() -%}
-    <div class="action-box message-only for-form public-protection-message accept">
+    <div class="action-box message-only for-form protection-message public-protection-message accept">
         <div class="section">
             <div class="icon icon-unlocked"></div>
             <div class="text">
@@ -17,7 +17,7 @@
 {%- endmacro %}
 
 {% macro render_protected_protection_message() -%}
-    <div class="action-box message-only for-form protected-protection-message danger">
+    <div class="action-box message-only for-form protection-message protected-protection-message danger">
         <div class="section">
             <div class="icon icon-lock"></div>
             <div class="text">
@@ -36,7 +36,7 @@
 {%- endmacro %}
 
 {% macro render_inherited_protection_message(parent, parent_type) -%}
-    <div class="action-box message-only for-form inheriting-protection-message {%- if parent.is_protected %} warning{% else %} accept{% endif %}">
+    <div class="action-box message-only for-form protection-message inheriting-protection-message {%- if parent.is_protected %} warning{% else %} accept{% endif %}">
         <div class="section">
             <div class="icon {%- if parent.is_protected %} icon-lock{% else %} icon-unlocked{% endif %}"></div>
             <div class="text">
