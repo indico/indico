@@ -51,44 +51,62 @@
                             data-friendly-id="{{ contrib.friendly_id }}"
                             data-title="{{ contrib.title }}">
                             <td class="i-table">
-                                <input type="checkbox" class="select-row" name="contribution_id" value="{{ contrib.id }}">
+                                <span class="vertical-aligner">
+                                    <input type="checkbox" class="select-row" name="contribution_id"
+                                           value="{{ contrib.id }}">
+                                </span>
                             </td>
-                            <td class="i-table id-column">#{{ contrib.friendly_id }}</td>
-                            <td class="i-table {% if contrib.is_self_protected %}self-protection-icon
-                                               {% elif contrib.is_public %}public-protection-icon{% endif %}">
-                            </td>
-                            <td class="i-table" data-searchable="{{ contrib.title | lower }}">
-                                <strong>{{ contrib.title }}</strong>
-                            </td>
-                            <td class="i-table start-date">
-                                {% if contrib.is_scheduled -%}
-                                    <a href="#" class="contrib-start-date icon-calendar"
-                                       data-href="{{ url_for('.manage_start_date', contrib) }}">
-                                    </a>
-                                    <span class="label">{{ contrib.start_dt|format_datetime('short') }}</span>
-                                {%- else -%}
-                                    <em>
-                                        {% trans %}Not scheduled{% endtrans %}
-                                    </em>
-                                {%- endif %}
+                            <td class="i-table id-column">
+                                <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
                             </td>
                             <td class="i-table">
-                                <a href="#" class="contrib-duration icon-time"
-                                   data-href="{{ url_for('.manage_duration', contrib) }}">
-                                </a>
-                                <span class="label">{{ contrib.duration|format_human_timedelta }}</span>
+                                <span class="vertical-aligner">
+                                    <i class="{% if contrib.is_self_protected %}self-protection-icon
+                                              {% elif contrib.is_public %}public-protection-icon{% endif %}"></i>
+                                </span>
+                            </td>
+                            <td class="i-table" data-searchable="{{ contrib.title | lower }}">
+                                <span class="vertical-aligner">
+                                    <strong>{{ contrib.title }}</strong>
+                                </span>
+                            </td>
+                            <td class="i-table start-date">
+                                <span class="vertical-aligner">
+                                    {% if contrib.is_scheduled -%}
+                                        <a href="#" class="contrib-start-date icon-calendar"
+                                           data-href="{{ url_for('.manage_start_date', contrib) }}">
+                                        </a>
+                                        <span class="label">{{ contrib.start_dt|format_datetime('short') }}</span>
+                                    {%- else -%}
+                                        <em>
+                                            {% trans %}Not scheduled{% endtrans %}
+                                        </em>
+                                    {%- endif %}
+                                </span>
+                            </td>
+                            <td class="i-table">
+                                <span class="vertical-aligner">
+                                    <a href="#" class="contrib-duration icon-time"
+                                       data-href="{{ url_for('.manage_duration', contrib) }}">
+                                    </a>
+                                    <span class="label">{{ contrib.duration|format_human_timedelta }}</span>
+                                </span>
                             </td>
                             <td class="i-table person-row-cell" data-searchable="{{ contrib.speaker_names | join(', ') | lower }}">
-                                {% for speaker in contrib.speakers | sort(attribute='full_name') %}
-                                    <div class="person-row icon-user">{{ speaker.full_name }}</div>
-                                {% endfor %}
+                                <span class="vertical-aligner">
+                                    {% for speaker in contrib.speakers | sort(attribute='full_name') -%}
+                                        <div class="person-row icon-user">{{ speaker.full_name }}</div>
+                                    {%- endfor %}
+                                </span>
                             </td>
                             <td class="i-table" data-text="{{ contrib.type.name if contrib.type else '' }}">
-                                {% if contrib.type %}
-                                    {{ contrib.type.name }}
-                                {% else %}
-                                    {% trans %}n/a{% endtrans %}
-                                {% endif %}
+                                <span class="vertical-aligner">
+                                    {% if contrib.type -%}
+                                        {{ contrib.type.name }}
+                                    {%- else %}
+                                        {% trans %}n/a{% endtrans %}
+                                    {%- endif %}
+                                </span>
                             </td>
                             <td class="i-table">
                                 <a href="#" class="i-label"
@@ -142,7 +160,7 @@
                             </td>
                             {{ render_attachment_info(contrib) }}
                             <td class="i-table">
-                                <div class="group right entry-action-buttons">
+                                <div class="group right entry-action-buttons vertical-aligner">
                                     <a href="#" class="icon-edit i-button-icon js-dialog-action"
                                        data-href="{{ url_for('.manage_update_contrib', contrib) }}"
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
