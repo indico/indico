@@ -57,7 +57,6 @@
 
 {% macro render_notes(item) -%}
     {% if item.has_note %}
-        {{ render_note(note=item.note, can_edit=(item.can_manage(session.user)
-                                                 or item.can_manage(session.user, 'submit'))) }}
+        {{ render_note(note=item.note, can_edit=item.can_edit_note(session.user)) }}
     {% endif %}
 {%- endmacro %}
