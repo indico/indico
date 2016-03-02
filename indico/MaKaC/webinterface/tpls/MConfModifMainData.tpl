@@ -1,5 +1,10 @@
-<table width="100%">
-    <div class="management-page">
+<div class="management-page">
+    <header>
+        <div class="title">
+            <h2>${ _("General Settings")}</h2>
+        </div>
+    </header>
+    <table width="100%">
         <%include file="EventModifMainData.tpl" args="evtType='meeting', confObj=self_._conf"/>
         % if Config.getInstance().getReportNumberSystems():
         <tr>
@@ -13,5 +18,5 @@
             <td colspan="3" class="horizontalLine">&nbsp;</td>
         </tr>
         % endif
-    </div>
-</table>
+    </table>
+</div>
