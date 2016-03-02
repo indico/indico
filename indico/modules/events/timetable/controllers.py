@@ -126,6 +126,6 @@ class RHTimetable(RHConferenceBaseDisplay):
     def _process(self):
         event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
         event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        timetable_data = serialize_timetable(self.event, self._aw)
+        timetable_data = serialize_timetable(self.event_new)
         return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
                                                   timetable_data=timetable_data, timetable_layout=self.layout)
