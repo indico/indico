@@ -131,7 +131,7 @@
                         row.data('hasItem', true);
                     }
                     updateField();
-                    updateRow(row, false);
+                    updateRow(row, false, false);
                 }
             }).on('click', '.js-add-row', function(e) {
                 e.preventDefault();
@@ -142,12 +142,12 @@
                 if (!row.data('hasItem')) {
                     removeRow(row);
                 } else {
-                    updateRow(row, false);
+                    updateRow(row, false, false);
                 }
             }).on('click', '.js-edit-row', function(e) {
                 e.preventDefault();
                 var row = $(this).closest('tr');
-                updateRow(row, true);
+                updateRow(row, true, false);
             }).on('keypress', 'input', function(e) {
                 if (e.keyCode == 13) {
                     e.preventDefault();
@@ -172,13 +172,15 @@
                 });
             }
 
-            function rowsChanged() {
+            function rowsChanged(moveTooltips) {
                 if (sortable) {
                     widget.find('tbody.ui-sortable').sortable('refresh');
                 }
                 fixWidths();
                 addButton.prop('disabled', !!widget.find('.js-table-input').length);
-                repositionTooltips();
+                if (moveTooltips === undefined || moveTooltips) {
+                    repositionTooltips();
+                }
             }
 
             function makeColData(item, col, forceEditable) {
@@ -294,7 +296,7 @@
                 rowsChanged();
             }
 
-            function updateRow(row, editMode) {
+            function updateRow(row, editMode, moveTooltips) {
                 row.children('td:not(.sort-handle):not(.js-action-col)').each(function(i) {
                     $(this).replaceWith($('<td>', makeColData(data[row.index()], columns[i], editMode)));
                 });
@@ -303,7 +305,7 @@
                 } else {
                     row.children('.js-action-col').html(deleteButton.clone().add(editButton.clone()));
                 }
-                rowsChanged();
+                rowsChanged(moveTooltips);
             }
 
             function removeRow(row) {
@@ -312,7 +314,7 @@
                     updateField();
                 }
                 row.remove();
-                rowsChanged();
+                rowsChanged(false);
             }
 
             function updateField() {
