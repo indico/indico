@@ -17,7 +17,7 @@
                 {{ item.title }}
             </span>
             {% if hide_end_time and item.duration -%}
-                <em>{{ item.duration |format_human_timedelta }}</em>
+                <em>{{ item.duration | format_human_timedelta }}</em>
             {%- endif %}
         </span>
 

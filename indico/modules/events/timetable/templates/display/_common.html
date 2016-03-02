@@ -27,19 +27,19 @@
 
 {% macro render_time(item, timezone=none, hide_end_time=false) -%}
     <span class="start-time">
-        {{ item.timetable_entry.start_dt |format_time(timezone=timezone) }}
+        {{ item.timetable_entry.start_dt | format_time(timezone=timezone) }}
     </span>
     {% if not hide_end_time %}
         &rarr;
         <span class="end-time">
-            {{ (item.timetable_entry.start_dt + item.duration) |format_time(timezone=timezone) }}
+            {{ item.timetable_entry.end_dt | format_time(timezone=timezone) }}
         </span>
     {% endif %}
 {%- endmacro %}
 
 {% macro render_speakers(speakers) -%}
     <div class="speaker-list">
-        <span class="label">{{ ngettext("Speaker", "Speakers", speakers|length) }}</span>:
+        <span class="label">{{ ngettext("Speaker", "Speakers", speakers | length) }}</span>:
         {{ render_users(speakers) }}
     </div>
 {%- endmacro %}
