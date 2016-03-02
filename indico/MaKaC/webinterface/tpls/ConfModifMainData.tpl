@@ -1,6 +1,11 @@
-<table class="groupTable">
-    <div class="management-page">
-        <%include file="EventModifMainData.tpl" args="evtType='conference', confObj=self_._conf"/>
+<div class="management-page">
+    <header>
+        <div class="title">
+            <h2>${ _("General Settings")}</h2>
+        </div>
+    </header>
+    <table class="groupTable">
+            <%include file="EventModifMainData.tpl" args="evtType='conference', confObj=self_._conf"/>
         <tr>
             <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Screen dates")}</span></td>
             <td class="blacktext">${screenDates}</td>
@@ -37,8 +42,8 @@
         <tr>
             <td colspan="3" class="horizontalLine">&nbsp;</td>
         </tr>
-    </div>
-</table>
+    </table>
+</div>
 
 <script type="text/javascript">
 function removeItem(number, form)
