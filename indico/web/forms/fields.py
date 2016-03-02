@@ -748,7 +748,8 @@ class IndicoProtectionField(IndicoEnumRadioField):
 
     def render_protection_message(self):
         protected_object = self.get_form().protected_object
+        non_inheriting_objects = protected_object.get_non_inheriting_objects()
         parent_type = _('Event') if isinstance(protected_object.protection_parent, Event) else _('Session')
         rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
-                             parent_type=parent_type)
+                             parent_type=parent_type, non_inheriting_objects=non_inheriting_objects)
         return Markup(rv)

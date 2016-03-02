@@ -63,3 +63,30 @@
         </div>
     </div>
 {%- endmacro %}
+
+{%- macro render_non_inheriting_children_message(protected_object, non_inheriting_objects) -%}
+    {% if non_inheriting_objects %}
+        <div class="action-box message-only for-form highlight">
+            <div class="section">
+                <div class="icon icon-shield"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Children with different protection{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans -%}
+                            Some elements inside this object have different protection settings.
+                        {%- endtrans %}
+                        <strong>
+                            <a data-href="{{ url_for('event_management.show_non_inheriting', protected_object) }}"
+                               data-title="{% trans %}Protection details{% endtrans %}"
+                               data-ajax-dialog>
+                                {%- trans %}Show them.{% endtrans -%}
+                            </a>
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{%- endmacro -%}

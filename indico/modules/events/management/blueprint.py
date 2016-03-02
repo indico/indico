@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.management.controllers import RHDeleteEvent, RHLockEvent, RHUnlockEvent, RHEmailEventPersons
+from indico.modules.events import event_management_object_url_prefixes
+from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockEvent, RHUnlockEvent,
+                                                          RHEmailEventPersons, RHShowNonInheriting)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -28,3 +30,11 @@ _bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', RHUnlockEvent, methods=('POST',))
 _bp.add_url_rule('/manage/person-list/email', 'email_event_persons', RHEmailEventPersons, methods=('POST',))
+
+for object_type, prefixes in event_management_object_url_prefixes.iteritems():
+    if object_type == 'subcontribution':
+        continue
+    for prefix in prefixes:
+        prefix = '!/event/<confId>' + prefix
+        _bp.add_url_rule(prefix + '/show-non-inheriting', 'show_non_inheriting', RHShowNonInheriting,
+                         defaults={'object_type': object_type})
