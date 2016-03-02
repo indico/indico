@@ -17,8 +17,10 @@
 
 
 .report {
-    thead {
-        font-weight: bold;
+    .i-table {
+        thead {
+            font-weight: bold;
+        }
 
         th {
             border-left: 0;
@@ -48,6 +50,15 @@
                 display: inline-block;
             }
         }
+
+        td {
+            vertical-align: top;
+
+            .vertical-aligner {
+                display: block;
+                padding-top: 0.27em;  // Ensure that single line text cells are aligned in the middle
+            }
+        }
     }
 
     .entry-action-buttons {
@@ -55,10 +66,6 @@
             font-size: 1.2em;
             margin-left: 3px;
         }
-    }
-
-    .person-row-cell {
-        position: relative;
     }
 
     .person-row {

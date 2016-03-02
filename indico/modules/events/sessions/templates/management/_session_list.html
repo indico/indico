@@ -24,22 +24,33 @@
                     {% for sess in sessions -%}
                         <tr class="i-table session-row" data-friendly-id="{{ sess.friendly_id }}">
                             <td class="i-table">
-                                <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
+                                <span class="vertical-aligner">
+                                    <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
+                                </span>
                             </td>
-                            <td class="i-table id-column">#{{ sess.friendly_id }}</td>
-                            <td class="i-table {% if sess.is_self_protected %}self-protection-icon
-                                               {% elif sess.is_public %}public-protection-icon{% endif %}">
+                            <td class="i-table id-column">
+                                <span class="vertical-aligner">#{{ sess.friendly_id }}</span>
+                            </td>
+                            <td class="i-table">
+                                <span class="vertical-aligner">
+                                    <i class="{% if sess.is_self_protected %}self-protection-icon
+                                              {% elif sess.is_public %}public-protection-icon{% endif %}"></i>
+                                </span>
                             </td>
                             <td class="i-table" data-searchable="{{ sess.title | lower }}">
-                                <strong>{{ sess.title }}</strong>
+                                <span class="vertical-aligner"><strong>{{ sess.title }}</strong></span>
                             </td>
-                            <td class="i-table" data-searchable="{{ sess.code | lower }}">{{ sess.code }}</td>
+                            <td class="i-table" data-searchable="{{ sess.code | lower }}">
+                                <span class="vertical-aligner">{{ sess.code }}</span>
+                            </td>
                             <td class="i-table">
-                                {%- if sess.is_poster %}
-                                    {%- trans %}Poster{% endtrans -%}
-                                {% else %}
-                                    {%- trans %}Standard{% endtrans -%}
-                                {% endif -%}
+                                <span class="vertical-aligner">
+                                    {%- if sess.is_poster %}
+                                        {%- trans %}Poster{% endtrans -%}
+                                    {% else %}
+                                        {%- trans %}Standard{% endtrans -%}
+                                    {% endif -%}
+                                </span>
                             </td>
                             <td class="i-table">
                                 <div class="group">
@@ -60,7 +71,7 @@
                             </td>
                             {{ render_attachment_info(sess) }}
                             <td class="i-table">
-                                <div class="group right entry-action-buttons">
+                                <div class="group right entry-action-buttons vertical-aligner">
                                     <a href="#" class="icon-edit highlight edit-session i-button-icon"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
