@@ -113,8 +113,9 @@ def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
         if i % print_every == 0 or i == total:
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
+            id_ = get_id(item)
             title = to_unicode(get_title(item).replace('\n', ' '))
-            text = fmt.format(i, total, (i / total * 100.0), remaining, get_id(item), title)
+            text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)
             print('\r', ' ' * term_width, end='', sep='')
             # terminal width + ansi control code length - trailing reset code (4)
             print('\r', text[:term_width + len(text.value_colors) - len(text.value_no_colors) - 4], cformat('%{reset}'),
