@@ -85,19 +85,19 @@
     <span class="event-time-data">
         {% if conf.getStartDate().date() == conf.getEndDate().date() %}
             <time itemprop="startDate" datetime="{{ conf.getStartDate().isoformat() }}">
-                {{ conf.getStartDate() |format_datetime(format='medium', timezone=timezone) }}
+                {{ conf.getStartDate() | format_datetime(format='medium', timezone=timezone) }}
             </time>
             &rarr;
             <time itemprop="endDate" datetime="{{ conf.getEndDate().isoformat() }}">
-                {{ conf.getEndDate() |format_time(format='medium', timezone=timezone) }}
+                {{ conf.getEndDate() | format_time(format='medium', timezone=timezone) }}
             </time>
         {% else %}
             <time itemprop="startDate" datetime="{{ conf.getStartDate().isoformat() }}">
-                {{ conf.getStartDate() |format_datetime(format='medium', timezone=timezone) }}
+                {{ conf.getStartDate() | format_datetime(format='medium', timezone=timezone) }}
             </time>
             &rarr;
             <time itemprop="endDate" datetime="{{ conf.getEndDate().isoformat() }}">
-                {{ conf.getEndDate() |format_datetime(format='medium', timezone=timezone) }}
+                {{ conf.getEndDate() | format_datetime(format='medium', timezone=timezone) }}
             </time>
         {% endif %}
         <span class="timezone">{{ timezone }}</span>
