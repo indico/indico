@@ -102,8 +102,8 @@ class AttachmentFile(StoredFileMixin, db.Model):
                 # event/<id>/contribution/<contribution_id>/...
                 path_segments.append(strict_unicode(folder.contribution.id))
             elif folder.link_type == LinkType.subcontribution:
-                # event/<id>/subcontribution/<contribution_id>-<subcontribution_id>/...
-                path_segments.append('{}-{}'.format(folder.contribution.id, folder.subcontribution.id))
+                # event/<id>/subcontribution/<subcontribution_id>/...
+                path_segments.append(strict_unicode(folder.subcontribution.id))
         self.attachment.assign_id()
         self.assign_id()
         filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
