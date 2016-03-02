@@ -1,7 +1,7 @@
 {% from 'attachments/_attachments.html' import get_attachment_icon, render_attachment %}
 
 {% macro render_folder(folder) -%}
-    <div class="folder toolbar {% if folder.is_self_protected %}is-protected{% endif %}">
+    <div class="folder {% if folder.is_self_protected %}is-protected{% endif %}">
         <div class="attachments group">
             <span class="i-button label" title="{{ folder.description }}">{{ folder.title }}</span>
             {% if folder.attachments|count <= 2 %}
@@ -35,13 +35,13 @@
     {% set files = item.attached_items.files if item else files %}
     {% set folders = item.attached_items.folders if item else folders %}
 
-    <div class="attachments-display-container">
-        <span class="folder folder-root toolbar">
+    <div class="attachments-display-container toolbar">
+        <div class="folder folder-root">
             {% for attachment in files %}
                 {{ render_attachment(attachment, classes='i-button') }}
                 {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=false) }}
             {% endfor %}
-        </span>
+        </div>
 
         {%- for folder in folders -%}
             {{ render_folder(folder) }}
