@@ -19,16 +19,16 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import flash, redirect, request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.management.util import can_lock
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.forms import EmailEventPersonsForm
+from indico.modules.events.util import get_object_from_args
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.util import jsonify_form, jsonify_template
@@ -150,3 +150,17 @@ class RHEmailEventPersons(RHConferenceModifBase):
         return (self.event_new.persons
                 .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
                 .all())
+
+
+class RHShowNonInheriting(RHConferenceModifBase):
+    """Show a list of non-inheriting child objects"""
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.obj = get_object_from_args()[2]
+        if self.obj is None:
+            raise NotFound
+
+    def _process(self):
+        objects = self.obj.get_non_inheriting_objects()
+        return jsonify_template('events/management/non_inheriting_objects.html', objects=objects)
