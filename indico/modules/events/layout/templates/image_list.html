@@ -7,6 +7,7 @@
             </a>
             <span class="menu">
                 <a class="icon-link js-copy-to-clipboard" title="{% trans %}Get link to image{% endtrans %}"
+                   href="{{ url_for('event_images.image_display', image, _external=true) }}"
                    data-clipboard-text="{{ url_for('event_images.image_display', image, _external=true) }}"
                    data-clipboard-action="copy"></a>
                 <a class="icon-remove danger delete" title="{% trans %}Delete image{% endtrans %}"
