@@ -66,4 +66,9 @@ $(document).ready(function() {
         copyShortcut = "<strong>" + copyShortcut + "</strong>";
         showQTip(evt.trigger, $T.gettext("Press {0} to copy").format(copyShortcut));
     });
+
+    /* Allow to use clipboard.js on <a> with href attributes. */
+    $('.js-copy-to-clipboard').on('click', function(evt) {
+        evt.preventDefault();
+    });
 });
