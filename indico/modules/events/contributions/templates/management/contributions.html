@@ -52,6 +52,12 @@
                         data-ajax-dialog>
                     {%- trans %}Author list{% endtrans -%}
                 </button>
+            </div>
+            <div class="group">
+                <a href="#" class="i-button icon-attachment js-enable-if-checked js-export-attachments disabled"
+                   data-href="{{ url_for('.material_package', event) }}">
+                    {%- trans %}Material package{%- endtrans %}
+                </a>
                 <button class="i-button js-enable-if-checked arrow" disabled
                         title="{% trans %}Export data{% endtrans %}">
                         {% trans %}Export{% endtrans %}

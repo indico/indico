@@ -28,7 +28,7 @@ from sqlalchemy import cast, Date
 
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.links import LinkType
-from indico.util.date_time import format_date
+from indico.util.date_time import format_date, format_time
 from indico.util.i18n import _
 from indico.util.fs import secure_filename
 from indico.util.string import to_unicode, natural_sort_key
@@ -38,7 +38,9 @@ from indico.web.forms.base import FormDefaults
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
-from MaKaC.conference import SubContribution
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.sessions.models.sessions import Session
 
 
 def adjust_path_length(segments):
@@ -66,13 +68,30 @@ def adjust_path_length(segments):
 
 def _get_start_dt(obj):
     # TODO: adapt to new models (needs extra properties to use event TZ)
+    if isinstance(obj, Contribution):
+        return obj.timetable_entry.start_dt if obj.timetable_entry else None
+    elif isinstance(obj, SubContribution):
+        return obj.timetable_entry.start_dt if obj.timetable_entry else None
+    elif isinstance(obj, Session):
+        return None
+    return obj.start_dt
+
+
+def _get_obj_parent(obj):
     if isinstance(obj, SubContribution):
-        return obj.getContribution().getAdjustedStartDate()
-    else:
-        return obj.getAdjustedStartDate()
+        return obj.contribution
+    elif isinstance(obj, Contribution):
+        if obj.session:
+            return obj.sesion
+        else:
+            return obj.event_new
+    return obj.event_new.as_legacy
 
 
 class AttachmentPackageGeneratorMixin:
+
+    #: Whether unscheduled contributions should be included
+    ALLOW_UNSCHEDULED = False
 
     def _filter_attachments(self, filter_data):
         added_since = filter_data.get('added_since', None)
@@ -113,10 +132,21 @@ class AttachmentPackageGeneratorMixin:
         return [attachment for attachment in query if attachment.folder.object.session.id in session_ids]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
-        query = self._build_base_query(added_since).filter(AttachmentFolder.contribution_id.in_(contribution_ids),
-                                                           AttachmentFolder.link_type.in_([LinkType.contribution,
+        query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.contribution,
                                                                                            LinkType.subcontribution]))
-        return [attachment for attachment in query if _get_start_dt(attachment.folder.object) is not None]
+        objs = []
+        for attachment in query:
+            linked_obj = attachment.folder.object
+            if linked_obj.is_deleted:
+                continue
+            if (isinstance(linked_obj, SubContribution) and not linked_obj.contribution.is_deleted and
+                    linked_obj.contribution_id in contribution_ids):
+                    objs.append(attachment)
+            elif isinstance(linked_obj, Contribution) and linked_obj.id in contribution_ids:
+                objs.append(attachment)
+
+        return [attachment for attachment in objs
+                if self.ALLOW_UNSCHEDULED or _get_start_dt(attachment.folder.object) is not None]
 
     def _filter_by_dates(self, dates):
         dates = set(dates)
@@ -149,6 +179,8 @@ class AttachmentPackageGeneratorMixin:
     def _prepare_folder_structure(self, attachment):
         event_dir = secure_filename(self._conf.getTitle(), None)
         segments = [event_dir] if event_dir else []
+        if _get_start_dt(attachment.folder.object) is None:
+            segments.append('Unscheduled')
         segments.extend(self._get_base_path(attachment))
         if not attachment.folder.is_default:
             segments.append(secure_filename(attachment.folder.title, unicode(attachment.folder.id)))
@@ -165,23 +197,22 @@ class AttachmentPackageGeneratorMixin:
         obj = linked_object = attachment.folder.object
         paths = []
         while obj != self._conf:
-            owner = obj.getOwner()
-            if isinstance(obj, SubContribution):
-                start_date = owner.getAdjustedStartDate()
-            else:
-                start_date = obj.getAdjustedStartDate()
-
+            start_date = _get_start_dt(obj)
             if start_date is not None:
-                paths.append(secure_filename(start_date.strftime('%H%M_{}').format(obj.getTitle()), ''))
+                if isinstance(obj, SubContribution):
+                    paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), ''))
+                else:
+                    paths.append(secure_filename('{}_{}'.format(format_time(start_date, format='HHmm',
+                                                                            timezone=self.event_new.timezone),
+                                                                obj.title), ''))
             else:
-                paths.append(secure_filename(obj.getTitle(), unicode(obj.getId())))
-            obj = owner
+                if isinstance(obj, SubContribution):
+                    paths.append(secure_filename('{}){}'.format(obj.position, obj.title), unicode(obj.id)))
+                else:
+                    paths.append(secure_filename(obj.title, unicode(obj.id)))
+            obj = _get_obj_parent(obj)
 
-        if isinstance(linked_object, SubContribution):
-            linked_obj_start_date = linked_object.getOwner().getAdjustedStartDate()
-        else:
-            linked_obj_start_date = linked_object.getAdjustedStartDate()
-
+        linked_obj_start_date = _get_start_dt(linked_object)
         if attachment.folder.object != self._conf and linked_obj_start_date is not None:
             paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
 

@@ -20,6 +20,7 @@ from flask import flash, request, jsonify, redirect
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest
 
+from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.contributions.forms import (ContributionForm, ContributionProtectionForm,
                                                        SubContributionForm, ContributionStartDateForm,
                                                        ContributionDurationForm)
@@ -37,6 +38,7 @@ from indico.modules.events.util import update_object_principals
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.base import RH
@@ -322,3 +324,16 @@ class RHContributionUpdateDuration(RHManageContributionBase):
             update_contribution(self.contrib, {'duration': form.duration.data})
             return jsonify_data(new_value=format_human_timedelta(self.contrib.duration))
         return jsonify_form(form, back_button=False, disabled_until_change=True)
+
+
+class RHContributionsMaterialPackage(RHManageContributionsActionsBase, AttachmentPackageGeneratorMixin):
+    """Generate a ZIP file with materials for a given list of contributions"""
+
+    ALLOW_UNSCHEDULED = True
+
+    def _process(self):
+        attachments = self._filter_by_contributions({c.id for c in self.contribs}, None)
+        if not attachments:
+            flash(_('The selected contributions do not have any materials.'), 'warning')
+            return redirect(url_for('.manage_contributions', self.event_new))
+        return self._generate_zip_file(attachments)
