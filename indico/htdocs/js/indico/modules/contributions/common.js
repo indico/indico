@@ -194,6 +194,13 @@
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
         setupReporter();
+        $('.js-export-attachments').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            if (!$this.hasClass('disabled')) {
+                $('#contribution-list form').attr('action', $this.data('href')).submit();
+            }
+        });
     };
 
     global.setupSubContributionList = function setupSubContributionList() {

@@ -23,9 +23,9 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHContributionsReportStaticURL,
                                                              RHContributionSubContributions, RHCreateSubContribution,
                                                              RHEditSubContribution, RHSubContributionREST,
-                                                             RHDeleteSubContributions,
-                                                             RHContributionUpdateStartDate,
-                                                             RHContributionUpdateDuration)
+                                                             RHDeleteSubContributions, RHContributionUpdateStartDate,
+                                                             RHContributionUpdateDuration,
+                                                             RHContributionsMaterialPackage)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -42,6 +42,8 @@ _bp.add_url_rule('/manage/contributions/create',
 _bp.add_url_rule('/manage/contributions/delete',
                  'manage_delete_contribs', RHDeleteContributions, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/person-list', 'person_list', RHContributionPersonList, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/material-package', 'material_package', RHContributionsMaterialPackage,
+                 methods=('POST',))
 
 # Single contribution
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>',
