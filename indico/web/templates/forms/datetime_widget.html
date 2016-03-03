@@ -56,10 +56,14 @@
 
             dateField.datepicker({
                 onSelect: function applyOnSelectHandlers() {
-                    var handlers = $(this).data('onSelectHandlers');
+                    var $this = $(this);
+                    var handlers = $this.data('onSelectHandlers');
                     for (var i = 0; i < handlers.length; i++) {
                         handlers[i].apply(this, arguments);
                     }
+                    // ensure we de-focus the field; otherwise clicking it again might
+                    // not re-open the datepicker
+                    $this.blur();
                 }
             }).data('onSelectHandlers', [
                 initTime,
