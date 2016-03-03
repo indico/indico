@@ -16,16 +16,17 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db.sqlalchemy.util.models import auto_table_args
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import format_repr, return_ascii
 
 
-class Break(ColorMixin, LocationMixin, db.Model):
+class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
     __tablename__ = 'breaks'
     __auto_table_args = {'schema': 'events'}
     location_backref_name = 'breaks'
@@ -42,11 +43,6 @@ class Break(ColorMixin, LocationMixin, db.Model):
     title = db.Column(
         db.String,
         nullable=False
-    )
-    description = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
     )
     duration = db.Column(
         db.Interval,

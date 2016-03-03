@@ -25,6 +25,7 @@ from sqlalchemy.dialects.postgresql import JSON, ARRAY
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
@@ -37,7 +38,7 @@ from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
-class Event(LocationMixin, ProtectionManagersMixin, db.Model):
+class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
@@ -125,12 +126,6 @@ class Event(LocationMixin, ProtectionManagersMixin, db.Model):
     title = db.Column(
         db.String,
         nullable=False
-    )
-    #: The description of the event
-    description = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(

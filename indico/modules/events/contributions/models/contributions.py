@@ -23,6 +23,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import mapper
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
@@ -42,7 +43,7 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_contribution_id, Event.id == event_id)
 
 
-class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
+class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
                          db.Index(None, 'event_id', 'track_id'),
@@ -105,11 +106,6 @@ class Contribution(ProtectionManagersMixin, LocationMixin, db.Model):
     title = db.Column(
         db.String,
         nullable=False
-    )
-    description = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
     )
     duration = db.Column(
         db.Interval,
