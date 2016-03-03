@@ -123,10 +123,12 @@ class AttachmentPackageForm(IndicoForm):
 
     sessions = IndicoSelectMultipleCheckboxField(_('Sessions'), [HiddenUnless('filter_type', 'sessions'),
                                                                  DataRequired()],
-                                                 description=_('Include materials from selected sessions'))
+                                                 description=_('Include materials from selected sessions'),
+                                                 coerce=int)
     contributions = IndicoSelectMultipleCheckboxField(_('Contributions'),
                                                       [HiddenUnless('filter_type', 'contributions'), DataRequired()],
-                                                      description=_('Include materials from selected contributions'))
+                                                      description=_('Include materials from selected contributions'),
+                                                      coerce=int)
     dates = IndicoSelectMultipleCheckboxField(_('Events scheduled on'), [HiddenUnless('filter_type', 'dates'),
                                                                          DataRequired()],
                                               description=_('Include materials from sessions/contributions scheduled '
