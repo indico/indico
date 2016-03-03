@@ -75,15 +75,19 @@ i.info-helper {
 .i-linking {
     width: 400px;
 
+    display: flex;
+    align-items: center;
+    min-height: 2.5em;
+
     > label {
         width: 28%;
-        padding: 0.7em 0;
     }
 
     > .i-linking-dropdown,
     > span.static-text {
         display: inline-block !important;
         width: 65% !important;
+        padding: 0 !important;
     }
 
     > .i-linking-dropdown > select { width: 100%; }
