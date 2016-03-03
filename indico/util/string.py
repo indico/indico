@@ -532,7 +532,7 @@ class RichMarkup(Markup):
         obj = Markup.__new__(cls, content)
         if preformatted is None:
             tmp = content.lower()
-            obj._preformatted = any(tag in tmp for tag in (u'<p>', u'<p ', u'<br', u'<li>'))
+            obj._preformatted = not any(tag in tmp for tag in (u'<p>', u'<p ', u'<br', u'<li>'))
         else:
             obj._preformatted = preformatted
         return obj
