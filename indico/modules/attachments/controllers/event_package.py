@@ -31,7 +31,7 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.date_time import format_date, format_time
 from indico.util.i18n import _
 from indico.util.fs import secure_filename
-from indico.util.string import to_unicode, natural_sort_key
+from indico.util.string import natural_sort_key
 from indico.util.tasks import delete_file
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -81,11 +81,8 @@ def _get_obj_parent(obj):
     if isinstance(obj, SubContribution):
         return obj.contribution
     elif isinstance(obj, Contribution):
-        if obj.session:
-            return obj.sesion
-        else:
-            return obj.event_new
-    return obj.event_new.as_legacy
+        return obj.session or obj.event_new
+    return obj.event_new
 
 
 class AttachmentPackageGeneratorMixin:
@@ -118,7 +115,7 @@ class AttachmentPackageGeneratorMixin:
 
     def _build_base_query(self, added_since=None):
         query = Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
-                                ~Attachment.is_deleted, AttachmentFolder.event_id == int(self._conf.getId()),
+                                ~Attachment.is_deleted, AttachmentFolder.event_new == self.event_new,
                                 _join=AttachmentFolder)
         if added_since is not None:
             query = query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
@@ -129,7 +126,7 @@ class AttachmentPackageGeneratorMixin:
         query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.session,
                                                                                            LinkType.contribution,
                                                                                            LinkType.subcontribution]))
-        return [attachment for attachment in query if attachment.folder.object.session.id in session_ids]
+        return [attachment for attachment in query if attachment.folder.object.id in session_ids]
 
     def _filter_by_contributions(self, contribution_ids, added_since):
         query = self._build_base_query(added_since).filter(AttachmentFolder.link_type.in_([LinkType.contribution,
@@ -174,10 +171,10 @@ class AttachmentPackageGeneratorMixin:
         # done sending it to the client.
         delete_file.apply_async(args=[temp_file.name], countdown=3600)
         temp_file.delete = False
-        return send_file('material-{}.zip'.format(self._conf.id), temp_file.name, 'application/zip', inline=False)
+        return send_file('material-{}.zip'.format(self.event_new.id), temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, attachment):
-        event_dir = secure_filename(self._conf.getTitle(), None)
+        event_dir = secure_filename(self.event_new.title, None)
         segments = [event_dir] if event_dir else []
         if _get_start_dt(attachment.folder.object) is None:
             segments.append('Unscheduled')
@@ -196,7 +193,7 @@ class AttachmentPackageGeneratorMixin:
         # TODO: adapt to new models (needs extra properties to use event TZ)
         obj = linked_object = attachment.folder.object
         paths = []
-        while obj != self._conf:
+        while obj != self.event_new:
             start_date = _get_start_dt(obj)
             if start_date is not None:
                 if isinstance(obj, SubContribution):
@@ -213,7 +210,7 @@ class AttachmentPackageGeneratorMixin:
             obj = _get_obj_parent(obj)
 
         linked_obj_start_date = _get_start_dt(linked_object)
-        if attachment.folder.object != self._conf and linked_obj_start_date is not None:
+        if attachment.folder.object != self.event_new and linked_obj_start_date is not None:
             paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
 
         return reversed(paths)
@@ -232,7 +229,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             else:
                 flash(_('There are no materials matching your criteria.'), 'warning')
 
-        return self.wp.render_template('generate_package.html', self._conf, form=form, event=self._conf,
+        return self.wp.render_template('generate_package.html', self._conf, form=form, event=self.event_new,
                                        management=self.management)
 
     def _prepare_form(self):
@@ -258,24 +255,24 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         return form
 
     def _load_session_data(self):
-        return [(session.getId(), escape(to_unicode(session.getTitle()))) for session in self._conf.getSessionList()]
+        return [(sess.id, escape(sess.title)) for sess in self.event_new.sessions]
 
     def _load_contribution_data(self):
         def _format_contrib(contrib):
-            if contrib.getSession() is None:
-                return to_unicode(contrib.getTitle())
+            if contrib.session is None:
+                return contrib.title
             else:
                 return _('{contrib} (in session "{session}")').format(
-                    session=to_unicode(contrib.getSession().getTitle()),
-                    contrib=to_unicode(contrib.getTitle())
+                    session=contrib.session.title,
+                    contrib=contrib.title
                 )
 
-        contribs = sorted([contrib for contrib in self._conf.getContributionList() if contrib.getStartDate()],
-                          key=lambda c: natural_sort_key(c.getTitle()))
-        return [(contrib.getId(), escape(_format_contrib(contrib))) for contrib in contribs]
+        contribs = sorted([contrib for contrib in self.event_new.contributions if contrib.timetable_entry],
+                          key=lambda c: natural_sort_key(c.title))
+        return [(contrib.id, escape(_format_contrib(contrib))) for contrib in contribs]
 
     def _iter_event_days(self):
-        duration = (self._conf.getAdjustedEndDate() - self._conf.getAdjustedStartDate()).days
+        duration = (self.event_new.end_dt - self.event_new.start_dt).days
         for offset in xrange(duration + 1):
-            day = (self._conf.getAdjustedStartDate() + timedelta(days=offset)).date()
+            day = (self.event_new.start_dt + timedelta(days=offset)).date()
             yield day.isoformat(), format_date(day, 'short')
