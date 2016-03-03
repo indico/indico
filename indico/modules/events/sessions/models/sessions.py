@@ -21,6 +21,7 @@ from datetime import timedelta
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
@@ -39,7 +40,7 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_session_id, Event.id == event_id)
 
 
-class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
+class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     __tablename__ = 'sessions'
     __auto_table_args = {'schema': 'events'}
     location_backref_name = 'sessions'
@@ -69,11 +70,6 @@ class Session(ColorMixin, ProtectionManagersMixin, LocationMixin, db.Model):
     title = db.Column(
         db.String,
         nullable=False
-    )
-    description = db.Column(
-        db.Text,
-        nullable=True,
-        default=''
     )
     code = db.Column(
         db.String,

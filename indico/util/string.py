@@ -32,6 +32,7 @@ import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
 from enum import Enum
 from lxml import html, etree
+from markupsafe import Markup
 from speaklater import _LazyString
 
 
@@ -516,3 +517,28 @@ def sanitize_email(email):
         return email
     m = re.search(r'<([^>]+)>', email)
     return email if m is None else m.group(1)
+
+
+class RichMarkup(Markup):
+    """unicode/Markup subclass that detects preformatted text
+
+    Note that HTML in this string will NOT be escaped when displaying
+    it in a jinja template.
+    """
+
+    __slots__ = ('_preformatted',)
+
+    def __new__(cls, content=u'', preformatted=None):
+        obj = Markup.__new__(cls, content)
+        if preformatted is None:
+            tmp = content.lower()
+            obj._preformatted = any(tag in tmp for tag in (u'<p>', u'<p ', u'<br', u'<li>'))
+        else:
+            obj._preformatted = preformatted
+        return obj
+
+    def __html__(self):
+        if self._preformatted:
+            return u'<div class="preformatted">{}</div>'.format(self)
+        else:
+            return self
