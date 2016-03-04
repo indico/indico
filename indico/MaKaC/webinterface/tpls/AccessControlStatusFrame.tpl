@@ -36,30 +36,26 @@ from MaKaC import conference as cmod
         </div>
 
         % if not isinstance(target, cmod.Category):
-            % if (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) and not target.getAccessController().isFullyPublic():
-                    <div class="noninheriting_children_danger">
-                      <span class="icon-shield"></span>
-                      <div class="text">
-                        ${_('Some parts of the event are accessible only by authorized people. <a href="#" class="see_children" data-url="{0}.protection.getProtectedChildren" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
-                      </div>
+            <% non_inheriting = target.as_event.get_non_inheriting_objects() %>
+            % if non_inheriting:
+                <div class="action-box message-only for-form highlight">
+                    <div class="section">
+                        <div class="icon icon-shield"></div>
+                        <div class="text">
+                            <div class="label">${ _('Parts with different protection') }</div>
+                            <div>
+                                ${ _('Some parts of this event have different protection settings.') }
+                                <strong>
+                                    <a data-href="${ url_for('event_management.show_non_inheriting', target.as_event) }"
+                                       data-title="${ _('Protection details') }"
+                                       data-ajax-dialog>
+                                        ${ _('Show them.') }
+                                    </a>
+                                </strong>
+                            </div>
+                        </div>
                     </div>
-            % elif (privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED')):
-                    % if len(target.getAccessController().getPublicChildren()) > 0:
-                    <div class="noninheriting_children_danger">
-                      <span class="icon-shield"></span>
-                      <div class="text">
-                        ${_('Some parts of the event are accessible by everybody. <a href="#" class="see_children" data-url="{0}.protection.getPublicChildren" data-type="Public">Which ones?</a>').format(termsDict[type]['name'])}
-                      </div>
-                    </div>
-                    %endif
-                    % if len(target.getAccessController().getProtectedChildren()) > 0:
-                    <div class="noninheriting_children_warning">
-                      <span class="icon-shield"></span>
-                      <div class="text">
-                        ${_('Some parts of the event are still protected but their protection has been redefined. <a href="#" class="see_children" data-url="{0}.protection.getProtectedChildren" data-type="Protected">Which ones?</a>').format(termsDict[type]['name'])}
-                      </div>
-                    </div>
-                    %endif
+                </div>
             % endif
         % endif
 
