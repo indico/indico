@@ -74,32 +74,36 @@
         var oldOnBeforeUnload = null;
         var ignoreOnBeforeUnload = false;
 
-        $.ajax({
-            type: options.method,
-            url: options.url,
-            data: $.isFunction(options.data) ? options.data() : options.data,
-            cache: false, // IE caches GET AJAX requests. WTF.
-            complete: IndicoUI.Dialogs.Util.progress(),
-            error: function(xhr) {
-                if (!options.onLoadError || options.onLoadError(xhr) !== false) {
-                    handleAjaxError(xhr);
+        loadDialog();
+
+        function loadDialog() {
+            $.ajax({
+                type: options.method,
+                url: options.url,
+                data: $.isFunction(options.data) ? options.data() : options.data,
+                cache: false, // IE caches GET AJAX requests. WTF.
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: function(xhr) {
+                    if (!options.onLoadError || options.onLoadError(xhr) !== false) {
+                        handleAjaxError(xhr);
+                    }
+                },
+                success: function(data, _, xhr) {
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
+                    var loadedURL = xhr.getResponseHeader('X-Indico-URL');
+                    if (loadedURL) {
+                        // in case of a redirect we need to update the url used to submit the ajaxified
+                        // form. otherwise url normalization might fail during the POST requests.
+                        // we also remove the _=\d+ cache buster since it's only relevant for the GET
+                        // request and added there automatically
+                        options.url = loadedURL.replace(/&_=\d+/, '').replace(/\?_=\d+$/, '').replace(/\?_=\d+&/, '?');
+                    }
+                    showDialog(data);
                 }
-            },
-            success: function(data, _, xhr) {
-                if (handleAjaxError(data)) {
-                    return;
-                }
-                var loadedURL = xhr.getResponseHeader('X-Indico-URL');
-                if (loadedURL) {
-                    // in case of a redirect we need to update the url used to submit the ajaxified
-                    // form. otherwise url normalization might fail during the POST requests.
-                    // we also remove the _=\d+ cache buster since it's only relevant for the GET
-                    // request and added there automatically
-                    options.url = loadedURL.replace(/&_=\d+/, '').replace(/\?_=\d+$/, '').replace(/\?_=\d+&/, '?');
-                }
-                showDialog(data);
-            }
-        });
+            });
+        }
 
         function hasChangedFields() {
             var forms = popup.contentContainer.find('form');
@@ -113,6 +117,9 @@
         }
 
         function showDialog(dialogData) {
+            if (popup) {
+                _doCloseDialog();
+            }
             popup = new ExclusivePopup($.isFunction(options.title) ? options.title.call(options.trigger) : options.title, function() {
                 closeDialog(null);
                 return false;
@@ -129,6 +136,9 @@
                 });
                 popup.canvas.on('ajaxDialog:close', function(e, data, submitted) {
                     closeDialog(data, submitted);
+                });
+                popup.canvas.on('ajaxDialog:reload', function() {
+                    loadDialog();
                 });
                 injectJS(dialogData.js);
 
@@ -172,9 +182,7 @@
                     onCloseResult = $.Deferred().resolve();
                 }
                 onCloseResult.then(function() {
-                    popup.close();
-                    if (options.confirmCloseUnsaved) {
-                        window.onbeforeunload = oldOnBeforeUnload;
+                    _doCloseDialog();
                     if (options.trigger) {
                         $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData])
                     }
@@ -182,6 +190,14 @@
                     ignoreOnBeforeUnload = false;
                 });
             });
+        }
+
+        function _doCloseDialog() {
+            popup.close();
+            if (options.confirmCloseUnsaved) {
+                window.onbeforeunload = oldOnBeforeUnload;
+            }
+            popup = null;
         }
 
         function ajaxifyForms() {
