@@ -175,6 +175,7 @@
             placeholder: $('#filter-placeholder')
         };
 
+        $('.report-section [data-toggle=dropdown]').closest('.group').dropdown();
         setupTableSorter('#contribution-list .tablesorter');
         setupSearchBox(filterConfig);
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
@@ -194,7 +195,7 @@
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
         setupReporter();
-        $('.js-export-attachments').on('click', function(e) {
+        $('.js-submit-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
             if (!$this.hasClass('disabled')) {

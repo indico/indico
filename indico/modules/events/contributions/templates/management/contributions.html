@@ -12,12 +12,12 @@
             <div class="group">
                 <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                 <ul class="dropdown">
-                    <li><a href="#" data-select-all="#contribution-list input:checkbox">
-                        {% trans %}All{% endtrans %}
-                    </a></li>
-                    <li><a href="#" data-select-none="#contribution-list input:checkbox">
-                        {% trans %}None{% endtrans %}
-                    </a></li>
+                    <li>
+                        <a href="#" data-select-all="#contribution-list input:checkbox">{% trans %}All{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none="#contribution-list input:checkbox">{% trans %}None{% endtrans %}</a>
+                    </li>
                 </ul>
             </div>
             <div class="group">
@@ -31,7 +31,7 @@
                 </button>
             </div>
             <div class="group">
-                <button class="i-button js-enable-if-checked icon-remove" disabled
+                <button class="i-button js-enable-if-checked icon-remove disabled"
                         title="{% trans %}Remove{% endtrans %}"
                         data-method="POST"
                         data-href="{{ url_for('.manage_delete_contribs', event) }}"
@@ -54,14 +54,31 @@
                 </button>
             </div>
             <div class="group">
-                <a href="#" class="i-button icon-attachment js-enable-if-checked js-export-attachments disabled"
+                <a href="#" class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
                    data-href="{{ url_for('.material_package', event) }}">
                     {%- trans %}Material package{%- endtrans %}
                 </a>
-                <button class="i-button js-enable-if-checked arrow" disabled
-                        title="{% trans %}Export data{% endtrans %}">
-                        {% trans %}Export{% endtrans %}
-                </button>
+            </div>
+            <div class="group">
+                <a class="i-button js-enable-if-checked arrow disabled"
+                   title="{% trans %}Export data{% endtrans %}"
+                   data-toggle="dropdown">
+                    {% trans -%}Export{%- endtrans %}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_csv_export', event) }}">
+                            {% trans -%}CSV{%- endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_excel_export', event) }}">
+                            {% trans -%}XLSX (Excel){%- endtrans %}
+                        </a>
+                    </li>
+                </ul>
             </div>
             <div class="group right">
                 <span class="i-button label icon-search"></span>
