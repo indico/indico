@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows %}
 
 {%- block content %}
-    {{ form_header(form, id='file-upload', classes=('full-width' if not existing_attachment else ''),
+    {{ form_header(form, id='attachment-upload-form', classes=('full-width' if not existing_attachment else ''),
                    action=action) }}
     <input type="hidden" autofocus>
     {% if existing_attachment %}
@@ -28,13 +28,23 @@
         (function() {
             'use strict';
 
-            $('#folder').nullableselector();
-            aclIfProtected($('#protected'), $('#acl'), $('.protected-protection-message'), $('.inheriting-protection-message'),
-                           $('#folder'));
-            messageIfFolderProtected($('#protected'), $('#folder'), {{ folders_protection_info | tojson }},
-                                     $('.protected-protection-message'), $('.inheriting-protection-message'),
-                                     $('.folder-protection-message'));
+            $('#{{ form.folder.id }}').nullableselector();
+            var form = $('#attachment-upload-form');
+            aclIfProtected(
+                $('#{{ form.protected.id }}'),
+                $('#{{ form.acl.id }}'),
+                form.find('.protected-protection-message'),
+                form.find('.inheriting-protection-message'),
+                $('#{{ form.folder.id }}')
+            );
+            messageIfFolderProtected(
+                $('#{{ form.protected.id }}'),
+                $('#{{ form.folder.id }}'),
+                {{ folders_protection_info | tojson }},
+                form.find('.protected-protection-message'),
+                form.find('.inheriting-protection-message'),
+                form.find('.folder-protection-message')
+            );
         })();
-
     </script>
 {%- endblock %}

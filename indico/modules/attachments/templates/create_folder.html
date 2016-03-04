@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 {% block content -%}
-    {{ form_header(form)}}
+    {{ form_header(form, id='attachment-folder-form')}}
     {{ form_rows(form, skip=('protected', 'acl')) }}
     {{ form_rows(form, fields=('protected', 'acl')) }}
     {{ protection_message | safe }}
@@ -10,7 +10,18 @@
         <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     {% endcall %}
     <script>
-        aclIfProtected($('#protected'), $('#acl'), $('.protected-protection-message'), $('.inheriting-protection-message'),
-                      null, $('.folder-protection-message'));
+        (function() {
+            'use strict';
+
+            var form = $('#attachment-folder-form');
+            aclIfProtected(
+                $('#{{ form.protected.id }}'),
+                $('#{{ form.acl.id }}'),
+                form.find('.protected-protection-message'),
+                form.find('.inheriting-protection-message'),
+                null,
+                form.find('.folder-protection-message')
+            );
+        })();
     </script>
 {%- endblock %}
