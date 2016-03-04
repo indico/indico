@@ -219,7 +219,7 @@ class TimetableMigration(object):
         email = sanitize_email(convert_to_unicode(email).lower()) if email else email
         if not is_valid_mail(email, False):
             email = None
-        return self.event_person_map[email] if email else self._create_person(old_person, with_event=True)
+        return self.event_person_map.get(email) if email else self._create_person(old_person, with_event=True)
 
     def _get_person_data(self, old_person):
         data = {}
