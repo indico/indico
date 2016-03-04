@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
 
 {%- block content %}
-    {{ form_header(form)}}
+    {{ form_header(form, id='attachment-link-form')}}
     {{ form_row(form.link_url, widget_attrs={'placeholder': 'Example: http://www.example.com/YourPDFFile.pdf'}) }}
     {{ form_rows(form, fields=('title', 'description', 'folder', 'protected', 'acl')) }}
     {{ protection_message | safe }}
@@ -10,11 +10,25 @@
         <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     {% endcall %}
     <script>
-        $('#folder').nullableselector();
-        aclIfProtected($('#protected'), $('#acl'), $('.protected-protection-message'), $('.inheriting-protection-message'),
-                       $('#folder'));
-        messageIfFolderProtected($('#protected'), $('#folder'), {{ folders_protection_info | tojson }},
-                                 $('.protected-protection-message'), $('.inheriting-protection-message'),
-                                 $('.folder-protection-message'));
+        (function() {
+            'use strict';
+
+            $('#{{ form.folder.id }}').nullableselector();
+            var form = $('#attachment-link-form');
+            aclIfProtected(
+                $('#{{ form.protected.id }}'),
+                $('#{{ form.acl.id }}'),
+                form.find('.protected-protection-message'),
+                form.find('.inheriting-protection-message'),
+                $('#{{ form.folder.id }}')
+            );
+            messageIfFolderProtected(
+                $('#{{ form.protected.id }}'), $('#{{ form.folder.id }}'),
+                {{ folders_protection_info | tojson }},
+                form.find('.protected-protection-message'),
+                form.find('.inheriting-protection-message'),
+                form.find('.folder-protection-message')
+            );
+        })();
     </script>
 {%- endblock %}
