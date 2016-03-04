@@ -2446,8 +2446,9 @@ class Conference(CommonObjectBase, Locatable):
         self.unindexConf()
 
         # set the dates
-        self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
-        self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
+        with db.session.no_autoflush:
+            self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
+            self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
 
         # sanity check
         self._checkInnerSchedule()
