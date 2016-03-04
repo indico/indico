@@ -29,7 +29,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
                                                             delete_contribution, create_subcontribution,
                                                             update_subcontribution, delete_subcontribution)
-from indico.modules.events.contributions.util import ContributionReporter
+from indico.modules.events.contributions.util import ContributionReporter, generate_spreadsheet_from_contributions
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions import Session
@@ -37,6 +37,7 @@ from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.util import update_object_principals
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -337,3 +338,19 @@ class RHContributionsMaterialPackage(RHManageContributionsActionsBase, Attachmen
             flash(_('The selected contributions do not have any materials.'), 'warning')
             return redirect(url_for('.manage_contributions', self.event_new))
         return self._generate_zip_file(attachments)
+
+
+class RHContributionsExportCSV(RHManageContributionsActionsBase):
+    """Export list of contributions to CSV"""
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_contributions(self.contribs)
+        return send_csv('contributions.csv', headers, rows)
+
+
+class RHContributionsExportExcel(RHManageContributionsActionsBase):
+    """Export list of contributions to XLSX"""
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_contributions(self.contribs)
+        return send_xlsx('contributions.xlsx', headers, rows)

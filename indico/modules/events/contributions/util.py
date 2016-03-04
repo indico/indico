@@ -27,6 +27,8 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.util import serialize_person_link, ReporterBase
+from indico.modules.attachments.util import get_attached_items
+from indico.util.date_time import format_human_timedelta, format_date
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
@@ -159,3 +161,34 @@ class ContributionReporter(ReporterBase):
     def flash_info_message(self, contrib):
         flash(_("The contribution '{}' is not displayed in the list due to the enabled filters")
               .format(contrib.title), 'info')
+
+
+def generate_spreadsheet_from_contributions(contributions):
+    """Return a tuple consisting of spreadsheet columns and respective
+    contribution values"""
+
+    headers = ['ID', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials']
+    rows = []
+    for c in contributions:
+        contrib_data = {'ID': c.id, 'Title': c.title, 'Description': c.description,
+                        'Duration': format_human_timedelta(c.duration),
+                        'Date': format_date(c.timetable_entry.start_dt) if c.timetable_entry else None,
+                        'Type': c.type.name if c.type else None,
+                        'Session': c.session.title if c.session else None,
+                        'Track': c.track.title if c.track else None,
+                        'Materials': None,
+                        'Presenters': ', '.join(speaker.person.full_name for speaker in c.speakers)}
+
+        attachments = []
+        attached_items = get_attached_items(c)
+        for attachment in attached_items.get('files', []):
+            attachments.append(attachment.absolute_download_url)
+
+        for folder in attached_items.get('folders', []):
+            for attachment in folder.attachments:
+                attachments.append(attachment.absolute_download_url)
+
+        if attachments:
+            contrib_data['Materials'] = ', '.join(attachments)
+        rows.append(contrib_data)
+    return headers, rows

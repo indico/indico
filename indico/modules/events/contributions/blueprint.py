@@ -25,7 +25,8 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHEditSubContribution, RHSubContributionREST,
                                                              RHDeleteSubContributions, RHContributionUpdateStartDate,
                                                              RHContributionUpdateDuration,
-                                                             RHContributionsMaterialPackage)
+                                                             RHContributionsMaterialPackage, RHContributionsExportCSV,
+                                                             RHContributionsExportExcel)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -43,6 +44,10 @@ _bp.add_url_rule('/manage/contributions/delete',
                  'manage_delete_contribs', RHDeleteContributions, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/person-list', 'person_list', RHContributionPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/material-package', 'material_package', RHContributionsMaterialPackage,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/contributions/contributions.csv', 'contributions_csv_export', RHContributionsExportCSV,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/contributions/contributions.xlsx', 'contributions_excel_export', RHContributionsExportExcel,
                  methods=('POST',))
 
 # Single contribution
