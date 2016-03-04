@@ -205,6 +205,21 @@
         })
     }
 
+    function setupDurationQBubbles() {
+        $('.contrib-duration').each(function() {
+            var $this = $(this);
+
+            $this.ajaxqbubble({
+                url: $this.data('href'),
+                qBubbleOptions: {
+                    style: {
+                        classes: 'qbubble-contrib-duration'
+                    }
+                }
+            });
+        });
+    }
+
     global.setupContributionList = function setupContributionList(options) {
         options = $.extend({
             createSessionURL: null,
@@ -216,6 +231,7 @@
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         setupStartDateQBubbles();
+        setupDurationQBubbles();
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter('#contribution-list .tablesorter');
@@ -223,6 +239,7 @@
             setupSessionPicker(options.createSessionURL);
             setupTrackPicker(options.createTrackURL);
             setupStartDateQBubbles();
+            setupDurationQBubbles();
         });
         setupReporter();
     };
