@@ -14,9 +14,11 @@
                {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
                {% if disabled %}disabled{% endif %}>{#--#}
         <i class="timezone" title="{{ field.timezone }}"></i>{#--#}
-        <span id="{{ field.id }}-reset"
-              class="icon-close clear-pickers" style="display: none;"
-              title="{% trans %}Clear date and time{% endtrans %}"></span>
+        {% if field.allow_clear -%}
+            <span id="{{ field.id }}-reset"
+                  class="icon-close clear-pickers" style="display: none;"
+                  title="{% trans %}Clear date and time{% endtrans %}"></span>
+        {%- endif %}
     </div>
 {% endblock %}
 
