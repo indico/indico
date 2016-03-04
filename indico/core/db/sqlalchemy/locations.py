@@ -71,7 +71,6 @@ class LocationMixin(object):
             if value is not None:
                 target.own_venue = value.location
 
-
     @property
     def location_parent(self):
         """The parent object to consult if the location is inherited."""
