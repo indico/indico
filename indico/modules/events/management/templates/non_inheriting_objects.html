@@ -1,13 +1,28 @@
+{% set id = 'non-inheriting-' + uuid() %}
 <p>
     {% trans -%}
         The following objects have custom protection settings.<br>
         Clicking their title will open the protection settings for that specific object.
     {%- endtrans %}
 </p>
-<ul>
+<ul id="{{ id }}">
     {% for object in objects|sort(attribute='title') %}
         <li class="{{ 'public-protection-icon' if object.is_public else 'self-protection-icon' }}">
-            <strong>{{ object.title }}</strong> ({{ object.type_name }})
+            <a href="#" {{ object.edit_link_attrs|html_params }}>
+                <strong>{{ object.title }}</strong>
+            </a>
+            ({{ object.type_name }})
         </li>
     {% endfor %}
 </ul>
+<script>
+    (function() {
+        'use strict';
+        var container = $('#{{ id }}');
+        container.on('ajaxDialog:closed', function(e, data) {
+            if (data) {
+                container.trigger('ajaxDialog:reload');
+            }
+        });
+    })();
+</script>
