@@ -632,6 +632,7 @@ class IndicoDateTimeField(DateTimeField):
         self.default_time = kwargs.pop('default_time', time(0, 0))
         self.date_missing = False
         self.time_missing = False
+        self.allow_clear = kwargs.pop('allow_clear', True)
         super(IndicoDateTimeField, self).__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
 
     def pre_validate(self, form):
