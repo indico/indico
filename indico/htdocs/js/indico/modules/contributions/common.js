@@ -138,13 +138,16 @@
                     if (data.unscheduled) {
                         var row = $this.closest('tr');
                         var startDateCol = row.find('td.start-date');
+                        var oldLabelHtml = startDateCol.children().detach();
+
                         startDateCol.html($('<em>', {'text': $T.gettext('Not scheduled')}));
                         showUndoWarning(
                             $T.gettext("'{0}' has been unscheduled due to the session change.").format(row.data('title')),
                             $T.gettext("Undo successful! Timetable entry and session have been restored."),
                             function() {
                                 return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
-                                    startDateCol.text(moment(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                                    oldLabelHtml.filter('.label').text(moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                                    startDateCol.html(oldLabelHtml);
                                     $this.itempicker('selectItem', oldSession ? oldSession.id : null);
                                 });
                             }
@@ -187,6 +190,21 @@
         });
     }
 
+    function setupStartDateQBubbles() {
+        $('.contrib-start-date').each(function() {
+            var $this = $(this);
+
+            $this.ajaxqbubble({
+                url: $this.data('href'),
+                qBubbleOptions: {
+                    style: {
+                        classes: 'qbubble-contrib-start-date'
+                    }
+                }
+            });
+        })
+    }
+
     global.setupContributionList = function setupContributionList(options) {
         options = $.extend({
             createSessionURL: null,
@@ -197,12 +215,14 @@
         setupSearchBox();
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
+        setupStartDateQBubbles();
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter('#contribution-list .tablesorter');
             applyFilters();
             setupSessionPicker(options.createSessionURL);
             setupTrackPicker(options.createTrackURL);
+            setupStartDateQBubbles();
         });
         setupReporter();
     };

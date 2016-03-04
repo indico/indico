@@ -20,20 +20,25 @@ from datetime import timedelta
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.events.contributions.fields import ContributionPersonListField, SubContributionPersonListField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.fields import ReferencesField
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TimeDeltaField, PrincipalListField, IndicoLocationField, IndicoProtectionField
-from indico.web.forms.validators import UsedIf, MaxDuration
+from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
+                                     IndicoDateTimeField)
+from indico.web.forms.validators import UsedIf, DateTimeRange, MaxDuration
 from indico.util.i18n import _
 
 
 class ContributionForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
     description = TextAreaField(_("Description"))
+    start_date = IndicoDateTimeField(_("Start date"), [DataRequired(),
+                                                       DateTimeRange(earliest=lambda form, field: form.event.start_dt,
+                                                                     latest=lambda form, field: form.event.end_dt)],
+                                     description=_("Start date of the contribution"))
     duration = TimeDeltaField(_("Duration"), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
@@ -46,8 +51,21 @@ class ContributionForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.contrib = kwargs.pop('contrib', None)
+        self.conf = self.event.as_legacy
+        self.timezone = self.conf.getTimezone()
         super(ContributionForm, self).__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
+        if self.contrib is None or not self.contrib.is_scheduled:
+            del self.start_date
+
+    def validate_duration(self, field):
+        duration = field.data
+        if duration > timedelta(days=1):
+            raise ValidationError(_('Duration can not span more than one day'))
+        start_date_field = self.start_date
+        if start_date_field and start_dt.data and start_date_field.data + duration > self.conf.getEndDate():
+            raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
 
 class ContributionProtectionForm(IndicoForm):
@@ -80,3 +98,21 @@ class SubContributionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(SubContributionForm, self).__init__(*args, **kwargs)
+
+
+class ContributionStartDateForm(IndicoForm):
+    start_dt = IndicoDateTimeField(_('Start date'), [DataRequired(),
+                                                     DateTimeRange(earliest=lambda f, field: f.conf.getStartDate(),
+                                                                   latest=lambda f, field: f.conf.getEndDate())],
+                                   with_clear_button=False)
+
+    def __init__(self, *args, **kwargs):
+        self.contrib = kwargs.pop('contrib')
+        self.conf = self.contrib.event_new.as_legacy
+        self.timezone = self.conf.getTimezone()
+        super(ContributionStartDateForm, self).__init__(*args, **kwargs)
+
+    def validate_start_dt(self, field):
+        if field.data + self.contrib.duration > self.conf.getEndDate():
+            raise ValidationError(_('The selected date is incorrect, since the overall time of this contribution would'
+                                    'exceed the event end date. Either change the date or the contribution duration'))

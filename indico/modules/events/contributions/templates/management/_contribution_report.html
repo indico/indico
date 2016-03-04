@@ -64,13 +64,16 @@
                                 <strong>{{ contrib.title }}</strong>
                             </td>
                             <td class="i-table start-date">
-                                {% if contrib.timetable_entry %}
-                                    {{ contrib.timetable_entry.start_dt|format_datetime('short') }}
-                                {% else %}
+                                {% if contrib.is_scheduled -%}
+                                    <a href="#" class="contrib-start-date icon-calendar"
+                                       data-href="{{ url_for('.manage_start_date', contrib) }}">
+                                    </a>
+                                    <span class="label">{{ contrib.start_dt|format_datetime('short') }}</span>
+                                {%- else -%}
                                     <em>
                                         {% trans %}Not scheduled{% endtrans %}
                                     </em>
-                                {% endif %}
+                                {%- endif %}
                             </td>
                             <td class="i-table">
                                 {{ contrib.duration|format_timedelta(format='medium') }}
