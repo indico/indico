@@ -1,6 +1,8 @@
-<div class="banner"><span class="bannerTitle bannerTitle_0">
-<span style="font-style: italic;">${ _("Category") }</span>: ${ category.getTitle()}
-</span></div>
+<div class="banner">
+    <div class="title">
+        ${ category.getTitle() }
+    </div>
+</div>
 
 ${ sideMenu }
 
