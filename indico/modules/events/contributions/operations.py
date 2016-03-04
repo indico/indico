@@ -24,6 +24,8 @@ from indico.modules.events.contributions import logger
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
 
 
 def _ensure_consistency(contrib):
@@ -54,6 +56,10 @@ def _ensure_consistency(contrib):
 
 def create_contribution(event, data):
     contrib = Contribution(event_new=event)
+    start_dt = data.pop('start_date', None)
+    if start_dt is not None:
+        create_timetable_entry(event, {'type': TimetableEntryType.CONTRIBUTION, 'start_dt': start_dt,
+                                       'contribution': contrib})
     contrib.populate_from_dict(data)
     db.session.flush()
     logger.info('Contribution %s created by %s', contrib, session.user)
@@ -77,6 +83,9 @@ def update_contribution(contrib, data):
     """
     rv = {'unscheduled': False, 'undo_unschedule': None}
     current_session_block = contrib.session_block
+    start_dt = data.pop('start_date', None)
+    if start_dt is not None:
+        update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
     contrib.populate_from_dict(data)
     if 'session' in data:
         timetable_entry = contrib.timetable_entry

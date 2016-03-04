@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from flask import flash, request, jsonify, redirect
 from werkzeug.exceptions import BadRequest
 
-from indico.modules.events.contributions.forms import ContributionForm, ContributionProtectionForm, SubContributionForm
+from indico.modules.events.contributions.forms import (ContributionForm, ContributionProtectionForm,
+                                                       SubContributionForm, ContributionStartDateForm)
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
@@ -28,7 +29,9 @@ from indico.modules.events.contributions.operations import (create_contribution,
 from indico.modules.events.contributions.util import ContributionReporter
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.util import update_object_principals
+from indico.util.date_time import format_datetime
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
@@ -139,7 +142,7 @@ class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
-        form = ContributionForm(event=self.event_new, obj=FormDefaults(location_data=inherited_location))
+        form = ContributionForm(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
             contrib = create_contribution(self.event_new, form.data)
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
@@ -152,7 +155,8 @@ class RHCreateContribution(RHManageContributionsBase):
 
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
-        form = ContributionForm(obj=FormDefaults(self.contrib), event=self.event_new)
+        form = ContributionForm(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt), event=self.event_new,
+                                contrib=self.contrib)
         if form.validate_on_submit():
             update_contribution(self.contrib, form.data)
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
@@ -296,3 +300,12 @@ class RHDeleteSubContributions(RHManageSubContributionsActionsBase):
         for subcontrib in self.subcontribs:
             delete_subcontribution(subcontrib)
         return jsonify_data(html=_render_subcontribution_list(self.contrib))
+
+
+class RHContributionUpdateStartDate(RHManageContributionBase):
+    def _process(self):
+        form = ContributionStartDateForm(obj=FormDefaults(start_dt=self.contrib.start_dt), contrib=self.contrib)
+        if form.validate_on_submit():
+            update_timetable_entry(self.contrib.timetable_entry, {'start_dt': form.start_dt.data})
+            return jsonify_data(new_value=format_datetime(self.contrib.start_dt, 'short'))
+        return jsonify_form(form, back_button=False, disabled_until_change=True)

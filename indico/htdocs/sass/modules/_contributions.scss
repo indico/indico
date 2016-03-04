@@ -85,3 +85,20 @@
         }
     }
 }
+
+.contrib-start-date {
+    width: 100%;
+    text-align: left;
+}
+
+.qbubble-contrib-start-date {
+    max-width: 450px !important;
+
+    .datetime-widget {
+        width: 100% !important;
+    }
+
+    .timepicker {
+        width: 35% !important;
+    }
+}

@@ -223,4 +223,4 @@ class MaxDuration(object):
 
     def __call__(self, form, field):
         if field.data is not None and field.data > self.max_duration:
-            raise ValidationError(_('Duration may not exceed {}').format(format_human_timedelta(self.max_duration)))
+            raise ValidationError(_('Duration cannot exceed {}').format(format_human_timedelta(self.max_duration)))
