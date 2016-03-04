@@ -175,6 +175,8 @@
                     popup.close();
                     if (options.confirmCloseUnsaved) {
                         window.onbeforeunload = oldOnBeforeUnload;
+                    if (options.trigger) {
+                        $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData])
                     }
                 }, function() {
                     ignoreOnBeforeUnload = false;
