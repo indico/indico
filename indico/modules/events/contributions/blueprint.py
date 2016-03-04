@@ -24,7 +24,8 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHContributionSubContributions, RHCreateSubContribution,
                                                              RHEditSubContribution, RHSubContributionREST,
                                                              RHDeleteSubContributions,
-                                                             RHContributionUpdateStartDate)
+                                                             RHContributionUpdateStartDate,
+                                                             RHContributionUpdateDuration)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -51,6 +52,8 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/protection', 'manage_co
                  RHContributionProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/start-date', 'manage_start_date',
                  RHContributionUpdateStartDate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/duration', 'manage_duration', RHContributionUpdateDuration,
+                 methods=('GET', 'POST'))
 
 # Subcontributions
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/', 'manage_subcontributions',

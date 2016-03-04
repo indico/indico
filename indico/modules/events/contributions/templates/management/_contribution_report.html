@@ -76,7 +76,10 @@
                                 {%- endif %}
                             </td>
                             <td class="i-table">
-                                {{ contrib.duration|format_timedelta(format='medium') }}
+                                <a href="#" class="contrib-duration icon-time"
+                                   data-href="{{ url_for('.manage_duration', contrib) }}">
+                                </a>
+                                <span class="label">{{ contrib.duration|format_human_timedelta }}</span>
                             </td>
                             <td class="i-table person-row-cell" data-searchable="{{ contrib.speaker_names | join(', ') }}">
                                 {% for speaker in contrib.speakers | sort(attribute='full_name') %}

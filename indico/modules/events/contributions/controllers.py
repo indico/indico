@@ -20,7 +20,8 @@ from flask import flash, request, jsonify, redirect
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.forms import (ContributionForm, ContributionProtectionForm,
-                                                       SubContributionForm, ContributionStartDateForm)
+                                                       SubContributionForm, ContributionStartDateForm,
+                                                       ContributionDurationForm)
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
@@ -31,7 +32,7 @@ from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.util import update_object_principals
-from indico.util.date_time import format_datetime
+from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
@@ -308,4 +309,13 @@ class RHContributionUpdateStartDate(RHManageContributionBase):
         if form.validate_on_submit():
             update_timetable_entry(self.contrib.timetable_entry, {'start_dt': form.start_dt.data})
             return jsonify_data(new_value=format_datetime(self.contrib.start_dt, 'short'))
+        return jsonify_form(form, back_button=False, disabled_until_change=True)
+
+
+class RHContributionUpdateDuration(RHManageContributionBase):
+    def _process(self):
+        form = ContributionDurationForm(obj=FormDefaults(self.contrib), contrib=self.contrib)
+        if form.validate_on_submit():
+            update_contribution(self.contrib, {'duration': form.duration.data})
+            return jsonify_data(new_value=format_human_timedelta(self.contrib.duration))
         return jsonify_form(form, back_button=False, disabled_until_change=True)

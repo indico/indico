@@ -52,19 +52,15 @@ class ContributionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.contrib = kwargs.pop('contrib', None)
-        self.conf = self.event.as_legacy
-        self.timezone = self.conf.getTimezone()
+        self.timezone = self.event.timezone
         super(ContributionForm, self).__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
         if self.contrib is None or not self.contrib.is_scheduled:
             del self.start_date
 
     def validate_duration(self, field):
-        duration = field.data
-        if duration > timedelta(days=1):
-            raise ValidationError(_('Duration can not span more than one day'))
         start_date_field = self.start_date
-        if start_date_field and start_dt.data and start_date_field.data + duration > self.conf.getEndDate():
+        if start_date_field and start_date_field.data and start_date_field.data + field.data > self.event.end_dt:
             raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
 
@@ -102,17 +98,33 @@ class SubContributionForm(IndicoForm):
 
 class ContributionStartDateForm(IndicoForm):
     start_dt = IndicoDateTimeField(_('Start date'), [DataRequired(),
-                                                     DateTimeRange(earliest=lambda f, field: f.conf.getStartDate(),
-                                                                   latest=lambda f, field: f.conf.getEndDate())],
-                                   with_clear_button=False)
+                                                     DateTimeRange(earliest=lambda form, field: form.event.start_dt,
+                                                                   latest=lambda form, field: form.event.end_dt)],
+                                   allow_clear=False)
 
     def __init__(self, *args, **kwargs):
         self.contrib = kwargs.pop('contrib')
-        self.conf = self.contrib.event_new.as_legacy
-        self.timezone = self.conf.getTimezone()
+        self.event = self.contrib.event_new
+        self.timezone = self.event.timezone
         super(ContributionStartDateForm, self).__init__(*args, **kwargs)
 
     def validate_start_dt(self, field):
-        if field.data + self.contrib.duration > self.conf.getEndDate():
+        if field.data + self.contrib.duration > self.event.end_dt:
             raise ValidationError(_('The selected date is incorrect, since the overall time of this contribution would'
                                     'exceed the event end date. Either change the date or the contribution duration'))
+
+
+class ContributionDurationForm(IndicoForm):
+    duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(days=1))],
+                              default=timedelta(minutes=20), units=('minutes', 'hours'),
+                              description=_('The duration of the contribution'))
+
+    def __init__(self, *args, **kwargs):
+        self.contrib = kwargs.pop('contrib')
+        super(ContributionDurationForm, self).__init__(*args, **kwargs)
+
+    def validate_duration(self, field):
+        if field.errors:
+            return
+        if self.contrib.is_scheduled and self.contrib.start_dt + field.data > self.contrib.event_new.end_dt:
+            raise ValidationError(_('With the current value, the contribution would exceed event end date'))
