@@ -160,7 +160,8 @@ class RHSessionProtection(RHManageSessionBase):
     """Manage session protection"""
 
     def _process(self):
-        form = SessionProtectionForm(obj=FormDefaults(**self._get_defaults()), session=self.session)
+        form = SessionProtectionForm(obj=FormDefaults(**self._get_defaults()), session=self.session,
+                                     prefix='session-protection-')
         if form.validate_on_submit():
             update_session(self.session, {'protection_mode': form.protection_mode.data})
             if self.session.is_protected:
