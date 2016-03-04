@@ -33,7 +33,7 @@
             },
             hide: {
                 event: 'unfocus click'
-            },
+            }
         },
 
         _create: function() {
