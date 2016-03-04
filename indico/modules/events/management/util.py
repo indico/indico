@@ -24,6 +24,7 @@ from indico.util.event import unify_event_args
 from indico.util.i18n import _
 from indico.util.struct.iterables import materialize_iterable
 from indico.util.user import unify_user_args
+from indico.web.flask.util import url_for
 
 
 @unify_user_args
@@ -54,18 +55,35 @@ class _ProtectedObjectWrapper(object):
 
     @property
     def type_name(self):
-        if isinstance(self.object, db.m.Event):
-            return _('Event')
-        elif isinstance(self.object, db.m.Session):
+        if isinstance(self.object, db.m.Session):
             return _('Session')
         elif isinstance(self.object, db.m.Contribution):
             return _('Contribution')
-        elif isinstance(self.object, db.m.SubContribution):
-            return _('Subcontribution')
         elif isinstance(self.object, db.m.AttachmentFolder):
             return _('Folder')
         elif isinstance(self.object, db.m.Attachment):
             return _('File')
+        else:
+            raise TypeError('Unexpected object of type {}: {}'.format(type(self.object).__name__, self.object))
+
+    @property
+    def edit_link_attrs(self):
+        if isinstance(self.object, db.m.Session):
+            return {'data-ajax-dialog': True,
+                    'data-title': _('Edit session "{name}"').format(name=self.object.title),
+                    'data-href': url_for('sessions.session_protection', self.object)}
+        elif isinstance(self.object, db.m.Contribution):
+            return {'data-ajax-dialog': True,
+                    'data-title': _('Edit contribution "{name}"').format(name=self.object.title),
+                    'data-href': url_for('contributions.manage_contrib_protection', self.object)}
+        elif isinstance(self.object, db.m.AttachmentFolder):
+            return {'data-ajax-dialog': True,
+                    'data-title': _('Edit folder "{name}"').format(name=self.object.title),
+                    'data-href': url_for('attachments.edit_folder', self.object)}
+        elif isinstance(self.object, db.m.Attachment):
+            return {'data-ajax-dialog': True,
+                    'data-title': _('Edit attachment "{name}"').format(name=self.object.title),
+                    'data-href': url_for('attachments.modify_attachment', self.object)}
         else:
             raise TypeError('Unexpected object of type {}: {}'.format(type(self.object).__name__, self.object))
 
