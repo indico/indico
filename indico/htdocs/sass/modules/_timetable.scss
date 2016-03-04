@@ -14,3 +14,175 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.day{
+    color:gray;
+    font-weight:bold;
+    left:0px;
+    position:absolute;
+}
+
+.time{
+    color:gray;
+    background-color:white;
+    font-size:-1;
+    padding-right:5px;
+    font-weight:normal;
+    left:65px;
+    height: 12px;
+    margin-left:35px;
+    position:absolute;
+}
+
+.blockSession{
+    margin-left:0px;
+    margin-top:0px;
+    margin-bottom: 0px;
+    margin-right:0px;
+    position: absolute;
+    border-top: 2px solid  white;
+    border-left: 1px solid  white;
+    border-right: 1px solid  white;
+}
+
+.contentTitleBlock{
+    font-size:12;
+    position:absolute;
+    color:gray;
+    text-align: left;
+
+}
+
+.filterBlock{
+    position:absolute;
+    font-weight:900;
+    background: #DDDDDD;
+    opacity: 0.8;
+}
+
+.filterType{
+    margin-top: 15px;
+    font-weight:bold;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.filterElement{
+    font-weight:normal;
+}
+
+
+/* * TimeTable Legend * */
+
+div#wholeLegend {
+    margin: 60px 0 0 0;
+}
+
+#legendMainToggle.active {
+    background: #DFC87B;
+}
+
+#legendMainToggle {
+    width: 116px;
+    padding: 4px 5px 3px 5px;
+    border: 1px solid #aaa;
+    color: #555;
+    background: #bbb;
+    border-width: 0 1px 1px 1px;
+    text-align: center;
+    cursor: pointer;
+    position: absolute;
+    font-size: 11px;
+}
+
+#legendMainToggle.active:hover {
+    background: #9F883B;
+}
+
+#legendMainToggle:hover {
+    color: white;
+    background: #999;
+}
+
+div.legendCloseButton {
+    float: right;
+    cursor: pointer;
+    background-image: image-url('images/popup_close_button.png');
+    width: 15px;
+    height: 15px;
+    margin: 1px 2px 0px 2px;
+}
+
+a.showMoreLink {
+    display: block;
+    float: right;
+    font-size: 11px;
+    color: #999;
+    text-align: right;
+}
+
+a.showMoreLink:hover {
+    color: #AAAAAA;
+}
+
+div#legendItemContainer {
+    overflow: auto;
+}
+
+div.timeTableLegend {
+    z-index: 1;
+    background: #FAFAFA;
+    border: 1px solid #ECECEC;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    overflow: hidden;
+    padding: 5px;
+}
+
+div#timeTableLegend.scrolling {
+    position: fixed;
+    border-radius: 0 0 10px 10px;
+    top: 0px;
+    box-shadow: 1px 1px 2px rgba(0,0,0,.1);
+}
+
+div.legendItem {
+    color: #4E4C46;
+    font-size: 11px;
+    height: 15px;
+    padding: 5px;
+    margin: 2px;
+    float: left;
+    overflow: hidden;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    background: #EEE;
+    max-width: 200px;
+}
+
+div.timeTableItemColour {
+    width: 15px;
+    height: 15px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    float: left;
+    margin-right: 3px;
+}
