@@ -1,4 +1,8 @@
-<div class="banner"><span class="bannerTitle bannerTitle_0">${ _("Server Administration") }</span></div>
+<div class="banner">
+    <div class="title">
+        ${ _("Server Administration") }
+    </div>
+</div>
 
 ${ sideMenu }
 

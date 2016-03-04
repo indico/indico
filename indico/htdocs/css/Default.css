@@ -2276,15 +2276,6 @@ ul.listCompact {
 
 /* General Titles */
 
-.banner
-{
-    background-color: #ECECEC;
-    color: #888;
-    vertical-align: middle;
-    padding: 20px 30px;
-    line-height: 30px;
-}
-
 .selectedCategoryName{
     padding:20px;
     font-size: 16px;
@@ -2398,59 +2389,6 @@ div.ACModifButtonEntry {
 
 div.ACUserListDiv {
     margin-bottom: 20px;
-}
-
-.bannerTitle
-{
-    font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
-    color: #777777;
-}
-
-.bannerTitle:hover
-{
-    color: #E25300
-}
-
-.bannerTitle_0
-{
-    font-size: 21px;
-}
-
-.bannerTitle_1
-{
-    font-size: 14px;
-}
-
-.bannerTitle_2
-{
-    font-size: 13px;
-}
-
-.bannerTitle_3
-{
-    font-size: 13px;
-}
-
-.bannerTitle_4
-{
-    font-size: 13px;
-}
-
-.bannerTitle_5
-{
-    font-size: 13px;
-}
-
-.bannerTitle_noIcon
-{
-    margin-left: 37px;
-}
-
-.banner_creator
-{
-    font-size: 11px;
-    font-weight: normal;
-    line-height: 10px;
 }
 
 .areaTitle_orange {
