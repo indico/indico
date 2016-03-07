@@ -193,6 +193,11 @@
         }
     }
 
+    &.clickable-label {
+        @extend .i-button.label;
+        cursor: pointer !important;
+    }
+
     &.arrow {
         @include icon-after('icon-arrow-down');
 

@@ -1,39 +1,91 @@
-<div class="toolbar action-menu-toolbar">
-    {% if can_manage %}
+{% set clones = event.clones|rejectattr('is_deleted')|list %}
+
+<div class="action-menu">
+    <div class="toolbar">
+        {% if can_manage %}
+            <div class="group left">
+                <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
+                   title="{% trans %}Clone event{% endtrans %}">Clone</a>
+                {% if clones %}
+                <a id="action-menu-clones-target" class="i-button clickable-label arrow" >{{ clones|length }}</a>
+                {% endif %}
+            </div>
+
+
+            <a id="action-menu-actions-target" class="i-button icon-settings i-button arrow"
+               title="{% trans %}Event actions{% endtrans %}"></a>
+
+            <div id="action-menu-actions">
+                {% if event.as_legacy.isClosed() %}
+                    <button class="i-button icon-lock-center disabled"
+                            title="{% trans %}This event is already locked.{% endtrans %}"></button>
+                {% elif not can_lock %}
+                    <button class="i-button icon-lock-center disabled"
+                            title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}"></button>
+                {% else %}
+                    <button class="i-button icon-lock-center js-ajax-dialog-lock"
+                            data-href="{{ url_for('event_management.lock', event) }}"
+                            title="{% trans %}Lock event{% endtrans %}"
+                            {{ 'disabled' if event.as_legacy.isClosed() }}>
+                        {% trans %}Lock{% endtrans %}</button>
+                {% endif %}
+
+                <button class="i-button icon-remove js-ajax-dialog-delete danger light"
+                        data-href="{{ url_for('event_management.delete', event) }}"
+                        title="{% trans %}Delete event{% endtrans %}"
+                        data-qtip-style="danger">
+                    {% trans %}Delete{% endtrans %}</button>
+            </div>
+
+            <div id="action-menu-clones">
+                {% trans %}Events cloned from the current event:{% endtrans %}
+                <ul>
+                    {% for clone in clones %}
+                        <li>
+                            <a href="{{ url_for('event_mgmt.conferenceModification', clone) }}"
+                               title="{{ clone.title }}" data-qtip-position="left">
+                                {{ clone.start_dt | format_date }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
         <div class="group">
-            <span class="icon-wrench i-button label">{% trans %}Event actions{% endtrans %}</span>
-            <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
-               title="{% trans %}Clone event{% endtrans %}"></a>
-            {% if event.isClosed() %}
-                <button class="i-button icon-lock-center disabled"
-                        title="{% trans %}This event is already locked.{% endtrans %}"></button>
-            {% elif not can_lock %}
-                <button class="i-button icon-lock-center disabled"
-                        title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}"></button>
-            {% else %}
-                <button class="i-button icon-lock-center js-ajax-dialog-lock" data-href="{{ url_for('event_management.lock', event) }}"
-                        title="{% trans %}Lock event{% endtrans %}" {{ 'disabled' if event.isClosed() }}></button>
-            {% endif %}
-            <button class="i-button icon-remove js-ajax-dialog-delete danger light"
-                    data-href="{{ url_for('event_management.delete', event) }}"
-                    title="{% trans %}Delete event{% endtrans %}"
-                    data-qtip-style="danger"></button>
+            <a class="icon-switchon highlight i-button"
+               title="{% trans %}See the display page of the event{% endtrans %}"
+               href="{{ url_for('event.conferenceDisplay', event) }}">{% trans %}Switch to display view{% endtrans %}</a>
         </div>
-    {% endif %}
-    <div class="group">
-        <a class="icon-switchon highlight i-button"
-           title="{% trans %}See the display page of the event{% endtrans %}"
-           href="{{ url_for('event.conferenceDisplay', event) }}">{% trans %}Switch to display view{% endtrans %}</a>
     </div>
 </div>
 
 <script>
-    $('.js-ajax-dialog-delete, .js-ajax-dialog-lock').ajaxDialog({
-        onClose: function(data) {
-            if (data && data.url) {
-                location.href = data.url;
+    (function() {
+        'use strict';
+        $('.js-ajax-dialog-delete, .js-ajax-dialog-lock').ajaxDialog({
+            onClose: function(data) {
+                if (data && data.url) {
+                    location.href = data.url;
+                }
+                return true;
             }
-            return true;
-        }
-    });
+        });
+
+        $('#action-menu-clones-target').qbubble({
+            content: {
+                text: $('#action-menu-clones')
+            }
+        });
+
+        $('#action-menu-actions-target').qbubble({
+            content: {
+                text: $('#action-menu-actions')
+            }
+        });
+
+        $('#action-menu-actions button').on('click', function() {
+            $('#action-menu-actions-target').qbubble('hide');
+        });
+    })();
 </script>

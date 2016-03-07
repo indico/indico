@@ -19,6 +19,34 @@
 @import "compass";
 @import "partials/icons";
 
+.action-menu {
+    .toolbar {
+        margin-bottom: 0px;
+        padding-bottom: 0px;
+
+        .group {
+            margin-bottom: 0px;
+        }
+    }
+
+    .clones a {
+        @include icon-after('icon-arrow-down');
+        &:after {
+            vertical-align: -10%;
+        }
+    }
+
+    #action-menu-clones,
+    #action-menu-actions {
+        display: none;
+    }
+}
+
+#action-menu-clones ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+}
+
 .static-sites {
     width: 650px;
     .i-table-widget {

@@ -660,7 +660,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
             self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
         elif self._confirm:
             if self._cloneType == "once" :
-                newConf = self._conf.clone( self._date, options, userPerformingClone = self._aw._currentUser )
+                newConf = self._conf.clone(self._date, options, userPerformingClone=self._aw._currentUser)
                 self._redirect( urlHandlers.UHConferenceModification.getURL( newConf ) )
             elif self._cloneType == "intervals" :
                 self._withIntervals(options)
@@ -690,7 +690,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
             endDate = datetime(int(params["stdyi"]),int(params["stdmi"]),int(params["stddi"]), self._conf.getEndDate().hour,self._conf.getEndDate().minute)
             while date <= endDate:
                 if confirmed:
-                    self._conf.clone(date,options, userPerformingClone = self._aw._currentUser)
+                    self._conf.clone(date, options, userPerformingClone=self._aw._currentUser)
                 nbClones += 1
                 if params["freq"] == "day" or params["freq"] == "week":
                     date = date + inter
@@ -711,7 +711,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
             while i < stop:
                 i = i + 1
                 if confirmed:
-                    self._conf.clone(date,options, userPerformingClone = self._aw._currentUser)
+                    self._conf.clone(date, options, userPerformingClone=self._aw._currentUser)
                 nbClones += 1
                 if params["freq"] == "day" or params["freq"] == "week":
                     date = date + inter
@@ -804,18 +804,21 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                     od=self._getOpenDay(date,params["order"])
                     if od <= endDate:
                         if confirmed:
-                            self._conf.clone(od, options, userPerformingClone = self._aw._currentUser)
+                            self._conf.clone(od, options, userPerformingClone=self._aw._currentUser)
                         nbClones += 1
                 else:
                     if params["order"] == "last":
                         if self._getLastDay(date,int(params["day"])) <= endDate:
                             if confirmed:
-                                self._conf.clone(self._getLastDay(date,int(params["day"])), options, userPerformingClone = self._aw._currentUser)
+                                self._conf.clone(self._getLastDay(date, int(params["day"])), options,
+                                                 userPerformingClone=self._aw._currentUser)
                             nbClones += 1
                     else:
-                        if self._getFirstDay(date, int(params["day"])) + timedelta((int(params["order"])-1)*7) <= endDate:
+                        new_date = (self._getFirstDay(date, int(params["day"])) +
+                                    timedelta((int(params["order"]) - 1) * 7))
+                        if new_date <= endDate:
                             if confirmed:
-                                self._conf.clone(self._getFirstDay(date, int(params["day"]))+ timedelta((int(params["order"])-1)*7), options, userPerformingClone = self._aw._currentUser)
+                                self._conf.clone(new_date, options, userPerformingClone=self._aw._currentUser)
                             nbClones += 1
                 month = int(date.month) + int(params["monthPeriod"])
                 year = int(date.year)
@@ -845,16 +848,20 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
                 i = i + 1
                 if params["day"] == "OpenDay":
                     if confirmed:
-                        self._conf.clone(self._getOpenDay(date, params["order"]), options, userPerformingClone = self._aw._currentUser)
+                        self._conf.clone(self._getOpenDay(date, params["order"]), options,
+                                         userPerformingClone=self._aw._currentUser)
                     nbClones += 1
                 else:
                     if params["order"] == "last":
                         if confirmed:
-                            self._conf.clone(self._getLastDay(date,int(params["day"])), options, userPerformingClone = self._aw._currentUser)
+                            self._conf.clone(self._getLastDay(date, int(params["day"])), options,
+                                             userPerformingClone=self._aw._currentUser)
                         nbClones += 1
                     else:
                         if confirmed:
-                            self._conf.clone(self._getFirstDay(date, int(params["day"]))+ timedelta((int(params["order"])-1)*7), options, userPerformingClone = self._aw._currentUser)
+                            new_date = (self._getFirstDay(date, int(params["day"])) +
+                                        timedelta((int(params["order"]) - 1) * 7))
+                            self._conf.clone(new_date, options, userPerformingClone=self._aw._currentUser)
                         nbClones += 1
                 month = int(date.month) + int(params["monthPeriod"])
                 year = int(date.year)

@@ -57,25 +57,27 @@
     $banner-title-color: #777777;
 
     display: flex;
-    align-items: center;
     background-color: #ECECEC;
     color: $banner-color;
     padding: 20px 30px 0px 20px;
 
     .title {
         flex-grow: 1;
-        align-self: flex-start;
         margin-bottom: 20px;
         font-size: 1.6em;
         color: $banner-title-color;
 
-        & > a:not(:hover) {
+        a:not(:hover) {
             color: inherit;
         }
 
         .subtitle {
             color: $banner-color;
             font-size: 0.6em;
+
+            a {
+                border-bottom: 1px dashed;
+            }
         }
 
         .date {
