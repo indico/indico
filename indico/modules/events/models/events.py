@@ -75,6 +75,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
                                    'valid_stylesheet'),
                 db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
                 db.CheckConstraint("title != ''", 'valid_title'),
+                db.CheckConstraint("cloned_from_id != id", 'not_cloned_from_self'),
                 {'schema': 'events'})
 
     @declared_attr
@@ -109,6 +110,13 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     category_chain = db.Column(
         ARRAY(db.Integer),
         nullable=True
+    )
+    #: If this event was cloned, the id of the parent event
+    cloned_from_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        nullable=True,
+        index=True,
     )
     #: The start date of the event
     start_dt = db.Column(
@@ -192,6 +200,18 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
             lazy='dynamic'
         )
     )
+    #: The event this one was cloned from
+    cloned_from = db.relationship(
+        'Event',
+        lazy=True,
+        remote_side='Event.id',
+        backref=db.backref(
+            'clones',
+            lazy=True,
+            order_by=start_dt
+        )
+    )
+
     #: The event's default page (conferences only)
     default_page = db.relationship(
         'EventPage',
@@ -236,6 +256,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     # - all_legacy_attachment_mappings (LegacyAttachmentMapping.event_new)
     # - all_notes (EventNote.event_new)
     # - attachment_folders (AttachmentFolder.linked_event)
+    # - clones (Event.cloned_from)
     # - contribution_fields (ContributionField.event_new)
     # - contribution_types (ContributionType.event_new)
     # - contributions (Contribution.event_new)

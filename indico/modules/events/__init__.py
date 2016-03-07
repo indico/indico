@@ -248,6 +248,11 @@ def _get_cloners(sender, **kwargs):
     yield clone.EventPersonLinkCloner
 
 
+@signals.event.cloned.connect
+def _event_cloned(old_event, new_event, **kwargs):
+    new_event.cloned_from = old_event
+
+
 @template_hook('event-references-list')
 def _inject_event_references(event, **kwargs):
     return render_template('events/management/reference_list.html', event=event, references=event.references, **kwargs)
