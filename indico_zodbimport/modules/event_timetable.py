@@ -258,7 +258,9 @@ class TimetableMigration(object):
         for old_person in old_people:
             person = self._create_person(old_person, skip_empty_email=True)
             if person:
-                all_persons[person.email].append(person)
+                user = self.importer.all_users_by_email.get(person.email)
+                email = user.email if user else person.email
+                all_persons[email].append(person)
         for email, persons in all_persons.iteritems():
             person = EventPerson(email=email,
                                  event_new=self.event,
