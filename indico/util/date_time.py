@@ -286,11 +286,16 @@ def get_overlap(range1, range2):
     return latest_start, earliest_end
 
 
-def iterdays(start, end, skip_weekends=False):
+def iterdays(start, end, skip_weekends=False, day_whitelist=None, day_blacklist=None):
     weekdays = (MO, TU, WE, TH, FR) if skip_weekends else None
     start = get_day_start(start) if isinstance(start, datetime) else start
     end = get_day_end(end) if isinstance(end, datetime) else end
-    return rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
+    for day in rrule(DAILY, dtstart=start, until=end, byweekday=weekdays):
+        if day_whitelist and day.date() not in day_whitelist:
+            continue
+        if day_blacklist and day.date() in day_blacklist:
+            continue
+        yield day
 
 
 def is_weekend(d):
