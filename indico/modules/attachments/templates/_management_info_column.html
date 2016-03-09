@@ -1,0 +1,20 @@
+{% macro render_attachment_info(obj) -%}
+    <td class="i-table" data-text="{{ obj.attachment_count }}">
+        <a href="#" class="icon-attachment"
+           title="{% trans %}Manage materials{% endtrans %}"
+           data-title="{% trans title=obj.title %}Manage materials for '{{ title }}'{% endtrans %}"
+           data-locator="{{ obj.locator|tojson|forceescape }}"
+           data-attachment-editor></a>
+        {% if not obj.attachment_count %}
+            <em>{% trans %}None{% endtrans %}</em>
+        {% else %}
+            <span class="label">
+                {% trans count=obj.attachment_count -%}
+                    {{ count }} file
+                {%- pluralize -%}
+                    {{ count }} files
+                {%- endtrans %}
+            </span>
+        {% endif %}
+    </td>
+{%- endmacro %}

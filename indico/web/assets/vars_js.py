@@ -80,6 +80,7 @@ def generate_global_file(config):
                 'contribution': urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router,
             },
             'AttachmentManager': url_rule_to_js('attachments.management'),
+            'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 
             'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
             'RoomBookingBook': url_rule_to_js('rooms.book'),

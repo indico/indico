@@ -39,7 +39,8 @@ from indico.modules.attachments.controllers.management.event import (RHManageEve
                                                                      RHEditEventFolder,
                                                                      RHDeleteEventFolder,
                                                                      RHDeleteEventAttachment,
-                                                                     RHPackageEventAttachmentsManagement)
+                                                                     RHPackageEventAttachmentsManagement,
+                                                                     RHAttachmentManagementInfoColumn)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func, make_compat_redirect_func
@@ -69,6 +70,9 @@ for object_type, prefixes in items:
             prefix = '/event/<confId>' + prefix
         _bp.add_url_rule(prefix + '/attachments/', 'management',
                          _dispatch(RHManageEventAttachments, RHManageCategoryAttachments),
+                         defaults={'object_type': object_type})
+        _bp.add_url_rule(prefix + '/attachments/info-column', 'management_info_column',
+                         RHAttachmentManagementInfoColumn,
                          defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/add/files', 'upload',
                          _dispatch(RHAddEventAttachmentFiles, RHAddCategoryAttachmentFiles),
