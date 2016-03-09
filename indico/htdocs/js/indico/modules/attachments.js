@@ -30,7 +30,7 @@
             var locator = $(this).data('locator');
             var title = $(this).data('title');
             var reloadOnChange = $this.data('reload-on-change') !== undefined;
-            openAttachmentManager(locator, title, reloadOnChange);
+            openAttachmentManager(locator, title, reloadOnChange, $this);
         });
     });
 
@@ -195,7 +195,7 @@
             });
     };
 
-    global.openAttachmentManager = function openAttachmentManager(itemLocator, title, reloadOnChange) {
+    global.openAttachmentManager = function openAttachmentManager(itemLocator, title, reloadOnChange, trigger) {
         reloadOnChange = reloadOnChange === undefined ? true : reloadOnChange;
         ajaxDialog({
             url: build_url(Indico.Urls.AttachmentManager, itemLocator),
@@ -205,6 +205,8 @@
             onClose: function(callbackData, customData) {
                 if (customData && reloadOnChange) {
                     location.reload();
+                } else if (customData && trigger) {
+                    trigger.trigger('attachments:updated');
                 }
             }
         });
