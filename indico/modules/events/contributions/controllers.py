@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, jsonify, redirect
+from flask import flash, request, jsonify, redirect, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest
 
@@ -42,7 +42,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import ContribsToPDF
+from MaKaC.PDFinterface.conference import ContribsToPDF, ContributionBook
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -361,3 +361,15 @@ class RHContributionsExportPDF(RHManageContributionsActionsBase):
     def _process(self):
         pdf = ContribsToPDF(self._conf, self.contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHContributionsExportPDFBook(RHManageContributionsActionsBase):
+    def _process(self):
+        pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone)
+        return send_file('book_of_abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHContributionsExportPDFBookSorted(RHManageContributionsActionsBase):
+    def _process(self):
+        pdf = ContributionBook(self._conf, session.user, self.contribs, tz=self.event_new.timezone, sort_by='boardNo')
+        return send_file('book_of_abstracts.pdf', pdf.generate(), 'application/pdf')

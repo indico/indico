@@ -56,9 +56,9 @@
     \mainmatter
     <%block name="book_body">
         % for contrib in contribs:
-            % if contrib.canAccess(aw):
-                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{300pt} / ${_("Report of Abstracts")}}
-                \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape}}
+            % if contrib.can_access(aw):
+                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Report of Abstracts")}}
+                \addcontentsline{toc}{chapter}{${contrib.title | latex_escape}}
 
                 \vspace{3em}
                 <%include file="inc/contribution_condensed.tpl" args="contrib=contrib"/>

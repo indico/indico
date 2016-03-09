@@ -26,7 +26,9 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHDeleteSubContributions, RHContributionUpdateStartDate,
                                                              RHContributionUpdateDuration,
                                                              RHContributionsMaterialPackage, RHContributionsExportCSV,
-                                                             RHContributionsExportExcel, RHContributionsExportPDF)
+                                                             RHContributionsExportExcel, RHContributionsExportPDF,
+                                                             RHContributionsExportPDFBook,
+                                                             RHContributionsExportPDFBookSorted)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -49,6 +51,10 @@ _bp.add_url_rule('/manage/contributions/contributions.xlsx', 'contributions_exce
                  methods=('POST',))
 _bp.add_url_rule('/manage/contributions/contributions.pdf', 'contributions_pdf_export', RHContributionsExportPDF,
                  methods=('POST',))
+_bp.add_url_rule('/manage/contributions/book.pdf', 'contributions_pdf_export_book', RHContributionsExportPDFBook,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/contributions/book-sorted.pdf', 'contributions_pdf_export_book_sorted',
+                 RHContributionsExportPDFBookSorted, methods=('POST',))
 
 # Single contribution
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>', 'manage_contrib_rest', RHContributionREST,

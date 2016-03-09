@@ -17,6 +17,8 @@
 import re
 import types
 from copy import deepcopy
+from operator import attrgetter
+
 from PIL import Image
 from qrcode import QRCode, constants
 
@@ -63,6 +65,7 @@ from MaKaC.common import utils
 
 from indico.core.config import Config
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date, format_datetime
 from indico.util.string import safe_upper, html_color_to_rgb
@@ -73,23 +76,21 @@ styles = getSampleStyleSheet()
 
 
 def extract_affiliations(contrib):
-
     affiliations = dict()
 
-    def enumerate_affil(lst):
+    def enumerate_affil(person_links):
         auth_list = []
 
-        for author in lst:
-            affil = author.getAffiliation()
-            if affil:
-                if affil not in affiliations:
-                    affiliations[affil] = len(affiliations) + 1
-            auth_list.append((author, affiliations[affil] if affil else None))
+        for person_link in person_links:
+            person = person_link.person
+            affil = person.affiliation
+            if affil and affil not in affiliations:
+                affiliations[affil] = len(affiliations) + 1
+            auth_list.append((person_link, affiliations[affil] if affil else None))
         return auth_list
 
-    authors = enumerate_affil(contrib.getPrimaryAuthorList())
-    coauthors = enumerate_affil(contrib.getCoAuthorList())
-
+    authors = enumerate_affil(contrib.primary_authors)
+    coauthors = enumerate_affil(contrib.secondary_authors)
     return affiliations, authors, coauthors
 
 
@@ -414,65 +415,21 @@ class ContributionBook(PDFLaTeXBase):
     _tpl_filename = "contribution_list_boa.tpl"
 
     def _sort_contribs(self, contribs, sort_by, aw):
-        if sort_by == "boardNo":
-            try:
-                return sorted(contribs, key=lambda x: int(x.getBoardNumber()))
-            except ValueError, e:
-                raise MaKaCError(
-                    _("In order to generate this PDF, all the contributions must contain a board number "
-                      "and it must only contain digits. There is a least one contribution with a wrong board number."))
-
-        elif sort_by == "schedule":
-            # TODO: this ignores contribution list param
-            # Maybe it would be worth ordering the incoming contribs
-            # by schedule time, if such a use case makes sense
-
-            res = []
-            for entry in self._conf.getSchedule().getEntries():
-                entry_owner = entry.getOwner()
-                if isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry_owner, conference.SessionSlot):
-                    if entry_owner.canAccess(aw):
-                        for slotentry in entry_owner.getSchedule().getEntries():
-                            owner = slotentry.getOwner()
-                            if isinstance(owner, conference.Contribution):
-                                res.append(owner)
-
-                elif isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry_owner, conference.Contribution):
-                    res.append(entry_owner)
-            return res
-        else:
-            fc = FilterCriteria(self._conf, {
-                "status": [ContribStatusList.getId(conference.ContribStatusSch),
-                           ContribStatusList.getId(conference.ContribStatusNotSch)]
-                })
-            sc = contribFilters.SortingCriteria((sort_by,))
-            f = filters.SimpleFilter(fc, sc)
-
-            res = []
-            for contrib in f.apply(contribs):
-                res.append(contrib)
-            return res
+        attr = {'boardNo': 'board_number', 'schedule': 'start_dt'}.get(sort_by, 'title')
+        return sorted(contribs, key=attrgetter(attr))
 
     def __init__(self, conf, aw, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
-
         self._conf = conf
 
-        if not tz:
-            tz = conf.getTimezone()
-
-        if contribs is None:
-            contribs = conf.getContributionList()
-
-        contribs = self._sort_contribs(contribs, sort_by, aw)
-
+        tz = tz or conf.getTimezone()
+        contribs = self._sort_contribs(contribs or conf.as_event.contributions, sort_by, aw)
         affiliation_contribs = {}
         corresp_authors = {}
 
         for contrib in contribs:
             affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
-
-            affiliation_contribs[contrib.getId()] = {
+            affiliation_contribs[contrib.id] = {
                 'affiliations': affiliations,
                 'authors_affil': author_mapping,
                 'coauthors_affil': coauthor_mapping
@@ -480,12 +437,9 @@ class ContributionBook(PDFLaTeXBase):
 
             # figure out "corresponding author(s)"
             if conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
-                if isinstance(contrib, conference.AcceptedContribution):
-                    corresp_authors[contrib.getId()] = [contrib.getAbstract().getSubmitter().getEmail()]
-                elif contrib.getSubmitterList():
-                    corresp_authors[contrib.getId()] = [contrib.getSubmitterList()[0].getEmail()]
+                corresp_authors[contrib.id] = [pl.person.email for pl in contrib.person_links if pl.is_submitter]
             elif conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
-                corresp_authors[contrib.getId()] = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
+                corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.spekaers]
 
         self._args.update({
             'affiliation_contribs': affiliation_contribs,
@@ -494,7 +448,7 @@ class ContributionBook(PDFLaTeXBase):
             'conf': conf,
             'tz': tz or conf.getTimezone(),
             'url': conf.getURL(),
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
+            'fields': [f for f in conf.as_event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
             'aw': aw,
             'boa_text': conf.getBOAConfig().getText()
