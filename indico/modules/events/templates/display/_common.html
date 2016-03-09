@@ -13,9 +13,9 @@
             </div>
         {%- endif %}
         {% if item.room and item.room.capacity %}
-            <span class="icon-user">
+            <div class="icon-user">
                 {{ item.room.capacity }}
-            </span>
+            </div>
         {% endif %}
         {% if show_url %}
             <a href="{{ item.room.map_url }}" class="map-link">
@@ -31,7 +31,7 @@
     {% if show_venue or show_room %}
         <span class="icon-location location-info {{ class }}"
               data-qtip-html=".qtip-hidden-content"
-              data-qtip-opts='{"hide": {"fixed": true, "delay": 1000}}'>
+              data-qtip-opts='{"hide": {"fixed": true, "delay": 500}}'>
             <span class="text">
                 {%- if show_venue and show_room -%}
                     {{ item.room_name }} ({{ item.venue_name }})
