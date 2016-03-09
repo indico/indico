@@ -32,6 +32,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
@@ -297,6 +298,18 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def speaker_names(self):
         return [person_link.full_name for person_link in self.person_links if person_link.is_speaker]
+
+    @property
+    def primary_authors(self):
+        return {person_link for person_link in self.person_links if person_link.author_type == AuthorType.primary}
+
+    @property
+    def secondary_authors(self):
+        return {person_link for person_link in self.person_links if person_link.author_type == AuthorType.secondary}
+
+    @property
+    def submitters(self):
+        return {person_link for person_link in self.person_links if person_link.is_submitter}
 
     @locator_property
     def locator(self):
