@@ -73,6 +73,18 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_pdf_export_book', event) }}">
+                            {% trans -%}PDF (book of abstract){%- endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_pdf_export_book_sorted', event) }}">
+                            {% trans -%}PDF (book of abstract - sorted by board number){%- endtrans %}
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
                            data-href="{{ url_for('.contributions_csv_export', event) }}">
                             {% trans -%}CSV{%- endtrans %}
