@@ -47,6 +47,7 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_ATTACHED_NOTES = True
+    ATTACHMENT_FOLDER_ID_COLUMN = 'subcontribution_id'
 
     id = db.Column(
         db.Integer,
