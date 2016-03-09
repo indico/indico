@@ -1786,6 +1786,10 @@ class Abstract(Persistent):
     def getTitle(self):
         return self._title
 
+    @property
+    def title(self):
+        return self._title
+
     def getFields(self):
         return self._fields
 

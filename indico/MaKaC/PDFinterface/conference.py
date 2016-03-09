@@ -392,17 +392,14 @@ class ContribsToPDF(PDFLaTeXBase):
     def __init__(self, conf, contribs, tz=None):
         super(ContribsToPDF, self).__init__()
 
-        if tz is None:
-            tz = conf.getTimezone()
-
-        self._contribs = contribs
+        tz = tz or conf.getTimezone()
 
         self._args.update({
             'doc_type': 'contribution',
             'title': _("Report of Contributions"),
             'conf': conf,
             'items': contribs,
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
+            'fields': [f for f in conf.as_event.contribution_fields if f.is_active],
             'url': conf.getURL(),
             'tz': tz
         })
