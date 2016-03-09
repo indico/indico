@@ -19,22 +19,25 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.util.date_time import is_weekend
+from indico.util.date_time import iterdays
 
 
 def serialize_timetable(event, days=None, hide_weekends=False, for_management=False):
     # TODO: Management mode
-    timetable = defaultdict(dict)
+    timetable = {}
+    start_dt = event.start_dt.astimezone(event.tzinfo)
+    end_dt = event.end_dt.astimezone(event.tzinfo)
+    for day in iterdays(start_dt, end_dt, skip_weekends=hide_weekends, day_whitelist=days):
+        date_str = day.strftime('%Y%m%d')
+        timetable[date_str] = {}
     for entry in event.timetable_entries.order_by(TimetableEntry.type != TimetableEntryType.SESSION_BLOCK):
         day = entry.start_dt.astimezone(event.tzinfo).date()
-        if days and day not in days:
-            continue
-        if hide_weekends and is_weekend(day):
+        date_str = day.strftime('%Y%m%d')
+        if date_str not in timetable:
             continue
         # TODO: checkProtection
         # if not check_protection(entry, aw):
         #     continue
-        date_str = day.strftime('%Y%m%d')
         data = serialize_timetable_entry(entry)
         key = _get_entry_key(entry)
         if entry.parent:
