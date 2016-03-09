@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, jsonify
 from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.attachments.controllers.management.base import (ManageAttachmentsMixin, AddAttachmentFilesMixin,
@@ -27,6 +27,7 @@ from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
 from indico.modules.events.util import get_object_from_args
+from indico.web.flask.templating import get_template_module
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -55,6 +56,12 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
 
 class RHManageEventAttachments(ManageAttachmentsMixin, RHEventAttachmentManagementBase):
     wp = WPEventAttachments
+
+
+class RHAttachmentManagementInfoColumn(RHEventAttachmentManagementBase):
+    def _process(self):
+        tpl = get_template_module('attachments/_management_info_column.html')
+        return jsonify(html=tpl.render_attachment_info(self.object))
 
 
 class RHAddEventAttachmentFiles(AddAttachmentFilesMixin, RHEventAttachmentManagementBase):

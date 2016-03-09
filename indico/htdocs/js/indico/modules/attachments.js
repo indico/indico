@@ -212,6 +212,17 @@
         });
     };
 
+    global.reloadManagementAttachmentInfoColumn = function reloadManagementAttachmentInfoColumn(itemLocator, column) {
+        $.ajax({
+            url: build_url(Indico.Urls.ManagementAttachmentInfoColumn, itemLocator),
+            method: 'GET',
+            error: handleAjaxError,
+            success: function(data) {
+                column.replaceWith(data.html);
+            }
+        });
+    };
+
     global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo, selfProtection, inheritedProtection, folderProtection) {
         folderField.on('change', function() {
             var selectedFolder = $(this);
