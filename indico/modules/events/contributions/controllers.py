@@ -39,9 +39,10 @@ from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from MaKaC.PDFinterface.conference import ContribsToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -354,3 +355,9 @@ class RHContributionsExportExcel(RHManageContributionsActionsBase):
     def _process(self):
         headers, rows = generate_spreadsheet_from_contributions(self.contribs)
         return send_xlsx('contributions.xlsx', headers, rows)
+
+
+class RHContributionsExportPDF(RHManageContributionsActionsBase):
+    def _process(self):
+        pdf = ContribsToPDF(self._conf, self.contribs)
+        return send_file('contributions.pdf', pdf.generate(), 'application/pdf')

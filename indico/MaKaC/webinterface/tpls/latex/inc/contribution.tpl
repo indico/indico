@@ -6,9 +6,9 @@
     \small
     \sffamily
     \noindent
-    ${_(u"Contribution ID")} : \textbf {${contrib.getId()}}
+    ${_(u"Contribution ID")} : \textbf {${contrib.id}}
     \hfill
-    ${_("Type")} : \textbf {${contrib.getType().getName() if contrib.getType() else _('not specified')}}
+    ${_("Type")} : \textbf {${contrib.type.name if contrib.type else _('not specified')}}
 }
 
 \vspace{2em}
@@ -17,17 +17,17 @@
     \textbf {
         \LARGE
         \sffamily
-        ${contrib.getTitle() | latex_escape}
+        ${contrib.title | latex_escape}
     }
 \end{center}
 
-% if contrib.isScheduled():
+% if contrib.is_scheduled:
     {
         \hfill
         \em
         \small
         \color{gray}
-        ${formatDate(contrib.getAdjustedStartDate(tz), format="full")} ${formatTime(contrib.getAdjustedStartDate(tz), format="short", tz=tz)} (${':'.join(str(contrib.getDuration()).split(':')[:2])})
+        ${formatDate(contrib.start_dt, format="full", timezone=tz)} ${formatTime(contrib.start_dt, format="short", tz=tz)} (${formatDuration(contrib.duration)})
     }
 % endif
 
@@ -38,7 +38,7 @@
     {\bf
         \noindent
         \large
-        ${field.getCaption()}
+        ${field.title}
     }
     \vspace{0.5em}
 
@@ -49,7 +49,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            ${md_convert(str(contrib.getField(field.getId())).decode('utf-8')).encode('utf-8')}
+            ${md_convert(str(contrib.get_field_value(field.id)).decode('utf-8')).encode('utf-8')}
         }
         \vspace{1.5em}
     \end{addmargin}
@@ -58,29 +58,29 @@
 
 \vspace{1.5em}
 
-<%include file="person_list.tpl" args="caption=_('Primary author(s)'), list=contrib.getPrimaryAuthorsList()" />
-<%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=contrib.getCoAuthorList()" />
-<%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=contrib.getSpeakerList()" />
+<%include file="person_list.tpl" args="caption=_('Primary author(s)'), list=contrib.primary_authors" />
+<%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=contrib.secondary_authors" />
+<%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=contrib.speakers" />
 
-% if contrib.getSession():
+% if contrib.session:
 {
     {
         \bf
         \noindent ${_("Session Classification")} :
     }
-    ${latex_escape(contrib.getSession().getTitle()) or _("not yet classified")}
+    ${latex_escape(contrib.session.title) or _("not yet classified")}
 }
 
 % endif
 
 \vspace{1em}
 
-% if contrib.getTrack():
+% if contrib.track:
 {
     {
         \bf
         \noindent ${_("Track Classification")} :
     }
-    ${latex_escape(contrib.getTrack().getTitle()) or _("not specified")}
+    ${latex_escape(contrib.track.title) or _("not specified")}
 }
 % endif

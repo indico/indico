@@ -11,9 +11,9 @@
             \item {
                 \small
                 \rmfamily
-                ${latex_escape(person.getFullName())}
-                %if person.getAffiliation():
-                    (${latex_escape(person.getAffiliation())})
+                ${latex_escape(person.person.full_name)}
+                %if person.person.affiliation:
+                    (${latex_escape(person.person.affiliation)})
                 %endif
             }
         % endfor

@@ -67,6 +67,12 @@
                 </a>
                 <ul class="dropdown">
                     <li>
+                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_pdf_export', event) }}">
+                            {% trans -%}PDF{%- endtrans %}
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
                            data-href="{{ url_for('.contributions_csv_export', event) }}">
                             {% trans -%}CSV{%- endtrans %}

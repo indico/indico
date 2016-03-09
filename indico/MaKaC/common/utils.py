@@ -224,14 +224,14 @@ def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz
         return format_datetime(dateTime, format, locale=locale, server_tz=server_tz)
 
 
-def formatDate(date, showWeek=False, format=None, locale=None):
+def formatDate(date, showWeek=False, format=None, locale=None, timezone=None):
     week = ""
     if showWeek:
         week = "EEE "
     if not format:
-        return format_date(date, week+'d/M/yyyy', locale=locale)
+        return format_date(date, week+'d/M/yyyy', locale=locale, timezone=timezone)
     else:
-        return format_date(date, format, locale=locale)
+        return format_date(date, format, locale=locale, timezone=timezone)
 
 
 def formatTime(tm, format=None, locale=None, server_tz=False, tz=None):

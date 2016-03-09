@@ -26,7 +26,7 @@ from indico.modules.events.contributions.controllers import (RHContributions, RH
                                                              RHDeleteSubContributions, RHContributionUpdateStartDate,
                                                              RHContributionUpdateDuration,
                                                              RHContributionsMaterialPackage, RHContributionsExportCSV,
-                                                             RHContributionsExportExcel)
+                                                             RHContributionsExportExcel, RHContributionsExportPDF)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -38,10 +38,8 @@ _bp.add_url_rule('/manage/contributions/customize', 'customize_contrib_report',
                  RHContributionsReportCustomize, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/static-url', 'generate_static_url', RHContributionsReportStaticURL,
                  methods=('POST',))
-_bp.add_url_rule('/manage/contributions/create',
-                 'manage_create_contrib', RHCreateContribution, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/contributions/delete',
-                 'manage_delete_contribs', RHDeleteContributions, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/create', 'manage_create_contrib', RHCreateContribution, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/contributions/delete', 'manage_delete_contribs', RHDeleteContributions, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/person-list', 'person_list', RHContributionPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/material-package', 'material_package', RHContributionsMaterialPackage,
                  methods=('POST',))
@@ -49,10 +47,12 @@ _bp.add_url_rule('/manage/contributions/contributions.csv', 'contributions_csv_e
                  methods=('POST',))
 _bp.add_url_rule('/manage/contributions/contributions.xlsx', 'contributions_excel_export', RHContributionsExportExcel,
                  methods=('POST',))
+_bp.add_url_rule('/manage/contributions/contributions.pdf', 'contributions_pdf_export', RHContributionsExportPDF,
+                 methods=('POST',))
 
 # Single contribution
-_bp.add_url_rule('/manage/contributions/<int:contrib_id>',
-                 'manage_contrib_rest', RHContributionREST, methods=('DELETE', 'PATCH'))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>', 'manage_contrib_rest', RHContributionREST,
+                 methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/edit',
                  'manage_update_contrib', RHEditContribution, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/protection', 'manage_contrib_protection',
