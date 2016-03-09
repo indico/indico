@@ -49,26 +49,16 @@ from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.upcoming import WUpcomingEvents
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
 
 
-def format_location(obj):
-    if obj.inherit_location:
-        return ''
-
-    room_name = obj.room_name
-    if obj.room:
-        if obj.room.map_url:
-            room_name = u'<a href="{}">{}</a>'.format(obj.room.map_url, room_name)
-
-    if not obj.venue_name and not room_name:
-        label = u''
-    elif not obj.venue_name or not room_name:
-        label = obj.venue_name or room_name
-    else:
-        label = u'({}: {})'.format(obj.venue_name, room_name)
-    return label
+def format_location(item):
+    if item.inherit_location or not item.has_location_info:
+        return u''
+    tpl = get_template_module('events/display/_common.html')
+    return tpl.render_location(item)
 
 
 class WPCategoryBase (main.WPMainBase):
