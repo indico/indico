@@ -37,10 +37,15 @@ def upgrade():
     """)
     op.execute("""
         CREATE TEMP TABLE orphaned_note_ids ON COMMIT DROP AS (
-            SELECT id FROM events.notes WHERE is_deleted AND (
-                (link_type = 3 AND contribution_id IS NULL) OR
-                (link_type = 4 AND subcontribution_id IS NULL) OR
-                (link_type = 5 AND session_id IS NULL)
+            SELECT n.id
+            FROM events.notes n
+            JOIN events.events e ON (e.id = n.event_id)
+            WHERE (
+                n.is_deleted AND (
+                    (n.link_type = 3 AND contribution_id IS NULL) OR
+                    (n.link_type = 4 AND subcontribution_id IS NULL) OR
+                    (n.link_type = 5 AND session_id IS NULL)
+                ) OR e.is_deleted
             )
         );
         UPDATE events.notes SET current_revision_id = NULL WHERE id IN (SELECT id FROM orphaned_note_ids);
