@@ -43,6 +43,12 @@
             self.element.qtip($.extend(true, {}, self.defaultQtipOptions, self.options, {
                 style: {classes: 'qbubble ' + classes}
             }));
+
+            this._on({
+                click: function(evt) {
+                    evt.preventDefault();
+                }
+            });
         },
 
         api: function() {
