@@ -52,6 +52,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_ATTACHED_NOTES = True
+    ATTACHMENT_FOLDER_ID_COLUMN = 'session_id'
 
     @declared_attr
     def __table_args__(cls):

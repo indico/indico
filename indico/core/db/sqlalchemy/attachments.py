@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.ext.declarative import declared_attr
+
+from indico.core.db import db
 from indico.modules.attachments.util import get_attached_items
 from indico.util.caching import memoize_request
 
@@ -27,9 +30,24 @@ class AttachedItemsMixin(object):
     #: When set to ``True`` will preload all items that exist for the same event.
     #: Should be set to False when not applicable (no object.event[_new] property).
     PRELOAD_EVENT_ATTACHED_ITEMS = False
+    #: The name of the AttachmentFolder column pointing to to the object's ID
+    ATTACHMENT_FOLDER_ID_COLUMN = None
 
     @property
     @memoize_request
     def attached_items(self):
         return get_attached_items(self, include_empty=False, include_hidden=False,
                                   preload_event=self.PRELOAD_EVENT_ATTACHED_ITEMS)
+
+    @declared_attr
+    def attachment_count(cls):
+        from indico.modules.attachments import AttachmentFolder, Attachment
+        query = (db.select([db.func.count(Attachment.id)])
+                 .select_from(db.join(Attachment, AttachmentFolder, Attachment.folder_id == AttachmentFolder.id))
+                 .where(db.and_(
+                     ~AttachmentFolder.is_deleted,
+                     ~Attachment.is_deleted,
+                     (getattr(AttachmentFolder, cls.ATTACHMENT_FOLDER_ID_COLUMN) == cls.id)
+                 ))
+                 .correlate_except(AttachmentFolder, Attachment))
+        return db.column_property(query, deferred=True)
