@@ -246,6 +246,12 @@ class RHUserEmailsVerify(RHUserBase):
 
             if existing and existing.is_pending:
                 logger.info("Found pending user {} to be merged into {}".format(existing, self.user))
+
+                # If the pending user has missing names, copy them from the active one
+                # to allow it to be marked as not pending and deleted during the merge.
+                existing.first_name = existing.first_name or self.user.first_name
+                existing.last_name = existing.last_name or self.user.last_name
+
                 merge_users(existing, self.user)
                 flash(_("Merged data from existing '{}' identity").format(existing.email))
                 existing.is_pending = False
