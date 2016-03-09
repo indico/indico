@@ -53,6 +53,12 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
+    /* Add qTips to elements with a title attribute. The position of the qTip
+     * can be specified in the data-qtip-position attribute and is one of
+     * "top", "left", "bottom" or "right". It defaults to "bottom".
+     *
+     * It is also possible to have HTML inside the qTip by using the
+     * data-qtip-html attribute instead of the title attribute. */
     $(document).on("mouseenter",
                    '[title]:not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)',
                    function(event) {
@@ -63,6 +69,8 @@ $(document).ready(function() {
             qtipHTMLContainer = $(this).data('qtip-html'),
             qtipHTML = (qtipHTMLContainer && qtipHTMLContainer.length) ? $(this).next(qtipHTMLContainer) : null;
 
+        var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
+
         if (!qtipHTML && !title) {
             return;
         }
@@ -70,12 +78,31 @@ $(document).ready(function() {
         $target.attr('data-qtip-oldtitle', title);
         $target.removeAttr('title');
 
+        var position = $(this).data('qtip-position');
+        var positionOptions;
+        if (position == "left") {
+            positionOptions = {
+                my: 'right center',
+                at: 'left center'
+            };
+        } else if (position == "right") {
+            positionOptions = {
+                my: 'left center',
+                at: 'right center'
+            };
+        } else if (position == "top") {
+            positionOptions = {
+                my: 'bottom center',
+                at: 'top center'
+            };
+        }
+
         /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
         var container = $('<span>').qtip($.extend(true, {}, {
             overwrite: false,
-            position: {
+            position: $.extend({
                 target: $target
-            },
+            }, positionOptions),
 
             show: {
                 event: event.type,
