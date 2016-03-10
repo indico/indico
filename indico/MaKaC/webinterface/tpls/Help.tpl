@@ -150,25 +150,5 @@
                 <a href="ihelp/html/Glossary/Glossary.html">${ _("Glossary") }</a>
             </div>
         </div>
-
-
-        <div class="title">${ _("Training doc") }</div>
-
-        <div class="content">
-            <div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/handsonmeetings.pdf"><img src="${Config.getInstance().getImagesBaseURL()}/pdf_small.png" alt="PDF version"></a></div>
-                ${ _("Hands-on - Meetings") }
-            </div>
-
-            <div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/handsonconferences.pdf"><img src="${Config.getInstance().getImagesBaseURL()}/pdf_small.png" alt="PDF version"></a></div>
-                ${ _("Hands-on - Conferences") }
-            </div>
-
-            <div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/slides.pdf"><img src="${Config.getInstance().getImagesBaseURL()}/pdf_small.png" alt="PDF version"></a></div>
-                ${ _("Slides") }
-            </div>
-        </div>
     </div>
 </div>
