@@ -133,6 +133,9 @@ class SessionBlock(LocationMixin, db.Model):
     def can_manage_attachments(self, user):
         return self.session.can_manage_attachments(user)
 
+    def can_edit_note(self, user):
+        return self.session.can_edit_note(user)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title or None)
