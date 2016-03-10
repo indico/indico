@@ -1,4 +1,4 @@
-<form id="eventModificationForm" action="${ postURL }" method="POST">
+<form class="i-form" id="eventModificationForm" action="${ postURL }" method="POST">
     <input type="hidden" name="event_type" value="${ event_type }">
     <table class="groupTable">
         <tr>

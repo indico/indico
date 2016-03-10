@@ -340,3 +340,12 @@ ul.category-resource-qtip {
     color: $yellow;
     margin-left: 0.2em;
 }
+
+
+#conferenceCreationForm, #eventCreationForm {
+    .form-group {
+        .form-field {
+            padding: 0;
+        }
+    }
+}
