@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.modules.attachments.util import get_attached_items
+from indico.modules.attachments.util import get_attached_items, can_manage_attachments
 from indico.util.caching import memoize_request
 
 
@@ -51,3 +51,6 @@ class AttachedItemsMixin(object):
                  ))
                  .correlate_except(AttachmentFolder, Attachment))
         return db.column_property(query, deferred=True)
+
+    def can_manage_attachments(self, user):
+        return can_manage_attachments(self, user)

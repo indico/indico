@@ -30,8 +30,6 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.events.notes.util import can_edit_note
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -148,12 +146,6 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     @property
     def protection_parent(self):
         return self.event_new
-
-    def can_manage_attachments(self, user):
-        return can_manage_attachments(self, user)
-
-    def can_edit_note(self, user):
-        return can_edit_note(self, user)
 
     @property
     def session(self):
