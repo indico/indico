@@ -177,9 +177,9 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
                               This must not be used when ``linked_object``
                               is a category.
         """
-        from MaKaC.conference import Category
+        from indico.modules.attachments.api.util import get_event
 
-        event = linked_object.event_new if not isinstance(linked_object, Category) else None
+        event = get_event(linked_object)
 
         if event and event in g.get('event_attachments', {}):
             return g.event_attachments[event].get(linked_object, [])
@@ -192,7 +192,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             if 'event_attachments' not in g:
                 g.event_attachments = {}
             g.event_attachments[event] = defaultdict(list)
-            query = (linked_object.event_new.all_attachment_folders
+            query = (event.all_attachment_folders
                      .filter_by(is_deleted=False)
                      .order_by(AttachmentFolder.is_default.desc(), db.func.lower(AttachmentFolder.title))
                      .options(joinedload(AttachmentFolder.attachments),
