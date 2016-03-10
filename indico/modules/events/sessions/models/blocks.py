@@ -71,6 +71,14 @@ class SessionBlock(LocationMixin, db.Model):
     # - session (Session.blocks)
     # - timetable_entry (TimetableEntry.session_block)
 
+    @declared_attr
+    def contribution_count(cls):
+        from indico.modules.events.contributions.models.contributions import Contribution
+        query = (db.select([db.func.count(Contribution.id)])
+                 .where((Contribution.session_block_id == cls.id) & ~Contribution.is_deleted)
+                 .correlate_except(Contribution))
+        return db.column_property(query, deferred=True)
+
     def __init__(self, **kwargs):
         # explicitly initialize those relationships with None to avoid
         # an extra query to check whether there is an object associated
