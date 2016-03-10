@@ -31,6 +31,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
 from indico.modules.events.contributions.util import ContributionReporter
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.util import update_object_principals
 from indico.util.date_time import format_datetime, format_human_timedelta
@@ -94,7 +95,7 @@ class RHManageContributionsActionsBase(RHManageContributionsBase):
     def _checkParams(self, params):
         RHManageContributionsBase._checkParams(self, params)
         ids = {int(x) for x in request.form.getlist('contribution_id')}
-        self.contribs = self.event_new.contributions.filter(Contribution.id.in_(ids)).all()
+        self.contribs = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(ids)).all()
 
 
 class RHManageSubContributionsActionsBase(RHManageContributionBase):
@@ -206,7 +207,7 @@ class RHContributionREST(RHManageContributionBase):
         if session_id is None:
             updates['session'] = None
         else:
-            session = self.event_new.sessions.filter_by(id=session_id).one()
+            session = Session.query.with_parent(self.event_new).filter_by(id=session_id).first()
             if not session:
                 raise BadRequest('Invalid session id')
             if session != self.contrib.session:

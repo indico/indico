@@ -106,7 +106,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
             'sessions',
             primaryjoin='(Session.event_id == Event.id) & ~Session.is_deleted',
             cascade='all, delete-orphan',
-            lazy='dynamic'
+            lazy=True
         )
     )
     acl_entries = db.relationship(

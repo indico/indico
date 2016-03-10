@@ -25,10 +25,12 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import send_email, make_email
 from indico.modules.auth.util import url_for_register
 from indico.modules.events import Event
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.report_links import ReportLink
+from indico.modules.events.sessions.models.sessions import Session
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
@@ -75,9 +77,9 @@ def get_object_from_args(args=None):
     elif object_type == 'event':
         obj = event
     elif object_type == 'session':
-        obj = event.sessions.filter_by(id=args['session_id'], is_deleted=False).first()
+        obj = Session.query.with_parent(event).filter_by(id=args['session_id']).first()
     elif object_type == 'contribution':
-        obj = event.contributions.filter_by(id=args['contrib_id'], is_deleted=False).first()
+        obj = Contribution.query.with_parent(event).filter_by(id=args['contrib_id']).first()
     elif object_type == 'subcontribution':
         obj = SubContribution.find(SubContribution.id == args['subcontrib_id'], ~SubContribution.is_deleted,
                                    SubContribution.contribution.has(event_new=event, id=args['contrib_id'],
@@ -262,7 +264,7 @@ class ReporterBase(object):
         The query should not take into account the user's filtering
         configuration, for example::
 
-            return event.contributions.filter_by(is_deleted=False)
+            return Contribution.query.with_parent(self.report_event)
         """
         raise NotImplementedError
 

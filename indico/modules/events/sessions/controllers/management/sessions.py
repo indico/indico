@@ -43,7 +43,7 @@ from indico.web.util import jsonify_data, jsonify_form
 
 
 def _get_session_list_args(event):
-    sessions = (event.sessions
+    sessions = (Session.query.with_parent(event)
                 .options(undefer('attachment_count'),
                          subqueryload('blocks').undefer('contribution_count'))
                 .order_by(db.func.lower(Session.title))
@@ -68,7 +68,7 @@ class RHCreateSession(RHManageSessionsBase):
     """Create a session in the event"""
 
     def _get_random_color(self):
-        used_colors = {s.colors for s in self.event_new.sessions.filter_by(is_deleted=False)}
+        used_colors = {s.colors for s in self.event_new.sessions}
         unused_colors = set(get_colors()) - used_colors
         return random.choice(tuple(unused_colors) or get_colors())
 
@@ -78,8 +78,7 @@ class RHCreateSession(RHManageSessionsBase):
         form = SessionForm(obj=FormDefaults(colors=self._get_random_color(), location_data=inherited_location))
         if form.validate_on_submit():
             new_session = create_session(self.event_new, form.data)
-            sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors}
-                        for s in self.event_new.sessions.filter_by(is_deleted=False)]
+            sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event_new.sessions]
             return jsonify_data(sessions=sessions, new_session_id=new_session.id,
                                 html=_render_session_list(self.event_new))
         return jsonify_form(form)

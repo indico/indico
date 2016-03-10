@@ -115,9 +115,9 @@ def get_non_inheriting_objects(root):
 
     if isinstance(root, db.m.Event):
         # For an event we check sessions, contributions and ALL attachments no matter where
-        for sess in root.sessions.filter(~db.m.Session.is_inheriting):
+        for sess in db.m.Session.query.with_parent(root).filter(~db.m.Session.is_inheriting):
             yield _ProtectedObjectWrapper(sess)
-        for contrib in root.contributions.filter(~db.m.Contribution.is_inheriting):
+        for contrib in db.m.Contribution.query.with_parent(root).filter(~db.m.Contribution.is_inheriting):
             yield _ProtectedObjectWrapper(contrib)
         query = (root.all_attachment_folders
                  .filter_by(is_deleted=False)

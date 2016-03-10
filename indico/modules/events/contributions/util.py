@@ -101,7 +101,7 @@ class ContributionReporter(ReporterBase):
     def build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
         timetable_entry_strategy.lazyload('*')
-        return (self.report_event.contributions
+        return (Contribution.query.with_parent(self.report_event)
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),

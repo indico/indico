@@ -149,7 +149,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             'contributions',
             primaryjoin='(Contribution.event_id == Event.id) & ~Contribution.is_deleted',
             cascade='all, delete-orphan',
-            lazy='dynamic'
+            lazy=True
         )
     )
     session = db.relationship(
