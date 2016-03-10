@@ -18,6 +18,7 @@
 
 @import 'base';
 @import 'compass';
+@import 'partials/_boxes';
 
 
 %survey-results-text-box {
@@ -55,9 +56,7 @@
         }
 
         .item-action-buttons {
-            vertical-align: middle;
             visibility: hidden;
-            width: 11%;
         }
 
         li.survey-item:hover {
@@ -68,14 +67,28 @@
         }
     }
 
-    .i-box-content > ul > li.survey-item {
-        background-color: white;
-        display: table;
-        width: 100%;
-        .item-row {
-            display: table-row;
-            > div {
-                display: table-cell;
+    .i-box-content > ul {
+        @extend %i-box-cancel-padding;
+
+        & > li.survey-item {
+            background-color: white;
+
+            .item-row {
+                display: flex;
+                align-items: center;
+                margin-top: 10px;
+                margin-bottom: 10px;
+
+                > .i-form {
+                    flex-grow: 1;
+                    margin-top: 0;
+                }
+
+                > .item-action-buttons {
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                    margin-right: $i-box-padding;
+                }
             }
         }
     }

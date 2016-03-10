@@ -11,7 +11,8 @@
     <div class="toolbar">
         <div class="group">
             <a href="{{ url_for('.export_questionnaire', survey) }}"
-               class="i-button">
+               class="i-button"
+               title="{% trans %}Download a file containing all the questions of this survey. The file can later be imported into another survey.{% endtrans %}">
                 {% trans %}Export{% endtrans %}
             </a>
             <a href="#" data-href="{{ url_for('.import_questionnaire', survey) }}"

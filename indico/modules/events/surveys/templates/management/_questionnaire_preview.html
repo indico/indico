@@ -24,6 +24,7 @@
                            data-title="{% trans %}Edit section{% endtrans %}"></a>
                         <a href="#" class="i-button js-delete-item icon-remove"
                            title="{% trans %}Delete section{% endtrans %}"
+                           data-qtip-style="danger"
                            data-href="{{ url_for('.delete_section', section) }}"
                            data-method="DELETE"
                            data-confirm="{% trans %}Are you sure you want to delete this section and all questions inside it?{% endtrans %}"
@@ -57,33 +58,37 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="i-box-content">
-                <ul class="group-list no-content-before js-sortable-survey-items
-                           {% if not section.children %}empty{% endif %}">
-                    {% for item in section.children %}
-                        <li class="survey-item" data-item-id="{{ item.id }}">
-                            {% if item.type.name == 'question' %}
-                                {{ _render_question(item, preview_form) }}
-                            {% elif item.type.name == 'text' %}
-                                {{ _render_text(item) }}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                    <li class="empty-msg">
-                        {% trans -%}
-                            No items have been added yet so this section will not be displayed.
-                        {%- endtrans %}
-                    </li>
-                </ul>
-            </div>
+            {% if not section.children %}
+                <div class="empty">
+                    {% trans -%}
+                        No items have been added yet so this section will not be displayed.
+                    {%- endtrans %}
+                </div>
+            {% else %}
+                <div class="i-box-content">
+                    <ul class="group-list no-content-before js-sortable-survey-items">
+                        {% for item in section.children %}
+                            <li class="ui-sortable survey-item" data-item-id="{{ item.id }}">
+                                {% if item.type.name == 'question' %}
+                                    {{ _render_question(item, preview_form) }}
+                                {% elif item.type.name == 'text' %}
+                                    {{ _render_text(item) }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
         </div>
     {% endfor %}
 {% endmacro %}
 
 
 {% macro _render_item() %}
-    <div class="ui-sortable-handle"></div>
-    <div class="item-row">
+    <div class="ui-sortable-handle">
+        <div class="handle"></div>
+    </div>
+    <div class="ui-sortable-content item-row">
         {{ caller() }}
     </div>
 {% endmacro %}
@@ -94,20 +99,26 @@
         <div class="i-form">
             {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true, orientation='vertical') }}
         </div>
-        <div class="item-action-buttons">
-            <a data-href="{{ url_for('.delete_question', question) }}"
-               data-method="DELETE"
-               data-title="{% trans %}Delete question{% endtrans %}"
-               data-confirm="{% trans %}Are you sure you want to delete this question?{% endtrans %}"
-               class="i-button icon-remove js-delete-item"></a>
-            <a href="#" data-href="{{ url_for('.edit_question', question) }}"
-               data-title="{% trans %}Edit question{% endtrans %}"
-               data-question-id="{{ question.id }}"
-               class="i-button js-survey-item-dialog icon-edit"></a>
-            <a href="#" data-href="{{ url_for('.add_question', question.parent, type=question.field_type, clone=question.id) }}"
-               data-title="{% trans %}Clone question{% endtrans %}"
-               data-question-id="{{ question.id }}"
-               class="i-button icon-copy js-survey-item-dialog"></a>
+        <div class="item-action-buttons toolbar">
+            <div class="group">
+                <a href="#" data-href="{{ url_for('.add_question', question.parent, type=question.field_type, clone=question.id) }}"
+                   data-title="{% trans %}Clone question{% endtrans %}"
+                   title="{% trans %}Clone question{% endtrans %}"
+                   data-question-id="{{ question.id }}"
+                   class="i-button icon-copy js-survey-item-dialog"></a>
+                <a href="#" data-href="{{ url_for('.edit_question', question) }}"
+                   data-title="{% trans %}Edit question{% endtrans %}"
+                   title="{% trans %}Edit question{% endtrans %}"
+                   data-question-id="{{ question.id }}"
+                   class="i-button js-survey-item-dialog icon-edit"></a>
+                <a data-href="{{ url_for('.delete_question', question) }}"
+                   data-method="DELETE"
+                   data-title="{% trans %}Delete question{% endtrans %}"
+                   title="{% trans %}Delete question{% endtrans %}"
+                   data-qtip-style="danger"
+                   data-confirm="{% trans %}Are you sure you want to delete this question?{% endtrans %}"
+                   class="i-button icon-remove js-delete-item"></a>
+            </div>
         </div>
     {% endcall %}
 {% endmacro %}
@@ -122,16 +133,21 @@
                 </div>
             </div>
         </div>
-        <div class="item-action-buttons">
-            <a data-href="{{ url_for('.delete_text', text) }}"
-               data-method="DELETE"
-               data-title="{% trans %}Delete text{% endtrans %}"
-               data-confirm="{% trans %}Are you sure you want to delete this text item?{% endtrans %}"
-               class="i-button icon-remove js-delete-item"></a>
-            <a href="#" data-href="{{ url_for('.edit_text', text) }}"
-               data-title="{% trans %}Edit text item{% endtrans %}"
-               data-text-id="{{ text.id }}"
-               class="i-button js-survey-item-dialog icon-edit"></a>
+        <div class="item-action-buttons toolbar">
+            <div class="group">
+                <a href="#" data-href="{{ url_for('.edit_text', text) }}"
+                   data-title="{% trans %}Edit text item{% endtrans %}"
+                   title="{% trans %}Edit text item{% endtrans %}"
+                   data-text-id="{{ text.id }}"
+                   class="i-button js-survey-item-dialog icon-edit"></a>
+                <a data-href="{{ url_for('.delete_text', text) }}"
+                   data-method="DELETE"
+                   data-title="{% trans %}Delete text{% endtrans %}"
+                   title="{% trans %}Delete text{% endtrans %}"
+                   data-qtip-style="danger"
+                   data-confirm="{% trans %}Are you sure you want to delete this text item?{% endtrans %}"
+                   class="i-button icon-remove js-delete-item"></a>
+            </div>
         </div>
     {% endcall %}
 {% endmacro %}
