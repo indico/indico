@@ -27,9 +27,15 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 from MaKaC.common.contextManager import ContextManager
 
 
+def get_event(linked_object):
+    from MaKaC.conference import Category
+
+    return linked_object.event_new if not isinstance(linked_object, Category) else None
+
+
 def build_material_legacy_api_data(linked_object):
     # Skipping root folder and files in legacy API
-    event = linked_object.event_new
+    event = get_event(linked_object)
     try:
         cache = g.legacy_api_event_attachments[event]
     except (AttributeError, KeyError):
