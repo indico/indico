@@ -18,6 +18,7 @@
 @import "base";
 @import "compass";
 @import "partials/icons";
+@import "partials/_boxes";
 
 .action-menu {
     flex-shrink: 0;
@@ -514,4 +515,49 @@ td.i-table i {
     .person-link-info {
         margin-bottom: 10px;
     }
+}
+
+// Participant list settings page
+
+.sortable-column-preview,
+.sortable-form-preview {
+    margin-bottom: 10px;
+
+    ul {
+        min-height: 1em;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            &.i-label {
+                margin: 3px;
+                cursor: move;
+            }
+        }
+    }
+
+    .disabled .i-label {
+        background-color: $light-gray;
+        border-color: $dark-gray;
+    }
+
+    .placeholder {
+        border-style: dashed;
+    }
+
+    .titled-rule {
+        @extend %i-box-cancel-horizontal-padding;
+    }
+}
+
+.sortable-form-preview {
+    ul li {
+            display: block;
+            text-align: left;
+    }
+}
+
+#participant-list-columns ul#publish-registrations {
+    list-style-type: none;
 }

@@ -41,6 +41,7 @@ from indico.modules.events.registration.controllers.management.invitations impor
 from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
                                                                                 RHManageRegistrationForms,
                                                                                 RHRegistrationFormCreate,
+                                                                                RHManageRegistrationFormsDisplay,
                                                                                 RHRegistrationFormEdit,
                                                                                 RHRegistrationFormDelete,
                                                                                 RHRegistrationFormManage,
@@ -84,6 +85,8 @@ _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId
 # Management
 _bp.add_url_rule('/manage/registration/', 'manage_regform_list', RHManageRegistrationForms)
 _bp.add_url_rule('/manage/registration/create', 'create_regform', RHRegistrationFormCreate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/display', 'manage_regforms_display', RHManageRegistrationFormsDisplay,
+                 methods=('GET', 'POST'))
 
 # Single registration form management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', RHRegistrationFormManage)

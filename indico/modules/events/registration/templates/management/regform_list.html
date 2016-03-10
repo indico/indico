@@ -35,6 +35,24 @@
         </div>
     {% endif %}
 
+    <div class="action-box">
+        <div class="section">
+            <div class="text">
+                <div class="label">
+                    {% trans %}Participant list customization{% endtrans %}
+                </div>
+                {% trans %}Define how the participant list will be shown on the event page.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                <div class="group">
+                    <a href="{{ url_for('.manage_regforms_display', event) }}" class="i-button icon-settings">
+                        {% trans %}Customize display{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% for regform in regforms %}
         <div class="action-box">
             <div class="section">
