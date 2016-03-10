@@ -18,7 +18,7 @@
             <h1 itemprop="name">{{ event.title }}</h1>
             <div class="details">
                 <div class="event-date">
-                    {{ render_event_time(conf, timezone) }}
+                    {{ render_event_time(event, timezone) }}
                 </div>
                 {% if event.venue_name or event.room_name or event.address %}
                     <div class="event-location">

@@ -523,7 +523,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
         tz = timezoneUtil.getDisplayTZ()
-        wvars['timezone'] = tz
+        wvars['timezone'] = timezone(tz)
 
         attached_items = conf.attached_items
         lectures, folders = [], []
