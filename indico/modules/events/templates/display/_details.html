@@ -3,83 +3,83 @@
 {% from 'attachments/_display.html' import render_attachments_folders %}
 
 <table class="eventDetails" id="eventDetails">
-<tbody>
-    {% if event.description %}
-        <tr id="eventDescription">
-            <td class="leftCol">
-                {%- trans %}Description{% endtrans -%}
-            </td>
-            <td>{{ render_description(event) }}</td>
-        </tr>
-    {% endif %}
+    <tbody>
+        {% if event.description %}
+            <tr id="eventDescription">
+                <td class="leftCol">
+                    {%- trans %}Description{% endtrans -%}
+                </td>
+                <td>{{ render_description(event) }}</td>
+            </tr>
+        {% endif %}
 
-    {% if event.references and conf.getType() == "meeting" %}
-        <tr id="eventReportNumbers">
-            <td class="leftCol">
-                {% trans %}External references{% endtrans %}
-            </td>
-            <td>
-                {{ render_references(event) }}
-            </td>
-        </tr>
-    {% endif %}
+        {% if event.references and conf.getType() == "meeting" %}
+            <tr id="eventReportNumbers">
+                <td class="leftCol">
+                    {% trans %}External references{% endtrans %}
+                </td>
+                <td>
+                    {{ render_references(event) }}
+                </td>
+            </tr>
+        {% endif %}
 
-    {% if files or folders %}
-        <tr id="materialList">
-            <td class="leftCol icon-attachment inline-attachments-icon"></td>
-            <td>
-                <div class="material-list clearfix">
-                    {{ render_attachments_folders(files=files, folders=folders) }}
-                </div>
-            </td>
-        </tr>
-    {% endif %}
+        {% if files or folders %}
+            <tr id="materialList">
+                <td class="leftCol icon-attachment inline-attachments-icon"></td>
+                <td>
+                    <div class="material-list clearfix">
+                        {{ render_attachments_folders(files=files, folders=folders) }}
+                    </div>
+                </td>
+            </tr>
+        {% endif %}
 
-    {% if lectures %}
-        <tr id="lectureLinks">
-            <td class="leftCol">{% trans %}From the same series{% endtrans %}</td>
-            <td>
-            {% for lecture in lectures %}
-                <a href="{{ lecture.attachments[0].link_url }}" class="lecture-series-link">
-                    {# We'll have to chop off the 'part' prefix #}
-                    {{ lecture.title[4:] }}
-                </a>
-            {% endfor %}
-            </td>
-        </tr>
-    {% endif %}
-
-    {% if conf.getOrgText() %}
-        <tr>
-            <td class="leftCol">{% trans %}Organised by{% endtrans %}</td>
-            <td>{{ conf.getOrgText() }}</td>
-        </tr>
-    {% endif %}
-
-    {{ template_hook('event-header', event=conf) }}
-
-    {% if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone() %}
-        <tr>
-            <td class="leftCol">{{ conf.getSupportInfo().getCaption() }}</td>
-            <td class="support-info">
-            {% if conf.getSupportInfo().getEmail() %}
-                <div>
-                    <i class="icon-mail"></i>
-                    <a href="mailto:{{ conf.getSupportInfo().getEmail() }}">
-                        {{ conf.getSupportInfo().getEmail() }}
+        {% if lectures %}
+            <tr id="lectureLinks">
+                <td class="leftCol">{% trans %}From the same series{% endtrans %}</td>
+                <td>
+                {% for lecture in lectures %}
+                    <a href="{{ lecture.attachments[0].link_url }}" class="lecture-series-link">
+                        {# We'll have to chop off the 'part' prefix #}
+                        {{ lecture.title[4:] }}
                     </a>
-                </div>
-            {% endif %}
-            {% if conf.getSupportInfo().getTelephone() %}
-                <div>
-                    <i class="icon-phone"></i>
-                    <a href="tel:{{ conf.getSupportInfo().getTelephone() }}">
-                        {{ conf.getSupportInfo().getTelephone() }}
-                    </a>
-                </div>
-            {% endif %}
-            </td>
-        </tr>
-    {% endif %}
-</tbody>
+                {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+
+        {% if conf.getOrgText() %}
+            <tr>
+                <td class="leftCol">{% trans %}Organised by{% endtrans %}</td>
+                <td>{{ conf.getOrgText() }}</td>
+            </tr>
+        {% endif %}
+
+        {{ template_hook('event-header', event=conf) }}
+
+        {% if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone() %}
+            <tr>
+                <td class="leftCol">{{ conf.getSupportInfo().getCaption() }}</td>
+                <td class="support-info">
+                {% if conf.getSupportInfo().getEmail() %}
+                    <div>
+                        <i class="icon-mail"></i>
+                        <a href="mailto:{{ conf.getSupportInfo().getEmail() }}">
+                            {{ conf.getSupportInfo().getEmail() }}
+                        </a>
+                    </div>
+                {% endif %}
+                {% if conf.getSupportInfo().getTelephone() %}
+                    <div>
+                        <i class="icon-phone"></i>
+                        <a href="tel:{{ conf.getSupportInfo().getTelephone() }}">
+                            {{ conf.getSupportInfo().getTelephone() }}
+                        </a>
+                    </div>
+                {% endif %}
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
 </table>
