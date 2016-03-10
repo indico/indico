@@ -167,6 +167,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         foreign_keys=[session_block_id],
         backref=db.backref(
             'contributions',
+            primaryjoin='(Contribution.session_block_id == SessionBlock.id) & ~Contribution.is_deleted',
             lazy=True
         )
     )
