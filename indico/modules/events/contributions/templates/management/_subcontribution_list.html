@@ -1,4 +1,6 @@
-{% macro render_subcontribution_list(event, contrib) %}
+{% from 'attachments/_management_info_column.html' import render_attachment_info %}
+
+{% macro render_subcontribution_list(event, contrib, subcontributions) %}
     <div class="flashed-messages"></div>
     <div id="subcontribution-list">
         <div>
@@ -54,13 +56,16 @@
                             <th class="i-table">
                                 {% trans %}Duration{% endtrans %}
                             </th>
+                            <th class="i-table">
+                                {% trans %}Material{% endtrans %}
+                            </th>
                             <th data-sorter="false">
                                 {# Actions #}
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for subcontribution in contrib.subcontributions -%}
+                        {% for subcontribution in subcontributions -%}
                             <tr class="i-table">
                                 <td class="i-table">
                                     <input type="checkbox" class="select-row" name="subcontribution_id"
@@ -69,6 +74,7 @@
                                 <td class="i-table">{{ subcontribution.friendly_id }}</td>
                                 <td class="i-table subcontribution-title">{{ subcontribution.title }}</td>
                                 <td class="i-table">{{ subcontribution.duration | format_timedelta(format='medium') }}</td>
+                                {{ render_attachment_info(subcontribution) }}
                                 <td class="i-table">
                                     <div class="group right">
                                         <a href="#" class="icon-edit i-button-icon"
@@ -76,11 +82,6 @@
                                            data-href="{{ url_for('.manage_edit_subcontrib', subcontribution) }}"
                                            data-update="#subcontribution-list"
                                            data-ajax-dialog>
-                                        </a>
-                                        <a href="#" class="icon-attachment i-button-icon"
-                                           data-title="{% trans title=subcontribution.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                                           data-locator="{{ subcontribution.locator|tojson|forceescape }}"
-                                           data-attachment-editor>
                                         </a>
                                         <a href="#" class="icon-remove i-button-icon"
                                            data-href="{{ url_for('.manage_subcontrib_rest', subcontribution) }}"
@@ -94,7 +95,7 @@
                             </tr>
                         {%- else -%}
                             <tr class="i-table">
-                                <td colspan="5">
+                                <td colspan="6">
                                     {%- trans %}There are no subcontributions in this contribution yet{% endtrans -%}
                                 </td>
                             </tr>

@@ -51,6 +51,9 @@
             if ($this.data('count')) {
                 $this.closest('tr').toggleClass('selected').nextUntil('tr:not(.session-blocks-row)', 'tr').toggle();
             }
+        }).on('attachments:updated', function(evt) {
+            var target = $(evt.target);
+            reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
 
         $('.js-submit-session-form').on('click', function(evt) {

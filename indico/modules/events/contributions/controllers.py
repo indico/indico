@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, jsonify, redirect
+from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.contributions.forms import (ContributionForm, ContributionProtectionForm,
@@ -43,7 +44,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 def _render_subcontribution_list(contrib):
     tpl = get_template_module('events/contributions/management/_subcontribution_list.html')
-    return tpl.render_subcontribution_list(contrib.event_new, contrib)
+    subcontribs = SubContribution.query.with_parent(contrib).options(undefer('attachment_count')).all()
+    return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
 
 
 class RHManageContributionsBase(RHConferenceModifBase):
