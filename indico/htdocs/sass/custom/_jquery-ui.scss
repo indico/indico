@@ -52,3 +52,8 @@
         background: $blue !important;
     }
 }
+
+ul.ui-sortable {
+    /* Never scroll a sortable list. If you want it to scroll, make the parent scroll. */
+    overflow: hidden;
+}
