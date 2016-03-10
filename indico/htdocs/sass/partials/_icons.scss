@@ -17,9 +17,7 @@
 
 @font-face {
     font-family: "icomoon-ultimate";
-    src: font-url("fonts/icomoon/icomoon.eot");
-    src: font-url("fonts/icomoon/icomoon.eot?#iefix") format("embedded-opentype"),
-         font-url("fonts/icomoon/icomoon.svg#icomoon-ultimate") format("svg"),
+    src: font-url("fonts/icomoon/icomoon.svg#icomoon-ultimate") format("svg"),
          font-url("fonts/icomoon/icomoon.woff") format("woff"),
          font-url("fonts/icomoon/icomoon.ttf") format("truetype");
     font-weight: normal;
@@ -141,6 +139,9 @@ i[class^="icon-"]:before {
 }
 .icon-copy:before {
     content: "\30";
+}
+.icon-cross:before {
+    content: "\ed6d";
 }
 .icon-disable:before {
     content: "\e00a";
