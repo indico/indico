@@ -44,9 +44,8 @@ from indico.web.util import jsonify_data, jsonify_form
 
 def _get_session_list_args(event):
     sessions = (event.sessions
-                .options(subqueryload('contributions'),
-                         subqueryload('blocks').joinedload('contributions'),
-                         undefer('attachment_count'))
+                .options(undefer('attachment_count'),
+                         subqueryload('blocks').undefer('contribution_count'))
                 .order_by(db.func.lower(Session.title))
                 .all())
     return {'sessions': sessions, 'default_colors': get_colors()}
