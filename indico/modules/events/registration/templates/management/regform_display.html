@@ -1,0 +1,164 @@
+{% extends 'layout/base.html' %}
+{% from '_switch.html' import switch %}
+{% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+
+{% block title %}
+    {%- trans %}Participants display{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {% trans -%}
+        Customize how the registrations are shown on the participant list page.
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(form, id='js-participant-display-form') }}
+    {{ form_rows(form) }}
+
+    {% if not regforms %}
+        <div class="action-box highlight">
+            <div class="section">
+                <div class="text">
+                    <div class="label">
+                        {% trans %}There are no registration form for this event.{% endtrans %}
+                    </div>
+                    {% trans %}Start by creating a registration form. {% endtrans %}
+                </div>
+                <div class="toolbar right">
+                    <a href="{{ url_for('.create_regform', event) }}" class="i-button icon-plus highlight">
+                        {% trans %}Create form{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="action-box">
+        <div class="section">
+            <div class="text">
+                <div class="label">
+                    {% trans %}Merge registration forms{% endtrans %}
+                </div>
+                {% trans %}Show all the registrations together, regardless of which form they came from.{% endtrans %}
+            </div>
+            <div class="toolbar right">
+                {{ switch(id='merge-forms', name='merge-forms', checked=merge_forms) }}
+            </div>
+        </div>
+    </div>
+
+    <div id="participant-list-columns">
+        <p>
+            {% trans -%}
+                Select which registration form entries will be published in the participant list.
+            {%- endtrans %}
+        </p>
+        <ul id="publish-registrations">
+            {% for form in regforms %}
+            <li>
+                <input type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}
+                       id="{{form.id}}"></input>
+                {{form.title}}
+            </li>
+            {% endfor %}
+        </ul>
+        <p>
+            {% trans -%}
+                By dragging the column titles, you can choose which fields to
+                display and reorder them. Custom fields added to registration
+                forms can only be shown if the registration forms are not
+                merged.
+            {%- endtrans %}
+        </p>
+        <div class="i-box titled sortable-column-preview">
+            <div class="titled-rule">{% trans %}Shown columns{% endtrans %}</div>
+            <ul class="enabled">
+                {% for column in enabled_columns %}
+                    <li class="i-label sortable-item" id="{{ column.id }}">
+                        <span class="title">{{ column.title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="titled-rule">{% trans %}Hidden columns{% endtrans %}</div>
+            <ul class="disabled">
+                {% for column in disabled_columns %}
+                    <li class="i-label sortable-item" id="{{ column.id }}">
+                        <span class="title">{{ column.title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div id="registration-forms">
+        <p>
+            {% trans -%}
+                By dragging the form titles, you can choose which to display and reorder them.
+            {%- endtrans %}
+        </p>
+        <div class="i-box titled sortable-form-preview">
+            <div class="titled-rule">{% trans %}Shown registration forms{% endtrans %}</div>
+            <ul class="enabled">
+                {% for form in enabled_forms %}
+                    <li class="i-label sortable-item" id="{{ form.id }}">
+                        <span class="title">{{ form.title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="titled-rule">{% trans %}Hidden registration forms{% endtrans %}</div>
+            <ul class="disabled">
+                {% for form in disabled_forms %}
+                    <li class="i-label sortable-item" id="{{ form.id }}">
+                        <span class="title">{{ form.title }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
+    <a class="i-button big" href="{{ url_for('.manage_regform_list', event) }}">
+        {% trans %}Back{% endtrans %}
+    </a>
+
+    {{ form_footer(form) }}
+
+    <script>
+        (function () {
+            function update() {
+                var mergeForms = $('#merge-forms').prop('checked');
+                $('#participant-list-columns').toggle(mergeForms);
+                $('#registration-forms').toggle(!mergeForms);
+            }
+
+            $('#merge-forms').on('change', update).trigger('change');
+
+            $('.sortable-column-preview ul').sortable({
+                connectWith: '.sortable-column-preview ul',
+                placeholder: 'i-label sortable-item placeholder',
+                forcePlaceholderSize: true
+            });
+
+            $('.sortable-form-preview ul').sortable({
+                connectWith: '.sortable-form-preview ul',
+                placeholder: 'i-label sortable-item placeholder',
+                forcePlaceholderSize: true
+            });
+
+            var $form = $('#js-participant-display-form');
+            $form.on('submit', function() {
+                var data = {'participant_list_columns': [], 'participant_list_forms': []};
+                $form.find('#participant-list-columns ul.enabled li').each(function() {
+                    data.participant_list_columns.push($(this).attr('id'));
+                });
+                $form.find('#registration-forms ul.enabled li').each(function() {
+                    data.participant_list_forms.push($(this).attr('id'));
+                });
+                $form.find('#json').val(JSON.stringify(data));
+            });
+        })();
+    </script>
+{% endblock %}

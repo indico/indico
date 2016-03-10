@@ -33,7 +33,8 @@ from indico.modules.events.payment import settings as payment_global_settings
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField
+from indico.web.forms.fields import (IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField,
+                                     JSONField)
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, IndicoEmail
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
@@ -250,3 +251,10 @@ class TicketsForm(IndicoForm):
                                           widget=SwitchWidget(),
                                           description=_('Allow users to download their ticket from the registration '
                                                         'summary page.'))
+
+
+class ParticipantsDisplayForm(IndicoForm):
+    json = JSONField()
+
+    def __init__(self, *args, **kwargs):
+        super(ParticipantsDisplayForm, self).__init__(*args, **kwargs)

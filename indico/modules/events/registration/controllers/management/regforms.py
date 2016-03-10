@@ -22,11 +22,13 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.registration import logger
+from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
-from indico.modules.events.registration.forms import RegistrationFormForm, RegistrationFormScheduleForm
+from indico.modules.events.registration.forms import (RegistrationFormForm, RegistrationFormScheduleForm,
+                                                      ParticipantsDisplayForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.stats import OverviewStats, AccommodationStats
 from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
@@ -55,6 +57,52 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
         return WPManageRegistration.render_template('management/regform_list.html', self.event,
                                                     event=self.event, regforms=regforms,
                                                     registration_counts=registration_counts)
+
+
+class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
+    """Customize the display of registrations on the public page"""
+
+    def _process(self):
+
+        enabled_columns = []
+        disabled_columns = []
+        for pdt, data in PersonalDataType.FIELD_DATA:
+            if pdt.name in registration_settings.get(self.event, 'participant_list_columns'):
+                enabled_columns.append({'id': pdt.name, 'title': data['title']})
+            else:
+                disabled_columns.append({'id': pdt.name, 'title': data['title']})
+
+        merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
+
+        regforms = (self.event_new.registration_forms
+                    .filter_by(is_deleted=False)
+                    .order_by(db.func.lower(RegistrationForm.title))
+                    .all())
+
+        enabled_forms = []
+        disabled_forms = []
+        for form in regforms:
+            if form.publish_registrations_enabled:
+                enabled_forms.append(form)
+            else:
+                disabled_forms.append(form)
+
+        form = ParticipantsDisplayForm()
+        if form.validate_on_submit():
+            print form.json.data
+            registration_settings.set(self.event, 'participant_list_columns',
+                                      form.json.data['participant_list_columns'])
+            for regform in regforms:
+                if str(regform.id) in form.json.data['participant_list_forms']:
+                    print "Enabled form " + str(regform.id)
+                else:
+                    print "Disabled form " + str(regform.id)
+
+        return WPManageRegistration.render_template('management/regform_display.html', self.event, event=self.event,
+                                                    regforms=regforms, enabled_columns=enabled_columns,
+                                                    disabled_columns=disabled_columns, enabled_forms=enabled_forms,
+                                                    disabled_forms=disabled_forms, merge_forms=merge_forms,
+                                                    form=form)
 
 
 class RHManageParticipants(RHManageRegFormsBase):
