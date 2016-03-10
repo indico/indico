@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
+from flask import session
+
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 
@@ -35,9 +37,8 @@ def serialize_timetable(event, days=None, hide_weekends=False, for_management=Fa
         date_str = day.strftime('%Y%m%d')
         if date_str not in timetable:
             continue
-        # TODO: checkProtection
-        # if not check_protection(entry, aw):
-        #     continue
+        if hasattr(entry.object, 'can_access') and not entry.object.can_access(session.user):
+            continue
         data = serialize_timetable_entry(entry)
         key = _get_entry_key(entry)
         if entry.parent:
