@@ -240,6 +240,9 @@
             setupTrackPicker(options.createTrackURL);
             setupStartDateQBubbles();
             setupDurationQBubbles();
+        }).on('attachments:updated', function(evt) {
+            var target = $(evt.target);
+            reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
         setupReporter();
     };
@@ -255,5 +258,9 @@
                 $this.attr('title', $this.text());
             }
         });
+        $('#subcontribution-list').on('attachments:updated', function(evt) {
+            var target = $(evt.target);
+            reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
+        })
     };
 })(window);

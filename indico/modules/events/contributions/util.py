@@ -106,7 +106,8 @@ class ContributionReporter(ReporterBase):
                 .options(timetable_entry_strategy,
                          joinedload('session'),
                          subqueryload('person_links'),
-                         db.undefer('subcontribution_count')))
+                         db.undefer('subcontribution_count'),
+                         db.undefer('attachment_count')))
 
     def filter_report_entries(self, query, filters):
         if not filters.get('items'):

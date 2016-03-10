@@ -1,4 +1,5 @@
 {% from 'message_box.html' import message_box %}
+{% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
 {% macro render_session_list(event, sessions, default_colors) -%}
     {% if sessions -%}
@@ -15,6 +16,7 @@
                         <th class="i-table">{%- trans %}Type{% endtrans -%}</th>
                         <th class="i-table" data-sorter="false">{% trans %}Colour{% endtrans %}</th>
                         <th class="i-table" data-sorter="false">{% trans %}Blocks{% endtrans %}</th>
+                        <th class="i-table">{% trans %}Material{% endtrans %}</th>
                         <th data-sorter="false"></th>
                     </tr>
                 </thead>
@@ -54,6 +56,7 @@
                                     <span class="badge">{{ sess.blocks | length }}</span>
                                 </span>
                             </td>
+                            {{ render_attachment_info(sess) }}
                             <td class="i-table">
                                 <div class="group right entry-action-buttons">
                                     <a href="#" class="icon-edit highlight edit-session i-button-icon"
@@ -68,12 +71,6 @@
                                        data-title="{% trans %}Manage session protection{% endtrans %}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-attachment highlight i-button-icon"
-                                       title="{% trans %}Manage materials{% endtrans %}"
-                                       data-attachment-editor
-                                       data-title="{% trans title=sess.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                                       data-locator="{{ sess.locator|tojson|forceescape }}">
-                                    </a>
                                     <a href="#" class="icon-time highlight i-button-icon"
                                        title="{% trans %}Go to this session timetable{% endtrans %}"></a>
                                     <a href="#" class="icon-remove highlight i-button-icon"
@@ -92,7 +89,7 @@
                                     <table class="i-table no-margin">
                                         <colgroup>
                                             <col span="2">
-                                            <col span="7">
+                                            <col span="8">
                                         </colgroup>
                                         <tr class="i-table content">
                                             <td class="i-table caption">

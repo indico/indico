@@ -19,17 +19,19 @@ from __future__ import unicode_literals
 import random
 
 from flask import request, jsonify
-from sqlalchemy.orm import subqueryload
+from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
 from indico.modules.events.sessions.forms import SessionForm, SessionProtectionForm
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.operations import create_session, update_session, delete_session
-from indico.modules.events.sessions.util import (get_colors, query_active_sessions, generate_spreadsheet_from_sessions,
+from indico.modules.events.sessions.util import (get_colors, generate_spreadsheet_from_sessions,
                                                  generate_pdf_from_sessions)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import update_object_principals
@@ -41,9 +43,11 @@ from indico.web.util import jsonify_data, jsonify_form
 
 
 def _get_session_list_args(event):
-    sessions = (query_active_sessions(event)
+    sessions = (event.sessions
                 .options(subqueryload('contributions'),
-                         subqueryload('blocks').joinedload('contributions'))
+                         subqueryload('blocks').joinedload('contributions'),
+                         undefer('attachment_count'))
+                .order_by(db.func.lower(Session.title))
                 .all())
     return {'sessions': sessions, 'default_colors': get_colors()}
 

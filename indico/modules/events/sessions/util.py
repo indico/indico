@@ -26,7 +26,6 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Table, TableStyle
 from sqlalchemy.orm import joinedload, load_only, contains_eager, noload
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.sessions import Session
@@ -59,12 +58,6 @@ def get_colors():
         ColorTuple('#000000', '#D0C296'),
         ColorTuple('#202020', '#EFEBC2')
     ]
-
-
-def query_active_sessions(event):
-    return (event.sessions
-            .filter_by(is_deleted=False)
-            .order_by(db.func.lower(Session.title)))
 
 
 def can_manage_sessions(user, event, role=None):

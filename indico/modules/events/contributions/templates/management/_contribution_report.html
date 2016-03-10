@@ -1,4 +1,5 @@
 {% from 'message_box.html' import message_box %}
+{% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
 {% macro render_displayed_entries_fragment(displayed_num, total_num) -%}
     <span id="filtering-state" class="i-button label icon-list"
@@ -42,6 +43,9 @@
                         </th>
                         <th class="i-table">
                             {% trans %}Track{% endtrans %}
+                        </th>
+                        <th class="i-table">
+                            {% trans %}Material{% endtrans %}
                         </th>
                         <th>
                             {# Actions #}
@@ -143,6 +147,7 @@
                                     <span class="icon-arrow-down"></span>
                                 </a>
                             </td>
+                            {{ render_attachment_info(contrib) }}
                             <td class="i-table">
                                 <div class="group right entry-action-buttons">
                                     <a href="#" class="icon-edit i-button-icon js-dialog-action"
@@ -156,11 +161,6 @@
                                        data-title="{% trans %}Manage contribution protection{% endtrans %}"
                                        data-update="#contribution-list"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-attachment i-button-icon"
-                                       title="{% trans %}Manage contribution attachments{% endtrans %}"
-                                       data-title="{% trans title=contrib.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                                       data-locator="{{ contrib.locator|tojson|forceescape }}"
-                                       data-attachment-editor></a>
                                     <a href="#" class="icon-remove i-button-icon js-delete"
                                        data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
                                        data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
