@@ -72,7 +72,7 @@ def serialize_session_block_entry(entry):
                  'title': block.session.title,
                  'slotTitle': block.title,
                  'entryType': 'Session',
-                 'attachments': None,
+                 'attachments': _get_attachment_data(block.session),
                  'code': block.session.code,
                  'conferenceId': block.session.event_id,
                  'contribDuration': block.session.default_contribution_duration.seconds / 60,
@@ -96,7 +96,7 @@ def serialize_contribution_entry(entry):
                  'contributionId': contribution.id,
                  'entryType': 'Contribution',
                  'title': contribution.title,
-                 'attachments': None,
+                 'attachments': _get_attachment_data(contribution),
                  'conferenceId': contribution.event_id,
                  'description': contribution.description,
                  'duration': contribution.duration.seconds / 60,
@@ -122,6 +122,23 @@ def serialize_break_entry(entry):
                  'title': break_.title,
                  'description': break_.description,
                  'duration': break_.duration.seconds / 60})
+    return data
+
+
+def _get_attachment_data(obj):
+    def serialize_attachment(attachment):
+        return {'title': attachment.title, 'download_url': attachment.download_url}
+
+    def serialize_folder(folder):
+        return {'title': folder.title,
+                'attachments': map(serialize_attachment, folder.attachments)}
+
+    data = {'files': [], 'folders': []}
+    items = obj.attached_items
+    data['files'] = map(serialize_attachment, items.get('files', []))
+    data['folders'] = map(serialize_folder, items.get('folders', []))
+    if not data['files'] and not data['folders']:
+        data['files'] = None
     return data
 
 
