@@ -1,0 +1,22 @@
+{% macro render_event_location_info(data) -%}
+    <div id="event-location">
+        <dl class="i-data-list">
+            <dt>{% trans %}Venue{% endtrans %}</dt>
+            <dd>
+                {% if data.venue_name -%}
+                    {{ data.venue_name }}
+                {%- endif %}
+            </dd>
+            <dt>{% trans %}Room{% endtrans %}</dt>
+            <dd>
+                {% if data.room_name -%}
+                    {{ data.room_name }}
+                {%- endif %}
+            </dd>
+            <dt>{% trans %}Address{% endtrans %}</dt>
+            <dd>
+                {{- data.address or '' -}}
+            </dd>
+        </dl>
+    </div>
+{%- endmacro %}

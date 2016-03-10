@@ -481,3 +481,27 @@ td.i-table i {
     color: $dark-yellow !important;
     border-color: $dark-yellow !important;
 }
+
+#eventModificationForm {
+    .form-field {
+        padding-left: 0;
+    }
+}
+
+#event-location {
+    dl.i-data-list {
+        margin-top: 0;
+        margin-bottom: 0.2em;
+
+        dd {
+            padding: 0;
+            margin-bottom: 0.1em;
+        }
+
+        dt {
+            margin-bottom: 0.1em;
+            padding: 0;
+            text-align: left;
+        }
+    }
+}

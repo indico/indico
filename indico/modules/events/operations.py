@@ -49,3 +49,9 @@ def create_event_references(event, data):
     db.session.flush()
     for reference in event.references:
         logger.info('Reference "%s" created by %s', reference, session.user)
+
+
+def update_event(event, data):
+    event.populate_from_dict(data)
+    db.session.flush()
+    logger.info('Event %r updated with %r', event, data)
