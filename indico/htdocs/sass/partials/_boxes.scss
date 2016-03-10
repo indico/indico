@@ -59,13 +59,13 @@
     text-align: left;
 }
 
-%i-box-sortable-handle {
-    @include icon-before('icon-handle');
+%i-box-sortable-handle-background {
     @include transition(background-color $default-transition-duration $default-transition-function);
     background-color: lighten($dark-gray, $color-variation);
     cursor: move;
 
-    &:before {
+    &:before,
+    & > .handle:before {
         color: $light-gray;
     }
 
@@ -73,10 +73,20 @@
     &:hover {
         background-color: white;
 
-        &:before {
+        &:before,
+        & > .handle:before {
             color: $dark-gray;
         }
     }
+}
+
+%i-box-sortable-handle-grip {
+    @include icon-before('icon-handle');
+}
+
+%i-box-sortable-handle {
+    @extend %i-box-sortable-handle-background;
+    @extend %i-box-sortable-handle-grip;
 }
 
 
@@ -301,15 +311,17 @@ $i-box-padding: 10px;
 .i-box ul.group-list {
     color: $light-black;
     list-style: outside none none;
-    margin: 0 0 -10px 0;
     padding: 0;
+    margin: 0;
+
+    /* Sortable <li> will use absolute positioning while being moved thus the
+     * <ul> must use relative positioning for correct alignment. */
+    position: relative;
 
     > li {
         border-top: 1px solid lighten($gray, $color-variation);
         display: block;
-        margin-left: -10px;
-        margin-right: -10px;
-        padding: 10px 10px;
+        margin: 10px 0px;
         position: relative;
         overflow: hidden;
     }
@@ -321,8 +333,6 @@ $i-box-padding: 10px;
     }
 
     &.no-content-before {
-        margin-top: -20px;
-
         > li:first-child {
             border-top-width: 0;
         }
@@ -357,34 +367,33 @@ $i-box-padding: 10px;
     }
 
     > li {
-        .ui-sortable-handle {
-            @extend %i-box-sortable-handle;
-            height: 100%;
-            left: 0;
-            top: 0;
-            position: absolute;
-            visibility: hidden;
-            width: 1em;
 
-            &:before {
-                margin-top: -0.5em;
-                position: absolute;
-                top: 50%;
-            }
+        /* Sortable row with handle on the left */
+        &.ui-sortable {
+            display: flex;
+            margin: 0;
 
-            &:after {
-                content: '.';
+            > .ui-sortable-handle {
+                @extend %i-box-sortable-handle-background;
                 visibility: hidden;
+                width: 1em;
+                display: flex;
+                align-items: center;
+
+                > .handle {
+                    @extend %i-box-sortable-handle-grip;
+                }
             }
 
-            &:active,
             &:hover {
-                @include border-right(lighten($gray, $color-variation));
+                > .ui-sortable-handle {
+                    visibility: visible;
+                }
             }
-        }
 
-        &:hover .ui-sortable-handle {
-            visibility: visible;
+            > .ui-sortable-content {
+                flex-grow: 1;
+            }
         }
 
         &.ui-sortable-helper {
