@@ -1,13 +1,6 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
-{% macro render_displayed_entries_fragment(displayed_num, total_num) -%}
-    <span id="filtering-state" class="i-button label icon-list"
-          title="{% trans %}Displaying {{displayed_num}} out of {{total_num}} contributions{% endtrans %}">
-        <strong>{{ displayed_num }}</strong> / {{ total_num }}
-    </span>
-{%- endmacro %}
-
 {% macro render_contrib_report(event, total_entries, contribs, sessions, tracks) %}
     {% if contribs %}
         <form method="POST">
@@ -64,7 +57,7 @@
                             <td class="i-table {% if contrib.is_self_protected %}self-protection-icon
                                                {% elif contrib.is_public %}public-protection-icon{% endif %}">
                             </td>
-                            <td class="i-table" data-searchable="{{ contrib.title }}">
+                            <td class="i-table" data-searchable="{{ contrib.title | lower }}">
                                 <strong>{{ contrib.title }}</strong>
                             </td>
                             <td class="i-table start-date">
@@ -85,7 +78,7 @@
                                 </a>
                                 <span class="label">{{ contrib.duration|format_human_timedelta }}</span>
                             </td>
-                            <td class="i-table person-row-cell" data-searchable="{{ contrib.speaker_names | join(', ') }}">
+                            <td class="i-table person-row-cell" data-searchable="{{ contrib.speaker_names | join(', ') | lower }}">
                                 {% for speaker in contrib.speakers | sort(attribute='full_name') %}
                                     <div class="person-row icon-user">{{ speaker.full_name }}</div>
                                 {% endfor %}

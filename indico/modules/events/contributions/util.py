@@ -149,9 +149,10 @@ class ContributionReporter(ReporterBase):
         """
         contrib_report_kwargs = self.get_contrib_report_kwargs()
         total_entries = contrib_report_kwargs.pop('total_entries')
-        tpl = get_template_module('events/contributions/management/_contribution_report.html')
-        fragment = tpl.render_displayed_entries_fragment(len(contrib_report_kwargs['contribs']), total_entries)
-        return {'html': tpl.render_contrib_report(self.report_event, total_entries, **contrib_report_kwargs),
+        tpl_contrib = get_template_module('events/contributions/management/_contribution_report.html')
+        tpl_reports = get_template_module('events/management/_reports.html')
+        fragment = tpl_reports.render_displayed_entries_fragment(len(contrib_report_kwargs['contribs']), total_entries)
+        return {'html': tpl_contrib.render_contrib_report(self.report_event, total_entries, **contrib_report_kwargs),
                 'counter': fragment,
                 'hide_contrib': contrib not in contrib_report_kwargs['contribs'] if contrib else None}
 
