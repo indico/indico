@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from flask import flash
 
-from indico.modules.events.forms import EventReferencesForm
-from indico.modules.events.operations import create_event_references
+from indico.modules.events.forms import EventReferencesForm, EventLocationForm
+from indico.modules.events.operations import create_event_references, update_event
 from indico.util.i18n import _
 from indico.web.util import jsonify_data, jsonify_form
 from indico.web.flask.templating import get_template_module
@@ -38,4 +38,17 @@ class RHManageReferences(RHConferenceModifBase):
             flash(_('External IDs saved'), 'success')
             tpl = get_template_module('events/management/_reference_list.html')
             return jsonify_data(html=tpl.render_event_references_list(self.event_new.references))
+        return jsonify_form(form)
+
+
+class RHManageEventLocation(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = EventLocationForm(obj=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, form.data)
+            flash(_('The location for the event has been updated'))
+            tpl = get_template_module('events/management/_event_location.html')
+            return jsonify_data(html=tpl.render_event_location_info(self.event_new.location_data))
         return jsonify_form(form)

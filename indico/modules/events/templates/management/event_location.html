@@ -1,0 +1,12 @@
+{% from 'forms/_form.html' import simple_form %}
+{% from 'events/management/_event_location.html' import render_event_location_info %}
+
+{{ render_event_location_info(event.location_data) }}
+
+(<a href="#" class="js-dialog-action"
+    data-href="{{ url_for('events.manage_event_location', event) }}"
+    data-title="{% trans %}Manage location{% endtrans %}"
+    data-update="#event-location"
+    data-ajax-dialog>
+    {%- trans %}edit{% endtrans -%}
+</a>)

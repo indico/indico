@@ -60,16 +60,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Place")}</span>
     </td>
     <td class="blacktext" id="inPlaceEditLocation">
-        <strong>${ _("Location:")} </strong>
-        <span id="inPlaceEditLocationName">${locationName }</span>
-        <br/>
-        <strong>${ _("Address:")} </strong>
-        <span id="inPlaceEditLocationAddress">${locationAddress }</span>
-        <br/>
-        <strong>${ _("Room:")} </strong>
-        <span id="inPlaceEditLocationRoom">${locationRoom }</span>
-        <div id="inPlaceEditLocation_Menu">
-        </div>
+        ${ render_template('events/management/event_location.html', event=confObj.as_event) }
     </td>
 </tr>
 <tr>
@@ -266,29 +257,6 @@ $E('inPlaceEditTimezone').set(new SelectEditWidget('event.main.changeTimezone',
 
 // Room parameters widget
 var context = new WidgetEditableContext();
-
-$E('inPlaceEditLocation').set([
-  WidgetEditable(
-    IndicoUI.Widgets.roomParamsShow,
-    function(target, source){
-        var info = $O(source.get().getAll());
-        var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, null, nullRoomInfo(info), ${ favoriteRooms | n,j }, null);
-    target.set(rbWidget.draw())
-        return {
-      activate: function(){},
-      save: function(){
-        // force the observers to be called,
-        // since objects look immutable to presentation,
-        // as references are compared
-        source.set($O(info.getAll()));
-      },
-      stop: function(){
-        bind.detach(target);
-      }
-    };
-    }
-  )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${currentLocation | n,j})), context),
-    IndicoUI.Aux.defaultEditMenu(context)]);
 
 // Search chairpersons/speakers
 
