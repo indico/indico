@@ -1,6 +1,6 @@
 {% extends 'layout/full_content_base.html' %}
-{% from 'events/contributions/management/_contribution_report.html' import render_contrib_report,
-                                                                           render_displayed_entries_fragment %}
+{% from 'events/contributions/management/_contribution_report.html' import render_contrib_report %}
+{% from 'events/management/_reports.html' import render_displayed_entries_fragment %}
 
 {% block title %}
     {% trans %}Contributions{% endtrans %}

@@ -28,65 +28,6 @@
         });
     }
 
-    function formatState(visible, total) {
-        return $T.gettext('{0} / {1}').format('<strong>{0}</strong>'.format(visible.length),
-                                              total.length);
-    }
-
-    function setState(visible, total) {
-        var $state = $('#filtering-state');
-        $state.html(formatState(visible, total));
-        $state.attr('title', $T.gettext("{0} out of {1} contributions displayed").format(visible.length, total.length));
-    }
-
-    function applyFilters() {
-        var contributions = $('#contribution-list tbody tr'),
-            term = $('#search-input').val().trim(),
-            visibleEntries, m,
-            $state = $('#filtering-state'),
-            $filterPlaceholder = $('#filter-placeholder');
-
-        $filterPlaceholder.hide();
-        $state.removeClass('active');
-
-        if (!term) {
-            contributions.show();
-            setState(contributions, contributions);
-            return;
-        }
-
-        // quick search of contribution by ID
-        if ((m = term.match(/^#(\d+)$/))) {
-            visibleEntries = $('[data-friendly-id="' + m[1] + '"]');
-        } else {
-            visibleEntries = contributions.find('td[data-searchable*="' + term + '"]').closest('tr');
-        }
-
-        if (visibleEntries.length === 0) {
-            $filterPlaceholder.text($T.gettext('There are no contributions that match your search criteria.')).show();
-            $state.addClass('active');
-        } else if (visibleEntries.length !== contributions.length) {
-            $state.addClass('active');
-        }
-
-        setState(visibleEntries, contributions);
-
-        contributions.hide();
-        visibleEntries.show();
-
-        // Needed because $(window).scroll() is not called when hiding elements
-        // causing scrolling elements to be out of place.
-        $(window).trigger('scroll');
-    }
-
-    function setupSearchBox() {
-        $('#search-input').realtimefilter({
-            callback: function() {
-                applyFilters();
-            }
-        });
-    }
-
     function patchObject(url, method, data) {
         return $.ajax({
             url: url,
@@ -202,7 +143,7 @@
                     }
                 }
             });
-        })
+        });
     }
 
     function setupDurationQBubbles() {
@@ -226,8 +167,16 @@
             createTrackURL: null,
             timetableRESTURL: null
         }, options);
+
+        var filterConfig = {
+            listItems: $('#contribution-list tbody tr'),
+            term: $('#search-input'),
+            state: $('#filtering-state'),
+            placeholder: $('#filter-placeholder')
+        };
+
         setupTableSorter('#contribution-list .tablesorter');
-        setupSearchBox();
+        setupSearchBox(filterConfig);
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
         setupStartDateQBubbles();
@@ -235,7 +184,7 @@
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter('#contribution-list .tablesorter');
-            applyFilters();
+            applySearchFilters();
             setupSessionPicker(options.createSessionURL);
             setupTrackPicker(options.createTrackURL);
             setupStartDateQBubbles();
@@ -261,6 +210,6 @@
         $('#subcontribution-list').on('attachments:updated', function(evt) {
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
-        })
+        });
     };
 })(window);
