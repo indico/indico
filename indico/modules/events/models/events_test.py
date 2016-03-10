@@ -26,8 +26,8 @@ from indico.modules.events.sessions import Session
 
 def test_deleted_relationships(db, dummy_event_new):
     event = dummy_event_new
-    assert not event.contributions.count()
-    assert not event.sessions.count()
+    assert not event.contributions
+    assert not event.sessions
     s = Session(event_new=event, title='s')
     sd = Session(event_new=event, title='sd', is_deleted=True)
     c = Contribution(event_new=event, title='c', session=sd, duration=timedelta(minutes=30))
@@ -45,8 +45,8 @@ def test_deleted_relationships(db, dummy_event_new):
     sc = SubContribution.get(sc.id)
     scd = SubContribution.get(scd.id)
     # deleted items should not be in the lists
-    assert event.sessions.all() == [s]
-    assert event.contributions.all() == [c]
+    assert event.sessions == [s]
+    assert event.contributions == [c]
     assert sd.contributions == [c]
     assert c.subcontributions == [sc]
     # the other direction should work fine even in case of deletion
@@ -63,7 +63,7 @@ def test_modify_relationship_with_deleted(db, dummy_event_new):
     c = Contribution(event_new=event, title='c', duration=timedelta(minutes=30))
     cd = Contribution(event_new=event, title='cd', duration=timedelta(minutes=30), is_deleted=True)
     db.session.flush()
-    assert event.contributions.all() == [c]
+    assert event.contributions == [c]
     c2 = Contribution(title='c2', duration=timedelta(minutes=30))
     # this should hard-delete c but not touch cd since it's not in the relationship
     event.contributions = [c2]

@@ -106,7 +106,7 @@ class ContributionCloner(EventCloner):
 
     def _clone_contribs(self, new_event):
         attrs = (get_simple_column_attrs(Contribution) | {'own_room', 'own_venue'}) - {'abstract_id'}
-        query = (self.old_event.contributions
+        query = (Contribution.query.with_parent(self.old_event)
                  .options(undefer('_last_friendly_subcontribution_id'),
                           joinedload('own_venue'),
                           joinedload('own_room').lazyload('*'),

@@ -18,7 +18,9 @@ from __future__ import unicode_literals
 
 from indico.modules.events import Event
 from indico.modules.attachments.api.util import build_folders_api_data
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.sessions import Session
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
 
@@ -39,12 +41,12 @@ class AttachmentsExportHook(HTTPAPIHook):
             raise HTTPAPIError('No such event', 404)
         session_id = self._pathParams.get('session_id')
         if session_id:
-            self._obj = event.sessions.filter_by(id=session_id).first()
+            self._obj = Session.query.with_parent(event).filter_by(id=session_id).first()
             if self._obj is None:
                 raise HTTPAPIError("No such session", 404)
         contribution_id = self._pathParams.get('contribution_id')
         if contribution_id:
-            contribution = self._obj = event.contributions.filter_by(id=contribution_id).first()
+            contribution = self._obj = Contribution.query.with_parent(event).filter_by(id=contribution_id).first()
             if contribution is None:
                 raise HTTPAPIError("No such contribution", 404)
             subcontribution_id = self._pathParams.get('subcontribution_id')

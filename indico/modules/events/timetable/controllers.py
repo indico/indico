@@ -20,6 +20,7 @@ import dateutil.parser
 from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
 
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
@@ -57,7 +58,7 @@ class RHTimetableREST(RHManageTimetableBase):
 
     def _get_contribution_updates(self, data):
         updates = {'parent': None}
-        contribution = self.event_new.contributions.filter_by(id=data['contribution_id'], is_deleted=False).first()
+        contribution = Contribution.query.with_parent(self.event_new).filter_by(id=data['contribution_id']).first()
         if contribution is None:
             raise BadRequest('Invalid contribution id')
         elif contribution.timetable_entry is not None:

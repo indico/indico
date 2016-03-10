@@ -62,8 +62,9 @@ def get_colors():
 
 def can_manage_sessions(user, event, role=None):
     """Check whether a user can manage any sessions in an event"""
-    return event.can_manage(user) or any(s.can_manage(user, role)
-                                         for s in event.sessions.options(joinedload('acl_entries')))
+    if event.can_manage(user):
+        return True
+    return any(s.can_manage(user, role) for s in Session.query.with_parent(event).options(joinedload('acl_entries')))
 
 
 def generate_spreadsheet_from_sessions(sessions):
@@ -172,7 +173,7 @@ def get_events_with_linked_sessions(user, from_dt=None, to_dt=None):
 
 
 def get_sessions_for_user(event, user):
-    sessions = (event.sessions
+    sessions = (Session.query.with_parent(event)
                 .options(joinedload('acl_entries'))
                 .filter(Session.acl_entries.any(SessionPrincipal.has_management_role('coordinate')),
                         ~Session.is_deleted)

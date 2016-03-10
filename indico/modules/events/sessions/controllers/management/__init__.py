@@ -43,9 +43,7 @@ class RHManageSessionBase(RHManageSessionsBase):
 
     def _checkParams(self, params):
         RHManageSessionsBase._checkParams(self, params)
-        self.session = (self.event_new.sessions
-                        .filter_by(id=request.view_args['session_id'], is_deleted=False)
-                        .first_or_404())
+        self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
 
 
 class RHManageSessionsActionsBase(RHManageSessionsBase):
@@ -54,4 +52,4 @@ class RHManageSessionsActionsBase(RHManageSessionsBase):
     def _checkParams(self, params):
         RHManageSessionsBase._checkParams(self, params)
         session_ids = set(map(int, request.form.getlist('session_id')))
-        self.sessions = self.event_new.sessions.filter(Session.id.in_(session_ids), ~Session.is_deleted).all()
+        self.sessions = Session.query.with_parent(self.event_new).filter(Session.id.in_(session_ids)).all()

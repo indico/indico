@@ -82,7 +82,7 @@ def get_nested_attached_items(obj):
     attachments = get_attached_items(obj, include_empty=False, include_hidden=False)
     nested_objects = []
     if isinstance(obj, db.m.Event):
-        nested_objects = obj.sessions.all() + obj.contributions.all()
+        nested_objects = obj.sessions + obj.contributions
     elif isinstance(obj, db.m.Session):
         nested_objects = obj.contributions
     elif isinstance(obj, db.m.Contribution):

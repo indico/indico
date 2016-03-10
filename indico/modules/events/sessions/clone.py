@@ -50,8 +50,7 @@ class SessionCloner(EventCloner):
 
     def _clone_sessions(self, new_event):
         attrs = get_simple_column_attrs(Session) | {'own_room', 'own_venue'}
-        query = (self.old_event.sessions
-                 .filter_by(is_deleted=False)
+        query = (Session.query.with_parent(self.old_event)
                  .options(joinedload('blocks'),
                           joinedload('own_venue'),
                           joinedload('own_room').lazyload('*'),
