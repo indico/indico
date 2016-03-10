@@ -91,10 +91,14 @@
                 setPersonDefaults(person);
                 $personRow.append($personName).append($personStatus);
                 $personStatus.append($personRoles).append($personButtons);
-                $personButtons.append($buttonRemove).append($buttonEdit).append($buttonConfig);
-                if (person.isSubmitter) {
-                    $personRoles.append($('<span>').addClass('i-label').text($T.gettext("Submitter")));
-                }
+                $personButtons.append($buttonRemove).append($buttonEdit);
+
+                {% if field.allow_submitters %}
+                    if (person.isSubmitter) {
+                        $personRoles.append($('<span>').addClass('i-label').text($T.gettext("Submitter")));
+                    }
+                {% endif %}
+
                 {% if field.allow_authors %}
                     if (person.isSpeaker) {
                         $personRoles.prepend($('<span>').addClass('i-label').text($T.gettext("Speaker")));
@@ -109,7 +113,10 @@
                     $coauthorList.append($personRow);
                 }
 
-                setupPersonConfig(person, $buttonConfig);
+                {% if field.allow_submitters or field.allow_authors %}
+                    $personButtons.append($buttonConfig);
+                    setupPersonConfig(person, $buttonConfig);
+                {% endif %}
                 $buttonEdit.on('click', function() {
                     $field.principalfield('edit', person.id);
                 });
@@ -171,13 +178,15 @@
                     }
                 {% endif %}
 
-                var $submitterButton = $('<div>').addClass('action-row');
-                $submitterButton.text(person.isSubmitter ? $T.gettext("Revoke submission rights") : $T.gettext("Grant submission rights"))
-                $submitterButton.on('click', function() {
-                    $element.qbubble('hide');
-                    $field.principalfield('set', person.id, {isSubmitter: !person.isSubmitter});
-                });
-                $buttons.append($submitterButton);
+                {% if field.allow_submitters %}
+                    var $submitterButton = $('<div>').addClass('action-row');
+                    $submitterButton.text(person.isSubmitter ? $T.gettext("Revoke submission rights") : $T.gettext("Grant submission rights"))
+                    $submitterButton.on('click', function() {
+                        $element.qbubble('hide');
+                        $field.principalfield('set', person.id, {isSubmitter: !person.isSubmitter});
+                    });
+                    $buttons.append($submitterButton);
+                {% endif %}
 
                 $element.qbubble({
                     style: {

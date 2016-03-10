@@ -34,6 +34,7 @@ class ContributionPersonListField(EventPersonListField):
     def __init__(self, *args, **kwargs):
         self.author_types = AuthorType.serialize()
         self.allow_authors = kwargs.pop('allow_authors', False)
+        self.allow_submitters = kwargs.pop('allow_submitters', True)
         self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         if self.allow_authors:
@@ -80,6 +81,10 @@ class ContributionPersonListField(EventPersonListField):
 
 class SubContributionPersonListField(ContributionPersonListField):
     """A field to configure a list of subcontribution persons"""
+
+    def __init__(self, *args, **kwargs):
+        kwargs['allow_submitters'] = False
+        super(SubContributionPersonListField, self).__init__(*args, **kwargs)
 
     def _get_contribution_person(self, data):
         return SubContributionPersonLink(person=self._get_event_person(data))
