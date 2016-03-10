@@ -25,7 +25,7 @@
                     </a>
                 </li>
             {% endif %}
-            {% if item.can_manage_attachments(session.user) %}
+            {% if item.can_edit_note(session.user) %}
                 {% if item.as_legacy.getType() != 'simple_event' %}
                     {{ _render_note_editor(item) }}
                     {% if item.scheduled_notes %}
@@ -43,7 +43,7 @@
             {% endif %}
         {% elif item_type == 'SESSION_BLOCK' %}
             {% set session_ = item.session %}
-            {% if item.can_manage_attachments(session.user) %}
+            {% if item.can_edit_note(session.user) %}
                 {% if not session_.has_note or show_note_operations %}
                     {{ _render_note_editor(session_) }}
                 {% endif %}
@@ -86,7 +86,7 @@
                 </li>
             {% endif %}
         {% elif item_type == 'SUBCONTRIBUTION' %}
-            {% if item.can_manage_attachments(session.user) %}
+            {% if item.can_edit_note(session.user) %}
                 {% if not item.has_note or show_note_operations %}
                     {{ _render_note_editor(item) }}
                 {% endif %}
