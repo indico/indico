@@ -22,7 +22,7 @@
                 </thead>
                 <tbody>
                     {% for sess in sessions -%}
-                        <tr class="i-table">
+                        <tr class="i-table session-row" data-friendly-id="{{ sess.friendly_id }}">
                             <td class="i-table">
                                 <input class="select-row" type="checkbox" value="{{ sess.id }}" name="session_id">
                             </td>
@@ -30,8 +30,10 @@
                             <td class="i-table {% if sess.is_self_protected %}self-protection-icon
                                                {% elif sess.is_public %}public-protection-icon{% endif %}">
                             </td>
-                            <td class="i-table"><strong>{{ sess.title }}</strong></td>
-                            <td class="i-table">{{ sess.code }}</td>
+                            <td class="i-table" data-searchable="{{ sess.title | lower }}">
+                                <strong>{{ sess.title }}</strong>
+                            </td>
+                            <td class="i-table" data-searchable="{{ sess.code | lower }}">{{ sess.code }}</td>
                             <td class="i-table">
                                 {%- if sess.is_poster %}
                                     {%- trans %}Poster{% endtrans -%}

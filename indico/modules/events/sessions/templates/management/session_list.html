@@ -1,6 +1,7 @@
 {% extends 'layout/full_content_base.html' %}
 
 {% from 'events/sessions/management/_session_list.html' import render_session_list %}
+{% from 'events/management/_reports.html' import render_displayed_entries_fragment %}
 
 {% block title %}
     {%- trans %}Sessions{% endtrans -%}
@@ -76,10 +77,20 @@
                     </li>
                 </ul>
             </div>
+            <div class="right">
+                <div class="group" id="contributions-counter">
+                    {{ render_displayed_entries_fragment(sessions|length, sessions|length) }}
+                </div>
+                <div class="group">
+                    <span class="i-button label icon-search"></span>
+                    <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                </div>
+            </div>
         </div>
         <div class="report" id="sessions-wrapper">
             {{- render_session_list(event, sessions, default_colors) -}}
         </div>
+        <div id="filter-placeholder"></div>
     </div>
 
     <script>
