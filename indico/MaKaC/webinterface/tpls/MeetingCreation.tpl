@@ -1,5 +1,5 @@
 <div class="container" style="max-width: 1000px; overflow: visible;">
-<form id="eventCreationForm" action="${ postURL }"  method="POST">
+<form class="i-form" id="eventCreationForm" action="${ postURL }"  method="POST">
     <input type="hidden" name="event_type" value="${ event_type }">
     <input type="hidden" name="sessionSlots" value="disabled"/>
 

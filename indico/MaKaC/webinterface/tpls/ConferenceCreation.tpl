@@ -1,5 +1,5 @@
 <div class="container" style="max-width: 1000px; overflow: visible;">
-<form id="conferenceCreationForm" action="${ postURL }" method="POST">
+<form class="i-form" id="conferenceCreationForm" action="${ postURL }" method="POST">
     <input type="hidden" name="event_type" value="${ event_type }">
 
     <em>${ _("Please follow the steps to create a conference")}</em>

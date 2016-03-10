@@ -13,8 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from cStringIO import StringIO
+
+import json
 import re
+from cStringIO import StringIO
 from datetime import timedelta, datetime
 
 from flask import session
@@ -47,8 +49,11 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.api import CategoryEventHook
 from indico.modules.events.layout import layout_settings
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.events.operations import update_event
 from indico.modules.groups.legacy import GroupWrapper
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.locations import Location
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.web.flask.util import send_file, endpoint_for_url
 from indico.web.http_api.metadata.serializer import Serializer
 
@@ -391,6 +396,15 @@ class UtilsConference:
                 raise FormValuesError('The end date you have entered is not correct: {}'.format(e), 'Event')
         return end_dt
 
+    @staticmethod
+    def get_location_data(params):
+        location_data = json.loads(params['location_data'])
+        if location_data.get('room_id'):
+            location_data['room'] = Room.get_one(location_data['room_id'])
+        if location_data.get('venue_id'):
+            location_data['venue'] = Location.get_one(location_data['venue_id'])
+        return location_data
+
     @classmethod
     def get_new_conference_kwargs(cls, params):
         start_dt = cls.get_start_dt(params)
@@ -435,52 +449,13 @@ class UtilsConference:
         #################################
         # Fermi timezone awareness(end) #
         #################################
-        changed = False
-        newLocation = confData.get("locationName","")
-        newRoom = confData.get( "locationBookedRoom" )  or  \
-                   confData.get( "roomName" )  or  ""
 
-        loc = c.getLocation()
-        room = c.getRoom()
-        old_data = {'location': loc.name if loc else '',
-                    'address': loc.address if loc else '',
-                    'room': room.name if room else ''}
+        old_location_data = c.as_event.location_data
+        location_data = cls.get_location_data(confData)
+        update_event(c.as_event, {'location_data': location_data})
 
-        if newLocation.strip() == "":
-            l = None
-            c.setLocation( None )
-        else:
-            l = c.getLocation()
-            if not l:
-                l = conference.CustomLocation()
-                c.setLocation( l )
-
-            if l.getName() != newLocation:
-                l.setName(newLocation)
-                changed = True
-
-            l.setAddress( confData.get("locationAddress","") )
-
-        if newRoom.strip() == "":
-            r = None
-            c.setRoom( None )
-        else:
-            r = c.getRoom()
-            if not r:
-                r = conference.CustomRoom()
-                c.setRoom( r )
-
-            if r.getName() != newRoom:
-                r.setName(newRoom)
-                r.retrieveFullName(newLocation)
-                changed = True
-
-        if changed:
-            new_data = {'location': l.name if l else '',
-                        'address': l.address if l else '',
-                        'room': r.name if r else ''}
-            if old_data != new_data:
-                signals.event.data_changed.send(c, attr='location', old=old_data, new=new_data)
+        if old_location_data != location_data:
+            signals.event.data_changed.send(c, attr='location', old=old_location_data, new=location_data)
 
         emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
 

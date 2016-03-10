@@ -26,7 +26,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.modules.events.fields import ReferencesField
 from indico.modules.events.models.references import ReferenceType, EventReference
-from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField
+from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField, IndicoLocationField
 from indico.web.forms.widgets import CKEditorWidget
 
 
@@ -74,3 +74,7 @@ class EmailEventPersonsForm(IndicoForm):
 class EventReferencesForm(IndicoForm):
     references = ReferencesField(_('External IDs'), reference_class=EventReference,
                                  description=_("Manage external resources for this event"))
+
+
+class EventLocationForm(IndicoForm):
+    location_data = IndicoLocationField(_('Location'))

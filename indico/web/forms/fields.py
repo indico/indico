@@ -149,8 +149,8 @@ class IndicoLocationField(JSONField):
         if not self.data:
             return {}
         result = {
-            'address': self.data['address'],
-            'inheriting': self.data['inheriting'],
+            'address': self.data.get('address', ''),
+            'inheriting': self.data.get('inheriting', False),
         }
         if self.data.get('room'):
             result['room_id'] = self.data['room'].id

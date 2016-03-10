@@ -30,8 +30,9 @@ from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.util import notify_pending
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
-from indico.web.flask.templating import template_hook
+from indico.web.flask.templating import template_hook, get_template_module
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from indico.web.menu import SideMenuItem
 
 
@@ -256,3 +257,12 @@ def _event_cloned(old_event, new_event, **kwargs):
 @template_hook('event-references-list')
 def _inject_event_references(event, **kwargs):
     return render_template('events/management/reference_list.html', event=event, references=event.references, **kwargs)
+
+
+@template_hook('event-location-field')
+def _render_location_field(event, **kwargs):
+    from indico.modules.events.forms import EventLocationForm
+    location_data = event.location_data if event else {'inheriting': False}
+    form = EventLocationForm(obj=FormDefaults(location_data=location_data))
+    tpl = get_template_module('forms/_form.html')
+    return tpl.form_row(form.location_data, skip_label=True)
