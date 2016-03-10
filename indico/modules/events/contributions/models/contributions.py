@@ -33,8 +33,6 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.events.notes.util import can_edit_note
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -321,12 +319,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
-
-    def can_manage_attachments(self, user):
-        return can_manage_attachments(self, user)
-
-    def can_edit_note(self, user):
-        return can_edit_note(self, user)
 
 
 @listens_for(mapper, 'after_configured', once=True)

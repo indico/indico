@@ -21,8 +21,6 @@ from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
-from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.events.notes.util import can_edit_note
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -159,9 +157,3 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     def can_manage(self, user, role=None, **kwargs):
         return self.contribution.can_manage(user, role, **kwargs)
-
-    def can_manage_attachments(self, user):
-        return can_manage_attachments(self, user)
-
-    def can_edit_note(self, user):
-        return can_edit_note(self, user)
