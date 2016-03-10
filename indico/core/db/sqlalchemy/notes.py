@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.notes.models.notes import EventNote
+from indico.modules.events.notes.util import can_edit_note
 from indico.util.caching import memoize_request
 
 
@@ -31,3 +32,6 @@ class AttachedNotesMixin(object):
     @memoize_request
     def has_note(self):
         return EventNote.get_for_linked_object(self, preload_event=self.PRELOAD_EVENT_NOTES) is not None
+
+    def can_edit_note(self, user):
+        return can_edit_note(self, user)

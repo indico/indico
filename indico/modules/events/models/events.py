@@ -25,13 +25,13 @@ from sqlalchemy.dialects.postgresql import JSON, ARRAY
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
-from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.util.caching import memoize_request
@@ -41,7 +41,7 @@ from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
-class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedNotesMixin, db.Model):
+class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin, AttachedNotesMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
@@ -55,6 +55,8 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedNo
     location_backref_name = 'events'
     allow_location_inheritance = False
     __logging_disabled = False
+
+    ATTACHMENT_FOLDER_ID_COLUMN = 'event_id'
 
     @strict_classproperty
     @classmethod
@@ -408,9 +410,6 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedNo
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
         return get_non_inheriting_objects(self)
-
-    def can_manage_attachments(self, user):
-        return can_manage_attachments(self, user)
 
     @memoize_request
     def has_feature(self, feature):
