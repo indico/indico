@@ -78,24 +78,24 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro render_event_time(conf, timezone) -%}
+{% macro render_event_time(event, timezone) -%}
     <i class="icon-calendar header-data"></i>
     <span class="event-time-data">
-        {% if conf.getStartDate().date() == conf.getEndDate().date() %}
-            <time itemprop="startDate" datetime="{{ conf.getStartDate().isoformat() }}">
-                {{ conf.getStartDate() | format_datetime(format='medium', timezone=timezone) }}
+        {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
+            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
+                {{ event.start_dt | format_datetime(format='medium', timezone=timezone) }}
             </time>
             &rarr;
-            <time itemprop="endDate" datetime="{{ conf.getEndDate().isoformat() }}">
-                {{ conf.getEndDate() | format_time(format='medium', timezone=timezone) }}
+            <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
+                {{ event.end_dt | format_time(format='medium', timezone=timezone) }}
             </time>
         {% else %}
-            <time itemprop="startDate" datetime="{{ conf.getStartDate().isoformat() }}">
-                {{ conf.getStartDate() | format_datetime(format='medium', timezone=timezone) }}
+            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
+                {{ event.start_dt | format_datetime(format='medium', timezone=timezone) }}
             </time>
             &rarr;
-            <time itemprop="endDate" datetime="{{ conf.getEndDate().isoformat() }}">
-                {{ conf.getEndDate() | format_datetime(format='medium', timezone=timezone) }}
+            <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
+                {{ event.end_dt | format_datetime(format='medium', timezone=timezone) }}
             </time>
         {% endif %}
         <span class="timezone">{{ timezone }}</span>
