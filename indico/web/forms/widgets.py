@@ -215,7 +215,7 @@ class LocationWidget(JinjaWidget):
             venues = {'data': []}
         parent = (self._get_parent_info(field.object_data['source'])
                   if field.object_data and field.object_data.get('source')
-                  else None)
+                  else ('', ''))
         return super(LocationWidget, self).__call__(field, rooms=rooms, venues=venues, parent=parent,
                                                     source=field.object_data.get('source'))
 

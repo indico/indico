@@ -3,7 +3,7 @@
 {% block html %}
     <div class="i-location-field" id="{{ field.id }}-wrapper">
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
-               value="{{ field._value() | tojson | forceescape }}">
+               value="{{ field._value() | tojson | forceescape }}" autofocus>
         <div class="wrapper">
             <div class="typeahead-container venue-container">
                 <div class="typeahead-field">
@@ -35,14 +35,16 @@
             </div>
             <textarea id="location-address-{{ field.id }}"
                       placeholder="{% trans %}Address{% endtrans %}"></textarea>
-            <div class="location-inheritance-field">
-                <div class="checkbox-container">
-                    <input id="location-inheritance-{{ field.id }}"
-                           type="checkbox">
-                    <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
-                    <i class="info-helper"></i>
+            {% if source and source.allow_location_inheritance -%}
+                <div class="location-inheritance-field">
+                    <div class="checkbox-container">
+                        <input id="location-inheritance-{{ field.id }}"
+                               type="checkbox">
+                        <label for="location-inheritance-{{ field.id }}">{% trans %}Use default{% endtrans %}</label>
+                        <i class="info-helper"></i>
+                    </div>
                 </div>
-            </div>
+            {%- endif %}
         </div>
     </div>
     <div class="clearfix"></div>
@@ -58,6 +60,7 @@
             var venueInput = $('#location-venue-{{ field.id }}');
             var roomInput = $('#location-room-{{ field.id }}');
             var address = $('#location-address-{{ field.id }}');
+            var locationInheritanceAllowed = {{ (source is not none and source.allow_location_inheritance) | tojson }};
             var usingDefault = $('#location-inheritance-{{ field.id }}');
             var venues = {{ venues | tojson }};
             var venueNames = {{ venues.data | map(attribute='name') | list | tojson }};
@@ -86,10 +89,16 @@
                 if (hiddenData.room_id) {
                     highlightOption(roomInput, roomInput.val());
                 }
-                usingDefault.prop('checked', hiddenData.inheriting);
+                if (locationInheritanceAllowed) {
+                    usingDefault.prop('checked', hiddenData.inheriting);
+                }
             }
 
             function toggleDefaultLocation(isChecked, isInitStep) {
+                if (!locationInheritanceAllowed) {
+                    return;
+                }
+
                 var message = ($T.gettext('Using default location from: {0} ({1})').format({{ parent[1] | tojson }},
                                                                                            {{ parent[0] | tojson }}));
                 var text = isChecked ? message : $T.gettext('Using custom location');
@@ -106,7 +115,7 @@
                 (clear them otherwise) */
                 if (!isInitStep) {
                     if (isChecked) {
-                        hiddenData = {{ source.inherited_widget_location_data | tojson }};
+                        hiddenData = {{ (source.inherited_widget_location_data or {}) | tojson }};
                         hiddenData.inheriting = true;
                         initializeInputs();
                     } else {
@@ -281,11 +290,13 @@
             var latestVenueValue = venueInput.val();
             var latestRoomValue = roomInput.val();
 
-            usingDefault.on('click', function() {
-                toggleDefaultLocation(this.checked);
-            });
+            if (locationInheritanceAllowed) {
+                usingDefault.on('click', function () {
+                    toggleDefaultLocation(this.checked);
+                });
 
-            toggleDefaultLocation(usingDefault.prop('checked'), true);
+                toggleDefaultLocation(usingDefault.prop('checked'), true);
+            }
 
             venueInput.typeahead({
                 source: venues,
