@@ -22,7 +22,7 @@
         </span>
 
         {% if item.description %}
-            <span class="description">{{ render_description(item) }}</span>
+            {{ render_description(item, class='break-description') }}
         {% endif %}
     </li>
 {% endmacro %}
