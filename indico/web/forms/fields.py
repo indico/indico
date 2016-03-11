@@ -51,6 +51,13 @@ from indico.web.forms.widgets import JinjaWidget, PasswordWidget, HiddenInputs, 
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
+def _preprocessed_formdata(valuelist):
+    if len(valuelist) != 1:
+        return False
+    value = valuelist[0]
+    return isinstance(value, (dict, list))
+
+
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
     """Like the parent, but with a callback that allows you to modify the list
 
@@ -90,7 +97,9 @@ class JSONField(HiddenField):
     CAN_POPULATE = False
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if _preprocessed_formdata(valuelist):
+            self.data = valuelist[0]
+        elif valuelist:
             self.data = json.loads(valuelist[0])
 
     def _value(self):
@@ -395,7 +404,9 @@ class MultiStringField(HiddenField):
         super(MultiStringField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if _preprocessed_formdata(valuelist):
+            self.data = valuelist[0]
+        elif valuelist:
             self.data = json.loads(valuelist[0])
             if self.uuid_field:
                 for item in self.data:
@@ -459,6 +470,8 @@ class MultipleItemsField(HiddenField):
         super(MultipleItemsField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
+        if _preprocessed_formdata(valuelist):
+            self.data = valuelist[0]
         if valuelist:
             self.data = json.loads(valuelist[0])
             # Preserve dict data, because the self.data can be modified by a subclass
@@ -516,7 +529,9 @@ class OverrideMultipleItemsField(HiddenField):
         super(OverrideMultipleItemsField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if _preprocessed_formdata(valuelist):
+            self.data = valuelist[0]
+        elif valuelist:
             self.data = json.loads(valuelist[0])
 
     def pre_validate(self, form):

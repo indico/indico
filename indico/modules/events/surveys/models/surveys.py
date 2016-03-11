@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.session import object_session
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -285,3 +286,11 @@ class Survey(db.Model):
 @listens_for(Survey.sections, 'remove')
 def _wrong_collection_modified(target, value, *unused):
     raise Exception('This collection is view-only. Use `items` for write operations!')
+
+
+@listens_for(Survey.items, 'append')
+@listens_for(Survey.items, 'remove')
+def _items_modified(target, value, *unused):
+    sess = object_session(target)
+    if sess is not None:
+        sess.expire(target, ['questions', 'sections'])

@@ -8,6 +8,20 @@
 {% endblock %}
 
 {% block content %}
+    <div class="toolbar">
+        <div class="group">
+            <a href="{{ url_for('.export_questionnaire', survey) }}"
+               class="i-button">
+                {% trans %}Export{% endtrans %}
+            </a>
+            <a href="#" data-href="{{ url_for('.import_questionnaire', survey) }}"
+               class="i-button js-survey-item-dialog"
+               data-title="{% trans %}Import questions{% endtrans %}">
+                {% trans %}Import{% endtrans %}
+            </a>
+        </div>
+    </div>
+
     <div class="flashed-messages"></div>
 
     <div class="action-box">
