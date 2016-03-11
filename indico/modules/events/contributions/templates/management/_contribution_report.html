@@ -109,12 +109,14 @@
                                 </span>
                             </td>
                             <td class="i-table">
-                                <a href="#" class="i-label"
+                                <a href="#" class="i-label subcontribution-count"
                                    title="{% trans %}Manage subcontributions{% endtrans %}"
                                    data-href="{{ url_for('.manage_subcontributions', contrib) }}"
                                    data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"
                                    data-ajax-dialog>
-                                    {%- trans %}Subcontributions{% endtrans -%}
+                                    <span class="label">
+                                        {%- trans %}Subcontributions{% endtrans -%}
+                                    </span>
                                     <span class="badge">
                                         {{- contrib.subcontribution_count -}}
                                     </span>
