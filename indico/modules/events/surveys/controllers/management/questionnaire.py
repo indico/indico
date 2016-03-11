@@ -121,7 +121,6 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
                 logger.info('%s tried to import an invalid JSON file: %s', session.user, exception.message)
                 flash(_("Invalid file selected."), 'error')
             else:
-                sections = len(data['sections'])
                 flash(_("The questionnaire has been imported."), 'success')
                 logger.info('Questionnaire imported from JSON document by %s', session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
