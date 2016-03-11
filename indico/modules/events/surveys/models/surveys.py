@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -292,5 +293,5 @@ def _wrong_collection_modified(target, value, *unused):
 @listens_for(Survey.items, 'remove')
 def _items_modified(target, value, *unused):
     sess = object_session(target)
-    if sess is not None:
+    if sess is not None and inspect(target).persistent:
         sess.expire(target, ['questions', 'sections'])
