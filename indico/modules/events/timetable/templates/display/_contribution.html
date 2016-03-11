@@ -32,7 +32,7 @@
         </span>
 
         {% if contrib.description %}
-            <br><span class="description">{{ render_description(contrib) }}</span>
+            <br>{{ render_description(contrib, class='contrib-description') }}
         {% endif %}
 
         {% set speakers = contrib.person_links|selectattr("is_speaker")|list %}
