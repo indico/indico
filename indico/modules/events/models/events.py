@@ -370,6 +370,11 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         return pytz.timezone(self.timezone)
 
     @property
+    def category(self):
+        from MaKaC.conference import CategoryManager
+        return CategoryManager().getById(str(self.category_id), True)
+
+    @property
     @contextmanager
     def logging_disabled(self):
         """Temporarily disables event logging
