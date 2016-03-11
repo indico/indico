@@ -59,6 +59,24 @@
     width: 100%;
 }
 
+#contribution-list {
+    .subcontribution-count {
+        max-width: 70%;
+        display: flex;
+
+        .label {
+            line-height: 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+
+        .badge {
+            display: inline-block;
+        }
+    }
+}
+
 #subcontribution-list {
     width: 600px;
 
