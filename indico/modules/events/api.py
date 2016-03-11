@@ -19,15 +19,21 @@ import itertools
 import re
 import pytz
 from datetime import datetime
+from hashlib import md5
 
-from sqlalchemy.orm import joinedload
+from flask import request
+from sqlalchemy.orm import joinedload, subqueryload
 
+from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.events import Event
+from indico.modules.events.notes.util import build_note_api_data
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
+from indico.util.fossilize.conversion import Conversion
 from indico.util.string import to_unicode
 
+from indico.web.flask.util import url_for
 from indico.web.http_api.fossils import (IConferenceMetadataWithContribsFossil, IConferenceMetadataFossil,
                                          IConferenceMetadataWithSubContribsFossil,
                                          IConferenceMetadataWithSessionsFossil, IPeriodFossil,
@@ -214,10 +220,23 @@ class CategoryEventFetcher(IteratedDataFetcher):
         return fossil
 
     def _makeFossil(self, obj, iface):
+        legacy_obj = obj.as_legacy if isinstance(obj, Event) else obj
         return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
                          filters={'access': self._userAccessFilter},
-                         canModify=obj.canModify(self._aw),
+                         canModify=legacy_obj.canModify(self._aw),
                          mapClassType={'AcceptedContribution': 'Contribution'})
+
+    def _get_query_options(self, include_contribs=False):
+        acl_user_strategy = joinedload('acl_entries').joinedload('user')
+        # remote group membership checks will trigger a load on _all_emails
+        # but not all events use this so there's no need to eager-load them
+        # acl_user_strategy.noload('_primary_email')
+        # acl_user_strategy.noload('_affiliation')
+        creator_strategy = joinedload('creator')
+        contributions_strategy = subqueryload('contributions')
+        if include_contribs:
+            return acl_user_strategy, creator_strategy, contributions_strategy
+        return acl_user_strategy, creator_strategy
 
     def category(self, idlist):
         filter = None
@@ -235,19 +254,18 @@ class CategoryEventFetcher(IteratedDataFetcher):
                         return False
                 return True
 
-        acl_user_strategy = joinedload('acl_entries').joinedload('user')
-        # remote group membership checks will trigger a load on _all_emails
-        # but not all events use this so there's no need to eager-load them
-        acl_user_strategy.noload('_primary_email')
-        acl_user_strategy.noload('_affiliation')
         query = (Event.query
                  .filter(~Event.is_deleted,
                          Event.category_chain.overlap(map(int, idlist)),
                          Event.happens_between(self._fromDT, self._toDT))
-                 .options(acl_user_strategy))
+                 .options(*self._get_query_options()))
         return self._process((x.as_legacy for x in query), filter)
 
     def event(self, idlist):
+        events = (Event.find(Event.id.in_(idlist), ~Event.is_deleted)
+                  .options(*self._get_query_options(include_contribs=True))
+                  .all())
+
         ch = ConferenceHolder()
 
         def _iterate_objs(objIds):
@@ -255,8 +273,93 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 obj = ch.getById(objId, True)
                 if obj is not None:
                     yield obj
+        return self.serialize_events(events)
 
-        return self._process(_iterate_objs(idlist))
+    def serialize_events(self, events):
+        return map(self._build_event_api_data, events)
+
+    def _serialize_date(self, date):
+        if date:
+            return {
+                'date': str(date.date()),
+                'time': str(date.time()),
+                'tz': str(date.tzinfo)
+            }
+
+    def _serialize_persons(self, persons):
+        return [self._serialize_person(person) for person in persons]
+
+    def _serialize_person(self, person):
+        if person:
+            return {
+                'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
+                'id': person.id if getattr(person, 'id', None) else person.person_id,
+                'affiliation': person.affiliation,
+                'emailHash': md5(person.email).hexdigest() if person.email else None,
+            }
+
+    def _build_event_api_data(self, event):
+        data = {
+            'id': event.id,
+            'categoryId': event.category_id,
+            'category': event.category.getTitle(),
+            'title': event.title,
+            'type': event.type,
+            'description': event.description,
+            'note': build_note_api_data(event.note),
+            'roomFullname': event.room_name,
+            'room': event.room_name,
+            'location': event.venue_name,
+            'address': event.address,
+            'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
+            'startDate': self._serialize_date(event.start_dt),
+            'endDate': self._serialize_date(event.end_dt),
+            'modificationDate': self._serialize_date(event.as_legacy.getModificationDate()),
+            'creationDate': self._serialize_date(event.as_legacy.getCreationDate()),
+            'creator': self._serialize_person(event.creator),
+            'hasAnyProtection': event.as_legacy.hasAnyProtection(),
+            'timezone': event.timezone,
+            'roomMapURL': event.room.map_url if event.room else None,
+            'visibility': Conversion.visibility(event.as_legacy),
+            'folders': build_folders_api_data(event)
+            # TODO: what about '_type'?
+            # TODO: what about 'material'? It doesn't return the material of the event ('folders' does that)
+            # TODO: what about 'chairs'. It doesn't return the Chairpersons
+
+        }
+        detail = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
+        if detail == 'contributions':
+            data['contributions'] = []
+            for contribution in event.contributions:
+                data['contributions'].append(self._build_contribution_api_data(contribution))
+        return data
+
+    def _build_contribution_api_data(self, contrib):
+        data = {
+            'id': contrib.id,
+            'title': contrib.title,
+            'startDate': self._serialize_date(contrib.start_dt) if contrib.start_dt else None,
+            'endDate': self._serialize_date(contrib.start_dt + contrib.duration) if contrib.start_dt else None,
+            'duration': contrib.duration.seconds // 60,
+            'roomFullname': contrib.room_name,
+            'room': contrib.get_room_name(full=False),
+            'note': build_note_api_data(contrib.note),
+            'location': contrib.venue_name,
+            'type': contrib.type.name if contrib.type else None,
+            'description': contrib.description,
+            'folders': build_folders_api_data(contrib),
+            'url': url_for('event.contributionDisplay', confId=contrib.event_id, contribId=contrib.friendly_id,
+                           _external=True),
+            'material': build_material_legacy_api_data(contrib),
+            'speakers': self._serialize_persons([x.person for x in contrib.speakers]),
+            'primaryauthors': self._serialize_persons([x.person for x in contrib.primary_authors]),
+            'coauthors': self._serialize_persons([x.person for x in contrib.secondary_authors]),
+            'keywords': contrib.keywords,
+            'track': contrib.track.title if contrib.track else None,
+            'session': contrib.session.title if contrib.session else None,
+            # TODO: what about '_type'?
+        }
+        return data
 
 
 class EventBaseHook(HTTPAPIHook):
