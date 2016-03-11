@@ -94,6 +94,9 @@ class SessionBlock(LocationMixin, db.Model):
     def location_parent(self):
         return self.session
 
+    def can_access(self, user, allow_admin=True):
+        return self.session.can_access(user, allow_admin=allow_admin)
+
     def can_manage(self, user, allow_admin=True):
         """Check whether a user can manage this session block.
 
