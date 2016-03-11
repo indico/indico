@@ -115,5 +115,5 @@ class ImportQuestionnaireForm(IndicoForm):
     json_file = HiddenField(_('File'),
                             description=_("Choose a previously exported survey content to import."
                                           " Existing sections will be preserved."),
-                            widget=DropzoneWidget(max_files=1, submit_form=False,
+                            widget=DropzoneWidget(max_files=1, submit_form=False, submit_if_empty=False,
                                                   accepted_file_types="application/json,*.json"))
