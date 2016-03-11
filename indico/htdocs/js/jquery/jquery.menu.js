@@ -25,7 +25,8 @@
             time_on: 200,
             time_off: 200,
             positioning: {},
-            relative_to: undefined
+            relative_to: undefined,
+            always_listen: false // if set to true, will trigger 'menu_select' event even when there is a valid href
         },
 
         _close: function(elem, effect) {
@@ -72,7 +73,7 @@
 
             elem.find(this.options.selector).each(function() {
                 var $this = $(this);
-                if (!$this.attr('href') || $this.attr('href') == "#") {
+                if (!$this.attr('href') || $this.attr('href') == "#" || self.options.always_listen) {
                     $this.click(function(e) {
                         if ($this.data('toggle') == 'dropdown') {
                             if ($this.data('on')) {
@@ -94,7 +95,7 @@
 
             elem.find('ul.dropdown > li > a').each(function() {
                 var $this = $(this);
-                if (!$this.attr('href') || $this.attr('href') == "#") {
+                if (!$this.attr('href') || $this.attr('href') == "#" || self.options.always_listen) {
                     $this.click(function(e) {
                         var result = $this.triggerHandler('menu_select', self.element);
                         if(!result) {

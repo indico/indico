@@ -1,0 +1,62 @@
+{% from 'events/notes/_note.html' import render_note %}
+{% from 'attachments/_display.html' import render_attachments_folders %}
+{% from 'events/display/_common.html' import render_users %}
+
+{% macro render_description(item, class='') %}
+    <div itemprop="description" class="item-description {{ class }}">
+        {{ item.description }}
+    </div>
+{% endmacro %}
+
+{% macro render_references(item) -%}
+    <ul class="reference-list">
+        {%- for reference in item.references: -%}
+            <li title="{% trans title=reference.reference_type.name %}External reference ({{ title }}){% endtrans %}"
+                class="icon-link">
+            {% if reference.url -%}
+                <a href="{{ reference.url }}" class="title" target="_blank">
+                    {{ reference.urn or reference.value }}
+                </a>
+            {%- else -%}
+                <span class="title">{{ reference.urn or reference.value }}</span>
+            {%- endif %}
+            </li>
+        {%- endfor -%}
+    </ul>
+{%- endmacro %}
+
+{% macro render_time(item, timezone=none, hide_end_time=false) -%}
+    <span class="start-time">
+        {{ item.timetable_entry.start_dt | format_time(timezone=timezone) }}
+    </span>
+    {% if not hide_end_time %}
+        &rarr;
+        <span class="end-time">
+            {{ item.timetable_entry.end_dt | format_time(timezone=timezone) }}
+        </span>
+    {% endif %}
+{%- endmacro %}
+
+{% macro render_speakers(speakers) -%}
+    <div class="speaker-list">
+        <span class="label">{{ ngettext("Speaker", "Speakers", speakers | length) }}</span>:
+        {{ render_users(speakers) }}
+    </div>
+{%- endmacro %}
+
+{% macro render_attachments(item) -%}
+    <tr class="js-attachment-container">
+        {% if item.attached_items %}
+            <td class="leftCol icon-attachment inline-attachments-icon"></td>
+            <td class="material-list">
+                {{ render_attachments_folders(item=item) }}
+            </td>
+        {% endif %}
+    </tr>
+{%- endmacro %}
+
+{% macro render_notes(item) -%}
+    {% if item.has_note %}
+        {{ render_note(note=item.note, can_edit=item.can_edit_note(session.user)) }}
+    {% endif %}
+{%- endmacro %}

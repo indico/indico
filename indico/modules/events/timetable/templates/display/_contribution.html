@@ -1,0 +1,62 @@
+{% from 'events/display/_manage_button.html' import render_manage_button %}
+{% from 'events/display/_common.html' import render_location %}
+{% from 'events/timetable/display/_subcontribution.html' import render_subcontribution %}
+{% from 'events/timetable/display/_common.html' import render_speakers, render_references, render_attachments,
+                                                       render_notes, render_description, render_time %}
+
+{% macro render_contribution(contrib, event, parent=none, nested=false, hide_end_time=false, timezone=none,
+                             show_notes=false) -%}
+    <li class="meetingContrib timetable-contrib">
+        {{ render_manage_button(contrib, 'CONTRIBUTION', align_right=true, show_notes=show_notes,
+                                show_button=(not event.as_legacy.isClosed() and
+                                             contrib.can_manage_attachments(session.user))) }}
+        {{ template_hook('vc-actions', event=event, item=contrib) }}
+
+        {% if not contrib.inherit_location and contrib.has_location_info -%}
+            {{ render_location(contrib, parent=parent) }}
+        {%- endif %}
+
+        <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
+            {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
+        </span>
+
+        <span class="confModifPadding">
+            <span class="timetable-contrib-title {{ 'topLevelTitle' if not nested }}">
+                {{ contrib.title }}
+            </span>
+            {% if contrib.duration -%}
+                <span class="icon-time timetable-duration">
+                    {{ contrib.duration | format_timedelta(format='narrow') }}
+                </span>
+            {%- endif %}
+        </span>
+
+        {% if contrib.description %}
+            <br>{{ render_description(contrib, class='contrib-description') }}
+        {% endif %}
+
+        {% set speakers = contrib.person_links|selectattr("is_speaker")|list %}
+        {% if speakers %}
+            {{ render_speakers(speakers) }}
+        {% endif %}
+
+        <table class="timetable-contrib-details sessionDetails">
+            <tbody>
+                {% if contrib.references -%}
+                    {{ render_references(contrib) }}
+                {%- endif %}
+                {{ render_attachments(contrib) }}
+            </tbody>
+        </table>
+
+        {{ render_notes(contrib) }}
+
+        {% if contrib.subcontributions %}
+            <ul class="{{ 'subEventLevelSCList' if nested else 'topLevelSCList' }}">
+                {% for subcont in contrib.subcontributions %}
+                    {{ render_subcontribution(subcont, event, show_notes=show_notes) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{%- endmacro %}

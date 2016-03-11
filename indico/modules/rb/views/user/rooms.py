@@ -19,7 +19,6 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from flask import session
 
-from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -143,11 +142,7 @@ class WRoomBookingRoomDetails(WTemplated):
         if not self._standalone:
             wvars['conference'] = self._rh._conf
 
-        room_mapper = RoomMapperHolder().match({'placeName': self._rh._location.name}, exact=True)
-        if room_mapper:
-            wvars['show_on_map'] = room_mapper[0].getMapURL(self._rh._room.name)
-        else:
-            wvars['show_on_map'] = UH.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
+        wvars['show_on_map'] = room.map_url if room.map_url else url_for('rooms.roomBooking-mapOfRooms', room)
 
         return wvars
 

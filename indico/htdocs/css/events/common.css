@@ -49,17 +49,6 @@ body {
 	color: #FFFFFF;
 }
 
-.day {
-    display: block;
-    margin: 10px 0;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 18px;
-    color: #222;
-    background-color: #D3DCE3;
-    -moz-border-radius: 5px;
-    padding: 5px 10px;
-}
-
 ul.dayList {
     list-style-type: none;
     padding-left: 0px;
@@ -455,14 +444,6 @@ div.meetingEventHeader h1 {
     margin-bottom: 10px;
 }
 
-div.meetingEventHeader a {
-    color: white;
-}
-
-div.meetingEventHeader a:hover {
-    color: #AAAAAA;
-}
-
 div.meetingEventHeader .iCal {
     position: absolute;
     top: 0px;
@@ -473,7 +454,6 @@ div.meetingEventHeader .iCal {
 div.meetingEventHeader .details {
     padding-top: 10px;
     margin: 0;
-    text-shadow: 1px 1px 1px #555;
 }
 
 div.meetingEventSubHeader {
@@ -495,10 +475,6 @@ div.meetingEventBody {
     min-height: 200px;
     border-bottom-left-radius: 0.2em;
     border-bottom-right-radius: 0.2em;
-}
-
-div.meetingEventLocation {
-    margin-top: 0.5em;
 }
 
 div.partList {
@@ -570,10 +546,6 @@ li.meetingSession, li.meetingContrib, li.breakListItem {
     margin: 0 0 0 0;
 }
 
-li.meetingContrib a.meeting-timetable-item-edit {
-    margin-top: 0;
-}
-
 li.breakListItem pre {
     margin: 0;
 }
@@ -609,6 +581,9 @@ table.eventDetails td.leftCol {
     text-align: right;
     padding-right: 6px;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 200px;
     width: 120px;
 }
 
@@ -618,7 +593,6 @@ table.sessionDetails {
 }
 
 table.sessionDetails td {
-    color: #444444;
     vertical-align: top;
     padding: 2px;
     padding-left: 0;
@@ -660,7 +634,9 @@ div.materialList h3, div.partList h3{
     -moz-border-radius-topleft: 0.2em;
     -moz-border-radius-topright: 0.2em;
 }
-.manageLink div {
+.manageLink .dropDownMenu {
+    color: #0b63a5;
+    display: block;
     padding-top: 7px;
     padding-bottom: 4px;
     padding-left: 12px;
@@ -681,4 +657,9 @@ span.description pre, p {
 
 .materialDisplayName {
     font-size: 14px;
+}
+
+.event-manage-button {
+    margin-top: 10px;
+    font-size: 10pt;
 }

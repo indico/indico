@@ -33,19 +33,28 @@
         });
     }
 
+    var filterConfig = {
+        listItems: '#sessions-wrapper tr.session-row',
+        term: '#search-input',
+        state: '#filtering-state',
+        placeholder: '#filter-placeholder'
+    };
+
     global.setupSessionsList = function setupSessionsList() {
         enableIfChecked('#sessions-wrapper', '.select-row', '#sessions .js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
+        setupSearchBox(filterConfig);
 
         $('#sessions .toolbar').on('click', '.disabled', function(evt) {
             evt.preventDefault();
             evt.stopPropagation();
         });
 
-        $('#sessions').on('indico:htmlUpdated', function() {
+        $('#sessions-wrapper').on('indico:htmlUpdated', function() {
             setupTableSorter();
             setupPalettePickers();
+            applySearchFilters();
         }).on('click', '.show-session-blocks', function() {
             var $this = $(this);
             if ($this.data('count')) {

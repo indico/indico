@@ -16,9 +16,8 @@
 
 from copy import copy
 from flask import session
-from xml.sax.saxutils import quoteattr
 from datetime import timedelta, datetime
-import time
+from time import mktime, strptime
 import os
 import calendar
 import MaKaC.webinterface.pages.main as main
@@ -29,7 +28,6 @@ import MaKaC.conference as conference
 from MaKaC.conference import CategoryManager
 from indico.core.config import Config
 import MaKaC.webinterface.wcalendar as wcalendar
-import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
@@ -37,10 +35,10 @@ from MaKaC.i18n import _
 from indico.modules.events.util import preload_events
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
+from indico.util.date_time import format_time, get_day_start, get_day_end
 from indico.util.i18n import i18nformat
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
-from MaKaC.webinterface.common.tools import escape_html
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
@@ -49,9 +47,18 @@ from MaKaC.common.fossilize import fossilize
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.upcoming import WUpcomingEvents
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu
+
+
+def format_location(item):
+    if item.inherit_location or not item.has_location_info:
+        return u''
+    tpl = get_template_module('events/display/_common.html')
+    return tpl.render_location(item)
 
 
 class WPCategoryBase (main.WPMainBase):
@@ -180,62 +187,39 @@ class WOverviewBreak( wcomponents.WTemplated ):
         self._break = entry
         self._aw = aw
 
-    def getVars( self ):
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["startTime"] = self._break.getAdjustedStartDate(tz).strftime("%H:%M")
-        vars["title"] = self._break.getTitle()
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["startTime"] = format_time(self._break.timetable_entry.start_dt)
+        vars["title"] = self._break.title
         return vars
 
 
-class WOverviewContribBase( wcomponents.WTemplated ):
+class WOverviewContribBase(wcomponents.WTemplated):
 
-    def __init__( self, aw, contrib, date, details="conference" ):
+    def __init__(self, aw, contrib, date, details="conference"):
         self._aw = aw
         self._contrib = contrib
         self._date = date
         self._details = details
 
-    def _getSpeakerText( self ):
-        l = []
-        if self._contrib.getSpeakerText()!="":
-            l.append( self._contrib.getSpeakerText() )
-        for av in self._contrib.getSpeakerList():
-            l.append( "%s"%av.getAbrName() )
-        speakers = ""
-        if len(l)>0:
-            speakers  = "(%s)"%"; ".join(l)
-        return speakers
-
-    def _getLocation( self ):
-        loc = ""
-        if self._contrib.getOwnLocation() != None:
-            loc = self._contrib.getLocation().getName()
-        room = ""
-        if self._contrib.getOwnRoom() != None:
-            if loc != "":
-                loc = "%s: "%loc
-            room = self._contrib.getRoom().getName()
-            url = linking.RoomLinker().getURL( self._contrib.getRoom(), \
-                                                   self._contrib.getLocation() )
-            if url != "":
-                room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
-        if loc != "" or room != "":
-            return "(%s %s)"%(loc, room)
+    def _getSpeakerText(self):
+        speakers = [link.person.get_full_name(abbrev_first_name=True, last_name_upper=False)
+                    for link in self._contrib.person_links if link.is_speaker]
+        if speakers:
+            return u'({})'.format(u'; '.join(speakers))
         else:
-            return ""
+            return ''
 
-    def getHTML( self, params={} ):
-        return wcomponents.WTemplated.getHTML( self, params )
+    def getHTML(self, params={}):
+        return wcomponents.WTemplated.getHTML(self, params)
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        vars["timezone"] = tz
-        vars["startTime"] = self._contrib.getAdjustedStartDate(tz).strftime( "%H:%M" )
-        vars["title"] = self._contrib.getTitle()
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["timezone"] = DisplayTZ(self._aw).getDisplayTZ()
+        vars["startTime"] = format_time(self._contrib.timetable_entry.start_dt)
+        vars["title"] = self._contrib.title
         vars["speakers"] = self._getSpeakerText()
-        vars["location"] = self._getLocation()
+        vars["location"] = format_location(self._contrib)
         return vars
 
 
@@ -248,27 +232,21 @@ class WOverviewContribMinDisplay( WOverviewContribBase ):
 
 
 class WOverviewContribution:
-
     def __init__( self, aw, contrib, date, details="conference" ):
         self._comp = None
 
         """ This is needed for the future? The two
             templates are currently identical """
 
-        if contrib.canAccess( aw ):
-            self._comp = WOverviewContribFullDisplay( aw, \
-                                                    contrib, \
-                                                    date, \
-                                                    details )
+        if contrib.can_access(session.user):
+            self._comp = WOverviewContribFullDisplay(aw, contrib, date, details)
         else:
-            self._comp = WOverviewContribMinDisplay( aw, \
-                                                    contrib, \
-                                                    date, \
-                                                    details )
-    def getHTML( self, params={} ):
+            self._comp = WOverviewContribMinDisplay(aw, contrib, date, details)
+
+    def getHTML(self, params={}):
         if not self._comp:
             return ""
-        return self._comp.getHTML( params )
+        return self._comp.getHTML(params)
 
 
 class WOverviewSessionBase( wcomponents.WTemplated ):
@@ -279,62 +257,29 @@ class WOverviewSessionBase( wcomponents.WTemplated ):
         self._date = date
         self._details = details
 
-    def _getConvenerText( self ):
-        l = []
-        if self._session.getConvenerText()!="":
-            l.append( self._session.getConvenerText() )
-        for av in self._session.getConvenerList():
-            l.append( "%s"%av.getAbrName() )
-        conveners = ""
-        if len(l)>0:
-            conveners = "(%s)"%"; ".join(l)
-        return conveners
+    def _getConvenerText(self):
+        conveners = [link.person.full_name for block in self._session.blocks for link in block.person_links]
+        return u"({})".format(u"; ".join(conveners))
 
-    def _getLocation( self ):
-        loc = ""
-        if self._session.getOwnLocation() != None:
-            loc = self._session.getLocation().getName()
-        room = ""
-        if self._session.getOwnRoom() != None:
-            if loc != "":
-                loc = "%s: "%loc
-            url = linking.RoomLinker().getURL( self._session.getRoom(), \
-                                                   self._session.getLocation() )
-            room = self._session.getRoom().getName()
-            if url != "":
-                room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
-        if loc != "" or room != "":
-            return "(%s %s)"%(loc, room)
-        else:
-            return ""
-
-    def _getBreakItem( self, entry ):
-        wc = WOverviewBreak( self._aw, entry )
-        return wc.getHTML( {} )
-
-    def _getDetails( self ):
+    def _getDetails(self):
         if self._details != "contribution":
             return ""
         res = []
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        for entry in self._session.getSchedule().getEntriesOnDay( self._date ):
+        entries = [block.timetable_entries.filter_by(start_dt=self._date) for block in self._session.blocks]
+        for entry in entries:
             if self._details == "contribution":
-                if isinstance( entry, schedule.LinkedTimeSchEntry) and \
-                        isinstance( entry.getOwner(), conference.Contribution):
-                    wc = WOverviewContribution( self._aw, \
-                                                entry.getOwner(), \
-                                                self._date, \
-                                                self._details )
-                    res.append( wc.getHTML( ) )
-                elif isinstance( entry, schedule.BreakTimeSchEntry):
-                    res.append( self._getBreakItem( entry ) )
-        return "".join( res )
+                if entry.type == TimetableEntryType.CONTRIBUTION:
+                    wc = WOverviewContribution(self._aw, entry.getOwner(), self._date, self._details)
+                    res.append(wc.getHTML())
+                elif entry.type == TimetableEntryType.BREAK:
+                    res.append(self._getBreakItem(entry))
+        return u"".join(res)
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw).getDisplayTZ()
-        vars["startTime"] = self._session.getStartDate().astimezone(timezone(tz)).strftime("%H:%M")
-        conf=self._session.getConference()
+        vars["startTime"] = format_time(self._slot.timetable_entry.start_dt.astimezone(timezone(tz)))
+        conf = self._session.event_new
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
         wr = webFactoryRegistry.WebFactoryRegistry()
         wf = wr.getFactory(conf)
@@ -343,41 +288,40 @@ class WOverviewSessionBase( wcomponents.WTemplated ):
         else:
             type = "conference"
         if type != 'meeting':
-            vars["title"] = self._session.getTitle()
+            vars["title"] = self._session.title
             vars["titleUrl"] = None
         else:
-            vars["title"] = self._session.getTitle()
-            vars["titleUrl"] = """%s#%s""" % (urlHandlers.UHConferenceDisplay.getURL(conf), self._session.getId())
+            vars["title"] = self._session.title
+            vars["titleUrl"] = '{}#{}'.format(urlHandlers.UHConferenceDisplay.getURL(conf), self._session.id)
         vars["conveners"] = self._getConvenerText()
-        vars["location"] = self._getLocation()
+        vars["location"] = format_location(self._session)
         vars["details"] = self._getDetails()
         return vars
 
-class WOverviewSessionSlot( WOverviewSessionBase ):
+class WOverviewSessionSlot(WOverviewSessionBase):
 
-    def __init__( self, aw, slot, date, details="conference" ):
+    def __init__(self, aw, slot, date, details="conference"):
         self._aw = aw
-        self._session = slot.getSession()
+        self._session = slot.session
         self._slot = slot
         self._date = date
         self._details = details
 
-    def _getDetails( self ):
+    def _getDetails(self):
         if self._details != "contribution":
             return ""
+
         res = []
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        for entry in self._slot.getSchedule().getEntriesOnDay( self._date ):
-            if self._details == "contribution":
-                if isinstance( entry, schedule.LinkedTimeSchEntry) and type(entry.getOwner()) is conference.Contribution:
-                    wc = WOverviewContribution( self._aw, \
-                                                entry.getOwner(), \
-                                                self._date, \
-                                                self._details )
-                    res.append( wc.getHTML( ) )
-                elif isinstance( entry, schedule.BreakTimeSchEntry):
-                    res.append( self._getBreakItem( entry ) )
-        return "".join( res )
+        for entry in self._slot.timetable_entry.children:
+            if entry.start_dt < self._date or entry.start_dt - self._date > timedelta(days=1):
+                continue
+            if entry.type == TimetableEntryType.CONTRIBUTION:
+                wc = WOverviewContribution(self._aw, entry.object, self._date, self._details)
+                res.append(wc.getHTML())
+            elif entry.type == TimetableEntryType.BREAK:
+                wc = WOverviewBreak(self._aw, entry.object)
+                res.append(wc.getHTML())
+        return "".join(res)
 
 class WOverviewSessionFullDisplay( WOverviewSessionBase ):
     pass
@@ -411,7 +355,7 @@ class WOverviewSession:
 
 class WOverviewConfBase( wcomponents.WTemplated ):
 
-    def __init__( self, aw, conference, date, url, icons, details="conference", startTime = None ):
+    def __init__(self, aw, conference, date, url, icons, data, details='conference', startTime=None):
         self._conf = conference
         self._url = url
         self._aw = aw
@@ -419,6 +363,7 @@ class WOverviewConfBase( wcomponents.WTemplated ):
         self._date = date
         self._icons = icons
         self._startTime = startTime
+        self._data = data
 
 
     def _getChairText( self ):
@@ -432,59 +377,32 @@ class WOverviewConfBase( wcomponents.WTemplated ):
             chairs = "(%s)"%"; ".join(l)
         return chairs
 
-    def _getLocation( self ):
-        loc = ""
-        if self._conf.getLocation() != None:
-            loc = self._conf.getLocation().getName()
-        room = ""
-        if self._conf.getRoom() != None and self._conf.getRoom().getName() != None:
-            room = self._conf.getRoom().getName()
-            url = "javascript:redirectToRoomLoc('" + escape_html(room) + "','" + escape_html(loc) +"')"
-            loc = "%s: "%loc
-            room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
-        if loc != "" or room != "":
-            return "(%s%s)"%(loc, room)
-        else:
-            return ""
-
-    def _getBreakItem( self, entry ):
-        wc = WOverviewBreak( self._aw, entry )
-        return wc.getHTML( {} )
-
-    def _getDetails( self ):
+    def _getDetails(self):
         if self._details == "conference":
             return ""
         res = []
-        tz = DisplayTZ(self._aw,useServerTZ=1).getDisplayTZ()
-        for entry in self._conf.getSchedule().getEntriesOnDay( self._date ):
-            if isinstance( entry, schedule.LinkedTimeSchEntry) and \
-                        isinstance( entry.getOwner(), conference.Session ) and entry.getOwner().canView(self._aw):
-                wc = WOverviewSession( self._aw, \
-                                        entry.getOwner(), \
-                                        self._date, \
-                                        self._details )
-                res.append( wc.getHTML({}) )
-            elif isinstance( entry, schedule.LinkedTimeSchEntry) and \
-                        isinstance( entry.getOwner(), conference.SessionSlot ) and entry.getOwner().canView(self._aw):
-                wc = WOverviewSessionSlot( self._aw, \
-                                        entry.getOwner(), \
-                                        self._date, \
-                                        self._details )
-                res.append( wc.getHTML({}) )
-            elif self._details == "contribution":
-                if isinstance(entry, conference.ContribSchEntry) or  \
-                    isinstance( entry, schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(), conference.Contribution) and entry.getOwner().canView(self._aw):
-                    wc = WOverviewContribution( self._aw, \
-                                                entry.getOwner(), \
-                                                self._date, \
-                                                self._details )
-                    res.append( wc.getHTML( ) )
-                elif isinstance( entry, schedule.BreakTimeSchEntry):
-                    res.append( self._getBreakItem( entry ) )
-        return "".join( res )
+        blocks, contribs, breaks = self._data['blocks'], self._data['contribs'], self._data['breaks']
+        day = self._date.date()
+
+        if self._details == 'session':
+            for tt_entry, block in blocks[day]:
+                wc = WOverviewSessionSlot(self._aw, block, self._date, self._details)
+                res.append(wc.getHTML())
+        elif self._details == 'contribution':
+            for tt_entry, obj in sorted(blocks[day] + contribs[day] + breaks[day], key=lambda x: x[0].start_dt):
+                if tt_entry.type == TimetableEntryType.SESSION_BLOCK:
+                    wc = WOverviewSessionSlot(self._aw, obj, self._date, self._details)
+                    res.append(wc.getHTML())
+                elif tt_entry.type == TimetableEntryType.CONTRIBUTION and tt_entry.parent_id is None:
+                    wc = WOverviewContribution(self._aw, obj, self._date, self._details)
+                    res.append(wc.getHTML())
+                elif tt_entry.type == TimetableEntryType.BREAK and tt_entry.parent_id is None:
+                    wc = WOverviewBreak(self._aw, obj)
+                    res.append(wc.getHTML())
+        return "".join(res)
 
     def _getIcon( self ):
-        confid = self._conf.getId()
+        confid = self._conf.as_event.id
         iconHtml = ""
         for icon in self._icons.keys():
             if confid in self._icons[icon]:
@@ -495,18 +413,18 @@ class WOverviewConfBase( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        tz = DisplayTZ(self._aw,useServerTZ=1).getDisplayTZ()
+        tz = timezone(DisplayTZ(session.user, None, useServerTZ=True).getDisplayTZ())
         if self._startTime:
-            vars["startTime"] = self._startTime.strftime("%H:%M")
+            vars["startTime"] = format_time(self._startTime.astimezone(tz))
         else:
-            vars["startTime"] = self._conf.calculateDayStartTime(self._date).strftime("%H:%M")
+            vars["startTime"] = _("Ongoing")
         vars["timezone"] = tz
         vars["title"] = self._conf.getTitle()
         if self._conf.isProtected():
             vars["title"] += """&nbsp;<img src=%s style="vertical-align: middle; border: 0;">""" % Config.getInstance().getSystemIconURL("protected")
         vars["url"] = self._url
         vars["chairs"] = self._getChairText()
-        vars["location"] = self._getLocation()
+        vars["location"] = format_location(self._conf.as_event)
         vars["details"] = self._getDetails()
         vars["icon"] = self._getIcon()
         return vars
@@ -526,7 +444,7 @@ class WOverviewConfMinDisplay( WOverviewConfBase ):
 
 class WOverviewConferenceItem:
 
-    def __init__(self, aw, conference, date, displayURL, icons, details="conference", startTime = None):
+    def __init__(self, aw, conference, date, displayURL, icons, data, details="conference", startTime = None):
         self._comp = None
         if details=="conference" or conference.canAccess( aw ):
             self._comp = WOverviewConfFullDisplay( aw, \
@@ -534,6 +452,7 @@ class WOverviewConferenceItem:
                                                     date, \
                                                     displayURL, \
                                                     icons, \
+                                                    data,
                                                     details,
                                                     startTime )
         else:
@@ -542,6 +461,7 @@ class WOverviewConferenceItem:
                                                     date, \
                                                     displayURL, \
                                                     icons, \
+                                                    data,
                                                     details,
                                                     startTime )
 
@@ -553,8 +473,10 @@ class WOverviewConferenceItem:
 
 class WDayOverview(wcomponents.WTemplated):
 
-    def __init__( self, ow ):
+    def __init__(self, ow):
         self._ow = ow
+        self._categ_list = ow.getCategoryList()
+        self._day = ow.getDate()
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -572,27 +494,42 @@ class WDayOverview(wcomponents.WTemplated):
                 self._ow.getDate().strftime("%A %d %B %Y"), \
                 nextsel,\
                 nnextsel)
-        l = []
-        confs = self._ow.getConferencesWithStartTime()
-        for tuple in confs:
-            conf = tuple[0]
-            startTime = tuple[1]
-            oi = WOverviewConferenceItem( self._ow.getAW(), \
-                                            conf, \
-                                            self._ow.getDate(), \
-                                            vars["displayConfURLGen"]( conf ),\
-                                            self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel(),
-                                            startTime )
-            l.append( oi.getHTML( {} ) )
-        if len(confs)==0:
-            l.append( _("There are no conferences on the selected day"))
-        vars["items"] = "".join(l)
+        segments = []
+        detailed_data = self._ow.getData()
+        icons = self._ow.getIcons()
+
+        for tt_start_dt, event in sorted(detailed_data['events'][self._day.date()]):
+            oi = WOverviewConferenceItem(self._ow.getAW(),
+                                         event.as_legacy,
+                                         self._ow.getDate(),
+                                         url_for('event.conferenceDisplay', event),
+                                         icons,
+                                         detailed_data[event.id],
+                                         self._ow.getDetailLevel(),
+                                         tt_start_dt)
+            segments.append(oi.getHTML({}))
+
+        for event in detailed_data['ongoing_events']:
+            oi = WOverviewConferenceItem(self._ow.getAW(),
+                                         event.as_legacy,
+                                         self._ow.getDate(),
+                                         url_for('event.conferenceDisplay', event),
+                                         icons,
+                                         detailed_data[event.id],
+                                         self._ow.getDetailLevel(),
+                                         None)
+            segments.append(oi.getHTML({}))
+
+        if not detailed_data['events']:
+            segments.append(_("There are no events on the selected day"))
+        vars["items"] = "".join(segments)
         return vars
+
 
 class WWeekOverview(wcomponents.WTemplated):
 
     def __init__( self, ow ):
+        self._categ_list = ow.getCategoryList()
         self._ow = ow
 
     def getVars( self ):
@@ -611,6 +548,8 @@ class WWeekOverview(wcomponents.WTemplated):
                 nextsel)
         vars["dates"] = """%s &nbsp;&ndash;&nbsp; %s"""%(startDate, endDate)
 
+        detailed_data = self._ow.getData()
+        icons = self._ow.getIcons()
         inc = timedelta(1)
         sd = self._ow.getStartDate()
         idx = 0
@@ -618,12 +557,10 @@ class WWeekOverview(wcomponents.WTemplated):
             weekend = sd.weekday() >= 5
             vars["date%i" % idx] = sd.strftime("%a %d/%m")
             res = []
-            confs = self._ow.getConferencesWithStartTime(sd)
-            for conf, stTime in confs:
-                if weekend and not conf.hasSomethingOnWeekend(sd.date()):
-                    continue
-                wc = WOverviewConferenceItem(self._ow.getAW(), conf, sd, vars["displayConfURLGen"](conf),
-                                             self._ow._cal.getIcons(), self._ow.getDetailLevel(), stTime)
+            for start_dt, event in sorted(detailed_data['events'][sd.date()]):
+                wc = WOverviewConferenceItem(self._ow.getAW(), event.as_legacy, sd,
+                                             url_for('event.conferenceDisplay', event), icons,
+                                             detailed_data[event.id], self._ow.getDetailLevel(), start_dt)
                 res.append(wc.getHTML({}))
             if not res:
                 res.append("<tr><td></td></tr>")
@@ -638,38 +575,37 @@ class WWeekOverview(wcomponents.WTemplated):
 
 class WMonthOverview(wcomponents.WTemplated):
 
-    def __init__( self, ow ):
+    def __init__(self, ow):
         self._ow = ow
+        self._categ_list = ow.getCategoryList()
         self._isWeekendFree = True
+        self._detailed_data = self._ow.getData()
+        self._icons = self._ow.getIcons()
 
-    def _getDayCell( self, day ):
+    def _getDayCell(self, day):
         res = []
-        confs = day.getConferencesWithStartTime()
-        if confs:
-            for tuple in confs:
-                conf = tuple[0]
-                stTime = tuple[1]
-                wc = WOverviewConferenceItem( self._ow.getAW(), \
-                                            conf, \
-                                            day.getDate(), \
-                                            self._displayConfURLGen( conf ),\
-                                            self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel(),
-                                            stTime )
-                res.append( wc.getHTML( {} ) )
+        for tt_start_dt, event in sorted(self._detailed_data['events'][day.getDate().date()]):
+            wc = WOverviewConferenceItem(self._ow.getAW(),
+                                         event.as_legacy,
+                                         day.getDate(),
+                                         url_for('event.conferenceDisplay', event),
+                                         self._icons,
+                                         self._detailed_data[event.id],
+                                         self._ow.getDetailLevel(),
+                                         tt_start_dt)
+            res.append(wc.getHTML({}))
         return "".join(res)
 
     def _getMonth( self ):
         dayList = [[]]
         numWeek=0
+
         dl = self._ow.getDayList()
-        for i in range( dl[0].getWeekDay() ):
+        for i in range(dl[0].getWeekDay()):
             dayList[numWeek].append(None)
-        for day in self._ow.getDayList():
+        for day in dl:
             dayList[numWeek].append(day)
             if day.getWeekDay() >= 5:
-                if day.getConferencesWithStartTime():
-                    self._isWeekendFree = False
                 if day.getWeekDay() == 6:
                     numWeek +=1
                     dayList.append([])
@@ -735,7 +671,7 @@ class WCategoryOverview(wcomponents.WTemplated):
 
     def _getKey( self, vars):
         l = []
-        icons = self._ow._cal.getIcons().keys()
+        icons = self._ow.getIcons().keys()
         if len(icons) > 0:
             for icon in icons:
                 cm= CategoryManager()
@@ -773,7 +709,7 @@ class WCategoryOverview(wcomponents.WTemplated):
             displayOW = WWeekOverview( self._ow )
             vars["selWeek"] = "selected"
         else:
-            displayOW = WDayOverview( self._ow )
+            displayOW = WDayOverview(self._ow)
             vars["selDay"] = "selected"
 
         p = { "displayConfURLGen": vars["displayConfURLGen"] }
@@ -873,10 +809,12 @@ class WPCategOverview( WPCategoryDisplayBase ):
             return i18nformat("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
         return ""
 
-    def _getBody( self, params ):
-        if self._categ.getId() ==  "0" and type(self._ow) is Overview and self._ow.getDate().date() == nowutc().astimezone(timezone(self._locTZ)).date():
-            path = os.path.join(Config.getInstance().getXMLCacheDir(),"categOverview")
-            currenttime = int(time.mktime(time.strptime((datetime.now()-timedelta(minutes=60)).strftime("%a %b %d %H:%M:%S %Y"))))
+    def _getBody(self, params):
+        if (self._categ.getId() == "0" and type(self._ow) is Overview and
+                self._ow.getDate().date() == nowutc().astimezone(timezone(self._locTZ)).date()):
+            path = os.path.join(Config.getInstance().getXMLCacheDir(), "categOverview")
+            currenttime = int(mktime(strptime(
+                (datetime.now() - timedelta(minutes=60)).strftime("%a %b %d %H:%M:%S %Y"))))
             if os.path.exists(path) and os.path.getmtime(path) > currenttime:
                 fp = file(path, 'rb')
                 cache = fp.read()

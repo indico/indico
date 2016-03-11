@@ -85,8 +85,9 @@ class WCalendarMonthItem:
     <tr>
       <td valign=top>
         <table cellSpacing=0 cellPadding=4 bgcolor="#FFFFFF" border=0>"""%fulldate ]
-        for conf in day.getConferences():
-            categs = self._cal.getConferenceCategories( conf )
+        for __, event in day.getConferences():
+            conf = event.as_legacy
+            categs = self._cal.getConferenceCategories(conf)
             if len(categs) > 1:
                 colors = ["""
                 <table cellspacing="0" cellpadding="0" border="0" align="left">

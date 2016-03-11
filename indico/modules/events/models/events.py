@@ -25,8 +25,10 @@ from sqlalchemy.dialects.postgresql import JSON, ARRAY
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db.sqlalchemy import db, UTCDateTime
+from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
+from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
@@ -39,7 +41,7 @@ from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
-class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
+class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin, AttachedNotesMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
@@ -53,6 +55,8 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
     location_backref_name = 'events'
     allow_location_inheritance = False
     __logging_disabled = False
+
+    ATTACHMENT_FOLDER_ID_COLUMN = 'event_id'
 
     @strict_classproperty
     @classmethod
@@ -412,6 +416,12 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, db.Model):
         """Checks if a feature is enabled for the event"""
         from indico.modules.events.features.util import is_feature_enabled
         return is_feature_enabled(self, feature)
+
+    @property
+    @memoize_request
+    def scheduled_notes(self):
+        from indico.modules.events.notes.util import get_scheduled_notes
+        return get_scheduled_notes(self)
 
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None):
         """Creates a new log entry for the event

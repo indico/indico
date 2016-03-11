@@ -233,3 +233,25 @@ div.impersonation-header {
         content: "\3b";
     }
 }
+
+.location-info-tip {
+    .location-address {
+        color: $gray;
+        white-space: pre;
+    }
+
+    .map-link {
+        float: right;
+        margin-top: 0.5em;
+    }
+
+    h3, h4 {
+        line-height: 1.2em;
+        margin-top: 0 !important;
+        margin-bottom: 0;
+
+        &:not(:last-child) {
+            margin-bottom: 0.4em;
+        }
+    }
+}

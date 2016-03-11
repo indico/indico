@@ -1,0 +1,70 @@
+{% from 'events/display/_manage_button.html' import render_manage_button %}
+{% from 'events/display/_common.html' import render_location, render_users %}
+{% from 'events/timetable/display/_common.html' import render_attachments, render_notes, render_description,
+                                                       render_time %}
+{% from 'events/timetable/display/_contribution.html' import render_contribution %}
+{% from 'events/timetable/display/_break.html' import render_break %}
+
+{% macro render_session_block(block, event, parent=none, timezone=none, show_notes=false, hide_contribs=false) %}
+    {% set session_ = block.session %}
+    {% set entries = block.timetable_entry.children %}
+
+    <li class="timetable-item meetingSession">
+        <span class="containerTitle confModifPadding">
+            <a name="{{ session_.id }}"></a>
+            {{ render_manage_button(block, 'SESSION_BLOCK', align_right=true, show_notes=show_notes,
+                                    show_button=(not event.as_legacy.isClosed() and
+                                                 block.can_manage_attachments(session.user))) }}
+            {{ template_hook('vc-actions', event=event, item=block) }}
+
+            {% if not block.inherit_location and block.has_location_info -%}
+                {{ render_location(block, parent=event) }}
+            {%- endif %}
+
+            <span class="timetable-time top-level">
+                {{ render_time(block, timezone=timezone, hide_end_time=hide_end_time) }}
+            </span>
+            <span class="topLevelTitle">
+                {% if block.title and block.title != session_.title %}
+                    {{ session_.title }}: {{ block.title }}
+                {% else %}
+                    {{ session_.title }}
+                {% endif %}
+            </span>
+        </span>
+
+        {% if session_.description %}
+            {{ render_description(session_, class='session-description') }}
+        {% endif %}
+
+        <table class="timetable-item-details sessionDetails">
+            <tbody>
+                {% set conveners = block.person_links %}
+                {% if conveners %}
+                    <div class="convener-list">
+                        <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
+                        {{ render_users(conveners) }}
+                    </div>
+                {% endif %}
+
+                {{ render_attachments(session) }}
+                </tbody>
+        </table>
+
+        {{ render_notes(block.session) }}
+
+        {% if entries and not hide_contribs -%}
+            <ul class="meetingSubTimetable">
+                {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
+                {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
+                    {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
+                        {{ render_contribution(entry.contribution, event, nested=true, hide_end_time=true,
+                                               show_notes=show_notes, timezone=timezone, parent=block) }}
+                    {% elif entry.type.name == 'BREAK' %}
+                        {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone) }}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {%- endif %}
+    </li>
+{% endmacro %}

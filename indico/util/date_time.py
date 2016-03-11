@@ -144,14 +144,14 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
 
-def format_timedelta(td, format='short', locale=None):
+def format_timedelta(td, format='short', threshold=0.85, locale=None):
     """
     Basically a wrapper around Babel's own format_timedelta
     """
     if not locale:
         locale = get_current_locale()
 
-    return _format_timedelta(td, format=format, locale=locale).encode('utf-8')
+    return _format_timedelta(td, format=format, locale=locale, threshold=threshold).encode('utf-8')
 
 
 def format_human_timedelta(delta, granularity='seconds'):

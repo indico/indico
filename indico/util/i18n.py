@@ -29,6 +29,7 @@ from flask import session, request, has_request_context, current_app, has_app_co
 from flask_babelex import Babel, get_domain, Domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
+from werkzeug.utils import cached_property
 
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
@@ -148,6 +149,13 @@ class IndicoLocale(Locale):
         Returns the week day given the index
         """
         return self.days['format']['abbreviated' if short else 'wide'][daynum].encode('utf-8')
+
+    @cached_property
+    def time_formats(self):
+        formats = super(IndicoLocale, self).time_formats
+        for k, v in formats.items():
+            v.format = v.format.replace(':%(ss)s', '')
+        return formats
 
 
 class IndicoTranslations(Translations):

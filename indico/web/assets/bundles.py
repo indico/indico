@@ -451,6 +451,11 @@ screen_sass = Bundle('sass/screen.scss',
                      output="sass/screen_sass_%(version)s.css",
                      depends=SASS_BASE_MODULES)
 
+themes_sass = Bundle('sass/themes/indico.scss',
+                     filters=("pyscss", "cssrewrite", "cssmin"),
+                     output="sass/themes_sass_%(version)s.css",
+                     depends=SASS_BASE_MODULES)
+
 
 def register_all_js(env):
     env.register('jquery', jquery)
@@ -534,6 +539,7 @@ def register_all_css(env, main_css_file):
     env.register('surveys_sass', surveys_sass)
     env.register('timetable_sass', timetable_sass)
     env.register('sessions_sass', sessions_sass)
+    env.register('themes_sass', themes_sass)
 
 
 core_env = IndicoEnvironment()

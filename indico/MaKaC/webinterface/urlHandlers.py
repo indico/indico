@@ -799,30 +799,6 @@ class UHDomainPerformModification(URLHandler):
     _endpoint = 'admin.domainDataModification-modify'
 
 
-class UHRoomMappers(URLHandler):
-    _endpoint = 'rooms_admin.roomMapper'
-
-
-class UHNewRoomMapper(URLHandler):
-    _endpoint = 'rooms_admin.roomMapper-creation'
-
-
-class UHRoomMapperPerformCreation(URLHandler):
-    _endpoint = 'rooms_admin.roomMapper-performCreation'
-
-
-class UHRoomMapperDetails(URLHandler):
-    _endpoint = 'rooms_admin.roomMapper-details'
-
-
-class UHRoomMapperModification(URLHandler):
-    _endpoint = 'rooms_admin.roomMapper-modify'
-
-
-class UHRoomMapperPerformModification(URLHandler):
-    _endpoint = 'rooms_admin.roomMapper-performModify'
-
-
 class UHAdminArea(URLHandler):
     _endpoint = 'admin.adminList'
 

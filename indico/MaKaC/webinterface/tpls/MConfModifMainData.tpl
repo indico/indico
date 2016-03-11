@@ -6,7 +6,6 @@
     </header>
     <table width="100%">
         <%include file="EventModifMainData.tpl" args="evtType='meeting', confObj=self_._conf"/>
-        % if Config.getInstance().getReportNumberSystems():
         <tr>
             <td class="dataCaptionTD"><a name="reportNumber"></a><span class="dataCaptionFormat">External IDs</span></td>
             <td colspan="2" class="blacktext">
@@ -17,6 +16,5 @@
         <tr>
             <td colspan="3" class="horizontalLine">&nbsp;</td>
         </tr>
-        % endif
     </table>
 </div>
