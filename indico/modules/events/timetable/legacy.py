@@ -37,7 +37,7 @@ def serialize_timetable(event, days=None, hide_weekends=False, for_management=Fa
         date_str = day.strftime('%Y%m%d')
         if date_str not in timetable:
             continue
-        if hasattr(entry.object, 'can_access') and not entry.object.can_access(session.user):
+        if not entry.can_view(session.user):
             continue
         data = serialize_timetable_entry(entry)
         key = _get_entry_key(entry)
