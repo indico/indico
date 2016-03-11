@@ -196,6 +196,17 @@ class TimetableEntry(db.Model):
     def __repr__(self):
         return format_repr(self, 'id', 'type', 'start_dt', 'end_dt', _repr=self.object)
 
+    def can_view(self, user):
+        """Checks whether the user will see this entry in the timetable."""
+        if self.type == TimetableEntryType.BREAK:
+            return True
+        elif self.type == TimetableEntryType.CONTRIBUTION:
+            return self.object.can_access(user)
+        elif self.type == TimetableEntryType.SESSION_BLOCK:
+            if self.object.can_access(user):
+                return True
+            return any(x.can_access(user) for x in self.object.contributions if not x.is_inheriting)
+
 
 @listens_for(TimetableEntry.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
