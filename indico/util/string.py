@@ -541,3 +541,10 @@ class RichMarkup(Markup):
             return u'<div class="preformatted">{}</div>'.format(self)
         else:
             return self
+
+    def __getstate__(self):
+        return {slot: getattr(self, slot) for slot in self.__slots__ if hasattr(self, slot)}
+
+    def __setstate__(self, state):
+        for slot, value in state.iteritems():
+            setattr(self, slot, value)
