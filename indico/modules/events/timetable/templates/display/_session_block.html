@@ -41,10 +41,12 @@
             <tbody>
                 {% set conveners = block.person_links %}
                 {% if conveners %}
-                    <div class="convener-list">
-                        <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
-                        {{ render_users(conveners) }}
-                    </div>
+                    <tr class="convener-list">
+                        <td colspan="2">
+                            <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
+                            {{ render_users(conveners) }}
+                        </td>
+                    </tr>
                 {% endif %}
 
                 {{ render_attachments(session) }}

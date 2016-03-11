@@ -20,17 +20,16 @@
             {{ render_description(subcontrib, class='subcontrib-description') }}
         {% endif %}
 
-        <table class="timetable-subcontrib-details sessionDetails">
+        {% set speakers = subcontrib.person_links|selectattr("is_speaker")|list %}
+        {% if speakers %}
+            {{ render_speakers(speakers) }}
+        {% endif %}
+
+        <table class="timetable-subcontrib-details">
             <tbody>
                 {% if subcontrib.references -%}
-                    ({{ render_references(subcontrib) }})
+                    {{ render_references(subcontrib) }}
                 {% endif %}
-
-                {% set speakers = subcontrib.person_links|selectattr("is_speaker")|list %}
-                {% if speakers %}
-                    {{ render_speakers(speakers) }}
-                {% endif %}
-
                 {{ render_attachments(subcontrib) }}
             </tbody>
         </table>
