@@ -2,10 +2,10 @@
 {% from 'attachments/_display.html' import render_attachments_folders %}
 {% from 'events/display/_common.html' import render_users %}
 
-{% macro render_description(item) %}
-    <span itemprop="description" class="item-description">
+{% macro render_description(item, class='') %}
+    <div itemprop="description" class="item-description {{ class }}">
         {{ item.description }}
-    </span>
+    </div>
 {% endmacro %}
 
 {% macro render_references(item) -%}

@@ -34,7 +34,7 @@
         </span>
 
         {% if session_.description %}
-            <div class="description">{{ session_.description }}</div>
+            {{ render_description(session_, class='session-description') }}
         {% endif %}
 
         <table class="timetable-item-details sessionDetails">

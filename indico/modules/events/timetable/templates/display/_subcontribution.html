@@ -17,7 +17,7 @@
         {% endif %}
 
         {% if subcontrib.description %}
-            <span class="description">{{ render_description(subcontrib) }}</span>
+            {{ render_description(subcontrib, class='subcontrib-description') }}
         {% endif %}
 
         <table class="timetable-subcontrib-details sessionDetails">
