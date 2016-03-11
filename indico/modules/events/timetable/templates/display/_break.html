@@ -14,7 +14,8 @@
 
         <span class="confModifPadding">
             <span class="{{ 'topLevelTitle' if not nested }} break">
-                {{ item.title }}
+                {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+                {{- item.title | safe -}}
             </span>
             {% if hide_end_time and item.duration -%}
                 <span class="icon-time timetable-duration">

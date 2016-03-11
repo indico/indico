@@ -15,7 +15,10 @@
                 {# extending templates can add their logo(s) here #}
             {% endblock %}
 
-            <h1 itemprop="name">{{ event.title }}</h1>
+            <h1 itemprop="name">
+                {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+                {{- event.title | safe -}}
+            </h1>
             <div class="details">
                 <div class="event-date">
                     {{ render_event_time(event, timezone) }}

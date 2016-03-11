@@ -8,7 +8,10 @@
         {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', align_right=true, show_notes=show_notes,
                                 show_button=(not event.as_legacy.isClosed() and
                                              subcontrib.can_manage_attachments(session.user))) }}
-        <span class="subLevelTitle confModifPadding">{{ subcontrib.title }}</span>
+        <span class="subLevelTitle confModifPadding">
+            {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+            {{- subcontrib.title | safe -}}
+        </span>
 
         {% if subcontrib.duration %}
             <span class="icon-time timetable-duration">

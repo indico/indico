@@ -26,9 +26,11 @@
             </span>
             <span class="topLevelTitle">
                 {% if block.title and block.title != session_.title %}
-                    {{ session_.title }}: {{ block.title }}
+                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+                    {{- session_.title | safe -}}: {{ block.title | safe -}}
                 {% else %}
-                    {{ session_.title }}
+                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+                    {{- session_.title | safe -}}
                 {% endif %}
             </span>
         </span>

@@ -22,7 +22,8 @@
 
         <span class="confModifPadding">
             <span class="timetable-contrib-title {{ 'topLevelTitle' if not nested }}">
-                {{ contrib.title }}
+                {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+                {{- contrib.title | safe -}}
             </span>
             {% if contrib.duration -%}
                 <span class="icon-time timetable-duration">
