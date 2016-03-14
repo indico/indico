@@ -406,8 +406,8 @@ module_js = {
     'contributions': rjs_bundle('modules_contributions',
                                 *namespace('js/indico/modules/contributions', 'common.js', 'userlists.js')),
     'timetable': rjs_bundle('modules_timetable',
-                            *namespace('js/indico/modules/timetable/timetable', 'Filter.js', 'Layout.js', 'Undo.js',
-                                       'Base.js', 'DragAndDrop.js', 'Draw.js', 'Management.js')),
+                            *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
+                                       'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js', 'Actions.js')),
     'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js')
 }
 
