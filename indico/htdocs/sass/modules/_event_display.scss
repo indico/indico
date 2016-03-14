@@ -38,6 +38,14 @@
     padding: 10px 50px;
 }
 
+.timetable-title {
+    @extend %font-family-title;
+    color: $black;
+
+    &.top-level {
+        font-size: 1.2em;
+    }
+}
 
 .i-selection.note-visibility-toggle input[type=checkbox] {
     & + label {
@@ -235,6 +243,10 @@ li > table + .note-area-wrapper {
         padding: 0.2em 0.5em;
         background-color: lighten($light-yellow, 5%);
 
+        &:first-child {
+            margin-left: 0;
+        }
+
         .type-name {
             color: $light-black;
         }
@@ -260,4 +272,8 @@ li > table + .note-area-wrapper {
 
 .session-block-form {
     width: 840px !important;
+}
+
+.material-list .attachments-display-container {
+    display: inline-block;
 }

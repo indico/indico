@@ -1,42 +1,47 @@
 {% from 'events/display/_manage_button.html' import render_manage_button %}
 {% from 'events/timetable/display/_common.html' import render_speakers, render_references, render_attachments,
-                                                       render_notes, render_description %}
+                                                       render_notes, render_description, render_time %}
 
 
 {% macro render_subcontribution(subcontrib, event, show_notes=true) %}
-    <li class="timetable-subcontrib">
-        {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', align_right=true, show_notes=show_notes,
-                                show_button=(not event.as_legacy.isClosed() and
-                                             subcontrib.can_manage_attachments(session.user))) }}
-        <span class="subLevelTitle confModifPadding">
-            {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-            {{- subcontrib.title | safe -}}
-        </span>
-
-        {% if subcontrib.duration %}
-            <span class="icon-time timetable-duration">
-                {{ subcontrib.duration | format_timedelta(format='narrow') }}
-            </span>
-        {% endif %}
-
-        {% if subcontrib.description %}
-            {{ render_description(subcontrib, class='subcontrib-description') }}
-        {% endif %}
-
-        {% set speakers = subcontrib.person_links|selectattr("is_speaker")|list %}
-        {% if speakers %}
-            {{ render_speakers(speakers) }}
-        {% endif %}
-
-        <table class="timetable-subcontrib-details">
-            <tbody>
-                {% if subcontrib.references -%}
-                    {{ render_references(subcontrib) }}
+    <li class="timetable-subcontrib timetable-item">
+        <div class="timetable-item-body">
+            <div class="timetable-item-header">
+                <span class="timetable-title">
+                    {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
+                    {{- subcontrib.title | safe -}}
+                </span>
+                {% if subcontrib.duration %}
+                    <span class="icon-time timetable-duration">
+                        {{- subcontrib.duration | format_timedelta(format='narrow') -}}
+                    </span>
                 {% endif %}
-                {{ render_attachments(subcontrib) }}
-            </tbody>
-        </table>
+                <div class="timetable-item-actions">
+                    {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', align_right=true, show_notes=show_notes,
+                                            show_button=(not event.as_legacy.isClosed() and
+                                            subcontrib.can_manage_attachments(session.user))) }}
+                </div>
+            </div>
 
-        {{ render_notes(subcontrib) }}
+            {% if subcontrib.description %}
+                {{ render_description(subcontrib, class='subcontrib-description') }}
+            {% endif %}
+
+            {% set speakers = subcontrib.person_links|selectattr("is_speaker")|list %}
+            {% if speakers %}
+                {{ render_speakers(speakers) }}
+            {% endif %}
+
+            <table class="timetable-subcontrib-details">
+                <tbody>
+                    {% if subcontrib.references -%}
+                        {{ render_references(subcontrib) }}
+                    {% endif %}
+                    {{ render_attachments(subcontrib) }}
+                </tbody>
+            </table>
+
+            {{ render_notes(subcontrib) }}
+        </div>
     </li>
 {% endmacro %}

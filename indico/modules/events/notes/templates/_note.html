@@ -1,7 +1,7 @@
 {% macro render_note(note, hidden=true, can_edit=false, for_event=none) %}
     {% if note %}
         {% if for_event %}
-            <div id="event-note-section">
+            <div class="event-note-section">
                 {{ _render_note_box(note=note, event=for_event, hidden=hidden, can_edit=can_edit) }}
             </div>
         {% else %}

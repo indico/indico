@@ -9,66 +9,65 @@
     {% set session_ = block.session %}
     {% set entries = block.timetable_entry.children %}
 
-    <li class="timetable-item meetingSession">
-        <span class="containerTitle confModifPadding">
-            <a name="{{ session_.id }}"></a>
-            {{ render_manage_button(block, 'SESSION_BLOCK', align_right=true, show_notes=show_notes,
-                                    show_button=(not event.as_legacy.isClosed() and
-                                                 block.can_manage_attachments(session.user))) }}
-            {{ template_hook('vc-actions', event=event, item=block) }}
-
-            {% if not block.inherit_location and block.has_location_info -%}
-                {{ render_location(block, parent=event) }}
-            {%- endif %}
-
-            <span class="timetable-time top-level">
-                {{ render_time(block, timezone=timezone, hide_end_time=hide_end_time) }}
-            </span>
-            <span class="topLevelTitle">
-                {% if block.title and block.title != session_.title %}
-                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-                    {{- session_.title | safe -}}: {{ block.title | safe -}}
-                {% else %}
-                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-                    {{- session_.title | safe -}}
-                {% endif %}
-            </span>
+    <li class="timetable-item" id="session-{{ session_.id }}">
+        <span class="timetable-time top-level">
+            {{ render_time(block, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
+        <div class="timetable-item-body">
+            <div class="timetable-item-header">
+                <span class="timetable-title {{ 'top-level' if not nested }}">
+                    {%- if block.title and block.title != session_.title -%}
+                        {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
+                        {{- session_.title | safe -}}: {{ block.title | safe -}}
+                    {%- else -%}
+                        {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
+                        {{- session_.title | safe -}}
+                    {%- endif -%}
+                </span>
+                {% if not block.inherit_location and block.has_location_info -%}
+                    {{ render_location(block, parent=event) }}
+                {%- endif %}
+                <div class="timetable-item-actions">
+                    {{ render_manage_button(block, 'SESSION_BLOCK', show_notes=show_notes,
+                                            show_button=(not event.as_legacy.isClosed() and
+                                                         block.can_manage_attachments(session.user))) }}
+                    {{ template_hook('vc-actions', event=event, item=block) }}
+                </div>
+            </div>
+            {% if session_.description %}
+                {{ render_description(session_, class='session-description') }}
+            {% endif %}
 
-        {% if session_.description %}
-            {{ render_description(session_, class='session-description') }}
-        {% endif %}
+            {% set conveners = block.person_links %}
+            {% if conveners %}
+                <div class="convener-list">
+                    <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
+                    {{ render_users(conveners) -}}
+                </div>
+            {% endif %}
 
-        <table class="timetable-item-details sessionDetails">
-            <tbody>
-                {% set conveners = block.person_links %}
-                {% if conveners %}
-                    <tr class="convener-list">
-                        <td colspan="2">
-                            <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
-                            {{ render_users(conveners) }}
-                        </td>
-                    </tr>
-                {% endif %}
 
-                {{ render_attachments(session) }}
-                </tbody>
-        </table>
+            <table class="timetable-item-details session-details">
+                <tbody>
+                    {{ render_attachments(session) }}
+                    </tbody>
+            </table>
 
-        {{ render_notes(block.session) }}
+            {{ render_notes(block.session) }}
 
-        {% if entries and not hide_contribs -%}
-            <ul class="meetingSubTimetable">
-                {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
-                {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
-                    {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
-                        {{ render_contribution(entry.contribution, event, nested=true, hide_end_time=true,
-                                               show_notes=show_notes, timezone=timezone, parent=block) }}
-                    {% elif entry.type.name == 'BREAK' %}
-                        {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone) }}
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {%- endif %}
+            {% if entries and not hide_contribs -%}
+                <ul class="meeting-sub-timetable">
+                    {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
+                    {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
+                        {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
+                            {{ render_contribution(entry.contribution, event, nested=true, hide_end_time=true,
+                                                   show_notes=show_notes, timezone=timezone, parent=block) }}
+                        {% elif entry.type.name == 'BREAK' %}
+                            {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone) }}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {%- endif %}
+        </div>
     </li>
 {% endmacro %}

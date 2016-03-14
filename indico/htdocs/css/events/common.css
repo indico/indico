@@ -466,11 +466,9 @@ div.meetingEventSubHeader {
 }
 
 div.meetingEventBody {
-    background: white;
     font-size: 10pt;
     color: black;
     margin: 0px;
-    padding: 10px 50px;
     position: relative;
     min-height: 200px;
     border-bottom-left-radius: 0.2em;

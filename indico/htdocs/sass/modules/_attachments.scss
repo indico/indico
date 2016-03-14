@@ -321,9 +321,9 @@
 
 .inline-attachments-icon {
     vertical-align: middle !important;
-    text-align: right;
     line-height: 1.7em;
     &:before {
+        vertical-align: middle !important;
         display: inline-block;
         margin-top: 0.3em;
         font-size: 1.4em;

@@ -19,7 +19,8 @@
 
  $header-blue: #1a63a0;
  $timetable-blue: #3875a8;
- $timetable-teal: #32b17e;
+ $timetable-cyan: #05B3B3;
+ $timetable-pastel-cyan: #A8DEDE;
 
 .contrib-description {
     &.plain {
@@ -30,8 +31,7 @@
 .item-location {
     box-sizing: border-box;
     border-radius: 0.2em;
-    padding: 0.15em 0.5em 0.15em 0.25em;
-    color: $timetable-teal;
+    color: $timetable-cyan;
     font-size: 0.9em;
     float: right;
     margin-right: 0.5em;
@@ -39,9 +39,10 @@
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 0.5rem;
 
     &:before {
-        color: $timetable-teal;
+        color: $timetable-cyan;
         margin-right: 0.2em;
         vertical-align: middle;
     }
@@ -53,10 +54,10 @@
 
 %highlighted-data {
     display: inline-block;
-    padding: 0.15em 0.25em 0.15em 0.25em;
+    padding: 0 0.25em 0 0.25em;
+    line-height: 2rem;
     background-color: $timetable-blue;
     color: $light-gray;
-    border-radius: 0.2em;
 }
 
 %highlighted-header-data {
@@ -107,7 +108,6 @@
 
 .timetable-duration {
     box-sizing: border-box;
-    padding: 0.15em 0.5em 0.15em 0.25em;
     color: $dark-gray;
 
     &:before {
@@ -147,11 +147,106 @@
     @extend %font-family-title-light;
 }
 
+.meeting-timetable, .meeting-sub-timetable {
+    list-style-type: none;
+    padding: 0;
+}
+
+.day {
+    display: block;
+    font-size: 1.3em;
+    color: white;
+    padding: 1em 0 0.5em 0.5em;
+    border-bottom: 3px solid $gray;
+}
+
+.meeting-timetable {
+    @extend %font-family-title-light;
+    padding: 0.5em 2em 0.5em 0;
+    background-color: white;
+
+    .toolbar, .toolbar .group {
+        margin-bottom: 0;
+        padding: 0;
+    }
+
+    .timetable-item {
+        display: flex;
+        flex-direction: row;
+
+        &:not(:first-child) {
+            margin-top: 1em;
+        }
+
+        .timetable-duration {
+            margin-top: 0.5rem;
+            min-width: 4em;
+        }
+    }
+}
+
+.timetable-item-body {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0.5rem;
+
+    &:hover > .timetable-item-header .timetable-item-actions .manage-button .i-button,
+    &:hover > .timetable-item-header .timetable-item-actions .manage-button:not(.selected) .i-button {
+        opacity: 1;
+    }
+
+    &:not(:first-child) {
+        margin-left: 1em;
+    }
+
+    .timetable-item-header {
+        display: flex;
+        flex: auto;
+        flex-direction: row;
+
+        .timetable-title {
+            padding-top: 0.5rem;
+            @extend %font-family-title;
+            flex: auto;
+            line-height: 1rem;
+
+            &.nested {
+                color: $timetable-cyan;
+            }
+        }
+
+        .timetable-item-actions {
+            flex-shrink: 0;
+            padding-top: 0.25rem;
+            max-height: 2em;
+
+            .manage-button {
+                .i-button {
+                    @include transition(opacity .5s);
+                }
+
+                &:not(.selected) .i-button {
+                    opacity: 0.3;
+                }
+            }
+        }
+    }
+}
+
+.meeting-sub-timetable {
+    margin-top: 1em;
+}
+
+.subcontrib-list {
+    list-style-type: none;
+    padding: 0;
+}
+
 .timetable-time {
     color: $timetable-blue !important;
-
-    position: absolute;
-    left: 0;
+    flex-shrink: 0;
+    line-height: 2rem;
 
     &.top-level {
         &.start-time {
@@ -161,8 +256,21 @@
 
     &.nested {
         margin-right: 0.5em;
+        border-right: 3px solid $gray;
+
         .start-time {
-            background-color: $timetable-teal;
+            background-color: $gray;
+        }
+    }
+
+    &.break {
+        color: $timetable-cyan !important;
+
+        .end-time {
+            color: $timetable-cyan !important;
+        }
+        .start-time {
+            background-color: $timetable-cyan;
         }
     }
 
@@ -176,21 +284,20 @@
     }
 }
 
-.day {
-    display: block;
-    margin: 10px 0;
-    @extend %font-family-title-light;
-    font-size: 1.2em;
-    color: white;
-    background-color: $header-blue;
-    border-radius: 3px;
-    padding: 5px 10px;
-}
-
-.break {
-    color: $light-gray !important;
-    @extend %highlighted-data;
-    background-color: $dark-gray;
+.timetable-item.timetable-break {
+    .timetable-item-body {
+        .timetable-title {
+            text-align: center;
+            color: $timetable-cyan !important;
+        }
+        background: repeating-linear-gradient(
+            -40deg,
+            $timetable-pastel-cyan,
+            $timetable-pastel-cyan 10px,
+            lighten($timetable-pastel-cyan, 0.5*$light-color-variation) 10px,
+            lighten($timetable-pastel-cyan, 0.5*$light-color-variation) 20px
+        );
+    }
 }
 
 a.lecture-series-link {
@@ -199,4 +306,8 @@ a.lecture-series-link {
     background: $header-blue;
     color: $light-gray !important;
     margin-right: 0.1em;
+}
+
+div.meetingEventSubHeader {
+    @extend %font-family-title-light;
 }

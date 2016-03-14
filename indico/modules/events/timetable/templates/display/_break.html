@@ -3,8 +3,8 @@
 {% from 'events/timetable/display/_common.html' import render_description, render_time %}
 
 {% macro render_break(item, event, parent=none, timezone=none, show_notes=true, hide_end_time=false, nested=false) %}
-    <li class="timetable-item breakListItem">
-        <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
+    <li class="timetable-item timetable-break">
+        <span class="timetable-time break {{ 'nested' if nested else 'top-level' }}">
             {{ render_time(item, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
 
@@ -12,17 +12,19 @@
             {{ render_location(item, parent=parent) }}
         {%- endif %}
 
-        <span class="confModifPadding">
-            <span class="{{ 'topLevelTitle' if not nested }} break">
-                {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-                {{- item.title | safe -}}
-            </span>
-            {% if hide_end_time and item.duration -%}
-                <span class="icon-time timetable-duration">
-                    {{ item.duration | format_timedelta(format='narrow') }}
+        <div class="timetable-item-body">
+            <div class="timetable-item-header">
+                <span class="timetable-title {{ 'top-level' if not nested }} break">
+                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
+                    {{- item.title | safe -}}
                 </span>
-            {%- endif %}
-        </span>
+                {% if hide_end_time and item.duration -%}
+                    <span class="icon-time timetable-duration">
+                        {{ item.duration | format_timedelta(format='narrow') }}
+                    </span>
+                {%- endif %}
+            </div>
+        </div>
 
         {% if item.description %}
             {{ render_description(item, class='break-description') }}
