@@ -18,11 +18,14 @@
 .qtip-default {
     @include border-radius();
     @include border-all($black);
+    font-size: 1em;
+}
+
+.qtip-default:not(.qbubble) {
     box-shadow: 1px 0px 0px 1px rgba(0, 0, 0, 0.2);
 
     color: $light-gray;
     background-color: $black;
-    font-size: 1em;
 
     .qtip-titlebar {
         background-color: #F0F0F0;
@@ -40,12 +43,12 @@
 
 .qtip-danger {
     border-color: $red;
-    background-color: $red;
+    background-color: $red !important;
 }
 
 .qtip-warning {
     border-color: $yellow;
-    background-color: $yellow;
+    background-color: $yellow !important;
 }
 
 .qtip-popup {
