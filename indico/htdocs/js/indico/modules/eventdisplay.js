@@ -52,16 +52,16 @@
         });
 
         $(document).ready(function() {
-            $('h1, .subLevelTitle, .subEventLevelTitle, .topLevelTitle').mathJax();
+            $('h1, .item-description, .timetable-title').mathJax();
         });
     };
 
     global.toggleNote = function toggleNote(element, visible, immediate) {
         // Note for event
-        var note = element.closest('#event-note-section');
+        var note = element.closest('.event-note-section');
         // Note for other elements
         if (note.length === 0) {
-            note = element.closest('li').children('.note-area-wrapper');
+            note = element.closest('li').find('.note-area-wrapper');
         }
         var content = note.hasClass('togglable') ? note : note.find('.togglable');
         if (immediate) {

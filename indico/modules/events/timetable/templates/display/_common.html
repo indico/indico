@@ -9,24 +9,20 @@
 {% endmacro %}
 
 {% macro render_references(item) -%}
-    <tr>
-        <td colspan="2">
-            <ul class="reference-list">
-                {%- for reference in item.references: -%}
-                    <li title="{% trans title=reference.reference_type.name %}External reference ({{ title }}){% endtrans %}"
-                        class="icon-link">
-                    {% if reference.url -%}
-                        <a href="{{ reference.url }}" class="title" target="_blank">
-                            {{ reference.urn or reference.value }}
-                        </a>
-                    {%- else -%}
-                        <span class="title">{{ reference.urn or reference.value }}</span>
-                    {%- endif %}
-                    </li>
-                {%- endfor -%}
-            </ul>
-        </td>
-    </tr>
+    <ul class="reference-list">
+        {%- for reference in item.references: -%}
+            <li title="{% trans title=reference.reference_type.name %}External reference ({{ title }}){% endtrans %}"
+                class="icon-link">
+            {% if reference.url -%}
+                <a href="{{ reference.url }}" class="title" target="_blank">
+                    {{ reference.urn or reference.value }}
+                </a>
+            {%- else -%}
+                <span class="title">{{ reference.urn or reference.value }}</span>
+            {%- endif %}
+            </li>
+        {%- endfor -%}
+    </ul>
 {%- endmacro %}
 
 {% macro render_time(item, timezone=none, hide_end_time=false) -%}
@@ -49,14 +45,13 @@
 {%- endmacro %}
 
 {% macro render_attachments(item) -%}
-    <tr class="js-attachment-container">
+    <div class="js-attachment-container">
         {% if item.attached_items %}
-            <td class="leftCol icon-attachment inline-attachments-icon"></td>
-            <td class="material-list">
+            <div class="material-list icon-attachment inline-attachments-icon">
                 {{ render_attachments_folders(item=item) }}
-            </td>
+            </div>
         {% endif %}
-    </tr>
+    </div>
 {%- endmacro %}
 
 {% macro render_notes(item) -%}

@@ -17,7 +17,6 @@
 
 
 .padded-box {
-    @include border-radius();
     @include box-sizing(border-box);
     @include border-all($color: $pastel-gray, $width: 2px);
     background: $pastel-gray;
