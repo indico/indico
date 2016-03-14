@@ -19,9 +19,15 @@ from __future__ import unicode_literals
 from collections import defaultdict
 
 from flask import session
+from sqlalchemy.orm import defaultload
 
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
+
+
+def _get_query_options():
+    return (defaultload('contribution').subqueryload('person_links'),
+            defaultload('session_block').subqueryload('person_links'))
 
 
 def serialize_timetable(event, days=None, hide_weekends=False, for_management=False):
@@ -32,7 +38,10 @@ def serialize_timetable(event, days=None, hide_weekends=False, for_management=Fa
     for day in iterdays(start_dt, end_dt, skip_weekends=hide_weekends, day_whitelist=days):
         date_str = day.strftime('%Y%m%d')
         timetable[date_str] = {}
-    for entry in event.timetable_entries.order_by(TimetableEntry.type != TimetableEntryType.SESSION_BLOCK):
+    query = (event.timetable_entries
+             .options(*_get_query_options())
+             .order_by(TimetableEntry.type != TimetableEntryType.SESSION_BLOCK))
+    for entry in query:
         day = entry.start_dt.astimezone(event.tzinfo).date()
         date_str = day.strftime('%Y%m%d')
         if date_str not in timetable:
