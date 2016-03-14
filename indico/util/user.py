@@ -14,11 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from functools import wraps
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.util.decorators import smart_decorator
+from indico.util.string import to_unicode
 
 from MaKaC.common.cache import GenericCache
 
@@ -175,3 +177,46 @@ def unify_user_args(fn, legacy=False):
         return fn(*args, **kwargs)
 
     return wrapper
+
+
+def _unify_pending_user_data(fn):
+    @wraps(fn)
+    def _wrapper(user_data):
+        if 'first_name' not in user_data:
+            user_data['first_name'] = user_data.pop('firstName')
+        if 'family_name' not in user_data:
+            user_data['family_name'] = user_data.pop('familyName')
+        return fn(user_data)
+
+    return _wrapper
+
+
+@_unify_pending_user_data
+def create_pending_user(user_data):
+    """Helper function to create a pending user.
+
+    :param user_data: data used to populate new User object
+
+    """
+    from indico.modules.users import User
+    from indico.modules.users.models.users import UserTitle
+
+    new_user = User()
+    new_user.first_name = to_unicode(user_data['first_name'])
+    new_user.last_name = to_unicode(user_data['family_name'])
+    new_user.email = to_unicode(user_data['email'].lower())
+    new_user.address = to_unicode(user_data.get('address', ''))
+    new_user.phone = to_unicode(user_data.get('phone', ''))
+    new_user.affiliation = to_unicode(user_data.get('affiliation', ''))
+    new_user.title = UserTitle.get(re.sub(r'[^A-Za-z]', '', user_data.get('title', '').lower())) or UserTitle.none
+    new_user.is_pending = True
+
+    db.session.add(new_user)
+    db.session.flush()
+    return new_user
+
+
+def send_email_to_pending_contributors(email, event_name):
+    from indico.modules.auth.controllers import send_confirmation
+    return send_confirmation(email, 'register-email', 'auth.register', 'auth/emails/verify_and_register.txt',
+                             template_args={'event_name': event_name})

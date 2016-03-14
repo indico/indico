@@ -117,7 +117,7 @@ class RHLogout(RH):
         return multipass.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
 
 
-def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
+def send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
     template_args = template_args or {}
     url_args = url_args or {}
     token = secure_serializer.dumps(data or email, salt=salt)
@@ -191,9 +191,9 @@ class RHLinkAccount(RH):
     def _send_confirmation(self, email):
         session['login_identity_info']['verification_email_sent'] = True
         session['login_identity_info']['data']['email'] = email  # throw away other emails
-        return _send_confirmation(email, 'link-identity-email', '.link_account',
-                                  'auth/emails/link_identity_verify_email.txt', {'user': self.user},
-                                  url_args={'provider': self.identity_info['provider']})
+        return send_confirmation(email, 'link-identity-email', '.link_account',
+                                 'auth/emails/link_identity_verify_email.txt', {'user': self.user},
+                                 url_args={'provider': self.identity_info['provider']})
 
 
 class RHRegister(RH):
@@ -270,8 +270,8 @@ class RHRegister(RH):
 
     def _send_confirmation(self, email):
         session['register_verification_email_sent'] = True
-        return _send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
-                                  url_args={'provider': self.provider_name})
+        return send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
+                                 url_args={'provider': self.provider_name})
 
     def _create_user(self, form, handler, pending_user):
         data = form.data
@@ -551,8 +551,8 @@ class RHResetPassword(RH):
             # Showing a list of usernames would be a little bit more user-friendly but less
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
             identity = next(iter(user.local_identities))
-            _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
-                               {'user': user, 'username': identity.identifier}, data=identity.id)
+            send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
+                              {'user': user, 'username': identity.identifier}, data=identity.id)
             session['resetpass_email_sent'] = True
             return redirect(url_for('.resetpass'))
         return WPAuth.render_template('reset_password.html', form=form, identity=None, widget_attrs={},

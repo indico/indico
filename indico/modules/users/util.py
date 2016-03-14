@@ -29,6 +29,7 @@ from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
 from indico.util.string import to_unicode
+from indico.util.user import create_pending_user
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import CategoryManager
 
@@ -195,12 +196,7 @@ def get_user_by_email(email, create_pending=False):
         return None
     # Create a new pending user
     data = user_or_identity.data
-    user = User(first_name=data.get('first_name') or '', last_name=data.get('last_name') or '', email=data['email'],
-                address=data.get('address', ''), phone=data.get('phone', ''),
-                affiliation=data.get('affiliation', ''), is_pending=True)
-    db.session.add(user)
-    db.session.flush()
-    return user
+    return create_pending_user(data)
 
 
 def merge_users(source, target, force=False):
