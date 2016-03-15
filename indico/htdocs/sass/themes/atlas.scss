@@ -15,15 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-body {
-    background: #424242;
-}
+@import 'base/palette';
+@import 'base/indico';
 
-.pageHeader {
-    border-bottom: none;
-}
-
-div.meetingEventBody {
-    border-bottom-left-radius: 0.2em;
-    border-bottom-right-radius: 0.2em;
-}
+@include header-logo('../../../images/conference_atlas.png', 25px 25px);

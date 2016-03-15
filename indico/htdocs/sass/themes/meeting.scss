@@ -15,27 +15,4 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url("IndicoMeeting.css");
-
-div.meetingEventHeader {
-    background: #fff url('../../../images/picosec_endotofpet_banner.jpg') no-repeat;
-    padding-top: 15px;
-    padding-left: 200px;
-    border-top-left-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-}
-
-div.meetingEventHeader .details{
-    text-shadow: none !important;
-    color: #222 !important;
-}
-
-div.meetingEventHeader h1 {
-    font-weight: bold;
-    text-shadow: none;
-    color: #555588;
-}
-
-a.logo {
-    display: none;
-}
+@import 'base/indico.scss';

@@ -15,31 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url("IndicoMeeting.css");
+@import 'base/palette';
 
-div.meetingEventHeader {
-    text-shadow: none !important;
-    background: #fff url('../../../images/Logo-EndoTOFPET.jpg') left top no-repeat;
-    padding-top: 15px;
-    padding-left: 180px;
-    border-top-left-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-}
+@import 'base/indico';
 
-div.meetingEventHeader .details{
-    text-shadow: none !important;
-    color: #222 !important;
-}
-
-div.meetingEventHeader h1 {
-    font-weight: bold;
-    text-shadow: none;
-    color: #555588;
-}
-
-a.logo {
-    position: absolute;
-    left: 26px;
-    top: 26px;
-    display: block;
-}
+@include header-logo('../../../images/APlogotype.png', 15px 0, 180px);
