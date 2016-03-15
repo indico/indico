@@ -19,6 +19,7 @@
 @import "compass";
 @import "partials/icons";
 @import "partials/_boxes";
+@import "partials/_labels";
 
 .action-menu {
     flex-shrink: 0;
@@ -538,8 +539,7 @@ td.i-table i {
     }
 
     .disabled .i-label {
-        background-color: $light-gray;
-        border-color: $dark-gray;
+        @extend .i-label.striped;
     }
 
     .placeholder {
