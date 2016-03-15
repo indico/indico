@@ -136,6 +136,10 @@ class ContributionFieldValueBase(db.Model):
             )
         )
 
+    @property
+    def friendly_data(self):
+        return self.contribution_field.field.get_friendly_value(self.data)
+
 
 class ContributionFieldValue(ContributionFieldValueBase):
     __tablename__ = 'contribution_field_values'

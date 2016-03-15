@@ -92,7 +92,7 @@
         \sectionfont{\normalsize\rmfamily}
         \subsectionfont{\small\rmfamily}
         \small
-        ${ md_convert(field_value.data.decode('utf-8')).encode('utf-8') }
+        ${ md_convert(field_value.friendly_data.decode('utf-8')).encode('utf-8') }
     }
 
     \vspace{0.5em}
