@@ -17,23 +17,24 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.util.signals import named_objects_from_signal
+from indico.modules.events.surveys.fields.base import SurveyField
+from indico.web.fields import get_field_definitions
 
 
 def get_field_types():
     """Gets a dict containing all field types"""
-    return named_objects_from_signal(signals.event.get_survey_fields.send(), plugin_attr='plugin')
+    return get_field_definitions(SurveyField)
 
 
-@signals.event.get_survey_fields.connect
+@signals.get_fields.connect_via(SurveyField)
 def _get_fields(sender, **kwargs):
-    from .simple import TextField, NumberField, BoolField
-    from .choices import SingleChoiceField, MultiSelectField
-    yield TextField
-    yield NumberField
-    yield BoolField
-    yield SingleChoiceField
-    yield MultiSelectField
+    from .simple import SurveyTextField, SurveyNumberField, SurveyBoolField
+    from .choices import SurveySingleChoiceField, SurveyMultiSelectField
+    yield SurveyTextField
+    yield SurveyNumberField
+    yield SurveyBoolField
+    yield SurveySingleChoiceField
+    yield SurveyMultiSelectField
 
 
 @signals.app_created.connect

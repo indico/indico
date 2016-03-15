@@ -18,77 +18,22 @@ from __future__ import unicode_literals, division
 
 from collections import Counter, OrderedDict
 
-from wtforms.fields import BooleanField, StringField, TextAreaField
-from wtforms.fields.html5 import IntegerField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
-
-from indico.modules.events.surveys.fields.base import SurveyField, FieldConfigForm
+from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
-from indico.web.forms.fields import IndicoRadioField
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.fields.simple import TextField, NumberField, BoolField
 
 
-class TextConfigForm(FieldConfigForm):
-    max_length = IntegerField(_('Max length'), [Optional(), NumberRange(min=1)])
-    multiline = BooleanField(_('Multiline'), widget=SwitchWidget(),
-                             description=_("If the field should be rendered as a textarea instead of a single-line "
-                                           "text field."))
-
-
-class TextField(SurveyField):
-    name = 'text'
-    friendly_name = _('Text')
-    config_form = TextConfigForm
-
-    @property
-    def wtf_field_class(self):
-        return TextAreaField if self.question.field_data.get('multiline') else StringField
-
-    @property
-    def validators(self):
-        max_length = self.question.field_data.get('max_length')
-        return [Length(max=max_length)] if max_length else None
-
+class SurveyTextField(TextField, SurveyField):
     def get_summary(self):
-        if not self.question.not_empty_answers:
+        if not self.object.not_empty_answers:
             return
-        return [a.data for a in self.question.not_empty_answers]
-
-    def is_answer_empty(self, answer):
-        return not answer.data
+        return [a.data for a in self.object.not_empty_answers]
 
 
-class NumberConfigForm(FieldConfigForm):
-    min_value = IntegerField(_('Min value'), [Optional()])
-    max_value = IntegerField(_('Max value'), [Optional()])
-
-    def _validate_min_max_value(self, field):
-        if (self.min_value.data is not None and self.max_value.data is not None and
-                self.min_value.data >= self.max_value.data):
-            raise ValidationError(_('The min value must be less than the max value.'))
-
-    validate_min_value = _validate_min_max_value
-    validate_max_value = _validate_min_max_value
-
-
-class NumberField(SurveyField):
-    name = 'number'
-    friendly_name = _('Number')
-    config_form = NumberConfigForm
-    wtf_field_class = IntegerField
-    required_validator = InputRequired
-
-    @property
-    def validators(self):
-        min_value = self.question.field_data.get('min_value')
-        max_value = self.question.field_data.get('max_value')
-        if min_value is None and max_value is None:
-            return
-        return [NumberRange(min=min_value, max=max_value)]
-
+class SurveyNumberField(NumberField, SurveyField):
     def get_summary(self):
         counter = Counter()
-        for answer in self.question.not_empty_answers:
+        for answer in self.object.not_empty_answers:
             counter[answer.data] += 1
         if not counter:
             return
@@ -102,21 +47,10 @@ class NumberField(SurveyField):
         return results
 
 
-class BoolField(SurveyField):
-    name = 'bool'
-    friendly_name = _('Yes/No')
-    wtf_field_class = IndicoRadioField
-    required_validator = InputRequired
-
-    @property
-    def wtf_field_kwargs(self):
-        return {'orientation': 'horizontal',
-                'choices': [(1, _('Yes')), (0, _('No'))],
-                'coerce': lambda x: bool(int(x))}
-
+class SurveyBoolField(BoolField, SurveyField):
     def get_summary(self):
         counter = Counter()
-        for answer in self.question.not_empty_answers:
+        for answer in self.object.not_empty_answers:
             counter[answer.data] += 1
         if not counter:
             return
@@ -124,8 +58,3 @@ class BoolField(SurveyField):
         return {'total': total,
                 'absolute': OrderedDict(((_('Yes'), counter[True]), (_('No'), counter[False]))),
                 'relative': OrderedDict(((_('Yes'), counter[True] / total), (_('No'), counter[False] / total)))}
-
-    def render_answer(self, answer):
-        if answer is None:
-            return ''
-        return _('Yes') if answer else _('No')

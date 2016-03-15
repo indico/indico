@@ -95,6 +95,13 @@ context.  The additional kwargs passed to this signal depend on
 the context.
 """)
 
+get_fields = _signals.signal('get-fields', """
+Expected to return `BaseField` subclasses.  The *sender* is an object
+(or just a string) identifying for what to get fields.  This signal
+should never be registered without restricting the sender to ensure
+only the correct field types are returned.
+""")
+
 db_schema_created = _signals.signal('db-schema-created', """
 Executed when a new database schema is created.  The *sender* is the
 name of the schema.

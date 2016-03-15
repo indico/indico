@@ -33,7 +33,7 @@ def add_survey_question(section, field_cls, data):
     """
     question = SurveyQuestion()
     field = field_cls(question)
-    field.update_question(data)
+    field.update_object(data)
     section.children.append(question)
     db.session.flush()
     logger.info('Survey question %s added by %s', question, session.user)
