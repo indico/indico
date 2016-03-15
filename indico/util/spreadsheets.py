@@ -95,7 +95,8 @@ def generate_xlsx(headers, rows):
     :param rows: a list of dicts mapping captions to values
     :return: an `io.BytesIO` containing the XLSX data
     """
-    workbook_options = {'in_memory': True, 'strings_to_formulas': False, 'strings_to_numbers': False}
+    workbook_options = {'in_memory': True, 'strings_to_formulas': False, 'strings_to_numbers': False,
+                        'strings_to_urls': False}
     buf = BytesIO()
     header_positions = {name: i for i, name in enumerate(headers)}
     # convert row dicts to lists
