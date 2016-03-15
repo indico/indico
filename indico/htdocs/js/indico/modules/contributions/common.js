@@ -196,10 +196,10 @@
         setupReporter();
     };
 
-    global.setupSubContributionList = function() {
+    global.setupSubContributionList = function setupSubContributionList() {
         $('#subcontribution-list [data-toggle=dropdown]').closest('.group').dropdown();
         setupTableSorter('#subcontribution-list .tablesorter');
-        enableIfChecked('#subcontribution-list', 'input[name=subcontribution_id]', '.js-enable-if-checked');
+        enableIfChecked('#subcontribution-list', 'input[name=subcontribution_id]', '#subcontribution-list .js-enable-if-checked');
 
         $('#subcontribution-list td.subcontribution-title').on('mouseenter', function() {
             var $this = $(this);
