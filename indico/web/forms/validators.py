@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import re
 from datetime import timedelta
 
 from wtforms.validators import StopValidation, ValidationError, EqualTo
@@ -224,3 +225,32 @@ class MaxDuration(object):
     def __call__(self, form, field):
         if field.data is not None and field.data > self.max_duration:
             raise ValidationError(_('Duration cannot exceed {}').format(format_human_timedelta(self.max_duration)))
+
+
+class WordCount(object):
+    """Validates the word count of a string.
+
+    :param min: The minimum number of words in the string.  If not
+                provided, the minimum word count will not be checked.
+    :param min: The maximum number of words in the string.  If not
+                provided, the maximum word count will not be checked.
+    """
+
+    def __init__(self, min=-1, max=-1):
+        assert min != -1 or max != -1, 'At least one of `min` or `max` must be specified.'
+        assert max == -1 or min <= max, '`min` cannot be more than `max`.'
+        self.min = min
+        self.max = max
+
+    def __call__(self, form, field):
+        count = len(re.findall(r'\w+', field.data)) if field.data else 0
+        if count < self.min or self.max != -1 and count > self.max:
+            if self.max == -1:
+                message = ngettext('Field must contain at least {min} word.',
+                                   'Field must contain at least {min} words.', self.min)
+            elif self.min == -1:
+                message = ngettext('Field cannot contain more than {max} word.',
+                                   'Field cannot contain more than {max} words.', self.max)
+            else:
+                message = _('Field must have between {min} and {max} words.')
+            raise ValidationError(message.format(min=self.min, max=self.max, length=count))
