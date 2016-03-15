@@ -520,6 +520,18 @@ td.i-table i {
 
 // Participant list settings page
 
+#registration-forms {
+    > .i-box {
+        display: inline-block;
+    }
+}
+
+#participant-list-columns {
+    ul#publish-registrations {
+        list-style-type: none;
+    }
+}
+
 .sortable-column-preview,
 .sortable-form-preview {
     margin-bottom: 10px;
@@ -532,9 +544,28 @@ td.i-table i {
 
         li {
             &.i-label {
-                margin: 3px;
+                margin: 5px;
                 cursor: move;
+                text-align: left;
+
+                > .title {
+                    flex-grow: 1;
+                    margin: 0 0.5em;
+                }
+
+                .toggle-enabled {
+                    cursor: pointer;
+                }
             }
+        }
+    }
+
+    ul {
+        &.enabled li .toggle-enabled {
+            @include icon-before('icon-eye');
+        }
+        &.disabled li .toggle-enabled {
+            @include icon-before('icon-eye-blocked');
         }
     }
 
@@ -545,19 +576,12 @@ td.i-table i {
     .placeholder {
         border-style: dashed;
     }
-
-    .titled-rule {
-        @extend %i-box-cancel-horizontal-padding;
-    }
 }
 
-.sortable-form-preview {
-    ul li {
-            display: block;
-            text-align: left;
-    }
+.sortable-column-preview ul li.i-label {
+    display: inline-flex;
 }
 
-#participant-list-columns ul#publish-registrations {
-    list-style-type: none;
+.sortable-form-preview ul li.i-label {
+    display: flex;
 }
