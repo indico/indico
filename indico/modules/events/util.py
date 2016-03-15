@@ -24,6 +24,7 @@ from sqlalchemy.orm import load_only, noload
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import send_email, make_email
+from indico.modules.api import settings as api_settings
 from indico.modules.auth.util import url_for_register
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -316,3 +317,29 @@ class ReporterBase(object):
         self.report_config = session.setdefault(session_key, {})
         self.report_config['filters'] = filters
         session.modified = True
+
+
+def get_base_ical_parameters(user, event, detail):
+    """Returns a dict of all parameters expected by iCal template"""
+
+    from indico.web.http_api.util import generate_public_auth_request
+
+    api_mode = api_settings.get('security_mode')
+    persistent_allowed = api_settings.get('allow_persistent')
+    api_key = user.api_key if user else None
+    persistent_user_enabled = api_key.is_persistent_allowed if api_key else None
+    tpl = get_template_module('api/_messages.html')
+    persistent_agreement = tpl.get_ical_persistent_msg()
+    top_urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(event.id))
+    urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(event.id), {'detail': detail})
+    request_urls = {
+        'publicRequestURL': top_urls['publicRequestURL'],
+        'authRequestURL': top_urls['authRequestURL'],
+        'publicRequestDetailedURL': urls['publicRequestURL'],
+        'authRequestDetailedURL': urls['authRequestURL']
+    }
+
+    return {'api_mode': api_mode, 'api_key': api_key, 'persistent_allowed': persistent_allowed,
+            'persistent_user_enabled': persistent_user_enabled, 'api_active': api_key is not None,
+            'api_key_user_agreement': tpl.get_ical_api_key_msg(), 'api_persistent_user_agreement': persistent_agreement,
+            'user_logged': user is not None, 'request_urls': request_urls}
