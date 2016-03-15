@@ -24,7 +24,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.operations import create_timetable_entry, update_timetable_entry
-from indico.modules.events.timetable.legacy import serialize_timetable
+from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.views import WPDisplayTimetable, WPManageTimetable
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
@@ -126,6 +126,6 @@ class RHTimetable(RHConferenceBaseDisplay):
     def _process(self):
         event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
         event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        timetable_data = serialize_timetable(self.event_new)
+        timetable_data = TimetableSerializer().serialize_timetable(self.event_new)
         return WPDisplayTimetable.render_template('display.html', self._conf, event_info=event_info,
                                                   timetable_data=timetable_data, timetable_layout=self.layout)
