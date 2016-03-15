@@ -21,6 +21,6 @@ $header-bg-color: #dedede;
 $header-icon-color: $red;
 $header-text-color: $black;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/alicelogo.png');

@@ -21,6 +21,6 @@ $header-bg-color: #dedede;
 $header-icon-color: $light-black;
 $header-text-color: $black;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/EuroCircolLogo.png', 26px 33px, 230px, 17%);

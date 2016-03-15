@@ -25,11 +25,11 @@
  $tt-secondary-pastel: #a8dede !default;
 
  @mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
-     div.meetingEventHeader {
-     	background: $header-bg-color url($image) left top no-repeat;
-     	background-position: $position;
+     div.event-header {
+         background: $header-bg-color url($image) left top no-repeat;
+         background-position: $position;
         background-size: $scale;
-     	padding-left: $padding-left;
+         padding-left: $padding-left;
      }
  }
 
@@ -156,7 +156,7 @@
     text-shadow: none;
 }
 
-div.meetingEventHeader {
+div.event-header {
     background: $header-bg-color;
     color: $header-text-color;
     font-size: 12pt;
@@ -177,7 +177,7 @@ div.meetingEventHeader {
     }
 }
 
-.meetingEventHeader {
+.event-header {
     @extend %font-family-title-light;
 }
 
@@ -334,14 +334,56 @@ div.meetingEventHeader {
     }
 }
 
+.event-sub-header {
+    background: $light-gray;
+    font-size: 12px;
+    color: black;
+    margin: 0;
+    padding: 3px 10px;
+    border-bottom: 1px solid $gray;
+    @extend %font-family-title-light;
+}
+
+.item-description {
+    &.session-description,
+    &.break-description,
+    &.contrib-description,
+    &.subcontrib-description {
+        font-size: 0.9em;
+        padding: 0.5em 0;
+    }
+    .event-description {
+        color: $black;
+    }
+
+    color: $light-black;
+
+    .preformatted {
+        white-space: pre-wrap;
+    }
+}
+
+// Lectures
+
+.event-header-lecture {
+    & > h1 {
+        margin-top: 1em;
+    }
+
+    & > h2 {
+        font-size: 1.1em;
+        color: $gray;
+    }
+
+    .lecture-category {
+        color: $tt-secondary-pastel;
+    }
+}
+
 a.lecture-series-link {
     display: inline-block;
     padding: 0.2em 0.5em;
     background: $header-bg-color;
     color: $light-gray !important;
     margin-right: 0.1em;
-}
-
-div.meetingEventSubHeader {
-    @extend %font-family-title-light;
 }

@@ -19,6 +19,6 @@
 
 $header-bg-color: #1a64a0;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/egee_small.png', 15px 45px, 200px);

@@ -21,6 +21,6 @@ $header-bg-color: #fff;
 $header-icon-color: $gray;
 $header-text-color: $black;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/intelum.png', 25px 50px, 250px, 20%);
