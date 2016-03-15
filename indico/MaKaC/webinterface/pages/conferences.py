@@ -720,7 +720,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         return render_template(posixpath.join('events/display', self.theme['template']), event=self._conf.as_event,
                                conf=self._conf,
-                               show_notes=(self.theme_id == 'standard_inline_minutes'),
+                               show_notes=self.theme.get('show_notes', False),
                                **vars).encode('utf-8')
 
 
