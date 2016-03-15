@@ -69,7 +69,7 @@ PROTECTION_MODE_MAP = {
     1: ProtectionMode.protected,
 }
 
-USER_TITLE_MAP = {x.title: x for x in UserTitle}
+USER_TITLE_MAP = {unicode(x.title): x for x in UserTitle}
 
 PERSON_INFO_MAP = {
     '_address': 'address',
