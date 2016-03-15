@@ -21,6 +21,6 @@ $header-bg-color: #fff;
 $header-icon-color: $gray;
 $header-text-color: $black;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/ilc_logo.png', 25px 35px, 220px);

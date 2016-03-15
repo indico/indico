@@ -19,9 +19,9 @@
 
 $header-bg-color: #006699;
 
-@import 'base/indico';
+@import 'indico';
 
-div.meetingEventHeader {
+div.event-header {
    padding-left: 150px;
 }
 

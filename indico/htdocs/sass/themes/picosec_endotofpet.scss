@@ -21,6 +21,10 @@ $header-bg-color: #fff;
 $header-icon-color: $gray;
 $header-text-color: #555588;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/picosec_endotofpet_banner.jpg', 0 0, 200px);
+
+.event-header h1 {
+    max-width: 600px;
+}

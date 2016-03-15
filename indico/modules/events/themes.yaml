@@ -8,13 +8,13 @@ definitions:
   event:
     event_types:
     - simple_event
-    stylesheet: lectures/IndicoLecture.css
+    stylesheet: indico.scss
     template: lecture.html
     title: Event
   lecture:
     event_types:
     - simple_event
-    stylesheet: lectures/IndicoLecture.css
+    stylesheet: indico.scss
     template: lecture.html
     title: Lecture
 
@@ -23,14 +23,14 @@ definitions:
     event_types:
     - conference
     - meeting
-    stylesheet: meeting.scss
+    stylesheet: indico.scss
     template: meeting.html
     title: Indico style
   standard_inline_minutes:
     event_types:
     - meeting
     show_notes: true
-    stylesheet: meeting.scss
+    stylesheet: lecture.scss
     template: meeting.html
     title: Indico style - inline minutes
   nicecompact:
@@ -62,25 +62,25 @@ definitions:
   egee_lecture:
     event_types:
     - simple_event
-    stylesheet: lectures/EGEELecture.css
+    stylesheet: egee.scss
     template: lecture.html
     title: EGEE lecture
   picosec_endtofpet_lectures:
     event_types:
     - simple_event
-    stylesheet: lectures/picosec_endotofpet.css
+    stylesheet: picosec_endotofpet.scss
     template: lecture.html
     title: PicoSEC - EndoTOFPET US
   picosec_lecture:
     event_types:
     - simple_event
-    stylesheet: lectures/picosec.css
+    stylesheet: picosec.scss
     template: lecture.html
     title: PicoSEC Lectures
   tical-lectures:
     event_types:
     - simple_event
-    stylesheet: lectures/tical.css
+    stylesheet: tical.scss
     template: lecture.html
     title: TICAL
 

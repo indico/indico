@@ -488,7 +488,9 @@ class WPXSLConferenceDisplay(WPConferenceBase):
                 includeContribution = 1
             else:
                 includeContribution = 0
-            body = outGen.getFormattedOutput(self._rh, self._conf, theme_settings.themes[self._view]['template'],
+            template_path = os.path.join(Config.getInstance().getStylesheetsDir(), 'events',
+                                         theme_settings.themes[self._view]['template'])
+            body = outGen.getFormattedOutput(self._rh, self._conf, template_path,
                                              body_vars, 1, includeContribution, 1, 1,
                                              self._params.get("showSession", ""), self._params.get("showDate", ""))
             return body

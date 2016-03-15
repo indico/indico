@@ -4,8 +4,8 @@
 
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     {% block header %}
-        <div class="lectureEventHeader">
-            <div class="lectureCategory">{{ category }}</div>
+        <div class="event-header event-header-lecture">
+            <div class="lecture-category">{{ category }}</div>
             {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
                 {{ render_manage_button(event, 'EVENT', align_right=true, manage_link=true, show_button=show_button) }}
@@ -16,7 +16,7 @@
             {% if chairpersons %}
                 <h2>
                     {% trans %}by{% endtrans %}
-                    {{ render_users(chairpersons, span_class='author', title=False) }}
+                    {{ render_users(chairpersons, span_class='author', title=True) }}
                 </h2>
             {% endif %}
             <div class="details">
@@ -33,7 +33,7 @@
     {% endblock %}
 
     {% block body %}
-        <div class="lectureEventBody">
+        <div class="event-sub-header">
             {% include 'events/display/_details.html' %}
         </div>
     {% endblock %}

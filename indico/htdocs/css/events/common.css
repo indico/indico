@@ -435,15 +435,6 @@ div.meetingEventHeader .details {
     margin: 0;
 }
 
-div.meetingEventSubHeader {
-    background: #ECECEC;
-    font-size: 12px;
-    color: black;
-    margin: 0;
-    padding: 3px 10px;
-    border-bottom: 1px solid #AAA;
-}
-
 div.meetingEventBody {
     font-size: 10pt;
     color: black;

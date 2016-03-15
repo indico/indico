@@ -21,6 +21,6 @@ $header-bg-color: #fff;
 $header-icon-color: $light-black;
 $header-text-color: #555588;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/logo-tical.jpg', 0 0, 200px, 230px);

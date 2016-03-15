@@ -19,6 +19,6 @@
 
 $header-bg-color: #006699;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/Logo-CrystalClear.jpg', 25px 25px);

@@ -21,6 +21,6 @@ $header-bg-color: #fff;
 $header-icon-color: $light-black;
 $header-text-color: $black;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/Logo-EndoTOFPET.jpg', 0 0, 180px);

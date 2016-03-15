@@ -21,6 +21,6 @@ $header-bg-color: #dedede;
 $header-icon-color: $light-black;
 $header-text-color: $black;
 
-@import 'base/indico';
+@import 'indico';
 
 @include header-logo('../../../images/FAST-logo-text.png', 28px 29px, 250px, 20%);

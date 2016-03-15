@@ -4,7 +4,7 @@
 
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     {% block header %}
-        <div class="meetingEventHeader">
+        <div class="event-header">
             {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
                 {{ render_manage_button(event, 'EVENT', align_right=true, manage_link=true, show_button=show_button,
@@ -42,7 +42,7 @@
     {% endblock %}
 
     {% block body %}
-        <div class="meetingEventSubHeader">
+        <div class="event-sub-header">
             <table class="eventDetails">
                 <tbody>
                     {% include 'events/display/_details.html' %}
@@ -54,7 +54,7 @@
             {{ render_note(conf.note, hidden=not show_notes, can_edit=event.can_manage(session.user), for_event=conf) }}
         {% endif %}
 
-        <div class="meetingEventBody">
+        <div class="event-body">
             {{ template_hook('meeting-body', event=event) }}
         </div>
     {% endblock %}

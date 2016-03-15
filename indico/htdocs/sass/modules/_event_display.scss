@@ -253,23 +253,6 @@ li > table + .note-area-wrapper {
     }
 }
 
-.item-description {
-
-    &.session-description,
-    &.break-description,
-    &.contrib-description,
-    &.subcontrib-description {
-        font-size: 0.9em;
-        padding: 0.5em 0;
-    }
-
-    color: $dark-gray;
-
-    .preformatted {
-        white-space: pre-wrap;
-    }
-}
-
 .session-block-form {
     width: 840px !important;
 }
