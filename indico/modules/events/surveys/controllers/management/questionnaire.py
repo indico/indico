@@ -104,9 +104,8 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
                 if value is not None:
                     data[key] = value
             field_cls = get_field_types()[data['field_type']]
-            form_cls = field_cls.config_form
             data = field_cls.process_imported_data(data)
-            form = form_cls(formdata=MultiDict(data.items()), csrf_enabled=False)
+            form = field_cls.create_config_form(formdata=MultiDict(data.items()), csrf_enabled=False)
             if not form.validate():
                 raise ValueError('Invalid question')
             add_survey_question(section, field_cls, form.data)
@@ -273,7 +272,7 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
         except KeyError:
             raise NotFound
 
-        form = field_cls.config_form()
+        form = field_cls.create_config_form()
         try:
             clone_id = int(request.args['clone'])
         except (KeyError, ValueError):
@@ -281,7 +280,7 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
         else:
             try:
                 question_to_clone = SurveyQuestion.query.with_parent(self.survey).filter_by(id=clone_id).one()
-                form = question_to_clone.field.config_form(
+                form = question_to_clone.field.create_config_form(
                     obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
             except NoResultFound:
                 pass
@@ -297,10 +296,10 @@ class RHEditSurveyQuestion(RHManageSurveyQuestionBase):
     """Edit a survey question"""
 
     def _process(self):
-        form = self.question.field.config_form(obj=FormDefaults(self.question, **self.question.field_data))
+        form = self.question.field.create_config_form(obj=FormDefaults(self.question, **self.question.field_data))
         if form.validate_on_submit():
             old_title = self.question.title
-            self.question.field.update_question(form.data)
+            self.question.field.update_object(form.data)
             db.session.flush()
             flash(_('Question "{title}" updated').format(title=old_title), 'success')
             logger.info('Survey question %s modified by %s', self.question, session.user)

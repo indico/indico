@@ -128,7 +128,7 @@ class SurveyAnswer(db.Model):
 
     @property
     def is_empty(self):
-        return self.question.field.is_answer_empty(self)
+        return self.question.field.is_value_empty(self)
 
     @return_ascii
     def __repr__(self):
@@ -136,4 +136,4 @@ class SurveyAnswer(db.Model):
 
     @property
     def answer_data(self):
-        return self.question.field.render_answer(self.data)
+        return self.question.field.get_friendly_value(self.data)
