@@ -13,6 +13,25 @@
     {%- endtrans %}
 {% endblock %}
 
+{% macro sortable_items(items) -%}
+    {% for item in items %}
+        <li class="i-label sortable-item" id="{{ item.id }}">
+            <span class="title">{{ item.title }}</span>
+        </li>
+    {% endfor %}
+{%- endmacro %}
+
+{% macro sortable_lists(enabled_title, enabled_items, disabled_title, disabled_items) -%}
+    <div class="titled-rule">{{ enabled_title }}</div>
+    <ul class="enabled">
+        {{ sortable_items(enabled_items) }}
+    </ul>
+    <div class="titled-rule">{{ disabled_title }}</div>
+    <ul class="disabled">
+        {{ sortable_items(disabled_items) }}
+    </ul>
+{%- endmacro %}
+
 {% block content %}
     {{ form_header(form, id='js-participant-display-form') }}
     {{ form_rows(form) }}
@@ -59,8 +78,8 @@
             {% for form in regforms %}
             <li>
                 <input type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}
-                       id="{{form.id}}"></input>
-                {{form.title}}
+                       />
+                {{form.title}} {{form.publish_registrations_enabled}}
             </li>
             {% endfor %}
         </ul>
@@ -73,23 +92,8 @@
             {%- endtrans %}
         </p>
         <div class="i-box titled sortable-column-preview">
-            <div class="titled-rule">{% trans %}Shown columns{% endtrans %}</div>
-            <ul class="enabled">
-                {% for column in enabled_columns %}
-                    <li class="i-label sortable-item" id="{{ column.id }}">
-                        <span class="title">{{ column.title }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-
-            <div class="titled-rule">{% trans %}Hidden columns{% endtrans %}</div>
-            <ul class="disabled">
-                {% for column in disabled_columns %}
-                    <li class="i-label sortable-item" id="{{ column.id }}">
-                        <span class="title">{{ column.title }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
+            {{ sortable_lists(_("Shown columns"), enabled_columns,
+                              _("Hidden columns"), disabled_columns) }}
         </div>
     </div>
 
@@ -100,22 +104,8 @@
             {%- endtrans %}
         </p>
         <div class="i-box titled sortable-form-preview">
-            <div class="titled-rule">{% trans %}Shown registration forms{% endtrans %}</div>
-            <ul class="enabled">
-                {% for form in enabled_forms %}
-                    <li class="i-label sortable-item" id="{{ form.id }}">
-                        <span class="title">{{ form.title }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-            <div class="titled-rule">{% trans %}Hidden registration forms{% endtrans %}</div>
-            <ul class="disabled">
-                {% for form in disabled_forms %}
-                    <li class="i-label sortable-item" id="{{ form.id }}">
-                        <span class="title">{{ form.title }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
+            {{ sortable_lists(_("Shown registration forms"), enabled_forms,
+                              _("Hidden registration forms"), disabled_forms) }}
         </div>
     </div>
 
