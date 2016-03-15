@@ -45,8 +45,18 @@ class RHManageTimetableBase(RHConferenceModifBase):
 class RHManageTimetable(RHManageTimetableBase):
     """Display timetable management page"""
 
+    def _checkParams(self, params):
+        RHManageTimetableBase._checkParams(self, params)
+        self.layout = request.args.get('layout', None)
+        if not self.layout:
+            self.layout = request.args.get('ttLyt', None)
+
     def _process(self):
-        return WPManageTimetable.render_template('management/timetable.html', self._conf)
+        event_info = fossilize(self._conf, IConferenceEventInfoFossil, tz=self._conf.tz)
+        event_info['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
+        return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
+                                                 timetable_data=timetable_data, timetable_layout=self.layout)
 
 
 class RHTimetableREST(RHManageTimetableBase):

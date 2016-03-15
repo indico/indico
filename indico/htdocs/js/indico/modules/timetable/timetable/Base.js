@@ -898,7 +898,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         var ul = $('<ul class="dropdown"/>');
 
         if (this._allowCreateHere('Session')) {
-            var sessionAdd = $('<a href="#"/>').text($T('Session')).appendTo(ul).wrap("<li/>");
+            var sessionAdd = $('<a href="#"/>').text($T('Session block')).appendTo(ul).wrap("<li/>");
             sessionAdd.bind('menu_select', function() {
                 if (keys(self.eventInfo.sessions).length === 0) {
                     self.managementActions.addSession();
