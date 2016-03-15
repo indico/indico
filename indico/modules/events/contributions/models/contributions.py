@@ -334,7 +334,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return get_non_inheriting_objects(self)
 
     def get_field_value(self, field_id):
-        return next((v.data for v in self.field_values if v.contribution_field_id == field_id), '')
+        return next((v.friendly_data for v in self.field_values if v.contribution_field_id == field_id), '')
 
 
 @listens_for(mapper, 'after_configured', once=True)
