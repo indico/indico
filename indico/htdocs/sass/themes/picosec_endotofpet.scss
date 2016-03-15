@@ -15,13 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url("IndicoMeeting.css");
+@import 'base/palette';
 
-div.meetingEventHeader {
-    background: #013D7C url('../../../images/lhcblogo.jpg') left top no-repeat;
-    background-position: 25px 25px;
-    background-size: 150px;
-    padding-left: 200px;
-    border-top-left-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-}
+$header-bg-color: #fff;
+$header-icon-color: $gray;
+$header-text-color: #555588;
+
+@import 'base/indico';
+
+@include header-logo('../../../images/picosec_endotofpet_banner.jpg', 0 0, 200px);

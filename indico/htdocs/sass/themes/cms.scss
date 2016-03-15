@@ -15,11 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url("IndicoMeeting.css");
+@import 'base/palette';
+@import 'base/indico';
 
-div.meetingEventHeader {
-    background: #1a64a0 url('../../../images/intelum.png') left top no-repeat;
-    background-size: 20%;
-    background-position: 28px 50px;
-    padding-left: 250px;
-}
+@include header-logo('../../../images/cms_logo.png', 30px 45px);

@@ -423,27 +423,6 @@ div.eventInfoBox {
 	padding: 10px;
 }
 
-div.meetingEventHeader {
-    background: #1a64a0;
-    color: white;
-    font-size: 12pt;
-    position: relative;
-
-    min-height: 125px;
-    margin: 0px;
-    padding: 10px 30px 10px;
-    border-top-left-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-}
-
-div.meetingEventHeader h1 {
-    font-size: 20pt;
-    color: white;
-    font-weight: normal;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
 div.meetingEventHeader .iCal {
     position: absolute;
     top: 0px;

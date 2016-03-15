@@ -17,10 +17,25 @@
 
  @import 'base';
 
- $header-blue: #1a63a0;
- $timetable-blue: #3875a8;
- $timetable-cyan: #05B3B3;
- $timetable-pastel-cyan: #A8DEDE;
+ $header-bg-color: #1a63a0 !default;
+ $header-icon-color: $light-gray !default;
+ $header-text-color: $light-gray !default;
+ $tt-primary-color: #3875a8 !default;
+ $tt-secondary-color: #05b3b3 !default;
+ $tt-secondary-pastel: #a8dede !default;
+
+ @mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
+     div.meetingEventHeader {
+     	background: $header-bg-color url($image) left top no-repeat;
+     	background-position: $position;
+        background-size: $scale;
+     	padding-left: $padding-left;
+     }
+ }
+
+ body {
+     background: #424242;
+ }
 
 .contrib-description {
     &.plain {
@@ -31,7 +46,7 @@
 .item-location {
     box-sizing: border-box;
     border-radius: 0.2em;
-    color: $timetable-cyan;
+    color: $tt-secondary-color;
     font-size: 0.9em;
     float: right;
     margin-right: 0.5em;
@@ -42,7 +57,7 @@
     margin-top: 0.5rem;
 
     &:before {
-        color: $timetable-cyan;
+        color: $tt-secondary-color;
         margin-right: 0.2em;
         vertical-align: middle;
     }
@@ -56,13 +71,14 @@
     display: inline-block;
     padding: 0 0.25em 0 0.25em;
     line-height: 2rem;
-    background-color: $timetable-blue;
+    background-color: $tt-primary-color;
     color: $light-gray;
 }
 
 %highlighted-header-data {
     @extend %highlighted-data;
-    background-color: darken($header-blue, 5%);
+    color: $header-text-color !important;
+    background-color: darken($header-bg-color, 5%);
 }
 
 .event-time-data {
@@ -81,15 +97,12 @@
 
 .header-data {
     &:before {
-        color: $light-gray;
+        color: $header-icon-color;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         margin-right: 0.4em;
         vertical-align: middle;
     }
 
-    a {
-        color: $light-gray !important;
-    }
     color: $light-gray;
     background-color: transparent;
 }
@@ -141,6 +154,27 @@
     color: #aaa;
     font-size: 12px;
     text-shadow: none;
+}
+
+div.meetingEventHeader {
+    background: $header-bg-color;
+    color: $header-text-color;
+    font-size: 12pt;
+    position: relative;
+
+    min-height: 125px;
+    margin: 0px;
+    padding: 10px 30px 10px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
+
+    h1 {
+        font-size: 20pt;
+        color: $header-text-color;
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 }
 
 .meetingEventHeader {
@@ -212,7 +246,7 @@
             line-height: 1rem;
 
             &.nested {
-                color: $timetable-cyan;
+                color: $tt-secondary-color;
             }
         }
 
@@ -244,13 +278,13 @@
 }
 
 .timetable-time {
-    color: $timetable-blue !important;
+    color: $tt-primary-color !important;
     flex-shrink: 0;
     line-height: 2rem;
 
     &.top-level {
         &.start-time {
-            background-color: $timetable-blue;
+            background-color: $tt-primary-color;
         }
     }
 
@@ -264,13 +298,13 @@
     }
 
     &.break {
-        color: $timetable-cyan !important;
+        color: $tt-secondary-color !important;
 
         .end-time {
-            color: $timetable-cyan !important;
+            color: $tt-secondary-color !important;
         }
         .start-time {
-            background-color: $timetable-cyan;
+            background-color: $tt-secondary-color;
         }
     }
 
@@ -280,7 +314,7 @@
     }
 
     .end-time {
-        color: $timetable-blue;
+        color: $tt-primary-color;
     }
 }
 
@@ -288,14 +322,14 @@
     .timetable-item-body {
         .timetable-title {
             text-align: center;
-            color: $timetable-cyan !important;
+            color: $tt-secondary-color !important;
         }
         background: repeating-linear-gradient(
             -40deg,
-            $timetable-pastel-cyan,
-            $timetable-pastel-cyan 10px,
-            lighten($timetable-pastel-cyan, 0.5*$light-color-variation) 10px,
-            lighten($timetable-pastel-cyan, 0.5*$light-color-variation) 20px
+            $tt-secondary-pastel,
+            $tt-secondary-pastel 10px,
+            lighten($tt-secondary-pastel, 0.5*$light-color-variation) 10px,
+            lighten($tt-secondary-pastel, 0.5*$light-color-variation) 20px
         );
     }
 }
@@ -303,7 +337,7 @@
 a.lecture-series-link {
     display: inline-block;
     padding: 0.2em 0.5em;
-    background: $header-blue;
+    background: $header-bg-color;
     color: $light-gray !important;
     margin-right: 0.1em;
 }
