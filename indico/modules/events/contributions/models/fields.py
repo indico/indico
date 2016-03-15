@@ -91,7 +91,14 @@ class ContributionField(db.Model):
     # relationship backrefs:
     # - contribution_values (ContributionFieldValue.contribution_field)
 
-    # TODO: add field logic similar to what we did for survey fields
+    @property
+    def field(self):
+        from indico.modules.events.contributions import get_contrib_field_types
+        try:
+            impl = get_contrib_field_types()[self.field_type]
+        except KeyError:
+            return None
+        return impl(self)
 
     @return_ascii
     def __repr__(self):

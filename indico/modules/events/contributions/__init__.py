@@ -21,7 +21,9 @@ from flask import flash, session
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole, check_roles
+from indico.modules.events.contributions.contrib_fields import get_contrib_field_types
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.fields import ContributionField
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -54,6 +56,19 @@ def _convert_email_principals(user, **kwargs):
         flash(ngettext("You have been granted manager/submission privileges for a contribution.",
                        "You have been granted manager/submission privileges for {} contributions.", num).format(num),
               'info')
+
+
+@signals.get_fields.connect_via(ContributionField)
+def _get_fields(sender, **kwargs):
+    from . import contrib_fields
+    yield contrib_fields.ContribTextField
+    yield contrib_fields.ContribSingleChoiceField
+
+
+@signals.app_created.connect
+def _check_field_definitions(app, **kwargs):
+    # This will raise RuntimeError if the field names are not unique
+    get_contrib_field_types()
 
 
 @signals.event_management.get_cloners.connect

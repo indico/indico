@@ -35,7 +35,6 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.rb.models.locations import Location
@@ -342,6 +341,7 @@ class EventPersonListField(PrincipalListField):
             raise ValueError(_("Uknown person type '{}'").format(person_type))
 
     def _serialize_principal(self, principal):
+        from indico.modules.events.util import serialize_event_person
         if not isinstance(principal, EventPerson):
             return super(EventPersonListField, self)._serialize_principal(principal)
         return serialize_event_person(principal)
