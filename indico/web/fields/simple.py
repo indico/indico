@@ -25,11 +25,13 @@ from wtforms.validators import NumberRange, Optional, ValidationError, Length, I
 
 from indico.util.i18n import _
 from indico.web.forms.fields import IndicoRadioField
+from indico.web.forms.validators import WordCount
 from indico.web.forms.widgets import SwitchWidget
 
 
 class TextConfigForm(object):
     max_length = IntegerField(_('Max length'), [Optional(), NumberRange(min=1)])
+    max_words = IntegerField(_('Max words'), [Optional(), NumberRange(min=1)])
     multiline = BooleanField(_('Multiline'), widget=SwitchWidget(),
                              description=_("If the field should be rendered as a textarea instead of a single-line "
                                            "text field."))
@@ -47,7 +49,13 @@ class TextField(object):
     @property
     def validators(self):
         max_length = self.object.field_data.get('max_length')
-        return [Length(max=max_length)] if max_length else None
+        max_words = self.object.field_data.get('max_words')
+        validators = []
+        if max_length:
+            validators.append(Length(max=max_length))
+        if max_words:
+            validators.append(WordCount(max=max_words))
+        return validators
 
     def is_value_empty(self, value):
         return not value.data
