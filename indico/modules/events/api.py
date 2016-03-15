@@ -26,7 +26,7 @@ from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
 from indico.modules.events import Event
-from indico.modules.events.notes.util import build_note_api_data
+from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.categories import LegacyCategoryMapping
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
@@ -286,20 +286,45 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 'tz': str(date.tzinfo)
             }
 
-    def _serialize_persons(self, persons):
-        return [self._serialize_person(person) for person in persons]
+    def _serialize_persons(self, persons, person_type):
+        return [self._serialize_person(person, person_type) for person in persons]
 
-    def _serialize_person(self, person):
+    def _serialize_person(self, person, person_type):
         if person:
             return {
+                '_type': person_type,
+                '_fossil': self.fossils_mapping['person'].get(person_type, None),
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
                 'id': person.id if getattr(person, 'id', None) else person.person_id,
                 'affiliation': person.affiliation,
                 'emailHash': md5(person.email).hexdigest() if person.email else None,
             }
 
+    fossils_mapping = {
+        'event': {
+            None: 'conferenceMetadata',
+            'contributions': 'conferenceMetadataWithContribs',
+            'subcontributions': 'conferenceMetadataWithSubContribs',
+            'sessions': 'conferenceMetadataWithSessions'
+        },
+        'contribution': {
+            'contributions': 'contributionMetadata',
+            'subcontributions': 'contributionMetadataWithSubContribs',
+            'sessions': 'contributionMetadataWithSubContribs'
+        },
+        'person': {
+            'Avatar': 'conferenceChairMetadata',
+            'ConferenceChair': 'conferenceChairMetadata',
+            'ContributionParticipation': 'contributionParticipationMetadata',
+            'SubContribParticipation': 'contributionParticipationMetadata'
+        }
+    }
+
     def _build_event_api_data(self, event):
+        self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
         data = {
+            '_type': 'Conference',
+            '_fossil': self.fossils_mapping['event'].get(self._detail_level, None),
             'id': event.id,
             'categoryId': event.category_id,
             'category': event.category.getTitle(),
@@ -316,29 +341,27 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'endDate': self._serialize_date(event.end_dt),
             'modificationDate': self._serialize_date(event.as_legacy.getModificationDate()),
             'creationDate': self._serialize_date(event.as_legacy.getCreationDate()),
-            'creator': self._serialize_person(event.creator),
+            'creator': self._serialize_person(event.creator, person_type='Avatar'),
             'hasAnyProtection': event.as_legacy.hasAnyProtection(),
             'timezone': event.timezone,
             'roomMapURL': event.room.map_url if event.room else None,
             'visibility': Conversion.visibility(event.as_legacy),
-            'folders': build_folders_api_data(event)
-            # TODO: what about '_type'?
-            # TODO: what about 'material'? It doesn't return the material of the event ('folders' does that)
-            # TODO: what about 'chairs'. It doesn't return the Chairpersons
-
+            'folders': build_folders_api_data(event),
+            'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair'),
+            'material': build_material_legacy_api_data(event) + [build_note_legacy_api_data(event.note)]
         }
-        detail = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
-        if detail in {'contributions', 'subcontributions'}:
+        if self._detail_level in {'contributions', 'subcontributions'}:
             data['contributions'] = []
             for contribution in event.contributions:
-                include_subcontribs = detail in {'subcontributions', 'sessions'}
+                include_subcontribs = self._detail_level in {'subcontributions', 'sessions'}
                 serialized_contrib = self._build_contribution_api_data(contribution, include_subcontribs)
                 data['contributions'].append(serialized_contrib)
         return data
 
-
     def _build_contribution_api_data(self, contrib, include_subcontribs=True):
         data = {
+            '_type': 'Contribution',
+            '_fossil': self.fossils_mapping['contribution'].get(self._detail_level, None),
             'id': contrib.id,
             'title': contrib.title,
             'startDate': self._serialize_date(contrib.start_dt) if contrib.start_dt else None,
@@ -354,13 +377,15 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'url': url_for('event.contributionDisplay', confId=contrib.event_id, contribId=contrib.friendly_id,
                            _external=True),
             'material': build_material_legacy_api_data(contrib),
-            'speakers': self._serialize_persons([x.person for x in contrib.speakers]),
-            'primaryauthors': self._serialize_persons([x.person for x in contrib.primary_authors]),
-            'coauthors': self._serialize_persons([x.person for x in contrib.secondary_authors]),
+            'speakers': self._serialize_persons([x.person for x in contrib.speakers],
+                                                person_type='ContributionParticipation'),
+            'primaryauthors': self._serialize_persons([x.person for x in contrib.primary_authors],
+                                                      person_type='ContributionParticipation'),
+            'coauthors': self._serialize_persons([x.person for x in contrib.secondary_authors],
+                                                 person_type='ContributionParticipation'),
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
-            # TODO: what about '_type'?
         }
         if include_subcontribs:
             data['subContributions'] = map(self._build_subcontribution_api_data, contrib.subcontributions)
@@ -368,15 +393,16 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
     def _build_subcontribution_api_data(self, subcontrib):
         data = {
+            '_type': 'SubContribution',
+            '_fossil': 'subContributionMetadata',
             'id': subcontrib.id,
             'title': subcontrib.title,
             'duration': subcontrib.duration.seconds // 60,
             'note': build_note_api_data(subcontrib.note),
             'material': build_material_legacy_api_data(subcontrib),
             'folders': build_folders_api_data(subcontrib),
-            'speakers': self._serialize_persons([x.person for x in subcontrib.speakers]),
-            # TODO: what about '_type'?
-
+            'speakers': self._serialize_persons([x.person for x in subcontrib.speakers],
+                                                person_type='SubContribParticipation')
         }
         return data
 
