@@ -29,7 +29,8 @@ definitions:
   standard_inline_minutes:
     event_types:
     - meeting
-    stylesheet: meetings/IndicoMeetingWithMinutes.css
+    show_notes: true
+    stylesheet: meeting.scss
     template: meeting.html
     title: Indico style - inline minutes
   nicecompact:
