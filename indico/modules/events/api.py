@@ -328,13 +328,16 @@ class CategoryEventFetcher(IteratedDataFetcher):
 
         }
         detail = get_query_parameter(request.args.to_dict(), ['d', 'detail'])
-        if detail == 'contributions':
+        if detail in {'contributions', 'subcontributions'}:
             data['contributions'] = []
             for contribution in event.contributions:
-                data['contributions'].append(self._build_contribution_api_data(contribution))
+                include_subcontribs = detail in {'subcontributions', 'sessions'}
+                serialized_contrib = self._build_contribution_api_data(contribution, include_subcontribs)
+                data['contributions'].append(serialized_contrib)
         return data
 
-    def _build_contribution_api_data(self, contrib):
+
+    def _build_contribution_api_data(self, contrib, include_subcontribs=True):
         data = {
             'id': contrib.id,
             'title': contrib.title,
@@ -358,6 +361,22 @@ class CategoryEventFetcher(IteratedDataFetcher):
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
             # TODO: what about '_type'?
+        }
+        if include_subcontribs:
+            data['subContributions'] = map(self._build_subcontribution_api_data, contrib.subcontributions)
+        return data
+
+    def _build_subcontribution_api_data(self, subcontrib):
+        data = {
+            'id': subcontrib.id,
+            'title': subcontrib.title,
+            'duration': subcontrib.duration.seconds // 60,
+            'note': build_note_api_data(subcontrib.note),
+            'material': build_material_legacy_api_data(subcontrib),
+            'folders': build_folders_api_data(subcontrib),
+            'speakers': self._serialize_persons([x.person for x in subcontrib.speakers]),
+            # TODO: what about '_type'?
+
         }
         return data
 
