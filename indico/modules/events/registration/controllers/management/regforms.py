@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter, itemgetter
+
 from flask import redirect, flash, session
 
 from indico.core import signals
@@ -63,41 +65,52 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
     """Customize the display of registrations on the public page"""
 
     def _process(self):
-
-        enabled_columns = []
-        disabled_columns = []
-        for pdt, data in PersonalDataType.FIELD_DATA:
-            if pdt.name in registration_settings.get(self.event, 'participant_list_columns'):
-                enabled_columns.append({'id': pdt.name, 'title': data['title']})
-            else:
-                disabled_columns.append({'id': pdt.name, 'title': data['title']})
-
-        merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
-
         regforms = (self.event_new.registration_forms
                     .filter_by(is_deleted=False)
                     .order_by(db.func.lower(RegistrationForm.title))
                     .all())
 
-        enabled_forms = []
-        disabled_forms = []
-        for form in regforms:
-            if form.publish_registrations_enabled:
-                enabled_forms.append(form)
-            else:
-                disabled_forms.append(form)
-
         form = ParticipantsDisplayForm()
         if form.validate_on_submit():
-            print form.json.data
-            registration_settings.set(self.event, 'participant_list_columns',
-                                      form.json.data['participant_list_columns'])
+            data = form.json.data
+            registration_settings.set(self.event, 'merge_registration_forms', data['merge_forms'])
+            registration_settings.set(self.event, 'participant_list_columns', data['participant_list_columns'])
             for regform in regforms:
-                if str(regform.id) in form.json.data['participant_list_forms']:
-                    print "Enabled form " + str(regform.id)
-                else:
-                    print "Disabled form " + str(regform.id)
+                regform.publish_registrations_enabled = str(regform.id) in data['participant_list_forms']
 
+        available_columns = {f[0].name: f[1]['title'] for f in PersonalDataType.FIELD_DATA}
+        enabled_columns = []
+        disabled_columns = []
+        for column_name in registration_settings.get(self.event, 'participant_list_columns'):
+            if column_name in available_columns:
+                enabled_columns.append({'id': column_name, 'title': available_columns[column_name]})
+                del available_columns[column_name]
+        for column_name, column_title in available_columns.iteritems():
+            disabled_columns.append({'id': column_name, 'title': column_title})
+        disabled_columns.sort(key=itemgetter('title'))
+
+        available_forms = {regform.id: regform for regform in regforms}
+        enabled_forms = []
+        disabled_forms = []
+        # Handle forms that have already been sorted by the user.
+        for form_id in registration_settings.get(self.event, 'participant_list_forms'):
+            try:
+                regform = available_forms[form_id]
+            except KeyError:
+                continue
+            # Make sure publication was not disabled since the display settings were modified.
+            if regform.publish_registrations_enabled:
+                enabled_forms.append(regform)
+                del available_forms[form_id]
+        for form_id, regform in available_forms.iteritems():
+            # There might be forms with publication enabled that haven't been sorted by the user yet.
+            if regform.publish_registrations_enabled:
+                enabled_forms.append(regform)
+            else:
+                disabled_forms.append(regform)
+        disabled_forms.sort(key=attrgetter('title'))
+
+        merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
         return WPManageRegistration.render_template('management/regform_display.html', self.event, event=self.event,
                                                     regforms=regforms, enabled_columns=enabled_columns,
                                                     disabled_columns=disabled_columns, enabled_forms=enabled_forms,

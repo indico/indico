@@ -16,7 +16,14 @@
 {% macro sortable_items(items) -%}
     {% for item in items %}
         <li class="i-label sortable-item" id="{{ item.id }}">
-            <span class="title">{{ item.title }}</span>
+            <div class="actions">
+                <div class="toggle-enabled"></div>
+            </div>
+            <div class="title">{{ item.title }}</div>
+            <div class="actions">
+                <div class="move-prev"></div>
+                <div class="move-next"></div>
+            </div>
         </li>
     {% endfor %}
 {%- endmacro %}
@@ -71,15 +78,14 @@
     <div id="participant-list-columns">
         <p>
             {% trans -%}
-                Select which registration form entries will be published in the participant list.
+                Select which registration form will have its entries published in the participant list.
             {%- endtrans %}
         </p>
         <ul id="publish-registrations">
             {% for form in regforms %}
             <li>
-                <input type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}
-                       />
-                {{form.title}} {{form.publish_registrations_enabled}}
+                <input id="{{form.id}}" type="checkbox" {% if form.publish_registrations_enabled %}checked{% endif %}></input>
+                {{form.title}}
             </li>
             {% endfor %}
         </ul>
@@ -140,12 +146,24 @@
 
             var $form = $('#js-participant-display-form');
             $form.on('submit', function() {
-                var data = {'participant_list_columns': [], 'participant_list_forms': []};
+                var mergeForms = $('#merge-forms').prop('checked');
+                var data = {
+                    participant_list_columns: [],
+                    participant_list_forms: [],
+                    merge_forms: mergeForms
+                };
+                if (mergeForms) {
+                    $form.find('#publish-registrations input:checked').each(function() {
+                        window.console.log($(this).attr('id'));
+                        data.participant_list_forms.push($(this).attr('id'));
+                    });
+                } else {
+                    $form.find('#registration-forms ul.enabled li').each(function() {
+                        data.participant_list_forms.push($(this).attr('id'));
+                    });
+                }
                 $form.find('#participant-list-columns ul.enabled li').each(function() {
                     data.participant_list_columns.push($(this).attr('id'));
-                });
-                $form.find('#registration-forms ul.enabled li').each(function() {
-                    data.participant_list_forms.push($(this).attr('id'));
                 });
                 $form.find('#json').val(JSON.stringify(data));
             });
