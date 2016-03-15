@@ -187,6 +187,7 @@
         }, options);
 
         var filterConfig = {
+            itemHandle: 'tr',
             listItems: $('#contribution-list tbody tr'),
             term: $('#search-input'),
             state: $('#filtering-state'),
