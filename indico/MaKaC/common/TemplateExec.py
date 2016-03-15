@@ -20,7 +20,7 @@ import os.path
 import re
 import posixpath
 from indico.core.config import Config
-from MaKaC.common.utils import formatDateTime, formatDate, formatTime
+from MaKaC.common.utils import formatDateTime, formatDate, formatTime, formatDuration
 from mako.lookup import TemplateLookup
 import mako.exceptions as exceptions
 import MaKaC
@@ -28,7 +28,7 @@ import xml.sax.saxutils
 
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.date_time import format_number, format_datetime, format_date, format_time
+from indico.util.date_time import format_number, format_datetime, format_date, format_time, format_human_timedelta
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
 from indico.util.mdx_latex import latex_escape
@@ -394,6 +394,10 @@ def registerHelpers(objDict):
         objDict['ngettext'] = ngettext
     if not 'format_number' in objDict:
         objDict['format_number'] = format_number
+    if 'formatDuration' not in objDict:
+        objDict['formatDuration'] = formatDuration
+    if 'format_human_timedelta' not in objDict:
+        objDict['format_human_timedelta'] = format_human_timedelta
     objDict.setdefault('safe_upper', safe_upper)
     # flask proxies
     objDict['_session'] = session
