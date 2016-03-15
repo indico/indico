@@ -47,14 +47,13 @@
     box-sizing: border-box;
     border-radius: 0.2em;
     color: $tt-secondary-color;
-    font-size: 0.9em;
+    font-size: 1em;
     float: right;
-    margin-right: 0.5em;
     white-space: nowrap;
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-top: 0.5rem;
+    margin: 0.5rem 0.7em 0 0;
 
     &:before {
         color: $tt-secondary-color;
@@ -119,16 +118,6 @@
     margin-right: 0.2em;
 }
 
-.timetable-duration {
-    box-sizing: border-box;
-    color: $dark-gray;
-
-    &:before {
-        color: $dark-gray;
-        margin-right: 0.2em;
-    }
-}
-
 .speaker-list, .chairperson-list, .convener-list {
     margin: 0.1em 55px 0 0;
 
@@ -186,6 +175,27 @@ div.event-header {
     padding: 0;
 }
 
+.item-description {
+    &.session-description,
+    &.break-description,
+    &.contrib-description,
+    &.subcontrib-description {
+        font-size: 0.9em;
+        padding: 0.5em 0;
+    }
+    .event-description {
+        color: $black;
+    }
+
+    color: $light-black;
+
+    .preformatted {
+        white-space: pre-wrap;
+    }
+}
+
+// Meeting Timetable-specific
+
 .day {
     display: block;
     font-size: 1.3em;
@@ -213,8 +223,16 @@ div.event-header {
         }
 
         .timetable-duration {
-            margin-top: 0.5rem;
+            margin: 0.5rem 0.7em 0 0;
             min-width: 4em;
+            text-align: right;
+            box-sizing: border-box;
+            color: $dark-gray;
+
+            &:before {
+                color: $dark-gray;
+                margin-right: 0.2em;
+            }
         }
     }
 }
@@ -240,6 +258,7 @@ div.event-header {
         flex-direction: row;
 
         .timetable-title {
+            font-size: 1.1em;
             padding-top: 0.5rem;
             @extend %font-family-title;
             flex: auto;
@@ -344,23 +363,8 @@ div.event-header {
     @extend %font-family-title-light;
 }
 
-.item-description {
-    &.session-description,
-    &.break-description,
-    &.contrib-description,
-    &.subcontrib-description {
-        font-size: 0.9em;
-        padding: 0.5em 0;
-    }
-    .event-description {
-        color: $black;
-    }
-
-    color: $light-black;
-
-    .preformatted {
-        white-space: pre-wrap;
-    }
+.note-area-wrapper .note-area{
+    margin-top: 10px;
 }
 
 // Lectures
