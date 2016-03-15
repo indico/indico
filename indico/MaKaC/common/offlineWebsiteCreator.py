@@ -42,6 +42,7 @@ from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.layout.models.menu import MenuEntryType
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.util.string import remove_tags
@@ -236,11 +237,10 @@ class OfflineEventCreator(object):
 
     def _create_home(self):
         # get default/selected view
-        styleMgr = HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        view = self._rh._target.getDefaultStyle()
+        view = self._rh._target.as_event.theme
         # if no default view was attributed, then get the configuration default
-        if view == "" or not styleMgr.existsStyle(view) or view in styleMgr.getXSLStyles():
-            view = styleMgr.getDefaultStyleForEventType(self._eventType)
+        if not view or view not in theme_settings.themes or theme_settings.themes[view].get('is_xml'):
+            view = theme_settings.defaults[self._eventType]
         p = WPTPLStaticConferenceDisplay(self._rh, self._rh._target, view, self._eventType, self._rh._reqParams)
         self._html = p.display(**self._rh._getRequestParams())
 

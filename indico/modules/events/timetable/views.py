@@ -108,7 +108,7 @@ def _inject_meeting_body(event, **kwargs):
     entries.sort(key=lambda entry: (entry.start_dt, entry.object.title if entry.object else entry.title))
 
     days = sorted({entry.start_dt.astimezone(event_tz).date() for entry in entries})
-    theme = view or layout_settings.get(event.as_legacy, 'theme', event.as_legacy.getDefaultStyle())
+    theme = view or event.theme
 
     return render_template('events/timetable/display/meeting.html', event=event, entries=entries, days=days,
                            timezone=event_tz_name, tz_object=event_tz, hide_contribs=(detail_level == 'session'),

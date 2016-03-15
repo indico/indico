@@ -53,7 +53,7 @@ from indico.core import signals
 from indico.core.db import DBMgr
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
-from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.util import preload_events
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month, format_date
@@ -344,11 +344,10 @@ class WConferenceHeader(WHeader):
         vars["MaKaCHomeURL"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
 
         # Default values to avoid NameError while executing the template
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        styles = styleMgr.getExistingStylesForEventType("conference")
+        styles = theme_settings.get_themes_for("conference")
 
-        vars["viewoptions"] = list({"id": sid, "name": styleMgr.getStyleName(sid)} \
-                                       for sid in sorted(styles, key=styleMgr.getStyleName))
+        vars["viewoptions"] = [{'id': theme_id, 'name': data['title']}
+                               for theme_id, data in sorted(styles.viewitems(), key=lambda x: x[1]['title'])]
         vars["SelectedStyle"] = ""
         vars["pdfURL"] = ""
         vars["displayURL"] = str(urlHandlers.UHConferenceOtherViews.getURL(self._conf))
@@ -508,16 +507,11 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars = WConferenceHeader.getVars( self )
 
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        styles = styleMgr.getExistingStylesForEventType(vars["type"])
+        view_options = [{'id': tid, 'name': data['title']} for tid, data in
+                        sorted(theme_settings.get_themes_for(vars["type"]).viewitems(), key=lambda x: x[1]['title'])]
 
-        viewoptions = []
-        if len(styles) != 0:
-            styles.sort(key=styleMgr.getStyleName)
-            for styleId in styles:
-                viewoptions.append({"id": styleId, "name": styleMgr.getStyleName(styleId) })
-        vars["viewoptions"] = viewoptions
-        vars["SelectedStyle"] = styleMgr.getStyleName(vars["currentView"])
+        vars["viewoptions"] = view_options
+        vars["SelectedStyle"] = theme_settings.themes[vars['currentView']]['title']
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._rh._conf)
 
         # Setting the buttons that will be displayed in the header menu

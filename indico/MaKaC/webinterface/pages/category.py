@@ -47,6 +47,7 @@ from MaKaC.common.fossilize import fossilize
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.upcoming import WUpcomingEvents
 from indico.web.flask.templating import get_template_module
@@ -963,20 +964,19 @@ class WConferenceCreation( wcomponents.WTemplated ):
             vars["orgText"] = self._rh._getUser().getStraightFullName()
         vars["chairText"] = vars.get("chairText","")
         vars["supportEmail"] = vars.get("supportEmail","")
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        styles = styleMgr.getExistingStylesForEventType(self._type)
+        styles = theme_settings.get_themes_for(self._type)
         styleoptions = ""
         defStyle = ""
         if self._categ:
             defStyle = self._categ.getDefaultStyle(self._type)
         if defStyle == "":
-            defStyle = styleMgr.getDefaultStyleForEventType(self._type)
-        for styleId in styles:
-            if styleId == defStyle:
+            defStyle = theme_settings.defaults[self._type]
+        for theme_id, theme_data in styles.viewitems():
+            if theme_id == defStyle:
                 selected = "selected"
             else:
                 selected = ""
-            styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
+            styleoptions += "<option value=\"%s\" %s>%s</option>" % (theme_id, selected, theme_data['title'])
         vars["styleOptions"] = styleoptions
 
         vars["chairpersonDefined"] = vars.get("chairpersonDefined", [])
@@ -1169,9 +1169,8 @@ class WCategModifMain(wcomponents.WTemplated):
         else:
             vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        vars["defaultMeetingStyle"] = styleMgr.getStyleName(self._categ.getDefaultStyle("meeting"))
-        vars["defaultLectureStyle"] = styleMgr.getStyleName(self._categ.getDefaultStyle("simple_event"))
+        vars["defaultMeetingStyle"] = theme_settings.themes[theme_settings.defaults['meeting']]['title']
+        vars["defaultLectureStyle"] = theme_settings.themes[theme_settings.defaults['simple_event']]['title']
 
 ##        vars["defaultVisibility"] = self._categ.getVisibility()
         vars["defaultTimezone"] = self._categ.getTimezone()
@@ -1243,20 +1242,20 @@ class WCategoryDataModification(wcomponents.WTemplated):
             vars["icon"] = """<img src="%s" width="16" height="16" alt="category">"""%urlHandlers.UHCategoryIcon.getURL( self._categ)
         else:
             vars["icon"] = "None"
-        for type in [ "simple_event", "meeting" ]:
-            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            styles = styleMgr.getExistingStylesForEventType(type)
+        for evt_type in ("simple_event", "meeting"):
+            themes = theme_settings.get_themes_for(evt_type)
             styleoptions = ""
-            for styleId in styles:
-                defStyle = self._categ.getDefaultStyle(type)
+            for theme_id, theme_data in themes.viewitems():
+                defStyle = self._categ.getDefaultStyle(evt_type)
                 if defStyle == "":
-                    defStyle = styleMgr.getDefaultStyleForEventType(type)
-                if styleId == defStyle:
+                    defStyle = theme_settings.default_for(evt_type)
+                if theme_id == defStyle:
                     selected = "selected"
                 else:
                     selected = ""
-                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
-            vars["%sStyleOptions" % type] = styleoptions
+                styleoptions += "<option value=\"%s\" %s>%s</option>" % (theme_id, selected,
+                                                                         theme_data['title'])
+            vars["%sStyleOptions" % evt_type] = styleoptions
 
         return vars
 
@@ -1278,23 +1277,21 @@ class WCategoryCreation(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         vars["locator"] = self.__target.getLocator().getWebForm()
 
-        for type in ["simple_event", "meeting"]:
-            styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            styles = styleMgr.getExistingStylesForEventType(type)
+        for evt_type in ("simple_event", "meeting"):
             styleoptions = ""
 
-            for styleId in styles:
-                defStyle = self.__target.getDefaultStyle(type)
+            for theme_id, theme_data in theme_settings.get_themes_for(evt_type).viewitems():
+                defStyle = self.__target.getDefaultStyle(evt_type)
 
                 if defStyle == "":
-                    defStyle = styleMgr.getDefaultStyleForEventType(type)
-                if styleId == defStyle:
+                    defStyle = theme_settings.defaults[evt_type]
+                if theme_id == defStyle:
                     selected = "selected"
                 else:
                     selected = ""
 
-                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId, selected, styleMgr.getStyleName(styleId))
-            vars["%sStyleOptions" % type] = styleoptions
+                styleoptions += "<option value=\"%s\" %s>%s</option>" % (theme_id, selected, theme_data['title'])
+            vars[evt_type + "StyleOptions"] = styleoptions
 
         default_tz = Config.getInstance().getDefaultTimezone()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(default_tz)

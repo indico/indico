@@ -25,9 +25,10 @@ from indico.modules.users.util import serialize_user
 from indico.util.caching import make_hashable
 from indico.util.i18n import po_to_json
 from indico.util.string import crc32
+from indico.web.assets.vars_js import generate_global_file
 from indico.web.flask.util import send_file
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.web.assets.vars_js import generate_global_file
+
 
 assets_blueprint = IndicoBlueprint('assets', __name__, url_prefix='/assets')
 

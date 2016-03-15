@@ -16,15 +16,17 @@
 
 from __future__ import unicode_literals
 
+import os
+
 from flask import session
 from jinja2.filters import do_filesizeformat
 
-
+import indico
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.logs import EventLogKind, EventLogRealm
-from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.events.settings import EventSettingsProxy, ThemeSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -47,6 +49,8 @@ layout_settings = EventSettingsProxy('layout', {
     'timetable_by_room': False,
     'timetable_detailed': False
 }, preload=True)
+
+theme_settings = ThemeSettingsProxy(os.path.join(os.path.dirname(indico.__file__), 'modules', 'events', 'themes.yaml'))
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

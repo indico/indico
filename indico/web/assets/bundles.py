@@ -29,6 +29,7 @@ from webassets import Bundle, Environment
 
 # legacy imports
 from indico.core.config import Config
+from indico.modules.events.layout import theme_settings
 
 
 def configure_pyscss(environment):
@@ -451,11 +452,6 @@ screen_sass = Bundle('sass/screen.scss',
                      output="sass/screen_sass_%(version)s.css",
                      depends=SASS_BASE_MODULES)
 
-themes_sass = Bundle('sass/themes/indico.scss',
-                     filters=("pyscss", "cssrewrite", "cssmin"),
-                     output="sass/themes_sass_%(version)s.css",
-                     depends=SASS_BASE_MODULES)
-
 
 def register_all_js(env):
     env.register('jquery', jquery)
@@ -488,6 +484,17 @@ def register_all_js(env):
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
+
+
+def register_theme_sass(env):
+    for theme_id, data in theme_settings.themes.viewitems():
+        if data['stylesheet']:
+            bundle = Bundle('css/events/common.css',
+                            os.path.join('sass', 'themes', data['stylesheet']),
+                            filters=("pyscss", "cssrewrite", "cssmin"),
+                            output="sass/themes/{}_%(version)s.css".format(theme_id),
+                            depends=SASS_BASE_MODULES)
+            env.register('themes_{}_sass'.format(theme_id), bundle)
 
 
 def register_all_css(env, main_css_file):
@@ -539,7 +546,7 @@ def register_all_css(env, main_css_file):
     env.register('surveys_sass', surveys_sass)
     env.register('timetable_sass', timetable_sass)
     env.register('sessions_sass', sessions_sass)
-    env.register('themes_sass', themes_sass)
+    register_theme_sass(env)
 
 
 core_env = IndicoEnvironment()

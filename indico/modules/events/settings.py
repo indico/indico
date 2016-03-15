@@ -18,10 +18,13 @@ from __future__ import unicode_literals
 
 from functools import wraps
 
+import yaml
+
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
 from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
 from indico.modules.events import Event
 from indico.modules.events.models.settings import EventSettingPrincipal, EventSetting
+from indico.util.caching import memoize
 from indico.util.user import iter_acl
 
 
@@ -181,3 +184,28 @@ class EventSettingsProxy(SettingsProxyBase):
         EventSetting.delete_all(self.module, event_id=event)
         EventSettingPrincipal.delete_all(self.module, event_id=event)
         self._flush_cache()
+
+
+class ThemeSettingsProxy(object):
+
+    def __init__(self, settings_file):
+        settings = self._load_settings(settings_file)
+        self.themes = settings['definitions']
+        self.defaults = settings['defaults']
+
+    @staticmethod
+    @memoize
+    def _load_settings(settings_file):
+        with open(settings_file) as f:
+            return yaml.load(f)
+
+    @memoize
+    def get_themes_for(self, event_type):
+        return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
+                if event_type in theme_data['event_types']}
+
+    @property
+    @memoize
+    def xml_themes(self):
+        return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
+                if theme_data.get('is_xml')}

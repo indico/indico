@@ -62,7 +62,7 @@ from MaKaC.common.TemplateExec import render, mako_call_template_hook
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.events.cloning import EventCloner
-from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.modules.users.util import get_user_by_email
@@ -224,9 +224,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         except OSError:
             timestamp = 0
         printCSS = '<link rel="stylesheet" type="text/css" href="{}/css/Conf_Basic.css?{}">'.format(path, timestamp)
-        theme_url = get_css_url(self._conf.as_event)
-        if theme_url:
-            printCSS += '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
 
         # Include MathJax
 
@@ -485,20 +482,18 @@ class WPXSLConferenceDisplay(WPConferenceBase):
 
     def _getBody(self, params):
         body_vars = self._getBodyVariables()
-        view = self._view
         outGen = outputGenerator(self._getAW())
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        if styleMgr.existsXSLFile(self._view):
+        if self._view in theme_settings.xml_themes:
             if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
                 includeContribution = 1
             else:
                 includeContribution = 0
-            body = outGen.getFormattedOutput(self._rh, self._conf, styleMgr.getXSLPath(self._view), body_vars, 1,
-                                             includeContribution, 1, 1, self._params.get("showSession", ""),
-                                             self._params.get("showDate", ""))
+            body = outGen.getFormattedOutput(self._rh, self._conf, theme_settings.themes[self._view]['template'],
+                                             body_vars, 1, includeContribution, 1, 1,
+                                             self._params.get("showSession", ""), self._params.get("showDate", ""))
             return body
         else:
-            return _("Cannot find the %s stylesheet") % view
+            return _("Cannot find the %s stylesheet") % self._view
 
 
 class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
@@ -509,7 +504,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def __init__(self, rh, conference, view, type, params):
         WPXSLConferenceDisplay.__init__(self, rh, conference, view, type, params)
-        imagesBaseURL = Config.getInstance().getImagesBaseURL()
+        theme_id = self._view or self._conf.as_event.theme
+        self.theme_id = theme_id
+        self.theme = theme_settings.themes[theme_id]
 
     def _getVariables(self, conf):
         wvars = {}
@@ -620,7 +617,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def _getHeadContent( self ):
         config = Config.getInstance()
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         htdocs = config.getHtdocsDir()
         baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
@@ -630,15 +626,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             timestamp = 0
         styleText = """<link rel="stylesheet" href="%s/css/%s?%d">\n""" % \
             (baseurl, Config.getInstance().getCssStylesheetName(), timestamp)
-        # Then the common event display stylesheet
-        if os.path.exists("%s/css/events/common.css" % htdocs):
-            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css?%d">\n""" % (baseurl,
-                                                                                                       timestamp)
-
-        # And finally the specific display stylesheet
-        if styleMgr.existsCSSFile(self._view):
-            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
-            styleText += """<link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
 
         theme_url = get_css_url(self._conf.as_event)
         if theme_url:
@@ -686,11 +673,12 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                             "dark": True } )
 
     def getCSSFiles(self):
+        theme_sass = self._asset_env['themes_{}_sass'.format(self.theme_id)].urls() if self.theme['stylesheet'] else []
+
         return (WPConferenceBase.getCSSFiles(self) +
                 self._asset_env['eventservices_sass'].urls() +
                 self._asset_env['contributions_sass'].urls() +
-                self._asset_env['event_display_sass'].urls() +
-                self._asset_env['themes_sass'].urls())
+                self._asset_env['event_display_sass'].urls() + theme_sass)
 
     def getJSFiles(self):
         modules = WPConferenceBase.getJSFiles(self)
@@ -730,11 +718,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             vars = {}
             vars['xml'] = outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)
 
-        theme = self._view or layout_settings.get(self._conf, 'theme', self._conf.getDefaultStyle())
-        file_name = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getTemplateFilename(theme)
-
-        return render_template(posixpath.join('events/display', file_name), event=self._conf.as_event,
-                               conf=self._conf, show_notes=(theme == 'standard_inline_minutes'), **vars).encode('utf-8')
+        return render_template(posixpath.join('events/display', self.theme['template']), event=self._conf.as_event,
+                               conf=self._conf,
+                               show_notes=(self.theme_id == 'standard_inline_minutes'),
+                               **vars).encode('utf-8')
 
 
 class WPrintPageFrame (wcomponents.WTemplated):
@@ -985,7 +972,7 @@ class WConfModifMainData(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         type = vars["type"]
-        vars["defaultStyle"] = self._conf.getDefaultStyle()
+        vars["defaultStyle"] = self._conf.as_event.theme
         vars["visibility"] = self._conf.getVisibility()
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
         vars["addTypeURL"]=urlHandlers.UHConfAddContribType.getURL(self._conf)
@@ -1059,6 +1046,8 @@ class WConfModifMainData(wcomponents.WTemplated):
 
         loc = self._conf.getLocation()
         room = self._conf.getRoom()
+        vars['styleOptions'] = {tid: data['title'] for tid, data in
+                                theme_settings.get_themes_for(self._conf.getType()).viewitems()}
         vars["currentLocation"] = { 'location': loc.getName() if loc else "",
                                     'room': room.name if room else "",
                                     'address': loc.getAddress() if loc else "" }
@@ -1189,23 +1178,20 @@ class WConferenceDataModification(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
         navigator = ""
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        type = self._conf.getType()
+        evt_type = self._conf.getType()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(self._conf.getTimezone())
-        styles=styleMgr.getExistingStylesForEventType(type)
         styleoptions = ""
-        defStyle = self._conf.getDefaultStyle()
-        if defStyle not in styles:
+        defStyle = self._conf.as_event.theme
+        if defStyle not in theme_settings.themes:
             defStyle = ""
-        for styleId in styles:
-            if styleId == defStyle or (defStyle == "" and styleId == "static"):
+        for theme_id, theme_data in theme_settings.get_themes_for(evt_type).viewitems():
+            if theme_id == defStyle or (defStyle == "" and theme_id == "static"):
                 selected = "selected"
             else:
                 selected = ""
-            styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
+            styleoptions += "<option value=\"%s\" %s>%s</option>" % (theme_id, selected, theme_data['title'])
         vars["conference"] = self._conf
         vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
         vars["styleOptions"] = styleoptions

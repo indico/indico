@@ -309,6 +309,12 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         return self.stylesheet_metadata is not None
 
     @property
+    def theme(self):
+        from indico.modules.events.layout import layout_settings, theme_settings
+        return (layout_settings.get(self, 'timetable_theme') or
+                theme_settings.defaults[self.type])
+
+    @property
     def is_protected(self):
         return self.as_legacy.isProtected()
 
