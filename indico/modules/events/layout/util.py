@@ -20,7 +20,6 @@ from collections import defaultdict
 from itertools import count, chain
 from sqlalchemy.exc import IntegrityError
 
-import MaKaC
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
@@ -31,6 +30,8 @@ from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
+
+import MaKaC
 from MaKaC.common.cache import GenericCache
 
 _cache = GenericCache('updated-menus')

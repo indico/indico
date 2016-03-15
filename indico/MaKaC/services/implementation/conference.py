@@ -31,7 +31,7 @@ import datetime
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, filters, HelperMaKaCInfo
+from MaKaC.common import indexes, filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -53,6 +53,7 @@ from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportErro
 
 # indico imports
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
+from indico.modules.events.layout import theme_settings
 from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil, principal_is_only_for_user
 from indico.web.http_api.util import generate_public_auth_request
@@ -347,8 +348,7 @@ class ConferenceDefaultStyleModification(ConferenceTextModificationBase):
     Conference default style modification
     """
     def _handleSet(self):
-        styleMgr = HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        if self._value == styleMgr.getDefaultStyleForEventType(self._conf.getType()):
+        if self._value == theme_settings.defaults[self._conf.getType()]:
             layout_settings.delete(self._conf, 'timetable_theme')
         else:
             layout_settings.set(self._conf, 'timetable_theme', self._value)

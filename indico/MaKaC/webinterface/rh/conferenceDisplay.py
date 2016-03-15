@@ -45,7 +45,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.core import signals
 from indico.modules.events.api import CategoryEventHook
-from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.views import WPPage
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
@@ -99,28 +99,19 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
             self._reqParams["detailLevel"] = "contribution"
         #get default/selected view
         view = "static"
-        wf = self.getWebFactory()
-        if wf != None:
-            type = self.getWebFactory().getId()
-        else:
-            type = "conference"
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        evt_type = self._conf.getType()
+
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
             view = layout_settings.get(self._conf, 'timetable_theme')
             # if no default view was attributed, then get the configuration default
-            if not view or not styleMgr.existsStyle(view):
-                view = styleMgr.getDefaultStyleForEventType(type)
-        isLibxml = True
+            if not view or view not in theme_settings.themes:
+                view = theme_settings.defaults[evt_type]
         warningText = ""
-        try:
-            import lxml
-        except:
-            isLibxml = False
 
         # create the html factory
-        if type == "conference":
+        if evt_type == "conference":
             if params.get("ovw", False):
                 p = conferences.WPConferenceDisplay( self, self._target )
             else:
@@ -129,13 +120,11 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
                     p = conferences.WPConferenceDisplay(self, self._conf)
                 else:
                     p = WPPage.render_template('page.html', self._conf, page=event.default_page)
-        elif view in styleMgr.getXSLStyles():
-            if not isLibxml:
-                warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
+        elif view in theme_settings.xml_themes:
             self._responseUtil.content_type = 'text/xml'
-            p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
+            p = conferences.WPXSLConferenceDisplay( self, self._target, view, evt_type, self._reqParams )
         elif view != "static":
-            p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
+            p = conferences.WPTPLConferenceDisplay( self, self._target, view, evt_type, self._reqParams )
         else:
             if wf != None:
                 p = wf.getConferenceDisplayPage( self, self._target, self._reqParams )
@@ -175,25 +164,20 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay):
             self._reqParams["detailLevel"] = "contribution"
         #get default/selected view
         view = "standard"
-        type = "conference"
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        isLibxml = True
-        try:
-            import lxml
-        except:
-            isLibxml = False
+        evt_type = "conference"
+
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
-            view = self._target.getDefaultStyle()
+            view = self._target.as_event.theme
             # if no default view was attributed, then get the configuration default
             if view == "":
-                view = styleMgr.getDefaultStyleForEventType(type)
+                view = theme_settings.defaults[evt_type]
         # create the html factory
-        if view in styleMgr.getXSLStyles() and isLibxml:
-            p = conferences.WPXSLConferenceDisplay(self, self._target, view, type, self._reqParams)
+        if view in theme_settings.xml_themes:
+            p = conferences.WPXSLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
         elif view != "static":
-            p = conferences.WPTPLConferenceDisplay(self, self._target, view, type, self._reqParams)
+            p = conferences.WPTPLConferenceDisplay(self, self._target, view, evt_type, self._reqParams)
         else:
             p = conferences.WPMeetingTimeTable(self, self._target, "parallel", "meeting", self._reqParams)
         # generate the html
@@ -293,7 +277,7 @@ class RHConferenceTimeTable(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceTimeTable
 
     def _process( self ):
-        defStyle = self._target.getDefaultStyle()
+        defStyle = self._target.as_event.theme
         if defStyle in ["", "static", "parallel"]:
             p = conferences.WPConferenceTimeTable( self, self._target )
             return p.display( **self._getRequestParams() )
@@ -329,7 +313,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
             self._showSpeakerAffiliation = True
         # Keep track of the used layout for getting back after cancelling
         # the export.
-        self._view = params.get("view", self._target.getDefaultStyle())
+        self._view = params.get("view", self._target.as_event.theme)
 
     def _reduceFontSize( self ):
         index = self.fontsizes.index(self._fontsize)

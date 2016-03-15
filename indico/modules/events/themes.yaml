@@ -1,0 +1,272 @@
+defaults:
+    conference: static
+    simple_event: lecture
+    lecture: lecture
+    meeting: standard
+definitions:
+  # Lectures - base
+  event:
+    event_types:
+    - simple_event
+    stylesheet: lectures/IndicoLecture.css
+    template: lecture.html
+    title: Event
+  lecture:
+    event_types:
+    - simple_event
+    stylesheet: lectures/IndicoLecture.css
+    template: lecture.html
+    title: Lecture
+
+  # Meetings - base
+  standard:
+    event_types:
+    - conference
+    - meeting
+    stylesheet: meeting.scss
+    template: meeting.html
+    title: Indico style
+  standard_inline_minutes:
+    event_types:
+    - meeting
+    stylesheet: meetings/IndicoMeetingWithMinutes.css
+    template: meeting.html
+    title: Indico style - inline minutes
+  nicecompact:
+    event_types:
+    - conference
+    - meeting
+    stylesheet: meetings/Compact.css
+    template: compact.html
+    title: Compact style
+  indico-weeks-view:
+    event_types:
+    - conference
+    - meeting
+    stylesheet: meetings/Weeks.css
+    template: weeks.html
+    title: Indico Weeks View
+
+  # Static
+  static:
+    event_types:
+    - conference
+    - simple_event
+    - meeting
+    stylesheet: null
+    template: null
+    title: Parallel
+
+  # Lectures - CERN extensions from base
+  egee_lecture:
+    event_types:
+    - simple_event
+    stylesheet: lectures/EGEELecture.css
+    template: lecture.html
+    title: EGEE lecture
+  picosec_endtofpet_lectures:
+    event_types:
+    - simple_event
+    stylesheet: lectures/picosec_endotofpet.css
+    template: lecture.html
+    title: PicoSEC - EndoTOFPET US
+  picosec_lecture:
+    event_types:
+    - simple_event
+    stylesheet: lectures/picosec.css
+    template: lecture.html
+    title: PicoSEC Lectures
+  tical-lectures:
+    event_types:
+    - simple_event
+    stylesheet: lectures/tical.css
+    template: lecture.html
+    title: TICAL
+
+  # Meetings - CERN extensions from base
+  atlas:
+    event_types:
+    - meeting
+    stylesheet: atlas.scss
+    template: meeting.html
+    title: ATLAS meeting
+  cms:
+    event_types:
+    - meeting
+    stylesheet: cms.scss
+    template: meeting.html
+    title: CMS meeting
+  alice_meeting:
+    event_types:
+    - meeting
+    stylesheet: alice.scss
+    template: meeting.html
+    title: ALICE meeting
+  lhcb_meeting:
+    event_types:
+    - conference
+    - meeting
+    stylesheet: lhcb.scss
+    template: meeting.html
+    title: LHCb meeting
+  cast:
+    event_types:
+    - meeting
+    stylesheet: cast.scss
+    template: meeting.html
+    title: CAST meeting
+  fcc:
+    event_types:
+    - meeting
+    stylesheet: fcc.scss
+    template: meeting.html
+    title: FCC
+  ilc:
+    event_types:
+    - meeting
+    stylesheet: ilc.scss
+    template: meeting.html
+    title: ILC style
+  intelum:
+    event_types:
+    - meeting
+    stylesheet: intelum.scss
+    template: meeting.html
+    title: Intelum
+  fast:
+    event_types:
+    - meeting
+    stylesheet: fast.scss
+    template: meeting.html
+    title: FAST meetings
+  EuroCirCol:
+    event_types:
+    - meeting
+    stylesheet: eurocirccol.scss
+    template: meeting.html
+    title: EuroCirCol
+  crystal_clear:
+    event_types:
+    - meeting
+    stylesheet: crystalclear.scss
+    template: meeting.html
+    title: Crystal Clear
+  egee_meeting:
+    event_types:
+    - conference
+    - meeting
+    stylesheet: egee.scss
+    template: meeting.html
+    title: EGEE meeting
+  endotofpet:
+    event_types:
+    - simple_event
+    - meeting
+    stylesheet: endotofpet.scss
+    template: openlab.html
+    title: EndoTOFPET
+  openlab:
+      event_types:
+      - meeting
+      stylesheet: openlab.scss
+      template: openlab.html
+      title: Openlab
+  lcg:
+    event_types:
+    - meeting
+    stylesheet: lcg.scss
+    template: meeting.html
+    title: LCG style
+  picosec:
+    event_types:
+    - meeting
+    stylesheet: picosec.scss
+    template: openlab.html
+    title: Picosec
+  picosec_endtofpet:
+    event_types:
+    - meeting
+    stylesheet: picosec_endotofpet.scss
+    template: openlab.html
+    title: PicoSEC - EndoTOFPET US
+  tical-meetings:
+    event_types:
+    - meeting
+    stylesheet: tical.scss
+    template: meeting.html
+    title: TICAL Meetings
+  totem_meeting:
+    event_types:
+    - meeting
+    stylesheet: totem.scss
+    template: meeting.html
+    title: TOTEM meeting
+  sa2:
+    event_types:
+    - meeting
+    stylesheet: staff_assoc_modern.scss
+    template: meeting.html
+    title: Staff Association (with time)
+
+  # Meetings - CERN Administrative
+  administrative:
+    event_types:
+    - conference
+    - meeting
+    stylesheet: meetings/administrative/Administrative.css
+    template: administrative.html
+    title: Administrative style
+  administrative2:
+    event_types:
+    - meeting
+    stylesheet: meetings/administrative/AdministrativeWithTime.css
+    template: administrative_time.html
+    title: Administrative style (with time)
+  administrative4:
+    event_types:
+    - meeting
+    stylesheet: meetings/administrative/AdministrativeAllMaterial.css
+    template: administrative_material.html
+    title: Administrative style (all material)
+  cern_committees:
+    event_types:
+    - meeting
+    stylesheet: meetings/administrative/CernCommittee.css
+    template: cern_committees.html
+    title: CERN Committees
+  lhcrrb:
+    event_types: []
+    stylesheet: meetings/administrative/LHCRBB.css
+    template: lhc_rrb.html
+    title: LHC RRB
+  pf:
+    event_types:
+    - meeting
+    stylesheet: meetings/administrative/PensionFund.css
+    template: pension_fund.html
+    title: Pension Fund
+  sa:
+    event_types:
+    - meeting
+    stylesheet: meetings/administrative/StaffAssociation.css
+    template: staff_association.html
+    title: Staff Association
+
+  # XML
+  jacow:
+    event_types:
+    - conference
+    - simple_event
+    is_xml: true
+    stylesheet: null
+    template: JACoW.xsl
+    title: JACoW XML
+  xml:
+    event_types:
+    - conference
+    - simple_event
+    - meeting
+    is_xml: true
+    stylesheet: null
+    template: XML.xsl
+    title: xml

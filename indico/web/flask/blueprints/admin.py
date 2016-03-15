@@ -69,10 +69,6 @@ admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, metho
 admin.add_url_rule('/layout/social', 'adminLayout-saveSocial', admins.RHAdminLayoutSaveSocial, methods=('POST',))
 admin.add_url_rule('/layout/template-set', 'adminLayout-saveTemplateSet', admins.RHAdminLayoutSaveTemplateSet,
                    methods=('POST',))
-admin.add_url_rule('/layout/styles/timetable/', 'adminLayout-styles', admins.RHStyles, methods=('GET', 'POST'))
-admin.add_url_rule('/layout/styles/timetable/create', 'adminLayout-addStyle', admins.RHAddStyle,
-                   methods=('GET', 'POST'))
-admin.add_url_rule('/layout/styles/timetable/<templatefile>/delete', 'adminLayout-deleteStyle', admins.RHDeleteStyle)
 admin.add_url_rule('/layout/styles/conference/', 'adminConferenceStyles', admins.RHConferenceStyles)
 
 # Badge templates

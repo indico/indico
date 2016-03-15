@@ -198,12 +198,6 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', $
             null).draw());
 % endif
 
-<%
-from MaKaC.common import info
-styleOptions = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStyleDictForEventType(confObj.getType())
-styleOptions = dict(map(lambda k: (k, styleOptions[k][0]), styleOptions))
-%>
-
 $E('inPlaceEditDefaultStyle').set(new SelectEditWidget('event.main.changeDefaultStyle',
         {'conference':'${ conferenceId }'}, ${ styleOptions }, ${ jsonEncode(defaultStyle) }, null).draw());
 

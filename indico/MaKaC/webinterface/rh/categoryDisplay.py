@@ -49,8 +49,9 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.api import CategoryEventHook
 from indico.modules.events.forms import EventPersonLinkForm
-from indico.modules.events.layout import layout_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.operations import update_event
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
@@ -478,7 +479,6 @@ class UtilsConference:
         c.getSupportInfo().setCaption(confData.get("supportCaption","Support"))
         if c.getVisibility() != confData.get("visibility",999):
             c.setVisibility( confData.get("visibility",999) )
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         theme = confData.get('defaultStyle', '')
         curType = c.getType()
         newType = confData.get('eventType', '')
@@ -488,7 +488,7 @@ class UtilsConference:
             wr.registerFactory(c,factory)
             # type changed. always revert to the default theme
             layout_settings.delete(c, 'timetable_theme')
-        elif not theme or theme == styleMgr.getDefaultStyleForEventType(newType):
+        elif not theme or theme == theme_settings.defaults.get(newType):
             # if it's the default theme or nothing was set (does this ever happen?!), we don't store it
             layout_settings.delete(c, 'timetable_theme')
         else:
@@ -574,4 +574,3 @@ class RHCategoryToAtom(RHCategDisplayBase):
 
 def sortByStartDate(conf1,conf2):
     return cmp(conf1.getStartDate(),conf2.getStartDate())
-

@@ -3468,8 +3468,7 @@ class Conference(CommonObjectBase, Locatable):
                 entry.getOwner().fit()
 
     def getDefaultStyle(self):
-        return (layout_settings.get(self, 'timetable_theme') or
-                HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getDefaultStyleForEventType(self.getType()))
+        return self.as_event.theme
 
     def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)

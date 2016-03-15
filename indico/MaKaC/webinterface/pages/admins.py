@@ -298,8 +298,6 @@ class WPTemplatesCommon( WPAdminsBase ):
 
         self._subTabGeneral = self._tabCtrl.newTab( "general", _("General Definitions"), \
                 urlHandlers.UHAdminLayoutGeneral.getURL() )
-        self._subTabStyles = self._tabCtrl.newTab( "styles", _("Timetable Styles"), \
-                urlHandlers.UHAdminsStyles.getURL() )
         self._subTabCSSTpls = self._tabCtrl.newTab( "styles", _("Conference Styles"), \
                 urlHandlers.UHAdminsConferenceStyles.getURL() )
         self._subTabBadges = self._tabCtrl.newTab( "badges", _("Badges"), \
@@ -396,63 +394,6 @@ class WAdminsConferenceStyles(wcomponents.WTemplated):
         vars["contextHelpText"] = _("This is the list of templates that an organizer can use to customize a conference")
         cssTplsModule=ModuleHolder().getById("cssTpls")
         vars["cssTplsModule"] = cssTplsModule
-        return vars
-
-
-class WPAdminsStyles( WPTemplatesCommon ):
-
-    def _getTabContent( self, params ):
-        wp = WAdminsStyles()
-        return wp.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabStyles.setActive()
-
-class WAdminsStyles(wcomponents.WTemplated):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        vars["styleMgr"] = styleMgr
-        baseTPLPath = styleMgr.getBaseTPLPath()
-        baseCSSPath = styleMgr.getBaseCSSPath()
-        vars["contextHelpText"] = i18nformat("""- <b>_("TPL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate missing .tpl or .css files (these styles will not be presented to the users"))""") % (baseTPLPath,baseCSSPath)
-        vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("remove")
-        return vars
-
-class WPAdminsAddStyle( WPAdminsStyles ):
-
-    def _getTabContent( self, params ):
-        wp = WAdminsAddStyle()
-        return wp.getHTML(params)
-
-class WAdminsAddStyle(wcomponents.WTemplated):
-
-    def _getAllFiles(self, basePath, extension, excludedDirs=[]):
-        collectedFiles = []
-        for root, dirs, files in os.walk(basePath):
-            for excluded in excludedDirs:
-                if excluded in dirs:
-                    dirs.remove(excluded)
-            for filename in files:
-                fullPath = os.path.join(root, filename)
-                if os.path.isfile(fullPath) and filename.endswith(extension):
-                    collectedFiles.append(os.path.relpath(fullPath, basePath))
-        return sorted(collectedFiles)
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        vars["styleMgr"] = styleMgr
-        baseTPLPath = styleMgr.getBaseTPLPath()
-        baseCSSPath = styleMgr.getBaseCSSPath()
-        baseXSLPath = styleMgr.getBaseXSLPath()
-        vars["availableTemplates"] = self._getAllFiles(baseTPLPath, '.tpl', excludedDirs=['include'])
-        vars["availableStyleSheets"] = self._getAllFiles(baseXSLPath, '.xsl', excludedDirs=['include'])
-        vars["availableCSS"] = self._getAllFiles(baseCSSPath, '.css')
-        vars["xslContextHelpText"] = r"Lists all XSL files in %s (except special folders named \'include\', which are reserved)" % baseXSLPath
-        vars["tplContextHelpText"] = r"Lists all TPL files in %s (except special folders named \'include\', which are reserved)" % baseTPLPath
-        vars["cssContextHelpText"] = "Lists all CSS files in %s" % baseCSSPath
         return vars
 
 
