@@ -623,10 +623,6 @@ span.description pre, p {
     overflow: hidden;
 }
 
-.materialDisplayName {
-    font-size: 14px;
-}
-
 .event-manage-button {
     margin-top: 10px;
     font-size: 10pt;

@@ -15,133 +15,114 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@page {
-    margin: 25mm 25mm 25mm 25mm;
-}
+@import 'base/palette';
+@import 'base/typography';
 
 body {
-    background: white;
-}
-
-p, br, dl, strong, em, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, a {
-   font-family: verdana, sans-serif;
+   font-family: verdana, arial, sans-serif;
    font-size: 12px;
    color: #000000;
 }
 
-hr {
-    display: none;
+.manage-button-container .manage-button {
+    padding-top: 25px;
+}
+
+em.time {
+    font-style: normal;
+    text-decoration: underline;
 }
 
 pre {
    font-family: helvetica, verdana, sans-serif;
-   color: #000;
+   font-size: small;
    white-space: pre-wrap;       /* css-3 */
    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
    white-space: -pre-wrap;      /* Opera 4-6 */
    white-space: -o-pre-wrap;    /* Opera 7 */
    word-wrap: break-word;       /* Internet Explorer 5.5+ */
    margin: 0px;
+   margin-left: 10px;
 }
 
-.tablepre {
-   table-layout: fixed;
-   margin: 0px;
-   padding: 0px;
-   border: 0px;
-}
-
-td {
-    font-family: Verdana;
-    font-size: medium;
+table.dayList td:not(.actions) {
+    font-family: Times;
+    font-size: large;
     color: #000;
-    text-align: left;
 }
 
 .eventInfo {
-    font-family: Verdana;
+    font-family: Times;
     font-size: large;
     text-align: center;
 }
 
+.tablepre {
+   table-layout: fixed;
+}
 
-table.eventWrapper {
-    width: 750px;
+/* Footer */
+
+.footerDark {
+    color: #444444;
+}
+
+.footerDark a {
+    color: #0B63A5;
+}
+
+table.eventWrapper{
+    width: 650px;
     margin-top: 0px;
     margin-bottom: 0px;
-}
-
-table.eventWrapper > tbody > tr > td > br {
-    display: none;
-}
-
-table.eventHeader {
-    border-spacing: 0px;
-    padding: 0px;
-    text-align: center;
-    width: 100%;
-}
-
-table.eventHeader img {
-    position: absolute;
 }
 
 table.dayList{
     width: 100%;
     border: 0;
-    border-spacing: 2px;
+    border-spacing:5px;
 }
 
 .textTitle{
-   display: none;
+   font-family: helvetica, verdana, sans-serif;
+   font-size: 12px;
+   font-style: italic;
 }
 .sessionTitle{
    font-weight: bold;
-   border: none;
 }
 
 .itemTime{
-   font-family: Verdana;
    font-size: medium;
-   font-style: italic;
-   padding-left: 2em;
-   padding-right: 1em;
 }
-
-.itemTitle {
-    width: 60%;
-}
-
 .participantText{
-   font-family: verdana, sans-serif;
+   font-family: helvetica, verdana, sans-serif;
    font-size: 12px;
    text-align: left;
 }
 
-.participantText + br,
-.materialDisplayName {
-    display: none;
-}
-
-.descriptionText{
-   display: none;
-}
 
 .subItemText{
     font-size: medium;
-    font-family: Verdana;
+    font-family: Times;
 }
 
 .reportNumberHeader{
     text-align: right;
     font-size: 12px;
-    font-family: Verdana;
+    font-family: Times;
 
 }
 .eventHeader{
-    font-family: Verdana;
-    font-size: x-large;
+    font-family: Arial;
+    font-size: large;
+    font-weight: bold;
     text-align: center;
+    text-transform: uppercase;
+
+    width: 100%;
+    border-spacing:0px;
+    padding:0px;
 }
 .CERNTitle{
     font-family: Arial;
@@ -153,75 +134,52 @@ td.itemLeftAlign{
 }
 
 td.itemRightAlign{
+    max-width: 200px;
     text-align: right;
 }
 
-td.itemHeaderDate {
-    font-family: Verdana;
+td.itemHeaderDate{
+    font-family: Times;
     font-size: medium;
     font-style: italic;
-    padding-top: 3em;
     text-align: left;
 }
 
-td.itemHeaderDate > span {
-    -webkit-print-color-adjust: exact;
-    background: #eaeaea;
-    display: block;
-    padding: 5px 2px;
-}
-
-td.itemHeaderDate > span ~ br {
-    display: none;
-}
-
 td.itemHeaderDocuments{
-    display: none;
+    font-family: Times;
+    font-size: medium;
+    text-align: right;
+    text-decoration: underline;
 }
 
 td.sessionInfo{
-    font-family: Verdana;
-    width: 100%;
+    font-family: Times;
+    font-size: large;
 }
 
 td.breakInfo{
-    display: none;
+    font-family: Times;
+    font-size: large;
+    text-align: center;
 }
-
 td.itemTopAlign{
     vertical-align: top;
 }
 
 td.subItemOrder{
-    font-size: 12px;
-    font-family: Verdana;
+    font-family: Times;
 }
 
-.subItemText {
-    font-size: 12px;
-    font-family: Verdana;
+.notes {
+    font-size: 12pt;
+
+    h1, h2, h3, h4 {
+        font-size: 1.1em;
+        font-family: Times;
+    }
 }
 
-.confModifIcon {
-    display: none;
+.materialDisplayName {
+    @extend %font-family-body;
+    font-size: 0.7em;
 }
-
-.itemIndex {
-    display: none;
-}
-
-.locationInfo {
-    float: right;
-    font-size: 0.9em;
-    color: #555;
-    line-height: 24px;
-}
-
-.locationParenthesis {
-    display: none;
-}
-
-.sessionDescription {
-    border-bottom: 1px solid #aaa;
-}
-

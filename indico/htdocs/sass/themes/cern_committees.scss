@@ -15,101 +15,132 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-p,br,dl,strong,em,h1,h2,h3,h4,h5,h6,blockquote,ol,ul,a {
-   font-family: verdana, arial, sans-serif;
+@page {
+    margin: 25mm 25mm 25mm 25mm;
+}
+
+body {
+    background: white;
+}
+
+p, br, dl, strong, em, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, a {
+   font-family: verdana, sans-serif;
    font-size: 12px;
    color: #000000;
 }
+
+hr {
+    display: none;
+}
+
 pre {
    font-family: helvetica, verdana, sans-serif;
-   font-size: small;
+   color: #000;
    white-space: pre-wrap;       /* css-3 */
    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
    white-space: -pre-wrap;      /* Opera 4-6 */
    white-space: -o-pre-wrap;    /* Opera 7 */
    word-wrap: break-word;       /* Internet Explorer 5.5+ */
    margin: 0px;
-   margin-left: 10px;
 }
 
-td{
-    font-family: Times;
-    font-size: large;
+.tablepre {
+   table-layout: fixed;
+   margin: 0px;
+   padding: 0px;
+   border: 0px;
+}
+
+td {
+    font-family: Verdana;
+    font-size: medium;
     color: #000;
+    text-align: left;
 }
 
 .eventInfo {
-    font-family: Times;
+    font-family: Verdana;
     font-size: large;
     text-align: center;
 }
-.tablepre {
-   table-layout: fixed;
-}
 
-/* Footer */
 
-.footerDark {
-    color: #444444;
-}
-
-.footerDark a {
-    color: #0B63A5;
-}
-
-table.eventWrapper{
-    width: 650px;
+table.eventWrapper {
+    width: 750px;
     margin-top: 0px;
     margin-bottom: 0px;
 }
 
-table.eventHeader{
-    width: 100%;
+table.eventWrapper > tbody > tr > td > br {
+    display: none;
+}
+
+table.eventHeader {
+    border-spacing: 0px;
+    padding: 0px;
     text-align: center;
-    border-spacing:0px;
-    padding:0px;
+    width: 100%;
+}
+
+table.eventHeader img {
+    position: absolute;
 }
 
 table.dayList{
     width: 100%;
     border: 0;
-    border-spacing:5px;
+    border-spacing: 2px;
 }
 
 .textTitle{
-   font-family: helvetica, verdana, sans-serif;
-   font-size: 12px;
-   font-style: italic;
+   display: none;
 }
 .sessionTitle{
    font-weight: bold;
+   border: none;
 }
 
 .itemTime{
+   font-family: Verdana;
    font-size: medium;
+   font-style: italic;
+   padding-left: 2em;
+   padding-right: 1em;
 }
+
+.itemTitle {
+    width: 60%;
+}
+
 .participantText{
-   font-family: helvetica, verdana, sans-serif;
+   font-family: verdana, sans-serif;
    font-size: 12px;
    text-align: left;
 }
 
+.participantText + br,
+.materialDisplayName {
+    display: none;
+}
+
+.descriptionText{
+   display: none;
+}
 
 .subItemText{
     font-size: medium;
-    font-family: Times;
+    font-family: Verdana;
 }
 
 .reportNumberHeader{
     text-align: right;
     font-size: 12px;
-    font-family: Times;
+    font-family: Verdana;
 
 }
 .eventHeader{
-    font-family: Arial;
-    font-size: large;
-    font-weight: bold;
+    font-family: Verdana;
+    font-size: x-large;
     text-align: center;
 }
 .CERNTitle{
@@ -122,38 +153,74 @@ td.itemLeftAlign{
 }
 
 td.itemRightAlign{
-    max-width: 200px;
     text-align: right;
 }
 
-td.itemHeaderDate{
-    font-family: Times;
+td.itemHeaderDate {
+    font-family: Verdana;
     font-size: medium;
     font-style: italic;
+    padding-top: 3em;
     text-align: left;
 }
 
+td.itemHeaderDate > span {
+    -webkit-print-color-adjust: exact;
+    background: #eaeaea;
+    display: block;
+    padding: 5px 2px;
+}
+
+td.itemHeaderDate > span ~ br {
+    display: none;
+}
+
 td.itemHeaderDocuments{
-    font-family: Times;
-    font-size: medium;
-    text-align: right;
-    text-decoration: underline;
+    display: none;
 }
 
 td.sessionInfo{
-    font-family: Times;
-    font-size: large;
+    font-family: Verdana;
+    width: 100%;
 }
 
 td.breakInfo{
-    font-family: Times;
-    font-size: large;
-    text-align: center;
+    display: none;
 }
+
 td.itemTopAlign{
     vertical-align: top;
 }
 
 td.subItemOrder{
-    font-family: Times;
+    font-size: 12px;
+    font-family: Verdana;
+}
+
+.subItemText {
+    font-size: 12px;
+    font-family: Verdana;
+}
+
+.confModifIcon {
+    display: none;
+}
+
+.itemIndex {
+    display: none;
+}
+
+.locationInfo {
+    float: right;
+    font-size: 0.9em;
+    color: #555;
+    line-height: 24px;
+}
+
+.locationParenthesis {
+    display: none;
+}
+
+.sessionDescription {
+    border-bottom: 1px solid #aaa;
 }

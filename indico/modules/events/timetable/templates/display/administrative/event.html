@@ -1,0 +1,66 @@
+{% from 'events/timetable/display/administrative/_session_block.html' import render_session_block %}
+{% from 'events/timetable/display/administrative/_contribution.html' import render_contribution %}
+{% from 'events/timetable/display/administrative/_break.html' import render_break %}
+
+{% set previous_date = none %}
+<table class="dayList">
+    {% set index = 1 %}
+
+    {% for item in entries -%}
+        {% set date = item.start_dt.astimezone(tz_object).date() %}
+
+        {%- if not previous_date or date != previous_date -%}
+            <tr></tr>
+            <tr>
+                <td class="itemHeaderDate" colspan="{{ 4 if theme_settings.print_mode else 2 }}">
+                    <span>
+                        {{ item.start_dt | format_date(format='full', timezone=timezone) }}
+                    </span>
+                    <br>
+                    <br>
+                </td>
+                {% if not theme_settings.print_mode %}
+                    <td class="itemHeaderDocuments" colspan="2">
+                        Documents
+                        <br>
+                        <br>
+                    </td>
+                    <td></td>
+                {% endif %}
+            </tr>
+        {%- endif %}
+
+        {% set show_notes = theme_settings.show_notes|default(false) %}
+        {% set hide_time = theme_settings.hide_time|default(true) %}
+        {% set link_documents = theme_settings.link_documents|default(true) %}
+        {% set session_attachments = theme_settings.session_attachments|default(false) %}
+        {% set print_mode = theme_settings.print_mode|default(false) %}
+        {% set show_numerals = theme_settings.show_numerals|default(true) %}
+
+        {% if item.type.name == 'CONTRIBUTION' -%}
+            {{ render_contribution(item.object, event, timezone=timezone,
+                                   show_notes=show_notes,
+                                   hide_time=hide_time,
+                                   link_documents=link_documents,
+                                   show_numerals=show_numerals,
+                                   numeral=index,
+                                   print_mode=print_mode) }}
+        {%- elif item.type.name == 'SESSION_BLOCK' -%}
+            {{ render_session_block(item.object, event, timezone=timezone,
+                                    show_notes=show_notes,
+                                    hide_time=hide_time,
+                                    link_documents=link_documents,
+                                    session_attachments=session_attachments,
+                                    show_numerals=show_numerals,
+                                    print_mode=print_mode) }}
+        {%- elif item.type.name == 'BREAK' -%}
+            {{ render_break(item.object) }}
+        {%- endif %}
+
+        {% if item.type.name != 'BREAK' %}
+            {% set index = index + 1 %}
+        {% endif %}
+
+        {% set previous_date = date %}
+    {%- endfor %}
+</table>

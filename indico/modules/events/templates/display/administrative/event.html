@@ -1,0 +1,100 @@
+{% from 'events/display/indico/_common.html' import render_datetime %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/timetable/display/administrative/_common.html' import render_location %}
+
+{% macro render_event_time(event, timezone) %}
+    {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
+        {{ event.start_dt | format_date(format='full', timezone=timezone|string) }}
+        - <em class="time">{{ event.start_dt | format_time(format='medium', timezone=timezone) }}</em>
+    {% else %}
+        {% trans start_date=event.start_dt|format_date(format='full', timezone=timezone|string),
+                 start_time=event.start_dt|format_time(format='medium', timezone=timezone),
+                 end_date=event.end_dt|format_date(format='full', timezone=timezone|string),
+                 end_time=event.end_dt|format_time(format='medium', timezone=timezone) %}
+            from {{start_date}} ({{start_time}}) to {{end_date}} ({{end_time}})
+        {% endtrans %}
+    {% endif %}
+{% endmacro %}
+
+<table class="eventWrapper">
+    <tr>
+        <td>
+            <div class="manage-button-container">
+                {{ render_manage_button(event, 'EVENT', toggle_notes=false, show_note_operations=true) }}
+            </div>
+            <div class="reportNumberHeader">
+                {% for ref in event.references|sort(attribute='value') %}
+                    {{ ref.value }}<br>
+                {% endfor %}
+            </div>
+            {% block header %}
+                <br>&nbsp;<br>
+                <div class="eventHeader">
+                    {{ (theme_settings.title_fr or
+                       'ORGANISATION EUROP&Eacute;ENNE POUR LA RECHERCHE NUCL&Eacute;AIRE') | safe }}
+                    <br>
+                    <span class="CERNTitle"> CERN </span>
+                    {{ (theme_settings.title_en or 'EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH') | safe }}
+                </div>
+                <div align="center">
+                    <hr width="50%">
+                </div>
+            {% endblock %}
+
+            <br>&nbsp;<br>
+
+            <div class="eventInfo">
+                {{ event.title }}
+                <br>
+                {% block location_time %}
+                    {% if event.has_location_info %}
+                        {{ render_location(event) }}
+                    {% endif %}
+                    {{ render_event_time(event, timezone=timezone) }}
+                {% endblock %}
+                <br>
+                {% block material %}
+                {% endblock %}
+                {% if event.has_note %}
+                    <a href="{{ url_for('event_notes.view', event) }}">
+                        {% trans %}Minutes{% endtrans %}
+                    </a>
+                {% endif %}
+                <br>
+            </div>
+            {% if event.description %}
+                <br/><br/>
+                <span class="textTitle">Description: </span>
+                <br/>
+                <span class="descriptionText">
+                    <span itemprop="description" class="event-description">
+                        {{ event.description }}
+                    </span>
+                </span>
+            {% endif %}
+
+            {% if event.published_registrations -%}
+                <br/><br/>
+                <span class="textTitle">Participants: </span><br>
+                <span class="participantText">
+                    {%- for participant in event.published_registrations -%}
+                        {{ participant.full_name }}
+                        {%- if not loop.last -%}
+                            ,
+                        {% endif -%}
+                    {%- endfor -%}
+                </span>
+            {%- endif %}
+
+            <br/><br/>
+
+            {% if theme_settings.show_notes and event.has_note %}
+                <span class="notes">{{ event.note.html | safe }}</span>
+            {% endif %}
+
+            <div class="event-body">
+                {{ template_hook('meeting-body', event=event) }}
+            </div>
+        </td>
+    </tr>
+</table>
