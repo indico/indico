@@ -9,13 +9,13 @@ definitions:
     event_types:
     - simple_event
     stylesheet: indico.scss
-    template: lecture.html
+    template: indico/lecture.html
     title: Event
   lecture:
     event_types:
     - simple_event
     stylesheet: indico.scss
-    template: lecture.html
+    template: indico/lecture.html
     title: Lecture
 
   # Meetings - base
@@ -24,14 +24,13 @@ definitions:
     - conference
     - meeting
     stylesheet: indico.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: Indico style
   standard_inline_minutes:
     event_types:
     - meeting
-    show_notes: true
-    stylesheet: lecture.scss
-    template: meeting.html
+    stylesheet: indico.scss
+    template: indico/meeting.html
     title: Indico style - inline minutes
   nicecompact:
     event_types:
@@ -63,25 +62,25 @@ definitions:
     event_types:
     - simple_event
     stylesheet: egee.scss
-    template: lecture.html
+    template: indico/lecture.html
     title: EGEE lecture
   picosec_endtofpet_lectures:
     event_types:
     - simple_event
     stylesheet: picosec_endotofpet.scss
-    template: lecture.html
+    template: indico/lecture.html
     title: PicoSEC - EndoTOFPET US
   picosec_lecture:
     event_types:
     - simple_event
     stylesheet: picosec.scss
-    template: lecture.html
+    template: indico/lecture.html
     title: PicoSEC Lectures
   tical-lectures:
     event_types:
     - simple_event
     stylesheet: tical.scss
-    template: lecture.html
+    template: indico/lecture.html
     title: TICAL
 
   # Meetings - CERN extensions from base
@@ -89,82 +88,82 @@ definitions:
     event_types:
     - meeting
     stylesheet: atlas.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: ATLAS meeting
   cms:
     event_types:
     - meeting
     stylesheet: cms.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: CMS meeting
   alice_meeting:
     event_types:
     - meeting
     stylesheet: alice.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: ALICE meeting
   lhcb_meeting:
     event_types:
     - conference
     - meeting
     stylesheet: lhcb.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: LHCb meeting
   cast:
     event_types:
     - meeting
     stylesheet: cast.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: CAST meeting
   fcc:
     event_types:
     - meeting
     stylesheet: fcc.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: FCC
   ilc:
     event_types:
     - meeting
     stylesheet: ilc.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: ILC style
   intelum:
     event_types:
     - meeting
     stylesheet: intelum.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: Intelum
   fast:
     event_types:
     - meeting
     stylesheet: fast.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: FAST meetings
   EuroCirCol:
     event_types:
     - meeting
     stylesheet: eurocirccol.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: EuroCirCol
   crystal_clear:
     event_types:
     - meeting
     stylesheet: crystalclear.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: Crystal Clear
   egee_meeting:
     event_types:
     - conference
     - meeting
     stylesheet: egee.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: EGEE meeting
   endotofpet:
     event_types:
     - simple_event
     - meeting
     stylesheet: endotofpet.scss
-    template: openlab.html
+    template: indico/meeting.html
     title: EndoTOFPET
   openlab:
       event_types:
@@ -176,7 +175,7 @@ definitions:
     event_types:
     - meeting
     stylesheet: lcg.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: LCG style
   picosec:
     event_types:
@@ -194,19 +193,19 @@ definitions:
     event_types:
     - meeting
     stylesheet: tical.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: TICAL Meetings
   totem_meeting:
     event_types:
     - meeting
     stylesheet: totem.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: TOTEM meeting
   sa2:
     event_types:
     - meeting
     stylesheet: staff_assoc_modern.scss
-    template: meeting.html
+    template: indico/meeting.html
     title: Staff Association (with time)
 
   # Meetings - CERN Administrative

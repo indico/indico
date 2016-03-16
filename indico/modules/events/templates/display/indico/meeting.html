@@ -1,5 +1,5 @@
-{% from 'events/display/_manage_button.html' import render_manage_button %}
-{% from 'events/display/_common.html' import render_location, render_users, render_event_time %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
 {% from 'events/notes/_note.html' import render_note %}
 
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
@@ -10,9 +10,9 @@
                 {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
             </div>
 
-            {% block logo %}
-                {# extending templates can add their logo(s) here #}
-            {% endblock %}
+            {% if theme_settings.logo_link %}
+                <a href="{{ theme_settings.logo_link }}" class="logo"></a>
+            {% endif %}
 
             <h1 itemprop="name">
                 {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
@@ -44,7 +44,7 @@
         <div class="event-sub-header">
             <table class="eventDetails">
                 <tbody>
-                    {% include 'events/display/_details.html' %}
+                    {% include 'events/display/indico/_details.html' %}
                 </tbody>
             </table>
         </div>
