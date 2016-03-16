@@ -1,7 +1,7 @@
 """Add event cloned_from_id
 
 Revision ID: 38ed666dda98
-Revises: 29232c09e58a
+Revises: b09db13d8da
 Create Date: 2016-03-08 16:17:39.294809
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '38ed666dda98'
-down_revision = '29232c09e58a'
+down_revision = 'b09db13d8da'
 
 
 def upgrade():
