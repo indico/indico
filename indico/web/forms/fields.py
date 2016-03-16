@@ -34,8 +34,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.models.events import Event
-from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.persons import EventPerson, PersonLinkBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.rb.models.locations import Location
@@ -382,6 +383,34 @@ class EventPersonField(EventPersonListField):
 
     def _get_data(self):
         return [] if self.data is None else [self.data]
+
+
+class PersonLinkListFieldBase(EventPersonListField):
+
+    #: class that inherits from `PersonLinkBase`
+    person_link_cls = None
+
+    widget = None
+
+    @no_autoflush
+    def _get_person_link(self, data, extra_data=None):
+        extra_data = extra_data or {}
+        person = self._get_event_person(data)
+        person_data = {'title': next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none),
+                       'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
+                       'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
+                       'phone': data.get('phone', '')}
+        person_data.update(extra_data)
+        return self.person_link_cls(person=person, **person_data)
+
+    def _serialize_principal(self, principal):
+        if not isinstance(principal, PersonLinkBase):
+            return super(PersonLinkListFieldBase, self)._serialize_principal(principal)
+        else:
+            return self._serialize_person_link(principal)
+
+    def _serialize_person_link(self, principal, extra_data=None):
+        raise NotImplementedError
 
 
 class MultiStringField(HiddenField):

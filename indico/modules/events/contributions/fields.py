@@ -20,16 +20,16 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, AuthorType,
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.util import serialize_contribution_person_link
-from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _
-from indico.web.forms.fields import EventPersonListField
+from indico.web.forms.fields import PersonLinkListFieldBase
 from indico.web.forms.widgets import JinjaWidget
 
 
-class ContributionPersonListField(EventPersonListField):
+class ContributionPersonLinkListField(PersonLinkListFieldBase):
     """A field to configure a list of contribution persons"""
 
-    widget = JinjaWidget('events/contributions/forms/contribution_person_widget.html')
+    person_link_cls = ContributionPersonLink
+    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.author_types = AuthorType.serialize()
@@ -43,31 +43,23 @@ class ContributionPersonListField(EventPersonListField):
         else:
             self.default_author_type = AuthorType.none
             self.default_is_speaker = True
-        super(ContributionPersonListField, self).__init__(*args, **kwargs)
+        super(ContributionPersonLinkListField, self).__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_contribution_person(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
+        return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
 
     @no_autoflush
-    def _get_contribution_person(self, data):
-        author_type = data.pop('authorType', self.default_author_type)
-        is_speaker = data.pop('isSpeaker', self.default_is_speaker)
-        person = self._get_event_person(data)
-        title = next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none)
-        return ContributionPersonLink(person=person, first_name=data.get('firstName', ''), last_name=data['familyName'],
-                                      title=title, affiliation=data.get('affiliation', ''),
-                                      address=data.get('address', ''), phone=data.get('phone', ''),
-                                      author_type=author_type, is_speaker=is_speaker)
+    def _get_person_link(self, data):
+        extra_data = {'author_type': data.pop('authorType', self.default_author_type),
+                      'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
+        return super(ContributionPersonLinkListField, self)._get_person_link(data, extra_data)
 
-    def _serialize_principal(self, principal):
-        if not isinstance(principal, (ContributionPersonLink, SubContributionPersonLink)):
-            return super(ContributionPersonListField, self)._serialize_principal(principal)
-        else:
-            is_submitter = self.data[principal] if self.get_form().is_submitted() else None
-            return serialize_contribution_person_link(principal, is_submitter=is_submitter)
+    def _serialize_person_link(self, principal, extra_data=None):
+        is_submitter = self.data[principal] if self.get_form().is_submitted() else None
+        return serialize_contribution_person_link(principal, is_submitter=is_submitter)
 
     def pre_validate(self, form):
-        super(ContributionPersonListField, self).pre_validate(form)
+        super(ContributionPersonLinkListField, self).pre_validate(form)
         persons = set()
         for person_link in self.data:
             if person_link.person in persons:
@@ -79,12 +71,8 @@ class ContributionPersonListField(EventPersonListField):
             persons.add(person_link.person)
 
 
-class SubContributionPersonListField(ContributionPersonListField):
+class SubContributionPersonLinkListField(ContributionPersonLinkListField):
     """A field to configure a list of subcontribution persons"""
 
-    def __init__(self, *args, **kwargs):
-        kwargs['allow_submitters'] = False
-        super(SubContributionPersonListField, self).__init__(*args, **kwargs)
-
-    def _get_contribution_person(self, data):
-        return SubContributionPersonLink(person=self._get_event_person(data))
+    person_link_cls = SubContributionPersonLink
+    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html')
