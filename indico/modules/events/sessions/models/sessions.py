@@ -173,9 +173,15 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         sorted_blocks = sorted(self.blocks, key=attrgetter('timetable_entry.end_dt'), reverse=True)
         return sorted_blocks[0].timetable_entry.end_dt if sorted_blocks else None
 
-    @property
-    def all_conveners(self):
-        return set(chain(*[block.person_links for block in self.blocks]))
+    def conveners(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
+
+        return (SessionBlockPersonLink.query
+                .join(SessionBlock)
+                .filter(SessionBlock.session_id == self.id)
+                .distinct(SessionBlockPersonLink.person_id)
+                .all())
 
     @locator_property
     def locator(self):
