@@ -12,7 +12,7 @@
     {% endif %}
 {% endblock %}
 
-{% macro table_header(columns) %}
+{% macro table_header(columns, show_checkin) %}
     <thead>
         <tr class="i-table">
             {% if show_checkin %}
@@ -25,7 +25,7 @@
     </thead>
 {% endmacro %}
 
-{% macro table_row(registration) %}
+{% macro table_row(registration, show_checkin) %}
     <tr class="i-table">
         {% if show_checkin %}
             <td class="i-table center"
@@ -41,15 +41,12 @@
         {% endfor %}
 {% endmacro %}
 
-{% macro participant_table(columns, registrations) %}
+{% macro participant_table(table) %}
     <table class="i-table tablesorter">
-        {{ table_header(columns) }}
+        {{ table_header(table.headers, table.show_checkin) }}
         <tbody>
-            {% for name, personal_data, checked_in in registrations %}
-                {{ table_row({"checked_in": checked_in, "columns": [
-                    {"text": (title or '') + " " + name, "sort_key": name},
-                    {"text": personal_data.position or ''},
-                    {"text": personal_data.affiliation} ]}) }}
+            {% for row in table.rows %}
+                {{ table_row(row, table.show_checkin) }}
             {% endfor %}
         </tbody>
     </table>
@@ -60,13 +57,15 @@
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no published registrations.{% endtrans %}
         {% endcall %}
-    {% elif not registrations %}
+    {% elif no_participants %}
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no participants yet.{% endtrans %}
         {% endcall %}
     {% else %}
         <div class="registrations report">
-            {{ participant_table(["Full name", "Position", "Affiliation"], registrations) }}
+            {% for table in tables %}
+                {{ participant_table(table) }}
+            {% endfor %}
         </div>
     {% endif %}
 

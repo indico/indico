@@ -23,6 +23,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
@@ -117,23 +118,43 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         def _is_checkin_visible(reg):
             return reg.registration_form.publish_checkin_enabled and reg.checked_in
 
-        registrations = [(reg.get_full_name(), reg.get_personal_data(), _is_checkin_visible(reg)) for reg in query]
-        enabled_pd_fields = {field.personal_data_type for reg in regforms for field in reg.active_fields}
-        affiliation_enabled = PersonalDataType.affiliation in enabled_pd_fields
-        position_enabled = PersonalDataType.position in enabled_pd_fields
-        checkin_enabled = any(checked_in for __, __, checked_in in registrations)
+        def _merged_participant_list_table():
+            def _process_registration(reg, column_names):
+                personal_data = reg.get_personal_data()
+                columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
+                return {'checked_in': _is_checkin_visible(reg), 'columns': columns}
+
+            column_names = registration_settings.get(self.event, 'participant_list_columns')
+            headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
+
+            query = (Registration
+                     .find(Registration.event_id == self.event.id,
+                           Registration.state == RegistrationState.complete,
+                           RegistrationForm.publish_registrations_enabled,
+                           ~RegistrationForm.is_deleted,
+                           ~Registration.is_deleted,
+                           _join=Registration.registration_form,
+                           _eager=Registration.registration_form)
+                     .order_by(*Registration.order_by_name))
+            registrations = [_process_registration(reg, column_names) for reg in query]
+            table = {'headers': headers, 'rows': registrations}
+            table['show_checkin'] = any(registration['checked_in'] for registration in registrations)
+            return table
+
+        if registration_settings.get(self.event, 'merge_registration_forms'):
+            tables = [_merged_participant_list_table()]
+        else:
+            tables = {}
+
         published = bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
-                         RegistrationForm.event_id == int(self.event.id)).count())
+                                               RegistrationForm.event_id == int(self.event.id)).count())
 
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
             event=self.event,
             regforms=regforms,
-            show_affiliation=affiliation_enabled and any(pd.get('affiliation') for __, pd, __ in registrations),
-            show_position=position_enabled and any(pd.get('position') for __, pd, __ in registrations),
-            show_checkin=checkin_enabled,
-            registrations=registrations,
+            tables=tables,
             published=published
         )
 
