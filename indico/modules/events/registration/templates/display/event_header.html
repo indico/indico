@@ -48,13 +48,13 @@
     </tr>
 {% endif %}
 
-{% if participants %}
+{% if event.published_registrations %}
     <tr>
         <td class="leftCol">{% trans %}Participants{% endtrans %}</td>
         <td>
             <div class="participant-list-wrapper">
                 <ul class="participant-list">
-                    {%- for participant in participants -%}
+                    {%- for participant in event.published_registrations -%}
                         <li class="event-user {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %}checked-in{% endif %}">
                             {{ participant.full_name }}
                         </li>
