@@ -264,6 +264,7 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
     # - layout_images (ImageFile.event_new)
     # - legacy_contribution_mappings (LegacyContributionMapping.event_new)
     # - legacy_mapping (LegacyEventMapping.event_new)
+    # - legacy_session_block_mappings (LegacySessionBlockMapping.event_new)
     # - legacy_session_mappings (LegacySessionMapping.event_new)
     # - legacy_subcontribution_mappings (LegacySubContributionMapping.event_new)
     # - log_entries (EventLogEntry.event_new)
