@@ -152,6 +152,17 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         """Convenience property so all event entities have it"""
         return self
 
+    @property
+    def conveners(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
+
+        return (SessionBlockPersonLink.query
+                .join(SessionBlock)
+                .filter(SessionBlock.session_id == self.id)
+                .distinct(SessionBlockPersonLink.person_id)
+                .all())
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, session_id=self.id)
