@@ -712,18 +712,19 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         """Return main information about the event."""
 
         if self._view != 'xml':
-            vars = self._getVariables(self._conf)
-            vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
+            kwargs = self._getVariables(self._conf)
+            kwargs['isStringHTML'] = MaKaC.common.utils.isStringHTML
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()
-            vars = {}
-            vars['xml'] = outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)
+            kwargs = {}
+            kwargs['xml'] = outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)
 
+        kwargs['theme_settings'] = self.theme.get('settings', {})
         return render_template(posixpath.join('events/display', self.theme['template']), event=self._conf.as_event,
                                conf=self._conf,
                                show_notes=self.theme.get('show_notes', False),
-                               **vars).encode('utf-8')
+                               **kwargs).encode('utf-8')
 
 
 class WPrintPageFrame (wcomponents.WTemplated):
