@@ -1,0 +1,10 @@
+{% extends 'forms/_person_link_widget_base.html' %}
+
+{% block sections %}
+    {% if field.get_form().event_type == 'lecture' %}
+        {% set placeholder = _('There are no speakers') %}
+    {% else %}
+        {% set placeholder = _('There are no chairpersons') %}
+    {% endif %}
+    {{ render_section('other', placeholder=placeholder) }}
+{% endblock %}

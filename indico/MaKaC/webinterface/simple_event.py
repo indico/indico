@@ -127,7 +127,7 @@ class WSimpleEventCreation(category.WConferenceCreation):
 
     def getVars( self ):
         vars = category.WConferenceCreation.getVars( self )
-        vars["event_type"] = WebFactory.getId()
+        vars["event_type"] = 'lecture'
         return vars
 
 ##################### Event Display ###################################
