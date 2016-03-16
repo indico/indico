@@ -115,4 +115,4 @@ def _inject_meeting_body(event, **kwargs):
 
     return render_template(posixpath.join('events/timetable/display', tt_tpl), event=event, entries=entries, days=days,
                            timezone=event_tz_name, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
-                           show_notes=(theme_id == 'standard_inline_minutes'), theme_settings=theme.get('settings', {}))
+                           theme_settings=theme.get('settings', {}))

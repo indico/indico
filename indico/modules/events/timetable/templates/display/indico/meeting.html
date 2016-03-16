@@ -38,13 +38,14 @@
         {%- endif %}
 
         {% if item.type.name == 'CONTRIBUTION' -%}
-            {{ render_contribution(item.object, event, nested=false, timezone=timezone, show_notes=show_notes,
-                                   parent=event) }}
+            {{ render_contribution(item.object, event, nested=false, timezone=timezone,
+                                   show_notes=theme_settings.show_notes, parent=event) }}
         {%- elif item.type.name == 'SESSION_BLOCK' -%}
-            {{ render_session_block(item.object, event, timezone=timezone, show_notes=show_notes, parent=event,
-                                    hide_contribs=hide_contribs) }}
+            {{ render_session_block(item.object, event, timezone=timezone, show_notes=theme_settings.show_notes,
+                                    parent=event, hide_contribs=hide_contribs) }}
         {%- elif item.type.name == 'BREAK' -%}
-            {{ render_break(item.object, event, nested=false, timezone=timezone, show_notes=show_notes, parent=event) }}
+            {{ render_break(item.object, event, nested=false, timezone=timezone, show_notes=theme_settings.show_notes,
+                            parent=event) }}
         {%- endif %}
 
         {% set previous_date = date %}

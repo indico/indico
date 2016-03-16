@@ -32,6 +32,8 @@ definitions:
     stylesheet: indico.scss
     template: indico/meeting.html
     title: Indico style - inline minutes
+    settings:
+        show_notes: true
   nicecompact:
     event_types:
     - conference

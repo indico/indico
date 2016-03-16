@@ -722,9 +722,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         kwargs['theme_settings'] = self.theme.get('settings', {})
         return render_template(posixpath.join('events/display', self.theme['template']), event=self._conf.as_event,
-                               conf=self._conf,
-                               show_notes=self.theme.get('show_notes', False),
-                               **kwargs).encode('utf-8')
+                               conf=self._conf, **kwargs).encode('utf-8')
 
 
 class WPrintPageFrame (wcomponents.WTemplated):
