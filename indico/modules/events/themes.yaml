@@ -169,8 +169,10 @@ definitions:
       event_types:
       - meeting
       stylesheet: openlab.scss
-      template: openlab.html
+      template: indico/meeting.html
       title: Openlab
+      settings:
+          logo_link: http://www.cern.ch/openlab
   lcg:
     event_types:
     - meeting
