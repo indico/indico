@@ -30,7 +30,6 @@ from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
 from MaKaC.accessControl import AccessWrapper
-from MaKaC.conference import CategoryManager
 
 
 def get_related_categories(user):
@@ -50,6 +49,8 @@ def get_related_categories(user):
 
 def get_suggested_categories(user):
     """Gets the suggested categories of a user for the dashboard"""
+    from MaKaC.conference import CategoryManager
+
     if not redis_write_client:
         return []
     related = user.favorite_categories | user.get_linked_objects('category', 'manager')
