@@ -1,9 +1,9 @@
-{% from 'events/display/_manage_button.html' import render_manage_button %}
-{% from 'events/display/_common.html' import render_location, render_users %}
-{% from 'events/timetable/display/_common.html' import render_attachments, render_notes, render_description,
-                                                       render_time %}
-{% from 'events/timetable/display/_contribution.html' import render_contribution %}
-{% from 'events/timetable/display/_break.html' import render_break %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'events/timetable/display/indico/_common.html' import render_attachments, render_notes, render_description,
+                                                              render_time %}
+{% from 'events/timetable/display/indico/_contribution.html' import render_contribution %}
+{% from 'events/timetable/display/indico/_break.html' import render_break %}
 
 {% macro render_session_block(block, event, parent=none, timezone=none, show_notes=false, hide_contribs=false) %}
     {% set session_ = block.session %}
@@ -50,7 +50,7 @@
             <table class="timetable-item-details session-details">
                 <tbody>
                     {{ render_attachments(session) }}
-                    </tbody>
+                </tbody>
             </table>
 
             {{ render_notes(block.session) }}

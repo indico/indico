@@ -58,7 +58,7 @@ from indico.web.menu import render_sidemenu
 def format_location(item):
     if item.inherit_location or not item.has_location_info:
         return u''
-    tpl = get_template_module('events/display/_common.html')
+    tpl = get_template_module('events/display/indico/_common.html')
     return tpl.render_location(item)
 
 

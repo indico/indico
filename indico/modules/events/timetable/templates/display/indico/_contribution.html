@@ -1,8 +1,8 @@
-{% from 'events/display/_manage_button.html' import render_manage_button %}
-{% from 'events/display/_common.html' import render_location %}
-{% from 'events/timetable/display/_subcontribution.html' import render_subcontribution %}
-{% from 'events/timetable/display/_common.html' import render_speakers, render_references, render_attachments,
-                                                       render_notes, render_description, render_time %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/display/indico/_common.html' import render_location %}
+{% from 'events/timetable/display/indico/_subcontribution.html' import render_subcontribution %}
+{% from 'events/timetable/display/indico/_common.html' import render_speakers, render_references, render_attachments,
+                                                              render_notes, render_description, render_time %}
 
 {% macro render_contribution(contrib, event, parent=none, nested=false, hide_end_time=false, timezone=none,
                              show_notes=false) -%}

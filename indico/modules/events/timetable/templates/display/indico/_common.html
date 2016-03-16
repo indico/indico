@@ -1,6 +1,6 @@
 {% from 'events/notes/_note.html' import render_note %}
 {% from 'attachments/_display.html' import render_attachments_folders %}
-{% from 'events/display/_common.html' import render_users %}
+{% from 'events/display/indico/_common.html' import render_users %}
 
 {% macro render_description(item, class='') %}
     <div itemprop="description" class="item-description {{ class }}">
@@ -10,7 +10,7 @@
 
 {% macro render_references(item) -%}
     <ul class="reference-list">
-        {%- for reference in item.references: -%}
+        {%- for reference in item.references -%}
             <li title="{% trans title=reference.reference_type.name %}External reference ({{ title }}){% endtrans %}"
                 class="icon-link">
             {% if reference.url -%}

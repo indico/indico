@@ -1,5 +1,5 @@
-{% from 'events/display/_manage_button.html' import render_manage_button %}
-{% from 'events/display/_common.html' import render_location, render_users, render_event_time %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
 {% from 'events/notes/_note.html' import render_note %}
 
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
@@ -8,7 +8,7 @@
             <div class="lecture-category">{{ category }}</div>
             {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
-                {{ render_manage_button(event, 'EVENT', align_right=true, manage_link=true, show_button=show_button) }}
+                {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
             </div>
 
             <h1 itemprop="name">{{ event.title }}</h1>
@@ -34,7 +34,7 @@
 
     {% block body %}
         <div class="event-sub-header">
-            {% include 'events/display/_details.html' %}
+            {% include 'events/display/indico/_details.html' %}
         </div>
     {% endblock %}
 
