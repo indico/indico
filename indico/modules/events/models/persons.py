@@ -255,6 +255,12 @@ class EventPersonLink(PersonLinkBase):
     # relationship backrefs:
     # - event (Event.person_links)
 
+    @property
+    def is_submitter(self):
+        if not self.event:
+            raise Exception("No event to check submission rights against")
+        return self.person.has_role('submit', self.event)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'event_id', 'person_id', _text=self.full_name)
