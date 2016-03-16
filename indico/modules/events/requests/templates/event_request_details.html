@@ -54,25 +54,18 @@
         {%- endif -%}
     {% endblock %}
 
-
-    {% if show_management %}
-        {% call form_fieldset(legend=_('Request details'), description=_('These are the details provided by the event manager.')) %}
-            {% if show_management %}
-                {% call form_row_static(_('Created by')) %}
-                    <a href="mailto:{{ req.created_by_user.email }}">{{ req.created_by_user.full_name }}</a>
-                    {% if req.created_by_user.phone %}
-                        (Phone: {{ req.created_by_user.phone }})
-                    {% endif %}
-                {% endcall %}
-                {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
+    {% call form_fieldset(legend=_('Request details'), description=_('These are the details provided by the event manager.')) %}
+        {% call form_row_static(_('Created by')) %}
+            <a href="mailto:{{ req.created_by_user.email }}">{{ req.created_by_user.full_name }}</a>
+            {% if req.created_by_user.phone %}
+                (Phone: <a href="tel:{{ req.created_by_user.phone }}">{{ req.created_by_user.phone }}</a>)
             {% endif %}
-            {% block form %}
-                {{ form_rows(form) }}
-            {% endblock %}
         {% endcall %}
-    {% else %}
-        {{ self.form() }}
-    {% endif %}
+        {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
+        {% block form %}
+            {{ form_rows(form) }}
+        {% endblock %}
+    {% endcall %}
 
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="
