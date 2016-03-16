@@ -78,25 +78,25 @@
     {% endfor %}
 {%- endmacro %}
 
+{% macro render_datetime(prop_name, dt, timezone, format='medium') -%}
+    <time itemprop="{{ prop_name }}" datetime="{{ dt.isoformat() }}">
+        {{ dt | format_datetime(format=format, timezone=timezone) }}
+    </time>
+{%- endmacro %}
+
 {% macro render_event_time(event, timezone) -%}
     <i class="icon-calendar header-data"></i>
     <span class="event-time-data">
         {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
-            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
-                {{ event.start_dt | format_datetime(format='medium', timezone=timezone) }}
-            </time>
+            {{ render_datetime('startDate', event.start_dt, timezone=timezone) }}
             &rarr;
             <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
                 {{ event.end_dt | format_time(format='medium', timezone=timezone) }}
             </time>
         {% else %}
-            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
-                {{ event.start_dt | format_datetime(format='medium', timezone=timezone) }}
-            </time>
+            {{ render_datetime('startDate', event.start_dt, timezone=timezone) }}
             &rarr;
-            <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
-                {{ event.end_dt | format_datetime(format='medium', timezone=timezone) }}
-            </time>
+            {{ render_datetime('endDate', event.end_dt, timezone=timezone) }}
         {% endif %}
         <span class="timezone">{{ timezone }}</span>
     </span>
