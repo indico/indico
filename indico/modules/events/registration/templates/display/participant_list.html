@@ -12,6 +12,49 @@
     {% endif %}
 {% endblock %}
 
+{% macro table_header(columns) %}
+    <thead>
+        <tr class="i-table">
+            {% if show_checkin %}
+            <th class="i-table checkbox-column" data-sorter="false"></th>
+            {% endif %}
+            {% for column in columns %}
+                <th class="i-table">{{ column }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+{% endmacro %}
+
+{% macro table_row(registration) %}
+    <tr class="i-table">
+        {% if show_checkin %}
+            <td class="i-table center"
+                {% if registration.checked_in %}title="{% trans %}Checked in{% endtrans %}"{% endif %}>
+                {% if registration.checked_in %}<i class="icon-checkmark"></i>{% endif %}
+            </td>
+        {% endif %}
+        {% for column in registration.columns %}
+            <td class="i-table"
+                {% if column.sort_key %} data-text="{{ column.sort_key }}"{% endif %}>
+                {{ column.text }}
+            </td>
+        {% endfor %}
+{% endmacro %}
+
+{% macro participant_table(columns, registrations) %}
+    <table class="i-table tablesorter">
+        {{ table_header(columns) }}
+        <tbody>
+            {% for name, personal_data, checked_in in registrations %}
+                {{ table_row({"checked_in": checked_in, "columns": [
+                    {"text": (title or '') + " " + name, "sort_key": name},
+                    {"text": personal_data.position or ''},
+                    {"text": personal_data.affiliation} ]}) }}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
 {% block content %}
     {% if not published %}
         {% call message_box('info', fixed_width=true) %}
@@ -23,42 +66,7 @@
         {% endcall %}
     {% else %}
         <div class="registrations report">
-            <table class="i-table tablesorter">
-                <thead>
-                    <tr class="i-table">
-                        {% if show_checkin %}
-                            <th class="i-table checkbox-column" data-sorter="false"></th>
-                        {% endif %}
-                        <th class="i-table">{% trans %}Full name{% endtrans %}</th>
-                        {% if show_position %}
-                            <th class="i-table">{% trans %}Position{% endtrans %}</th>
-                        {% endif %}
-                        {% if show_affiliation %}
-                            <th class="i-table">{% trans %}Affiliation{% endtrans %}</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for name, personal_data, checked_in in registrations %}
-                        <tr class="i-table">
-                            {% if show_checkin %}
-                                <td class="i-table center" {% if checked_in %}title="{% trans %}Checked in{% endtrans %}"{% endif %}>
-                                    {% if checked_in %}<i class="icon-checkmark"></i>{% endif %}
-                                </td>
-                            {% endif %}
-                            <td class="i-table" data-text="{{ name }}">
-                                {{ title }} {{ name }}
-                            </td>
-                            {% if show_position %}
-                                <td class="i-table">{{ personal_data.position or '' }}</td>
-                            {% endif %}
-                            {% if show_affiliation %}
-                                <td class="i-table">{{ personal_data.affiliation or '' }}</td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {{ participant_table(["Full name", "Position", "Affiliation"], registrations) }}
         </div>
     {% endif %}
 
