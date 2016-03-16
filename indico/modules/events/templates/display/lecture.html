@@ -23,7 +23,7 @@
                 <div class="event-date">
                     {{ render_event_time(event, timezone) }}
                 </div>
-                {% if event.venue_name or event.room_name or event.address %}
+                {% if event.has_location_info or event.address %}
                     <div class="event-location">
                         {{ render_location(event, class='header-data') }}
                     </div>
