@@ -239,6 +239,10 @@ class PersonLinkBase(PersonMixin, db.Model):
             )
         )
 
+    @property
+    def email(self):
+        return self.person.email
+
     first_name = override_attr('first_name', 'person')
     last_name = override_attr('last_name', 'person')
     title = override_attr('title', 'person', fget=lambda self, __: self._get_title())
