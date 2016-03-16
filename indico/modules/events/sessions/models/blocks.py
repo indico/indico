@@ -111,6 +111,10 @@ class SessionBlock(LocationMixin, db.Model):
     def note(self):
         return self.session.note
 
+    @property
+    def full_title(self):
+        return '{}: {}'.format(self.session.title, self.title) if self.title else self.session.title
+
     def can_manage(self, user, allow_admin=True):
         """Check whether a user can manage this session block.
 
@@ -127,9 +131,6 @@ class SessionBlock(LocationMixin, db.Model):
             return True
         else:
             return False
-
-    def can_access(self, user, allow_admin=True):
-        return self.session.can_access(user, allow_admin=allow_admin)
 
     def can_manage_attachments(self, user):
         return self.session.can_manage_attachments(user)
