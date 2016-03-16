@@ -38,11 +38,6 @@
         % endfor
         <![endif]-->
 
-        <!-- page-specific CSS files-->
-        % for cssFile in extraCSS:
-            <link rel="stylesheet" type="text/css" href="${cssFile}">
-        % endfor
-
         <!-- global JS variables -->
         <script>
         % if user:
@@ -56,6 +51,11 @@
 
         <!-- other page-specific things -->
         ${ page._getHeadContent() }
+
+        <!-- page-specific CSS files-->
+        % for cssFile in extraCSS:
+            <link rel="stylesheet" type="text/css" href="${cssFile}">
+        % endfor
 
         ${ template_hook('html-head', template=self) }
     </head>
