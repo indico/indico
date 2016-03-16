@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.util import serialize_person_link
 from indico.util.i18n import _
-from indico.web.forms.fields import MultipleItemsField
+from indico.web.forms.fields import MultipleItemsField, PersonLinkListFieldBase
+from indico.web.forms.widgets import JinjaWidget
 
 
 class ReferencesField(MultipleItemsField):
@@ -62,3 +65,32 @@ class ReferencesField(MultipleItemsField):
             return []
         else:
             return [{'id': r.id, 'type': unicode(r.reference_type_id), 'value': r.value} for r in self.data]
+
+
+class EventPersonLinkListField(PersonLinkListFieldBase):
+    """A field to manage event's chairpersons"""
+
+    person_link_cls = EventPersonLink
+    widget = JinjaWidget('events/forms/event_person_link_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.allow_submitters = True
+        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+        super(EventPersonLinkListField, self).__init__(*args, **kwargs)
+
+    def _convert_data(self, data):
+        return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
+
+    def _serialize_person_link(self, principal, extra_data=None):
+        extra_data = extra_data or {}
+        data = dict(extra_data, **serialize_person_link(principal))
+        data['isSubmitter'] = principal.is_submitter
+        return data
+
+    def pre_validate(self, form):
+        super(PersonLinkListFieldBase, self).pre_validate(form)
+        persons = set()
+        for person_link in self.data:
+            if person_link.person in persons:
+                raise ValueError(_("Person with email '{}' is duplicated").format(person_link.person.email))
+            persons.add(person_link.person)
