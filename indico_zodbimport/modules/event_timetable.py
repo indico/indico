@@ -45,7 +45,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.models.legacy_mapping import LegacySessionMapping
+from indico.modules.events.sessions.models.legacy_mapping import LegacySessionMapping, LegacySessionBlockMapping
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
@@ -688,6 +688,9 @@ class TimetableMigration(object):
         session_block = SessionBlock(session=session, title=convert_to_unicode(old_block.title),
                                      duration=old_block.duration)
         session_block.timetable_entry = TimetableEntry(event_new=self.event, start_dt=old_block.startDate)
+        session_block.legacy_mapping = LegacySessionBlockMapping(event_new=self.event,
+                                                                 legacy_session_id=old_block.session.id,
+                                                                 legacy_session_block_id=old_block.id)
         self._migrate_location(old_block, session_block)
         session_block.person_links = list(self._migrate_session_block_person_links(old_block))
         self._migrate_timetable_entries(old_block._schedule._entries, session_block)

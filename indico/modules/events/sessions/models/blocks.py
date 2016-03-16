@@ -69,6 +69,7 @@ class SessionBlock(LocationMixin, db.Model):
 
     # relationship backrefs:
     # - contributions (Contribution.session_block)
+    # - legacy_mapping (LegacySessionBlockMapping.session_block)
     # - session (Session.blocks)
     # - timetable_entry (TimetableEntry.session_block)
 
