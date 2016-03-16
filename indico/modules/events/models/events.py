@@ -331,6 +331,12 @@ class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedIt
         return self.registration_forms.filter_by(is_participation=True, is_deleted=False).first()
 
     @property
+    @memoize_request
+    def published_registrations(self):
+        from indico.modules.events.registration.util import get_published_registrations
+        return get_published_registrations(self)
+
+    @property
     def protection_parent(self):
         return self.as_legacy.getOwner()
 
