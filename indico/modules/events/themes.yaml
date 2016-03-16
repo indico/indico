@@ -217,43 +217,65 @@ definitions:
     event_types:
     - conference
     - meeting
-    stylesheet: meetings/administrative/Administrative.css
-    template: administrative.html
+    stylesheet: administrative.scss
+    template: administrative/event.html
     title: Administrative style
   administrative2:
     event_types:
     - meeting
-    stylesheet: meetings/administrative/AdministrativeWithTime.css
-    template: administrative_time.html
+    stylesheet: administrative.scss
+    template: administrative/event.html
     title: Administrative style (with time)
+    settings:
+        hide_time: false
   administrative4:
     event_types:
     - meeting
-    stylesheet: meetings/administrative/AdministrativeAllMaterial.css
-    template: administrative_material.html
+    stylesheet: administrative.scss
+    template: administrative/event.html
     title: Administrative style (all material)
+    settings:
+        link_documents: false
   cern_committees:
     event_types:
     - meeting
-    stylesheet: meetings/administrative/CernCommittee.css
+    stylesheet: cern_committees.scss
     template: cern_committees.html
+    tt_template: administrative/event.html
     title: CERN Committees
+    settings:
+        session_attachments: true
+        hide_time: false
+        show_numerals: false
+        print_mode: true
   lhcrrb:
     event_types: []
-    stylesheet: meetings/administrative/LHCRBB.css
-    template: lhc_rrb.html
+    stylesheet: lhc_rrb.scss
+    template: cern_committees.html
+    tt_template: administrative/event.html
     title: LHC RRB
+    settings:
+        session_attachments: true
+        hide_time: false
+        show_numerals: false
   pf:
     event_types:
     - meeting
-    stylesheet: meetings/administrative/PensionFund.css
+    stylesheet: administrative.scss
     template: pension_fund.html
+    tt_template: administrative/event.html
     title: Pension Fund
+    settings:
+        link_documents: false
   sa:
     event_types:
     - meeting
-    stylesheet: meetings/administrative/StaffAssociation.css
-    template: staff_association.html
+    stylesheet: administrative.scss
+    template: administrative/event.html
+    settings:
+        show_notes: true
+        title_en: 'Staff Association'
+        title_fr: 'Association du Personnel'
     title: Staff Association
 
   # XML

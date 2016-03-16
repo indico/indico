@@ -1,0 +1,64 @@
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/timetable/display/administrative/_common.html' import render_linked_attachments %}
+{% from 'events/timetable/display/administrative/_subcontribution.html' import render_subcontribution %}
+{% from 'events/display/indico/_common.html' import render_users %}
+
+{% macro render_contribution(contrib, event, show_notes=false, numeral=none, show_numerals=true, hide_time=false,
+                             link_documents=false, print_mode=false, timezone=none) -%}
+    <tr>
+        <td colspan="4"></td>
+    </tr>
+    <tr>
+        <td class="itemTopAlign itemLeftAlign ">
+            {% if not hide_time -%}
+                <span class="itemTime">{{ contrib.start_dt | format_time(timezone=timezone) }}</span>
+            {%- endif %}
+            {% if show_numerals -%}
+                <span class="itemIndex">{{ numeral }}.</span>
+            {%- endif %}
+        </td>
+        <td class="itemTopAlign itemLeftAlign itemTitle">
+            {{ contrib.title }}
+            <br/>
+            {% if contrib.description %}
+               {{ contrib.description }}
+            {% endif %}
+            {% if show_notes and contrib.has_note %}
+                <span class="notes">
+                    {{ contrib.note.html | safe }}
+                </span>
+            {% endif %}
+        </td>
+        <td class="itemTopAlign itemRightAlign">
+            {% set speakers = contrib.person_links|selectattr("is_speaker")|list %}
+            {% if speakers %}
+                <span class="participantText">
+                    {{ render_users(speakers) }}
+                </span>
+                <br>
+            {% endif %}
+            <span class="materialDisplayName">
+                {{ render_linked_attachments(contrib) }}
+                {% if contrib.has_note %}
+                    <a href="{{ url_for('event_notes.view', contrib) }}">
+                        {% trans %}Minutes{% endtrans %}
+                    </a>
+                {% endif %}
+            </span>
+
+        </td>
+        <td class="itemTopAlign actions">
+            {% if not print_mode %}
+                {{ render_manage_button(contrib, 'CONTRIBUTION', toggle_notes=false, show_notes=show_notes,
+                                        show_note_operations=true,
+                                        show_button=(not event.as_legacy.isClosed() and
+                                                     contrib.can_manage_attachments(session.user))) }}
+            {% endif %}
+        </td>
+        {% for subcontrib in contrib.subcontributions %}
+            {{ render_subcontribution(subcontrib, event, numeral='%s.%s'|format(numeral, loop.index),
+                                      show_notes=show_notes, link_documents=link_documents, timezone=timezone,
+                                      show_numerals=show_numerals, print_mode=print_mode) }}
+        {% endfor %}
+    </tr>
+{%- endmacro %}

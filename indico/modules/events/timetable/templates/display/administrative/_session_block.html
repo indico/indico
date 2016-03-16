@@ -1,0 +1,73 @@
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/timetable/display/administrative/_contribution.html' import render_contribution %}
+{% from 'events/timetable/display/administrative/_break.html' import render_break %}
+{% from 'events/timetable/display/administrative/_common.html' import render_location, render_attachments %}
+
+{% macro render_session_block(block, event, timezone=none, show_notes=false, link_documents=true, hide_time=false,
+                              session_attachments=true, print_mode=false, show_numerals=true) %}
+    {% set session_ = block.session %}
+    {% set entries = block.timetable_entry.children %}
+
+    <tr>
+        <td class="itemLeftAlign sessionInfo" colspan="{{ 3 if print_mode else 2 }}">
+            <span class="sessionTitle">
+                {{ session_.title }}
+            </span>
+            <span class="locationInfo">
+                {% if block.inherits_location %}
+                    ({{ render_location(event) }})
+                {% elif block.has_location_info %}
+                    ({{ render_location(block) }})
+                {% endif %}
+            </span>
+        </td>
+        <td class="itemRightAlign" >
+            <span class="materialDisplayName">
+            {% if not link_documents %}
+                {{ render_attachments(session_) }}
+            {% elif session_attachments %}
+                {{ render_attachments(session_, exclude_document=True) }}
+            {% endif %}
+            {% if session_.has_note %}
+                <a href="{{ url_for('event_notes.view', session_) }}">
+                    {% trans %}Minutes{% endtrans %}
+                </a>
+            {% endif %}
+            </span>
+        </td>
+        {% if not print_mode %}
+            <td class="itemTopAlign actions">
+                {{ render_manage_button(block, 'SESSION_BLOCK', toggle_notes=false, show_notes=show_notes,
+                                        show_note_operations=true,
+                                        show_button=(not event.as_legacy.isClosed() and
+                                                     block.can_manage_attachments(session.user))) }}
+            </td>
+        {% endif %}
+    </tr>
+    <tr>
+        <td class="itemLeftAlign sessionInfo sessionDescription" colspan="4">
+            <hr width="100%"/>
+            {% if session_.description %}
+                {{ session_.description }}
+                <hr width="100%"/>
+            {% endif %}
+        </td>
+    </tr>
+
+    {% if entries -%}
+        <ul class="meeting-sub-timetable">
+            {% set index = 1 %}
+            {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
+            {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
+                {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
+                    {{ render_contribution(entry.contribution, event, timezone=timezone, hide_time=hide_time,
+                                           show_notes=show_notes, link_documents=link_documents,
+                                           numeral=index, show_numerals=show_numerals, print_mode=print_mode) }}
+                   {% set index = index + 1 %}
+                {% elif entry.type.name == 'BREAK' %}
+                    {{ render_break(entry.break_) }}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {%- endif %}
+{% endmacro %}

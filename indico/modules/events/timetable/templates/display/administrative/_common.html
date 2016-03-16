@@ -1,0 +1,61 @@
+{% macro render_attachments(item, exclude_document=false) %}
+    {% for folder in item.attached_items['folders'] %}
+        {% if not exclude_document or folder.title != 'document' %}
+            <a href="{{url_for('attachments.list_folder', folder, redirect_if_single=true)}}">
+                {{ folder.title }}
+            </a>
+        {% endif %}
+    {% endfor %}
+    {% for file in item.attached_items['files'] %}
+        <a href="{{ file.download_url }}">
+            {{ file.title }}
+        </a>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_linked_attachments(item, link_documents=false) %}
+    {% if link_documents %}
+        {% for folder in item.attached_items.get('folders', []) %}
+            {% if folder.title == 'document' and item.references %}
+                <a href="{{ url_for('attachments.list_folder', folder, redirect_if_single=true) }}">
+                    {% for reference in item.references|sort(attribute='value') %}
+                         {{ reference.value }}
+                    {% endfor %}
+                </a><br>
+            {% endif %}
+        {% endfor %}
+
+        {# if there are no 'document' folders, then show unlinked references anyway #}
+        {% if not item.attached_items.get('folders', [])|selectattr('title', 'equalto', 'document')|list
+              and item.references %}
+            {% for reference in item.references|sort(attribute='value') %}
+                {{ reference.value }}
+            {% endfor %}
+        {% endif %}
+
+        {% if item.attached_items %}
+            {{ render_attachments(item, exclude_document=True) }}
+        {% endif %}
+    {% else %}
+        {% if item.attached_items %}
+            {{ render_attachments(item) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_location(item) -%}
+    <span class="location-info">
+        {#- -#}
+        <span class="text">
+            {%- if item.venue_name and (not parent or parent.venue_name != item.venue_name) -%}
+                <strong>{{ item.venue_name }}</strong>
+                {%- if item.room_name  %}
+                    ({{ item.get_room_name(full=false) }})
+                {%- endif -%}
+            {%- elif item.room_name -%}
+                {{ item.get_room_name(full=false) }}
+            {%- endif -%}
+        </span>
+        {#- -#}
+    </span>
+{%- endmacro %}

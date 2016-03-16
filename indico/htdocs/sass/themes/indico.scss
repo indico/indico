@@ -28,7 +28,7 @@
      div.event-header {
          background: $header-bg-color url($image) left top no-repeat;
          background-position: $position;
-        background-size: $scale;
+         background-size: $scale;
          padding-left: $padding-left;
      }
  }
@@ -188,10 +188,6 @@ div.event-header {
     }
 
     color: $light-black;
-
-    .preformatted {
-        white-space: pre-wrap;
-    }
 }
 
 // Meeting Timetable-specific

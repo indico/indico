@@ -1,0 +1,18 @@
+{% extends 'events/display/administrative/event.html' %}
+
+{% block header %}
+    <table class="eventHeader">
+        <tr>
+            <td>
+                <div style="float:left;">
+                    <img src="{{ indico_config.ImagesBaseURL }}/smallcern.png">
+                </div>
+                <br/>
+                <div class="eventHeader">{{ category }}</div>
+            </td>
+        </tr>
+    </table>
+{% endblock %}
+
+{% block location_time %}
+{% endblock %}
