@@ -1,35 +1,23 @@
 {% extends 'forms/base_widget.html' %}
 
+{% macro render_section(id, title=none, placeholder=none) %}
+    {% if title is not none %}
+        <div id="{{ id }}-list-title-{{ field.id }}" class="titled-rule">
+            {{ title }}
+        </div>
+    {% endif %}
+    {% if placeholder is not none %}
+        <div id="no-{{ id }}-placeholder-{{ field.id }}" class="nobody-placeholder">
+            {{ placeholder }}
+        </div>
+    {% endif %}
+    <div id="{{ id }}-list-{{ field.id }}" class="person-list"></div>
+{% endmacro %}
+
 {% block html %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
     <div id="people-list-{{ field.id }}" class="person-link-list {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
-        {% if field.allow_authors %}
-            <div id="author-list-title-{{ field.id }}" class="titled-rule">
-                {% trans %}Authors{% endtrans %}
-            </div>
-            <div id="no-author-placeholder-{{ field.id }}" class="nobody-placeholder">
-                {% trans %}There are no authors{% endtrans %}
-            </div>
-            <div id="author-list-{{ field.id }}" class="person-list"></div>
-            <div id="coauthor-list-title-{{ field.id }}" class="titled-rule">
-                {% trans %}Co-authors{% endtrans %}
-            </div>
-            {% if field.show_empty_coauthors %}
-                <div id="no-coauthor-placeholder-{{ field.id }}" class="nobody-placeholder">
-                    {% trans %}There are no co-authors{% endtrans %}
-                </div>
-            {% endif %}
-            <div id="coauthor-list-{{ field.id }}" class="person-list"></div>
-            <div id="other-list-title-{{ field.id }}" class="titled-rule">
-                {% trans %}Others{% endtrans %}
-            </div>
-            <div id="other-list-{{ field.id }}" class="person-list"></div>
-        {% else %}
-            <div id="other-list-{{ field.id }}" class="person-list"></div>
-            <div id="nobody-placeholder-{{ field.id }}" class="nobody-placeholder">
-                {% trans %}There are no speakers{% endtrans %}
-            </div>
-        {% endif %}
+        {% block sections %}{% endblock %}
         <div class="i-box-footer" style="text-align: right;">
             <i class="info-helper"
                title="{% trans %}Added people can be modified by moving the cursor over them.{% endtrans %}"></i>
@@ -58,10 +46,10 @@
             var $noCoauthorPlaceholder = $fieldDisplay.find('#no-coauthor-placeholder-{{ field.id }}');
             var $otherList = $fieldDisplay.find('#other-list-{{ field.id }}');
             var $otherListTitle = $fieldDisplay.find('#other-list-title-{{ field.id }}');
-            var $nobodyPlaceholder = $fieldDisplay.find('#nobody-placeholder-{{ field.id }}');
+            var $noOtherPlaceholder = $fieldDisplay.find('#no-other-placeholder-{{ field.id }}');
             var $buttonAddExisting = $('#add-existing-{{ field.id }}');
             var $buttonAddNew = $('#add-new-{{ field.id }}');
-            var authorTypes = {{ field.author_types|safe }};
+            var authorTypes = {{ (field.author_types or none)|tojson }};
 
             function renderPeople(people) {
                 $authorList.html('');
@@ -75,7 +63,7 @@
                     $noCoauthorPlaceholder.toggle($coauthorList.is(':empty'));
                 {% endif %}
                 $otherListTitle.toggle($otherList.is(':not(:empty)'));
-                $nobodyPlaceholder.toggle(people.length == 0);
+                $noOtherPlaceholder.toggle(people.length == 0);
             }
 
             function renderPerson(person) {
@@ -105,7 +93,7 @@
                     }
                 {% endif %}
 
-                if (person.authorType == authorTypes.none) {
+                if (!authorTypes || person.authorType == authorTypes.none) {
                     $otherList.append($personRow);
                 } else if (person.authorType == authorTypes.primary) {
                     $authorList.append($personRow);
@@ -127,13 +115,13 @@
 
             function setPersonDefaults(person) {
                 if (person.authorType === undefined) {
-                    person.authorType = {{ field.default_author_type.value|tojson }};
+                    person.authorType = {{ (field.default_author_type.value if field.default_author_type else 0)|tojson }};
                 }
                 if (person.isSpeaker === undefined) {
-                    person.isSpeaker = {{ field.default_is_speaker|tojson }};
+                    person.isSpeaker = {{ (field.default_is_speaker or false)|tojson }};
                 }
                 if (person.isSubmitter === undefined) {
-                    person.isSubmitter = {{ field.default_is_submitter|tojson }};
+                    person.isSubmitter = {{ (field.default_is_submitter or false)|tojson }};
                 }
             }
 

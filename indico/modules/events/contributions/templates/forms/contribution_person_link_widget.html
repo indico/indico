@@ -1,0 +1,14 @@
+{% extends 'forms/_person_link_widget_base.html' %}
+
+{% block sections %}
+    {% if field.allow_authors %}
+        {{ render_section('author', title=_('Authors'), placeholder=_('There are no authors')) }}
+
+        {% set coauthor_placeholder = _('There are no co-authors') if field.show_empty_coauthors else none %}
+        {{ render_section('coauthor', title=_('Co-authors'), placeholder=coauthor_placeholder) }}
+
+        {{ render_section('other', title=_('Others')) }}
+    {% else %}
+        {{ render_section('other', placeholder=_('There are no speakers')) }}
+    {% endif %}
+{% endblock %}

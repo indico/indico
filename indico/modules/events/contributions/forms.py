@@ -22,7 +22,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.modules.events.contributions.fields import ContributionPersonListField, SubContributionPersonListField
+from indico.modules.events.contributions.fields import ContributionPersonLinkListField, SubContributionPersonLinkListField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.fields import ReferencesField
 from indico.web.forms.base import IndicoForm
@@ -43,7 +43,7 @@ class ContributionForm(IndicoForm):
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_("The duration of the contribution"))
     type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
-    person_link_data = ContributionPersonListField(_("People"), allow_authors=True)
+    person_link_data = ContributionPersonLinkListField(_("People"), allow_authors=True)
     location_data = IndicoLocationField(_("Location"),
                                         description=_("The physical location where the contribution takes place."))
     references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
@@ -87,8 +87,8 @@ class SubContributionForm(IndicoForm):
     duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               default=timedelta(minutes=20), units=('minutes', 'hours'),
                               description=_('The duration of the subcontribution'))
-    speakers = SubContributionPersonListField(_('Speakers'), allow_submitters=False,
-                                              description=_('List of the subcontributions speakers'))
+    speakers = SubContributionPersonLinkListField(_('Speakers'), allow_submitters=False,
+                                                  description=_('The speakers of the subcontribution'))
     references = ReferencesField(_("External IDs"), reference_class=SubContributionReference,
                                  description=_("Manage external resources for this sub-contribution"))
 
