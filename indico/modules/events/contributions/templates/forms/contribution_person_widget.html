@@ -2,7 +2,7 @@
 
 {% block html %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
-    <div id="people-list-{{ field.id }}" class="contribution-people {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
+    <div id="people-list-{{ field.id }}" class="person-link-list {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
         {% if field.allow_authors %}
             <div id="author-list-title-{{ field.id }}" class="titled-rule">
                 {% trans %}Authors{% endtrans %}
@@ -190,7 +190,7 @@
 
                 $element.qbubble({
                     style: {
-                        classes: 'contribution-person-qbubble'
+                        classes: 'person-link-qbubble'
                     },
                     content: {
                         text: $buttons
@@ -220,7 +220,7 @@
                 overwriteChoice: false,
                 render: function(people) {
                     renderPeople(people);
-                },
+                }
             });
 
             $buttonAddExisting.on('click', function() {

@@ -18,7 +18,7 @@
 @import 'base';
 @import 'partials/boxes';
 
-.contribution-people {
+.person-link-list {
     @extend .i-box;
     @extend .i-box.no-shadow;
     width: 400px;
@@ -125,7 +125,7 @@
     }
 }
 
-.contribution-person-qbubble {
+.person-link-qbubble {
     .qtip-content {
         width: 200px;
     }
