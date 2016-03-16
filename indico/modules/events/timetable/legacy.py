@@ -296,7 +296,7 @@ def serialize_session(sess):
         'title': sess.title,
         'url': url_for('sessions.display_session', sess)
     }
-    for convener in sess.all_conveners:
+    for convener in sess.conveners:
         convener_data = serialize_person_link(convener)
         data['sessionConveners'].append(convener_data)
     return data
