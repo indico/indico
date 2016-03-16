@@ -65,8 +65,8 @@ def serialize_contribution_person_link(person_link, is_submitter=None):
     """Serialize ContributionPersonLink to JSON-like object"""
     data = serialize_person_link(person_link)
     data['isSpeaker'] = person_link.is_speaker
-    data['authorType'] = person_link.author_type.value
     if not isinstance(person_link, SubContributionPersonLink):
+        data['authorType'] = person_link.author_type.value
         data['isSubmitter'] = person_link.is_submitter if is_submitter is None else is_submitter
     return data
 
