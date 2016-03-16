@@ -50,7 +50,12 @@ class RegistrationFormItemType(int, IndicoEnum):
     field_pd = 5  # personal data field
 
 
+# We are not using a TitledIntEnum since one of the instances is named "title".
 class PersonalDataType(int, IndicoEnum):
+    """Description of the personal data items that exist on every registration form"""
+
+    __titles__ = [None, 'Email Address', 'First Name', 'Last Name', 'Affiliation', 'Title', 'Address',
+                  'Phone Number', 'Country', 'Position']
     email = 1
     first_name = 2
     last_name = 3
@@ -61,6 +66,9 @@ class PersonalDataType(int, IndicoEnum):
     country = 8
     position = 9
 
+    def get_title(self):
+        return self.__titles__[self]
+
     @strict_classproperty
     @classmethod
     def FIELD_DATA(cls):
@@ -70,7 +78,7 @@ class PersonalDataType(int, IndicoEnum):
                       'is_enabled': True}
         return [
             (cls.title, {
-                'title': 'Title',
+                'title': cls.title.get_title(),
                 'input_type': 'single_choice',
                 'data': {
                     'item_type': 'dropdown',
@@ -79,38 +87,38 @@ class PersonalDataType(int, IndicoEnum):
                 }
             }),
             (cls.first_name, {
-                'title': 'First Name',
+                'title': cls.first_name.get_title(),
                 'input_type': 'text'
             }),
             (cls.last_name, {
-                'title': 'Last Name',
+                'title': cls.last_name.get_title(),
                 'input_type': 'text'
             }),
             (cls.email, {
-                'title': 'Email Address',
+                'title': cls.email.get_title(),
                 'input_type': 'email'
             }),
             (cls.affiliation, {
-                'title': 'Affiliation',
+                'title': cls.affiliation.get_title(),
                 'input_type': 'text'
             }),
             (cls.address, {
-                'title': 'Address',
+                'title': cls.address.get_title(),
                 'input_type': 'textarea',
                 'is_enabled': False
             }),
             (cls.country, {
-                'title': 'Country',
+                'title': cls.country.get_title(),
                 'input_type': 'country',
                 'is_enabled': False
             }),
             (cls.phone, {
-                'title': 'Phone Number',
+                'title': cls.phone.get_title(),
                 'input_type': 'phone',
                 'is_enabled': False
             }),
             (cls.position, {
-                'title': 'Position',
+                'title': cls.position.get_title(),
                 'input_type': 'text',
                 'is_enabled': False
             }),
