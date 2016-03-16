@@ -26,7 +26,7 @@
                     {{ render_location(contrib, parent=parent) }}
                 {%- endif %}
                 <div class="timetable-item-actions">
-                    {{ render_manage_button(contrib, 'CONTRIBUTION', align_right=true, show_notes=show_notes,
+                    {{ render_manage_button(contrib, 'CONTRIBUTION', show_notes=show_notes,
                                             show_button=(not event.as_legacy.isClosed() and
                                                          contrib.can_manage_attachments(session.user))) }}
                     {{ template_hook('vc-actions', event=event, item=contrib) }}

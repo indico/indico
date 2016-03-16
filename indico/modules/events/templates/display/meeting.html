@@ -7,8 +7,7 @@
         <div class="event-header">
             {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
-                {{ render_manage_button(event, 'EVENT', align_right=true, manage_link=true, show_button=show_button,
-                                        toggle_notes=false) }}
+                {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
             </div>
 
             {% block logo %}

@@ -17,7 +17,7 @@
                     </span>
                 {% endif %}
                 <div class="timetable-item-actions">
-                    {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', align_right=true, show_notes=show_notes,
+                    {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', show_notes=show_notes,
                                             show_button=(not event.as_legacy.isClosed() and
                                             subcontrib.can_manage_attachments(session.user))) }}
                 </div>

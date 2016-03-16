@@ -117,8 +117,8 @@
     </ul>
 {%- endmacro %}
 
-{% macro render_manage_button(item, item_type, align_right=false, manage_link=false, show_notes=true,
-                              toggle_notes=true, show_note_operations=false, show_button=true) -%}
+{% macro render_manage_button(item, item_type, show_notes=true, toggle_notes=true, show_note_operations=false,
+                              show_button=true) -%}
     <div class="toolbar right thin">
         {% if toggle_notes and item.has_note %}
             {{ render_toggle_button(note=item.note, note_is_hidden=not show_notes) }}
