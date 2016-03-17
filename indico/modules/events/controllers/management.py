@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import flash
 
-from indico.modules.events.forms import EventReferencesForm, EventLocationForm
+from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm
 from indico.modules.events.operations import create_event_references, update_event
 from indico.util.i18n import _
 from indico.web.util import jsonify_data, jsonify_form
@@ -51,4 +51,16 @@ class RHManageEventLocation(RHConferenceModifBase):
             flash(_('The location for the event has been updated'))
             tpl = get_template_module('events/management/_event_location.html')
             return jsonify_data(html=tpl.render_event_location_info(self.event_new.location_data))
+        return jsonify_form(form)
+
+
+class RHManageEventPersonLinks(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = EventPersonLinkForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
+        if form.validate_on_submit():
+            update_event(self.event_new, form.data)
+            tpl = get_template_module('events/management/_event_person_links.html')
+            return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
         return jsonify_form(form)

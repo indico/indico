@@ -202,7 +202,7 @@
             }
 
             $field.principalfield({
-                eventId: {{ field.event.id|tojson }},
+                eventId: {{ (field.event.id if field.event else none)|tojson }},
                 allowExternalUsers: false,
                 multiChoice: true,
                 overwriteChoice: false,

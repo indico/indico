@@ -1,0 +1,16 @@
+{% from 'forms/_form.html' import simple_form %}
+{% from 'events/management/_event_person_links.html' import render_event_person_links %}
+
+{% set title = _('Manage speakers') if event.type == 'lecture' else _('Manage chairpersons') %}
+
+<div id="event-person-links">
+    {{ render_event_person_links(event.type, event.person_links) }}
+</div>
+
+(<a href="#" class="js-dialog-action"
+    data-href="{{ url_for('events.manage_event_person_links', event) }}"
+    data-title="{{ title }}"
+    data-update="#event-person-links"
+    data-ajax-dialog>
+    {%- trans %}edit{% endtrans -%}
+</a>)

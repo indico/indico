@@ -163,27 +163,14 @@ additionalInfo = confObj.getContactInfo()
 </tr>
 
 <tr>
-    <td colspan="3" class="horizontalLine">
-        &nbsp;
-    </td>
+    <td colspan="3" class="horizontalLine"></td>
 </tr>
 <tr>
     <td class="dataCaptionTD">
         <span class="dataCaptionFormat">${ _("Speakers") if evtType == 'lecture' else  _("Chairpersons")}</span>
     </td>
     <td colspan="2">
-        <table width="100%">
-            <tr>
-                <td class="blacktext" style="width: 79%">
-                    <ul id="chairPersonsList" class="user-list"></ul>
-                </td>
-                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
-                    <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                        <a id="addNewChairLink" class="dropDownMenu fakeLink">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
-                    </span>
-                </td>
-            </tr>
-        </table>
+        ${ render_template('events/management/event_person_links.html', event=confObj.as_event) }
     </td>
 </tr>
 <tr>
@@ -257,16 +244,4 @@ $E('inPlaceEditTimezone').set(new SelectEditWidget('event.main.changeTimezone',
 
 // Room parameters widget
 var context = new WidgetEditableContext();
-
-// Search chairpersons/speakers
-
-var chairPersonsManager = new ParticipantsListManager(confFossile["id"],
-        {'addNew': 'event.main.addNewChairPerson',
-         'addExisting': 'event.main.addExistingChairPerson',
-         'remove': 'event.main.removeChairPerson',
-         'edit': 'event.main.editChairPerson',
-         'sendEmail': 'event.main.sendEmailData',
-         'changeSubmission': 'event.main.changeSubmissionRights'},
-        {confId: confFossile["id"], kindOfList: "chairperson"}, $E('chairPersonsList'), $E('addNewChairSpan'),
-         "chairperson", "chairperson", "conference", "UIAuthorMove",  ${chairpersons | n,j});
 </script>
