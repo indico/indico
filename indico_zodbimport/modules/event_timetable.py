@@ -53,6 +53,7 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.rb import Location
 from indico.modules.users import User
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users.models.users import UserTitle
 from indico.util.console import cformat, verbose_iterator
 from indico.util.string import fix_broken_string, sanitize_email, is_valid_mail
@@ -77,6 +78,14 @@ PERSON_INFO_MAP = {
     '_firstName': 'first_name',
     '_surName': 'last_name',
     '_phone': 'phone'
+}
+
+AVATAR_PERSON_INFO_MAP = {
+    'getAddress': 'address',
+    'getAffiliation': 'affiliation',
+    'getFirstName': 'first_name',
+    'getFamilyName': 'last_name',
+    'getPhone': 'phone'
 }
 
 
@@ -198,7 +207,7 @@ class TimetableMigration(object):
         return map(convert_to_unicode, keywords.splitlines())
 
     def _create_person(self, old_person, with_event=False, skip_empty_email=False):
-        email = getattr(old_person, '_email', None)
+        email = getattr(old_person, '_email', None) or getattr(old_person, 'email', None)
         email = sanitize_email(convert_to_unicode(email).lower()) if email else email
         if not is_valid_mail(email, False):
             email = None
@@ -215,7 +224,7 @@ class TimetableMigration(object):
         return person
 
     def _get_person(self, old_person):
-        email = getattr(old_person, '_email', None)
+        email = getattr(old_person, '_email', None) or getattr(old_person, 'email', None)
         email = sanitize_email(convert_to_unicode(email).lower()) if email else email
         if not is_valid_mail(email, False):
             email = None
@@ -223,8 +232,12 @@ class TimetableMigration(object):
 
     def _get_person_data(self, old_person):
         data = {}
-        for old_attr, new_attr in PERSON_INFO_MAP.iteritems():
-            data[new_attr] = convert_to_unicode(getattr(old_person, old_attr, ''))
+        if isinstance(old_person, AvatarUserWrapper):
+            for old_meth, new_attr in AVATAR_PERSON_INFO_MAP.iteritems():
+                data[new_attr] = convert_to_unicode(getattr(old_person, old_meth)())
+        else:
+            for old_attr, new_attr in PERSON_INFO_MAP.iteritems():
+                data[new_attr] = convert_to_unicode(getattr(old_person, old_attr, ''))
         data['_title'] = USER_TITLE_MAP.get(getattr(old_person, '_title', ''), UserTitle.none)
         return data
 
