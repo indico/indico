@@ -264,3 +264,55 @@ li > table + .note-area-wrapper {
 .preformatted {
     white-space: pre-wrap;
 }
+
+.contribution-list {
+    @include border-top();
+
+    .contribution-row {
+        &:not(:last-child) {
+            @include border-bottom();
+        }
+
+        padding: 10px;
+
+        .info {
+            margin: 5px 0;
+
+            .label {
+                font-weight: bold;
+            }
+
+            .value {
+                display: inline-block;
+                word-wrap: normal;
+                word-break: break-all;
+
+                .session-bg-color {
+                    display: inline-block;
+                    width: 10px;
+                    height: 10px;
+                }
+            }
+
+            &.contrib-speakers {
+                text-align: right;
+                margin-top: 15px;
+
+                .label {
+                    font-weight: normal;
+                }
+            }
+        }
+    }
+}
+
+
+.author-info {
+    table-layout: auto;
+
+    td {
+        &.caption {
+            width: 150px;
+        }
+    }
+}

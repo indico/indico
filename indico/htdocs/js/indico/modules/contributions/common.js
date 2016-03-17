@@ -237,4 +237,18 @@
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
     };
+
+    global.setupEventDisplayContributionList = function setupEventDisplayContributionList() {
+        var filterConfig = {
+            itemHandle: 'div.contribution-row',
+            listItems: '#display-contribution-list div.contribution-row',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
+        };
+
+        setupSearchBox(filterConfig);
+        applySearchFilters();
+        setupReporter();
+    };
 })(window);
