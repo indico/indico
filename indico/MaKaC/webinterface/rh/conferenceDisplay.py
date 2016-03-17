@@ -348,7 +348,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
                             showSpeakerAffiliation = self._showSpeakerAffiliation)
                 else:
                     filename = "SimplifiedTimetable.pdf"
-                    pdf = SimplifiedTimeTablePlain(self._target,self.getAW(),
+                    pdf = SimplifiedTimeTablePlain(self._target, session.user,
                         showSessions=self._showSessions,showDays=self._showDays,
                         sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
                         pagesize = self._pagesize, fontsize = self._fontsize)
