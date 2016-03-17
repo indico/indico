@@ -279,11 +279,11 @@ def is_valid_mail(emails_string, multi=True):
     Returns True if emails are valid.
     """
 
+    if not emails_string:
+        return False
     emails = re.split(r'[\s;,]+', emails_string)
-
     if not multi and len(emails) > 1:
         return False
-
     return all(re.match(VALID_EMAIL_REGEX, email) for email in emails if email)
 
 
