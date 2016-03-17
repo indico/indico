@@ -197,7 +197,6 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
     :param full_access: Whether the full access ACL should be updated
     :param role: The role ACL that should be updated
     """
-
     if read_access + full_access + bool(role) != 1:
         raise ValueError('Only one ACL property can be specified')
     if full_access:
@@ -213,6 +212,7 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
         grant = {'add_roles': {role}}
         revoke = {'del_roles': {role}}
 
+    new_principals = set(new_principals)
     for principal in new_principals - existing:
         obj.update_principal(principal, **grant)
     for principal in existing - new_principals:
