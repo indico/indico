@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from collections import defaultdict, OrderedDict
 
-from flask import flash
+from flask import flash, session
+from pytz import timezone
 from sqlalchemy.orm import load_only, contains_eager, noload, joinedload, subqueryload
 
 from indico.core.db import db
@@ -34,6 +35,7 @@ from indico.util.string import to_unicode
 from indico.util.user import iter_acl
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data
+from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 def get_events_with_linked_contributions(user, from_dt=None, to_dt=None):
@@ -252,3 +254,23 @@ def serialize_contribution_for_ical(contrib):
 
     contrib_data['description'] = description
     return contrib_data
+
+
+class ContributionDisplayReporter(ContributionReporter):
+    endpoint = '.contribution_list'
+    report_link_type = 'contribution_display'
+
+    def render_contribution_list(self):
+        """Render the contribution report template components.
+
+        :return: dict containing the report's entries, the fragment of
+                 displayed entries and whether the contrib passed is displayed
+                 in the results.
+        """
+        contrib_report_kwargs = self.get_contrib_report_kwargs()
+        total_entries = contrib_report_kwargs.pop('total_entries')
+        contribs = contrib_report_kwargs['contribs']
+        tpl = get_template_module('events/contributions/display/_contribution_list.html')
+        tz = timezone(DisplayTZ(session.user, self.report_event.as_legacy).getDisplayTZ())
+        return {'html': tpl.render_contribution_list(self.report_event, tz, contribs),
+                'counter': tpl.render_displayed_entries_fragment(len(contribs), total_entries)}
