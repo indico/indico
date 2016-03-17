@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.contributions.controllers.display import (RHContributionDisplay,
+from indico.modules.events.contributions.controllers.display import (RHMyContributions, RHContributionDisplay,
                                                                      RHContributionList, RHContributionAuthor,
                                                                      RHContributionExportToPDF, RHContributionReport,
                                                                      RHContributionExportToICAL,
@@ -108,6 +108,7 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'de
 # Display
 _bp.add_url_rule('/contributions/', 'contribution_list', RHContributionList)
 _bp.add_url_rule('/contributions/contributions.pdf', 'contribution_list_pdf', RHContributionsExportToPDF)
+_bp.add_url_rule('/contributions/mine', 'my_contributions', RHMyContributions)
 _bp.add_url_rule('/contributions/customize', 'customize_contribution_list', RHContributionReport,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/contributions/static-url', 'contribution_list_static_url', RHContributionListStaticURL,

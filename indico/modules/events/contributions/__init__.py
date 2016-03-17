@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, session
+from sqlalchemy import literal
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -104,5 +105,12 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_my_contributions(conf):
         return session.user and bool(get_contributions_with_user_as_submitter(conf.as_event, session.user))
 
+    def _visible_list_of_contributions(conf):
+        return bool(Contribution.query.with_entities(literal(True))
+                    .filter(Contribution.event_new == conf.as_event)
+                    .count())
+
     yield MenuEntryData(title=_("My Contributions"), name='my_contributions', visible=_visible_my_contributions,
                         endpoint='contributions.my_contributions', position=2, parent='my_conference')
+    yield MenuEntryData(title=_("Contribution List"), name='contributions', endpoint='contributions.contribution_list',
+                        position=4, static_site=True, visible=_visible_list_of_contributions)

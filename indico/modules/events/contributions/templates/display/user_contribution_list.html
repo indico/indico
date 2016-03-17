@@ -1,0 +1,51 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title -%}
+    {% trans %}My Contributions{% endtrans %}
+{%- endblock %}
+
+{% block content -%}
+    <table id="my-contributions" class="i-table-widget">
+        <thead>
+            <tr>
+                <th>{% trans %}Title{% endtrans %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contrib in contributions -%}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                    </td>
+                    <td>
+                        <div class="group right">
+                            {% if contrib.can_manage(session.user) -%}
+                                <a href="#" class="icon-edit js-edit-contribution"
+                                   title="{% trans %}Edit this contribution{% endtrans %}"
+                                   data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
+                                   data-href="{{ url_for('.manage_update_contrib', contrib) }}"
+                                   data-ajax-dialog
+                                   data-reload-after></a>
+                            {%- endif %}
+                            <a href="#" class="icon-time" title="{% trans %}Go to this contribution timetable{% endtrans %}"></a>
+                        </div>
+                    </td>
+                </tr>
+            {%- else -%}
+                <tr>
+                    <td colspan="2">
+                        {%- trans %}You don't have any contributions at the moment.{% endtrans -%}
+                    </td>
+                </tr>
+            {%- endfor %}
+        </tbody>
+    </table>
+    {% if event.type != 'conference' -%}
+        <p>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+                {%- trans %}Back to the event{% endtrans -%}
+            </a>
+        </p>
+    {%- endif %}
+{%- endblock %}
