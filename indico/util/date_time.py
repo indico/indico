@@ -122,7 +122,7 @@ def format_date(d, format='medium', locale=None, timezone=None):
     if not locale:
         locale = get_current_locale()
     if timezone and isinstance(d, datetime) and d.tzinfo:
-        d = d.astimezone(pytz.timezone(timezone))
+        d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, basestring) else timezone)
     return _format_date(d, format=format, locale=locale).encode('utf-8')
 
 
