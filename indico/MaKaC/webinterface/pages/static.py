@@ -41,13 +41,7 @@ class WPStaticEventBase:
 
 
 class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
-
-    def _extractInfoForButton(self, item):
-        info = {}
-        for key in ['sessId', 'slotId', 'contId', 'subContId']:
-            info[key] = 'null'
-        info['confId'] = self._conf.getId()
-        return info
+    pass
 
 
 class WPStaticConferenceDisplay(WPStaticEventBase, WPConferenceDisplay):

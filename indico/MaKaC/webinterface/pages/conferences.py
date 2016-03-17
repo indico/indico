@@ -558,62 +558,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             # return Conference, Contribution or SubContribution
             return itemClass
 
-    def _extractInfoForButton(self, item):
-        info = {}
-        for key in ['sessId', 'slotId', 'contId', 'subContId']:
-            info[key] = 'null'
-        info['confId'] = self._conf.getId()
-
-        itemType = self._getItemType(item)
-        info['uploadURL'] = 'Indico.Urls.UploadAction.%s' % itemType.lower()
-
-        if itemType == 'Conference':
-            info['parentProtection'] = item.getAccessController().isProtected()
-            if item.canModify(self._rh._aw):
-                info["modifyLink"] = urlHandlers.UHConferenceModification.getURL(item)
-                info["minutesLink"] = self._type != 'simple_event'
-                info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
-            elif item.as_event.can_manage(session.user, 'submit'):
-                info["materialLink"] = True
-
-        elif itemType == 'Session':
-            sess = item.getSession()
-            info['parentProtection'] = sess.getAccessController().isProtected()
-            if sess.canModify(self._rh._aw) or sess.canCoordinate(self._rh._aw):
-                info["modifyLink"] = urlHandlers.UHSessionModification.getURL(item)
-            info['slotId'] = item.getId()
-            info['sessId'] = sess.getId()
-            if sess.canModify(self._rh._aw) or sess.canCoordinate(self._rh._aw):
-                info["minutesLink"] = True
-                url = urlHandlers.UHSessionModifSchedule.getURL(sess)
-                ttLink = "%s#%s.s%sl%s" % (url, sess.getStartDate().strftime('%Y%m%d'), sess.getId(), info['slotId'])
-                info["sessionTimetableLink"] = ttLink
-
-        elif itemType == 'Contribution':
-            info['parentProtection'] = item.getAccessController().isProtected()
-            if item.canModify(self._rh._aw):
-                info["modifyLink"] = urlHandlers.UHContributionModification.getURL(item)
-            if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
-                info["minutesLink"] = True
-            info["contId"] = item.getId()
-            owner = item.getOwner()
-            if self._getItemType(owner) == 'Session':
-                info['sessId'] = owner.getId()
-
-        elif itemType == 'SubContribution':
-            info['parentProtection'] = item.getContribution().getAccessController().isProtected()
-            if item.canModify(self._rh._aw):
-                info["modifyLink"] = urlHandlers.UHSubContributionModification.getURL(item)
-            if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
-                info["minutesLink"] = True
-            info["subContId"] = item.getId()
-            info["contId"] = item.getContribution().getId()
-            owner = item.getOwner()
-            if self._getItemType(owner) == 'Session':
-                info['sessId'] = owner.getId()
-
-        return info
-
     def _getHTMLHeader( self ):
         return WPConferenceBase._getHTMLHeader(self)
 
