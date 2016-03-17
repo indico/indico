@@ -75,7 +75,8 @@ def _convert_email_principals(user, **kwargs):
 def _extend_event_management_menu(sender, event, **kwargs):
     if not can_manage_sessions(session.user, event, 'ANY'):
         return
-    return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
+    if event.type == 'conference':
+        return SideMenuItem('sessions', _('Sessions'), url_for('sessions.session_list', event), section='organization')
 
 
 @signals.event_management.management_url.connect
