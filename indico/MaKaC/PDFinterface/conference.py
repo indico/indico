@@ -361,12 +361,7 @@ class ContribToPDF(PDFLaTeXBase):
     def __init__(self, contrib, tz=None):
         super(ContribToPDF, self).__init__()
 
-        self._contrib = contrib
-        conf = contrib.getConference()
-
-        if tz is None:
-            tz = conf.getTimezone()
-
+        event = contrib.event_new
         affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
 
         self._args.update({
@@ -375,12 +370,12 @@ class ContribToPDF(PDFLaTeXBase):
             'authors_affil': author_mapping,
             'coauthors_affil': coauthor_mapping,
             'contrib': contrib,
-            'conf': conf,
-            'tz': conf.getTimezone(),
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+            'conf': event.as_legacy,
+            'tz': tz or event.timezone,
+            'fields': [f for f in event.contribution_fields if f.is_active]
         })
 
-        logo = conf.getLogo()
+        logo = event.as_legacy.getLogo()
         if logo:
             self._args['logo_img'] = logo.getFilePath()
 
@@ -393,16 +388,15 @@ class ContribsToPDF(PDFLaTeXBase):
     def __init__(self, conf, contribs, tz=None):
         super(ContribsToPDF, self).__init__()
 
-        tz = tz or conf.getTimezone()
-
+        event = conf.as_event
         self._args.update({
             'doc_type': 'contribution',
             'title': _("Report of Contributions"),
             'conf': conf,
             'items': contribs,
-            'fields': [f for f in conf.as_event.contribution_fields if f.is_active],
+            'fields': [f for f in event.contribution_fields if f.is_active],
             'url': conf.getURL(),
-            'tz': tz
+            'tz': tz or event.timezone
         })
 
         logo = conf.getLogo()
