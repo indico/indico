@@ -1,0 +1,79 @@
+{% from 'events/display/common/_legacy.html' import render_event_time, render_location %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+
+<table class= "eventHeader">
+    <tr>
+        <td>
+        <div style="font-weight:bold;">
+            {{ render_manage_button(event, 'EVENT', toggle_notes=false, show_note_operations=true) }}
+            {% if event.has_note %}
+                <div class="toolbar right thin">
+                    <div class="group">
+                        <a href="{{ url_for('event_notes.view', event) }}" class="i-button normal-button">
+                            {% trans %}Minutes{% endtrans %}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            {{ event.title }}
+        </div>
+        <br/>
+        {{ render_event_time(event, timezone) }}
+        <br>
+        {{ render_location(event) }}
+        <br/><br/>
+        </td>
+        <td style="width: 1%; white-space: nowrap;">
+        <table class="headerLegendsBorder" cellpadding="1" align="right">
+        <tr>
+            <td>
+                <table class="headerLegendsContent" cellpadding="2">
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td class="sessionsLegend">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td class="titleClass">: Sessions</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table cellspacing="0">
+                            <tr>
+                                <td class="contribsLegendSilver">
+                                    &nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td>/</td>
+                                <td class="contribsLegendGrey">
+                                    &nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td class="titleClass">: Talks</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td class="breaksLegend">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td class="titleClass">: Breaks</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                </table>
+            </td>
+        </tr>
+        </table>
+        </td>
+    </tr>
+</table>
+
+<center>
+    <table class="dayList" cellpadding="0">
+        {{ template_hook('meeting-body', event=event) }}
+    </table>
+</center>

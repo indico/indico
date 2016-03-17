@@ -38,7 +38,7 @@ definitions:
     event_types:
     - conference
     - meeting
-    stylesheet: meetings/Compact.css
+    stylesheet: compact.scss
     template: compact.html
     title: Compact style
   indico-weeks-view:

@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import posixpath
+from itertools import groupby
 from operator import attrgetter
 
 from flask import render_template, request, session
@@ -58,7 +59,7 @@ class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
 
 @template_hook('meeting-body')
-def _inject_meeting_body(event, **kwargs):
+def inject_meeting_body(event, **kwargs):
     event_tz_name = DisplayTZ(session.user, event.as_legacy).getDisplayTZ()
     event_tz = timezone(event_tz_name)
     show_date = request.args.get('showDate', 'all')
@@ -108,11 +109,11 @@ def _inject_meeting_body(event, **kwargs):
     entries.sort(key=attrgetter('end_dt'), reverse=True)
     entries.sort(key=lambda entry: (entry.start_dt, entry.object.title if entry.object else entry.title))
 
-    days = sorted({entry.start_dt.astimezone(event_tz).date() for entry in entries})
+    days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
     theme_id = view or event.theme
     theme = theme_settings.themes[theme_id]
     tt_tpl = theme.get('tt_template', theme['template'])
 
     return render_template(posixpath.join('events/timetable/display', tt_tpl), event=event, entries=entries, days=days,
                            timezone=event_tz_name, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
-                           theme_settings=theme.get('settings', {}))
+                           theme_settings=theme.get('settings', {}), **kwargs)

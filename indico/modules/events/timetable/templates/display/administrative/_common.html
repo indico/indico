@@ -1,12 +1,12 @@
 {% macro render_attachments(item, exclude_document=false) %}
-    {% for folder in item.attached_items['folders'] %}
+    {% for folder in item.attached_items.folders %}
         {% if not exclude_document or folder.title != 'document' %}
             <a href="{{url_for('attachments.list_folder', folder, redirect_if_single=true)}}">
                 {{ folder.title }}
             </a>
         {% endif %}
     {% endfor %}
-    {% for file in item.attached_items['files'] %}
+    {% for file in item.attached_items.files %}
         <a href="{{ file.download_url }}">
             {{ file.title }}
         </a>
@@ -42,20 +42,3 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-
-{% macro render_location(item) -%}
-    <span class="location-info">
-        {#- -#}
-        <span class="text">
-            {%- if item.venue_name and (not parent or parent.venue_name != item.venue_name) -%}
-                <strong>{{ item.venue_name }}</strong>
-                {%- if item.room_name  %}
-                    ({{ item.get_room_name(full=false) }})
-                {%- endif -%}
-            {%- elif item.room_name -%}
-                {{ item.get_room_name(full=false) }}
-            {%- endif -%}
-        </span>
-        {#- -#}
-    </span>
-{%- endmacro %}

@@ -1,20 +1,5 @@
-{% from 'events/display/indico/_common.html' import render_datetime %}
+{% from 'events/display/common/_legacy.html' import render_event_time, render_location %}
 {% from 'events/display/common/_manage_button.html' import render_manage_button %}
-{% from 'events/timetable/display/administrative/_common.html' import render_location %}
-
-{% macro render_event_time(event, timezone) %}
-    {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
-        {{ event.start_dt | format_date(format='full', timezone=timezone|string) }}
-        - <em class="time">{{ event.start_dt | format_time(format='medium', timezone=timezone) }}</em>
-    {% else %}
-        {% trans start_date=event.start_dt|format_date(format='full', timezone=timezone|string),
-                 start_time=event.start_dt|format_time(format='medium', timezone=timezone),
-                 end_date=event.end_dt|format_date(format='full', timezone=timezone|string),
-                 end_time=event.end_dt|format_time(format='medium', timezone=timezone) %}
-            from {{start_date}} ({{start_time}}) to {{end_date}} ({{end_time}})
-        {% endtrans %}
-    {% endif %}
-{% endmacro %}
 
 <table class="eventWrapper">
     <tr>
@@ -24,7 +9,10 @@
             </div>
             <div class="reportNumberHeader">
                 {% for ref in event.references|sort(attribute='value') %}
-                    {{ ref.value }}<br>
+                    {{ ref.value }}
+                    {% if not loop.last %}
+                        <br>
+                    {% endif %}
                 {% endfor %}
             </div>
             {% block header %}
@@ -53,8 +41,7 @@
                     {{ render_event_time(event, timezone=timezone) }}
                 {% endblock %}
                 <br>
-                {% block material %}
-                {% endblock %}
+                {% block material %}{% endblock %}
                 {% if event.has_note %}
                     <a href="{{ url_for('event_notes.view', event) }}">
                         {% trans %}Minutes{% endtrans %}

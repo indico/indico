@@ -1,0 +1,171 @@
+{% from 'attachments/_display.html' import render_attachments_folders %}
+{% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/display/indico/_common.html' import render_users %}
+
+{% macro render_break(break_, timezone) %}
+    <tr>
+      <td valign="top" bgcolor="#FFdcdc">
+          {{ break_.timetable_entry.start_dt | format_time(timezone=timezone) }}
+      </td>
+      <td valign="top" bgcolor="#FFcccc" align="center" colspan="1">
+        ---&nbsp;{{ break_.title }}&nbsp;---
+      </td>
+    </tr>
+{% endmacro %}
+
+{% macro render_session_block(block, timezone) %}
+    {% set entries = block.timetable_entry.children %}
+    <tr>
+        <td valign="top" bgcolor="#b0e0ff" width="5%">
+            <span style="font-weight:bold;">
+                {{ block.timetable_entry.start_dt | format_time(timezone=timezone) }}
+            </span>
+        </td>
+        <td colspan="1" bgcolor="#90c0f0">
+            <div style="float:right">
+                {{ render_manage_button(block, 'SESSION_BLOCK', toggle_notes=false, show_note_operations=true) }}
+                {% if block.has_note %}
+                    <div class="toolbar right thin">
+                        <div class="group">
+                            <a href="{{ url_for('event_notes.view', block) }}" class="i-button''">
+                                {% trans %}Minutes{% endtrans %}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <span style="font-weight:bold;">
+                {{- block.title }}
+            </span>
+            {% set conveners = block.person_links|list %}
+            {% if conveners %}
+                -{{ render_users(conveners, span_class="speakerList", separator=' ') }}
+            {% endif %}
+
+            (until {{ block.timetable_entry.end_dt | format_time(timezone=timezone) }})
+
+            {% if not block.inherits_location %}
+                ({{ block.room_name }})
+            {% endif %}
+
+            <div style="float:right">
+                {{ render_attachments_folders(item=block.session) }}
+            </div>
+        </td>
+    </tr>
+    {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
+        {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
+            {{ render_contribution(entry.contribution, timezone, loop.index) }}
+        {% elif entry.type.name == 'BREAK' %}
+            {{ render_break(entry.break_, timezone) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_contribution(contrib, timezone, index) %}
+    <tr bgcolor={{ "silver" if index % 2 != 0 else "#D2D2D2" }}>
+        <td bgcolor=${"#D0D0D0" if index % 2 != 0 else "#E2E2E2"}  valign="top" width="5%">
+            {{ contrib.start_dt | format_time(timezone=timezone) }}
+        </td>
+        <td valign="top">
+            {{ contrib.title }}
+            {% set speakers = contrib.person_links|selectattr("is_speaker")|list %}
+            {% if speakers %}
+                - {{ render_users(speakers, span_class="speakerList", separator=' ') }}
+            {% endif %}
+
+            &nbsp;
+
+            {% if not contrib.inherits_location %}
+                ({{ contrib.room_name }})
+            {% endif %}
+            <div style="float: right">
+                <div style="float: left">
+                    {{ render_attachments_folders(item=contrib) }}
+                </div>
+                <div style="float: right">
+                    {{ render_manage_button(contrib, 'CONTRIBUTION', toggle_notes=false, show_note_operations=true) }}
+                    {% if contrib.has_note %}
+                        <div class="toolbar right thin">
+                            <div class="group">
+                                <a href="{{ url_for('event_notes.view', contrib) }}" class="i-button''">
+                                    {% trans %}Minutes{% endtrans %}
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                  </div>
+              </div>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro render_entry(entry, timezone, index) %}
+    {% if entry.type.name == 'CONTRIBUTION' -%}
+        {{ render_contribution(entry.object, timezone, index) }}
+    {% elif entry.type.name == 'SESSION_BLOCK' -%}
+        {{ render_session_block(entry.object, timezone) }}
+    {% elif entry.type.name == 'BREAK' -%}
+        {{ render_break(entry.object, timezone) }}
+    {% endif %}
+{% endmacro %}
+
+<tr>
+    <td></td>
+    {% for day, _ in days %}
+        <td class="headerselected" align="center" bgcolor="#000060">
+            <span style="color:white; font-weight:bold;">
+                {{ day | format_date(format='medium', timezone=timezone) }}
+            </span>
+            <br/>
+        </td>
+    {% endfor %}
+</tr>
+<tr bgcolor="white">
+    <td valign="top" class="headerselected" bgcolor="#000060" width="30">
+        <table width="100%" cellspacing="0" cellpadding="2" border="0">
+            <tr>
+                <td align="center" class="headerselected" bgcolor="#000060">
+                    <span style="font-size: x-small; font-weight:bold; color:white;" >
+                    AM
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </td>
+    {% for day, entries in days %}
+        <td valign="top" bgcolor="gray">
+            <table width="100%" cellspacing="1" cellpadding="3" border="0">
+                {% for entry in entries %}
+                    {% if entry.start_dt.astimezone(tz_object).hour < 12 %}
+                        {{ render_entry(entry, tz_object, loop.index) }}
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </td>
+    {% endfor %}
+</tr>
+<tr>
+    <td valign="top" class="headerselected" bgcolor="#000060">
+        <table width="100%" cellspacing="0" cellpadding="2" border="0">
+            <tr>
+                <td align="center" class="headerselected" bgcolor="#000060">
+                    <span style="font-size: x-small; font-weight:bold; color:white;" >
+                    PM
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </td>
+    {% for day, entries in days %}
+        <td valign="top" bgcolor="gray">
+            <table width="100%" cellspacing="1" cellpadding="3" border="0">
+                {% for entry in entries %}
+                    {% if entry.start_dt.astimezone(tz_object).hour >= 12 %}
+                        {{ render_entry(entry, tz_object, loop.index) }}
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </td>
+    {% endfor %}
+</tr>

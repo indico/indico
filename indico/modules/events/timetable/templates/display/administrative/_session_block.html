@@ -1,7 +1,8 @@
+{% from 'events/display/common/_legacy.html' import render_location %}
 {% from 'events/display/common/_manage_button.html' import render_manage_button %}
 {% from 'events/timetable/display/administrative/_contribution.html' import render_contribution %}
 {% from 'events/timetable/display/administrative/_break.html' import render_break %}
-{% from 'events/timetable/display/administrative/_common.html' import render_location, render_attachments %}
+{% from 'events/timetable/display/administrative/_common.html' import render_attachments %}
 
 {% macro render_session_block(block, event, timezone=none, show_notes=false, link_documents=true, hide_time=false,
                               session_attachments=true, print_mode=false, show_numerals=true) %}

@@ -1,0 +1,33 @@
+{% from 'events/display/indico/_common.html' import render_datetime %}
+
+{% macro render_event_time(event, timezone) %}
+    {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
+        {{ event.start_dt | format_date(format='full', timezone=timezone|string) }}
+        - <em class="time">{{ event.start_dt | format_time(format='medium', timezone=timezone) }}</em>
+    {% else %}
+        {% trans start_date=event.start_dt|format_date(format='full', timezone=timezone|string),
+                 start_time=event.start_dt|format_time(format='medium', timezone=timezone),
+                 end_date=event.end_dt|format_date(format='full', timezone=timezone|string),
+                 end_time=event.end_dt|format_time(format='medium', timezone=timezone) -%}
+            from <strong>{{start_date}} ({{start_time}})</strong>
+            to <strong>{{end_date}} ({{end_time}})</strong>
+        {%- endtrans %}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_location(item) -%}
+    <span class="location-info">
+        {#- -#}
+        <span class="text">
+            {%- if item.venue_name and (not parent or parent.venue_name != item.venue_name) -%}
+                <strong>{{ item.venue_name }}</strong>
+                {%- if item.room_name  %}
+                    ({{ item.get_room_name(full=false) }})
+                {%- endif -%}
+            {%- elif item.room_name -%}
+                {{ item.get_room_name(full=false) }}
+            {%- endif -%}
+        </span>
+        {#- -#}
+    </span>
+{%- endmacro %}

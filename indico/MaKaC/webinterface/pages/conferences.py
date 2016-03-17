@@ -541,9 +541,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             'lectures': sorted(lectures, cmp=cmp_title_number)
         })
 
-        wvars["daysPerRow"] = self._daysPerRow
-        wvars["firstDay"] = self._firstDay
-        wvars["lastDay"] = self._lastDay
         return wvars
 
     def _getItemType(self, item):
