@@ -340,7 +340,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
             while retry:
                 if params.get("typeTT","normalTT")=="normalTT":
                     filename = "timetable.pdf"
-                    pdf = TimeTablePlain(self._target,self.getAW(),
+                    pdf = TimeTablePlain(self._target, session.user,
                             showSessions=self._showSessions,showDays=self._showDays,
                             sortingCrit=self._sortingCrit, ttPDFFormat=ttPDFFormat,
                             pagesize = self._pagesize, fontsize = self._fontsize,
