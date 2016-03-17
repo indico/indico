@@ -16,6 +16,11 @@
  */
 
 
+@import "base/palette";
+@import "base/defaults";
+@import "base/typography";
+
+
 #sessions {
     .show-session-blocks {
         cursor: pointer;
@@ -50,6 +55,31 @@
                 .speaker-icon {
                     font-size: 1.5em;
                     float: right;
+                }
+            }
+        }
+    }
+}
+
+#session-display {
+    .infoline {
+        .text {
+            padding-left: 0;
+        }
+
+        ul {
+            padding: 0;
+            list-style-type: none;
+
+            li {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin: 5px 0;
+                padding: 0 5px;
+
+                a {
+                    padding: 5px;
                 }
             }
         }

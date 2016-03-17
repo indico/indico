@@ -16,11 +16,20 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from io import BytesIO
+
+from flask import session, request
+from pytz import timezone
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.sessions.util import get_sessions_for_user
+from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.util import get_sessions_for_user, serialize_session_for_ical
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference
+from indico.modules.events.util import get_base_ical_parameters
+from indico.web.flask.util import send_file
+from indico.web.http_api.metadata.serializer import Serializer
+from MaKaC.common.timezoneUtils import DisplayTZ
+from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -34,3 +43,46 @@ class RHDisplaySessionList(RHConferenceBaseDisplay):
         sessions = get_sessions_for_user(self.event_new, session.user)
         return WPDisplayMySessionsConference.render_template('display/session_list.html', self._conf,
                                                              event=self.event_new, sessions=sessions)
+
+
+class RHDisplaySessionBase(RHConferenceBaseDisplay):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.session
+        }
+    }
+
+    def _checkProtection(self):
+        if not self.session.can_access(session.user):
+            raise Forbidden
+
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
+
+
+class RHDisplaySession(RHDisplaySessionBase):
+    def _process(self):
+        ical_params = get_base_ical_parameters(session.user, self.event_new, 'sessions')
+        session_contribs = [c for c in self.session.contributions if not c.is_deleted]
+        tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
+        return WPDisplayMySessionsConference.render_template('display/session_display.html', self._conf,
+                                                             sess=self.session, event=self.event_new,
+                                                             session_contribs=session_contribs, timezone=tz,
+                                                             **ical_params)
+
+
+class RHExportSessionToICAL(RHDisplaySessionBase):
+    def _process(self):
+        data = {'results': serialize_session_for_ical(self.session)}
+        serializer = Serializer.create('ics')
+        return send_file('session.ics', BytesIO(serializer(data)), 'text/calendar')
+
+
+class RHExportSessionTimetableToPDF(RHDisplaySessionBase):
+    def _process(self):
+        pdf_format = TimetablePDFFormat(params={'coverPage': False})
+        pdf = TimeTablePlain(self._conf, session.user, showSessions=[self.session.id], showDays=[], sortingCrit=None,
+                             ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal', firstPageNumber=1,
+                             showSpeakerAffiliation=False)
+        return send_file('session-timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
