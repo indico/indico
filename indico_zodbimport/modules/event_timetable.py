@@ -821,6 +821,7 @@ class EventTimetableImporter(Importer):
             except Exception:
                 self.print_error(cformat('%{red!}MIGRATION FAILED!'), event_id=event.id)
                 traceback.print_exc()
+                raw_input('Press ENTER to continue')
 
     def _iter_events(self):
         it = self.zodb_root['conferences'].itervalues()
