@@ -1125,158 +1125,173 @@ class TimeTablePlain(PDFWithTOC):
                 story.append(PageBreak())
             current_day += timedelta(days=1)
 
-class SimplifiedTimeTablePlain(PDFBase):
 
-    def __init__(self,conf,aw,showSessions=[],showDays=[],sortingCrit=None, ttPDFFormat=None, pagesize = 'A4', fontsize = 'normal', tz=None):
-        self._conf=conf
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        self._aw=aw
-        self._showSessions=showSessions
-        self._showDays=showDays
-        PDFBase.__init__(self, story=[], pagesize = pagesize)
-        self._title= _("Simplified Programme")
-        self._doc.leftMargin=1*cm
-        self._doc.rightMargin=1*cm
-        self._doc.topMargin=1*cm
-        self._doc.bottomMargin=1*cm
-        self._sortingCrit=sortingCrit
+class SimplifiedTimeTablePlain(PDFBase):
+    def __init__(self, conf, aw, showSessions=[], showDays=[], sortingCrit=None, ttPDFFormat=None, pagesize='A4',
+                 fontsize='normal', tz=None):
+        self._conf = conf
+        self._event = conf.as_event
+        self._tz = tz or self._conf.getTimezone()
+        self._aw = aw
+        self._showSessions = showSessions
+        self._showDays = showDays
+        PDFBase.__init__(self, story=[], pagesize=pagesize)
+        self._title = _("Simplified Programme")
+        self._doc.leftMargin = 1 * cm
+        self._doc.rightMargin = 1 * cm
+        self._doc.topMargin = 1 * cm
+        self._doc.bottomMargin = 1 * cm
+        self._sortingCrit = sortingCrit
         self._ttPDFFormat = ttPDFFormat or TimetablePDFFormat()
         self._fontsize = fontsize
 
     def _defineStyles(self):
-        self._styles={}
-        normalStl=getSampleStyleSheet()["Normal"]
-        normalStl.fontName="Courier"
+        self._styles = {}
+        stylesheets = getSampleStyleSheet()
+
+        normalStl = stylesheets["Normal"]
+        normalStl.fontName = "Courier"
         normalStl.fontSize = modifiedFontSize(10, self._fontsize)
-        normalStl.spaceBefore=0
-        normalStl.spaceAfter=0
-        normalStl.alignment=TA_LEFT
-        self._styles["normal"]=normalStl
-        titleStl=getSampleStyleSheet()["Normal"]
-        titleStl.fontName="Courier-Bold"
+        normalStl.spaceBefore = 0
+        normalStl.spaceAfter = 0
+        normalStl.alignment = TA_LEFT
+        self._styles["normal"] = normalStl
+        titleStl = stylesheets["Normal"]
+        titleStl.fontName = "Courier-Bold"
         titleStl.fontSize = modifiedFontSize(12, self._fontsize)
-        titleStl.spaceBefore=0
-        titleStl.spaceAfter=0
-        titleStl.alignment=TA_LEFT
-        self._styles["title"]=titleStl
-        dayStl=getSampleStyleSheet()["Normal"]
-        dayStl.fontName="Courier-Bold"
+        titleStl.spaceBefore = 0
+        titleStl.spaceAfter = 0
+        titleStl.alignment = TA_LEFT
+        self._styles["title"] = titleStl
+        dayStl = stylesheets["Normal"]
+        dayStl.fontName = "Courier-Bold"
         dayStl.fontSize = modifiedFontSize(10, self._fontsize)
-        dayStl.spaceBefore=0
-        dayStl.spaceAfter=0
-        dayStl.alignment=TA_LEFT
-        self._styles["day"]=dayStl
+        dayStl.spaceBefore = 0
+        dayStl.spaceAfter = 0
+        dayStl.alignment = TA_LEFT
+        self._styles["day"] = dayStl
 
     def _haveSessionSlotsTitles(self, session):
         """Checks if the session has slots with titles or not"""
-        for ss in session.getSlotList():
-            if ss.getTitle().strip() != "":
+        for ss in session.blocks:
+            if ss.title.strip():
                 return True
         return False
 
-    def _processDayEntries(self,day,story):
-        lastSessions=[] # this is to avoid checking if the slots have titles for all the slots
-        res=[]
-        for entry in self._conf.getSchedule().getEntriesOnDay(day):
-            if isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                    isinstance(entry.getOwner(),conference.SessionSlot):
-                sessionSlot=entry.getOwner()
-                session = sessionSlot.getSession()
-                if len(self._showSessions)>0 and \
-                    session.getId() not in self._showSessions:
+    def _processDayEntries(self, day, story):
+        lastSessions = []  # this is to avoid checking if the slots have titles for all the slots
+        res = []
+        entries = (self._event.timetable_entries
+                   .filter(cast(TimetableEntry.start_dt) == day.date(),
+                           TimetableEntry.parent_id.is_(None))
+                   .order_by(TimetableEntry.start_dt))
+        for entry in entries:
+            if entry.type == TimetableEntryType.SESSION_BLOCK:
+                session_slot = entry.object
+                sess = session_slot.session
+                if self._showSessions and sess.id not in self._showSessions:
                     continue
-                if not sessionSlot.canView(self._aw):
+                if not session_slot.can_access(self._aw):
                     continue
-                if session in lastSessions:
+                if sess in lastSessions:
                     continue
-                if self._haveSessionSlotsTitles(session):
-                    e=sessionSlot
+                if self._haveSessionSlotsTitles(sess):
+                    e = session_slot
                 else:
-                    lastSessions.append(session)
-                    e=session
-                title=e.getTitle()
-                if title.strip()=="":
-                    title=e.getOwner().getTitle()
-                res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Session"):</b></font> %s""")%escape(title),self._styles["normal"]))
-                roomTime=""
-                if sessionSlot.getRoom() is not None:
-                    roomTime="%s "%(escape(sessionSlot.getRoom().getName()))
-                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, sessionSlot.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
-                        sessionSlot.getAdjustedEndDate(self._tz).strftime("%H:%M"))
-                res.append(Paragraph(roomTime,self._styles["normal"]))
-                chairs=[]
-                for c in sessionSlot.getOwnConvenerList():
-                    chairs.append("%s"%c.getFullName())
-                if chairs != []:
-                    res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Chair/s"):</b></font> %s""")%("; ".join(chairs)),self._styles["normal"]))
-                res.append(Spacer(1,0.2*inch))
-            elif self._ttPDFFormat.showContribsAtConfLevel() and isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                    isinstance(entry.getOwner(),conference.Contribution):
-                contrib=entry.getOwner()
-                if not contrib.canView(self._aw):
+                    lastSessions.append(sess)
+                    e = sess
+                title = e.title
+                res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Session"):</b></font> {}')
+                                     .format(escape(title)), self._styles["normal"]))
+                room_time = ""
+                if session_slot.room_name:
+                    room_time = escape(session_slot.room_name)
+                room_time = (i18nformat('<font face="Times-Bold"><b> _("Time and Place"):</b></font> {}({}-{})')
+                             .format(room_time, format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
+                res.append(Paragraph(room_time, self._styles["normal"]))
+                chairs = []
+                for c in session_slot.person_links:
+                    chairs.append(c.full_name)
+
+                if chairs:
+                    res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Chair/s"):</b></font> {}')
+                                         .format("; ".join(chairs)), self._styles["normal"]))
+                res.append(Spacer(1, 0.2 * inch))
+            elif self._ttPDFFormat.showContribsAtConfLevel() and entry.type == TimetableEntryType.CONTRIBUTION:
+                contrib = entry.object
+                if not contrib.can_access(self._aw):
                     continue
-                title=contrib.getTitle()
-                res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Contribution"):</b></font> %s""")%escape(title),self._styles["normal"]))
-                roomTime=""
-                if contrib.getRoom() is not None:
-                    roomTime="%s "%(escape(contrib.getRoom().getName()))
-                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, contrib.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
-                        contrib.getAdjustedEndDate(self._tz).strftime("%H:%M"))
-                res.append(Paragraph(roomTime,self._styles["normal"]))
-                spks=[]
-                for c in contrib.getSpeakerList():
-                    spks.append("%s"%c.getFullName())
-                if spks != []:
-                    res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Presenter/s"):</b></font> %s""")%("; ".join(spks)),self._styles["normal"]))
-                res.append(Spacer(1,0.2*inch))
-            elif self._ttPDFFormat.showBreaksAtConfLevel() and isinstance(entry,schedule.BreakTimeSchEntry):
-                title=entry.getTitle()
-                res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Break"):</b></font> %s""")%escape(title),self._styles["normal"]))
-                roomTime=""
-                if entry.getRoom() is not None:
-                    roomTime="%s "%(escape(entry.getRoom().getName()))
-                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
-                        entry.getAdjustedEndDate(self._tz).strftime("%H:%M"))
-                res.append(Paragraph(roomTime,self._styles["normal"]))
-                res.append(Spacer(1,0.2*inch))
+
+                title = contrib.title
+                res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Contribution"):</b></font> {}')
+                                     .format(escape(title)), self._styles["normal"]))
+                room_time = ""
+                if contrib.room_name:
+                    room_time = escape(contrib.room_name)
+
+                room_time = (i18nformat('<font face="Times-Bold"><b> _("Time and Place"):</b></font> {}({}-{})')
+                             .format(room_time, format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
+                res.append(Paragraph(room_time, self._styles["normal"]))
+                spks = []
+                for c in contrib.speakers:
+                    spks.append(c.full_name)
+                if spks:
+                    res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Presenter/s"):</b></font> {}')
+                                         .format("; ".join(spks)), self._styles["normal"]))
+                res.append(Spacer(1, 0.2 * inch))
+            elif self._ttPDFFormat.showBreaksAtConfLevel() and entry.type == TimetableEntryType.BREAK:
+                break_ = entry.object
+                title = break_.title
+                res.append(Paragraph(i18nformat('<font face="Times-Bold"><b> _("Break"):</b></font> {}')
+                                     .format(escape(title)), self._styles["normal"]))
+                room_time = ""
+                if break_.room_name:
+                    room_time = escape(break_.room_name)
+                room_time = (i18nformat('<font face="Times-Bold"><b> _("Time and Place"):</b></font> {}({}-{})')
+                             .format(room_time, format_date(entry.start_dt, timezone=self._tz),
+                                     format_date(entry.end_dt, timezone=self._tz)))
+                res.append(Paragraph(room_time, self._styles["normal"]))
+                res.append(Spacer(1, 0.2 * inch))
         res.append(PageBreak())
         return res
 
-    def getBody(self,story=None):
+    def getBody(self, story=None):
         self._defineStyles()
         if not story:
-            story=self._story
-        currentDay=self._conf.getSchedule().getAdjustedStartDate(self._tz)
-        while currentDay.strftime("%Y-%m-%d")<=self._conf.getSchedule().getAdjustedEndDate(self._tz).strftime("%Y-%m-%d"):
-            if len(self._showDays)>0 and \
-                    currentDay.strftime("%d-%B-%Y") not in self._showDays:
-                currentDay+=timedelta(days=1)
+            story = self._story
+
+        currentDay = self._event.start_dt
+        while currentDay <= self._event.end_dt:
+            if len(self._showDays) > 0 and currentDay.strftime("%d-%B-%Y") not in self._showDays:
+                currentDay += timedelta(days=1)
                 continue
-            dayEntries=self._processDayEntries(currentDay,story)
-            if len(dayEntries)==0:
-                currentDay+=timedelta(days=1)
+
+            dayEntries = self._processDayEntries(currentDay, story)
+            if not dayEntries:
+                currentDay += timedelta(days=1)
                 continue
-            if self._conf.getAdjustedEndDate(self._tz).month != self._conf.getAdjustedEndDate(self._tz).month:
-                text="%s - %s-%s"%(escape(self._conf.getTitle()), escape(self._conf.getAdjustedStartDate(self._tz).strftime("%d %B %Y")), \
-                    escape(self._conf.getAdjustedEndDate(self._tz).strftime("%d %B %Y")) )
+            if self._event.end_dt.astimezone(timezone(self._tz)).month != self._conf.getAdjustedEndDate(self._tz).month:
+                text = "%s - %s-%s" % (escape(self._event.title), escape(format_date(self._event.start_dt,
+                                                                                     timezone=self._tz)),
+                                       escape(format_date(self._event.end_dt, timezone=self._tz)))
             else:
-                text="%s - %s-%s"%(escape(self._conf.getTitle()), escape(self._conf.getAdjustedStartDate(self._tz).strftime("%d")), \
-                        escape(self._conf.getAdjustedEndDate(self._tz).strftime("%d %B %Y")) )
-            if self._conf.getLocation() is not None:
-                text="%s, %s."%(text, self._conf.getLocation().getName())
-            text="%s"%text
-            p=Paragraph(text, self._styles["title"])
+                text = "%s - %s-%s" % (escape(self._event.title),
+                                       escape(format_date(self._event.start_dt, format='dd', timezone=self._tz)),
+                                       escape(format_date(self._event.end_dt, format='dd MM YY', timezone=self._tz)))
+            if self._event.venue_name:
+                text = "%s, %s." % (text, self._event.venue_name)
+            text = "%s" % text
+            p = Paragraph(text, self._styles["title"])
             story.append(p)
-            text2= i18nformat(""" _("Daily Programme"): %s""")%escape(currentDay.strftime("%A %d %B %Y"))
-            p2=Paragraph(text2,self._styles["day"])
+            text2 = i18nformat(""" _("Daily Programme"): %s""") % escape(currentDay.strftime("%A %d %B %Y"))
+            p2 = Paragraph(text2, self._styles["day"])
             story.append(p2)
-            story.append(Spacer(1,0.4*inch))
+            story.append(Spacer(1, 0.4 * inch))
             for entry in dayEntries:
                 story.append(entry)
-            currentDay+=timedelta(days=1)
+            currentDay += timedelta(days=1)
 
 
 class FilterCriteria(filters.FilterCriteria):
