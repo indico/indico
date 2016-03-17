@@ -2,12 +2,14 @@
 {% from 'events/timetable/display/indico/_contribution.html' import render_contribution %}
 {% from 'events/timetable/display/indico/_break.html' import render_break %}
 
-{% if days|length > 1 %}
+{% set day_list = days|list %}
+
+{% if day_list|length > 1 %}
     <div class="toolbar right">
         <div class="group right js-go-to-day">
             <a href="" class="i-button icon-calendar arrow" data-toggle="dropdown"></a>
             <ul class="dropdown">
-                {% for day in days %}
+                {% for day, _ in day_list %}
                     <li>
                         <a href="#day-{{ day.isoformat() }}">
                             {{ day | format_date(format='full', timezone=timezone) }}
