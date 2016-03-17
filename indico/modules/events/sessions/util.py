@@ -153,3 +153,26 @@ def get_sessions_for_user(event, user):
                         ~Session.is_deleted)
                 .all())
     return {sess for sess in sessions if any(user in entry.principal for entry in iter_acl(sess.acl_entries))}
+
+
+def serialize_session_for_ical(sess):
+    session_data = {
+        '_fossil': 'sessionMetadata',
+        'id': sess.id,
+        'startDate': sess.start_dt,
+        'endDate': sess.end_dt,
+        'url': '',
+        'title': sess.title,
+        'location': sess.venue_name,
+        'roomFullname': sess.room_name,
+        'description': ''
+    }
+
+    description = ''
+    for c in sess.contributions:
+        if c.speakers:
+            speakers = ('{} ({})'.format(s.person.full_name, s.person.affiliation) for s in c.speakers)
+            description += 'Speakers: {}\n'.format(', '.join(speakers))
+
+    session_data['description'] = description
+    return session_data
