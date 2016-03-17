@@ -36,8 +36,9 @@ logger = Logger.get('events.contributions')
 def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, allow_key=True):
         return
-    return SideMenuItem('contributions', _('Contributions'), url_for('contributions.manage_contributions', event),
-                        section='organization')
+    if event.type == 'conference':
+        return SideMenuItem('contributions', _('Contributions'), url_for('contributions.manage_contributions', event),
+                            section='organization')
 
 
 @signals.users.merged.connect
