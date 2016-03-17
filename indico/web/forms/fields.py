@@ -310,8 +310,8 @@ class EventPersonListField(PrincipalListField):
     """
 
     def __init__(self, *args, **kwargs):
-        super(EventPersonListField, self).__init__(*args,
-                                                   groups=False, allow_external=True, serializable=False, **kwargs)
+        super(EventPersonListField, self).__init__(*args, groups=False, allow_external=True, serializable=False,
+                                                   **kwargs)
 
     @property
     def event(self):

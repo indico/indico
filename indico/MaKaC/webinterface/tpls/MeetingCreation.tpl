@@ -80,7 +80,7 @@
             </tr>
 
             <tr>
-                <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Chairperson") }</span></td>
+                <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Chairpersons") }</span></td>
                 <%include file="EventParticipantAddition.tpl"/>
             </tr>
             <tr>

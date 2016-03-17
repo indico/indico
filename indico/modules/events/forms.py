@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.modules.events.fields import ReferencesField
+from indico.modules.events.fields import ReferencesField, EventPersonLinkListField
 from indico.modules.events.models.references import ReferenceType, EventReference
 from indico.web.forms.fields import HiddenFieldList, IndicoStaticTextField, IndicoLocationField
 from indico.web.forms.widgets import CKEditorWidget
@@ -78,3 +78,14 @@ class EventReferencesForm(IndicoForm):
 
 class EventLocationForm(IndicoForm):
     location_data = IndicoLocationField(_('Location'))
+
+
+class EventPersonLinkForm(IndicoForm):
+    person_link_data = EventPersonLinkListField(_('Chairpersons'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        self.event_type = kwargs.pop('event_type')
+        super(EventPersonLinkForm, self).__init__(*args, **kwargs)
+        if self.event_type == 'lecture':
+            self.person_link_data.label.text = _('Speakers')

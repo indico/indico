@@ -41,7 +41,7 @@
         <%include file="EventLocationInfo.tpl" args="modifying=False, showParent=False, conf=False"/>
         <tr>
             <td nowrap class="titleCellTD">
-                <span class="titleCellFormat">${ _("Speaker") }</span>
+                <span class="titleCellFormat">${ _("Speakers") }</span>
             </td>
             <%include file="EventParticipantAddition.tpl"/>
         </tr>
