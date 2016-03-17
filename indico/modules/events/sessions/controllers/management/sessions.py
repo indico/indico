@@ -75,7 +75,8 @@ class RHCreateSession(RHManageSessionsBase):
     def _process(self):
         inherited_location = self.event_new.location_data
         inherited_location['inheriting'] = True
-        form = SessionForm(obj=FormDefaults(colors=self._get_random_color(), location_data=inherited_location))
+        form = SessionForm(obj=FormDefaults(colors=self._get_random_color(), location_data=inherited_location),
+                           event=self.event_new)
         if form.validate_on_submit():
             new_session = create_session(self.event_new, form.data)
             sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event_new.sessions]
@@ -88,7 +89,7 @@ class RHModifySession(RHManageSessionBase):
     """Modify a session"""
 
     def _process(self):
-        form = SessionForm(obj=self.session)
+        form = SessionForm(obj=self.session, event=self.event_new)
         if form.validate_on_submit():
             update_session(self.session, form.data)
             return jsonify_data(html=_render_session_list(self.event_new))

@@ -45,6 +45,12 @@ class SessionForm(IndicoForm):
     is_poster = BooleanField(_('Poster session'), widget=SwitchWidget(),
                              description=_('Whether the session is a poster session.'))
 
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event')
+        super(SessionForm, self).__init__(*args, **kwargs)
+        if event.type != 'conference':
+            del self.is_poster
+
 
 class SessionProtectionForm(IndicoForm):
     protection_mode = IndicoProtectionField(_('Protection mode'))
