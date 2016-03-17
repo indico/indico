@@ -27,13 +27,13 @@ from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
-from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -48,7 +48,7 @@ def _get_next_friendly_id(context):
 
 
 class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin,
-                   AttachedNotesMixin, db.Model):
+                   AttachedNotesMixin, PersonLinkDataMixin, db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True),
                          db.Index(None, 'event_id', 'track_id'),
@@ -280,20 +280,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def start_dt(self):
         return self.timetable_entry.start_dt if self.is_scheduled else None
-
-    @property
-    def person_link_data(self):
-        return {x: x.is_submitter for x in self.person_links}
-
-    @person_link_data.setter
-    @no_autoflush
-    def person_link_data(self, value):
-        self.person_links = value.keys()
-        for person_link, is_submitter in value.iteritems():
-            person = person_link.person
-            principal = person.user if person.user is not None else EmailPrincipal(person.email)
-            action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
-            self.update_principal(principal, **action)
 
     @property
     def speakers(self):

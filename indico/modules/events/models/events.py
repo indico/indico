@@ -34,6 +34,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string, escape_like, db_dates_overlap
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps
 from indico.util.decorators import classproperty, strict_classproperty
@@ -41,7 +42,8 @@ from indico.util.string import return_ascii, format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
 
-class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin, AttachedNotesMixin, db.Model):
+class Event(DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin, AttachedNotesMixin,
+            PersonLinkDataMixin, db.Model):
     """An Indico event
 
     This model contains the most basic information related to an event.
