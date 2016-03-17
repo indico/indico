@@ -231,3 +231,24 @@ def get_contributions_with_user_as_submitter(event, user):
                 .filter(Contribution.acl_entries.any(ContributionPrincipal.has_management_role('submit')))
                 .all())
     return {c for c in contribs if any(user in entry.principal for entry in iter_acl(c.acl_entries))}
+
+
+def serialize_contribution_for_ical(contrib):
+    contrib_data = {
+        '_fossil': 'contributionMetadata',
+        'id': contrib.id,
+        'startDate': contrib.timetable_entry.start_dt if contrib.timetable_entry else None,
+        'endDate': contrib.timetable_entry.end_dt if contrib.timetable_entry else None,
+        'url': '',
+        'title': contrib.title,
+        'location': contrib.venue_name,
+        'roomFullname': contrib.room_name
+    }
+
+    description = ''
+    if contrib.speakers:
+        speakers = ('{} ({})'.format(s.person.full_name, s.person.affiliation) for s in contrib.speakers)
+        description = 'Speakers: {}\n'.format(', '.join(speakers))
+
+    contrib_data['description'] = description
+    return contrib_data
