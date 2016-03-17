@@ -1,0 +1,53 @@
+{% extends 'layout/conference_page_base.html' %}
+{% from 'events/contributions/display/_contribution_list.html' import render_contribution_list,
+                                                                      render_displayed_entries_fragment %}
+
+{% block title %}
+    {% trans %}Contribution List{% endtrans %}
+{% endblock %}
+
+{% block content -%}
+    <div class="toolbar">
+        <div class="right">
+            <div class="group">
+                <a href="{{ url_for('.contribution_list_pdf', event) }}"
+                   class="i-button icon-file-pdf">{% trans %}Export to PDF{% endtrans %}</a>
+            </div>
+            <div class="group">
+                <button class="i-button icon-filter js-dialog-action"
+                        data-href="{{ url_for('.customize_contribution_list', event) }}"
+                        data-title="{% trans %}Contribution list configuration{% endtrans %}"
+                        data-dialog-classes="report-filter-dialog"
+                        data-update='{"html": "#display-contribution-list", "counter": "#counter"}'
+                        data-ajax-dialog>
+                    {%- trans %}Filters{% endtrans -%}
+                </button>
+            </div>
+            <div class="group">
+                <button class="i-button icon-link js-static-url"
+                        data-href="{{ url_for('.contribution_list_static_url', event) }}"
+                        title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+            </div>
+            <div id="counter" class="group">
+                {{- render_displayed_entries_fragment(contribs|length, total_entries) -}}
+            </div>
+            <div class="group">
+                <span class="i-button label icon-search"></span>
+                <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+            </div>
+        </div>
+    </div>
+    <div id="display-contribution-list" class="contribution-list">
+        {{ render_contribution_list(event, timezone, contribs) }}
+    </div>
+    <script>
+        setupEventDisplayContributionList();
+    </script>
+    {% if event.type != 'conference' -%}
+        <p>
+            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+                {%- trans %}Back to the event{% endtrans -%}
+            </a>
+        </p>
+    {%- endif %}
+{%- endblock %}
