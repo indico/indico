@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.sessions.controllers.display import RHDisplaySessionList
+from indico.modules.events.sessions.controllers.display import (RHDisplaySessionList, RHDisplaySession,
+                                                                RHExportSessionToICAL, RHExportSessionTimetableToPDF)
 from indico.modules.events.sessions.controllers.management.protection import RHSessionCoordinatorPrivs
 from indico.modules.events.sessions.controllers.management.sessions import (RHSessionsList, RHCreateSession,
                                                                             RHModifySession, RHDeleteSessions,
@@ -50,3 +51,7 @@ _bp.add_url_rule('/manage/sessions/coordinator-privs/<priv>', 'coordinator_privs
 
 # Display
 _bp.add_url_rule('/sessions/mine', 'my_sessions', RHDisplaySessionList)
+_bp.add_url_rule('/sessions/<int:session_id>/', 'display_session', RHDisplaySession)
+_bp.add_url_rule('/sessions/<int:session_id>/session.ics', 'export_ics', RHExportSessionToICAL)
+_bp.add_url_rule('/sessions/<int:session_id>/session-timetable.pdf', 'export_session_timetable',
+                 RHExportSessionTimetableToPDF)
