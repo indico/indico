@@ -148,6 +148,10 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def speakers(self, value):
         self.person_links = value.keys()
 
+    @property
+    def location_parent(self):
+        return self.contribution
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
