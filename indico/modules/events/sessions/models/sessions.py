@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import timedelta
+from operator import attrgetter
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -30,6 +31,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.modules.events.timetable.models.entries import TimetableEntryType, TimetableEntry
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -151,6 +153,23 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     def session(self):
         """Convenience property so all event entities have it"""
         return self
+
+    @property
+    def start_dt(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        start_dt = (self.event_new.timetable_entries
+                    .with_entities(TimetableEntry.start_dt)
+                    .join('session_block')
+                    .filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
+                            SessionBlock.session == self)
+                    .order_by(TimetableEntry.start_dt)
+                    .first())
+        return start_dt[0] if start_dt else None
+
+    @property
+    def end_dt(self):
+        sorted_blocks = sorted(self.blocks, key=attrgetter('timetable_entry.end_dt'), reverse=True)
+        return sorted_blocks[0].timetable_entry.end_dt if sorted_blocks else None
 
     @locator_property
     def locator(self):
