@@ -6,292 +6,241 @@ defaults:
 definitions:
   # Lectures - base
   event:
-    event_types:
-    - simple_event
+    event_types: [simple_event]
     stylesheet: indico.scss
     template: indico/lecture.html
     title: Event
   lecture:
-    event_types:
-    - simple_event
+    event_types: [simple_event]
     stylesheet: indico.scss
     template: indico/lecture.html
     title: Lecture
 
   # Meetings - base
   standard:
-    event_types:
-    - conference
-    - meeting
+    event_types: [conference, meeting]
     stylesheet: indico.scss
     template: indico/meeting.html
     title: Indico style
   standard_inline_minutes:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: indico.scss
     template: indico/meeting.html
     title: Indico style - inline minutes
     settings:
-        show_notes: true
+      show_notes: true
   nicecompact:
-    event_types:
-    - conference
-    - meeting
+    event_types: [conference, meeting]
     stylesheet: compact.scss
     template: compact.html
     title: Compact style
   indico-weeks-view:
-    event_types:
-    - conference
-    - meeting
+    event_types: [conference, meeting]
     stylesheet: meetings/Weeks.css
     template: weeks.html
     title: Indico Weeks View
 
   # Static
   static:
-    event_types:
-    - conference
-    - simple_event
-    - meeting
+    event_types: [conference, simple_event, meeting]
     stylesheet: null
     template: null
     title: Parallel
 
   # Lectures - CERN extensions from base
   egee_lecture:
-    event_types:
-    - simple_event
+    event_types: [simple_event]
     stylesheet: egee.scss
     template: indico/lecture.html
     title: EGEE lecture
   picosec_endtofpet_lectures:
-    event_types:
-    - simple_event
+    event_types: [simple_event]
     stylesheet: picosec_endotofpet.scss
     template: indico/lecture.html
     title: PicoSEC - EndoTOFPET US
   picosec_lecture:
-    event_types:
-    - simple_event
+    event_types: [simple_event]
     stylesheet: picosec.scss
     template: indico/lecture.html
     title: PicoSEC Lectures
   tical-lectures:
-    event_types:
-    - simple_event
+    event_types: [simple_event]
     stylesheet: tical.scss
     template: indico/lecture.html
     title: TICAL
 
   # Meetings - CERN extensions from base
   atlas:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: atlas.scss
     template: indico/meeting.html
     title: ATLAS meeting
   cms:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: cms.scss
     template: indico/meeting.html
     title: CMS meeting
   alice_meeting:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: alice.scss
     template: indico/meeting.html
     title: ALICE meeting
   lhcb_meeting:
-    event_types:
-    - conference
-    - meeting
+    event_types: [conference, meeting]
     stylesheet: lhcb.scss
     template: indico/meeting.html
     title: LHCb meeting
   cast:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: cast.scss
     template: indico/meeting.html
     title: CAST meeting
   fcc:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: fcc.scss
     template: indico/meeting.html
     title: FCC
   ilc:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: ilc.scss
     template: indico/meeting.html
     title: ILC style
   intelum:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: intelum.scss
     template: indico/meeting.html
     title: Intelum
   fast:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: fast.scss
     template: indico/meeting.html
     title: FAST meetings
   EuroCirCol:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: eurocirccol.scss
     template: indico/meeting.html
     title: EuroCirCol
   crystal_clear:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: crystalclear.scss
     template: indico/meeting.html
     title: Crystal Clear
   egee_meeting:
-    event_types:
-    - conference
-    - meeting
+    event_types: [conference, meeting]
     stylesheet: egee.scss
     template: indico/meeting.html
     title: EGEE meeting
   endotofpet:
-    event_types:
-    - simple_event
-    - meeting
+    event_types: [simple_event, meeting]
     stylesheet: endotofpet.scss
     template: indico/meeting.html
     title: EndoTOFPET
   openlab:
-      event_types:
-      - meeting
-      stylesheet: openlab.scss
-      template: indico/meeting.html
-      title: Openlab
-      settings:
-          logo_link: http://www.cern.ch/openlab
+    event_types: [meeting]
+    stylesheet: openlab.scss
+    template: indico/meeting.html
+    title: Openlab
+    settings:
+      logo_link: http://www.cern.ch/openlab
   lcg:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: lcg.scss
     template: indico/meeting.html
     title: LCG style
   picosec:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: picosec.scss
     template: openlab.html
     title: Picosec
   picosec_endtofpet:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: picosec_endotofpet.scss
     template: openlab.html
     title: PicoSEC - EndoTOFPET US
   tical-meetings:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: tical.scss
     template: indico/meeting.html
     title: TICAL Meetings
   totem_meeting:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: totem.scss
     template: indico/meeting.html
     title: TOTEM meeting
   sa2:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: staff_assoc_modern.scss
     template: indico/meeting.html
     title: Staff Association (with time)
 
   # Meetings - CERN Administrative
   administrative:
-    event_types:
-    - conference
-    - meeting
+    event_types: [conference, meeting]
     stylesheet: administrative.scss
     template: administrative/event.html
     title: Administrative style
   administrative2:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: administrative.scss
     template: administrative/event.html
     title: Administrative style (with time)
     settings:
-        hide_time: false
+      hide_time: false
   administrative4:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: administrative.scss
     template: administrative/event.html
     title: Administrative style (all material)
     settings:
-        link_documents: false
+      link_documents: false
   cern_committees:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: cern_committees.scss
     template: cern_committees.html
     tt_template: administrative/event.html
     title: CERN Committees
     settings:
-        session_attachments: true
-        hide_time: false
-        show_numerals: false
-        print_mode: true
+      session_attachments: true
+      hide_time: false
+      show_numerals: false
+      print_mode: true
   lhcrrb:
-    event_types: []
+    event_types: [meeting]
     stylesheet: lhc_rrb.scss
     template: cern_committees.html
     tt_template: administrative/event.html
     title: LHC RRB
     settings:
-        session_attachments: true
-        hide_time: false
-        show_numerals: false
+      session_attachments: true
+      hide_time: false
+      show_numerals: false
   pf:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: administrative.scss
     template: pension_fund.html
     tt_template: administrative/event.html
     title: Pension Fund
     settings:
-        link_documents: false
+      link_documents: false
   sa:
-    event_types:
-    - meeting
+    event_types: [meeting]
     stylesheet: administrative.scss
     template: administrative/event.html
     settings:
-        show_notes: true
-        title_en: 'Staff Association'
-        title_fr: 'Association du Personnel'
+      show_notes: true
+      title_en: 'Staff Association'
+      title_fr: 'Association du Personnel'
     title: Staff Association
 
   # XML
   jacow:
-    event_types:
-    - conference
-    - simple_event
+    event_types: [conference, simple_event]
     is_xml: true
     stylesheet: null
     template: JACoW.xsl
     title: JACoW XML
   xml:
-    event_types:
-    - conference
-    - simple_event
-    - meeting
+    event_types: [conference, simple_event, meeting]
     is_xml: true
     stylesheet: null
     template: XML.xsl
