@@ -214,9 +214,9 @@ class TimetableMigration(object):
     def _create_person(self, old_person, with_event=False, skip_empty_email=False):
         email = getattr(old_person, '_email', None) or getattr(old_person, 'email', None)
         email = sanitize_email(convert_to_unicode(email).lower()) if email else email
-        if not is_valid_mail(email, False):
+        if email and not is_valid_mail(email, False):
             email = None
-            if not skip_empty_email:
+            if skip_empty_email:
                 self.importer.print_warning(cformat('%{yellow!}Skipping invalid email {}').format(email),
                                             event_id=self.event.id)
         if not email and skip_empty_email:
