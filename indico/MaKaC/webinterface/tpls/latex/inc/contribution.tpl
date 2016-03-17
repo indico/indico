@@ -6,7 +6,7 @@
     \small
     \sffamily
     \noindent
-    ${_(u"Contribution ID")} : \textbf {${contrib.id}}
+    ${_(u"Contribution ID")} : \textbf {${contrib.friendly_id}}
     \hfill
     ${_("Type")} : \textbf {${contrib.type.name if contrib.type else _('not specified')}}
 }
