@@ -1,0 +1,117 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% from 'attachments/_attachments.html' import render_attachments %}
+{% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
+
+{% block title -%}
+    {% trans title=sess.title %}{{ title }}{% endtrans %}
+{%- endblock %}
+
+{% block page_actions -%}
+    <div class="toolbar right">
+        {% if sess.can_manage(session.user, role='coordinate') -%}
+            <a href="#" class="i-button icon-edit"
+               data-title="{% trans %}Edit session{% endtrans %}"
+               data-href="{{ url_for('.modify_session', sess) }}"
+               data-ajax-dialog
+               data-reload-after></a>
+        {%- endif %}
+        <div class="group">
+            <a href="{{ url_for('.export_session_timetable', sess) }}" class="i-button icon-file-pdf"></a>
+            {% if sess.start_dt -%}
+                <a id="exportIcal{{ sess.id }}" href="#"
+                   class="i-button icon-calendar exportIcal"
+                   data-id="{{ sess.id }}"></a>
+            {%- endif %}
+        </div>
+        {% if sess.start_dt -%}
+            {% with item=sess, ics_url=url_for('.export_ics', sess) -%}
+                {% include 'events/sessions/display/session_ical_export.html' %}
+            {%- endwith %}
+        {%- endif %}
+    </div>
+{%- endblock %}
+
+{% block content -%}
+    <div id="session-display">
+        <div class="infogrid condensed">
+            <div class="infoline">
+                <i class="icon-time"></i>
+                <div class="text">
+                    <div>
+                        <span>
+                            {% if sess.start_dt -%}
+                                {{ sess.start_dt|format_datetime }}
+                            {%- else -%}
+                                {% trans %}Session not scheduled yet.{% endtrans %}
+                            {%- endif %}
+                        </span>
+                    </div>
+                    <div>
+                        <span>
+                            {% if sess.end_dt -%}
+                                {{ sess.end_dt|format_datetime }}
+                            {%- endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if sess.blocks -%}
+            <div class="infogrid condensed">
+                <div class="infoline">
+                    <div class="text">
+                        <h2>{% trans %}Conveners{% endtrans %}</h2>
+                        {% for block in sess.blocks -%}
+                            <span><strong>{{ block.title }}</strong></span>
+                            <ul>
+                                {% for convener in block.person_links -%}
+                                    <li class="icon-user">
+                                        <a href="mailto:{{ convener.person.email }}">{{ convener.person.full_name }}</a>
+                                        ({{ convener.person.affiliation }})
+                                    </li>
+                                {%- else -%}
+                                    <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
+                                {%- endfor %}
+                            </ul>
+                        {%- endfor %}
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
+
+        {% if session_contribs %}
+            <h2>{% trans %}Session contributions{% endtrans %}</h2>
+            <div id="session-contrib-list" class="contribution-list">
+                {{ render_contribution_list(event, timezone, session_contribs, false) }}
+            </div>
+            <div class="i-box titled no-padding">
+                <div class="i-box-header">
+                    <div class="i-box-title icon-attachment">
+                        {% trans %}Materials{% endtrans %}
+                    </div>
+                    <div class="i-box-buttons toolbar right">
+                        <div class="group">
+                            {% if sess.can_manage_attachments(session.user) -%}
+                                <a href="#" class="i-button icon-edit"
+                                   data-locator="{{ sess.locator|tojson|forceescape }}"
+                                   data-attachment-editor></a>
+                            {%- endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    <div class="attachments-box">
+                        {{ render_attachments(sess.attached_items, management=false) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# TODO: Add session timetable here #}
+
+    </div>
+    <script>
+        setupAttachmentTreeView();
+    </script>
+{%- endblock %}

@@ -17,14 +17,18 @@
                 <tr>
                     <td>
                         {% if sess.can_manage(session.user) %}
-                            <a href="{{ url_for('.session_list', event) }}">{{ sess.title }}</a>
+                            <a href="{{ url_for('.display_session', sess) }}">{{ sess.title }}</a>
                         {% else %}
                             {{ sess.title }}
                         {% endif %}
                     </td>
                     <td>
                         <div class="group right">
-                            <a href="#" class="icon-time" title="{% trans %}Go to this session timetable{% endtrans %}"></a>
+                            <a href="#" class="icon-edit" title="{% trans %}Edit the session{% endtrans %}"
+                               data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
+                               data-href="{{ url_for('.modify_session', sess) }}"
+                               data-ajax-dialog
+                               data-reload-after></a>
                         </div>
                     </td>
                 </tr>
