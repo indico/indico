@@ -141,7 +141,6 @@
                     return false;
                 }
                 if( editor.clean()){
-                    $E('chairperson').set(Json.write(uf.getUsers()));
                     $E('description').set(editor.get());
                     injectFromProtectionChooser();
                     return true
