@@ -333,12 +333,11 @@ class ContributionFetcher(SessionContribFetcher):
     }
 
     def contribution(self, idlist):
-        ch = ConferenceHolder()
-        event = ch.getById(self._eventId)
+        event = Event.find(id=self._eventId, is_deleted=False).first()
 
         def _iterate_objs(objIds):
             for objId in objIds:
-                obj = event.getContributionById(objId)
+                obj = event.contributions.filter_by(id=objId).one()
                 if obj is not None:
                     yield obj
 

@@ -1,0 +1,215 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% from 'attachments/_attachments.html' import render_attachments %}
+{% from 'events/display/indico/_common.html' import render_location %}
+
+{% block title -%}
+    {{ contribution.title }}
+{%- endblock %}
+
+{% block page_actions -%}
+    <div class="toolbar right">
+        {% if contribution.can_manage(session.user) -%}
+            <a href="#" class="i-button icon-edit"
+               data-title="{% trans %}Edit contribution{% endtrans %}"
+               data-href="{{ url_for('.manage_update_contrib', contribution) }}"
+               data-ajax-dialog
+               data-reload-after></a>
+        {%- endif %}
+        <div class="group">
+            <a href="{{ url_for('.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+            {% if contribution.timetable_entry -%}
+                <a id="exportIcal{{ contribution.id }}" href="#"
+                   class="i-button icon-calendar exportIcal"
+                   data-id="{{ contribution.id }}"></a>
+            {%- endif %}
+        </div>
+
+        {% if contribution.timetable_entry -%}
+            {% with item=contribution, ics_url=url_for('.export_ics', contribution) -%}
+                {% include 'events/contributions/display/contribution_ical_export.html' %}
+            {%- endwith %}
+        {%- endif %}
+    </div>
+{%- endblock %}
+
+{% block content -%}
+    {# TODO: Add abstract related info #}
+    <div id="contribution-display">
+        <div class="infogrid condensed">
+            <div class="infoline">
+                <i class="icon-time"></i>
+                <div class="text">
+                    <div>
+                        <span>
+                            {% if contribution.timetable_entry -%}
+                                {{ contribution.timetable_entry.start_dt|format_datetime }}
+                            {%- else -%}
+                                {% trans %}Not scheduled yet{% endtrans %}
+                            {%- endif %}
+                        </span>
+                    </div>
+                    {% if contribution.duration -%}
+                        <div>
+                            <span>
+                                {{ contribution.duration|format_human_timedelta }}
+                            </span>
+                        </div>
+                    {%- endif %}
+                </div>
+            </div>
+            {% if contribution.has_location_info %}
+                <div class="infoline">
+                    <div class="text">
+                        {{ render_location(contribution, class='contribution-location') }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="toolbar">
+            {% if contribution.track -%}
+                <span class="icon-stack contrib-track">
+                    {{ contribution.track.getTitle() }}
+                </span>
+            {%- endif %}
+            {% if contribution.session -%}
+                <span class="icon-star contrib-session" style="{{ contribution.session.colors.css }}">
+                    <a href="{{ url_for('sessions.display_session', contribution.session) }}"
+                       style="color: #{{ contribution.session.colors.text }}">{{ contribution.session.title }}</a>
+                </span>
+            {%- endif %}
+            {% if contribution.type -%}
+                <span class="contrib-type">
+                    {{ contribution.type.name }}
+                </span>
+            {%- endif %}
+        </div>
+
+        <div class="infogrid condensed">
+            {% if contribution.primary_authors %}
+                <div class="infoline">
+                    <div class="text">
+                        <h3>
+                            {% trans count=contribution.primary_authors|length -%}
+                                Primary author
+                            {%- pluralize -%}
+                                Primary authors
+                            {%- endtrans %}
+                        </h3>
+                        <ul>
+                            {% for author in contribution.primary_authors -%}
+                                <li class="icon-user">
+                                    <a href="{{ url_for('.display_author', author) }}">
+                                        {{- author.full_name -}}
+                                    </a>{% if author.affiliation %} ({{ author.affiliation }}){% endif %}
+                                </li>
+                            {%- endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            {% if contribution.secondary_authors %}
+                <div class="infoline">
+                    <div class="text">
+                        <h3>
+                            {% trans count=contribution.secondary_authors -%}
+                                Co-author
+                            {%- pluralize -%}
+                                Co-authors
+                            {%- endtrans %}
+                        </h3>
+                        <ul>
+                            {% for coauthor in contribution.secondary_authors -%}
+                                <li class="icon-user">
+                                    <a href="{{ url_for('.display_author', coauthor) }}">
+                                        {{ coauthor.full_name }}
+                                    </a>{% if coauthor.affiliation %} ({{ coauthor.affiliation }}){% endif %}
+                                </li>
+                            {%- endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            {% if contribution.speakers %}
+                <div class="infoline">
+                    <div class="text">
+                        <h3>
+                            {% trans count=contribution.speakers -%}
+                                Speaker
+                            {%- pluralize -%}
+                                Speakers
+                            {%- endtrans %}
+                        </h3>
+                        <ul>
+                            {% for speaker in contribution.speakers -%}
+                                <li class="icon-user">
+                                    {{ speaker.full_name }}
+                                </li>
+                            {%- endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="i-box-group vert">
+            <div class="i-box titled no-padding">
+                <div class="i-box-header">
+                    <div class="i-box-title icon-attachment">
+                        {% trans %}Materials{% endtrans %}
+                    </div>
+                    <div class="i-box-buttons toolbar right">
+                        <div class="group">
+                            {% if contribution.can_manage_attachments(session.user)
+                                or contribution.can_manage(session.user, role='submit') -%}
+                                <a href="#" class="i-button icon-edit"
+                                   data-locator="{{ contribution.locator|tojson|forceescape }}"
+                                   data-attachment-editor></a>
+                            {%- endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    <div class="attachments-box">
+                        {{ render_attachments(contribution.attached_items, management=false) }}
+                    </div>
+                </div>
+            </div>
+
+            {% if contribution.subcontributions -%}
+                <div class="i-box titled no-padding">
+                    <div class="i-box-header">
+                        <div class="i-box-title">
+                            {% trans %}Subcontributions{% endtrans %}
+                        </div>
+                    </div>
+                    <div class="i-box-content">
+                        <ul class="group-list no-content-before with-buttons">
+                            {% for subcontrib in contribution.subcontributions -%}
+                                <li>
+                                    <span>
+                                        <a href="{{ url_for('.subcontribution_display', subcontrib) }}">
+                                            {{ subcontrib.title }}
+                                        </a>
+                                    </span>
+                                    {% if subcontrib.can_manage(session.user) -%}
+                                        <span class="right group">
+                                            <a href="#" class="icon-edit"
+                                               data-href="{{ url_for('.manage_edit_subcontrib', subcontrib) }}"
+                                               data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
+                                               data-ajax-dialog
+                                               data-reload-after></a>
+                                        </span>
+                                    {%- endif %}
+                                </li>
+                            {%- endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {%- endif %}
+        </div>
+    </div>
+    <script>
+        setupAttachmentTreeView();
+    </script>
+{%- endblock %}

@@ -94,3 +94,15 @@ class SubmitterRole(ManagementRole):
     name = 'submit'
     friendly_name = _('Submission')
     description = _('Grants access to materials and minutes.')
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.contributions.util import get_contributions_with_user_as_submitter
+    from indico.modules.events.layout.util import MenuEntryData
+
+    def _visible_my_contributions(conf):
+        return session.user and bool(get_contributions_with_user_as_submitter(conf.as_event, session.user))
+
+    yield MenuEntryData(title=_("My Contributions"), name='my_contributions', visible=_visible_my_contributions,
+                        endpoint='contributions.my_contributions', position=2, parent='my_conference')

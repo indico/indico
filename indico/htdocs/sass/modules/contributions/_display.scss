@@ -74,13 +74,13 @@ $display-preview-bg-color: white;
     overflow-y: auto;
 
     &.empty {
-       @extend %font-family-sans;
+        @extend %font-family-sans;
         background-color: lighten($background-color, 2%);
         color: $gray;
         min-height: 2em;
         text-align: center;
         overflow-y: hidden;
-         font-size: 1em;
+        font-size: 1em;
 
         .instructions {
             padding: 10px;
@@ -102,6 +102,96 @@ $display-preview-bg-color: white;
 }
 
 .md-preview-wrapper.display {
-        padding: 1em 1em 1em 0;
-        @include md-preview-wrapper-mixin($display-preview-bg-color, none);
+    padding: 1em 1em 1em 0;
+    @include md-preview-wrapper-mixin($display-preview-bg-color, none);
+}
+
+#contribution-display {
+    .contrib-track {
+        margin-left: 5px;
+        float: right;
+        padding: 0.5em;
+        display: inline-block;
+        background: $dark-gray;
+        color: $light-blue;
+    }
+
+    .contrib-session {
+        margin-left: 5px;
+        float: right;
+        padding: 0.5em;
+        display: inline-block;
+
+        a {
+            line-height: 1em;
+        }
+    }
+
+    .contrib-type {
+        margin-left: 5px;
+        float: left;
+        padding: 0.5em;
+        display: inline-block;
+        background: $blue;
+    }
+
+    .contribution-location {
+        &::before {
+            font-size: 2rem;
+        }
+    }
+
+    .infoline {
+        .text {
+            padding-left: 0;
+        }
+
+        ul {
+            padding: 0;
+            list-style-type: none;
+
+            li {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin: 5px 0;
+                padding: 0 5px;
+
+                a {
+                    padding: 5px;
+                }
+            }
+        }
+    }
+}
+
+#subcontribution-display {
+    .subcontribution-location {
+        &::before {
+            font-size: 2rem;
+        }
+    }
+
+    .infoline {
+        .text {
+            padding-left: 0;
+        }
+
+        ul {
+            padding: 0;
+            list-style-type: none;
+
+            li {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin: 5px 0;
+                padding: 0 5px;
+
+                a {
+                    padding: 5px;
+                }
+            }
+        }
+    }
 }

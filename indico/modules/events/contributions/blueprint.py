@@ -16,7 +16,13 @@
 
 from __future__ import unicode_literals
 
-
+from indico.modules.events.contributions.controllers.display import (RHContributionDisplay,
+                                                                     RHContributionList, RHContributionAuthor,
+                                                                     RHContributionExportToPDF, RHContributionReport,
+                                                                     RHContributionExportToICAL,
+                                                                     RHContributionsExportToPDF,
+                                                                     RHContributionListStaticURL,
+                                                                     RHSubcontributionDisplay)
 from indico.modules.events.contributions.controllers.management import (RHContributions, RHCreateContribution,
                                                                         RHEditContribution, RHContributionREST,
                                                                         RHDeleteContributions, RHContributionPersonList,
@@ -98,3 +104,18 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>', 'manage_ty
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'delete_type',
                  RHDeleteContributionType, methods=('POST',))
+
+# Display
+_bp.add_url_rule('/contributions/', 'contribution_list', RHContributionList)
+_bp.add_url_rule('/contributions/contributions.pdf', 'contribution_list_pdf', RHContributionsExportToPDF)
+_bp.add_url_rule('/contributions/customize', 'customize_contribution_list', RHContributionReport,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/contributions/static-url', 'contribution_list_static_url', RHContributionListStaticURL,
+                 methods=('POST',))
+_bp.add_url_rule('/contributions/<int:contrib_id>/', 'display_contribution', RHContributionDisplay)
+_bp.add_url_rule('/contributions/<int:contrib_id>/author/<int:person_id>', 'display_author',
+                 RHContributionAuthor)
+_bp.add_url_rule('/contributions/<int:contrib_id>/contribution.pdf', 'export_pdf', RHContributionExportToPDF)
+_bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics', RHContributionExportToICAL)
+_bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'subcontribution_display',
+                 RHSubcontributionDisplay)

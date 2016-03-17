@@ -1,0 +1,44 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title -%}
+    {% trans full_name=author.full_name %}
+        Details for {{ full_name }}
+    {% endtrans %}
+{%- endblock %}
+
+{% block content %}
+    <table class="i-table fixed-width no-margin author-info">
+        <tr class="i-table content">
+            <td class="i-table caption">
+                {% trans %}Title{% endtrans %}
+            </td>
+            <td class="i-table value">
+                {{ author.title }}
+            </td>
+        </tr>
+        <tr class="i-table content">
+            <td class="i-table caption">
+                {% trans %}Affiliation{% endtrans %}
+            </td>
+            <td class="i-table value">
+                {{ author.affiliation }}
+            </td>
+        </tr>
+    </table>
+    {% if contribs -%}
+        <table class="i-table">
+            <tr>
+                <th style="text-align: left;">
+                    <h3>{% trans %}Author in the following contribution(s){% endtrans %}</h3>
+                </th>
+            </tr>
+            {% for contrib in contribs -%}
+                <tr class="i-table">
+                    <td class="i-table">
+                        <a href="{{ url_for('contributions.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                    </td>
+                </tr>
+            {%- endfor %}
+        </table>
+    {%- endif %}
+{% endblock %}
