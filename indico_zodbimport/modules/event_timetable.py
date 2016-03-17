@@ -26,11 +26,13 @@ from uuid import uuid4
 
 import click
 from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm.attributes import set_committed_value
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
@@ -101,6 +103,9 @@ class TimetableMigration(object):
         self.legacy_contribution_type_map = {}
         self.legacy_contribution_field_map = {}
         self.legacy_field_option_id_map = {}
+        # we know some relationships are empty; prevent SA from loading them
+        set_committed_value(self.event, 'references', [])
+        set_committed_value(self.event, 'person_links', [])
 
     def __repr__(self):
         return '<TimetableMigration({})>'.format(self.event)
@@ -786,6 +791,7 @@ class EventTimetableImporter(Importer):
                 self.all_users_by_email[email] = user
 
     def migrate(self):
+        update_session_options(db, {'expire_on_commit': False})
         self._load_data()
         self.migrate_reference_types()
         with patch_default_group_provider(self.default_group_provider):
