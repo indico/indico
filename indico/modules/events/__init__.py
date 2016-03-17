@@ -266,3 +266,11 @@ def _render_location_field(event, **kwargs):
     form = EventLocationForm(obj=FormDefaults(location_data=location_data))
     tpl = get_template_module('forms/_form.html')
     return tpl.form_row(form.location_data, skip_label=True)
+
+
+@template_hook('event-person-links-field')
+def _render_event_person_link_list_field(event, event_type, **kwargs):
+    from indico.modules.events.forms import EventPersonLinkForm
+    form = EventPersonLinkForm(event=event, event_type=event_type)
+    tpl = get_template_module('forms/_form.html')
+    return tpl.form_row(form.person_link_data, skip_label=True)

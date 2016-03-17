@@ -19,7 +19,7 @@ import re
 from cStringIO import StringIO
 from datetime import timedelta, datetime
 
-from flask import session
+from flask import session, request
 from pytz import timezone
 
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -48,6 +48,7 @@ from indico.core.errors import IndicoError
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.api import CategoryEventHook
+from indico.modules.events.forms import EventPersonLinkForm
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.operations import update_event
 from indico.modules.groups.legacy import GroupWrapper
@@ -229,13 +230,18 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
             self._wfReg.registerFactory( c, self._wf )
 
         eventAccessProtection = params.get("eventProtection", "inherit")
-
         if eventAccessProtection == "private" :
             c.getAccessController().setProtection(1)
         elif eventAccessProtection == "public" :
             c.getAccessController().setProtection(-1)
+
         avatars, newUsers, editedAvatars, allowedAvatars = self._getPersons()
         UtilPersons.addToConf(avatars, newUsers, editedAvatars, allowedAvatars, c, self._params.has_key('grant-manager'), self._params.has_key('presenter-grant-submission'))
+
+        # Add EventPersonLinks to the Event
+        person_links = self.get_event_person_links_data(c.as_event)
+        update_event(c.as_event, {'person_link_data': person_links})
+
         if params.get("sessionSlots",None) is not None :
             if params["sessionSlots"] == "enabled" :
                 c.enableSessionSlots()
@@ -243,6 +249,12 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
                 c.disableSessionSlots()
 
         return c
+
+    def get_event_person_links_data(self, event):
+        form = EventPersonLinkForm(event=event, event_type=event.type)
+        if not form.validate_on_submit():
+            raise FormValuesError(form.errors)
+        return form.person_link_data.data
 
     def _getPersons(self):
         cpAvatars, cpNewUsers, cpEditedAvatars , auAvatars, auNewUsers, auEditedAvatars = [], [], [] , [] , [] , []
