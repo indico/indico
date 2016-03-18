@@ -77,7 +77,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
-                regform.publish_registrations_enabled = str(regform.id) in data['participant_list_forms']
+                regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
         enabled_columns = []
@@ -115,8 +115,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         return WPManageRegistration.render_template('management/regform_display.html', self.event, event=self.event,
                                                     regforms=regforms, enabled_columns=enabled_columns,
                                                     disabled_columns=disabled_columns, enabled_forms=enabled_forms,
-                                                    disabled_forms=disabled_forms, merge_forms=merge_forms,
-                                                    form=form, is_regform=lambda x: isinstance(x, RegistrationForm))
+                                                    disabled_forms=disabled_forms, merge_forms=merge_forms, form=form)
 
 
 class RHManageRegistrationFormDisplay(RHManageRegFormBase):
