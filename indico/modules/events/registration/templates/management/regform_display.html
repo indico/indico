@@ -80,10 +80,9 @@
                 merged.
             {%- endtrans %}
         </p>
-        <div class="i-box titled sortable-column-preview">
-            {{ sortable_lists(_("Shown columns"), enabled_columns,
-                              _("Hidden columns"), disabled_columns) }}
-        </div>
+        {{ sortable_lists(_("Shown columns"), enabled_columns,
+                          _("Hidden columns"), disabled_columns,
+                          classes="i-box titled sortable-column-preview") }}
     </div>
 
     <div id="registration-forms">
@@ -92,11 +91,10 @@
                 By dragging the form titles, you can choose which to display and reorder them.
             {%- endtrans %}
         </p>
-        <div class="i-box titled sortable-form-preview">
-            {{ sortable_lists(_("Shown registration forms"), enabled_forms,
-                              _("Hidden registration forms"), disabled_forms,
-                              form_actions_macro) }}
-        </div>
+        {{ sortable_lists(_("Shown registration forms"), enabled_forms,
+                          _("Hidden registration forms"), disabled_forms,
+                          actions_macro=form_actions_macro,
+                          classes="i-box titled sortable-form-preview") }}
     </div>
 
     <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
@@ -109,6 +107,7 @@
     <script>
         (function () {
             'use strict';
+
             function update() {
                 var mergeForms = $('#merge-forms').prop('checked');
                 $('#participant-list-columns').toggle(mergeForms);
@@ -116,18 +115,6 @@
             }
 
             $('#merge-forms').on('change', update).trigger('change');
-
-            $('.sortable-column-preview ul').sortable({
-                connectWith: '.sortable-column-preview ul',
-                placeholder: 'i-label sortable-item placeholder',
-                forcePlaceholderSize: true
-            });
-
-            $('.sortable-form-preview ul').sortable({
-                connectWith: '.sortable-form-preview ul',
-                placeholder: 'i-label sortable-item placeholder',
-                forcePlaceholderSize: true
-            });
 
             var $form = $('#js-participant-display-form');
             $form.on('submit', function() {
@@ -139,7 +126,6 @@
                 };
                 if (mergeForms) {
                     $form.find('#publish-registrations input:checked').each(function() {
-                        window.console.log($(this).attr('id'));
                         data.participant_list_forms.push($(this).attr('id'));
                     });
                 } else {

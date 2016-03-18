@@ -5,10 +5,9 @@
 {{ form_rows(form) }}
 
 <div id="participant-list-form-columns">
-    <div class="i-box titled sortable-column-preview">
-        {{ sortable_lists(_("Shown columns"), enabled_columns,
-                          _("Hidden columns"), disabled_columns) }}
-    </div>
+    {{ sortable_lists(_("Shown columns"), enabled_columns,
+                      _("Hidden columns"), disabled_columns,
+                      classes="i-box titled sortable-column-preview") }}
 </div>
 <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
 
@@ -18,11 +17,7 @@
     (function () {
         'use strict';
 
-        $('#participant-list-form-columns ul').sortable({
-            connectWith: '#participant-list-form-columns ul',
-            placeholder: 'i-label sortable-item placeholder',
-            forcePlaceholderSize: true
-        });
+        setupRegistrationSortableLists($('#participant-list-form-columns .js-sortable-list-widget'));
 
         function updateHiddenField() {
             var data = {'columns': []};
